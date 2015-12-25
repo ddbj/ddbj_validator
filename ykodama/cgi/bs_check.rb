@@ -1,6 +1,7 @@
 #! /usr/bin/env ruby
 # -*- coding: utf-8 -*-
 
+# biosample をチェックする ruby cgi
 # 指定した BioSample SSUB ID/SAMD に対する項目を抽出
 
 require 'rubygems'
