@@ -1,2 +1,2 @@
-# ddbj_validatior
+# ddbj_validator
 DDBJ Validation Rule/Validator/Module/API server
