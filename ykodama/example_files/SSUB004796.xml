@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<BioSample access="public" publication_date="2015-09-01T12:03:33+09:00" last_update="2015-09-01T12:03:33+09:00">
+    <Ids>
+        <Id is_primary="1" namespace="BioSample">SAMD00039988</Id>
+    </Ids>
+    <Description>
+        <SampleName>QA2_cryo</SampleName>
+        <Title>Cryoconite granule on Qaanaaq Glacier:site QA2</Title>
+        <Organism taxonomy_id="77133">
+            <OrganismName>uncultured bacterium</OrganismName>
+        </Organism>
+    </Description>
+    <Owner>
+        <Name url="http://www.nipr.ac.jp/english/">National Institute of Polar Research</Name>
+        <Contacts>
+            <Contact email="juetake@nipr.ac.jp">
+                <Name>
+                    <First>jun</First>
+                    <Last>uetake</Last>
+                </Name>
+            </Contact>
+        </Contacts>
+    </Owner>
+    <Models>
+        <Model>MIMS.me.microbial</Model>
+    </Models>
+    <Attributes>
+        <Attribute attribute_name="sample_name">QA2_cryo</Attribute>
+        <Attribute attribute_name="bioproject_id">PRJDB3974</Attribute>
+        <Attribute attribute_name="collection_date">2012-07</Attribute>
+        <Attribute attribute_name="env_biome">glacier</Attribute>
+        <Attribute attribute_name="env_feature">ice surface</Attribute>
+        <Attribute attribute_name="env_material">cryoconite granule</Attribute>
+        <Attribute attribute_name="geo_loc_name">Greenland: Qaanaaq, Qaanaaq Glacier</Attribute>
+        <Attribute attribute_name="lat_lon">77.4977 N 69.2119 W</Attribute>
+        <Attribute attribute_name="project_name">Bactria communities in cryoconite granule</Attribute>
+        <Attribute attribute_name="depth">0 m</Attribute>
+        <Attribute attribute_name="elev">441 m</Attribute>
+    </Attributes>
+</BioSample>

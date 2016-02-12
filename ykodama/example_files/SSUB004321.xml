@@ -1,0 +1,820 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BioSampleSet>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031378</Id>
+    </Ids>
+    <Description>
+      <SampleName>coffee-1</SampleName>
+      <Title>compost made from coffee lees spot1</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">coffee-1</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031379</Id>
+    </Ids>
+    <Description>
+      <SampleName>coffee-2</SampleName>
+      <Title>compost made from coffee lees spot2</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">coffee-2</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031380</Id>
+    </Ids>
+    <Description>
+      <SampleName>coffee-3</SampleName>
+      <Title>compost made from coffee lees spot3</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">coffee-3</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031381</Id>
+    </Ids>
+    <Description>
+      <SampleName>coffee-4</SampleName>
+      <Title>compost made from coffee lees spot4</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">coffee-4</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031382</Id>
+    </Ids>
+    <Description>
+      <SampleName>goma-1</SampleName>
+      <Title>farm soil with no fertilization spot1</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">goma-1</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031383</Id>
+    </Ids>
+    <Description>
+      <SampleName>goma-2</SampleName>
+      <Title>farm soil with no fertilization spot2</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">goma-2</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031384</Id>
+    </Ids>
+    <Description>
+      <SampleName>goma-3</SampleName>
+      <Title>farm soil with no fertilization spot3</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">goma-3</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031385</Id>
+    </Ids>
+    <Description>
+      <SampleName>goma-4</SampleName>
+      <Title>farm soil with no fertilization spot4</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">goma-4</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031386</Id>
+    </Ids>
+    <Description>
+      <SampleName>kasai-1</SampleName>
+      <Title>farm soil fertilized by coffee compost much spot1</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">kasai-1</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031387</Id>
+    </Ids>
+    <Description>
+      <SampleName>kasai-2</SampleName>
+      <Title>farm soil fertilized by coffee compost much spot2</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">kasai-2</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031388</Id>
+    </Ids>
+    <Description>
+      <SampleName>kasai-3</SampleName>
+      <Title>farm soil fertilized by coffee compost much spot3</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">kasai-3</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031389</Id>
+    </Ids>
+    <Description>
+      <SampleName>kasai-4</SampleName>
+      <Title>farm soil fertilized by coffee compost much spot4</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">kasai-4</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031390</Id>
+    </Ids>
+    <Description>
+      <SampleName>yastu-1</SampleName>
+      <Title>farm soil fertilized by coffee compost a little spot1</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">yastu-1</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031391</Id>
+    </Ids>
+    <Description>
+      <SampleName>yastu-2</SampleName>
+      <Title>farm soil fertilized by coffee compost a little spot2</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">yastu-2</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031392</Id>
+    </Ids>
+    <Description>
+      <SampleName>yastu-3</SampleName>
+      <Title>farm soil fertilized by coffee compost a little spot3</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">yastu-3</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+  <BioSample access="public" publication_date="2015-06-03T15:25:09+09:00" last_update="2015-06-03T15:25:09+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00031393</Id>
+    </Ids>
+    <Description>
+      <SampleName>yastu-4</SampleName>
+      <Title>farm soil fertilized by coffee compost a little spot4</Title>
+      <Organism taxonomy_id="702656">
+        <OrganismName>compost metagenome</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.fasmac.co.jp/index.html">NGS Group, business development unit, FASMAC Co., Ltd</Name>
+      <Contacts>
+        <Contact email="knakano@fasmac.co.jp">
+          <Name>
+            <First>koichiro</First>
+            <Last>nakano</Last>
+          </Name>
+        </Contact>
+        <Contact email="hkatsumata@fasmac.co.jp">
+          <Name>
+            <First>hiroshi</First>
+            <Last>katsumata</Last>
+          </Name>
+        </Contact>
+        <Contact email="yhanda@fasmac.co.jp">
+          <Name>
+            <First>yoshihiro</First>
+            <Last>handa</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIMS.me.soil</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">yastu-4</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
+      <Attribute attribute_name="collection_date">2015-05-08</Attribute>
+      <Attribute attribute_name="env_biome">village biome</Attribute>
+      <Attribute attribute_name="env_feature">farm</Attribute>
+      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
+      <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
+      <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
+      <Attribute attribute_name="depth">0.1m</Attribute>
+      <Attribute attribute_name="elev">230</Attribute>
+    </Attributes>
+  </BioSample>
+</BioSampleSet>
+
