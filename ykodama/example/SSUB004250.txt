@@ -1,0 +1,13 @@
+biosample_accession	*sample_name	*sample_title	description	*organism	*taxonomy_id	bioproject_id	strain	breed	cultivar	isolate	label	biomaterial_provider	collection_date	env_biome	geo_loc_name	host	subspecf_gen_lin	tissue_type	age	anamorph	authority	cell_line	cell_type	collected_by	culture_collection	dev_stage	disease	disease_stage	genotype	haplotype	health_state	host_body_site	isolation_source	lab_host	passage_history	pathovar	phenotype	sample_type	serotype	serovar	sex	specimen_voucher	subgroup	subtype	teleomorph
+SAMD00029877	PR0070_21_a	PR0070_21_a	Ovary ground control	Oryzias latipes	8090	PRJDB3903												ovary																											
+SAMD00029878	PR0070_22_a	PR0070_22_a	Ovary space flight	Oryzias latipes	8090	PRJDB3903												ovary																											
+SAMD00029879	PR0070_23_a	PR0070_23_a	Testis ground control	Oryzias latipes	8090	PRJDB3903												testis																											
+SAMD00029880	PR0070_24_a	PR0070_24_a	Testis space flight	Oryzias latipes	8090	PRJDB3903												testis																											
+SAMD00029881	PR0070_27_a	PR0070_27_a	Liver ground control	Oryzias latipes	8090	PRJDB3903												liver																											
+SAMD00029882	PR0070_28_a	PR0070_28_a	Liver space flight	Oryzias latipes	8090	PRJDB3903												liver																											
+SAMD00029883	PR0070_43_a	PR0070_43_a	Brain ground control	Oryzias latipes	8090	PRJDB3903												brain																											
+SAMD00029884	PR0070_44_a	PR0070_44_a	Brain space flight	Oryzias latipes	8090	PRJDB3903												brain																											
+SAMD00029885	PR0070_45_a	PR0070_45_a	Eye ground control	Oryzias latipes	8090	PRJDB3903												eye																											
+SAMD00029886	PR0070_46_a	PR0070_46_a	Eye space flight	Oryzias latipes	8090	PRJDB3903												eye																											
+SAMD00029887	PR0070_57_a	PR0070_57_a	Hind intestine space flight	Oryzias latipes	8090	PRJDB3903												hind intestine																											
+SAMD00029888	PR0070_62_a	PR0070_62_a	Hind intestine ground control	Oryzias latipes	8090	PRJDB3903												hind intestine																											

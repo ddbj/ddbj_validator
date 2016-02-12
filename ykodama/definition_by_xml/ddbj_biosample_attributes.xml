@@ -1,0 +1,3010 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BioSampleAttributes>
+  <Attribute>
+    <Name>sample_name</Name>
+    <HarmonizedName/>
+    <Description>The sample name is a name that you choose for the sample, it works as an ID. Each sample name must be unique in a submission. Sample name cannot be changed after registration. After submitting BioSamples from D-way, BioSamples are sorted in alphabetical order of sample_name values</Description>
+    <DescriptionJapanese>sample name は登録者がサンプルに付ける名前で ID として機能します。sample name は Submission においてユニークである必要があります。登録後は sample name を変更することはできません。1 submission 中で投稿された複数サンプルは sample_name のアルファベット順に並べ替えられますのでご注意ください。</DescriptionJapanese>
+    <Format>[A-Z][a-z][0-9](){}[]+-_.</Format>
+    <Synonym/>
+    <Package use="mandatory">Generic</Package>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>sample_title</Name>
+    <HarmonizedName/>
+    <Description>Sample title should be short and informative. Each sample title must be unique in a submission. Examples: 1) Escherichia coli O104:H4 str. C227-11 clinical isolate 2010_333_NC-6; 2) CD8+ T cells from female TSG6-knockout BALB/c mouse; 3) Human metagenome isolated from urine of healthy female.</Description>
+    <DescriptionJapanese>タイトルはサンプルをよく表す簡潔なものを記入します。 タイトルは Submission においてユニークである必要があります。 例: 1) Escherichia coli O104:H4 str. C227-11 clinical isolate 2010_333_NC-6; 2) CD8+ T cells from female TSG6-knockout BALB/c mouse; 3) Human metagenome isolated from urine of healthy female.</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="mandatory">Generic</Package>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>description</Name>
+    <HarmonizedName/>
+    <Description>A brief description for the sample.</Description>
+    <DescriptionJapanese>サンプルに対する簡潔な補足情報。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>organism</Name>
+    <HarmonizedName/>
+    <Description>The most descriptive organism name for this sample (to the species, if relevant) in the NCBI Taxonomy database. If it is not in the database, provide as much information about the organism as possible and the DDBJ staff apply a new organism name to NCBI Taxonomy.</Description>
+    <DescriptionJapanese>NCBI Taxonomy database に登録されている最も下位のランクの生物名 (適切な場合は species まで)。データベースに登録されていない場合，未登録の生物に関する情報をできるだけ記入してください。 DDBJ スタッフが NCBI Taxonomy に未登録の生物を申請します。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="mandatory">Generic</Package>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>taxonomy_id</Name>
+    <HarmonizedName/>
+    <Description>NCBI Taxonomy identifier. This is appropriate for individual organisms, some metagenomes and environmental samples. If it is not in the database, enter a tentative ID (e.g., 1). The DDBJ staff apply a new organism name to NCBI Taxonomy, and then the tentative ID is replaced by an assigned TaxID.</Description>
+    <DescriptionJapanese>NCBI Taxonomy identifier. 個別の生物、メタゲノム、環境サンプルに割り当てられています。データベースに登録されていない場合，仮の ID (例: 1)を記入してください。 DDBJ スタッフが NCBI Taxonomy に未登録の生物を申請後、割り当てられた TaxID に差し替えます。</DescriptionJapanese>
+    <Format>{integer}</Format>
+    <Synonym/>
+    <Package use="mandatory">Generic</Package>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>bioproject_id</Name>
+    <HarmonizedName/>
+    <Description>Associated BioProject accession number (PRJDB)</Description>
+    <DescriptionJapanese>関連する BioProject アクセッション番号 (PRJDB)</DescriptionJapanese>
+    <Format>PRJDB[0-9]+</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>locus_tag_prefix</Name>
+    <HarmonizedName/>
+    <Description>"A locus tag prefix for an annotated genome/locus tag qualifier"</Description>
+    <DescriptionJapanese>"アノテーションを記載するゲノムに対するユニークな locus_tag_prefix /locus tag について"</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+  </Attribute>
+  <Attribute>
+    <Name>strain</Name>
+    <HarmonizedName/>
+    <Description>Microbial/eukaryotic strain name</Description>
+    <DescriptionJapanese>微生物や真核生物の株名。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>breed</Name>
+    <HarmonizedName/>
+    <Description>Breed name - chiefly used in domesticated animals or plants</Description>
+    <DescriptionJapanese>品種の名称。主に家畜化された動物に用いられます。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>cultivar</Name>
+    <HarmonizedName/>
+    <Description>Cultivar name - cultivated variety of plant</Description>
+    <DescriptionJapanese>植物の栽培品種名。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>isolate</Name>
+    <HarmonizedName/>
+    <Description>Identification or description of the specific individual from which this sample was obtained</Description>
+    <DescriptionJapanese>サンプルの得られた individual isolate</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>label</Name>
+    <HarmonizedName/>
+    <Description>A label for sample, or name of an individual animal (e.g., Clint)</Description>
+    <DescriptionJapanese>単離されたサンプルのラベル名，もしくは個々の動物の名前 (例: Clint)。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>biomaterial_provider</Name>
+    <HarmonizedName/>
+    <Description>name and address of the lab or PI, or a culture collection identifier</Description>
+    <DescriptionJapanese>実験材料の提供元(例: culture collection identifier，Principal Investigator，研究室名)</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>collection_date</Name>
+    <HarmonizedName/>
+    <Description>Time of sampling (single instance or interval, eg., 2008-01-23T19:23:10, 2008-01-23, 2008-01, 2008, 1952-10-21T11:43Z/1952-10-21T17:43Z, 1952-10-21/1953-02-15, 1952-10/1953-02, 1952/1953)</Description>
+    <DescriptionJapanese>サンプルを採取した日付 (例: 2008-01-23T19:23:10, 2008-01-23, 2008-01, 2008, 1952-10-21T11:43Z/1952-10-21T17:43Z, 1952-10-21/1953-02-15, 1952-10/1953-02, 1952/1953)</DescriptionJapanese>
+    <Format>{timestamp}</Format>
+    <Synonym>collection date</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>env_biome</Name>
+    <HarmonizedName/>
+    <Description>Descriptor of the broad ecological context of a sample. Examples include: desert, taiga or deciduous woodland. FAQ: What is the difference between biome, feature and material? EnvO (v 2013-06-14) terms can be found via the link: www.environmentontology.org/Browse-EnvO</Description>
+    <DescriptionJapanese>サンプルに関する広い生態学的な環境。例: desert, taiga, deciduous woodland。FAQ: biome，feature，material の違いは？。EnvO (v 2013-06-14) 用語は次のリストから探すことができます: www.environmentontology.org/Browse-EnvO</DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>environmental biome</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>env_feature</Name>
+    <HarmonizedName/>
+    <Description>Descriptor of the local environment. Examples include: harbor, cliff, or lake. FAQ: What is the difference between biome, feature and material? EnvO (v 2013-06-14) terms can be found via the link: www.environmentontology.org/Browse-EnvO</Description>
+    <DescriptionJapanese>局所的な環境。例：harbor, cliff, lake。FAQ: biome，feature，material の違いは？。EnvO (v 2013-06-14) 用語は次のリストから探すことができます: www.environmentontology.org/Browse-EnvO</DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>environmental feature</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>env_material</Name>
+    <HarmonizedName/>
+    <Description>Material that was displaced by the sample, or material in which a sample was embedded, prior to the sampling event. Examples include: air, soil, or water. FAQ: What is the difference between biome, feature and material? EnvO (v 2013-06-14) terms can be found via the link: www.environmentontology.org/Browse-EnvO</Description>
+    <DescriptionJapanese>サンプリングする前、サンプルによって置換されていた物質やサンプルが埋め込まれていた物質。例: air, soil, water。FAQ: biome，feature，material の違いは？。EnvO (v 2013-06-14) 用語は次のリストから探すことができます: www.environmentontology.org/Browse-EnvO</DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>environment (material)</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>geo_loc_name</Name>
+    <HarmonizedName/>
+    <Description>Geographical origin of the sample; use the appropriate name from this list. Use a colon to separate the country or ocean from more detailed information about the location, eg "Japan:Kanagawa, Hakone, Lake Ashi" </Description>
+    <DescriptionJapanese>サンプルを得た地域。このリストから国, 大洋, または, 海, の名称を選択します。 コロンに続けて地方・地域を示します。 例：Japan:Kanagawa, Hakone, Lake Ashi</DescriptionJapanese>
+    <Format>{term}:{term}:{text}</Format>
+    <Synonym>geographic location (country and/or sea,region)</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>lat_lon</Name>
+    <HarmonizedName/>
+    <Description>The geographical coordinates of the location where the sample was collected. Specify as decimal degrees latitude and longitude in format "d[d.dddd] N|S d[dd.dddd] W|E", eg, “47.94 N 28.12 W” “45.0123 S 4.1234 E”</Description>
+    <DescriptionJapanese>サンプルが採取された位置の地理的座標。 (書式：d[d.dddd] d[dd.dddd] ) (例： "47.94 N 28.12 W", "45.0123 S 4.1234 E") 小数点以下の数字は分秒ではなく小数で記載してください。</DescriptionJapanese>
+    <Format>{float} {float}</Format>
+    <Synonym>geographic location (latitude and longitude)</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>project_name</Name>
+    <HarmonizedName/>
+    <Description>A concise name that describes the overall project, for example "Analysis of sequences collected from Antarctic soil"</Description>
+    <DescriptionJapanese>全体のプロジェクトを記載した簡潔な名称。(例： Analysis of sequences collected from Antarctic soil)</DescriptionJapanese>
+    <Format>{text}</Format>
+    <Synonym>project name</Synonym>
+    <Package use="mandatory">MIMS.me</Package>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+    <Package use="mandatory">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>isol_growth_condt</Name>
+    <HarmonizedName/>
+    <Description>Publication reference in the form of pubmed ID, DOI or URL for isolation and growth condition specifications of the organism/material</Description>
+    <DescriptionJapanese>単離や生育条件の詳細を記載している pubmed ID, DOI, あるいは URL</DescriptionJapanese>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>isolation and growth condition</Synonym>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+    <Package use="mandatory">MIMARKS.specimen</Package>
+  </Attribute>
+  <Attribute>
+    <Name>ref_biomaterial</Name>
+    <HarmonizedName/>
+    <Description>Primary publication if isolated before genome publication; otherwise, primary genome report in the form of pubmed ID, DOI or URL</Description>
+    <DescriptionJapanese>Primary publication か primary genome report の pubmed ID, DOI, URL</DescriptionJapanese>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>reference for biomaterial</Synonym>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>num_replicons</Name>
+    <HarmonizedName/>
+    <Description>Reports the number of replicons in a nuclear genome of eukaryotes, in the genome of a bacterium or archaea or the number of segments in a segmented virus. Always applied to the haploid chromosome count of a eukaryote</Description>
+    <DescriptionJapanese>真核生物の核ゲノム、微生物のゲノムにおけるレプリコンの数、セグメント化されたウィルスにおけるセグメントの数。</DescriptionJapanese>
+    <Format>{integer}</Format>
+    <Synonym>number of replicons</Synonym>
+    <Package use="mandatory">MIGS.ba</Package>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>estimated_size</Name>
+    <HarmonizedName/>
+    <Description>Estimated size of genome</Description>
+    <DescriptionJapanese>ゲノムの推定のサイズ</DescriptionJapanese>
+    <Format>{integer} bp</Format>
+    <Synonym>estimated size</Synonym>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>ploidy</Name>
+    <HarmonizedName/>
+    <Description>The ploidy level of the genome (e.g. allopolyploid, haploid, diploid, triploid, tetraploid). </Description>
+    <DescriptionJapanese>ゲノムの倍数性レベル (例: allopolyploid, haploid, diploid, triploid, tetraploid)</DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>ploidy</Synonym>
+    <Package use="mandatory">MIGS.eu</Package>
+  </Attribute>
+  <Attribute>
+    <Name>propagation</Name>
+    <HarmonizedName/>
+    <Description>This field is specific to different taxa. For phage: lytic/lysogenic/temperate/obligately lytic; for plasmid: incompatibility group; for eukaryote: asexual/sexual</Description>
+    <DescriptionJapanese>増殖・繁殖方法。Phage: lytic/lysogenic/temperate/obligately lytic から選択します。Plasmid: 不和合性グループを記載します。真核生物: asexual/sexual のどちらか選択します。</DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>propagation</Synonym>
+    <Package use="mandatory">MIGS.eu</Package>
+    <Package use="mandatory">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>biotic_relationship</Name>
+    <HarmonizedName/>
+    <Description>Free-living or from host (define relationship)</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'free living', 'parasite', 'commensal', 'symbiont']</Format>
+    <Synonym>observed biotic relationship</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+  </Attribute>
+  <Attribute>
+    <Name>encoded_traits</Name>
+    <HarmonizedName/>
+    <Description>Traits like antibiotic resistance/xenobiotic degration phenotypes/converting phage genes</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>encoded traits</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>extrachrom_elements</Name>
+    <HarmonizedName/>
+    <Description>Plasmids that have significance phenotypic consequence</Description>
+    <DescriptionJapanese/>
+    <Format>{integer}</Format>
+    <Synonym>extrachromosomal elements</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+  </Attribute>
+  <Attribute>
+    <Name>health_disease_stat</Name>
+    <HarmonizedName/>
+    <Description>Health or disease status of specific host at time of collection</Description>
+    <DescriptionJapanese>収集時の宿主の健康状態</DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>health or disease status of specific host at time of collection</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>host</Name>
+    <HarmonizedName/>
+    <Description>The natural (as opposed to laboratory) host to the organism from which the sample was obtained. Use the full taxonomic name, eg, "Homo sapiens".</Description>
+    <DescriptionJapanese>生物の(実験室ではない)自然界における宿主の学名 (例: Homo sapiens)</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>specific host, host, nat-host</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.host-associated</Package>
+    <Package use="optional">MIGS.eu.host-associated</Package>
+    <Package use="optional">MIGS.vi.host-associated</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.human-associated</Package>
+    <Package use="optional">MIGS.eu.human-associated</Package>
+    <Package use="optional">MIGS.vi.human-associated</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.human-gut</Package>
+    <Package use="optional">MIGS.eu.human-gut</Package>
+    <Package use="optional">MIGS.vi.human-gut</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.human-oral</Package>
+    <Package use="optional">MIGS.eu.human-oral</Package>
+    <Package use="optional">MIGS.vi.human-oral</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.human-skin</Package>
+    <Package use="optional">MIGS.eu.human-skin</Package>
+    <Package use="optional">MIGS.vi.human-skin</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.human-vaginal</Package>
+    <Package use="optional">MIGS.eu.human-vaginal</Package>
+    <Package use="optional">MIGS.vi.human-vaginal</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba.plant-associated</Package>
+    <Package use="optional">MIGS.eu.plant-associated</Package>
+    <Package use="optional">MIGS.vi.plant-associated</Package>
+  </Attribute>
+  <Attribute>
+    <Name>host_spec_range</Name>
+    <HarmonizedName/>
+    <Description>Taxid of the specific host if known</Description>
+    <DescriptionJapanese>宿主の NCBI taxonomy ID</DescriptionJapanese>
+    <Format>{integer}</Format>
+    <Synonym>host specificity or range</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>pathogenicity</Name>
+    <HarmonizedName/>
+    <Description>To what is the entity pathogenic</Description>
+    <DescriptionJapanese/>
+    <Format>{term}</Format>
+    <Synonym>known pathogenicity</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+  </Attribute>
+  <Attribute>
+    <Name>rel_to_oxygen</Name>
+    <HarmonizedName/>
+    <Description>Aerobic or anaerobic</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'aerobe', 'anaerobe', 'facultative', 'microaerophilic', 'microanaerobe', 'obligate aerobe', 'obligate anaerobe']</Format>
+    <Synonym>relationship to oxygen</Synonym>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>samp_collect_device</Name>
+    <HarmonizedName/>
+    <Description>Method or device employed for collecting sample</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>sample collection device or method</Synonym>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>samp_mat_process</Name>
+    <HarmonizedName/>
+    <Description>Processing applied to the sample during or after isolation</Description>
+    <DescriptionJapanese/>
+    <Format>{text|term}</Format>
+    <Synonym>sample material processing</Synonym>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+    <Package use="optional">MIMARKS.survey</Package>
+  </Attribute>
+  <Attribute>
+    <Name>sample_size</Name>
+    <HarmonizedName/>
+    <Description>Amount or size of sample</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>samp_size, sample size, amount or size of sample collected</Synonym>
+    <Package use="optional">MIGS.ba.air</Package>
+    <Package use="optional">MIGS.eu.air</Package>
+    <Package use="optional">MIGS.vi.air</Package>
+    <Package use="optional">MIMARKS.specimen.air</Package>
+    <Package use="optional">MIGS.ba.host-associated</Package>
+    <Package use="optional">MIGS.eu.host-associated</Package>
+    <Package use="optional">MIGS.vi.host-associated</Package>
+    <Package use="optional">MIMARKS.specimen.host-associated</Package>
+    <Package use="optional">MIGS.ba.human-associated</Package>
+    <Package use="optional">MIGS.eu.human-associated</Package>
+    <Package use="optional">MIGS.vi.human-associated</Package>
+    <Package use="optional">MIMARKS.specimen.human-associated</Package>
+    <Package use="optional">MIGS.ba.human-gut</Package>
+    <Package use="optional">MIGS.eu.human-gut</Package>
+    <Package use="optional">MIGS.vi.human-gut</Package>
+    <Package use="optional">MIMARKS.specimen.human-gut</Package>
+    <Package use="optional">MIGS.ba.human-oral</Package>
+    <Package use="optional">MIGS.eu.human-oral</Package>
+    <Package use="optional">MIGS.vi.human-oral</Package>
+    <Package use="optional">MIMARKS.specimen.human-oral</Package>
+    <Package use="optional">MIGS.ba.human-skin</Package>
+    <Package use="optional">MIGS.eu.human-skin</Package>
+    <Package use="optional">MIGS.vi.human-skin</Package>
+    <Package use="optional">MIMARKS.specimen.human-skin</Package>
+    <Package use="optional">MIGS.ba.human-vaginal</Package>
+    <Package use="optional">MIGS.eu.human-vaginal</Package>
+    <Package use="optional">MIGS.vi.human-vaginal</Package>
+    <Package use="optional">MIMARKS.specimen.human-vaginal</Package>
+    <Package use="optional">MIGS.ba.microbial</Package>
+    <Package use="optional">MIGS.eu.microbial</Package>
+    <Package use="optional">MIGS.vi.microbial</Package>
+    <Package use="optional">MIMARKS.specimen.microbial</Package>
+    <Package use="optional">MIGS.ba.miscellaneous</Package>
+    <Package use="optional">MIGS.eu.miscellaneous</Package>
+    <Package use="optional">MIGS.vi.miscellaneous</Package>
+    <Package use="optional">MIMARKS.specimen.miscellaneous</Package>
+    <Package use="optional">MIGS.ba.plant-associated</Package>
+    <Package use="optional">MIGS.eu.plant-associated</Package>
+    <Package use="optional">MIGS.vi.plant-associated</Package>
+    <Package use="optional">MIMARKS.specimen.plant-associated</Package>
+    <Package use="optional">MIGS.ba.sediment</Package>
+    <Package use="optional">MIGS.eu.sediment</Package>
+    <Package use="optional">MIGS.vi.sediment</Package>
+    <Package use="optional">MIMARKS.specimen.sediment</Package>
+    <Package use="optional">MIGS.ba.soil</Package>
+    <Package use="optional">MIGS.eu.soil</Package>
+    <Package use="optional">MIGS.vi.soil</Package>
+    <Package use="optional">MIMARKS.specimen.soil</Package>
+    <Package use="optional">MIGS.ba.wastewater</Package>
+    <Package use="optional">MIGS.eu.wastewater</Package>
+    <Package use="optional">MIGS.vi.wastewater</Package>
+    <Package use="optional">MIMARKS.specimen.wastewater</Package>
+    <Package use="optional">MIGS.ba.water</Package>
+    <Package use="optional">MIGS.eu.water</Package>
+    <Package use="optional">MIGS.vi.water</Package>
+    <Package use="optional">MIMARKS.specimen.water</Package>
+  </Attribute>
+  <Attribute>
+    <Name>source_material_id</Name>
+    <HarmonizedName/>
+    <Description>unique identifier assigned to a material sample used for extracting nucleic acids, and subsequent sequencing. The identifier can refer either to the original material collected or to any derived sub-samples.</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>source material identifiers</Synonym>
+    <Package use="optional">MIMS.me</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+  </Attribute>
+  <Attribute>
+    <Name>subspecf_gen_lin</Name>
+    <HarmonizedName/>
+    <Description>Information about the genetic distinctness of the lineage (eg., biovar, serovar)</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>subspecific genetic lineage</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIGS.vi</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+  </Attribute>
+  <Attribute>
+    <Name>trophic_level</Name>
+    <HarmonizedName/>
+    <Description>Feeding position in food chain (eg., chemolithotroph)</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'autotroph', ' carboxydotroph', ' chemoautotroph', ' chemoheterotroph', ' chemolithoautotroph', ' chemolithotroph', ' chemoorganoheterotroph', ' chemoorganotroph', ' chemosynthetic', ' chemotroph', ' copiotroph', ' diazotroph', ' facultative', ' autotroph', ' heterotroph', ' lithoautotroph', ' lithoheterotroph', ' lithotroph', ' methanotroph', ' methylotroph', ' mixotroph', ' obligate', ' chemoautolithotroph', ' oligotroph', ' organoheterotroph', ' organotroph', ' photoautotroph', ' photoheterotroph', ' photolithoautotroph', ' photolithotroph', ' photosynthetic', ' phototroph']</Format>
+    <Synonym>trophic level</Synonym>
+    <Package use="optional">MIGS.ba</Package>
+    <Package use="optional">MIGS.eu</Package>
+    <Package use="optional">MIMARKS.specimen</Package>
+  </Attribute>
+  <Attribute>
+    <Name>depth</Name>
+    <HarmonizedName/>
+    <Description>Depth is defined as the vertical distance below surface, e.g. for sediment or soil samples depth is measured from sediment or soil surface, respectively. Depth can be reported as an interval for subsurface samples.</Description>
+    <DescriptionJapanese>水深・深度。局所表面下の垂直距離。例えば、堆積物や土壌サンプルの深度は堆積物や土壌の表面から測定される。深度は地下サンプルに対する距離として報告される。</DescriptionJapanese>
+    <Format>{float} m</Format>
+    <Synonym>depth</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>elev</Name>
+    <HarmonizedName/>
+    <Description>The elevation of the sampling site as measured by the vertical distance from mean sea level.</Description>
+    <DescriptionJapanese>サンプルを採取した場所の標高。平均海面からの垂直距離。</DescriptionJapanese>
+    <Format>{float} {unit}</Format>
+    <Synonym>elevation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>altitude</Name>
+    <HarmonizedName/>
+    <Description>The altitude of the sample is the vertical distance between Earth's surface above Sea Level and the sampled position in the air.</Description>
+    <DescriptionJapanese>海抜上の地表面から空中にあるサンプルを採取した位置までの垂直距離。</DescriptionJapanese>
+    <Format>{float} m</Format>
+    <Synonym>altitude</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tissue_type</Name>
+    <HarmonizedName/>
+    <Description>Type of tissue the sample was taken from.</Description>
+    <DescriptionJapanese>サンプルが得られた組織の名称</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>tissue type</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>age</Name>
+    <HarmonizedName/>
+    <Description>age at the time of sampling; relevant scale depends on species and study, e.g. could be seconds for amoebae or centuries for trees</Description>
+    <DescriptionJapanese>サンプリング時の年齢。規模は種や研究に依存する。(例：アメーバに対する秒、樹木に対する世紀)</DescriptionJapanese>
+    <Format>{float} {unit}</Format>
+    <Synonym>age</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>agrochem_addition</Name>
+    <HarmonizedName/>
+    <Description>addition of fertilizers, pesticides, etc. - amount and time of applications</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{timestamp}</Format>
+    <Synonym>history/agrochemical additions</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>air_temp_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving an exposure to varying temperatures; should include the temperature, treatment duration, interval and total experimental duration; can include different temperature regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>air temperature regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>al_sat</Name>
+    <HarmonizedName/>
+    <Description>aluminum saturation (esp. for tropical soils)</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>extreme_unusual_properties/Al saturation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>al_sat_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining Al saturation</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>extreme_unusual_properties/Al saturation method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>alkalinity</Name>
+    <HarmonizedName/>
+    <Description>alkalinity, the ability of a solution to neutralize acids to the equivalence point of carbonate or bicarbonate</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>alkalinity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>alkyl_diethers</Name>
+    <HarmonizedName/>
+    <Description>concentration of alkyl diethers</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>alkyl diethers</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>aminopept_act</Name>
+    <HarmonizedName/>
+    <Description>measurement of aminopeptidase activity</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>aminopeptidase activity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ammonium</Name>
+    <HarmonizedName/>
+    <Description>concentration of ammonium</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>ammonium</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>amniotic_fluid_color</Name>
+    <HarmonizedName/>
+    <Description>specification of the color of the amniotic fluid sample</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>amniotic fluid/color</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>anamorph</Name>
+    <HarmonizedName/>
+    <Description>Genus and species of the asexually reproducing stage of fungi - note that anamorph and teleomorph forms of the same taxon may have used taxonomic different names.</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>annual_season_precpt</Name>
+    <HarmonizedName/>
+    <Description>mean annual and seasonal precipitation (mm)</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>mean annual and seasonal precipitation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>annual_season_temp</Name>
+    <HarmonizedName/>
+    <Description>mean annual and seasonal temperature (oC)</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>mean annual and seasonal temperature</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>antibiotic_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving antibiotic administration; should include the name of antibiotic, amount administered, treatment duration, interval and total experimental duration; can include multiple antibiotic regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>antibiotic regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>atmospheric_data</Name>
+    <HarmonizedName/>
+    <Description>measurement of atmospheric data; can include multiple data</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>atmospheric data</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>authority</Name>
+    <HarmonizedName/>
+    <Description>Authority for the species identification.</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>bacteria_carb_prod</Name>
+    <HarmonizedName/>
+    <Description>measurement of bacterial carbon production</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>bacterial carbon production</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>barometric_press</Name>
+    <HarmonizedName/>
+    <Description>force per unit area exerted against a surface by the weight of air above that surface</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>barometric pressure</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>biochem_oxygen_dem</Name>
+    <HarmonizedName/>
+    <Description>a measure of the relative oxygen-depletion effect of a waste contaminant</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>biochemical oxygen demand</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>biomass</Name>
+    <HarmonizedName/>
+    <Description>amount of biomass; should include the name for the part of biomass measured, e.g. microbial, total. can include multiple measurements</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>biomass</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>birth_control</Name>
+    <HarmonizedName/>
+    <Description>specification of birth control medication used</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>birth control</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>bishomohopanol</Name>
+    <HarmonizedName/>
+    <Description>concentration of bishomohopanol</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>bishomohopanol</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>blood_blood_disord</Name>
+    <HarmonizedName/>
+    <Description>history of blood disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>blood/blood disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>blood_press_diast</Name>
+    <HarmonizedName/>
+    <Description>resting diastolic blood pressure, measured as mm mercury</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>blood pressure diastolic</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>blood_press_syst</Name>
+    <HarmonizedName/>
+    <Description>resting systolic blood pressure, measured as mm mercury</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>blood pressure systolic</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>body_habitat</Name>
+    <HarmonizedName/>
+    <Description>original body habitat where the sample was obtained from</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>body habitat</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>body_mass_index</Name>
+    <HarmonizedName/>
+    <Description>body mass index, calculated as weight/(height)squared</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>body-mass index</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>body_product</Name>
+    <HarmonizedName/>
+    <Description>substance produced by the plant where the sample was obtained from</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>body product</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>bromide</Name>
+    <HarmonizedName/>
+    <Description>concentration of bromide</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>bromide</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>calcium</Name>
+    <HarmonizedName/>
+    <Description>concentration of calcium</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>calcium</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>carb_dioxide</Name>
+    <HarmonizedName/>
+    <Description>carbon dioxide (gas) amount or concentration at the time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>carbon dioxide</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>carb_monoxide</Name>
+    <HarmonizedName/>
+    <Description>carbon monoxide (gas) amount or concentration at the time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>carbon monoxide</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>carb_nitro_ratio</Name>
+    <HarmonizedName/>
+    <Description>ratio of amount or concentrations of carbon to nitrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>carbon/nitrogen ratio</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>cell_line</Name>
+    <HarmonizedName/>
+    <Description>Name of the cell line.</Description>
+    <DescriptionJapanese>cell line の名称</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>cell_line, cell line</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>cell_type</Name>
+    <HarmonizedName/>
+    <Description>Type of cell of the sample or from which the sample was obtained.</Description>
+    <DescriptionJapanese>サンプルの細胞のタイプ</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>cell_type, cell type</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>chem_administration</Name>
+    <HarmonizedName/>
+    <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see this list.</Description>
+    <DescriptionJapanese/>
+    <Format>{term}; {timestamp}</Format>
+    <Synonym>chemical administration</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>chem_mutagen</Name>
+    <HarmonizedName/>
+    <Description>treatment involving use of mutagens; should include the name of mutagen, amount administered, treatment duration, interval and total experimental duration; can include multiple mutagen regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>chemical mutagen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>chem_oxygen_dem</Name>
+    <HarmonizedName/>
+    <Description>a measure of the relative oxygen-depletion effect of a waste contaminant</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>chemical oxygen demand</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>chloride</Name>
+    <HarmonizedName/>
+    <Description>concentration of chloride</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>chloride</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>chlorophyll</Name>
+    <HarmonizedName/>
+    <Description>concentration of chlorophyll</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>chlorophyll</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>climate_environment</Name>
+    <HarmonizedName/>
+    <Description>treatment involving an exposure to a particular climate; can include multiple climates</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{period};{interval};{period}</Format>
+    <Synonym>climate environment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>collected_by</Name>
+    <HarmonizedName/>
+    <Description>Name of persons or institute who collected the sample</Description>
+    <DescriptionJapanese>標本個体を採集した人物、または、団体の名称</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>collected_by</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>crop_rotation</Name>
+    <HarmonizedName/>
+    <Description>whether or not crop is rotated, and if yes, rotation schedule</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};Rn/{timestamp}/{period}</Format>
+    <Synonym>history/crop rotation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>culture_collection</Name>
+    <HarmonizedName/>
+    <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes.</Description>
+    <DescriptionJapanese>"配列の得られた培養細胞の保管施設と ID (例: ATCC:26370) 生きている微生物やウイルスの培養系, および細胞株を記載するのに用います。書式は institute のリストを参照してください。"</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>culture collection</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>cur_land_use</Name>
+    <HarmonizedName/>
+    <Description>present state of sample site</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'cities', 'farmstead', 'industrial areas', 'roads/railroads', 'rock', 'sand', 'gravel', 'mudflats', 'salt flats', 'badlands', 'permanent snow or ice', 'saline seeps', 'mines/quarries', 'oil waste areas', 'small grains', 'row crops', 'vegetable crops', 'horticultural plants (e.g. tulips)', 'marshlands (grass,sedges,rushes)', 'tundra (mosses,lichens)', 'rangeland', 'pastureland (grasslands used for livestock grazing)', 'hayland', 'meadows (grasses,alfalfa,fescue,bromegrass,timothy)', 'shrub land (e.g. mesquite,sage-brush,creosote bush,shrub oak,eucalyptus)', 'successional shrub land (tree saplings,hazels,sumacs,chokecherry,shrub dogwoods,blackberries)', 'shrub crops (blueberries,nursery ornamentals,filberts)', 'vine crops (grapes)', 'conifers (e.g. pine,spruce,fir,cypress)', 'hardwoods (e.g. oak,hickory,elm,aspen)', 'intermixed hardwood and conifers', 'tropical (e.g. mangrove,palms)', 'rainforest (evergreen forest receiving &gt;406 cm annual rainfall)', 'swamp (permanent or semi-permanent water body dominated by woody plants)', 'crop trees (nuts,fruit,christmas trees,nursery trees)']</Format>
+    <Synonym>current land use</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>cur_vegetation</Name>
+    <HarmonizedName/>
+    <Description>vegetation classification from one or more standard classification systems, or agricultural crop</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>current vegetation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>cur_vegetation_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in vegetation classification</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>current vegetation method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>current</Name>
+    <HarmonizedName/>
+    <Description>measurement of current</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>current</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>density</Name>
+    <HarmonizedName/>
+    <Description>density of sample</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>density</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>dermatology_disord</Name>
+    <HarmonizedName/>
+    <Description>history of dermatology disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>dermatology disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>dev_stage</Name>
+    <HarmonizedName/>
+    <Description>Developmental stage at the time of sampling.</Description>
+    <DescriptionJapanese>サンプリング時における生物の発生段階</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>developmental stage, development stage</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>diet_last_six_month</Name>
+    <HarmonizedName/>
+    <Description>specification of major diet changes in the last six months, if yes the change should be specified</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};{text}</Format>
+    <Synonym>major diet change in last six months</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diether_lipids</Name>
+    <HarmonizedName/>
+    <Description>concentration of diether lipids; can include multiple types of diether lipids</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>diether lipids</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>disease</Name>
+    <HarmonizedName/>
+    <Description>Name of relevant disease.</Description>
+    <DescriptionJapanese>関連する病気の名称</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>disease_stage</Name>
+    <HarmonizedName/>
+    <Description>Stage of disease at the time of sampling.</Description>
+    <DescriptionJapanese>サンプリング時における病気の段階</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>disease stage</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>diss_carb_dioxide</Name>
+    <HarmonizedName/>
+    <Description>concentration of dissolved carbon dioxide</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved carbon dioxide</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_hydrogen</Name>
+    <HarmonizedName/>
+    <Description>concentration of dissolved hydrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved hydrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_inorg_carb</Name>
+    <HarmonizedName/>
+    <Description>dissolved inorganic carbon concentration</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved inorganic carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_inorg_nitro</Name>
+    <HarmonizedName/>
+    <Description>concentration of dissolved inorganic nitrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved inorganic nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_inorg_phosp</Name>
+    <HarmonizedName/>
+    <Description>concentration of dissolved inorganic phosphorus</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved inorganic phosphorus</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_org_carb</Name>
+    <HarmonizedName/>
+    <Description>concentration of dissolved organic carbon</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved organic carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_org_nitro</Name>
+    <HarmonizedName/>
+    <Description>dissolved organic nitrogen concentration measured as; total dissolved nitrogen - NH4 - NO3 - NO2</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved organic nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>diss_oxygen</Name>
+    <HarmonizedName/>
+    <Description>concentration of dissolved oxygen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dissolved oxygen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>dominant_hand</Name>
+    <HarmonizedName/>
+    <Description>dominant hand of the subject</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'left', 'right', 'ambidextrous']</Format>
+    <Synonym>dominant hand</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>douche</Name>
+    <HarmonizedName/>
+    <Description>date of most recent douche</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>douche</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>drainage_class</Name>
+    <HarmonizedName/>
+    <Description>drainage classification from a standard system such as the USDA system</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'very poorly', 'poorly', 'somewhat poorly', 'moderately well', 'well', 'excessively drained']</Format>
+    <Synonym>drainage classification</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>drug_usage</Name>
+    <HarmonizedName/>
+    <Description>any drug used by subject and the frequency of usage; can include multiple drugs used</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{integer}/[year|month|week|day|hour]</Format>
+    <Synonym>drug usage</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>dry_mass</Name>
+    <HarmonizedName/>
+    <Description>measurement of dry mass</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>dry mass</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>efficiency_percent</Name>
+    <HarmonizedName/>
+    <Description>percentage of volatile solids removed from the anaerobic digestor</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>efficiency percent</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>emulsions</Name>
+    <HarmonizedName/>
+    <Description>amount or concentration of substances such as paints, adhesives, mayonnaise, hair colorants, emulsified oils, etc.; can include multiple emulsion types</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>emulsions</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>extreme_event</Name>
+    <HarmonizedName/>
+    <Description>unusual physical events that may have affected microbial populations</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>history/extreme events</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>extreme_salinity</Name>
+    <HarmonizedName/>
+    <Description>measured salinity</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>extreme_unusual_properties/salinity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>family_relationship</Name>
+    <HarmonizedName/>
+    <Description>relationships to other hosts in the same study; can include multiple relationships</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{text}</Format>
+    <Synonym>family relationship, family-relationship, familyrelationship</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>fao_class</Name>
+    <HarmonizedName/>
+    <Description>soil classification from the FAO World Reference Database for Soil Resources</Description>
+    <DescriptionJapanese/>
+    <Format>{term}</Format>
+    <Synonym>soil_taxonomic/FAO classification</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>fertilizer_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving the use of fertilizers; should include the name fertilizer, amount administered, treatment duration, interval and total experimental duration; can include multiple fertilizer regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>fertilizer regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>fire</Name>
+    <HarmonizedName/>
+    <Description>historical and/or physical evidence of fire</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>history/fire</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>flooding</Name>
+    <HarmonizedName/>
+    <Description>historical and/or physical evidence of flooding</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>history/flooding</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>foetal_health_stat</Name>
+    <HarmonizedName/>
+    <Description>specification of foetal health status, should also include abortion</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>amniotic fluid/foetal health status</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>fungicide_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving use of fungicides; should include the name of fungicide, amount administered, treatment duration, interval and total experimental duration; can include multiple fungicide regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>fungicide regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>gaseous_environment</Name>
+    <HarmonizedName/>
+    <Description>use of conditions with differing gaseous environments; should include the name of gaseous compound, amount administered, treatment duration, interval and total experimental duration; can include multiple gaseous environment regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>gaseous environment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>gaseous_substances</Name>
+    <HarmonizedName/>
+    <Description>amount or concentration of substances such as hydrogen sulfide, carbon dioxide, methane, etc.; can include multiple substances</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>gaseous substances</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>gastrointest_disord</Name>
+    <HarmonizedName/>
+    <Description>history of gastrointestinal tract disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>gastrointestinal tract disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>genotype</Name>
+    <HarmonizedName/>
+    <Description>observed genotype</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>genotype</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>gestation_state</Name>
+    <HarmonizedName/>
+    <Description>specification of the gestation state</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>amniotic fluid/gestation state</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>glucosidase_act</Name>
+    <HarmonizedName/>
+    <Description>measurement of glucosidase activity</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>glucosidase activity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>gravidity</Name>
+    <HarmonizedName/>
+    <Description>whether or not subject is gravid, and if yes date due or date post-conception, specifying which is used</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};{timestamp}</Format>
+    <Synonym>gravidity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>gravity</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving use of gravity factor to study various types of responses in presence, absence or modified levels of gravity; can include multiple treatments</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>gravity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>growth_hormone_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving use of growth hormones; should include the name of growth hormone, amount administered, treatment duration, interval and total experimental duration; can include multiple growth hormone regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>growth hormone regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>growth_med</Name>
+    <HarmonizedName/>
+    <Description>information about growth media for growing the plants or tissue cultured samples</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'soil', 'liquid']</Format>
+    <Synonym>growth media</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>gynecologic_disord</Name>
+    <HarmonizedName/>
+    <Description>history of gynecological disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>gynecological disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>haplotype</Name>
+    <HarmonizedName/>
+    <Description>Name of the haplotype. Primarily used for identification. A combination of alleles at multiple loci on the same chromosome that are closely linked and tend to be inherited as a unit.</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>health_state</Name>
+    <HarmonizedName/>
+    <Description>Health or disease status of sample at time of collection</Description>
+    <DescriptionJapanese>収集時におけるサンプルの健康あるいは病気の状態</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>health state</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>heavy_metals</Name>
+    <HarmonizedName/>
+    <Description>heavy metals present and concentrations of any drug used by subject and the frequency of usage; can include multiple heavy metals and concentrations</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>extreme_unusual_properties/heavy metals</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>heavy_metals_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining heavy metals</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>extreme_unusual_properties/heavy metals method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>height_or_length</Name>
+    <HarmonizedName/>
+    <Description>measurement of height or length</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>height or length</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>herbicide_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving use of herbicides; information about treatment involving use of growth hormones; should include the name of herbicide, amount administered, treatment duration, interval and total experimental duration; can include multiple regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>herbicide regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>hiv_stat</Name>
+    <HarmonizedName/>
+    <Description>HIV status of subject, if yes HAART initiation status should also be indicated as [YES or NO]</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};{boolean}</Format>
+    <Synonym>HIV status</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>horizon</Name>
+    <HarmonizedName/>
+    <Description>specific layer in the land area which measures parallel to the soil surface and possesses physical characteristics which differ from the layers above and beneath</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'O horizon', 'A horizon', 'E horizon', 'B horizon', 'C horizon', 'R layer', 'Permafrost']</Format>
+    <Synonym>horizon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>horizon_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining the horizon</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>horizon method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_age</Name>
+    <HarmonizedName/>
+    <Description>Age of host at the time of sampling</Description>
+    <DescriptionJapanese>サンプリング時の宿主の年齢</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>host age, host_age</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_body_site</Name>
+    <HarmonizedName/>
+    <Description>name of body site where the sample was obtained from. For Foundational Model of Anatomy Ontology (FMA) (v3.1) terms, please see this site.</Description>
+    <DescriptionJapanese/>
+    <Format>{term}</Format>
+    <Synonym>body site</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>host_body_temp</Name>
+    <HarmonizedName/>
+    <Description>core body temperature of the host when sample was collected</Description>
+    <DescriptionJapanese>サンプルを採取した時の宿主の体温</DescriptionJapanese>
+    <Format>{float} {unit}</Format>
+    <Synonym>host body temperature</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_color</Name>
+    <HarmonizedName/>
+    <Description>the color of host</Description>
+    <DescriptionJapanese>宿主の色</DescriptionJapanese>
+    <Format>{text}</Format>
+    <Synonym>host color</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_common_name</Name>
+    <HarmonizedName/>
+    <Description>common name of the host, e.g. human</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>host common name</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_description</Name>
+    <HarmonizedName/>
+    <Description>Additional information not included in other defined vocabulary fields</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym>host description, host_description</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_diet</Name>
+    <HarmonizedName/>
+    <Description>type of diet depending on the sample for animals omnivore, herbivore etc., for humans high-fat, meditteranean etc.; can include multiple diet types</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_disease</Name>
+    <HarmonizedName/>
+    <Description>Name of relevant disease, e.g. Salmonella gastroenteritis. For the controlled vocabulary, please see Human Disease Ontology or MeSH.</Description>
+    <DescriptionJapanese>宿主の病気の名称。(例：Salmonella gastroenteritis) Controlled vocabulary として Human Disease Ontology，MeSH を参照してください。</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_disease_outcome</Name>
+    <HarmonizedName/>
+    <Description>Final outcome of disease, e.g., death, chronic disease, recovery</Description>
+    <DescriptionJapanese>病気の最終的な結果。(例：death, chronic disease, recovery)</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>host disease outcome, host_disease_outcome</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_disease_stage</Name>
+    <HarmonizedName/>
+    <Description>Stage of disease at the time of sampling</Description>
+    <DescriptionJapanese>サンプリング時の宿主の病気の段階</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_disease_stat</Name>
+    <HarmonizedName/>
+    <Description>list of diseases with which the host has been diagnosed; can include multiple diagnoses. the value of the field depends on host; for humans the terms should be chosen from DO (Disease Ontology), other hosts are free text</Description>
+    <DescriptionJapanese>"宿主が診断されている疾患のリスト。複数の診断結果を含めることができます。宿主がヒトの場合は Disease Ontology から選択してください。他の宿主は自由記述です。"</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_growth_cond</Name>
+    <HarmonizedName/>
+    <Description>literature reference giving growth conditions of the host</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>host growth conditions</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_health_state</Name>
+    <HarmonizedName/>
+    <Description>Information regarding health state of the individual sampled at the time of sampling</Description>
+    <DescriptionJapanese>サンプリング時の個々のサンプルの健康状態に関する情報</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_height</Name>
+    <HarmonizedName/>
+    <Description>the height of subject</Description>
+    <DescriptionJapanese/>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_sex</Name>
+    <HarmonizedName/>
+    <Description>Gender or physical sex of the host</Description>
+    <DescriptionJapanese>宿主の性別</DescriptionJapanese>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>host_shape</Name>
+    <HarmonizedName/>
+    <Description>morphological shape of host</Description>
+    <DescriptionJapanese>宿主の形態学的形状</DescriptionJapanese>
+    <Format>{text}</Format>
+    <Synonym>host shape</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_subject_id</Name>
+    <HarmonizedName/>
+    <Description>a unique identifier by which each subject can be referred to, de-identified, e.g. #131</Description>
+    <DescriptionJapanese>宿主の匿名化されたユニーク ID</DescriptionJapanese>
+    <Format>{text}</Format>
+    <Synonym>host subject id</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_taxid</Name>
+    <HarmonizedName/>
+    <Description>NCBI taxon id of the host, e.g. 9606</Description>
+    <DescriptionJapanese>宿主の NCBI Taxonomy identifier</DescriptionJapanese>
+    <Format>{integer}</Format>
+    <Synonym>host taxid</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>host_tissue_sampled</Name>
+    <HarmonizedName/>
+    <Description>Type of tissue the initial sample was taken from. Controlled vocabulary, http://bioportal.bioontology.org/ontologies/1005.</Description>
+    <DescriptionJapanese/>
+    <Format/>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>hrt</Name>
+    <HarmonizedName/>
+    <Description>whether subject had hormone replacement theraphy, and if yes start date</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>humidity</Name>
+    <HarmonizedName/>
+    <Description>amount of water vapour in the air, at the time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>humidity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>humidity_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving an exposure to varying degree of humidity; information about treatment involving use of growth hormones; should include amount of humidity administered, treatment duration, interval and total experimental duration; can include multiple regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>humidity regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>hysterectomy</Name>
+    <HarmonizedName/>
+    <Description>specification of whether hysterectomy was performed</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean}</Format>
+    <Synonym>hysterectomy</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ihmc_ethnicity</Name>
+    <HarmonizedName/>
+    <Description>ethnicity of the subject</Description>
+    <DescriptionJapanese/>
+    <Format>{integer|text}</Format>
+    <Synonym>ihmc ethnicity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ihmc_medication_code</Name>
+    <HarmonizedName/>
+    <Description>can include multiple medication codes</Description>
+    <DescriptionJapanese/>
+    <Format>{integer}</Format>
+    <Synonym>ihmc medication code</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>indust_eff_percent</Name>
+    <HarmonizedName/>
+    <Description>percentage of industrial effluents received by wastewater treatment plant</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>industrial effluent percent</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>infra_specific_name</Name>
+    <HarmonizedName/>
+    <Description>taxonomic information about the host below subspecies level</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>infra_specific_name</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>infra_specific_rank</Name>
+    <HarmonizedName/>
+    <Description>taxonomic rank information about the host below subspecies level, such as variety, form, rank etc.</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>infra_specific_rank</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>inorg_particles</Name>
+    <HarmonizedName/>
+    <Description>concentration of particles such as sand, grit, metal particles, ceramics, etc.; can include multiple particles</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>inorganic particles</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>isolation_source</Name>
+    <HarmonizedName/>
+    <Description>Describes the physical, environmental and/or local geographical source of the biological sample from which the sample was derived.</Description>
+    <DescriptionJapanese>サンプルが得られた生物学的サンプルに関する, 物理的, 環境的, かつまたは, 地理的な由来</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>isolation_source</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>kidney_disord</Name>
+    <HarmonizedName/>
+    <Description>history of kidney disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>urine/kidney disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>lab_host</Name>
+    <HarmonizedName/>
+    <Description>Originally meaning host on which a parasite is maintained in the lab, which may not be the same as the natural host (example hamster cells used to support a parasite normally found in mouse in the wild). </Description>
+    <DescriptionJapanese>配列決定した分子を得た生物を増殖させるために実験室で使われた宿主の学名</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>last_meal</Name>
+    <HarmonizedName/>
+    <Description>content of last meal and time since feeding; can include multiple values</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{period}</Format>
+    <Synonym>last meal</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>life_stage</Name>
+    <HarmonizedName/>
+    <Description>description of life stage of host</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>life stage</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>light_intensity</Name>
+    <HarmonizedName/>
+    <Description>measurement of light intensity</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>light intensity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>link_addit_analys</Name>
+    <HarmonizedName/>
+    <Description/>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>links to additional analysis</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>link_class_info</Name>
+    <HarmonizedName/>
+    <Description>link to digitized soil maps or other soil classification information</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>link to classification information</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>link_climate_info</Name>
+    <HarmonizedName/>
+    <Description>link to climate resource</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>link to climate information</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>liver_disord</Name>
+    <HarmonizedName/>
+    <Description>history of liver disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>liver disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>local_class</Name>
+    <HarmonizedName/>
+    <Description>soil classification based on local soil classification system</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>soil_taxonomic/local classification</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>local_class_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining the local soil classification</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>soil_taxonomic/local classification method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>magnesium</Name>
+    <HarmonizedName/>
+    <Description>concentration of magnesium</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>magnesium</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>maternal_health_stat</Name>
+    <HarmonizedName/>
+    <Description>specification of the maternal health status</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>amniotic fluid/maternal health status</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>mean_frict_vel</Name>
+    <HarmonizedName/>
+    <Description>measurement of mean friction velocity</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>mean friction velocity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>mean_peak_frict_vel</Name>
+    <HarmonizedName/>
+    <Description>measurement of mean peak friction velocity</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>mean peak friction velocity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>mechanical_damage</Name>
+    <HarmonizedName/>
+    <Description>information about any mechanical damage exerted on the plant; can include multiple damages and sites</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{text}</Format>
+    <Synonym>mechanical damage</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>medic_hist_perform</Name>
+    <HarmonizedName/>
+    <Description>whether full medical history was collected</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean}</Format>
+    <Synonym>medical history performed</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>menarche</Name>
+    <HarmonizedName/>
+    <Description>date of most recent menstruation</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>menarche</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>menopause</Name>
+    <HarmonizedName/>
+    <Description>date of onset of menopause</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>menopause</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>methane</Name>
+    <HarmonizedName/>
+    <Description>methane (gas) amount or concentration at the time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>methane</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>microbial_biomass</Name>
+    <HarmonizedName/>
+    <Description>the part of the organic matter in the soil that constitutes living microorganisms smaller than 5-10 micrometers. IF you keep this, you would need to have correction factors used for conversion to the final units, which should be mg C (or N)/kg soil).</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>microbial biomass</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>microbial_biomass_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining microbial biomass</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>microbial biomass method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>mineral_nutr_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving the use of mineral supplements; should include the name of mineral nutrient, amount administered, treatment duration, interval and total experimental duration; can include multiple mineral nutrient regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>mineral nutrient regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>misc_param</Name>
+    <HarmonizedName/>
+    <Description>any other measurement performed or parameter collected, that is not listed here</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>miscellaneous parameter</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>n_alkanes</Name>
+    <HarmonizedName/>
+    <Description>concentration of n-alkanes; can include multiple n-alkanes</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>n-alkanes</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>nitrate</Name>
+    <HarmonizedName/>
+    <Description>concentration of nitrate</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>nitrate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>nitrite</Name>
+    <HarmonizedName/>
+    <Description>concentration of nitrite</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>nitrite</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>nitro</Name>
+    <HarmonizedName/>
+    <Description>concentration of nitrogen (total)</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>non_mineral_nutr_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving the exposure of plant to non-mineral nutrient such as oxygen, hydrogen or carbon; should include the name of non-mineral nutrient, amount administered, treatment duration, interval and total experimental duration; can include multiple non-mineral nutrient regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>non-mineral nutrient regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>nose_mouth_teeth_throat_disord</Name>
+    <HarmonizedName/>
+    <Description>history of nose/mouth/teeth/throat disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>nose/mouth/teeth/throat disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>nose_throat_disord</Name>
+    <HarmonizedName/>
+    <Description>history of nose-throat disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>lung/nose-throat disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>occupation</Name>
+    <HarmonizedName/>
+    <Description>most frequent job performed by subject</Description>
+    <DescriptionJapanese/>
+    <Format>{integer}</Format>
+    <Synonym>occupation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>org_carb</Name>
+    <HarmonizedName/>
+    <Description>concentration of organic carbon</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>organic carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>org_matter</Name>
+    <HarmonizedName/>
+    <Description>concentration of organic matter</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>organic matter</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>org_nitro</Name>
+    <HarmonizedName/>
+    <Description>concentration of organic nitrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>organic nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>org_particles</Name>
+    <HarmonizedName/>
+    <Description>concentration of particles such as faeces, hairs, food, vomit, paper fibers, plant material, humus, etc.</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>organic particles</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>organism_count</Name>
+    <HarmonizedName/>
+    <Description>total count of any organism per gram or volume of sample, should include name of organism followed by count; can include multiple organism counts</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>organism count</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>oxy_stat_samp</Name>
+    <HarmonizedName/>
+    <Description>oxygenation status of sample</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'aerobic', 'anaerobic']</Format>
+    <Synonym>oxygenation status of sample</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>oxygen</Name>
+    <HarmonizedName/>
+    <Description>oxygen (gas) amount or concentration at the time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>oxygen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>part_org_carb</Name>
+    <HarmonizedName/>
+    <Description>concentration of particulate organic carbon</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>particulate organic carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>part_org_nitro</Name>
+    <HarmonizedName/>
+    <Description>concentration of particulate organic nitrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>particulate organic nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>particle_class</Name>
+    <HarmonizedName/>
+    <Description>particles are classified, based on their size, into six general categories: clay, silt, sand, gravel, cobbles, and boulders; should include amount of particle preceded by the name of the particle type; can include multiple values</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>particle classification</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>passage_history</Name>
+    <HarmonizedName/>
+    <Description>Number of passages and passage method</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>pathotype</Name>
+    <HarmonizedName/>
+    <Description>Some bacterial specific pathotypes (example Eschericia coli - STEC, UPEC)</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym>pathotype, pathotype</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pathovar</Name>
+    <HarmonizedName/>
+    <Description>Taxonomy below subspecies; a variety (in bacteria, fungi or virus) usually based on its pathogenic properties. Sometimes used as equivalent to subspecies.</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>perturbation</Name>
+    <HarmonizedName/>
+    <Description>type of perturbation, e.g. chemical administration, physical disturbance, etc., coupled with time that perturbation occurred; can include multiple perturbation types</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{interval}</Format>
+    <Synonym>perturbation</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pesticide_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving use of insecticides; should include the name of pesticide, amount administered, treatment duration, interval and total experimental duration; can include multiple pesticide regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>pesticide regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pet_farm_animal</Name>
+    <HarmonizedName/>
+    <Description>specification of presence of pets or farm animals in the environment of subject, if yes the animals should be specified; can include multiple animals present</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};{text}</Format>
+    <Synonym>presence of pets or farm animals</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>petroleum_hydrocarb</Name>
+    <HarmonizedName/>
+    <Description>concentration of petroleum hydrocarbon</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>petroleum hydrocarbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ph</Name>
+    <HarmonizedName/>
+    <Description>pH measurement</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym/>
+  </Attribute>
+  <Attribute>
+    <Name>ph_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining pH</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>pH method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ph_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving exposure of plants to varying levels of pH of the growth media; can include multiple regimen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>pH regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>phaeopigments</Name>
+    <HarmonizedName/>
+    <Description>concentration of phaeopigments; can include multiple phaeopigments</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>phaeopigments</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>phenotype</Name>
+    <HarmonizedName/>
+    <Description>Phenotype of sampled organism. For Phenotypic quality Ontology (PATO) (v1.269) terms, please see this link.</Description>
+    <DescriptionJapanese>サンプル生物の表現型。Phenotypic quality Ontology (PATO) (v1.269) の用語はこのリンクを参照してください。 </DescriptionJapanese>
+    <Format>{term}</Format>
+    <Synonym>phenotype</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>phosphate</Name>
+    <HarmonizedName/>
+    <Description>concentration of phosphate</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>phosphate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>phosplipid_fatt_acid</Name>
+    <HarmonizedName/>
+    <Description>concentration of phospholipid fatty acids; can include multiple values</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>phospholipid fatty acid</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>photon_flux</Name>
+    <HarmonizedName/>
+    <Description>measurement of photon flux</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>photon flux</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>plant_body_site</Name>
+    <HarmonizedName/>
+    <Description>name of body site that the sample was obtained from. For PO (v819) terms please see this site.</Description>
+    <DescriptionJapanese/>
+    <Format>{term}</Format>
+    <Synonym>plant body site</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>plant_product</Name>
+    <HarmonizedName/>
+    <Description>substance produced by the plant, where the sample was obtained from</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>plant product</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pollutants</Name>
+    <HarmonizedName/>
+    <Description>pollutant types and, amount or concentrations measured at the time of sampling; can report multiple pollutants by entering numeric values preceded by name of pollutant</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>pollutants</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pool_dna_extracts</Name>
+    <HarmonizedName/>
+    <Description>were multiple DNA extractions mixed? how many?</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};{float} {unit}</Format>
+    <Synonym>pooling of DNA extracts (if done)</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>porosity</Name>
+    <HarmonizedName/>
+    <Description>porosity of deposited sediment is volume of voids divided by the total volume of sample</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>porosity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>potassium</Name>
+    <HarmonizedName/>
+    <Description>concentration of potassium</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>potassium</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pre_treatment</Name>
+    <HarmonizedName/>
+    <Description>the process of pre-treatment removes materials that can be easily collected from the raw wastewater</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>pre-treatment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pregnancy</Name>
+    <HarmonizedName/>
+    <Description>date due of pregnancy</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>pregnancy</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pressure</Name>
+    <HarmonizedName/>
+    <Description>pressure to which the sample is subject, in atmospheres</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>pressure</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>previous_land_use</Name>
+    <HarmonizedName/>
+    <Description>previous land use and dates</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{timestamp}</Format>
+    <Synonym>history/previous land use</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>previous_land_use_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining previous land use and dates</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>history/previous land use method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>primary_prod</Name>
+    <HarmonizedName/>
+    <Description>measurement of primary production</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>primary production</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>primary_treatment</Name>
+    <HarmonizedName/>
+    <Description>the process to produce both a generally homogeneous liquid capable of being treated biologically and a sludge that can be separately treated or processed</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>primary treatment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>profile_position</Name>
+    <HarmonizedName/>
+    <Description>cross-sectional position in the hillslope where sample was collected, sample area position in relation to surrounding areas</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'summit', 'shoulder', 'backslope', 'footslope', 'toeslope']</Format>
+    <Synonym>profile position</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pulmonary_disord</Name>
+    <HarmonizedName/>
+    <Description>history of pulmonary disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>lung/pulmonary disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>pulse</Name>
+    <HarmonizedName/>
+    <Description>resting pulse, measured as beats per minute</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>pulse</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>radiation_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving exposure of plant or a plant part to a particular radiation regimen; should include the radiation type, amount or intensity administered, treatment duration, interval and total experimental duration; can include multiple radiation regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>radiation regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>rainfall_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving an exposure to a given amount of rainfall; can include multiple regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>rainfall regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>reactor_type</Name>
+    <HarmonizedName/>
+    <Description>anaerobic digesters can be designed and engineered to operate using a number of different process configurations, as batch or continuous, mesophilic, high solid or low solid, and single stage or multistage</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>reactor type</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>redox_potential</Name>
+    <HarmonizedName/>
+    <Description>redox potential, measured relative to a hydrogen cell, indicating oxidation or reduction potential</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>redox potential</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>resp_part_matter</Name>
+    <HarmonizedName/>
+    <Description>concentration of substances that remain suspended in the air, and comprise mixtures of organic and inorganic substances (PM10 and PM2.5); can report multiple PM's by entering numeric values preceded by name of PM</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>respirable particulate matter</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>salinity</Name>
+    <HarmonizedName/>
+    <Description>salinity measurement</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>salinity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>salinity_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining salinity</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>extreme_unusual_properties/salinity method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>salt_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving use of salts as supplement to liquid and soil growth media; should include the name of salt, amount administered, treatment duration, interval and total experimental duration; can include multiple salt regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>salt regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>samp_salinity</Name>
+    <HarmonizedName/>
+    <Description>salinity of sample, i.e. measure of total salt concentration</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>sample salinity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>samp_store_dur</Name>
+    <HarmonizedName/>
+    <Description>duration for which sample was stored</Description>
+    <DescriptionJapanese/>
+    <Format>{interval}</Format>
+    <Synonym>sample storage duration</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>samp_store_loc</Name>
+    <HarmonizedName/>
+    <Description>location at which sample was stored, usually name of a specific freezer/room</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>sample storage location</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>samp_store_temp</Name>
+    <HarmonizedName/>
+    <Description>temperature at which sample was stored, e.g. -80</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>sample storage temperature</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>samp_vol_we_dna_ext</Name>
+    <HarmonizedName/>
+    <Description>weight (g) of soil processed</Description>
+    <DescriptionJapanese/>
+    <Format>{float} g</Format>
+    <Synonym>sample weight for DNA extraction</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sample_type</Name>
+    <HarmonizedName/>
+    <Description>Sample type, such as cell culture, mixed culture, tissue sample, whole organism, single cell, metagenomic assembly</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym>sample type, sample_type, sampletype</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>season_environment</Name>
+    <HarmonizedName/>
+    <Description>treatment involving an exposure to a particular season (e.g. winter, summer, rabi, rainy etc.)</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{period};{interval};{period}</Format>
+    <Synonym>seasonal environment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>secondary_treatment</Name>
+    <HarmonizedName/>
+    <Description>the process for substantially degrading the biological content of the sewage</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>secondary treatment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sediment_type</Name>
+    <HarmonizedName/>
+    <Description>information about the sediment type based on major constituents</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'biogenous', 'cosmogenous', 'hydrogenous', 'lithogenous']</Format>
+    <Synonym>sediment type</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>serotype</Name>
+    <HarmonizedName/>
+    <Description>Taxonomy below subspecies; a variety (in bacteria, fungi or virus) usually based on its antigenic properties. Same as serovar and serogroup. e.g. serotype="H1N1" in Influenza A virus CY098518.</Description>
+    <DescriptionJapanese>subspecies 以下の分類。配列の得られた生物, ウイルスなどの血清学的タイプ。例: serotype="H1N1" (インフルエンザ A 型 の場合)</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>serovar</Name>
+    <HarmonizedName/>
+    <Description>Taxonomy below subspecies; a variety (in bacteria, fungi or virus) usually based on its antigenic properties. Same as serovar and serotype. Sometimes used as species identifier in bacteria with shaky taxonomy, e.g. Leptospira interrogans serovar Hardjo</Description>
+    <DescriptionJapanese>subspecies 以下の分類。(一般に原核生物で)抗原特性により分類される血清学的変種。例: serovar="O157:H7"</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>sewage_type</Name>
+    <HarmonizedName/>
+    <Description>type of wastewater treatment plant as municipial or industrial</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>sewage type</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sex</Name>
+    <HarmonizedName/>
+    <Description>physical sex of sampled organism</Description>
+    <DescriptionJapanese>サンプル生物の性別</DescriptionJapanese>
+    <Format>['', 'male', 'female', 'neuter', 'hermaphrodite', 'not determined', 'missing' | 'not applicable' | 'not collected']</Format>
+    <Synonym>sex</Synonym>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>sexual_act</Name>
+    <HarmonizedName/>
+    <Description>current sexual partner and frequency of sex</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>sexual activity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sieving</Name>
+    <HarmonizedName/>
+    <Description>collection design of pooled samples and/or sieve size and amount of sample sieved</Description>
+    <DescriptionJapanese/>
+    <Format>{{text}|{float} {unit}};{float} {unit}</Format>
+    <Synonym>composite design/sieving (if any)</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>silicate</Name>
+    <HarmonizedName/>
+    <Description>concentration of silicate</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>silicate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>slope_aspect</Name>
+    <HarmonizedName/>
+    <Description>the direction a slope faces. While looking down a slope use a compass to record the direction you are facing (direction or degrees); e.g., NW or 315°. This measure provides an indication of sun and wind exposure that will influence soil temperature and evapotranspiration.</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>slope aspect</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>slope_gradient</Name>
+    <HarmonizedName/>
+    <Description>commonly called "slope". The angle between ground surface and a horizontal line (in percent). This is the direction that overland water would flow. This measure is usually taken with a hand level meter or clinometer.</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>slope gradient</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sludge_retent_time</Name>
+    <HarmonizedName/>
+    <Description>the time activated sludge remains in reactor</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>sludge retention time</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>smoker</Name>
+    <HarmonizedName/>
+    <Description>specification of smoking status</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean}</Format>
+    <Synonym>smoker</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sodium</Name>
+    <HarmonizedName/>
+    <Description>sodium concentration</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>sodium</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>soil_type</Name>
+    <HarmonizedName/>
+    <Description>soil series name or other lower-level classification</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>soil type</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>soil_type_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining soil series name or other lower-level classification</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>soil type method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>solar_irradiance</Name>
+    <HarmonizedName/>
+    <Description>the amount of solar energy that arrives at a specific area of a surface during a specific time interval</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>solar irradiance</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>soluble_inorg_mat</Name>
+    <HarmonizedName/>
+    <Description>concentration of substances such as ammonia, road-salt, sea-salt, cyanide, hydrogen sulfide, thiocyanates, thiosulfates, etc.</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>soluble inorganic material</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>soluble_org_mat</Name>
+    <HarmonizedName/>
+    <Description>concentration of substances such as urea, fruit sugars, soluble proteins, drugs, pharmaceuticals, etc.</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>soluble organic material</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>soluble_react_phosp</Name>
+    <HarmonizedName/>
+    <Description>concentration of soluble reactive phosphorus</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>soluble reactive phosphorus</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>special_diet</Name>
+    <HarmonizedName/>
+    <Description>specification of special diet; can include multiple special diets</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'low carb', 'reduced calorie', 'vegetarian', 'other(to be specified)']</Format>
+    <Synonym>special diet</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>specimen_voucher</Name>
+    <HarmonizedName/>
+    <Description>Identifier for the physical specimen. Use format: "[&lt;institution-code&gt;:[&lt;collection-code&gt;:]]&lt;specimen_id&gt;", eg, "UAM:Mamm:52179". Intended as a reference to the physical specimen that remains after it was analyzed. If the specimen was destroyed in the process of analysis, electronic images (e-vouchers) are an adequate substitute for a physical voucher specimen. Ideally the specimens will be deposited in a curated museum, herbarium, or frozen tissue collection, but often they will remain in a personal or laboratory collection for some time before they are deposited in a curated collection. There are three forms of specimen_voucher qualifiers. If the text of the qualifier includes one or more colons it is a 'structured voucher'. Structured vouchers include institution-codes (and optional collection-codes) taken from a controlled vocabulary maintained by the INSDC that denotes the museum or herbarium collection where the specimen resides, please visit the INSDC website.</Description>
+    <DescriptionJapanese>配列の得られた標本(動植物個体の一部 または 全体)が維持管理されている管理団体とＩＤ。(書式：[&lt;institution_code&gt;:[&lt;collection_code&gt;:]]&lt;specimen_id&gt;)(例：UAM:Mamm:52179) &lt;collection_code&gt; が存在しない場合は記載不要です。&lt;institution_code&gt; はこちらを参照してください。</DescriptionJapanese>
+    <Format>None</Format>
+    <Synonym>specimen voucher</Synonym>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>standing_water_regm</Name>
+    <HarmonizedName/>
+    <Description>treatment involving an exposure to standing water during a plant's life span, types can be flood water or standing water; can include multiple regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{period};{interval};{period}</Format>
+    <Synonym>standing water regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>store_cond</Name>
+    <HarmonizedName/>
+    <Description>explain how and for how long the soil sample was stored before DNA extraction.</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{period}</Format>
+    <Synonym>storage conditions (fresh/frozen/other)</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>study_complt_stat</Name>
+    <HarmonizedName/>
+    <Description>specification of study completion status, if no the reason should be specified</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};[adverse event|non-compliance|lost to follow up|other-specify]</Format>
+    <Synonym>study completion status</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>subgroup</Name>
+    <HarmonizedName/>
+    <Description>Taxonomy below subspecies; sometimes used in viruses to denote subgroups taken from a single isolate.</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>substrate</Name>
+    <HarmonizedName/>
+    <Description>the growth substrate of the host</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>substrate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>subtype</Name>
+    <HarmonizedName/>
+    <Description>Used as classifier in viruses (e.g. HIV type 1, Group M, Subtype A).</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>sulfate</Name>
+    <HarmonizedName/>
+    <Description>concentration of sulfate</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>sulfate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>sulfide</Name>
+    <HarmonizedName/>
+    <Description>concentration of sulfide</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>sulfide</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>suspend_part_matter</Name>
+    <HarmonizedName/>
+    <Description>concentration of suspended particulate matter</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>suspended particulate matter</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>suspend_solids</Name>
+    <HarmonizedName/>
+    <Description>concentration of substances including a wide variety of material, such as silt, decaying plant and animal matter, etc,; can include multiple substances</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>suspended solids</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>teleomorph</Name>
+    <HarmonizedName/>
+    <Description>Genus and species of the sexual (fruiting) form of fungi - note that anamorph and teleomorph forms of the same taxon may have used taxonomic different names.</Description>
+    <DescriptionJapanese/>
+    <Format>None</Format>
+    <Synonym/>
+    <Package use="optional">Generic</Package>
+  </Attribute>
+  <Attribute>
+    <Name>temp</Name>
+    <HarmonizedName/>
+    <Description>temperature of the sample at time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>temperature</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tertiary_treatment</Name>
+    <HarmonizedName/>
+    <Description>the process providing a final treatment stage to raise the effluent quality before it is discharged to the receiving environment</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>tertiary treatment</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>texture</Name>
+    <HarmonizedName/>
+    <Description>the relative proportion of different grain sizes of mineral particles in a soil, as described using a standard system; express as % sand (50 um to 2 mm), silt (2 um to 50 um), and clay (&lt;2 um) with textural name (e.g., silty clay loam) optional.</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>texture</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>texture_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining soil texture</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>texture method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tidal_stage</Name>
+    <HarmonizedName/>
+    <Description>stage of tide</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'low', 'high']</Format>
+    <Synonym>tidal stage</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tillage</Name>
+    <HarmonizedName/>
+    <Description>note method(s) used for tilling</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'drill', 'cutting disc', 'ridge till', 'strip tillage', 'zonal tillage', 'chisel', 'tined', 'mouldboard', 'disc plough']</Format>
+    <Synonym>history/tillage</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>time_last_toothbrush</Name>
+    <HarmonizedName/>
+    <Description>specification of the time since last toothbrushing</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>time since last toothbrushing</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>time_since_last_wash</Name>
+    <HarmonizedName/>
+    <Description>specification of the time since last wash</Description>
+    <DescriptionJapanese/>
+    <Format>{timestamp}</Format>
+    <Synonym>time since last wash</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tiss_cult_growth_med</Name>
+    <HarmonizedName/>
+    <Description>description of plant tissue culture growth media used</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>tissue culture growth media</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_carb</Name>
+    <HarmonizedName/>
+    <Description>total carbon content</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_depth_water_col</Name>
+    <HarmonizedName/>
+    <Description>measurement of total depth of water column</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total depth of water column</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_diss_nitro</Name>
+    <HarmonizedName/>
+    <Description>total dissolved nitrogen concentration, reported as nitrogen, measured by: total dissolved nitrogen = NH4 + NO3NO2 + dissolved organic nitrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total dissolved nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_inorg_nitro</Name>
+    <HarmonizedName/>
+    <Description>total inorganic nitrogen content</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total inorganic nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_mass</Name>
+    <HarmonizedName/>
+    <Description>total mass of the host at collection, the unit depends on host</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total mass</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_n_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining the total N</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>total N method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_nitro</Name>
+    <HarmonizedName/>
+    <Description>total nitrogen concentration, calculated by: total nitrogen = total dissolved nitrogen + particulate nitrogen. Can also be measured without filtering, reported as nitrogen</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total nitrogen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_org_c_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining total organic C</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>total organic C method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_org_carb</Name>
+    <HarmonizedName/>
+    <Description>Definition for soil: total organic C content of the soil units of g C/kg soil. Definition otherwise: total organic carbon content</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total organic carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_part_carb</Name>
+    <HarmonizedName/>
+    <Description>total particulate carbon content</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total particulate carbon</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_phosp</Name>
+    <HarmonizedName/>
+    <Description>total phosphorus concentration, calculated by: total phosphorus = total dissolved phosphorus + particulate phosphorus. Can also be measured without filtering, reported as phosphorus</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total phosphorus</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>tot_phosphate</Name>
+    <HarmonizedName/>
+    <Description>total amount or concentration of phosphate</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>total phosphate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>travel_out_six_month</Name>
+    <HarmonizedName/>
+    <Description>specification of the countries travelled in the last six months; can include multiple travels</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>travel outside the country in last six months</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>turbidity</Name>
+    <HarmonizedName/>
+    <Description>turbidity measurement</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>turbidity</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>twin_sibling</Name>
+    <HarmonizedName/>
+    <Description>specification of twin sibling presence</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean}</Format>
+    <Synonym>twin sibling presence</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>urine_collect_meth</Name>
+    <HarmonizedName/>
+    <Description>specification of urine collection method</Description>
+    <DescriptionJapanese/>
+    <Format>['', 'clean catch', 'catheter']</Format>
+    <Synonym>urine/collection method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>urogenit_disord</Name>
+    <HarmonizedName/>
+    <Description>history of urogenital disorders, can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>urogenital disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>urogenit_tract_disor</Name>
+    <HarmonizedName/>
+    <Description>history of urogenitaltract disorders; can include multiple disorders</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>urine/urogenital tract disorder</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ventilation_rate</Name>
+    <HarmonizedName/>
+    <Description>ventilation rate of the system in the sampled premises</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>ventilation rate</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>ventilation_type</Name>
+    <HarmonizedName/>
+    <Description>ventilation system used in the sampled premises</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>ventilation type</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>volatile_org_comp</Name>
+    <HarmonizedName/>
+    <Description>concentration of carbon-based chemicals that easily evaporate at room temperature; can report multiple volatile organic compounds by entering numeric values preceded by name of compound</Description>
+    <DescriptionJapanese/>
+    <Format>{text};{float} {unit}</Format>
+    <Synonym>volatile organic compounds</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>wastewater_type</Name>
+    <HarmonizedName/>
+    <Description>the origin of wastewater such as human waste, rainfall, storm drains, etc.</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>wastewater type</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>water_content</Name>
+    <HarmonizedName/>
+    <Description>water content measurement</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>water content</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>water_content_soil</Name>
+    <HarmonizedName/>
+    <Description>water content (g/g or cm3/cm3)</Description>
+    <DescriptionJapanese/>
+    <Format>{float} [g/g|cm3/cm3]</Format>
+    <Synonym>water content of soil</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>water_content_soil_meth</Name>
+    <HarmonizedName/>
+    <Description>reference or method used in determining the water content of soil</Description>
+    <DescriptionJapanese/>
+    <Format>{PMID|DOI|URL}</Format>
+    <Synonym>water content of soil method</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>water_temp_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving an exposure to water with varying degree of temperature; can include multiple regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>water temperature regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>watering_regm</Name>
+    <HarmonizedName/>
+    <Description>information about treatment involving an exposure to watering frequencies; can include multiple regimens</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit};{period};{interval};{period}</Format>
+    <Synonym>watering regimen</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>weight_loss_3_month</Name>
+    <HarmonizedName/>
+    <Description>specification of weight loss in the last three months, if yes should be further specified to include amount of weight loss</Description>
+    <DescriptionJapanese/>
+    <Format>{boolean};{float} {unit}</Format>
+    <Synonym>weight loss in last three months</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>wet_mass</Name>
+    <HarmonizedName/>
+    <Description>measurement of wet mass</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>wet mass</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>wind_direction</Name>
+    <HarmonizedName/>
+    <Description>wind direction is the direction from which a wind originates</Description>
+    <DescriptionJapanese/>
+    <Format>{text}</Format>
+    <Synonym>wind direction</Synonym>
+  </Attribute>
+  <Attribute>
+    <Name>wind_speed</Name>
+    <HarmonizedName/>
+    <Description>speed of wind measured at the time of sampling</Description>
+    <DescriptionJapanese/>
+    <Format>{float} {unit}</Format>
+    <Synonym>wind speed</Synonym>
+  </Attribute>
+</BioSampleAttributes>

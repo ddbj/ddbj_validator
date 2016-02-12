@@ -1,0 +1,822 @@
+<?xml version="1.0" encoding="utf-8"?>
+<BioSamplePackages>
+  <Package>
+    <Name>Generic</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage/>
+    <EnvPackageDisplay/>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>No environmental package</EnvPackage>
+    <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.air</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>air</EnvPackage>
+    <EnvPackageDisplay>air</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.host-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>host-associated</EnvPackage>
+    <EnvPackageDisplay>host-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.human-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-associated</EnvPackage>
+    <EnvPackageDisplay>human-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.human-gut</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-gut</EnvPackage>
+    <EnvPackageDisplay>human-gut</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.human-oral</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-oral</EnvPackage>
+    <EnvPackageDisplay>human-oral</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.human-skin</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-skin</EnvPackage>
+    <EnvPackageDisplay>human-skin</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.human-vaginal</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-vaginal</EnvPackage>
+    <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.microbial</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>microbial</EnvPackage>
+    <EnvPackageDisplay>microbial</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.miscellaneous</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>miscellaneous</EnvPackage>
+    <EnvPackageDisplay>miscellaneous</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.plant-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>plant-associated</EnvPackage>
+    <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.sediment</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>sediment</EnvPackage>
+    <EnvPackageDisplay>sediment</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.soil</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>soil</EnvPackage>
+    <EnvPackageDisplay>soil</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.wastewater</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>wastewater</EnvPackage>
+    <EnvPackageDisplay>wastewater</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMS.me">
+    <Name>MIMS.me.water</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>water</EnvPackage>
+    <EnvPackageDisplay>water</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>No environmental package</EnvPackage>
+    <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.air</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>air</EnvPackage>
+    <EnvPackageDisplay>air</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.host-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>host-associated</EnvPackage>
+    <EnvPackageDisplay>host-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.human-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-associated</EnvPackage>
+    <EnvPackageDisplay>human-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.human-gut</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-gut</EnvPackage>
+    <EnvPackageDisplay>human-gut</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.human-oral</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-oral</EnvPackage>
+    <EnvPackageDisplay>human-oral</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.human-skin</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-skin</EnvPackage>
+    <EnvPackageDisplay>human-skin</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.human-vaginal</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-vaginal</EnvPackage>
+    <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.microbial</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>microbial</EnvPackage>
+    <EnvPackageDisplay>microbial</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.miscellaneous</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>miscellaneous</EnvPackage>
+    <EnvPackageDisplay>miscellaneous</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.plant-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>plant-associated</EnvPackage>
+    <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.sediment</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>sediment</EnvPackage>
+    <EnvPackageDisplay>sediment</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.soil</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>soil</EnvPackage>
+    <EnvPackageDisplay>soil</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.wastewater</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>wastewater</EnvPackage>
+    <EnvPackageDisplay>wastewater</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.ba">
+    <Name>MIGS.ba.water</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>water</EnvPackage>
+    <EnvPackageDisplay>water</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>No environmental package</EnvPackage>
+    <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.air</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>air</EnvPackage>
+    <EnvPackageDisplay>air</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.host-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>host-associated</EnvPackage>
+    <EnvPackageDisplay>host-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.human-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-associated</EnvPackage>
+    <EnvPackageDisplay>human-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.human-gut</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-gut</EnvPackage>
+    <EnvPackageDisplay>human-gut</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.human-oral</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-oral</EnvPackage>
+    <EnvPackageDisplay>human-oral</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.human-skin</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-skin</EnvPackage>
+    <EnvPackageDisplay>human-skin</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.human-vaginal</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-vaginal</EnvPackage>
+    <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.microbial</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>microbial</EnvPackage>
+    <EnvPackageDisplay>microbial</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.miscellaneous</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>miscellaneous</EnvPackage>
+    <EnvPackageDisplay>miscellaneous</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.plant-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>plant-associated</EnvPackage>
+    <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.sediment</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>sediment</EnvPackage>
+    <EnvPackageDisplay>sediment</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.soil</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>soil</EnvPackage>
+    <EnvPackageDisplay>soil</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.wastewater</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>wastewater</EnvPackage>
+    <EnvPackageDisplay>wastewater</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.eu">
+    <Name>MIGS.eu.water</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>water</EnvPackage>
+    <EnvPackageDisplay>water</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>No environmental package</EnvPackage>
+    <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.air</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>air</EnvPackage>
+    <EnvPackageDisplay>air</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.host-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>host-associated</EnvPackage>
+    <EnvPackageDisplay>host-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.human-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-associated</EnvPackage>
+    <EnvPackageDisplay>human-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.human-gut</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-gut</EnvPackage>
+    <EnvPackageDisplay>human-gut</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.human-oral</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-oral</EnvPackage>
+    <EnvPackageDisplay>human-oral</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.human-skin</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-skin</EnvPackage>
+    <EnvPackageDisplay>human-skin</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.human-vaginal</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-vaginal</EnvPackage>
+    <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.microbial</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>microbial</EnvPackage>
+    <EnvPackageDisplay>microbial</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.miscellaneous</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>miscellaneous</EnvPackage>
+    <EnvPackageDisplay>miscellaneous</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.plant-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>plant-associated</EnvPackage>
+    <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.sediment</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>sediment</EnvPackage>
+    <EnvPackageDisplay>sediment</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.soil</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>soil</EnvPackage>
+    <EnvPackageDisplay>soil</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.wastewater</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>wastewater</EnvPackage>
+    <EnvPackageDisplay>wastewater</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIGS.vi">
+    <Name>MIGS.vi.water</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>water</EnvPackage>
+    <EnvPackageDisplay>water</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>No environmental package</EnvPackage>
+    <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.air</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>air</EnvPackage>
+    <EnvPackageDisplay>air</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.host-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>host-associated</EnvPackage>
+    <EnvPackageDisplay>host-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.human-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-associated</EnvPackage>
+    <EnvPackageDisplay>human-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.human-gut</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-gut</EnvPackage>
+    <EnvPackageDisplay>human-gut</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.human-oral</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-oral</EnvPackage>
+    <EnvPackageDisplay>human-oral</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.human-skin</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-skin</EnvPackage>
+    <EnvPackageDisplay>human-skin</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.human-vaginal</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-vaginal</EnvPackage>
+    <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.microbial</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>microbial</EnvPackage>
+    <EnvPackageDisplay>microbial</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.miscellaneous</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>miscellaneous</EnvPackage>
+    <EnvPackageDisplay>miscellaneous</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.plant-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>plant-associated</EnvPackage>
+    <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.sediment</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>sediment</EnvPackage>
+    <EnvPackageDisplay>sediment</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.soil</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>soil</EnvPackage>
+    <EnvPackageDisplay>soil</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.wastewater</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>wastewater</EnvPackage>
+    <EnvPackageDisplay>wastewater</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.specimen">
+    <Name>MIMARKS.specimen.water</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>water</EnvPackage>
+    <EnvPackageDisplay>water</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>No environmental package</EnvPackage>
+    <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.air</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>air</EnvPackage>
+    <EnvPackageDisplay>air</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.host-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>host-associated</EnvPackage>
+    <EnvPackageDisplay>host-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.human-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-associated</EnvPackage>
+    <EnvPackageDisplay>human-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.human-gut</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-gut</EnvPackage>
+    <EnvPackageDisplay>human-gut</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.human-oral</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-oral</EnvPackage>
+    <EnvPackageDisplay>human-oral</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.human-skin</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-skin</EnvPackage>
+    <EnvPackageDisplay>human-skin</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.human-vaginal</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>human-vaginal</EnvPackage>
+    <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.microbial</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>microbial</EnvPackage>
+    <EnvPackageDisplay>microbial</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.miscellaneous</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>miscellaneous</EnvPackage>
+    <EnvPackageDisplay>miscellaneous</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.plant-associated</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>plant-associated</EnvPackage>
+    <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.sediment</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>sediment</EnvPackage>
+    <EnvPackageDisplay>sediment</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.soil</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>soil</EnvPackage>
+    <EnvPackageDisplay>soil</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.wastewater</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>wastewater</EnvPackage>
+    <EnvPackageDisplay>wastewater</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+  <Package group="MIMARKS.survey">
+    <Name>MIMARKS.survey.water</Name>
+    <DisplayName/>
+    <ShortName/>
+    <EnvPackage>water</EnvPackage>
+    <EnvPackageDisplay>water</EnvPackageDisplay>
+    <Description/>
+    <Example/>
+  </Package>
+</BioSamplePackages>
