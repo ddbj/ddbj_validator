@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<BioSample access="public" publication_date="2014-04-01T00:00:00+09:00" last_update="2015-12-11T15:30:42+09:00">
+    <Ids>
+        <Id is_primary="1" namespace="BioSample">SAMD00008944</Id>
+        <Id namespace="SRA">DRS013790</Id>
+    </Ids>
+    <Description>
+        <SampleName>DRS013790</SampleName>
+        <Title>Genome of Klebsiella oxytoca</Title>
+        <Organism taxonomy_id="571">
+            <OrganismName>Klebsiella oxytoca</OrganismName>
+        </Organism>
+    </Description>
+    <Owner>
+        <Name>Gifu University School of Medicine Pathogenic Bacterial Genetic Resorce Stock Center (GMGC)</Name>
+        <Contacts>
+            <Contact email="afujiyam@nii.ac.jp">
+                <Name>
+                    <First>Asao</First>
+                    <Last>Fujiyama</Last>
+                </Name>
+            </Contact>
+            <Contact email="tshini@genes.nig.ac.jp">
+                <Name>
+                    <First>Tadasu</First>
+                    <Last>Shin-i</Last>
+                </Name>
+            </Contact>
+            <Contact email="atoyoda@nig.ac.jp">
+                <Name>
+                    <First>Atsushi</First>
+                    <Last>Toyoda</Last>
+                </Name>
+            </Contact>
+            <Contact email="yminakuc@nig.ac.jp">
+                <Name>
+                    <First>Yohei</First>
+                    <Last>Minakuchi</Last>
+                </Name>
+            </Contact>
+            <Contact email="yaaoki@nig.ac.jp">
+                <Name>
+                    <First>Yasuhiro</First>
+                    <Last>Aoki</Last>
+                </Name>
+            </Contact>
+            <Contact email="tezaki@gifu-u.ac.jp">
+                <Name>
+                    <First>Takayuki</First>
+                    <Last>Ezaki</Last>
+                </Name>
+            </Contact>
+        </Contacts>
+    </Owner>
+    <Models>
+        <Model>Generic</Model>
+    </Models>
+    <Attributes>
+        <Attribute attribute_name="sample_name">DRS013790</Attribute>
+        <Attribute attribute_name="sample comment">Genome of Klebsiella oxytoca, GTC_14652, Gifu003, N-023, NBRC_1stRun_lane1_N703_S501</Attribute>
+    </Attributes>
+</BioSample>

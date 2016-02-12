@@ -1,0 +1,694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<BioSampleSet>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046702</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 100056</SampleName>
+      <Title>Cupriavidus numazuensis NBRC 100056</Title>
+      <Organism taxonomy_id="1218073">
+        <OrganismName>Cupriavidus numazuensis NBRC 100056</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 100056</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB246</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">WN1</Attribute>
+      <Attribute attribute_name="strain">NBRC 100056</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Cupriavidus numazuensis NBRC 100056 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 100056</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046703</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 102051</SampleName>
+      <Title>Novosphingobium naphthalenivorans NBRC 102051</Title>
+      <Organism taxonomy_id="1219034">
+        <OrganismName>Novosphingobium naphthalenivorans NBRC 102051</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 102051</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB313</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">NN5</Attribute>
+      <Attribute attribute_name="strain">NBRC 102051</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Novosphingobium naphthalenivorans NBRC 102051 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 102051</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046704</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 102152</SampleName>
+      <Title>Psychrobacter phenylpyruvicus NBRC 102152</Title>
+      <Organism taxonomy_id="1123034">
+        <OrganismName>Psychrobacter phenylpyruvicus DSM 7000 = NBRC 102152</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 102152</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB411</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">PP14</Attribute>
+      <Attribute attribute_name="strain">NBRC 102152</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Psychrobacter phenylpyruvicus NBRC 102152 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 102152</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046705</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 102154</SampleName>
+      <Title>Moraxella lacunata NBRC 102154</Title>
+      <Organism taxonomy_id="1223506">
+        <OrganismName>Moraxella lacunata NBRC 102154</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 102154</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB432</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">ML1</Attribute>
+      <Attribute attribute_name="strain">NBRC 102154</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Moraxella lacunata NBRC 102154 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 102154</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046706</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 102517</SampleName>
+      <Title>Sphingobium cloacae NBRC 102517</Title>
+      <Organism taxonomy_id="1223531">
+        <OrganismName>Sphingobium cloacae NBRC 102517</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 102517</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB456</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">SC4</Attribute>
+      <Attribute attribute_name="strain">NBRC 102517</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Sphingobium cloacae NBRC 102517 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 102517</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046707</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 102518</SampleName>
+      <Title>Sphingobium amiense NBRC 102518</Title>
+      <Organism taxonomy_id="1223534">
+        <OrganismName>Sphingobium amiense NBRC 102518</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 102518</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB459</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">SAM01S</Attribute>
+      <Attribute attribute_name="strain">NBRC 102518</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Sphingobium amiense NBRC 102518 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 102518</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046708</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 102523</SampleName>
+      <Title>Herbaspirillum rubrisubalbicans NBRC 102523</Title>
+      <Organism taxonomy_id="1223495">
+        <OrganismName>Herbaspirillum rubrisubalbicans NBRC 102523</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 102523</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB421</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">HR1</Attribute>
+      <Attribute attribute_name="strain">NBRC 102523</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Herbaspirillum rubrisubalbicans NBRC 102523 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 102523</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046709</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 107847</SampleName>
+      <Title>Novosphingobium lentum NBRC 107847</Title>
+      <Organism taxonomy_id="1219033">
+        <OrganismName>Novosphingobium lentum NBRC 107847</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 107847</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB312</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">NL2</Attribute>
+      <Attribute attribute_name="strain">NBRC 107847</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Novosphingobium lentum NBRC 107847 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 107847</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046710</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 14588</SampleName>
+      <Title>Moraxella atlantae NBRC 14588</Title>
+      <Organism taxonomy_id="1223508">
+        <OrganismName>Moraxella atlantae NBRC 14588</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 14588</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB434</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">MA2</Attribute>
+      <Attribute attribute_name="strain">NBRC 14588</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Moraxella atlantae NBRC 14588 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 14588</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046711</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 14940</SampleName>
+      <Title>Klebsiella pneumoniae subsp. pneumoniae NBRC 14940</Title>
+      <Organism taxonomy_id="1218099">
+        <OrganismName>Klebsiella pneumoniae subsp. pneumoniae NBRC 14940</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 14940</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB272</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">KP2</Attribute>
+      <Attribute attribute_name="strain">NBRC 14940</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Klebsiella pneumoniae subsp. pneumoniae NBRC 14940 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 14940</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046712</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 15208</SampleName>
+      <Title>Sphingomonas rosa NBRC 15208</Title>
+      <Organism taxonomy_id="1219053">
+        <OrganismName>Novosphingobium rosa NBRC 15208</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 15208</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB332</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">SR3</Attribute>
+      <Attribute attribute_name="strain">NBRC 15208</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Sphingomonas rosa NBRC 15208 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 15208</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046713</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 15645</SampleName>
+      <Title>Vibrio vulnificus NBRC 15645</Title>
+      <Organism taxonomy_id="1219061">
+        <OrganismName>Vibrio vulnificus NBRC 15645 = ATCC 27562</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 15645</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB340</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">VIBVU1</Attribute>
+      <Attribute attribute_name="strain">NBRC 15645</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Vibrio vulnificus NBRC 15645 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 15645</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046714</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 16172</SampleName>
+      <Title>Sphingomonas chlorophenolica NBRC 16172</Title>
+      <Organism taxonomy_id="1219044">
+        <OrganismName>Sphingobium chlorophenolicum NBRC 16172</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 16172</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB323</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">SC6</Attribute>
+      <Attribute attribute_name="strain">NBRC 16172</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Sphingomonas chlorophenolica NBRC 16172 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 16172</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046715</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 16415</SampleName>
+      <Title>Sphingomonas herbicidovorans NBRC 16415</Title>
+      <Organism taxonomy_id="1219045">
+        <OrganismName>Sphingobium herbicidovorans NBRC 16415</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 16415</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB324</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">SH1</Attribute>
+      <Attribute attribute_name="strain">NBRC 16415</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Sphingomonas herbicidovorans NBRC 16415 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 16415</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+  <BioSample access="public" publication_date="2016-02-08T16:01:46+09:00" last_update="2016-02-08T16:01:46+09:00">
+    <Ids>
+      <Id is_primary="1" namespace="BioSample">SAMD00046716</Id>
+    </Ids>
+    <Description>
+      <SampleName>NBRC 3908</SampleName>
+      <Title>Shewanella putrefaciens NBRC 3908</Title>
+      <Organism taxonomy_id="1236543">
+        <OrganismName>Shewanella putrefaciens JCM 20190 = NBRC 3908</OrganismName>
+      </Organism>
+    </Description>
+    <Owner>
+      <Name url="http://www.nite.go.jp/en/nbrc/genome/index.html">National Institute of Technology and Evaluation Biological Resource Center</Name>
+      <Contacts>
+        <Contact email="genome@nite.go.jp">
+          <Name>
+            <First>Yuko</First>
+            <Last>Kitahashi</Last>
+          </Name>
+        </Contact>
+      </Contacts>
+    </Owner>
+    <Models>
+      <Model>MIGS.ba</Model>
+    </Models>
+    <Attributes>
+      <Attribute attribute_name="sample_name">NBRC 3908</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB463</Attribute>
+      <Attribute attribute_name="locus_tag_prefix">SP3</Attribute>
+      <Attribute attribute_name="strain">NBRC 3908</Attribute>
+      <Attribute attribute_name="collection_date">missing</Attribute>
+      <Attribute attribute_name="env_biome">missing</Attribute>
+      <Attribute attribute_name="env_feature">missing</Attribute>
+      <Attribute attribute_name="env_material">missing</Attribute>
+      <Attribute attribute_name="geo_loc_name">missing</Attribute>
+      <Attribute attribute_name="lat_lon">missing</Attribute>
+      <Attribute attribute_name="project_name">Shewanella putrefaciens NBRC 3908 genome sequencing project</Attribute>
+      <Attribute attribute_name="isol_growth_condt">missing</Attribute>
+      <Attribute attribute_name="ref_biomaterial">missing</Attribute>
+      <Attribute attribute_name="num_replicons">missing</Attribute>
+      <Attribute attribute_name="source_material_id">NBRC 3908</Attribute>
+    </Attributes>
+    <Links>
+      <Link label="Whole Genome Shotgun Project" type="url">http://www.nite.go.jp/en/nbrc/genome/project/wgs/project_wgs2.html</Link>
+    </Links>
+  </BioSample>
+</BioSampleSet>
+
