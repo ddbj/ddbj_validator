@@ -1,0 +1,471 @@
+
+1. EC_number に記載してください。
+-------------------------------------
+ADP-ribosyl-(dinitrogen reductase) hydrolase( EC:3.2.2.24 )
+->
+ADP-ribosyl-(dinitrogen reductase) hydrolase
+EC_number	3.2.2.24 
+
+probable extracellular protease [EC:3.4.24.-
+->
+probable extracellular protease
+EC_number	EC:3.4.24.-
+-------------------------------------
+
+2. 二つのスペースの記載
+-------------------------------------
+aTP-dependent protease La  Type I
+->
+ATP-dependent protease La Type I
+-------------------------------------
+
+3. 複数の product 名
+-------------------------------------
+binding-protein-dependent transport systems inner membrane component:ATP/GTP-binding site motif A (P-loop) :TrkA-N:Potassium e
+->
+binding-protein-dependent transport systems inner membrane component
+note	ATP/GTP-binding site motif A (P-loop) :TrkA-N:Potassium e
+
+chemotaxis regulator - transmits chemoreceptor signals to flagelllar motor components CheY
+->
+chemotaxis regulator
+note	transmits chemoreceptor signals to flagelllar motor components CheY
+-------------------------------------
+
+4. 括弧記載の変更
+-------------------------------------
+Ca2+-binding protein (EF-Hand superfamily)
+->
+Ca2+-binding protein, EF-Hand superfamily
+
+Proteophosphoglycan precursor (Fragment)
+->
+proteophosphoglycan precursor
+note	Fragment
+
+Bucepa02001210 protein family (probably prophage associated)
+->
+Bucepa02001210 protein family
+note	probably prophage associated
+
+Dna binding response regulator PrrA (RegA)
+->
+Dna binding response regulator PrrA
+
+RelB/StbD replicon stabilization protein (antitoxin to RelE/StbE)
+->
+RelB/StbD replicon stabilization protein
+note	antitoxin to RelE/StbE
+
+SAM-dependent methyltransferase PA0798 (UbiE paralog)
+->
+SAM-dependent methyltransferase PA0798
+note	UbiE paralog
+
+VapB protein (antitoxin to VapC)
+->
+VapB protein
+note	antitoxin to VapC
+
+acetate permease ActP (cation/acetate symporter)
+->
+acetate permease ActP
+note	cation/acetate symporter
+
+cell division protein DivIC (FtsB)
+->
+cell division protein DivIC
+
+cell division protein YlmG/Ycf19 (putative)
+->
+putative cell division protein YlmG/Ycf19
+
+glutaredoxin 3 (Grx3)
+->
+glutaredoxin 3, Grx3
+
+glycine dehydrogenase [decarboxylating] (glycine cleavage system P1 protein)
+->
+glycine dehydrogenase [decarboxylating]
+note	glycine cleavage system P1 protein
+
+glycine dehydrogenase [decarboxylating] (glycine cleavage system P2 protein)
+->
+glycine dehydrogenase [decarboxylating]
+note	glycine cleavage system P2 protein
+
+gramicidin S synthetase 2 (Gramicidin S synthetase II) [Includes: ATP-dependent proline adenylase (ProA) (Proline activase)
+->
+gramicidin S synthetase 2
+note	Gramicidin S synthetase II [Includes: ATP-dependent proline adenylase (ProA) (Proline activase)
+
+helicase (Snf2/Rad54 family)
+->
+helicase, Snf2/Rad54 family
+
+lysine exporter protein (LYSE/YGGA)
+->
+lysine exporter protein LYSE/YGGA
+
+lysyl-tRNA synthetase (class I)
+->
+lysyl-tRNA synthetase class I
+
+mannose-1-phosphate guanylyltransferase (GDP)
+->
+mannose-1-phosphate guanylyltransferase GDP
+
+methyl-accepting chemotaxis protein I (serine chemoreceptor protein)
+->
+methyl-accepting chemotaxis protein I
+note	serine chemoreceptor protein
+
+multidrug and toxin extrusion (MATE) family efflux pump YdhE/NorM
+->
+multidrug and toxin extrusion family efflux pump YdhE/NorM
+
+nitric oxide -responding transcriptional regulator NnrR (Crp/Fnr family)
+->
+nitric oxide -responding transcriptional regulator NnrR
+note	Crp/Fnr family
+
+nucleoside 5-triphosphatase RdgB (dHAPTP
+->
+nucleoside 5-triphosphatase RdgB
+note	dHAPTP
+
+observed by proteomics Citation: Proteomics from VerBerkmoes et al. (2003) unpublished
+->
+hypothetical protein
+note	observed by proteomics Citation: Proteomics from VerBerkmoes et al. (2003) unpublished
+
+permease of the drug/metabolite transporter (DMT) superfamily
+->
+permease of the drug/metabolite transporter DMT superfamily
+
+phosphate regulon sensor protein PhoR (SphS)
+->
+phosphate regulon sensor protein PhoR
+
+phosphate regulon transcriptional regulatory protein PhoB (SphR)
+->
+phosphate regulon transcriptional regulatory protein PhoB
+
+phosphate transport regulator (distant homolog of PhoU)
+->
+phosphate transport regulator
+note	distant homolog of PhoU
+
+phage tail length tape-measure protein 1 # Enterobacteria-related
+->
+phage tail length tape-measure protein
+note	Enterobacteria-related
+
+phosphoglycerate mutase family (Rhiz)
+->
+phosphoglycerate mutase family Rhiz
+
+photosystem II CP43 protein (PsbC)
+->
+photosystem II CP43 protein PsbC
+
+photosystem II protein D2 (PsbD)
+->
+photosystem II protein D2 PsbD
+
+positive regulator of CheA protein activity (CheW)
+->
+positive regulator of CheA protein activity, CheW
+
+ribosomal silencing factor RsfA (former Iojap)
+->
+ribosomal silencing factor RsfA
+note	former Iojap
+
+sensor histidine kinase PrrB (RegB)
+->
+sensor histidine kinase PrrB
+
+sigma factor regulator VreR (cytoplasmic membrane-localized) of trans-envelope signaling system
+->
+sigma factor regulator VreR
+note	(cytoplasmic membrane-localized) of trans-envelope signaling system
+
+signal recognition particle receptor protein FtsY (=alpha subunit)
+->
+signal recognition particle receptor protein FtsY, alpha subunit
+
+survival protein SurA precursor (Peptidyl-prolyl cis-trans isomerase SurA)
+->
+survival protein SurA precursor
+note	Peptidyl-prolyl cis-trans isomerase SurA
+
+transcription accessory protein (S1 RNA-binding domain)
+->
+transcription accessory protein with S1 RNA-binding domain
+
+uncharacterized protein sll1880 (YjbQ family)
+->
+uncharacterized protein sll1880, YjbQ family
+
+gene Transfer Agent prohead protease ## ORFG04
+->
+gene Transfer Agent prohead protease
+
+gene Transfer Agent tail tape measure ## ORFG11
+->
+gene transfer agent tail tape measure
+
+heparinase II/III-like
+->
+heparinase II/III-like protein
+
+hypothetical
+->
+hypothetical protein
+
+iNTEGRAL MEMBRANE PROTEIN (Rhomboid family)
+->
+integral membrane protein, Rhomboid family
+
+probable periplasmic protein Cj0610c {imported} - Campylobacter jejuni (strain NCTC 11168)
+->
+probable periplasmic protein Cj0610c
+note	{imported} - Campylobacter jejuni (strain NCTC 11168)
+
+protein export cytoplasm chaperone protein (SecB
+->
+protein export cytoplasm chaperone protein SecB
+
+3'-5' exonuclease domain similar to epsilon subunit of DNA polymerase III
+->
+putative 3'-5' exonuclease
+note	domain similar to epsilon subunit of DNA polymerase III
+
+3-hydroxyacyl-CoA dehydrogenase -like
+->
+putative 3-hydroxyacyl-CoA dehydrogenase
+
+SAM-dependent methyltransferases
+->
+SAM-dependent methyltransferase
+
+TcuA: flavoprotein used to oxidize tricarballylate to cis-aconitate
+->
+flavoprotein TcuA
+note	used to oxidize tricarballylate to cis-aconitate
+
+TcuB: works with TcuA to oxidize tricarballylate to cis-aconitate
+->
+TcuB protein
+note	works with TcuA to oxidize tricarballylate to cis-aconitate
+
+Zn-dependent hydrolases
+->
+Zn-dependent hydrolase
+
+permeases of the major facilitator superfamily
+->
+permease of the major facilitator superfamily
+
+possible methyltransferases
+->
+possible methyltransferase
+
+putative
+->
+hypothetical protein
+
+putative phosphohydrolases
+->
+putative phosphohydrolase
+
+similar to TadZ/CpaE
+->
+putative TadZ/CpaE protein
+
+similar to phosphoglycolate phosphatase
+->
+putative phosphoglycolate phosphatase
+
+similar to ribulose-1,5-bisphosphate carboxylase
+->
+putative ribulose-1,5-bisphosphate carboxylase
+
+spermidine Putrescine ABC transporter permease component potC (TC_3.A.1.11.1)
+->
+spermidine putrescine ABC transporter permease component potC
+
+transcription regulator [contains diacylglycerol kinase catalytic domain]
+->
+transcription regulator
+note	contains diacylglycerol kinase catalytic domain
+
+trilactone hydrolase [bacillibactin] siderophore
+->
+bacillibactin trilactone hydrolase siderophore
+-------------------------------------
+
+5. 略語記載の変更
+-------------------------------------
+ErfK/YbiS/YcfS/YnhG
+->
+ErfK/YbiS/YcfS/YnhG protein
+
+FOG: TPR repeat
+TPR repeat
+->
+TPR repeat-containing protein
+
+PhbF
+->
+PhbF protein
+
+YgfY COG2938
+->
+YgfY protein, COG2938 
+
+cblY
+->
+cblY protein
+-------------------------------------
+
+
+6. 以下の product 名については hypothetical protein が適切かと存じます。
+-------------------------------------
+Gll3169 protein
+->
+hypothetical protein
+note	Gll3169 protein
+
+
+BH3131 unknown
+COG1872
+COG2110
+COGs COG2378
+COGs COG2966
+COGs COG3683
+bll0087
+bll1389
+bll2563
+bll3040
+bll4671
+bll5137
+bll5824
+bll6129
+bll6205
+bll7264
+bll7522
+bll7531
+blr0478
+blr0833
+blr0907
+blr1130
+blr1402
+blr2545
+blr2625
+blr3043
+blr3067
+blr3076
+blr3123
+blr3697
+blr3702
+blr4240
+blr4592
+blr4609
+blr4611
+blr5840
+blr5868
+blr7447
+blr7534
+bsl2560
+bsl3737
+bsl7915
+bsr0136
+bsr1504
+bsr2468
+bsr7045
+Bll1313 protein
+Bll3066 protein
+Bll3113 protein
+Bll4347 protein
+Bll4645 protein
+Bll4656 protein
+Bll5866 protein
+Bll6480 protein
+Bll7046 protein
+Bll7160 protein
+Bll7406 protein
+interPro IPR000387 COGs COG2453
+interPro IPR001687:IPR003439:IPR003593 COGs COG1131
+interPro IPR001993:IPR004843:IPR006311
+-------------------------------------
+
+7. product 名のみ、ご記載ください。
+-------------------------------------
+例、
+fIG098404: Hypothetical protein
+->
+hypothetical protein
+
+fIG028883: Permeases of the drug/metabolite transporter (DMT) superfamily
+->
+permeases of the drug/metabolite transporter DMT superfamily
+
+
+fIG000875: Thioredoxin domain-containing protein EC-YbbN
+fIG000988: Predicted permease
+fIG001353: Acetyltransferase
+fIG001571: Hypothetical protein
+fIG002473: Protein YcaR in KDO2-Lipid A biosynthesis cluster
+fIG003033: Helicase domain protein
+fIG003492: Threonine dehydrogenase and related Zn-dependent dehydrogenases
+fIG00450516: Zinc-finger domain protein
+fIG004694: Hypothetical protein
+fIG00820637:: Acyl dehydratase
+fIG028883: Permeases of the drug/metabolite transporter (DMT) superfamily
+fIG033376: Heat shock protein DnaJ-like
+fIG043197: Inositol monophosphatase family protein
+fIG045374: Type II restriction enzyme
+fIG049039: Transcriptional regulator
+fIG087842: Hypothetical protein
+fIG097019: Amino acid efflux protein
+fIG097052: Sugar transporter
+fIG098404: Hypothetical protein
+fIG100068: Hypothetical protein
+fIG124585: Hypothetical protein
+fIG139612: Possible conserved membrane protein
+fIG139928: Putative protease
+fIG147869: Carbon-nitrogen hydrolase
+-------------------------------------
+
+8. domain, motif 名称のみではなく protein 名をご記載ください。
+-------------------------------
+MOSC domain
+dNA-binding domain of ModE
+ATP/GTP-binding site motif A
+ATP/GTP-binding site motif A (P-loop) :Porin
+-------------------------------
+
+9. ご確認の上、適切な名称をご記入ください。
+-------------------------------
+lead
+leucine-
+-------------------------------
+
+
+SECRETION ACTIVATOR PROTEIN
+->
+secretion activator protein
+
+SERINE PROTEASE
+->
+serine protease
+
+SMR/MUTS FAMILY PROTEIN
+->
+SMR/MUTS family protein
+
+exopolysacchride production negative regulator ExoR
+->
+exopolysaccharide production negative regulator ExoR

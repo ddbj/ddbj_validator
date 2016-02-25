@@ -1,0 +1,424 @@
+unchracterized transporter YcgO
+->
+uncharacterized transporter YcgO
+
+dipeptidyl anminopeptidase
+->
+dipeptidyl aminopeptidase
+
+uspA
+yajC
+mutT1
+->
+uspA protein
+yajC protein
+mutT1 protein
+
+alternate gene name: yzbB
+->
+yzbB protein
+
+arginine pathway regulatory protein ArgR, repressor of arg regulon
+->
+arginine pathway regulatory protein ArgR
+note	repressor of arg regulon
+
+cAMP-binding proteins - catabolite gene activator and regulatory subunit of cAMP-dependent protein kinases
+->
+cAMP-binding protein
+note	catabolite gene activator and regulatory subunit of cAMP-dependent protein kinases
+
+catalyzes the cleavage of p-aminobenzoyl-glutamate to p-aminobenzoate and glutamate, subunit A
+->
+?
+
+cell division protein DivIC (FtsB), stabilizes FtsL against RasP cleavage
+->
+ell division protein DivIC
+note	(FtsB), stabilizes FtsL against RasP cleavage
+
+copper metallochaperone, bacterial analog of Cox17 protein
+->
+copper metallochaperone
+note	bacterial analog of Cox17 protein
+
+cytochrome c-type biogenesis protein DsbD, protein-disulfide reductase
+->
+cytochrome c-type biogenesis protein DsbD
+note	protein-disulfide reductase
+
+cytochrome oxidase biogenesis protein Surf1, facilitates heme A insertion
+->
+cytochrome oxidase biogenesis protein Surf1
+note	facilitates heme A insertion
+
+Acetyl-CoA:Cys-GlcN-Ins acetyltransferase, mycothiol synthase MshD
+->
+acetyl-CoA:Cys-GlcN-Ins acetyltransferase
+note	mycothiol synthase MshD
+
+Competence protein F homolog, phosphoribosyltransferase domain
+->
+competence protein F homolog
+note	phosphoribosyltransferase domain
+
+DUF1794
+->
+hypothetical protein, DUF1794
+
+NADH-dependent dyhydrogenase
+->
+NADH-dependent dehydrogenase
+
+clustered with transcription termination protein NusA
+->
+?
+
+chromosome segregation protein SMC-like
+->
+SMC-like chromosome segregation protein
+
+copper metallochaperone, bacterial analog of Cox17 protein
+->
+copper metallochaperone
+note	bacterial analog of Cox17 protein
+
+cytochrome c-type biogenesis protein DsbD, protein-disulfide reductase
+->
+cytochrome c-type biogenesis protein DsbD
+note	protein-disulfide reductase
+
+cytochrome oxidase biogenesis protein Surf1, facilitates heme A insertion
+->
+cytochrome oxidase biogenesis protein Surf1
+note	facilitates heme A insertion
+
+cytoplasmic axial filament protein CafA and Ribonuclease G
+->
+cytoplasmic axial filament protein CafA
+note	Ribonuclease G
+
+flavodoxin reductases (ferredoxin-NADPH reductases) family 1
+->
+flavodoxin reductase family 1
+note	ferredoxin-NADPH reductases
+
+flavohemoprotein (Hemoglobin-like protein) (Flavohemoglobin)
+->
+flavohemoprotein
+note	Hemoglobin-like protein, Flavohemoglobin
+
+glucose-methanol-choline (GMC) oxidoreductase:NAD binding site
+->
+glucose-methanol-choline GMC oxidoreductase
+note	NAD binding site
+
+glutamine amidotransferases, class-II
+->
+glutamine amidotransferase, class-II
+
+glutaredoxin-like protein NrdH, required for reduction of Ribonucleotide reductase class Ib
+->
+glutaredoxin-like protein NrdH
+note	required for reduction of Ribonucleotide reductase class Ib
+
+glycosyltransferase LafA, responsible for the formation of Glc-DAG
+->
+glycosyltransferase LafA
+note	responsible for the formation of Glc-DAG
+
+glycosyltransferase LafB, responsible for the formation of Gal-Glc-DAG
+->
+glycosyltransferase LafB
+note	responsible for the formation of Gal-Glc-DAG
+
+helicase, C-terminal
+->
+helicase
+note	C-terminal
+
+heme O synthase, protoheme IX farnesyltransferase COX10-CtaB
+->
+heme O synthase
+note	protoheme IX farnesyltransferase COX10-CtaB
+
+hemoprotein HemQ, essential component of heme biosynthetic pathway in Gram-positive bacteria
+->
+hemoprotein HemQ
+note	essential component of heme biosynthetic pathway in Gram-positive bacteria
+
+helicase PriA essential for oriC/DnaA-independent DNA replication
+->
+helicase PriA
+note	essential for oriC/DnaA-independent DNA replication
+
+hypothetical YciO protein, TsaC/YrdC paralog
+->
+hypothetical YciO protein
+note	TsaC/YrdC paralog
+
+hypothetical radical SAM family enzyme in heat shock gene cluster, similarity with CPO of BS HemN-type
+->
+hypothetical radical SAM family enzyme
+note	in heat shock gene cluster, similarity with CPO of BS HemN-type
+
+inner membrane protein YihY, formerly thought to be RNase BN
+->
+inner membrane protein YihY
+note	formerly thought to be RNase BN
+
+lipid carrier : UDP-N-acetylgalactosaminyltransferase
+->
+lipid carrier
+note	UDP-N-acetylgalactosaminyltransferase
+
+membrane-flanked domain
+->
+membrane-flanked domain protein
+
+membrane proteins related to metalloendopeptidases
+->
+membrane protein related to metalloendopeptidases
+
+metal-dependent hydrolase YbeY, involved in rRNA and/or ribosome maturation and assembly
+->
+metal-dependent hydrolase YbeY
+note	involved in rRNA and/or ribosome maturation and assembly
+
+molybdate-binding domain of ModE
+->
+molybdate-binding domain of ModE
+
+nitrite transporter from formate/nitrite family
+->
+nitrite transporter
+note	from formate/nitrite family
+
+oligopeptide/dipeptide ABC transporter, ATP-binding protein, C-terminal
+->
+oligopeptide/dipeptide ABC transporter, ATP-binding protein
+note	C-terminal
+
+opcA, an allosteric effector of glucose-6-phosphate dehydrogenase, actinobacterial
+->
+opcA protein
+note	an allosteric effector of glucose-6-phosphate dehydrogenase, actinobacterial
+
+paaD-like protein (DUF59) involved in Fe-S cluster assembly
+->
+paaD-like protein DUF59
+note	involved in Fe-S cluster assembly
+
+peptidase S8 and S53, subtilisin, kexin, sedolisin
+->
+peptidase S8 and S53
+note	subtilisin, kexin, sedolisin
+
+peptidase S9, prolyl oligopeptidase active site domain protein
+->
+peptidase S9
+note	prolyl oligopeptidase active site domain protein
+
+peptidase M20D, amidohydrolase
+->
+peptidase M20D
+note	amidohydrolase
+
+peptidase C2, calpain
+->
+peptidase C2
+note	calpain
+
+permeases of the major facilitator superfamily
+->
+permease of the major facilitator superfamily
+
+phage capsid and scaffold
+->
+?
+
+phosphate starvation-inducible protein PhoH, predicted ATPase
+->
+phosphate starvation-inducible protein PhoH
+note	predicted ATPase
+
+possible toxin to DivIC
+->
+?
+
+possibly a cell division protein, antigen 84 in Mycobacteria
+->
+possibly a cell division protein
+note	antigen 84 in Mycobacteria
+
+predicted glycogen synthase, ADP-glucose transglucosylase, Actinobacterial type
+->
+predicted glycogen synthase
+note	ADP-glucose transglucosylase, Actinobacterial type
+
+proline dehydrogenase (Proline oxidase)
+->
+proline dehydrogenase
+note	Proline oxidase
+
+protein containing transglutaminase-like domain, putative cysteine protease
+->
+protein containing transglutaminase-like domain
+note	putative cysteine protease
+
+protein export cytoplasm protein SecA ATPase RNA helicase
+->
+?
+
+protein often found in Actinomycetes clustered with signal peptidase and/or RNaseHII
+->
+hypothetical protein
+note	often found in Actinomycetes clustered with signal peptidase and/or RNaseHII
+
+protein serine/threonine phosphatase PrpC, regulation of stationary phase
+->
+serine/threonine phosphatase PrpC
+note	regulation of stationary phase
+
+protein-N(5)-glutamine methyltransferase PrmC, methylates polypeptide chain release factors RF1 and RF2
+->
+protein-N(5)-glutamine methyltransferase PrmC
+note	methylates polypeptide chain release factors RF1 and RF2
+
+pup ligase PafA' paralog, possible component of postulated heterodimer PafA-PafA'
+->
+pup ligase PafA' paralog
+note	possible component of postulated heterodimer PafA-PafA'
+
+pup ligase PafA, possible component of postulated heterodimer PafA-PafA'
+->
+pup ligase PafA
+note	possible component of postulated heterodimer PafA-PafA'
+
+putative ABC iron siderophore transporter, fused permease and ATPase domains
+->
+putative ABC iron siderophore transporter,
+note	fused permease and ATPase domains
+
+putative hydrolase in cluster with formaldehyde/S-nitrosomycothiol reductase MscR
+->
+putative hydrolase
+note	in cluster with formaldehyde/S-nitrosomycothiol reductase MscR
+
+regulatory protein, LuxR:Response regulator receiver
+->
+regulatory protein, LuxR
+note	Response regulator receiver
+
+response regulator receiver:Transcriptional regulatory protein, C terminal
+->
+response regulator receiver
+note	Transcriptional regulatory protein, C terminal
+
+ribosome-associated heat shock protein implicated in the recycling of the 50S subunit
+->
+ribosome-associated heat shock protein
+note	implicated in the recycling of the 50S subunit
+
+ribulosamine/erythrulosamine 3-kinase potentially involved in protein deglycation
+->
+ribulosamine/erythrulosamine 3-kinase
+note	potentially involved in protein deglycation
+
+rossmann fold nucleotide-binding protein Smf possibly involved in DNA uptake
+->
+rossmann fold nucleotide-binding protein Smf
+note	possibly involved in DNA uptake
+
+serine/threonine protein kinase PrkC, regulator of stationary phase
+->
+serine/threonine protein kinase PrkC
+note	regulator of stationary phase
+
+signal recognition particle receptor protein FtsY (=alpha subunit)
+->
+signal recognition particle receptor protein FtsY, alpha subunit
+
+streptomycin 6-kinase (Streptidine kinase) (Streptomycin 6-phosphotransferase)
+->
+streptomycin 6-kinase
+note	Streptidine kinase, Streptomycin 6-phosphotransferase
+
+substrate-specific component YkoE of thiamin-regulated ECF transporter for HydroxyMethylPyrimidine
+->
+substrate-specific component YkoE
+note	thiamin-regulated ECF transporter for HydroxyMethylPyrimidine
+
+sulfur acceptor protein SufE for iron-sulfur cluster assembly
+->
+sulfur acceptor protein SufE
+note	for iron-sulfur cluster assembly
+
+thiosulfate sulfurtransferase, rhodanese
+->
+thiosulfate sulfurtransferase
+note	rhodanese
+
+toxin 1, PIN domain
+->
+toxin 1 with PIN domain
+
+transcriptional regulator containing an amidase domain and an AraC-type DNA-binding HTH domain
+->
+transcriptional regulator
+note	containing an amidase domain and an AraC-type DNA-binding HTH domain
+
+transcriptional regulatory protein, C-terminal:Uroporphyrinogen III synthase HEM4
+->
+transcriptional regulatory protein
+note	C-terminal:Uroporphyrinogen III synthase HEM4
+
+transglutaminase-like enzymes, putative cysteine proteases
+->
+transglutaminase-like enzyme
+note	putative cysteine proteases
+
+transmembrane protein MT2276, clustered with lipoate gene
+->
+transmembrane protein MT2276
+note	clustered with lipoate gene
+
+transmembrane protein, distant homology with ydbS
+->
+transmembrane protein
+note	distant homology with ydbS
+
+tsaB protein, required for threonylcarbamoyladenosine (t(6)A) formation in tRNA
+->
+tsaB protein
+note	required for threonylcarbamoyladenosine (t(6)A) formation in tRNA
+
+tsaC protein (YrdC domain) required for threonylcarbamoyladenosine t(6)A37 modification in tRNA
+->
+tsaC protein with YrdC domain
+note	required for threonylcarbamoyladenosine t(6)A37 modification in tRNA
+
+tsaD/Kae1/Qri7 protein, required for threonylcarbamoyladenosine t(6)A37 formation in tRNA
+->
+tsaD/Kae1/Qri7 protein
+note	required for threonylcarbamoyladenosine t(6)A37 formation in tRNA
+
+tsaE protein, required for threonylcarbamoyladenosine t(6)A37 formation in tRNA
+->
+tsaE protein
+note	required for threonylcarbamoyladenosine t(6)A37 formation in tRNA
+
+ycfF/hinT protein: a purine nucleoside phosphoramidase
+->
+ycfF/hinT protein
+note	a purine nucleoside phosphoramidase
+
+twin-arginine translocation pathway signal:YD repeat
+->
+twin-arginine translocation pathway signal
+note	YD repeat
+
+type II/IV secretion system protein TadC, associated with Flp pilus assembly
+->
+type II/IV secretion system protein TadC
+note	associated with Flp pilus assembly
