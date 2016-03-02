@@ -1,0 +1,74 @@
+{
+  "rule2" : {
+    "code" : "2",
+    "scope": "all",
+    "tag" : "invalid_attribute_value_for_controlled_terms",    
+    "name": "Invalid Attribute value for controlled terms",
+    "message": "Attribute value is not in controlled terms for attribute '<%= attribute_name %>'.",
+    "method": "is_value_in_controlled_terms"
+  },
+  "rule5" : {
+    "code" : "5",
+    "scope": "bioproject_id",
+    "tag": "is_valid_bioproject_accession",
+    "title" : "Invalid BioProject accession",
+    "message": "Invalid BioProject accession: <%= value %>. Please provide a valid BioProject accession with format PRJDxxxxxx or PSUBxxxxxx",
+    "method": "is_valid_bioproject_accession"
+  },
+  "rule48" : {
+    "code" : "48",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism",
+    "message": "Organism is inappropriate for package. Please either specify a different sample type package or edit the organism according to the 'Appropriate organism and package' rules described at http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/.",
+    "method": "is_appropriate_taxonomy_for_package"
+  },
+  "rule83" : {
+    "code" : "83",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism > MIMS Environmental/Metagenome",
+    "message": "Must be a metagenome, where lineage starts with unclassified sequences and scientific name ends with 'metagenome'",
+    "method": "is_appropriate_taxonomy_for_package"
+  },
+  "rule84" : {
+    "code" : "84",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism > MIGS Cultured Bacterial/Archaeal",
+    "message": "Must have lineage Bacteria or Archaea",
+    "method": "is_appropriate_taxonomy_for_package"
+  },
+  "rule85" : {
+    "code" : "85",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism > MIGS Eukaryotic",
+    "message": "Must have lineage Eukaryota",
+    "method": "is_appropriate_taxonomy_for_package"
+  },
+  "rule86" : {
+    "code" : "86",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism > MIGS Viral",
+    "message": "Must have lineage Viruses",
+    "method": "is_appropriate_taxonomy_for_package"
+  },
+  "rule87" : {
+    "code" : "87",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism > MIMARKS Specimen",
+    "message": "No check",
+    "method": "is_appropriate_taxonomy_for_package"
+  },
+  "rule88" : {
+    "code" : "88",
+    "scope": ["package", "organism"],
+    "tag" : "package_vs_organism",
+    "title": "Package versus Organism > MIMARKS Survey related",
+    "message": "Must be a metagenome, where lineage starts with unclassified sequences and scientific name ends with 'metagenome'",
+    "method": "is_appropriate_taxonomy_for_package"
+  }
+}
