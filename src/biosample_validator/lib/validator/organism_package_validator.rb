@@ -1,27 +1,28 @@
+#$:.unshift File.dirname(__FILE__)
 require 'rubygems'
 require 'json'
 require 'erb'
-require File.dirname(__FILE__) + "/lib/sparql.rb"
+require File.dirname(__FILE__) + "/sparql_base.rb"
+require File.dirname(__FILE__) + "/../common_utils.rb"
 
-class OrganismVsPackage 
+class OrganismVsPackage < SPARQLBase 
   #TODO tax_id is string of integer?
-  TAX_BACTERIA = "2" 
-  TAX_VIRUSES = "10239"
-  TAX_FUNGI = "4751"
-  TAX_ARCHAEA = "2157"
-  TAX_VIROIDS = "12884"
-  TAX_METAZOA = "33208"
-  TAX_EMBRYOPHYTA = "3193" #Embryophyta
-  TAX_UNCLASSIFIED_SEQUENCES = "12908"
-  TAX_OTHER_SEQUENCES = "28384"
-  TAX_HOMO_SAPIENS = "9606"
-  TAX_VIRIDIPLANTAE = "33090" #Viridiplantae
-  TAX_EUKARYOTA = "2759"
+  TAX_BACTERIA = "2" #bacteria
+  TAX_VIRUSES = "10239" #viruses
+  TAX_FUNGI = "4751" #fungi
+  TAX_ARCHAEA = "2157" #archaea
+  TAX_VIROIDS = "12884" #viroids
+  TAX_METAZOA = "33208" #metazoa
+  TAX_EMBRYOPHYTA = "3193" #embryophyta
+  TAX_UNCLASSIFIED_SEQUENCES = "12908" #unclassified_sequences
+  TAX_OTHER_SEQUENCES = "28384" #other sequences
+  TAX_HOMO_SAPIENS = "9606" #homo sapiens
+  TAX_VIRIDIPLANTAE = "33090" #viridiplantae
+  TAX_EUKARYOTA = "2759" #eukaryota
 
-  #TODO move to the setting file?
-  def initialize
-    @endpoint_url = "http://staging-genome.annotation.jp/sparql"
-    @base_dir = File.dirname(__FILE__)
+  def initialize (endpoint)
+    super(endpoint)
+    @template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
   end
 
   #
@@ -70,39 +71,25 @@ class OrganismVsPackage
     end
   end
 
-  #TODO create class for sparql query
-  #
-  # Queries sparql query to endpoint, return result value 
-  #
-  def query(sparql_query)
-    #puts sparql_query
-    sparql_ep = SPARQL.new("#{@endpoint_url}")
-    result = sparql_ep.query(sparql_query, :format => 'json')
-    #TODO error handling
-    result = JSON.parse(result)["results"]["bindings"]
-    #TODO expand key-value list
-    return result
-  end
-
   #
   # Returns an organism name of specified taxonomy_id
   #
   def get_organism_name(tax_id)
-    template = File.read("#{@base_dir}/sparql/organism_name.rq")
-    sparql_query  = ERB.new(template).result(binding)
+    params = {tax_id: tax_id}
+    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/organism_name.rq", params)
     result = query(sparql_query) 
-    return result.first["organism_name"]["value"]
+    return result.first["organism_name"]
   end
 
   #
-  # Returns sparql result of "./sparql/has_linage.rq"
+  # Returns sparql result of "has_linage.rq"
   #
   def get_linage(tax_id, linages)
     parent_tax_id = linages.map {|linage|
       "id-tax:" + linage  
     }.join(" ")
-    template = File.read("#{@base_dir}/sparql/has_linage.rq")
-    sparql_query  = ERB.new(template).result(binding)
+    params = {tax_id: tax_id, parent_tax_id: parent_tax_id}
+    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_linage.rq", params)
     result = query(sparql_query) 
     return result
   end

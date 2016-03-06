@@ -1,0 +1,6 @@
+SELECT (COUNT(?s) AS ?count)
+FROM <http://ddbj.nig.ac.jp/ontologies/sample_attribute>
+WHERE
+{
+ ?s ?p <http://ddbj.nig.ac.jp/ontologies/biosample/<%= package_name %>>
+}  
