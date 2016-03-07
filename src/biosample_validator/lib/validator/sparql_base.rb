@@ -6,10 +6,15 @@ require File.dirname(__FILE__) + "/../sparql.rb"
 
 
 # A class for execute sparql query
-# Date:: 2016/3//4
 #
 class SPARQLBase
 
+  #
+  # Initializer
+  #
+  # ==== Args
+  # endpoint: endpoint url
+  #
   def initialize(endpoint)
     #TODO get filepath from root
     #config = JSON.parse(File.read(File.expand_path("../../conf/app_config.json", __FILE__)))
@@ -17,7 +22,9 @@ class SPARQLBase
     @endpoint_url = endpoint 
   end
 
+  #
   # Queries sparql query to endpoint, return result value 
+  #
   # ==== Args
   # _query_ :: SPARQL query string
   #  "SELECT * { ?s ?p ?o } LIMIT 10"
@@ -36,9 +43,5 @@ class SPARQLBase
        end
     end
     return result
-  end
-  def assemble_query (template_path, param)
-    template = File.read(template_path)
-    ERB.new(template).result(binding) 
   end
 end

@@ -2,7 +2,7 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require 'ostruct'
-require File.dirname(__FILE__) + "/organism_package_validator.rb"
+require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
 
@@ -11,20 +11,24 @@ require File.dirname(__FILE__) + "/../common_utils.rb"
 #
 class MainValidator
 
-  # Initialize
+  #
+  # Initializer
   #
   def initialize
     @base_dir = File.dirname(__FILE__)
     #TODO setting config from SPARQL?
     @validation_config = JSON.parse(File.read(@base_dir + "/../../conf/validation_config.json"))
     @error_list = []
+    @org_validator = OrganismValidator.new("http://staging-genome.annotation.jp/sparql") #TODO config
     #TODO load sub validator class or modules
   end
 
   
-  # Flattens json data which is send from node
+  #
+  # Flattens and json data which is send from node
+  #
   # ==== Args
-  # Json data   
+  # Converted object from input json   
   #
   # ==== Return
   # An array of biosample data.
@@ -70,9 +74,15 @@ class MainValidator
   end
 
   #
-  # validate the bio sample data
+  # Validate the all rules for the bio sample data.
+  # Error/warning list is stored to @error_list
+  #
+  # ==== Args
+  # data_json: json file path  
+  #
   #
   def validate (data_json)
+    #convert to object for validator
     @data_file = File::basename(data_json)
     begin
       json_data = JSON.parse(File.read(data_json))
@@ -94,7 +104,7 @@ class MainValidator
       send("unknown_package", "26", biosample_data[:package], line_num)
 
       #TODO get mandatory attribute from sparql
-      attr_list = get_attributes_list(biosample_data[:package])
+      attr_list = get_attributes_of_package(biosample_data[:package])
       ### 6.check all attributes (rule: 1, 14, 27, 35, 36)
 
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 70, 90, 91)
@@ -110,15 +120,19 @@ class MainValidator
 
       ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
 
+      send("invalid_host_organism_name", "15", biosample_data[:attributes][:host], line_num)
 
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
-      package = biosample_data[:package]
-      tax_id =  biosample_data[:taxonomy_id]
-      send("package_versus_organism", "48", tax_id, package, line_num)
+      send("taxonomy_name_and_id_not_match", "4", biosample_data[:taxonomy_id], biosample_data[:organism], line_num)
+
+      send("package_versus_organism", "48", biosample_data[:taxonomy_id], biosample_data[:package], line_num)
+      
+      send("sex_for_bacteria", "59", biosample_data[:taxonomy_id], biosample_data[:attributes][:sex], line_num)
     end
   end
 
+  #
   # Returns error/warning list as the validation result
   #
   #
@@ -126,6 +140,7 @@ class MainValidator
     JSON.generate(@error_list)
   end
 
+  #
   # Returns attribute list in the specified package 
   #
   # ==== Args
@@ -140,11 +155,11 @@ class MainValidator
   #   },
   #   {...}, ...
   # ]
-  def get_attributes_list (package)
+  def get_attributes_of_package (package)
     package_name = package.gsub(".", "_")
-    package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be corrected
-    package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be corrected
-    
+    package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
+    package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
+
     sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
     params = {package_name: package_name}
     template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
@@ -161,16 +176,19 @@ class MainValidator
 
 ### validate method ###
 
+  #
   # Validates package name is valid
   #
   # ==== Args
-  # package name ex."MIGS.ba.soil"
+  # package name ex."MIGS.ba.microbial"
   #
   def unknown_package (rule_code, package, line_num)
+    return nil if package.nil?
     package_name = package.gsub(".", "_")
-    package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be corrected
-    package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be corrected
-    
+    package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
+    package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
+
+    #TODO when package name isn't as url, occures erro.    
     sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
     params = {package_name: package_name}
     template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
@@ -188,10 +206,18 @@ class MainValidator
     end 
   end
   
+  #
   # Validates the attributes values in controlled term
   #
+  # ==== Args
+  # rule_code
+  # project_id ex."PDBJ123456"
+  # line_num 
+  # ==== Return
+  # true/false
   # 
   def invalid_attribute_value_for_controlled_terms(rule_code, attr_name, attr_val, cv_attr, line_num)
+    return nil  if attr_name.nil? || attr_val.nil?
     result =  true
     if !cv_attr[attr_name].nil? # is contralled term attribute 
       if !cv_attr[attr_name].include?(attr_val) # is not appropriate value
@@ -208,8 +234,15 @@ class MainValidator
     result
   end
 
-  # Validates the bioproject_id attribute
-  # 
+  #
+  # Validates the bioproject_id format
+  #
+  # ==== Args
+  # rule_code
+  # project_id ex."PDBJ123456"
+  # line_num 
+  # ==== Return
+  # true/false
   #
   def invalid_bioproject_accession (rule_code, project_id, line_num)
     return nil if project_id.nil?
@@ -226,12 +259,90 @@ class MainValidator
     end
   end
 
+  #
+  # Validates that the specified host name is exist in taxonomy ontology as the organism(scientific) name.
+  # 
+  # ==== Args
+  # rule_code
+  # host_name ex."Homo sapiens"
+  # line_num 
+  # ==== Return
+  # true/false
+  #
+  def invalid_host_organism_name (rule_code, host_name, line_num)
+    return nil if host_name.nil?
+    if @org_validator.exist_organism_name?(host_name)
+      true
+    else
+      organism_names = @org_validator.organism_name_of_synonym(host_name) #if it's synonym, suggests scientific name
+      value = [host_name]
+      if organism_names.size > 0
+        value.concat(organism_names)
+      end
+      annotation = [{key: "host", source: @data_file, location: line_num.to_s, value: value}]
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end 
+  end
+
+  #
+  # Validates that the organism(scientific) name is appropriate for taxonomy id
+  #
+  # ==== Args
+  # rule_code
+  # taxonomy_id ex."103690"
+  # organism_name ex."Nostoc sp. PCC 7120"
+  # line_num 
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_name_and_id_not_match (rule_code, taxonomy_id, organism_name, line_num)
+    return nil if taxonomy_id.nil?
+    return nil if organism_name.nil?
+    if @org_validator.match_taxid_vs_organism?(taxonomy_id, organism_name) 
+      true
+    else
+      annotation = []
+      # suggest correct organism name
+      org_value = [organism_name]
+      if taxonomy_id.to_s != "1" #not tentative id
+        org_name = @org_validator.get_organism_name(taxonomy_id)
+        org_value.push(org_name) unless org_name.nil? || org_name == ""
+      end
+      annotation.push({key: "organism", source: @data_file, location: line_num.to_s, value: org_value})
+
+      # suggest correct taxonomy id
+      tax_value = [taxonomy_id]
+      tax_ids = @org_validator.get_taxid_from_name(organism_name)
+      tax_value.concat(tax_ids) if !tax_ids.nil? && tax_ids.size > 0
+      annotation.push({key: "taxonomy_id", source: @data_file, location: line_num.to_s, value: tax_value})
+
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
+  #
   # Validates that the organism is appropriate for package
   #
+  # ==== Args
+  # rule_code
+  # taxonomy_id ex."103690"
+  # sex ex."MIGS.ba.microbial"
+  # line_num 
+  # ==== Return
+  # true/false
   # 
   def package_versus_organism (rule_code, taxonomy_id, package_name, line_num)
-    org_vs_package = OrganismVsPackage.new("http://staging-genome.annotation.jp/sparql") #TODO config
-    valid_result = org_vs_package.validate(taxonomy_id.to_i, package_name) 
+    return nil if taxonomy_id.nil?
+    return nil if package_name.nil?
+    valid_result = @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name) 
     if valid_result[:status] == "error"
       annotation = []
       annotation.push({key: "taxonomy_id", source: @data_file, location: line_num.to_s, value: [taxonomy_id]})
@@ -244,4 +355,34 @@ class MainValidator
       true
     end
   end
+
+  #
+  # Validates sex attribute is specified when taxonomy has linage the bacteria.
+  #
+  # ==== Args
+  # rule_code
+  # taxonomy_id ex."103690"
+  # sex ex."male"
+  # line_num 
+  # ==== Return
+  # true/false
+  #
+  def sex_for_bacteria (rule_code, taxonomy_id, sex, line_num)
+    return nil if taxonomy_id.nil?
+    return nil if sex.nil?
+    ret = true
+    linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES, OrganismValidator::TAX_FUNGI]
+    if @org_validator.has_linage(taxonomy_id, linages)
+      unless sex == ""
+        annotation = [{key: "sex", source: @data_file, location: line_num.to_s, value: [sex]}]
+        rule = @validation_config["rule" + rule_code]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        ret = false
+      end
+    end
+    ret
+  end
+
 end
