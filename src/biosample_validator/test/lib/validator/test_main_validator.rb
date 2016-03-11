@@ -151,18 +151,37 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret
     error_list =  @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
-
     @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.sex_for_bacteria("59", "9606", "male", 1)
     assert_equal true, ret
     error_list =  @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
+
     #ng case
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.sex_for_bacteria("59", "103690", "male", 1)
+    ret = @validator.sex_for_bacteria("59", "103690", "male", 1) #bacteria
     assert_equal false, ret
     error_list =  @validator.instance_variable_get (:@error_list)
     assert_equal 1, error_list.size
+    except_msg = "Attribute 'sex' is not appropriate for bacterial or viral organisms; did you mean 'host sex'?"
+    assert_equal except_msg, error_list[0][:message]
+
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.sex_for_bacteria("59", "510903", "male", 1) #viral
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_msg = "Attribute 'sex' is not appropriate for bacterial or viral organisms; did you mean 'host sex'?"
+    assert_equal except_msg, error_list[0][:message]
+
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.sex_for_bacteria("59", "1445577", "male", 1) #fungi
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_msg = "Attribute 'sex' is not appropriate for fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"
+    assert_equal except_msg, error_list[0][:message]
+
     #params are nil pattern
     @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.sex_for_bacteria("58", "103690", nil, 1)

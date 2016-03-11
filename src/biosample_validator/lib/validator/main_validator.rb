@@ -371,15 +371,22 @@ class MainValidator
     return nil if taxonomy_id.nil?
     return nil if sex.nil?
     ret = true
-    linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES, OrganismValidator::TAX_FUNGI]
-    if @org_validator.has_linage(taxonomy_id, linages)
-      unless sex == ""
+    bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
+    fungi_linages = [OrganismValidator::TAX_FUNGI]
+    unless sex == ""
+      if @org_validator.has_linage(taxonomy_id, bac_vir_linages)
+        param = {message: "for bacterial or viral organisms; did you mean 'host sex'?"}
+        ret = false
+      elsif @org_validator.has_linage(taxonomy_id, fungi_linages)
+        param = {message: "for fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"}
+        ret = false
+      end
+      if ret == false
         annotation = [{key: "sex", source: @data_file, location: line_num.to_s, value: [sex]}]
         rule = @validation_config["rule" + rule_code]
-        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        message = CommonUtils::error_msg(@validation_config, rule_code, param)
         error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
         @error_list.push(error_hash)
-        ret = false
       end
     end
     ret

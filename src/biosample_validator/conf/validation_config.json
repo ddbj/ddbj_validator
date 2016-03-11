@@ -277,7 +277,7 @@
     "scope": "taxonomy_id, attribute.sex",
     "name": "Sex for bacteria",
     "method": "sex_for_bacteria",
-    "message": "Attribute 'sex' is not appropriate for bacteria"
+    "message": "Attribute 'sex' is not appropriate <%= message %>"
   },
   "rule60": {
     "code": "60",
