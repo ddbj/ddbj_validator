@@ -1,5 +1,5 @@
 require 'erb'
-require 'ostruct'
+require 'erubis'
 
 class CommonUtils
 
@@ -13,12 +13,11 @@ class CommonUtils
   # returns binding result as string
   #
   def self.binding_template_with_hash (template, params)
-    vars = OpenStruct.new(params)
     if File.exist?(template)
       template = File.read(template)
     end
-    query = ERB.new(template).result(vars.instance_eval { binding })
-    return query
+    result = Erubis::Eruby.new(template).result(params)
+    return result
   end
 
   #
