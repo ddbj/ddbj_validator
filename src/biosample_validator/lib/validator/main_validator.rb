@@ -196,7 +196,7 @@ class MainValidator
     result = sparql.query(sparql_query)
     if result.first[:count].to_i <= 0
       annotation = [{key: "package", source: @data_file, location: line_num.to_s, value: [package]}]
-      param = {package: package}
+      param = {PACKAGE: package}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
@@ -224,7 +224,7 @@ class MainValidator
         annotation = []
         annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: [attr_val]})
         rule = @validation_config["rule" + rule_code]
-        param = {attribute_name: attr_name}
+        param = {ATTRIBUTE_NAME: attr_name}
         message = CommonUtils::error_msg(@validation_config, rule_code, param)
         error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
         @error_list.push(error_hash)
@@ -251,7 +251,7 @@ class MainValidator
     else
       annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id]}]
       rule = @validation_config["rule" + rule_code]
-      param = {value: project_id}
+      param = {VALUE: project_id}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
@@ -375,10 +375,10 @@ class MainValidator
     fungi_linages = [OrganismValidator::TAX_FUNGI]
     unless sex == ""
       if @org_validator.has_linage(taxonomy_id, bac_vir_linages)
-        param = {message: "for bacterial or viral organisms; did you mean 'host sex'?"}
+        param = {MESSAGE: "for bacterial or viral organisms; did you mean 'host sex'?"}
         ret = false
       elsif @org_validator.has_linage(taxonomy_id, fungi_linages)
-        param = {message: "for fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"}
+        param = {MESSAGE: "for fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"}
         ret = false
       end
       if ret == false
