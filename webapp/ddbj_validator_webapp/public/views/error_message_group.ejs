@@ -1,0 +1,172 @@
+<div class="container result-summary group">
+    <h2>Error found in while checking this document</h2>
+    <table class="result">
+        <tbody>
+        <tr>
+            <th>Result:</th>
+            <td>
+                    <span class="error_info">
+                        <% if(error_size != 0){ %>
+                        <%= error_size %> Errors
+                        <% } else if(exception){%>
+                            <%= exception %>
+                        <% } else { %>
+                        No Errors Found
+                        <% } %>
+                    </span>
+            </td>
+        </tr>
+        <tr>
+            <th>File:</th>
+            <td><%= original_file %></td>
+        </tr>
+        <tr>
+            <th>Validation Method:</th>
+            <td><%= method %></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<% if(error_size != 0){ %>
+<div class="container result-group">
+    <h2>Error Message</h2>
+
+    <% for(var i=0; i< errors.length; i++){ %>
+
+        <% if(errors[i].level == "error"){ %>
+        <h3>
+            <span class="label label-danger error_level error"><%= errors[i].level %></span>
+            <%= errors[i].message %>
+        </h3>
+        <div class="tbl_error">
+        <% }else if(errors[i].level == "warning"){ %>
+        <h3>
+            <span class="label label-danger error_level warning"><%= errors[i].level %></span>
+            <%= errors[i].message %>
+        </h3>
+        <div class="tbl_warning">
+        <% } %>
+        <% if(errors[i].location == "#attribute"){ %>
+                <table>
+                    <tr>
+                        <th>Location</th>
+                        <th>Attribute</th>
+                        <th>Value</th>
+                    </tr>
+
+                    <% for(var j = 0; j < errors[i].values.length; j++){ %>
+                    <tr>
+                        <td><%= errors[i].location %></td>
+                        <td><%= errors[i].values[j].annotation[0].key %></td>
+                        <td><input type="text" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
+                    </tr>
+                    <% } %>
+                </table>
+
+        <% }else if(errors[i].location == "bioproject_id"){ %>
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Value</th>
+                </tr>
+                <tr>
+                    <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td><%= errors[i].location %></td>
+                    <td><%= errors[i].values[j].annotation[0].key %></td>
+                    <% } %>
+                </tr>
+            </table>
+        <% }else if(errors[i].location == "package, organism"){ %>
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Taxonomy Id</th>
+                    <th>Package</th>
+                </tr>
+                <tr>
+                    <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td><%= errors[i].location %></td>
+                    <td><%= errors[i].values[j].annotation[0].value %></td>
+                    <td><%= errors[i].values[j].annotation[1].value %></td>
+                    <% } %>
+                </tr>
+            </table>
+        <% }else if(errors[i].location == "organism and taxonomy_id"){ %>
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Organism</th>
+                    <th>Suggested organism</th>
+                    <th>Taxonomy ID</th>
+                    <th>Suggested taxonomy ID</th>
+                </tr>
+                <tr>
+                    <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td><%= errors[i].location %></td>
+                    <td><%= errors[i].values[j].annotation[0].value[0] %></td>
+                    <td><%= errors[i].values[j].annotation[0].value[1] %></td>
+                    <td><%= errors[i].values[j].annotation[1].value[0] %></td>
+                    <td><%= errors[i].values[j].annotation[1].value[1] %></td>
+                    <% } %>
+                </tr>
+            </table>
+        <% }else if(errors[i].correction == "auto-annotation"){ %>
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Key</th>
+                    <th>Value</th>
+                    <th>Suggested value</th>
+                </tr>
+                <tr>
+                    <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td><%= errors[i].location %></td>
+                    <td><%= errors[i].values[j].annotation[0].key %></td>
+                    <td><%= errors[i].values[j].annotation[0].value[0] %></td>
+                    <td><%= errors[i].values[j].annotation[0].value[1] %></td>
+                    <% } %>
+                </tr>
+            </table>
+        <% }else{ %>
+            <table>
+                <tr>
+                    <th>Location</th>
+                    <th>Key</th>
+                    <th>Value</th>
+                </tr>
+
+                <% for(var j = 0; j < errors[i].values.length; j++){ %>
+                <tr>
+                    <td><%= errors[i].location %></td>
+                    <td><%= errors[i].values[j].annotation[0].key %></td>
+                    <td><%= errors[i].values[j].annotation[0].value %></td>
+                </tr>
+                <% } %>
+            </table>
+
+        <% } %>
+        </div>
+    <% } %>
+
+</div>
+
+<div class="container user-reaction">
+    <div class="input-group">
+        <button id="dl_xml" type="button" class="btn btn-default btn-sm">down load file</button>
+    </div>
+</div>
+<script>
+    $(function(){
+        if($("#edit-option").is(":checked")){
+            $(".result-group input[type=text]").prop("disabled", false);
+            /*
+            $(".result-group input[type=text]").change(function(){
+
+            })
+            */
+        }
+    })
+</script>
+<% } %>
+

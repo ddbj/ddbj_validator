@@ -1,0 +1,18 @@
+{
+  "biotic_relationship":["", "free living", "parasite", "commensal", "symbiont"],
+  "cur_land_use":["", "cities", "farmstead", "industrial areas", "roads/railroads", "rock", "sand", "gravel", "mudflats", "salt flats", "badlands", "permanent snow or ice", "saline seeps", "mines/quarries", "oil waste areas", "small grains", "row crops", "vegetable crops", "horticultural plants (e.g. tulips)", "marshlands (grass,sedges,rushes)", "tundra (mosses,lichens)", "rangeland", "pastureland (grasslands used for livestock grazing)", "hayland", "meadows (grasses,alfalfa,fescue,bromegrass,timothy)", "shrub land (e.g. mesquite,sage-brush,creosote bush,shrub oak,eucalyptus)", "successional shrub land (tree saplings,hazels,sumacs,chokecherry,shrub dogwoods,blackberries)", "shrub crops (blueberries,nursery ornamentals,filberts)", "vine crops (grapes)", "conifers (e.g. pine,spruce,fir,cypress)", "hardwoods (e.g. oak,hickory,elm,aspen)", "intermixed hardwood and conifers", "tropical (e.g. mangrove,palms)", "rainforest (evergreen forest receiving >406 cm annual rainfall)", "swamp (permanent or semi-permanent water body dominated by woody plants)", "crop trees (nuts,fruit,christmas trees,nursery trees)"],
+  "dominant_hand":["", "left", "right", "ambidextrous"],
+  "drainage_class":["", "very poorly", "poorly", "somewhat poorly", "moderately well", "well", "excessively drained"],
+  "growth_med":["", "soil", "liquid"],
+  "horizon":["", "O horizon", "A horizon", "E horizon", "B horizon", "C horizon", "R layer", "Permafrost"],
+  "oxy_stat_samp":["", "aerobic", "anaerobic"],
+  "profile_position":["", "summit", "shoulder", "backslope", "footslope", "toeslope"],
+  "rel_to_oxygen":["", "aerobe", "anaerobe", "facultative", "microaerophilic", "microanaerobe", "obligate aerobe", "obligate anaerobe"],
+  "sediment_type":["", "biogenous", "cosmogenous", "hydrogenous", "lithogenous"],
+  "trophic_level":["", "autotroph", " carboxydotroph", " chemoautotroph", " chemoheterotroph", " chemolithoautotroph", " chemolithotroph", " chemoorganoheterotroph", " chemoorganotroph", " chemosynthetic", " chemotroph", " copiotroph", " diazotroph", " facultative", " autotroph", " heterotroph", " lithoautotroph", " lithoheterotroph", " lithotroph", " methanotroph", " methylotroph", " mixotroph", " obligate", " chemoautolithotroph", " oligotroph", " organoheterotroph", " organotroph", " photoautotroph", " photoheterotroph", " photolithoautotroph", " photolithotroph", " photosynthetic", " phototroph"],
+  "sex":["", "male", "female", "neuter", "hermaphrodite", "not determined", "missing", "not applicable", "not collected"],
+  "special_diet":["", "low carb", "reduced calorie", "vegetarian", "other(to be specified)"],
+  "tidal_stage":["", "low", "high"],
+  "tillage":["", "drill", "cutting disc", "ridge till", "strip tillage", "zonal tillage", "chisel", "tined", "mouldboard", "disc plough"],
+  "urine_collect_meth":["", "clean catch", "catheter"]
+}

@@ -1,0 +1,464 @@
+{
+  "rule1": {
+    "code": "1",
+    "scope": "sample",
+    "name": "Invalid Attribute value for null",
+    "method": "invalid_attribute_value_for_null",
+    "message": "Invalid 'null' value for attribute <%= attribute_name %>, please provide value as either 'not collected', 'not applicable' or 'missing'."
+  },
+  "rule2": {
+    "code": "2",
+    "scope": "sample",
+    "name": "Invalid Attribute value for controlled terms",
+    "method": "invalid_attribute_value_for_controlled_terms",
+    "message": "Attribute value is not in controlled terms for attribute '<%= attribute_name %>'."
+  },
+  "rule3": {
+    "code": "3",
+    "scope": "all_samples",
+    "name": "Duplicated sample title in this account",
+    "method": "duplicate_sample_title_in_account",
+    "message": "Sample title is duplicated in the submission account."
+  },
+  "rule4": {
+    "code": "4",
+    "scope": "organism, taxonomy_id",
+    "name": "Taxonomy name and id not match",
+    "method": "taxonomy_name_and_id_not_match",
+    "message": "Organism and taxonomy id do not match."
+  },
+  "rule5": {
+    "code": "5",
+    "scope": "attribute.bioproject_id",
+    "name": "Invalid BioProject accession",
+    "method": "invalid_bioproject_accession",
+    "message": "Invalid BioProject accession: <%= value %>. Please provide a valid BioProject accession with format PRJDxxxxxx or PSUBxxxxxx"
+  },
+  "rule6": {
+    "code": "6",
+    "scope": "all_samples",
+    "name": "BioProject not found",
+    "method": "bioproject_not_found",
+    "message": "BioProject accession <%= value %> does not exist. Please provide a valid BioProject accession."
+  },
+  "rule7": {
+    "code": "7",
+    "scope": "sample",
+    "name": "Invalid date format",
+    "method": "invalid_date_format",
+    "message": "Invalid date format."
+  },
+  "rule8": {
+    "code": "8",
+    "scope": "attribute.geo_loc_name",
+    "name": "Invalid country",
+    "method": "invalid_country",
+    "message": "Entered country is not in controlled terms for attribute '<%= attribute_name %>'."
+  },
+  "rule9": {
+    "code": "9",
+    "scope": "attribute.lat_lon",
+    "name": "Invalid lat_lon format",
+    "method": "invalid_lat_lon_format",
+    "message": "Invalid lat_lon format"
+  },
+  "rule11": {
+    "code": "11",
+    "scope": "sample",
+    "name": "Invalid publication identifier",
+    "method": "invalid_publication_identifier",
+    "message": "Invalid publication identifier, enter pubmed id, DOI or URL."
+  },
+  "rule12": {
+    "code": "12",
+    "scope": "all_samples",
+    "name": "Special character included",
+    "method": "auto_correct_special_character",
+    "message": "Special character is included"
+  },
+  "rule13": {
+    "code": "13",
+    "scope": "all_samples",
+    "name": "Invalid data format",
+    "method": "auto_correct_invalid_data_format",
+    "message": "Invalid data format"
+  },
+  "rule14": {
+    "code": "14",
+    "scope": "sample",
+    "name": "Not predefined Attribute name",
+    "method": "not_predefined_attribute_name",
+    "message": "Not predefined attribute name: attribute '<%= attribute_name %>'."
+  },
+  "rule15": {
+    "code": "15",
+    "scope": "attribute.host",
+    "name": "Invalid host organism name",
+    "method": "invalid_host_organism_name",
+    "message": "Invalid host organism name"
+  },
+  "rule18": {
+    "code": "18",
+    "scope": "",
+    "name": "Missing sample name",
+    "method": "convert_method",
+    "message": "Sample name is missing for <%= count %> sample(s)."
+  },
+  "rule20": {
+    "code": "20",
+    "scope": "",
+    "name": "Missing organism",
+    "method": "convert_method",
+    "message": "Organism is missing for <%= count %> sample(s)."
+  },
+  "rule21": {
+    "code": "21",
+    "scope": "all_samples",
+    "name": "Identical samples",
+    "method": "identical_samples",
+    "message": "These samples have the same Sample Names and identical attributes. If these are duplicates, please delete one. If they really are 2 different samples, provide a unique Sample Name for each."
+  },
+  "rule22": {
+    "code": "22",
+    "scope": "all_samples",
+    "name": "Identical Sample Names",
+    "method": "identical_sample_names",
+    "message": "These samples have the same Sample Names and different attributes. If they are different samples, please provide a unique Sample Name for each"
+  },
+  "rule24": {
+    "code": "24",
+    "scope": "all_samples",
+    "name": "Identical Attributes",
+    "method": "identical_attributes",
+    "message": "Your sample upload failed because multiple BioSamples cannot have identical attributes. You should have one BioSample for each specimen, and each of your BioSamples must have differentiating information (excluding sample name, title, bioproject accession and description). This check was implemented to encourage submitters to include distinguishing information in their samples. If the distinguishing information is in the sample name, title or description, please recode it into an appropriate attribute, either one of the predefined attributes or a custom attribute you define. If it is necessary to represent true biological replicates as separate BioSamples, you might add an 'aliquot' or 'replicate' attribute, e.g., 'replicate = biological replicate 1', as appropriate. Note that multiple assay types, e.g., RNA-seq and ChIP-seq data may reference the same BioSample if appropriate."
+  },
+  "rule25": {
+    "code": "25",
+    "scope": "",
+    "name": "Missing Package information",
+    "method": "convert_method",
+    "message": "Package information is missing."
+  },
+  "rule26": {
+    "code": "26",
+    "scope": "package",
+    "name": "Unknown Package",
+    "method": "unknown_package",
+    "message": "Sample refers to unknown Package '<%= package %>'."
+  },
+  "rule27": {
+    "code": "27",
+    "scope": "sample",
+    "name": "Missing mandatory Attribute",
+    "method": "missing_mandatory_attribute",
+    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide value as either 'not collected', 'not applicable' or 'missing'."
+  },
+  "rule28": {
+    "code": "28",
+    "scope": "all_samples",
+    "name": "Duplicate Sample Names",
+    "method": "duplicate_sample_names",
+    "message": "The following Sample Names were used in submission more than one time: <% names %>. Please provide unique Sample Names."
+  },
+  "rule29": {
+    "code": "29",
+    "scope": "",
+    "name": "Failure to parse batch submission file",
+    "method": "",
+    "message": "Unable to parse batch file: quoted text possibly split across multiple lines."
+  },
+  "rule30": {
+    "code": "30",
+    "scope": "",
+    "name": "Non-ASCII header line",
+    "method": "",
+    "message": "Unable to parse batch file: the header line contains non-ASCII characters. Please check that uploaded file is in text tab-delimited format, not Excel."
+  },
+  "rule31": {
+    "code": "31",
+    "scope": "",
+    "name": "Invalid Attribute value",
+    "method": "",
+    "message": "These attribute values are not valid so please correct the data. Refer to http://trace.ddbj.nig.ac.jp/biosample/attribute_e.html for required format descriptions. If you do not have information for the required field(s), please provide the value as either 'not collected', 'not applicable' or 'missing'."
+  },
+  "rule34": {
+    "code": "34",
+    "scope": "",
+    "name": "Missing Attribute name",
+    "method": "convert_method",
+    "message": "Attribute name is missing."
+  },
+  "rule35": {
+    "code": "35",
+    "scope": "sample",
+    "name": "Missing Attribute value",
+    "method": "missing_attibute_value",
+    "message": "Empty attribute value for attribute '<%= attribute_name %>'."
+  },
+  "rule36": {
+    "code": "36",
+    "scope": "sample",
+    "name": "Missing group of at least one required Attributes",
+    "method": "missing_group_of_at_least_one_required_attributes",
+    "message": "Sample has missing attribute(s), at least one the the following <%= group_name %> attributes is required. If you do not have information for the required field(s), please provide value as either 'not collected', 'not applicable' or 'missing'."
+  },
+  "rule37": {
+    "code": "37",
+    "scope": "",
+    "name": "Empty column name",
+    "method": "",
+    "message": "Unable to parse batch file: the header line has empty column name."
+  },
+  "rule38": {
+    "code": "38",
+    "scope": "",
+    "name": "Non-UTF8 input",
+    "method": "",
+    "message": "Unable to parse batch file: some values cannot be converted to UTF8 encoding."
+  },
+  "rule39": {
+    "code": "39",
+    "scope": "",
+    "name": "Invalid Attribute value with autofix",
+    "method": "",
+    "message": "These attribute values are not valid. An automatically-generated correction will be applied."
+  },
+  "rule40": {
+    "code": "40",
+    "scope": "attribute.collection_date",
+    "name": "Future collection date",
+    "method": "future_collection_date",
+    "message": "Sample collection date is a future date, please specify a date from the past."
+  },
+  "rule43": {
+    "code": "43",
+    "scope": "",
+    "name": "Revised taxonomy warning",
+    "method": "",
+    "message": "Provided taxonomy information was revised according to NCBI Taxonomy database rules. Please contact biosample@ddbj.nig.ac.jp if you have any questions."
+  },
+  "rule44": {
+    "code": "44",
+    "scope": "",
+    "name": "Taxonomy consult warning",
+    "method": "",
+    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information could not be resolved automatically and will require a taxonomy consult."
+  },
+  "rule45": {
+    "code": "45",
+    "scope": "",
+    "name": "Taxonomy error warning",
+    "method": "",
+    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult: <%= message %>."
+  },
+  "rule46": {
+    "code": "46",
+    "scope": "attribute.lat_lon, attribute.geo_loc_name",
+    "name": "Latlon versus country warning",
+    "method": "latlon_versus_country_warning",
+    "message": "Values provided for 'latitude and longitude' and 'geographic location' appear to contradict each other: <%= message %>."
+  },
+  "rule48": {
+    "code": "48",
+    "scope": "package, taxonomy_id",
+    "name": "Package versus Organism",
+    "method": "package_versus_organism",
+    "message": "Organism is inappropriate for package. Please either specify a different sample type package or edit the organism according to the 'Appropriate organism and package' rules described at "
+  },
+  "rule58": {
+    "code": "58",
+    "scope": "all_samples",
+    "name": "Non-ASCII Attribute value",
+    "method": "non_ascii_attribute_value",
+    "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values and reformat as ASCII-only so that data can be properly consumed by dependent databases, including GenBank and Taxonomy."
+  },
+  "rule59": {
+    "code": "59",
+    "scope": "taxonomy_id, attribute.sex",
+    "name": "Sex for bacteria",
+    "method": "sex_for_bacteria",
+    "message": "Attribute 'sex' is not appropriate for bacteria"
+  },
+  "rule60": {
+    "code": "60",
+    "scope": "all_samples",
+    "name": "Non-ASCII identifier",
+    "method": "non_ascii_identifier",
+    "message": "Non-ASCII format characters detected in Sample Name. Please format as ASCII."
+  },
+  "rule61": {
+    "code": "61",
+    "scope": "",
+    "name": "Multiple Attribute values",
+    "method": "convert_method",
+    "message": "Multiple values detected for '<%= attribute_name %>'. Only one <%= value %> is allowed."
+  },
+  "rule62": {
+    "code": "62",
+    "scope": "attribute.specimen_voucher, attribute.culture_collection(, attribute.biologic_material)",
+    "name": "Multiple vouchers",
+    "method": "multiple_vouchers",
+    "message": "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same <%= institution_code %>. Only one value is allowed."
+  },
+  "rule63": {
+    "code": "63",
+    "scope": "",
+    "name": "Missing header sample_name",
+    "method": "convert_method",
+    "message": "Required field 'sample_name' is missing from the header line of the file."
+  },
+  "rule64": {
+    "code": "64",
+    "scope": "",
+    "name": "Missing header organism",
+    "method": "convert_method",
+    "message": "Required field 'organism' is missing from the header line of the file."
+  },
+  "rule65": {
+    "code": "65",
+    "scope": "all_samples",
+    "name": "Non-ASCII Organism",
+    "method": "non_ascii_organism",
+    "message": "Non-ASCII format characters detected in organism. Please format as ASCII."
+  },
+  "rule69": {
+    "code": "69",
+    "scope": "all_samples",
+    "name": "Warning about BioProject increment",
+    "method": "warning_about_bioproject_increment",
+    "message": "Consecutive BioProjects are referenced in this submission. This is often a mistake caused by incrementing autofill in Excel, please check your file."
+  },
+  "rule70": {
+    "code": "70",
+    "scope": "attribute.bioproject_id",
+    "name": "Invalid BioProject type",
+    "method": "Invalid_bioproject_type",
+    "message": "BioProject <%= value %> is an Umbrella project, not a primary data type of BioProject. Please provide the accession of the correct primary data BioProject or create a new BioProject, if necessary."
+  },
+  "rule72": {
+    "code": "72",
+    "scope": "",
+    "name": "Unknown Attribute value",
+    "method": "",
+    "message": "Submission processing may be delayed. The value '<%= value %>' provided for Attribute '<%= attribute %>' requires curator review."
+  },
+  "rule73": {
+    "code": "73",
+    "scope": "organism, attribute.host, attribute.strain, attribute.isolate, attribute.isolation_source, attribute.breed",
+    "name": "Redundant taxonomy attributes",
+    "method": "redundant_taxonomy_attributes",
+    "message": "Redundant values are detected in at least two of the following fields: organism; host; strain; isolate; isolation source; breed. For example, the value you supply for 'host' should not be identical to the value supplied for 'isolation source'. This check is case-insensitive and ignores white-space."
+  },
+  "rule74": {
+    "code": "74",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Pathogen: clinical or host-associated",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Bacteria, Viruses or Fungi, to species-level"
+  },
+  "rule75": {
+    "code": "75",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Pathogen: environmental/food/other",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Bacteria, Viruses or Fungi, to species-level"
+  },
+  "rule76": {
+    "code": "76",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Microbe",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Bacteria, Archaea, Viruses, Viroids or Fungi; or for unicellular eukaryotes, Must not have lineage Metazoa, Embryophyta, unclassified sequences or other sequences"
+  },
+  "rule77": {
+    "code": "77",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Model organism or animal",
+    "method": "package_versus_organism",
+    "message": "Must NOT be Homo sapiens or have lineage Bacteria, Archaea, Viruses or Fungi"
+  },
+  "rule78": {
+    "code": "78",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Metagenome or environmental",
+    "method": "package_versus_organism",
+    "message": "Must be a metagenome, where lineage starts with unclassified sequences and scientific name ends with 'metagenome'"
+  },
+  "rule80": {
+    "code": "80",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Human",
+    "method": "package_versus_organism",
+    "message": "Must be Homo sapiens"
+  },
+  "rule81": {
+    "code": "81",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Plant",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Viridiplantae, or be known to have plastids"
+  },
+  "rule82": {
+    "code": "82",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Virus",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Viruses"
+  },
+  "rule83": {
+    "code": "83",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > MIMS Environmental/Metagenome",
+    "method": "package_versus_organism",
+    "message": "Must be a metagenome, where lineage starts with unclassified sequences and scientific name ends with 'metagenome'"
+  },
+  "rule84": {
+    "code": "84",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > MIGS Cultured Bacterial/Archaeal",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Bacteria or Archaea"
+  },
+  "rule85": {
+    "code": "85",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > MIGS Eukaryotic",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Eukaryota"
+  },
+  "rule86": {
+    "code": "86",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > MIGS Viral",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Viruses"
+  },
+  "rule88": {
+    "code": "88",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > MIMARKS Survey related",
+    "method": "package_versus_organism",
+    "message": "Must be a metagenome, where lineage starts with unclassified sequences and scientific name ends with 'metagenome'"
+  },
+  "rule89": {
+    "code": "89",
+    "scope": "package, taxonomy_id",
+    "name": "package_vs_organism > Beta-lactamase",
+    "method": "package_versus_organism",
+    "message": "Must have lineage Bacteria"
+  },
+  "rule90": {
+    "code": "90",
+    "scope": "",
+    "name": "Invalid Attribute value format",
+    "method": "",
+    "message": "Attribute value format is invalid"
+  },
+  "rule91": {
+    "code": "91",
+    "scope": "locus_tag_prefix",
+    "name": "Duplicated locus tag prefix",
+    "method": "duplicated locus tag prefix",
+    "message": "Locus tag prefix <%= value %> is duplicated."
+  }
+}

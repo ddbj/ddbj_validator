@@ -1,0 +1,117 @@
+{
+  "errors": [
+    {
+      "id": "2",
+      "message": "Attribute value is not in controlled terms for attribute 'rel_to_oxygen'.",
+      "message_ja": "",
+      "reference": "",
+      "level": "error",
+      "method": "biosample validator",
+      "annotation": [
+        {
+          "key": "rel_to_oxygen",
+          "source": "SSUB000019_error.json",
+          "location": "1",
+          "value": [
+            "aaaa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "message": "Attribute value is not in controlled terms for attribute 'oxy_stat_samp'.",
+      "message_ja": "",
+      "reference": "",
+      "level": "error",
+      "method": "biosample validator",
+      "annotation": [
+        {
+          "key": "oxy_stat_samp",
+          "source": "SSUB000019_error.json",
+          "location": "1",
+          "value": [
+            "bbbb"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "message": "Invalid BioProject accession: PDAAAAA1654. Please provide a valid BioProject accession with format PRJDxxxxxx or PSUBxxxxxx",
+      "message_ja": "",
+      "reference": "",
+      "level": "error",
+      "method": "biosample validator",
+      "annotation": [
+        {
+          "key": "bioproject_id",
+          "source": "SSUB000019_error.json",
+          "location": "1",
+          "value": [
+            "PDAAAAA1654"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "message": "Organism and taxonomy id do not match.",
+      "message_ja": "",
+      "reference": "",
+      "level": "error",
+      "method": "biosample validator",
+      "annotation": [
+        {
+          "key": "organism",
+          "source": "SSUB000019_error.json",
+          "location": "1",
+          "value": [
+            "Streptococcus pyogenes",
+            "Homo sapiens"
+          ]
+        },
+        {
+          "key": "taxonomy_id",
+          "source": "SSUB000019_error.json",
+          "location": "1",
+          "value": [
+            "9606",
+            "1314"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "84",
+      "message": "Must have lineage Bacteria or Archaea",
+      "message_ja": "",
+      "reference": "",
+      "level": "error",
+      "method": "biosample validator",
+      "annotation": [
+        {
+          "key": "taxonomy_id",
+          "source": "SSUB000019_error.json",
+          "location": "1",
+          "value": [
+            "9606"
+          ]
+        },
+        {
+          "key": "package",
+          "source": "SSUB000019_error.json",
+          "location": 1,
+          "value": [
+            "MIGS.ba.microbial"
+          ]
+        }
+      ]
+    }
+  ],
+  "error_size": 5,
+  "exception": "",
+  "method": "biosample validator",
+  "original_file": "SSUB000019_error.xml",
+  "xml_filename": "354f29083c5f900734ff1b3f8d33a0b6"
+}
