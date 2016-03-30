@@ -73,11 +73,43 @@
      └─   index.ejs             
 
      
-     
 ```  
 
 
+## インストール環境
 
-## インストールと起動
+* アプリケーションはMacOS(10.9)およびUbuntu 14.04.4LTSで動作確認を行っています。
+* アプリケーションの起動には以下ライブラリが必用です。
+ - node.js
+ - ruby
+ - libxml2 (apt-get install)
+ - libxml2-dev (apt-get install)
+ - forever (npm install)
+ - libxmljs (npm install)
+ - node-gyp (npm install -g)
+ 
+ 
+## アプリケーションの起動
 
+手動によるWebアプリケーションの起動は下記のようにアプリケーションのルートディレクトリでExpressの起動スクリプトを呼び出すことで開始します。
+アプリケーションはforeverによってデーモン化します。
+
+    forever start bin/www
+
+foreverの自動起動を行うため下記のように /etc/rc.localに追記します。
+
+```
+/usr/local/bin/node /usr/local/bin/forever start \
+  -p /var/run/forever \
+  --pidfile /var/run/node-app.pid \
+  -l /var/log/node-app.log -a \
+  /home/ubuntu/ddbj_validator/webapp/bin/www
+```
+
+
+アプリケーションは3000番のportを利用します。下記のアドレスでローカルで起動したアプリケーションを利用することができます。
+
+    http://localhost:3000    
+
+配布するコンテナなどでは、nginxによるリバースプロキシの適応を予定しています。
 
