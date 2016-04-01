@@ -73,7 +73,7 @@
                 <tr>
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
                     <td><%= errors[i].location %></td>
-                    <td><%= errors[i].values[j].annotation[0].key %></td>
+                    <td><input type="text" value="<%= errors[i].values[j].annotation[0].key %>" disabled></td>
                     <% } %>
                 </tr>
             </table>
@@ -87,8 +87,8 @@
                 <tr>
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
                     <td><%= errors[i].location %></td>
-                    <td><%= errors[i].values[j].annotation[0].value %></td>
-                    <td><%= errors[i].values[j].annotation[1].value %></td>
+                    <td><input type="text" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
+                    <td><input type="text" value="<%= errors[i].values[j].annotation[1].value %>" disabled></td>
                     <% } %>
                 </tr>
             </table>
@@ -160,6 +160,7 @@
     $(function(){
         if($("#edit-option").is(":checked")){
             $(".result-group input[type=text]").prop("disabled", false);
+            $(".result-group input[type=text]").css("border", "solid 1px #cccccc");
             /*
             $(".result-group input[type=text]").change(function(){
 

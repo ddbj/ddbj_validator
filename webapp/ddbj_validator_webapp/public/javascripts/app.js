@@ -1,17 +1,17 @@
 (function(){
+    //error_message_response model
     var Message = Backbone.Model.extend({
         urlRoot: "/messages",
         idAttribute: "_id",
         defaults: {
-            "id":"",
-            "message":"",
-            "reference":"",
-            "method":"",
-            "annotation":[]
+            errors: [],
+            error_size: 0,
+            method: "",
+            original_file: "",
+            selected: [],
+            updateTime: new Date()
         }
     });
-
-    var message = new Message();
 
     var output_f = "";
     $('#select_file').click(function(){
@@ -52,6 +52,16 @@
                     contentType: false
                 }).done(function (error_message) {
 
+                    //error_message_response object
+                    var message = new Message();
+                    console.log(error_message);
+                    message.save({
+                        errors: error_message["errors"],
+                        error_size:error_message["error_size"],
+                        method: error_message["method"],
+                        original_file: error_message["original_file"]});
+
+
                     if(list_option == "option-grouped") {
                         // if option Group Error Message selected
                         var grouped_message = d3.nest().key(function(d){return d.id})
@@ -91,8 +101,6 @@
                         });
 
                         var error_view = new ErrorView({el: $("#result")});
-
-
 
                         $("#dl_xml").click(function(){
                             error_message["selected_option"] = [{"rel_to_oxygen":edit_item}, {"oxy_stat_samp": "BB"}];
