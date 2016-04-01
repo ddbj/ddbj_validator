@@ -43,6 +43,7 @@
                 showLoading("test_loading");
                 var form = $("#submit_data").get()[0];
                 var formData = new FormData(form);
+
                 $.ajax({
                     url: "./upload",
                     method: "post",
@@ -54,7 +55,6 @@
 
                     //error_message_response object
                     var message = new Message();
-                    console.log(error_message);
                     message.save({
                         errors: error_message["errors"],
                         error_size:error_message["error_size"],
@@ -80,7 +80,8 @@
 
                         error_message["errors"] = grouped_message;
 
-                        var edit_item = "";
+                        var edit_item =[];
+                        var selected = new Object();
 
                         var ErrorView = Backbone.View.extend({
                             initialize: function () {
@@ -95,15 +96,15 @@
                                 'change .result-group input[type=text]': 'onChange'
                             },
                             onChange: function(e){
-                                edit_item = $(".result-group input[type=text]").val();
-
+                                selected[$(".result-group input[type=text]").attr("name")] = $(".result-group input[type=text]").val()
+                                edit_item.push(selected);
                             }
                         });
 
                         var error_view = new ErrorView({el: $("#result")});
 
                         $("#dl_xml").click(function(){
-                            error_message["selected_option"] = [{"rel_to_oxygen":edit_item}, {"oxy_stat_samp": "BB"}];
+                            error_message["selected_option"] = edit_item;
                             $.ajax({
                                 url: "./j2x",
                                 method: "post",

@@ -59,7 +59,7 @@
                     <tr>
                         <td><%= errors[i].location %></td>
                         <td><%= errors[i].values[j].annotation[0].key %></td>
-                        <td><input type="text" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
+                        <td><input type="text" name="<%= errors[i].values[j].annotation[0].key %>" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
                     </tr>
                     <% } %>
                 </table>
