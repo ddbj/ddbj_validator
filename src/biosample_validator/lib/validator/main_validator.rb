@@ -118,6 +118,9 @@ class MainValidator
 
       date_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json")) #for rule_id:7
 
+      country_list = JSON.parse(File.read(@base_dir + "/../../conf/country_list.json"))
+      send("invalid_country", "8", biosample_data[:attributes][:geo_loc_name], country_list, line_num)
+
       ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
 
       send("invalid_host_organism_name", "15", biosample_data[:attributes][:host], line_num)
@@ -260,6 +263,34 @@ class MainValidator
   end
 
   #
+  # Validates the country name
+  #
+  # ==== Args
+  # rule_code
+  # geo_loc_name ex."Japan:Kanagawa, Hakone, Lake Ashi"
+  # country_list json of ISNDC country_list
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_country  (rule_code, geo_loc_name, country_list, line_num)
+    return nil if geo_loc_name.nil?
+
+    country_name = geo_loc_name.split(":").first.strip
+    if country_list.include?(country_name)
+      true
+    else
+      annotation = [{key: "geo_loc_name", source: @data_file, location: line_num.to_s, value: [geo_loc_name]}]
+      rule = @validation_config["rule" + rule_code]
+      param = {ATTRIBUTE_NAME: "geo_loc_name"}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
+  #
   # Validates that the specified host name is exist in taxonomy ontology as the organism(scientific) name.
   # 
   # ==== Args
@@ -282,7 +313,7 @@ class MainValidator
       annotation = [{key: "host", source: @data_file, location: line_num.to_s, value: value}]
       rule = @validation_config["rule" + rule_code]
       message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
       @error_list.push(error_hash)
       false
     end 
@@ -322,7 +353,7 @@ class MainValidator
 
       rule = @validation_config["rule" + rule_code]
       message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
       @error_list.push(error_hash)
       false
     end
@@ -348,7 +379,8 @@ class MainValidator
       annotation.push({key: "taxonomy_id", source: @data_file, location: line_num.to_s, value: [taxonomy_id]})
       annotation.push({key: "package", source: @data_file, location: line_num, value: [package_name]})
       message = CommonUtils::error_msg(@validation_config, valid_result[:error_code], nil)
-      error_hash = CommonUtils::error_obj(valid_result[:error_code], message, "", "error", annotation)
+      rule = @validation_config["rule" + valid_result[:error_code].to_s]
+      error_hash = CommonUtils::error_obj(valid_result[:error_code], message, "", rule["level"], annotation)
       @error_list.push(error_hash)
       false
     else
@@ -385,7 +417,7 @@ class MainValidator
         annotation = [{key: "sex", source: @data_file, location: line_num.to_s, value: [sex]}]
         rule = @validation_config["rule" + rule_code]
         message = CommonUtils::error_msg(@validation_config, rule_code, param)
-        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
         @error_list.push(error_hash)
       end
     end

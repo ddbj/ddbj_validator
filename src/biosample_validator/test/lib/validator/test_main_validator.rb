@@ -51,7 +51,26 @@ class TestMainValidator < Minitest::Test
 
   end
 
-  def test_invalid_bioproject_accession
+  def test_invalid_country
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/country_list.json"))
+    #ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_country("8", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    #ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_country("8", "Non exist country:Kanagawa, Hakone, Lake Ashi", country_list, 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_country("8", nil, country_list, 1)
+    assert_equal nil, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
   end
 
   def test_invalid_bioproject_accession
