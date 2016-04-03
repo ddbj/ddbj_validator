@@ -6,9 +6,9 @@
     <Description>
         <SampleName>MTB313</SampleName>
         <Title>MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes</Title>
-        <Organism taxonomy_id="9606">
+        <Orgatnism taxonomy_id="9606">
             <OrganismName>Streptococcus pyogenes</OrganismName>
-        </Organism>
+        </Orgatnism>
     </Description>
     <Owner>
         <Name url="https://www.kitasato-u.ac.jp/lisci/">Kitasato Institute of Life Sciences</Name>

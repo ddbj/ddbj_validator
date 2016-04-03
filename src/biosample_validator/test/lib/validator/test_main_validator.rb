@@ -190,4 +190,46 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, error_list.size
   end
 
+  def test_future_collection_date
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.future_collection_date("40", "2015", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.future_collection_date("40", "2019", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #parameter are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.future_collection_date("40", nil, 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
+  def test_invalid_attribute_value_for_null
+    i_n_value = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/invalid_null_values.json"))
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "strain", "missing", i_n_value, 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "strain", "N.A.", i_n_value, 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "strain", "", i_n_value, 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
 end

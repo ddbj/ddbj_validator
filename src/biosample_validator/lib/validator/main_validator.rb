@@ -2,6 +2,7 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require 'ostruct'
+require 'date'
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
@@ -129,6 +130,13 @@ class MainValidator
       send("package_versus_organism", "48", biosample_data[:taxonomy_id], biosample_data[:package], line_num)
       
       send("sex_for_bacteria", "59", biosample_data[:taxonomy_id], biosample_data[:attributes][:sex], line_num)
+
+      send("future_collection_date", "40", biosample_data[:attribute][:collection_date], line_num)
+
+      i_n_value = JSON.parse(File.read(@base_dir + "/../../conf/invalid_null_values.json"))
+      biosample_data[:attributes].each do |attribute_name, value|
+        send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, i_n_value, line_num)
+      end
     end
   end
 
@@ -390,6 +398,59 @@ class MainValidator
       end
     end
     ret
+  end
+
+  #
+  # Validates that sample collection date is not a future date
+  #
+  # ==== Args
+  # rule_code
+  # collection_date, ex. 2011
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def future_collection_date (rule_code, collection_date, line_num)
+    return nil if collection_date.nil?
+    result = true
+    date_format = '%Y'
+    collection_date = Date.strptime(collection_date, date_format)
+    if (Date.today <=> collection_date) >= 0
+      result =  true
+    else
+      annotation = [{key: "collection_date", source: @data_file, location: line_num.to_s, value: [collection_date]}]
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # Validates invalid attribute value for null
+  #
+  # ==== Args
+  # rule_code
+  # line_num
+  # ==== Return
+  # true/false
+  def invalid_attribute_value_for_null(rule_code, attr_name, attr_val, i_n_value, line_num)
+    return nil if attr_val.nil? || attr_val.empty?
+    result = true
+    if i_n_value.include?(attr_val)
+      annotation = []
+      attr_vals = [attr_val, "missing"]
+      annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+      rule = @validation_config["rule" + rule_code]
+      param = {ATTRIBUTE_NAME: attr_name}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
   end
 
 end
