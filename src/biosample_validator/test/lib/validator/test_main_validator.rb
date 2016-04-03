@@ -73,6 +73,44 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, error_list.size
   end
 
+  def test_invalid_lat_lon_format
+    #ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_lat_lon_format("9", "45.0123 S 4.1234 E", 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    #auto annotation
+    ##dec format
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_lat_lon_format("9", "47.94345678 N 28.12345678 W", 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_annotation = "47.9435 N 28.1235 W"
+    assert_equal except_annotation, error_list[0][:annotation][0][:value][1]
+    ##deg format
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_lat_lon_format("9", "12 34 56.78 S 123 45 67.89 E", 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_annotation = "12.5824 S 123.7689 E"
+    assert_equal except_annotation, error_list[0][:annotation][0][:value][1]
+    #ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_lat_lon_format("9", "47.9456 28.1212", 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_lat_lon_format("9", nil, 1)
+    assert_equal nil, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
   def test_invalid_bioproject_accession
     #ok case
     @validator.instance_variable_set :@error_list, [] #clear

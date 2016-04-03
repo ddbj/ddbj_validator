@@ -121,6 +121,8 @@ class MainValidator
       country_list = JSON.parse(File.read(@base_dir + "/../../conf/country_list.json"))
       send("invalid_country", "8", biosample_data[:attributes][:geo_loc_name], country_list, line_num)
 
+      send("invalid_lat_lon_format", "9", biosample_data[:attributes][:lat_lon], line_num)
+
       ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
 
       send("invalid_host_organism_name", "15", biosample_data[:attributes][:host], line_num)
@@ -273,7 +275,7 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def invalid_country  (rule_code, geo_loc_name, country_list, line_num)
+  def invalid_country (rule_code, geo_loc_name, country_list, line_num)
     return nil if geo_loc_name.nil?
 
     country_name = geo_loc_name.split(":").first.strip
@@ -284,6 +286,62 @@ class MainValidator
       rule = @validation_config["rule" + rule_code]
       param = {ATTRIBUTE_NAME: "geo_loc_name"}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
+  #
+  # Validates the lat_lon format
+  #
+  # ==== Args
+  # rule_code
+  # lat_lon ex."47.94 N 28.12 W", "45.0123 S 4.1234 E"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_lat_lon_format (rule_code, lat_lon, line_num)
+    return nil if lat_lon.nil?
+
+    #TODO move to common?
+    #require format
+    deg_latlon_reg = %r{(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+))\D+(?<lat_hemi>[NS])[ ,_]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+))\D+(?<lng_hemi>[EW])}
+    dec_latlon_reg = %r{(?<lat_dec>\d{1,2}(\.\d+))\s*(?<lat_dec_hemi>[NS])[ ,_]+(?<lng_dec>\d{1,3}(\.\d+))\s*(?<lng_dec_hemi>[EW])}
+
+    replace_candidate =  nil
+    is_valid_format = true
+    if deg_latlon_reg.match(lat_lon)
+      g = deg_latlon_reg.match(lat_lon)
+      lat = (g['lat_deg'].to_i + g['lat_min'].to_f/60 + g['lat_sec'].to_f/3600).round(4)
+      lng = (g['lng_deg'].to_i + g['lng_min'].to_f/60 + g['lng_sec'].to_f/3600).round(4)
+      replaced_text = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
+      if lat_lon != replaced_text
+        replace_candidate = replaced_text
+      end
+    elsif dec_latlon_reg.match(lat_lon)
+      d = dec_latlon_reg.match(lat_lon)
+      lat_dec = (d['lat_dec'].to_f).round(4)
+      lng_dec = (d['lng_dec'].to_f).round(4)
+
+      replaced_text = "#{lat_dec} #{d['lat_dec_hemi']} #{lng_dec} #{d['lng_dec_hemi']}"
+      if lat_lon != replaced_text
+        replace_candidate = replaced_text
+      end
+    else
+      is_valid_format = false
+    end
+    if is_valid_format == true && replace_candidate.nil?
+      true
+    else
+      value = [lat_lon]
+      if !replace_candidate.nil?
+        value.push(replace_candidate)
+      end
+      annotation = [{key: "lat_lon", source: @data_file, location: line_num.to_s, value: value}]
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
       error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
       @error_list.push(error_hash)
       false
