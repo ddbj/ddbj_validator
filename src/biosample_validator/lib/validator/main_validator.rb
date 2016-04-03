@@ -2,6 +2,7 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require 'ostruct'
+require 'geocoder'
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
@@ -130,6 +131,8 @@ class MainValidator
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
       send("taxonomy_name_and_id_not_match", "4", biosample_data[:taxonomy_id], biosample_data[:organism], line_num)
+
+      send("latlon_versus_country", "46", biosample_data[:attributes][:geo_loc_name], biosample_data[:attributes][:lat_lon], line_num)
 
       send("package_versus_organism", "48", biosample_data[:taxonomy_id], biosample_data[:package], line_num)
       
@@ -304,40 +307,14 @@ class MainValidator
   #
   def invalid_lat_lon_format (rule_code, lat_lon, line_num)
     return nil if lat_lon.nil?
-
-    #TODO move to common?
-    #require format
-    deg_latlon_reg = %r{(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+))\D+(?<lat_hemi>[NS])[ ,_]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+))\D+(?<lng_hemi>[EW])}
-    dec_latlon_reg = %r{(?<lat_dec>\d{1,2}(\.\d+))\s*(?<lat_dec_hemi>[NS])[ ,_]+(?<lng_dec>\d{1,3}(\.\d+))\s*(?<lng_dec_hemi>[EW])}
-
-    replace_candidate =  nil
-    is_valid_format = true
-    if deg_latlon_reg.match(lat_lon)
-      g = deg_latlon_reg.match(lat_lon)
-      lat = (g['lat_deg'].to_i + g['lat_min'].to_f/60 + g['lat_sec'].to_f/3600).round(4)
-      lng = (g['lng_deg'].to_i + g['lng_min'].to_f/60 + g['lng_sec'].to_f/3600).round(4)
-      replaced_text = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
-      if lat_lon != replaced_text
-        replace_candidate = replaced_text
-      end
-    elsif dec_latlon_reg.match(lat_lon)
-      d = dec_latlon_reg.match(lat_lon)
-      lat_dec = (d['lat_dec'].to_f).round(4)
-      lng_dec = (d['lng_dec'].to_f).round(4)
-
-      replaced_text = "#{lat_dec} #{d['lat_dec_hemi']} #{lng_dec} #{d['lng_dec_hemi']}"
-      if lat_lon != replaced_text
-        replace_candidate = replaced_text
-      end
-    else
-      is_valid_format = false
-    end
-    if is_valid_format == true && replace_candidate.nil?
+    common = CommonUtils.new
+    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    if insdc_latlon == lat_lon
       true
     else
       value = [lat_lon]
-      if !replace_candidate.nil?
-        value.push(replace_candidate)
+      if !insdc_latlon.nil? #replace_candidate
+        value.push(insdc_latlon)
       end
       annotation = [{key: "lat_lon", source: @data_file, location: line_num.to_s, value: value}]
       rule = @validation_config["rule" + rule_code]
@@ -418,6 +395,52 @@ class MainValidator
   end
 
   #
+  # Validates that the organism(scientific) name is appropriate for taxonomy id
+  #
+  # ==== Args
+  # rule_code
+  # geo_loc_name ex."Japan:Kanagawa, Hakone, Lake Ashi"
+  # lat_lon ex."35.2095674, 139.0034626"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def latlon_versus_country (rule_code, geo_loc_name, lat_lon, line_num)
+    return nil if geo_loc_name.nil?
+    return nil if lat_lon.nil?
+
+    country_name = geo_loc_name.split(":").first.strip
+
+    common = CommonUtils.new
+    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    iso_latlon = common.convert_latlon_insdc2iso(insdc_latlon)
+    if iso_latlon.nil?
+      latlon_for_google = lat_lon
+    else
+      latlon_for_google = "#{iso_latlon[:latitude].to_s}, #{iso_latlon[:longitude].to_s}"
+    end
+    latlon_country_name = common.geocode_country_from_latlon(latlon_for_google)
+    if !latlon_country_name.nil? && common.is_same_google_country_name(country_name, latlon_country_name)
+      true
+    else
+      if latlon_country_name.nil?
+        param = {MESSAGE: "Could not get the geographic data in this lat_lon'?"}
+      else
+        #TODO USAなどの読み替え時の警告の値#{latlon_country_name}を読み替える必要がある
+        param = {MESSAGE: "Lat_lon '#{lat_lon}' maps to '#{latlon_country_name}' instead of '#{geo_loc_name}"}
+      end
+      annotation = []
+      annotation.push({key: "geo_loc_name", source: @data_file, location: line_num.to_s, value: [geo_loc_name]})
+      annotation.push({key: "lat_lon", source: @data_file, location: line_num, value: [lat_lon]})
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      rule = @validation_config["rule" + rule_code]
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
+  #
   # Validates that the organism is appropriate for package
   #
   # ==== Args
@@ -481,5 +504,4 @@ class MainValidator
     end
     ret
   end
-
 end

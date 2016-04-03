@@ -91,11 +91,11 @@ class TestMainValidator < Minitest::Test
     assert_equal except_annotation, error_list[0][:annotation][0][:value][1]
     ##deg format
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.invalid_lat_lon_format("9", "12 34 56.78 S 123 45 67.89 E", 1)
+    ret = @validator.invalid_lat_lon_format("9", "37°26′36.42″N 06°15′14.28″W", 1)
     assert_equal false, ret
     error_list =  @validator.instance_variable_get (:@error_list)
     assert_equal 1, error_list.size
-    except_annotation = "12.5824 S 123.7689 E"
+    except_annotation = "37.4435 N 6.254 W"
     assert_equal except_annotation, error_list[0][:annotation][0][:value][1]
     #ng case
     @validator.instance_variable_set :@error_list, [] #clear
@@ -172,6 +172,30 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret
     error_list =  @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
+  end
+
+  def test_latlon_versus_country
+    #ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.latlon_versus_country("41", "Japan", "35.2399 N, 139.0306 E", 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    ## exchange google country to insdc country case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.latlon_versus_country("41", "Svalbard", "78.92267 N 11.98147 E", 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.latlon_versus_country("41", "Norway:Svalbard", "78.92267 N 11.98147 E", 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_msg = "Values provided for 'latitude and longitude' and 'geographic location' contradict each other: Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway:Svalbard'"
+    assert_equal except_msg, error_list[0][:message]
+    #TODO more error case
   end
 
   def test_package_versus_organism
