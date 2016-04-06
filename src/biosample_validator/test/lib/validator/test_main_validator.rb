@@ -232,4 +232,50 @@ class TestMainValidator < Minitest::Test
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
   end
+
+  def test_invalid_date_format
+    ts_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/timestamp_attributes.json"))
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_date_format("7", "collection_date", "2016-01-01", ts_attr,  1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_date_format("7", "collection_date", "January/2016", ts_attr,  1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_date_format("7", "collection_date", "", ts_attr,  1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
+  def test_special_character_included
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "title", "1.0 microm", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "title", "1.0 μm", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "title", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
 end

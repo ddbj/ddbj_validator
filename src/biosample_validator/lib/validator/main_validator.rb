@@ -94,6 +94,18 @@ class MainValidator
     end
 
     ### 2.auto correct (rule: 12, 13)
+    @biosample_list.each_with_index do |biosample_data, idx|
+      line_num = idx + 1
+      biosample_data.each do |sample_data_key, sample_data_value|
+        sample_data_key[:attributes].each do |attr_name, value|
+          send("special_character_included", "12", attr_name, value, line_num)
+        end
+        sample_data_item = sample_data_key
+        sample_data_item.delete(:attribute)
+        send("special_character_included", "12", sample_data_item, sample_data_value, line_num)
+      end
+    end
+
 
     ### 3.non-ASCII check (rule: 58, 60, 65)
 
@@ -107,6 +119,10 @@ class MainValidator
       #TODO get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data[:package])
       ### 6.check all attributes (rule: 1, 14, 27, 35, 36)
+      i_n_value = JSON.parse(File.read(@base_dir + "/../../conf/invalid_null_values.json"))
+      biosample_data[:attributes].each do |attribute_name, value|
+        send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, i_n_value, line_num)
+      end
 
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 70, 90, 91)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
@@ -123,20 +139,21 @@ class MainValidator
 
       send("invalid_host_organism_name", "15", biosample_data[:attributes][:host], line_num)
 
+      ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
+      biosample_data[:attributes].each do |attribute_name, value|
+        send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
+      end
+
+      send("future_collection_date", "40", biosample_data[:attributes][:collection_date], line_num)
+
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
       send("taxonomy_name_and_id_not_match", "4", biosample_data[:taxonomy_id], biosample_data[:organism], line_num)
 
       send("package_versus_organism", "48", biosample_data[:taxonomy_id], biosample_data[:package], line_num)
-      
+
       send("sex_for_bacteria", "59", biosample_data[:taxonomy_id], biosample_data[:attributes][:sex], line_num)
 
-      send("future_collection_date", "40", biosample_data[:attribute][:collection_date], line_num)
-
-      i_n_value = JSON.parse(File.read(@base_dir + "/../../conf/invalid_null_values.json"))
-      biosample_data[:attributes].each do |attribute_name, value|
-        send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, i_n_value, line_num)
-      end
     end
   end
 
@@ -413,6 +430,20 @@ class MainValidator
   def future_collection_date (rule_code, collection_date, line_num)
     return nil if collection_date.nil?
     result = true
+    case collection_date
+      when /\d{4}/
+        date_format = '%Y'
+
+      when /\d{4}\/\d{1,2}\/\d{1,2}/
+        date_format = "%Y-%m-%d"
+
+      when /\d{4}\/\d{1,2}/
+        date_format = "%Y-%m"
+
+      when /\w{3}\/\d{4}/
+        date_format = "%b-%Y"
+
+    end
     date_format = '%Y'
     collection_date = Date.strptime(collection_date, date_format)
     if (Date.today <=> collection_date) >= 0
@@ -446,11 +477,137 @@ class MainValidator
       rule = @validation_config["rule" + rule_code]
       param = {ATTRIBUTE_NAME: attr_name}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
-      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
       @error_list.push(error_hash)
       result = false
     end
     result
   end
+
+  #
+  # ==== Args
+  # rule_code
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_date_format(rule_code, attr_name, attr_val, ts_attr, line_num )
+    return nil if attr_val.nil? || attr_val.empty?
+    ori_attr_val = attr_val
+    result = true
+
+    if ts_attr.include?(attr_name)
+      rep_table_month = {
+          "January" => "Jan", "February" => "Feb", "March" => "Mar", "April" => "Apr", "May" => "May", "June" => "Jun", "July" => "Jul", "August" => "Aug", "September" => "Sep", "October" => "Oct", "November" => "Nov", "December" => "Dec",
+          "january" => "Jan", "february" => "Feb", "march" => "Mar", "april" => "Apr", "may" => "May", "june" => "Jun", "july" => "Jul", "august" => "Aug", "september" => "Sep", "october" => "Oct", "november" => "Nov", "december" => "Dec"
+      }
+
+        def format_date(date, formats)
+          dateobj = DateTime.new
+          formats.each do |format|
+            begin
+              dateobj = DateTime.strptime(date, format)
+              break
+            rescue ArgumentError
+            end
+          end
+          dateobj
+        end
+
+        if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/i)
+          attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/i,rep_table_month)
+          reslut = false
+        end
+
+        if attr_val.include?("/")
+          case attr_val
+            when /\d{4}\/\d{1,2}\/\d{1,2}/
+              formats = ["%Y/%m/%d"]
+              dateobj = format_date(attr_val, formats)
+              attr_val= dateobj.strftime("%Y-%m-%d")
+
+            when /\d{4}\/\d{1,2}/
+              formats = ["%Y/%m"]
+              dateobj = format_date(attr_val, formats)
+              attr_val = dateobj.strftime("%Y-%m")
+
+            when /\d{1,2}\/\d{1,2}\/\d{4}/
+              formats = ["%d/%m/%Y"]
+              dateobj = format_date(attr_val, formats)
+              attr_val = dateobj.strftime("%Y-%m-%d")
+
+            when /\w{3}\/\d{4}/
+              formats = ["%b/%Y"]
+              dateobj = format_date(attr_val, formats)
+              attr_val = dateobj.strftime("%b-%Y")
+          end
+          result = false
+
+        elsif attr_val =~ /^(\d{1,2})-(\d{1,2})$/
+          if $1.to_i.between?(13, 15)
+            formats = ["%y-%m"]
+          else
+            formats = ["%m-%y"]
+          end
+
+          dateobj = format_date(attr_val, formats)
+          attr_val= dateobj.strftime("%Y-%m")
+          result = false
+
+        elsif attr_val =~ /^\d{1,2}-\d{1,2}-\d{4}$/
+          formats = ["%d-%m-%Y"]
+          dateobj = format_date(attr_val, formats)
+          attr_val = dateobj.strftime("%Y-%m-%d")
+          result = false
+
+        elsif attr_val =~ /^\d{4}-\d{1,2}-\d{1,2}$/
+          formats = ["%Y-%m-%d"]
+          dateobj = format_date(attr_val, formats)
+          attr_val = dateobj.strftime("%Y-%m-%d")
+
+        end
+      end
+    unless result
+      annotation = []
+      attr_vals = [ori_attr_val, attr_val]
+      annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # Validate if Special character included
+  #
+  # ==== Args
+  # rule_code
+  # line_num
+  # ==== Return
+  # true/false
+  def special_character_included(rule_code, attr_name, attr_val, line_num)
+    return nil if attr_val.nil? || attr_val.empty?
+    result  = true
+    sp_character = ["℃", "μ"]
+    rep_table_sp_character = {
+        "℃" => "degree Celsius", "μ" => "micro"
+    }
+    sp_character.each do |char|
+      if attr_val.include?(char)
+        attr_val_rep = attr_val.sub(/℃|μ/, rep_table_sp_character)
+        annotation = []
+        attr_vals = [attr_val, attr_val_rep]
+        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
 
 end
