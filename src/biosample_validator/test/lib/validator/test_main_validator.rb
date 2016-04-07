@@ -278,4 +278,26 @@ class TestMainValidator < Minitest::Test
 
   end
 
+  def test_invalid_data_format
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_data_format("13", "sample_name", "MTB313", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_data_format("13", "sample_name", " MTB313 ", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_data_format("13", "sample_name", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
 end

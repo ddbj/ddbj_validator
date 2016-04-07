@@ -101,11 +101,11 @@ class MainValidator
         if biosample_item[0] == (:attributes)
           biosample_item.each do |attr_name, value|
             send("special_character_included", "12", attr_name, value, line_num)
-            #send("invalid_data_format", "13", attr_name, value, line_num)
+            send("invalid_data_format", "13", attr_name, value, line_num)
           end
         else
           send("special_character_included", "12", biosample_item[0], biosample_item[1], line_num)
-          #send("invalid_data_format", sample_data_item, sample_data_value)
+          send("invalid_data_format", biosample_item[0], biosample_item[1])
         end
 
       end
@@ -626,8 +626,20 @@ class MainValidator
   def invalid_data_format(rule_code, attr_name, attr_val, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
-
-
+    rep_table_ws = {
+        /\s{2,}/ => " ", /^\s+/ => "", /\s$/ => "", /^\sor/ => "", /\sor$/ => ""
+    }
+    attr_val.match(/\s{2,}|^\s+|\s$|^\sor|\sor$/) do
+      attr_val_annotaed = attr_val.sub(/\s{2,}|^\s+|\s$|^\sor|\sor$/,rep_table_ws)
+      annotation = []
+      attr_vals = [attr_val, attr_val_annotaed]
+      annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
   end
 
 end
