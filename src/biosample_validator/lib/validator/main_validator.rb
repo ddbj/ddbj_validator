@@ -139,6 +139,9 @@ class MainValidator
       send("sex_for_bacteria", "59", biosample_data[:taxonomy_id], biosample_data[:attributes][:sex], line_num)
 
       send("multiple_vouchers", "62", biosample_data[:attributes][:specimen_voucher], biosample_data[:attributes][:culture_collection], line_num)
+
+      send("redundant_taxonomy_attributes", "73", biosample_data[:organism], biosample_data[:attributes][:host], biosample_data[:attributes][:isolation_source], line_num)
+
     end
   end
 
@@ -539,6 +542,44 @@ class MainValidator
         @error_list.push(error_hash)
         return false
       end
+    end
+  end
+
+  #
+  # Validates whether the multiple taxonomy attributes have the same organism name
+  #
+  # ==== Args
+  # rule_code
+  # organism ex."Nostoc sp. PCC 7120"
+  # isolation_source ex."rumen isolates from standard pelleted ration-fed steer #6"
+  # host ex. "Homo sapiens"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def redundant_taxonomy_attributes (rule_code, organism, host, isolation_source, line_num)
+    if organism.nil? && host.nil? && isolation_source.nil?
+      return nil
+    end
+    taxon_values = []
+    taxon_values.push(organism) unless organism.nil?
+    taxon_values.push(host) unless host.nil?
+    taxon_values.push(isolation_source) unless isolation_source.nil?
+    uniq_taxon_values = taxon_values.uniq {|tax_name|
+      tax_name.strip.gsub(" ", "").downcase
+    }
+    if taxon_values.size <= uniq_taxon_values.size
+      return true
+    else
+      annotation = []
+      annotation.push({key: "organism", source: @data_file, location: line_num.to_s, value: [organism]})
+      annotation.push({key: "host", source: @data_file, location: line_num.to_s, value: []})
+      annotation.push({key: "isolation_source", source: @data_file, location: line_num.to_s, value: [isolation_source]})
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
+      @error_list.push(error_hash)
+      return false
     end
   end
 end

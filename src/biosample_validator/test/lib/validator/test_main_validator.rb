@@ -291,6 +291,7 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, error_list.size
 
     #ng case
+    @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.multiple_vouchers("62", "UAM:Mamm:52179",  "UAM:26370", 1)
     assert_equal false, ret
     error_list =  @validator.instance_variable_get (:@error_list)
@@ -304,5 +305,31 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret
     error_list =  @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
+  end
+
+  def test_redundant_taxonomy_attributes
+    #ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.redundant_taxonomy_attributes("73", "Nostoc sp. PCC 7120", "rumen", "Homo sapiens", 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+    #ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.redundant_taxonomy_attributes("73", "homo   sapiens", nil, "Homo sapiens", 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_msg = "Redundant values are detected in at least two of the following fields: organism; host; isolation source. For example, the value you supply for 'host' should not be identical to the value supplied for 'isolation source'. This check is case-insensitive and ignores white-space."
+    assert_equal except_msg, error_list[0][:message]
+
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.redundant_taxonomy_attributes("73",  nil, nil, nil, 1)
+    assert_equal nil, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
   end
 end
