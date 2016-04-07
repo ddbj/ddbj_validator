@@ -271,4 +271,38 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, error_list.size
   end
 
+  def test_multiple_vouchers
+    #ok case
+    ## difference institution name
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.multiple_vouchers("62", "UAM:Mamm:52179", "ATCC:26370", 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    ## only specimen is nil
+    ret = @validator.multiple_vouchers("62", "UAM:Mamm:52179" , nil, 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    ## only culture is nil
+    ret = @validator.multiple_vouchers("62", "UAM:Mamm:52179", nil, 1)
+    assert_equal true, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+    #ng case
+    ret = @validator.multiple_vouchers("62", "UAM:Mamm:52179",  "UAM:26370", 1)
+    assert_equal false, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    except_msg = "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same UAM. Only one value is allowed."
+    assert_equal except_msg, error_list[0][:message]
+
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.multiple_vouchers("62", nil, nil, 1)
+    assert_equal nil, ret
+    error_list =  @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
 end

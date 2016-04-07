@@ -137,6 +137,8 @@ class MainValidator
       send("package_versus_organism", "48", biosample_data[:taxonomy_id], biosample_data[:package], line_num)
       
       send("sex_for_bacteria", "59", biosample_data[:taxonomy_id], biosample_data[:attributes][:sex], line_num)
+
+      send("multiple_vouchers", "62", biosample_data[:attributes][:specimen_voucher], biosample_data[:attributes][:culture_collection], line_num)
     end
   end
 
@@ -503,5 +505,40 @@ class MainValidator
       end
     end
     ret
+  end
+
+  #
+  # Validates whether the multiple voucher attributes have the same INSTITUTION_CODE value
+  #
+  # ==== Args
+  # rule_code
+  # specimen_voucher ex."UAM:Mamm:52179"
+  # culture_collection ex."ATCC:26370"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def multiple_vouchers (rule_code, specimen_voucher, culture_collection, line_num)
+    if specimen_voucher.nil? && culture_collection.nil?
+      return nil
+    elsif !(!specimen_voucher.nil? && !culture_collection.nil?) #one only
+      return true
+    else
+      specimen_inst = specimen_voucher.split(":").first.strip
+      culture_inst = culture_collection.split(":").first.strip
+      if specimen_inst != culture_inst
+        return true
+      else
+        annotation = []
+        annotation.push({key: "specimen_voucher", source: @data_file, location: line_num.to_s, value: [specimen_voucher]})
+        annotation.push({key: "culture_collection", source: @data_file, location: line_num.to_s, value: [culture_collection]})
+        rule = @validation_config["rule" + rule_code]
+        param = {INSTITUTION_CODE: specimen_inst}
+        message = CommonUtils::error_msg(@validation_config, rule_code, param)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
+        @error_list.push(error_hash)
+        return false
+      end
+    end
   end
 end
