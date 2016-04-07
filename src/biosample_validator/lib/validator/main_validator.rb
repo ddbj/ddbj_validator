@@ -96,13 +96,18 @@ class MainValidator
     ### 2.auto correct (rule: 12, 13)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      biosample_data.each do |sample_data_key, sample_data_value|
-        sample_data_key[:attributes].each do |attr_name, value|
-          send("special_character_included", "12", attr_name, value, line_num)
+      # if sample_data key is [:attribute]
+      biosample_data.each do |biosample_item|
+        if biosample_item[0] == (:attributes)
+          biosample_item.each do |attr_name, value|
+            send("special_character_included", "12", attr_name, value, line_num)
+            #send("invalid_data_format", "13", attr_name, value, line_num)
+          end
+        else
+          send("special_character_included", "12", biosample_item[0], biosample_item[1], line_num)
+          #send("invalid_data_format", sample_data_item, sample_data_value)
         end
-        sample_data_item = sample_data_key
-        sample_data_item.delete(:attribute)
-        send("special_character_included", "12", sample_data_item, sample_data_value, line_num)
+
       end
     end
 
@@ -587,6 +592,7 @@ class MainValidator
   # line_num
   # ==== Return
   # true/false
+  #
   def special_character_included(rule_code, attr_name, attr_val, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result  = true
@@ -609,5 +615,19 @@ class MainValidator
     result
   end
 
+  # Validate invalid data format
+  #
+  # ==== Args
+  # rule_code
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_data_format(rule_code, attr_name, attr_val, line_num)
+    return nil if attr_val.nil? || attr_val.empty?
+    result = true
+
+
+  end
 
 end
