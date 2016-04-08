@@ -169,6 +169,23 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_taxonomy_error_warning
+    #ok case
+    ret = exec_validator("taxonomy_error_warning", "45", "Homo sapiens", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ret = exec_validator("taxonomy_error_warning", "45", "Not exist taxonomy name", 1)
+    except_msg = "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult: Organism not found, value 'Not exist taxonomy name'."
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal except_msg, get_error_message(ret[:error_list])
+    #params are nil pattern
+    ret = exec_validator("taxonomy_error_warning", "45", nil, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
   def test_taxonomy_name_and_id_not_match
     #ok case
     ret = exec_validator("taxonomy_name_and_id_not_match", "4", "103690", "Nostoc sp. PCC 7120", 1)

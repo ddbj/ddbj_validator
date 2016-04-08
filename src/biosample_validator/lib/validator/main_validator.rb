@@ -108,7 +108,7 @@ class MainValidator
       attr_list = get_attributes_of_package(biosample_data[:package])
       ### 6.check all attributes (rule: 1, 14, 27, 35, 36)
 
-      ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 70, 90, 91)
+      ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
       biosample_data[:attributes].each do|attribute_name, value|
@@ -127,6 +127,8 @@ class MainValidator
       ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
 
       send("invalid_host_organism_name", "15", biosample_data[:attributes][:host], line_num)
+
+      send("taxonomy_error_warning", "45", biosample_data[:organism], line_num)
 
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
@@ -345,7 +347,7 @@ class MainValidator
     if @org_validator.exist_organism_name?(host_name)
       true
     else
-      organism_names = @org_validator.organism_name_of_synonym(host_name) #if it's synonym, suggests scientific name
+      organism_names = @org_validator.organism_name_of_synonym(host_name) #if it's synonym, suggests scientific name. #TODO over spec?
       value = [host_name]
       if organism_names.size > 0
         value.concat(organism_names)
@@ -357,6 +359,31 @@ class MainValidator
       @error_list.push(error_hash)
       false
     end 
+  end
+
+  #
+  # Validates that the specified organism name is exist in taxonomy ontology as the organism(scientific) name.
+  #
+  # ==== Args
+  # rule_code
+  # organism_name ex."Homo sapiens"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_error_warning (rule_code, organism_name, line_num)
+    return nil if organism_name.nil?
+    if @org_validator.exist_organism_name?(organism_name)
+      true
+    else
+      annotation =[{key: "organism", source: @data_file, location: line_num.to_s, value: organism_name}]
+      rule = @validation_config["rule" + rule_code]
+      param = {MESSAGE: "Organism not found, value '#{organism_name}'"}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
+      @error_list.push(error_hash)
+      false
+    end
   end
 
   #
