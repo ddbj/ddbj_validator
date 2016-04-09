@@ -319,4 +319,137 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+
+  def test_future_collection_date
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.future_collection_date("40", "2015", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.future_collection_date("40", "2019", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #parameter are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.future_collection_date("40", nil, 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
+  def test_invalid_attribute_value_for_null
+    i_n_value = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/invalid_null_values.json"))
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "strain", "missing", i_n_value, 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "strain", "N.A.", i_n_value, 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "strain", "", i_n_value, 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
+  def test_invalid_date_format
+    ts_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/timestamp_attributes.json"))
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_date_format("7", "collection_date", "2016-01-01", ts_attr,  1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_date_format("7", "collection_date", "January/2016", ts_attr,  1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_date_format("7", "collection_date", "", ts_attr,  1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
+  def test_special_character_included
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "title", "1.0 microm", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "title", "1.0 μm", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "title", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
+  def test_invalid_data_format
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_data_format("13", "sample_name", "MTB313", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_data_format("13", "sample_name", " MTB313 ", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_data_format("13", "sample_name", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
+  def test_non_ascii_attribute_value
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.non_ascii_attribute_value("58", "sample_name", "A and a", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.non_ascii_attribute_value("58", "sample_name", "Ä and ä", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.non_ascii_attribute_value("58", "sample_name", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
 end

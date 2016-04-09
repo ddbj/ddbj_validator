@@ -1,0 +1,7 @@
+SELECT ?attribute ?require
+WHERE
+{
+  ?attr ?mandatory <http://ddbj.nig.ac.jp/ontologies/biosample/<%= package_name %>> .
+  BIND(REPLACE(STR(?attr),"http://ddbj.nig.ac.jp/ontologies/biosample/","") AS ?attribute)
+  BIND(if(?mandatory = <http://ddbj.nig.ac.jp/ontologies/biosample/mandatory_package>,"mandatory","optional") AS ?require)
+}

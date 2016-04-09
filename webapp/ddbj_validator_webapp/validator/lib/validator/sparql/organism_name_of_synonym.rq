@@ -1,0 +1,13 @@
+DEFINE sql:select-option "order"
+PREFIX id-tax: <http://identifiers.org/taxonomy/>
+PREFIX tax: <http://ddbj.nig.ac.jp/ontologies/taxonomy/>
+
+SELECT DISTINCT ?organism_name
+FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy>
+WHERE
+{
+  ?tax_id ?name_prop "<%= synonym %>" ;
+    tax:scientificName ?organism_name .
+  ?name_prop rdfs:subPropertyOf tax:name .
+  FILTER ( ?name_prop != tax:scientificName )
+}
