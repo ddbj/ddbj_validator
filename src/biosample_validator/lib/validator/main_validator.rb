@@ -118,9 +118,6 @@ class MainValidator
       line_num = idx
       biosample_data[:attribute].each do |attribute_name, value|
         send("non_ascii_attribute_value", attribute_name, value, line_num)
-
-
-
       end
     end
 
