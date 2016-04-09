@@ -113,8 +113,19 @@ class MainValidator
 
 
     ### 3.non-ASCII check (rule: 58, 60, 65)
+    @biosample_list.each_with_index do |biosample_data, idx|
+      line_num = idx
+      biosample_data[:attribute].each do |attribute_name, value|
+        send("non_ascii_attribute_value", attribute_name, value, line_num)
+
+
+
+      end
+    end
+
 
     ### 4.multiple samples & account data check (rule: 3,  6, 21, 22, 24, 28, 69)
+
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
@@ -638,6 +649,26 @@ class MainValidator
       error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+
+  def non_ascii_attribute_value(rule_code, attr_name, attr_val, line_num)
+    return nil if attr_val.nil? || attr_val.empty?
+    result = true
+    ords = []
+    attr_val.chars{|s|
+      ords.push(s.ord)
+    }
+    unless ords.max{|a, b| a.to_i <=> b.to_i} < 128
+      annotation = []
+      attr_vals = [attr_val]
+      annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result =  false
     end
     result
   end
