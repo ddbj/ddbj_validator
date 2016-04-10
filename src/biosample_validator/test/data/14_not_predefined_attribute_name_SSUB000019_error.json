@@ -169,6 +169,18 @@
                   }
                 },
                 {
+                  "text": "user_data1",
+                  "@": {
+                    "attribute_name": "user_attr1"
+                  }
+                },
+                {
+                  "text": "user_data2",
+                  "@": {
+                    "attribute_name": "user_attr2"
+                  }
+                },
+                {
                   "text": "PRJDB1654",
                   "@": {
                     "attribute_name": "bioproject_id"

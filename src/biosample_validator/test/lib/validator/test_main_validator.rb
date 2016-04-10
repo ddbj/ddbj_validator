@@ -84,6 +84,44 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_not_predefined_attribute_name
+    #ok case
+    json_data = JSON.parse(File.read("../../data/14_not_predefined_attribute_name_SSUB000019_ok.json"))
+    biosample_data = @validator.flatten_sample_json(json_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
+    ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0], attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    json_data = JSON.parse(File.read("../../data/14_not_predefined_attribute_name_SSUB000019_error.json"))
+    biosample_data = @validator.flatten_sample_json(json_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
+    ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0], attr_list, 1)
+    except_msg = "Not predefined attribute name: attribute 'user_attr1,user_attr2'."
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal except_msg, get_error_message(ret[:error_list])
+  end
+
+  def test_missing_required_attribute_name
+    #ok case
+    json_data = JSON.parse(File.read("../../data/92_missing_required_attribute_name_SSUB000019_ok.json"))
+    biosample_data = @validator.flatten_sample_json(json_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
+    ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0], attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    json_data = JSON.parse(File.read("../../data/92_missing_required_attribute_name_SSUB000019_error.json"))
+    biosample_data = @validator.flatten_sample_json(json_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
+    ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0], attr_list, 1)
+    except_msg = "Required field 'env_feature,isol_growth_condt' is missing from the header line of the file."
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal except_msg, get_error_message(ret[:error_list])
+  end
+
   def test_invalid_attribute_value_for_controlled_terms
     cv_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/controlled_terms.json"))
     #ok case

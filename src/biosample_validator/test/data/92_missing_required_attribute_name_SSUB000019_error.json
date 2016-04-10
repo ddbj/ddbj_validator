@@ -109,12 +109,6 @@
                   }
                 },
                 {
-                  "text": "town",
-                  "@": {
-                    "attribute_name": "env_feature"
-                  }
-                },
-                {
                   "text": "Japan: Hikone-shi",
                   "@": {
                     "attribute_name": "geo_loc_name"
@@ -136,12 +130,6 @@
                   "text": "Streptococcus pyogenes MTB313 genome sequencing",
                   "@": {
                     "attribute_name": "project_name"
-                  }
-                },
-                {
-                  "text": "24464696",
-                  "@": {
-                    "attribute_name": "isol_growth_condt"
                   }
                 },
                 {

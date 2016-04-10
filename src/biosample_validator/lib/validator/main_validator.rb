@@ -132,11 +132,15 @@ class MainValidator
 
       #TODO get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data[:package])
-      ### 6.check all attributes (rule: 1, 14, 27, 35, 36)
+      ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
       i_n_value = JSON.parse(File.read(@base_dir + "/../../conf/invalid_null_values.json"))
       biosample_data[:attributes].each do |attribute_name, value|
         send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, i_n_value, line_num)
       end
+
+      send("not_predefined_attribute_name", "14", biosample_data, attr_list , line_num)
+      send("missing_mandatory_attribute", "27", biosample_data, attr_list , line_num)
+      send("missing_required_attribute_name", "92", biosample_data, attr_list , line_num)
 
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
@@ -258,7 +262,84 @@ class MainValidator
       true
     end 
   end
-  
+
+  #
+  # Validates biosample data has not predefined (user defined) attributes
+  #
+  # ==== Args
+  # rule_code
+  # biosample_data a biosample object
+  # package_attr_list attribute_list of this samples package
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def not_predefined_attribute_name (rule_code, biosample_data, package_attr_list , line_num)
+    predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] }
+    not_attribute_name = [ "attributes", "biosample_accession", "package" ]
+    attr_list = biosample_data.keys.map{|key| key.to_s} - not_attribute_name
+    attr_list.concat(biosample_data[:attributes].keys.map{|key| key.to_s})
+    not_predifined_attr_names = attr_list - predefined_attr_list
+    if not_predifined_attr_names.size <= 0
+      true
+    else
+      value = not_predifined_attr_names.join(",")
+      annotation = [{key: "attributes", source: @data_file, location: line_num.to_s, value: [value]}]
+      param = {ATTRIBUTE_NAME: value}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
+  #
+  # Validates biosample data is is missing the mandatory attribute(value)
+  #
+  # ==== Args
+  # rule_code
+  # biosample_data a biosample object
+  # package_attr_list attribute_list of this samples package
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_mandatory_attribute (rule_code, biosample_data, package_attr_list , line_num)
+    #TODO
+  end
+
+  #
+  # Validates biosample data is is missing the required attribute(name)
+  #
+  # ==== Args
+  # rule_code
+  # biosample_data a biosample object
+  # package_attr_list attribute_list of this samples package
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_required_attribute_name (rule_code, biosample_data, package_attr_list , line_num)
+    mandatory_attr_list = package_attr_list.map { |attr|
+      attr[:attribute_name] if attr[:require] == "mandatory"
+    }.compact
+    not_attribute_name = [ "attributes", "biosample_accession", "package" ]
+    attr_list = biosample_data.keys.map{|key| key.to_s} - not_attribute_name
+    attr_list.concat(biosample_data[:attributes].keys.map{|key| key.to_s})
+    missing_attr_names = mandatory_attr_list - attr_list
+    if missing_attr_names.size <= 0
+      true
+    else
+      value = missing_attr_names.join(",")
+      annotation = [{key: "attributes", source: @data_file, location: line_num.to_s, value: [value]}]
+      param = {ATTRIBUTE_NAME: value}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+ 
   #
   # Validates the attributes values in controlled term
   #
