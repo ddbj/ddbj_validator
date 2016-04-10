@@ -97,10 +97,10 @@ class TestMainValidator < Minitest::Test
     biosample_data = @validator.flatten_sample_json(json_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
     ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0], attr_list, 1)
-    except_msg = "Not predefined attribute name: attribute 'user_attr1,user_attr2'."
+    expect_msg = "Not predefined attribute name: attribute 'user_attr1,user_attr2'."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
   end
 
   def test_missing_required_attribute_name
@@ -116,10 +116,10 @@ class TestMainValidator < Minitest::Test
     biosample_data = @validator.flatten_sample_json(json_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
     ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0], attr_list, 1)
-    except_msg = "Required field 'env_feature,isol_growth_condt' is missing from the header line of the file."
+    expect_msg = "Required field 'env_feature,isol_growth_condt' is missing from the header line of the file."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
   end
 
   def test_invalid_attribute_value_for_controlled_terms
@@ -163,16 +163,16 @@ class TestMainValidator < Minitest::Test
     #ng case
     ##dec format(auto annotation)
     ret = exec_validator("invalid_lat_lon_format", "9", "47.94345678 N 28.12345678 W", 1)
-    except_annotation = "47.9435 N 28.1235 W"
+    expect_annotation = "47.9435 N 28.1235 W"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_annotation, get_annotation(ret[:error_list], 0).first
+    assert_equal expect_annotation, get_annotation(ret[:error_list], 0).first
     ##deg format(auto annotation)
     ret = exec_validator("invalid_lat_lon_format", "9", "37°26′36.42″N 06°15′14.28″W", 1)
-    except_annotation = "37.4435 N 6.254 W"
+    expect_annotation = "37.4435 N 6.254 W"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_annotation, get_annotation(ret[:error_list], 0).first
+    assert_equal expect_annotation, get_annotation(ret[:error_list], 0).first
     ##can't parse format as lat lon
     ret = exec_validator("invalid_lat_lon_format", "9", "47.9456 28.1212", 1)
     assert_equal false, ret[:result]
@@ -220,10 +220,10 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("taxonomy_error_warning", "45", "Not exist taxonomy name", 1)
-    except_msg = "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult: Organism not found, value 'Not exist taxonomy name'."
+    expect_msg = "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult: Organism not found, value 'Not exist taxonomy name'."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("taxonomy_error_warning", "45", nil, 1)
     assert_equal nil, ret[:result]
@@ -256,10 +256,10 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     # ng case
     ret = exec_validator("latlon_versus_country", "41", "Norway:Svalbard", "78.92267 N 11.98147 E", 1)
-    except_msg = "Values provided for 'latitude and longitude' and 'geographic location' contradict each other: Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway:Svalbard'"
+    expect_msg = "Values provided for 'latitude and longitude' and 'geographic location' contradict each other: Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway:Svalbard'"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
     #TODO more error case
   end
 
@@ -296,22 +296,22 @@ class TestMainValidator < Minitest::Test
     #ng case
     ##bacteria
     ret = exec_validator("sex_for_bacteria", "59", "103690", "male", 1)
-    except_msg = "Attribute 'sex' is not appropriate for bacterial or viral organisms; did you mean 'host sex'?"
+    expect_msg = "Attribute 'sex' is not appropriate for bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
     ##viral
     ret = exec_validator("sex_for_bacteria", "59", "510903", "male", 1)
-    except_msg = "Attribute 'sex' is not appropriate for bacterial or viral organisms; did you mean 'host sex'?"
+    expect_msg = "Attribute 'sex' is not appropriate for bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
     #fungi
     ret = exec_validator("sex_for_bacteria", "59", "1445577", "male", 1)
-    except_msg = "Attribute 'sex' is not appropriate for fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"
+    expect_msg = "Attribute 'sex' is not appropriate for fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
 
     #params are nil pattern
     ret = exec_validator("sex_for_bacteria", "59", "103690", nil, 1)
@@ -336,10 +336,10 @@ class TestMainValidator < Minitest::Test
 
     #ng case
     ret = exec_validator("multiple_vouchers", "62", "UAM:Mamm:52179", "UAM:26370", 1)
-    except_msg = "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same UAM. Only one value is allowed."
+    expect_msg = "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same UAM. Only one value is allowed."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
 
     #params are nil pattern
     ret = exec_validator("multiple_vouchers", "62", nil, nil, 1)
@@ -354,10 +354,10 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("redundant_taxonomy_attributes", "73", "homo   sapiens", nil, "Homo sapiens", 1)
-    except_msg = "Redundant values are detected in at least two of the following fields: organism; host; isolation source. For example, the value you supply for 'host' should not be identical to the value supplied for 'isolation source'. This check is case-insensitive and ignores white-space."
+    expect_msg = "Redundant values are detected in at least two of the following fields: organism; host; isolation source. For example, the value you supply for 'host' should not be identical to the value supplied for 'isolation source'. This check is case-insensitive and ignores white-space."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal except_msg, get_error_message(ret[:error_list])
+    assert_equal expect_msg, get_error_message(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("redundant_taxonomy_attributes", "73", nil, nil, nil, 1)
     assert_equal nil, ret[:result]
