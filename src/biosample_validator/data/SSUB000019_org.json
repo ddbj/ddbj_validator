@@ -1,5 +1,8 @@
-{
-  "BioSample": {
+[
+  {
+    "BioSampleSet": {
+      "BioSample": [
+  {
     "@": {
       "access": "public",
       "publication_date": "2015-02-25T09:59:23+09:00",
@@ -175,4 +178,7 @@
       }
     ]
   }
-}
+      ]
+    }
+  }
+]

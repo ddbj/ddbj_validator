@@ -63,6 +63,12 @@ class TestMainValidator < Minitest::Test
     end
   end
 
+  def test_flatten_sample_json
+    json_data = JSON.parse(File.read("../../data/flatten_sample_json_SSUB001341.json"))
+    biosample_set = @validator.flatten_sample_json(json_data)
+    assert_equal 4, biosample_set.size
+  end
+
   def test_unknown_package
     #ok case
     ret = exec_validator("unknown_package", "26", "MIGS.ba.microbial", 1)

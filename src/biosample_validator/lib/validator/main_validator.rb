@@ -53,9 +53,9 @@ class MainValidator
   def flatten_sample_json(json_data)
     ###TODO 1.data schema check(rule: 18, 20, 25, 34, 61, 63, 64)
     sample_list = []
-    json_data.each_with_index do |row, idx|
+    biosample_list = json_data[0]["BioSampleSet"]["BioSample"]
+    biosample_list.each_with_index do |biosample, idx|
       sample_data = {}
-      biosample = row["BioSample"]
       sample_data[:biosample_accession] = biosample["Ids"][0]["Id"][0]["text"]
       sample_data[:sample_name] = biosample["Description"][0]["SampleName"][0]
       sample_data[:sample_title] = biosample["Description"][0]["Title"][0]
@@ -106,7 +106,7 @@ class MainValidator
           end
         else
           send("special_character_included", "12", biosample_item[0], biosample_item[1], line_num)
-          send("invalid_data_format", biosample_item[0], biosample_item[1])
+          send("invalid_data_format", "13", biosample_item[0], biosample_item[1], line_num)
         end
 
       end
@@ -116,8 +116,8 @@ class MainValidator
     ### 3.non-ASCII check (rule: 58, 60, 65)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx
-      biosample_data[:attribute].each do |attribute_name, value|
-        send("non_ascii_attribute_value", attribute_name, value, line_num)
+      biosample_data[:attributes].each do |attribute_name, value|
+        send("non_ascii_attribute_value", "58", attribute_name, value, line_num)
       end
     end
 
