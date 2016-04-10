@@ -5,7 +5,7 @@ var Message = require("../models/Message");
 /* GET home page. */
 router.post('/', function(req, res, next) {
     var message = new Message();
-    message.errors = req.body.errors;
+    message.error_res = req.body.errors;
     message.error_size = req.body.error_size;
     message.method = req.body.method;
     message.original_file = req.body.original_file;

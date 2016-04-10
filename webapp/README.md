@@ -113,3 +113,23 @@ foreverの自動起動を行うため下記のように /etc/rc.localに追記�
 
 配布するコンテナなどでは、nginxによるリバースプロキシの適応を予定しています。
 
+## エラーレスポンス、選択したアノテーションの保存
+
+validatorから返却されたerror responseはmongodbに保存されます。同一の接続でユーザが選択したアノテーションの値についても、
+返却されたエラーレスポンスと共に保存します。
+
+### エラーレスポンスのログ（例）
+
+    { 
+    "_id" : ObjectId("570a54f421afe15a63dfc250"),
+     "updateTime" : ISODate("2016-04-10T13:28:12.538Z"),
+     "original_file" : "SSUB000070.xml",
+     "method" : "biosample validator",
+     "error_size" : 1,
+     "error_res" : [ ], // エラーレスポンスをそのまま格納
+     "selected" : [{attribute_name: value} ], //値が変更されたattributeとvalueのセットを格納
+     "__v" : 0 
+     }
+
+
+

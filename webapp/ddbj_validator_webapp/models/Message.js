@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var MessageSchema = new Schema({
-    erros: Array,
+    error_res: Array,
     error_size: Number,
     method: String,
     original_file: String,
