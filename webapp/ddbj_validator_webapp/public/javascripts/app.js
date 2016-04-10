@@ -4,7 +4,7 @@
         urlRoot: "/messages",
         idAttribute: "_id",
         defaults: {
-            errors: [],
+            errs: "",
             error_size: 0,
             method: "",
             original_file: "",
@@ -52,7 +52,6 @@
                     processData: false,
                     contentType: false
                 }).done(function (error_message) {
-
                     //error_message_response object
                     var message = new Message();
                     message.save({
@@ -60,7 +59,6 @@
                         error_size:error_message["error_size"],
                         method: error_message["method"],
                         original_file: error_message["original_file"]});
-
 
                     if(list_option == "option-grouped") {
                         // if option Group Error Message selected
@@ -96,8 +94,10 @@
                                 'change .result-group input[type=text]': 'onChange'
                             },
                             onChange: function(e){
+                                console.log(e);
                                 selected[$(".result-group input[type=text]").attr("name")] = $(".result-group input[type=text]").val()
                                 edit_item.push(selected);
+                                console.log(edit_item);
                             }
                         });
 

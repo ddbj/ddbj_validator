@@ -5,15 +5,15 @@
         <tr>
             <th>Result:</th>
             <td>
-                    <span class="error_info">
-                        <% if(error_size != 0){ %>
-                        <%= error_size %> Errors
-                        <% } else if(exception){%>
-                            <%= exception %>
-                        <% } else { %>
-                        No Errors Found
-                        <% } %>
-                    </span>
+                <span class="error_info">
+                    <% if(error_size != 0){ %>
+                    <%= error_size %> Errors
+                    <% } else if(exception){%>
+                        <%= exception %>
+                    <% } else { %>
+                    No Errors Found
+                    <% } %>
+                </span>
             </td>
         </tr>
         <tr>
@@ -50,6 +50,7 @@
         <% if(errors[i].location == "#attribute"){ %>
                 <table>
                     <tr>
+                        <th>Sample name</th>
                         <th>Location</th>
                         <th>Attribute</th>
                         <th>Value</th>
@@ -57,6 +58,7 @@
 
                     <% for(var j = 0; j < errors[i].values.length; j++){ %>
                     <tr>
+                        <td></td>
                         <td><%= errors[i].location %></td>
                         <td><%= errors[i].values[j].annotation[0].key %></td>
                         <td><input type="text" name="<%= errors[i].values[j].annotation[0].key %>" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
@@ -67,11 +69,13 @@
         <% }else if(errors[i].location == "bioproject_id"){ %>
             <table>
                 <tr>
+                    <th>Sample name</th>
                     <th>Location</th>
                     <th>Value</th>
                 </tr>
                 <tr>
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td></td>
                     <td><%= errors[i].location %></td>
                     <td><input type="text" value="<%= errors[i].values[j].annotation[0].key %>" disabled></td>
                     <% } %>
@@ -80,12 +84,14 @@
         <% }else if(errors[i].location == "package, organism"){ %>
             <table>
                 <tr>
+                    <th>Sample name</th>
                     <th>Location</th>
                     <th>Taxonomy Id</th>
                     <th>Package</th>
                 </tr>
                 <tr>
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td></td>
                     <td><%= errors[i].location %></td>
                     <td><input type="text" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
                     <td><input type="text" value="<%= errors[i].values[j].annotation[1].value %>" disabled></td>
@@ -95,6 +101,7 @@
         <% }else if(errors[i].location == "organism and taxonomy_id"){ %>
             <table>
                 <tr>
+                    <th>Sample name</th>
                     <th>Location</th>
                     <th>Organism</th>
                     <th>Suggested organism</th>
@@ -103,6 +110,7 @@
                 </tr>
                 <tr>
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td></td>
                     <td><%= errors[i].location %></td>
                     <td><%= errors[i].values[j].annotation[0].value[0] %></td>
                     <td><%= errors[i].values[j].annotation[0].value[1] %></td>
@@ -114,6 +122,7 @@
         <% }else if(errors[i].correction == "auto-annotation"){ %>
             <table>
                 <tr>
+                    <th>Sample name</th>
                     <th>Location</th>
                     <th>Key</th>
                     <th>Value</th>
@@ -121,6 +130,7 @@
                 </tr>
                 <tr>
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
+                    <td></td>
                     <td><%= errors[i].location %></td>
                     <td><%= errors[i].values[j].annotation[0].key %></td>
                     <td><%= errors[i].values[j].annotation[0].value[0] %></td>
@@ -131,6 +141,7 @@
         <% }else{ %>
             <table>
                 <tr>
+                    <th>Sample name</th>
                     <th>Location</th>
                     <th>Key</th>
                     <th>Value</th>
@@ -138,6 +149,7 @@
 
                 <% for(var j = 0; j < errors[i].values.length; j++){ %>
                 <tr>
+                    <td></td>
                     <td><%= errors[i].location %></td>
                     <td><%= errors[i].values[j].annotation[0].key %></td>
                     <td><%= errors[i].values[j].annotation[0].value %></td>
