@@ -133,9 +133,9 @@ class MainValidator
       #TODO get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data[:package])
       ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
-      i_n_value = JSON.parse(File.read(@base_dir + "/../../conf/invalid_null_values.json"))
+      null_accepted_a = JSON.parse(File.read(@base_dir + "/../../conf/null_accepted_a"))
       biosample_data[:attributes].each do |attribute_name, value|
-        send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, i_n_value, line_num)
+        send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, null_accepted_a, line_num)
       end
 
       send("not_predefined_attribute_name", "14", biosample_data, attr_list , line_num)
@@ -747,19 +747,34 @@ class MainValidator
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null(rule_code, attr_name, attr_val, i_n_value, line_num)
+  def invalid_attribute_value_for_null(rule_code, attr_name, attr_val, null_accepted_a, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
-    if i_n_value.include?(attr_val)
+    if null_accepted_a.include?attr_val.downcase
+      for null_accepted in null_accepted_a
+        if /#{null_accepted}/i =~ attr_val
+          attr_val_result = attr_val.downcase
+          unless attr_val_result == attr_val
+            result = false
+          end
+        end
+      end
+    end
+
+    null_not_recommended = Regexp.new(/^(NA|N\/A|N\.A\.?|Unknown)$/i)
+    if attr_val =~ null_not_recommended
+      attr_val_result = "missing"
+      result = false
+    end
+
+    unless result
       annotation = []
-      attr_vals = [attr_val, "missing"]
+      attr_vals = [attr_val, attr_val_result]
       annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
-      rule = @validation_config["rule" + rule_code]
       param = {ATTRIBUTE_NAME: attr_name}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
       @error_list.push(error_hash)
-      result = false
     end
     result
   end
