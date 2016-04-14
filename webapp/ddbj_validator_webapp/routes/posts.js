@@ -9,43 +9,73 @@ var exec = require('child_process').exec;
 var fs = require('fs');
 var xml2js = require('xml2js');
 var conf = require('config');
+var jschardet = require('jschardet');
+var formattype = require('format-type');
 var json_path = "";
 var file_name = "";
 var original_name = "";
+var format_type = "";
+
 //var filewriter = require("filewriter");
 
 router.post('/upload', function(req, res, next){
     original_name = req.file['originalname'];
     json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
     file_name = req.file['filename'];
-    var parser = new xml2js.Parser({attrkey: "@", charkey: "text"});
+    var xml2js_parser = new xml2js.Parser({attrkey: "@", charkey: "text"});
     var parseString = require('xml2js').parseString;
     var json_array = [];
 
     fs.readFile(conf.read_file_dir + file_name, "utf8", function(err, data){
-        parser.parseString(data, function(err, result){
-            json_array.push(result);
-            json_string = JSON.stringify(json_array);
-            fs.writeFile(json_path, json_string);
-        })
+        var type = formattype(data)["type"];
+        switch (type){
+            case "xml":
+                //check sample and wrap root_node
+
+                //
+                xml2js_parser.parseString(data, function (err, result) {
+                    json_array.push(result);
+                    json_string = JSON.stringify(json_array);
+                    fs.writeFile(json_path, json_string);
+                });
+                break;
+            case "tsv":
+                console.log("tsv");
+                break;
+            case "json":
+                console.log("json");
+                break;
+        }
+        go_next(type);
     });
-    next();
+
+    function go_next(type){
+        format_type = type;
+        next();
+    }
+
 }, function(req, res, next){
-    var original_name = req.file['originalname'];
-    json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
-    exec('ruby ./validator/biosample_validator.rb ' +  json_path, function(error, stdout, stderr){
-        if(stdout){
-            var error_list = eval(stdout);
-            render_result(error_list);
-        }
-        if(stderr){
-            console.log('stderr: ' + stderr);
-            render_exception(stderr);
-        }
-        if(error !== null){
-            console.log('Exec error: ' + error);
-        }
-    });
+    var type = format_type;
+    switch(type){
+        case "xml":
+            var original_name = req.file['originalname'];
+                json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
+                exec('ruby ./validator/biosample_validator.rb ' +  json_path, function(error, stdout, stderr){
+                    if(stdout){
+                        var error_list = eval(stdout);
+                        render_result(error_list);
+                    }
+                    if(stderr){
+                        console.log('stderr: ' + stderr);
+                        render_exception(stderr);
+                    }
+                    if(error !== null){
+                        console.log('Exec error: ' + error);
+                    }
+                });
+            break
+    }
+
     function render_exception(stderr){
         //res.render('validator_error', {message:"Exception occured",error: stderr });
         var item = new Object();
