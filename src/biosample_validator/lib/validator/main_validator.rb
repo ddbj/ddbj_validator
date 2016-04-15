@@ -36,40 +36,50 @@ class MainValidator
   # An array of biosample data.
   # [
   #   {
-  #     :biosample_accession => "SAMDXXXXXX",
-  #     :sample_name =>"XXXXXX",
-  #     :sample_title => "XXXXXXXXXX",
-  #     :organism => "XXXXXXX",
-  #     :taxonomy_id => "NNNN",
-  #     :package => "XXXXXXXXX",
-  #     :attributes =>
+  #     "biosample_accession" => "SAMDXXXXXX",
+  #     "package" => "XXXXXXXXX",
+  #     "attributes" =>
   #       {
-  #         :sample_name => "XXXXXX", 
+  #         "sample_name" => "XXXXXX", 
   #         .....
   #       }
   #   },
   #   {.....}, ....
   # ]
   def flatten_sample_json(json_data)
-    ###TODO 1.data schema check(rule: 18, 20, 25, 34, 61, 63, 64)
+    ###TODO 1.data schema check(rule: 18, 20, 25, 34, 61)
     sample_list = []
     biosample_list = json_data[0]["BioSampleSet"]["BioSample"]
     biosample_list.each_with_index do |biosample, idx|
       sample_data = {}
-      sample_data[:biosample_accession] = biosample["Ids"][0]["Id"][0]["text"]
-      sample_data[:sample_name] = biosample["Description"][0]["SampleName"][0]
-      sample_data[:sample_title] = biosample["Description"][0]["Title"][0]
-      organism = biosample["Description"][0]["Organism"][0]
-      sample_data[:organism] =  organism["OrganismName"][0]
-      sample_data[:taxonomy_id] = organism["@"]["taxonomy_id"]
-      sample_data[:package] = biosample["Models"][0]["Model"][0]
-      sample_data[:attributes] = {}
-      attributes = biosample["Attributes"][0]["Attribute"]
-      attributes.each do |attr|
+      #sample_id
+      biosample["Ids"][0]["Id"].each do |sample_id|
+        if sample_id["@"]["namespace"] == "BioSample"
+          sample_data["biosample_accession"] = sample_id["text"]
+        end
+      end
+      #package
+      if !biosample["Models"].nil? && !biosample["Models"][0]["Model"].nil?
+        sample_data["package"] = biosample["Models"][0]["Model"][0]
+      end
+      #attributes
+      attributes = {}
+      description = biosample["Description"][0]
+      if !description["Title"].nil?
+        attributes["sample_title"] = description["Title"][0]
+      end
+      if !description["Organism"].nil?
+        organism = description["Organism"][0]
+        attributes["organism"] = organism["OrganismName"][0]
+        attributes["taxonomy_id"] = organism["@"]["taxonomy_id"]
+      end
+      attributes_list = biosample["Attributes"][0]["Attribute"]
+      attributes_list.each do |attr|
         key = attr["@"]["attribute_name"]
         value = attr["text"]
-        sample_data[:attributes][key.to_sym] = value
+        attributes[key] = value
       end
+      sample_data["attributes"] = attributes
       sample_list.push(sample_data)
     end
     sample_list
@@ -97,18 +107,9 @@ class MainValidator
     ### 2.auto correct (rule: 12, 13)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      # if sample_data key is [:attribute]
-      biosample_data.each do |biosample_item|
-        if biosample_item[0] == (:attributes)
-          biosample_item.each do |attr_name, value|
-            send("special_character_included", "12", attr_name, value, line_num)
-            send("invalid_data_format", "13", attr_name, value, line_num)
-          end
-        else
-          send("special_character_included", "12", biosample_item[0], biosample_item[1], line_num)
-          send("invalid_data_format", "13", biosample_item[0], biosample_item[1], line_num)
-        end
-
+      biosample_data["attributes"].each do |attr_name, value|
+        send("special_character_included", "12", attr_name, value, line_num)
+        send("invalid_data_format", "13", attr_name, value, line_num)
       end
     end
 
@@ -116,7 +117,7 @@ class MainValidator
     ### 3.non-ASCII check (rule: 58, 60, 65)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx
-      biosample_data[:attributes].each do |attribute_name, value|
+      biosample_data["attributes"].each do |attribute_name, value|
         send("non_ascii_attribute_value", "58", attribute_name, value, line_num)
       end
     end
@@ -128,63 +129,63 @@ class MainValidator
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       ### 5.package check (rule: 26)
-      send("unknown_package", "26", biosample_data[:package], line_num)
+      send("unknown_package", "26", biosample_data["package"], line_num)
 
       #TODO get mandatory attribute from sparql
-      attr_list = get_attributes_of_package(biosample_data[:package])
+      attr_list = get_attributes_of_package(biosample_data["package"])
       ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
       null_accepted_a = JSON.parse(File.read(@base_dir + "/../../conf/null_accepted_a"))
-      biosample_data[:attributes].each do |attribute_name, value|
+      biosample_data["attributes"].each do |attribute_name, value|
         send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, null_accepted_a, line_num)
       end
 
-      send("not_predefined_attribute_name", "14", biosample_data, attr_list , line_num)
-      send("missing_mandatory_attribute", "27", biosample_data, attr_list , line_num)
-      send("missing_required_attribute_name", "92", biosample_data, attr_list , line_num)
+      send("not_predefined_attribute_name", "14", biosample_data["attributes"], attr_list , line_num)
+      send("missing_mandatory_attribute", "27", biosample_data["attributes"], attr_list , line_num)
+      send("missing_required_attribute_name", "92", biosample_data["attributes"], attr_list , line_num)
 
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
-      biosample_data[:attributes].each do|attribute_name, value|
+      biosample_data["attributes"].each do|attribute_name, value|
         send("invalid_attribute_value_for_controlled_terms", "2", attribute_name.to_s, value, cv_attr, line_num)
       end
 
-      send("invalid_bioproject_accession", "5", biosample_data[:attributes][:bioproject_id], line_num)
+      send("invalid_bioproject_accession", "5", biosample_data["attributes"]["bioproject_id"], line_num)
 
       date_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json")) #for rule_id:7
 
       country_list = JSON.parse(File.read(@base_dir + "/../../conf/country_list.json"))
-      send("invalid_country", "8", biosample_data[:attributes][:geo_loc_name], country_list, line_num)
+      send("invalid_country", "8", biosample_data["attributes"]["geo_loc_name"], country_list, line_num)
 
-      send("invalid_lat_lon_format", "9", biosample_data[:attributes][:lat_lon], line_num)
+      send("invalid_lat_lon_format", "9", biosample_data["attributes"]["lat_lon"], line_num)
 
       ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
 
-      send("invalid_host_organism_name", "15", biosample_data[:attributes][:host], line_num)
+      send("invalid_host_organism_name", "15", biosample_data["attributes"]["host"], line_num)
 
-      send("taxonomy_error_warning", "45", biosample_data[:organism], line_num)
+      send("taxonomy_error_warning", "45", biosample_data["attributes"]["organism"], line_num)
       ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
-      biosample_data[:attributes].each do |attribute_name, value|
+      biosample_data["attributes"].each do |attribute_name, value|
         send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
       end
 
-      send("future_collection_date", "40", biosample_data[:attributes][:collection_date], line_num)
+      send("future_collection_date", "40", biosample_data["attributes"]["collection_date"], line_num)
 
 
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
-      send("taxonomy_name_and_id_not_match", "4", biosample_data[:taxonomy_id], biosample_data[:organism], line_num)
+      send("taxonomy_name_and_id_not_match", "4", biosample_data["attributes"]["taxonomy_id"], biosample_data["attributes"]["organism"], line_num)
 
-      send("latlon_versus_country", "46", biosample_data[:attributes][:geo_loc_name], biosample_data[:attributes][:lat_lon], line_num)
+      send("latlon_versus_country", "46", biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
 
-      send("package_versus_organism", "48", biosample_data[:taxonomy_id], biosample_data[:package], line_num)
+      send("package_versus_organism", "48", biosample_data["attributes"]["taxonomy_id"], biosample_data["package"], line_num)
 
-      send("sex_for_bacteria", "59", biosample_data[:taxonomy_id], biosample_data[:attributes][:sex], line_num)
+      send("sex_for_bacteria", "59", biosample_data["attributes"]["taxonomy_id"], biosample_data["attributes"]["sex"], line_num)
 
 
-      send("multiple_vouchers", "62", biosample_data[:attributes][:specimen_voucher], biosample_data[:attributes][:culture_collection], line_num)
+      send("multiple_vouchers", "62", biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
 
-      send("redundant_taxonomy_attributes", "73", biosample_data[:organism], biosample_data[:attributes][:host], biosample_data[:attributes][:isolation_source], line_num)
+      send("redundant_taxonomy_attributes", "73", biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
     end
   end
@@ -268,18 +269,15 @@ class MainValidator
   #
   # ==== Args
   # rule_code
-  # biosample_data a biosample object
+  # sample_attr attributes of the biosample object
   # package_attr_list attribute_list of this samples package
   # line_num
   # ==== Return
   # true/false
   #
-  def not_predefined_attribute_name (rule_code, biosample_data, package_attr_list , line_num)
+  def not_predefined_attribute_name (rule_code, sample_attr, package_attr_list , line_num)
     predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] }
-    not_attribute_name = [ "attributes", "biosample_accession", "package" ]
-    attr_list = biosample_data.keys.map{|key| key.to_s} - not_attribute_name
-    attr_list.concat(biosample_data[:attributes].keys.map{|key| key.to_s})
-    not_predifined_attr_names = attr_list - predefined_attr_list
+    not_predifined_attr_names = sample_attr.keys - predefined_attr_list
     if not_predifined_attr_names.size <= 0
       true
     else
@@ -298,13 +296,13 @@ class MainValidator
   #
   # ==== Args
   # rule_code
-  # biosample_data a biosample object
+  # sample_attr attributes of the biosample object
   # package_attr_list attribute_list of this samples package
   # line_num
   # ==== Return
   # true/false
   #
-  def missing_mandatory_attribute (rule_code, biosample_data, package_attr_list , line_num)
+  def missing_mandatory_attribute (rule_code, sample_attr, package_attr_list , line_num)
     #TODO
   end
 
@@ -313,20 +311,17 @@ class MainValidator
   #
   # ==== Args
   # rule_code
-  # biosample_data a biosample object
+  # sample_attr attributes of the biosample object
   # package_attr_list attribute_list of this samples package
   # line_num
   # ==== Return
   # true/false
   #
-  def missing_required_attribute_name (rule_code, biosample_data, package_attr_list , line_num)
+  def missing_required_attribute_name (rule_code, sample_attr, package_attr_list , line_num)
     mandatory_attr_list = package_attr_list.map { |attr|
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
-    not_attribute_name = [ "attributes", "biosample_accession", "package" ]
-    attr_list = biosample_data.keys.map{|key| key.to_s} - not_attribute_name
-    attr_list.concat(biosample_data[:attributes].keys.map{|key| key.to_s})
-    missing_attr_names = mandatory_attr_list - attr_list
+    missing_attr_names = mandatory_attr_list - sample_attr.keys 
     if missing_attr_names.size <= 0
       true
     else
