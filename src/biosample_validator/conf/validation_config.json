@@ -216,13 +216,6 @@
     "method": "taxonomy_error_warning",
     "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult: <%=MESSAGE%>."
   },
-  "rule46": {
-    "code": "46",
-    "level": "warning",
-    "name": "Latlon versus country warning",
-    "method": "latlon_versus_country_warning",
-    "message": "Values provided for 'latitude and longitude' and 'geographic location' appear to contradict each other: <%=MESSAGE%>."
-  },
   "rule48": {
     "code": "48",
     "level": "error",

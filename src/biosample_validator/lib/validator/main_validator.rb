@@ -117,26 +117,26 @@ class MainValidator
       exit(1)
     end
 
-    ### 2.auto correct (rule: 12, 13)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
+      ### 2.auto correct (rule: 12, 13)
       biosample_data["attributes"].each do |attr_name, value|
-        send("special_character_included", "12", attr_name, value, line_num)
-        send("invalid_data_format", "13", attr_name, value, line_num)
+        ret = send("special_character_included", "12", attr_name, value, line_num)
+        if ret == false #save auto annotation value
+          annotation = @error_list.last[:annotation].find{|anno| anno[:key] == attr_name }
+          biosample_data["attributes"][attr_name] = annotation[:value][1]
+        end
+        ret = send("invalid_data_format", "13", attr_name, value, line_num)
+	if ret == false #save auto annotation value
+          annotation = @error_list.last[:annotation].find {|anno| anno[:key] == attr_name }
+          biosample_data["attributes"][attr_name] = annotation[:value][1]
+        end
+        ### 3.non-ASCII check (rule: 58)
+        send("non_ascii_attribute_value", "58", attr_name, value, line_num)
       end
     end
 
-
-    ### 3.non-ASCII check (rule: 58, 60, 65)
-    @biosample_list.each_with_index do |biosample_data, idx|
-      line_num = idx
-      biosample_data["attributes"].each do |attribute_name, value|
-        send("non_ascii_attribute_value", "58", attribute_name, value, line_num)
-      end
-    end
-
-
-    ### 4.multiple samples & account data check (rule: 3,  6, 21, 22, 24, 28, 69)
+    ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
 
 
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -149,7 +149,11 @@ class MainValidator
       ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
       null_accepted_a = JSON.parse(File.read(@base_dir + "/../../conf/null_accepted_a"))
       biosample_data["attributes"].each do |attribute_name, value|
-        send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, null_accepted_a, line_num)
+        ret = send("invalid_attribute_value_for_null", "1", attribute_name.to_s, value, null_accepted_a, line_num)
+        if ret == false #save auto annotation value
+          annotation = @error_list.last[:annotation].find {|anno| anno[:key] == attribute_name }
+          biosample_data["attributes"][attr_name] = annotation[:value][1]
+        end
       end
 
       send("not_predefined_attribute_name", "14", biosample_data["attributes"], attr_list , line_num)
@@ -189,7 +193,7 @@ class MainValidator
 
       send("taxonomy_name_and_id_not_match", "4", biosample_data["attributes"]["taxonomy_id"], biosample_data["attributes"]["organism"], line_num)
 
-      send("latlon_versus_country", "46", biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
+      send("latlon_versus_country", "41", biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
 
       send("package_versus_organism", "48", biosample_data["attributes"]["taxonomy_id"], biosample_data["package"], line_num)
 

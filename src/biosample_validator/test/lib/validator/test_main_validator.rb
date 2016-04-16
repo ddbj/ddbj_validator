@@ -74,6 +74,19 @@ class TestMainValidator < Minitest::Test
     #TODO has description("Comment/Paragraph1") case
   end
 
+  def test_save_auto_annotation_value
+    # is not method test
+    # test data: "geo_loc_name" => "  Jaaaapan"
+    # expect:
+    #     "  Jaaaapan" will be auto-annotated to "Jaaaapan" by the auto-annotation or rule 13.
+    #     And, this value will be used on next validation method(rule46) as "geo_loc_name" attribute value
+    biosample_set = @validator.validate("../../data/save_auto_annotation_value.json")
+    error_list = @validator.instance_variable_get (:@error_list)
+    error =  error_list.find {|error| error[:id] == "41"}
+    annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
+    assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
+  end
+
   def test_unknown_package
     #ok case
     ret = exec_validator("unknown_package", "26", "MIGS.ba.microbial", 1)
