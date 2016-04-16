@@ -67,6 +67,10 @@ class TestMainValidator < Minitest::Test
     json_data = JSON.parse(File.read("../../data/flatten_sample_json_SSUB001341.json"))
     biosample_set = @validator.flatten_sample_json(json_data)
     assert_equal 4, biosample_set.size
+    first_sample = biosample_set[0]
+    assert_equal "SAMD00010225", first_sample["biosample_accession"]
+    assert_equal "Generic", first_sample["package"]
+    assert_equal "DRS012892", first_sample["attributes"]["sample_name"]
   end
 
   def test_unknown_package
@@ -88,15 +92,15 @@ class TestMainValidator < Minitest::Test
     #ok case
     json_data = JSON.parse(File.read("../../data/14_not_predefined_attribute_name_SSUB000019_ok.json"))
     biosample_data = @validator.flatten_sample_json(json_data)
-    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
-    ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0], attr_list, 1)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     json_data = JSON.parse(File.read("../../data/14_not_predefined_attribute_name_SSUB000019_error.json"))
     biosample_data = @validator.flatten_sample_json(json_data)
-    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
-    ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0], attr_list, 1)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0]["attributes"], attr_list, 1)
     expect_msg = "Not predefined attribute name: attribute 'user_attr1,user_attr2'."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -107,15 +111,15 @@ class TestMainValidator < Minitest::Test
     #ok case
     json_data = JSON.parse(File.read("../../data/92_missing_required_attribute_name_SSUB000019_ok.json"))
     biosample_data = @validator.flatten_sample_json(json_data)
-    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
-    ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0], attr_list, 1)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     json_data = JSON.parse(File.read("../../data/92_missing_required_attribute_name_SSUB000019_error.json"))
     biosample_data = @validator.flatten_sample_json(json_data)
-    attr_list = @validator.get_attributes_of_package(biosample_data[0][:package])
-    ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0], attr_list, 1)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0]["attributes"], attr_list, 1)
     expect_msg = "Required field 'env_feature,isol_growth_condt' is missing from the header line of the file."
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
