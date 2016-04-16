@@ -71,6 +71,7 @@ class TestMainValidator < Minitest::Test
     assert_equal "SAMD00010225", first_sample["biosample_accession"]
     assert_equal "Generic", first_sample["package"]
     assert_equal "DRS012892", first_sample["attributes"]["sample_name"]
+    #TODO has description("Comment/Paragraph1") case
   end
 
   def test_unknown_package

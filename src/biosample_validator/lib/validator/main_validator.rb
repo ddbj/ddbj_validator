@@ -43,6 +43,10 @@ class MainValidator
   #         "sample_name" => "XXXXXX", 
   #         .....
   #       }
+  #     "attribute_names_list" =>
+  #       [
+  #         "sample_name", "sample_title", ..
+  #       ]
   #   },
   #   {.....}, ....
   # ]
@@ -64,22 +68,31 @@ class MainValidator
       end
       #attributes
       attributes = {}
+      attribute_names_list = []
       description = biosample["Description"][0]
       if !description["Title"].nil?
         attributes["sample_title"] = description["Title"][0]
+        attribute_names_list.push("sample_title");
+      end
+      if !description["Comment"].nil?
+        attributes["description"] = description["Comment"][0]["Paragraph"][0]
       end
       if !description["Organism"].nil?
         organism = description["Organism"][0]
         attributes["organism"] = organism["OrganismName"][0]
         attributes["taxonomy_id"] = organism["@"]["taxonomy_id"]
+        attribute_names_list.push("organism");
+        attribute_names_list.push("taxonomy_id");
       end
       attributes_list = biosample["Attributes"][0]["Attribute"]
       attributes_list.each do |attr|
         key = attr["@"]["attribute_name"]
         value = attr["text"]
         attributes[key] = value
+        attribute_names_list.push(key);
       end
       sample_data["attributes"] = attributes
+      sample_data["attribute_names_list"] = attribute_names_list
       sample_list.push(sample_data)
     end
     sample_list
