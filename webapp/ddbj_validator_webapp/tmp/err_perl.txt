@@ -1,0 +1,4 @@
+Error: Command failed: Can't locate Bag/Similarity/Cosine.pm in @INC (you may need to install the Bag::Similarity::Cosine module) (@INC contains: /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/lib /etc/perl /usr/local/lib/perl/5.18.2 /usr/local/share/perl/5.18.2 /usr/lib/perl5 /usr/share/perl5 /usr/lib/perl/5.18 /usr/share/perl/5.18 /usr/local/lib/site_perl .) at /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/lib/Text/TogoAnnotator.pm line 31.
+BEGIN failed--compilation aborted at /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/lib/Text/TogoAnnotator.pm line 31.
+Compilation failed in require at ./validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl line 10.
+BEGIN failed--compilation aborted at ./validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl line 10.

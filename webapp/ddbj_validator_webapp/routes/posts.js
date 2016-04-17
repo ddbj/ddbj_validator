@@ -53,13 +53,16 @@ router.post('/upload', function(req, res, next){
                 break;
             case "tsv":
                 //tsv2json
-                exec('ruby ./validator/annotated_sequence_validator/submission_tsv2json '  + sample_path + '> ' + json_path, function(error, stdout, stderr){
+                exec('ruby ./validator/annotated_sequence_validator/submission_tsv2json '  + conf.read_file_dir + file_name + '> ' + json_path, function(error, stdout, stderr){
                     if(stdout){
-                        console.log(stdout)
-                    }else if(stderr){
-                        console.log("stderr: "+ stderr)
+                       
                     }
-
+                    if(stderr){
+                        fs.writeFile("./tmp/stderr.txt", stderr);
+                    }
+                    if(error){
+                        fs.writeFile("./tmp/err.txt", error);
+                    }
                 });
                 break;
             case "json":
@@ -99,16 +102,16 @@ router.post('/upload', function(req, res, next){
             });
             break;
         case "tsv":
-            console.log(json_path);
             exec('perl ./validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl ' + json_path, function(error, stdout, stderr){
                 if(stdout){
                     res.json(stdout)
+                    fs.writeFile("./tmp/stdout_perl.json", stdout);
                 }
                 if(stderr){
-                    res.send("stderr: " + stderr);
+                    fs.writeFile("./tmp/stderr_perl.txt", stderr);
                 }
                 if(error){
-                    res.send("err: " + error);
+                    fs.writeFile("./tmp/err_perl.txt", error);
                 }
             });
 
