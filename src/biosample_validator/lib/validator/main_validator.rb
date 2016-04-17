@@ -117,6 +117,14 @@ class MainValidator
       exit(1)
     end
 
+    ### 1.file format (rule: 29, 30, 37, 38)
+
+    @biosample_list.each_with_index do |biosample_data, idx|
+      line_num = idx + 1
+      send("non_ascii_header_line", "30", biosample_data["attribute_names_list"], line_num)
+      send("empty_column_name", "37", biosample_data["attribute_names_list"], line_num)
+    end
+
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       ### 2.auto correct (rule: 12, 13)
@@ -252,10 +260,68 @@ class MainValidator
 ### validate method ###
 
   #
+  # Validates Non-ASCII attribute names
+  #
+  # ==== Args
+  # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
+  # ==== Return
+  # true/false
+  #
+  def non_ascii_header_line (rule_code, attribute_names, line_num)
+    return if attribute_names.nil?
+    result = true
+    invalid_headers = []
+    attribute_names.each do |attr_name|
+      if !attr_name.ascii_only?
+        invalid_headers.push(attr_name)
+        result = false
+      end
+    end
+    if result
+      result
+    else
+      annotation = [{key: "_header", source: @data_file, location: line_num.to_s, value: [invalid_headers.join(", ")]}]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result
+    end
+  end
+
+  #
+  # Validates empty attribute names
+  #
+  # ==== Args
+  # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
+  # ==== Return
+  # true/false
+  #
+  def empty_column_name (rule_code, attribute_names, line_num)
+    return if attribute_names.nil?
+    result = true
+    attribute_names.each do |attr_name|
+      if attr_name.nil? || attr_name.strip == ""
+        result = false
+      end
+    end
+    if result
+      result
+    else
+      annotation = [{key: "_header", source: @data_file, location: line_num.to_s, value: [""]}]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result
+    end
+  end
+
+  #
   # Validates package name is valid
   #
   # ==== Args
   # package name ex."MIGS.ba.microbial"
+  # ==== Return
+  # true/false
   #
   def unknown_package (rule_code, package, line_num)
     return nil if package.nil?
