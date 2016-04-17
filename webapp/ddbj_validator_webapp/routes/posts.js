@@ -13,6 +13,7 @@ var conf = require('config');
 var jschardet = require('jschardet');
 var formattype = require('format-type');
 var json_path = "";
+var sample_path = "";
 var file_name = "";
 var original_name = "";
 var format_type = "";
@@ -22,6 +23,7 @@ var format_type = "";
 router.post('/upload', function(req, res, next){
     original_name = req.file['originalname'];
     json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
+    sample_path = conf.read_file_dir + original_name;
     file_name = req.file['filename'];
     var xml2js_parser = new xml2js.Parser({attrkey: "@", charkey: "text"});
     var parseString = require('xml2js').parseString;
@@ -50,11 +52,23 @@ router.post('/upload', function(req, res, next){
                 });
                 break;
             case "tsv":
-                console.log("tsv");
+                //tsv2json
+                exec('ruby ./validator/annotated_sequence_validator/submission_tsv2json '  + sample_path + '> ' + json_path, function(error, stdout, stderr){
+                    if(stdout){
+                        console.log(stdout)
+                    }else if(stderr){
+                        console.log("stderr: "+ stderr)
+                    }
+
+                });
                 break;
             case "json":
-                console.log("json");
+                type = "invalid_value";
                 break;
+            default:
+                type = "invalid_value";
+                break;
+
         }
         go_next(type);
     });
@@ -66,7 +80,6 @@ router.post('/upload', function(req, res, next){
 
 }, function(req, res, next){
     var type = format_type;
-    console.log(original_name)
     switch(type){
         case "xml":
             var original_name = req.file['originalname'];
@@ -85,6 +98,22 @@ router.post('/upload', function(req, res, next){
                 }
             });
             break;
+        case "tsv":
+            console.log(json_path);
+            exec('perl ./validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl ' + json_path, function(error, stdout, stderr){
+                if(stdout){
+                    res.json(stdout)
+                }
+                if(stderr){
+                    res.send("stderr: " + stderr);
+                }
+                if(err){
+                    res.("err: " + err);
+                }
+            });
+
+            break;
+
         case "invalid_value":
             var item = {};
             var original_name = req.file["originalname"];
