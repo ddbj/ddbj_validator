@@ -107,8 +107,8 @@ router.post('/upload', function(req, res, next){
                 if(stderr){
                     res.send("stderr: " + stderr);
                 }
-                if(err){
-                    res.("err: " + err);
+                if(error){
+                    res.send("err: " + error);
                 }
             });
 
