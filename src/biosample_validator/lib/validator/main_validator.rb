@@ -168,7 +168,7 @@ class MainValidator
       send("missing_mandatory_attribute", "27", biosample_data["attributes"], attr_list , line_num)
       send("missing_required_attribute_name", "92", biosample_data["attributes"], attr_list , line_num)
 
-      ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91)
+      ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
       biosample_data["attributes"].each do|attribute_name, value|
@@ -179,6 +179,11 @@ class MainValidator
 
       date_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json")) #for rule_id:7
 
+      ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], line_num)
+      if ret == false #save auto annotation value
+        annotation = @error_list.last[:annotation].find {|anno| anno[:key] == attribute_name }
+        biosample_data["attributes"]["geo_loc_name"] = annotation[:value][1]
+      end
       country_list = JSON.parse(File.read(@base_dir + "/../../conf/country_list.json"))
       send("invalid_country", "8", biosample_data["attributes"]["geo_loc_name"], country_list, line_num)
 
@@ -466,6 +471,34 @@ class MainValidator
       param = {VALUE: project_id}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
+  #
+  # Validates the geo_loc_name format
+  #
+  # ==== Args
+  # rule_code
+  # geo_loc_name ex."Japan:Kanagawa, Hakone, Lake Ashi"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def format_of_geo_loc_name_is_invalid (rule_code, geo_loc_name, line_num)
+    return nil if geo_loc_name.nil?
+
+    annotated_name = geo_loc_name.sub(/\s+:\s+/, ":")
+    annotated_name = annotated_name.gsub(/,\s+/, ', ')
+    annotated_name = annotated_name.gsub(/,(?![ ])/, ', ')
+    if geo_loc_name == annotated_name
+      true
+    else
+      annotation = [{key: "geo_loc_name", source: @data_file, location: line_num.to_s, value: [geo_loc_name, annotated_name]}]
+      rule = @validation_config["rule" + rule_code]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", rule["level"], annotation)
       @error_list.push(error_hash)
       false
     end

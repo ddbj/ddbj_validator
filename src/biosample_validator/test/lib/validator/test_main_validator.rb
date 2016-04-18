@@ -194,6 +194,24 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_format_of_geo_loc_name_is_invalid
+    #ok case
+    ret = exec_validator("format_of_geo_loc_name_is_invalid", "94", "Japan:Kanagawa, Hakone, Lake Ashi", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = exec_validator("format_of_geo_loc_name_is_invalid", "94", "Japan : Kanagaw,Hakone,  Lake Ashi", 1)
+    expect_annotation = "Japan:Kanagaw, Hakone, Lake Ashi"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_annotation(ret[:error_list], 0).first
+    #params are nil pattern
+    ret = exec_validator("format_of_geo_loc_name_is_invalid", "94", nil, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
   def test_invalid_country
     country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/country_list.json"))
     #ok case

@@ -390,5 +390,19 @@
     "name": "Missing required attribute name",
     "method": "missing_required_attribute_name",
     "message": "Required field '<%=ATTRIBUTE_NAME%>' is missing from the header line of the file."
+  },
+  "rule93": {
+    "code": "93",
+    "level": "warning",
+    "name": "Attribute value is not integer",
+    "method": "attribute_value_is_not_integer",
+    "message": "Attribute value must be integer."
+  },
+  "rule94": {
+    "code": "94",
+    "level": "warning",
+    "name": "Format of geo_loc_name is invalid",
+    "method": "format_of_geo_loc_name_is_invalid",
+    "message": "Format of geo_loc_name is invalid."
   }
 }
