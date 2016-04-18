@@ -63,7 +63,7 @@ class MainValidator
         end
       end
       #package
-      if !biosample["Models"].nil? && !biosample["Models"][0]["Model"].nil?
+      if !biosample["Models"].nil? && !biosample["Models"][0].nil? && !biosample["Models"][0]["Model"].nil?
         sample_data["package"] = biosample["Models"][0]["Model"][0]
       end
       #attributes
@@ -150,6 +150,7 @@ class MainValidator
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       ### 5.package check (rule: 26)
+      send("missing_package_information", "25", biosample_data, line_num)
       send("unknown_package", "26", biosample_data["package"], line_num)
 
       #TODO get mandatory attribute from sparql
@@ -317,6 +318,28 @@ class MainValidator
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result
+    end
+  end
+
+  #
+  # Validates package information is exist
+  #
+  # ==== Args
+  # biosample_data object of a biosample
+  # ==== Return
+  # true/false
+  #
+  def missing_package_information (rule_code, biosample_data, line_num)
+    return nil if biosample_data.nil?
+
+    if !biosample_data["package"].nil?
+      true
+    else
+      annotation = [{key: "package", source: @data_file, location: line_num.to_s, value: [""]}]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
     end
   end
 

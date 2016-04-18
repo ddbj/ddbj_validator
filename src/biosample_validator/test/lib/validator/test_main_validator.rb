@@ -122,7 +122,22 @@ class TestMainValidator < Minitest::Test
 
   def test_not_predefined_attribute_name
     #ok case
+    #TODO
+  end
 
+  def test_missing_package_information
+    #ok case
+    json_data = JSON.parse(File.read("../../data/25_missing_package_information_ok.json"))
+    biosample_data = @validator.flatten_sample_json(json_data)
+    ret = exec_validator("missing_package_information", "25", biosample_data[0], 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    json_data = JSON.parse(File.read("../../data/25_missing_package_information_ng.json"))
+    biosample_data = @validator.flatten_sample_json(json_data)
+    ret = exec_validator("missing_package_information", "25", biosample_data[0], 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   def test_unknown_package
