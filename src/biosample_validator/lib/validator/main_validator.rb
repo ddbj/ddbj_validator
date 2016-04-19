@@ -51,7 +51,7 @@ class MainValidator
   #   {.....}, ....
   # ]
   def flatten_sample_json(json_data)
-    ###TODO 1.data schema check(rule: 18, 20, 25, 34, 61)
+    ###TODO 1.data schema check(rule: 18, 20)
     sample_list = []
     biosample_list = json_data[0]["BioSampleSet"]["BioSample"]
     biosample_list.each_with_index do |biosample, idx|
@@ -117,12 +117,12 @@ class MainValidator
       exit(1)
     end
 
-    ### 1.file format (rule: 29, 30, 37, 38)
+    ### 1.file format (rule: 29, 30, 34, 38)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       send("non_ascii_header_line", "30", biosample_data["attribute_names_list"], line_num)
-      send("empty_column_name", "37", biosample_data["attribute_names_list"], line_num)
+      send("missing_attribute_name", "34", biosample_data["attribute_names_list"], line_num)
     end
 
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -295,14 +295,14 @@ class MainValidator
   end
 
   #
-  # Validates empty attribute names
+  # Validates missing attribute names
   #
   # ==== Args
   # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
   # ==== Return
   # true/false
   #
-  def empty_column_name (rule_code, attribute_names, line_num)
+  def missing_attribute_name (rule_code, attribute_names, line_num)
     return if attribute_names.nil?
     result = true
     attribute_names.each do |attr_name|

@@ -101,21 +101,21 @@ class TestMainValidator < Minitest::Test
     assert_equal "Très, 生物種", ret[:error_list][0][:annotation][0][:value][0]
   end
 
-  def test_empty_column_name
+  def test_missing_attribute_name
     #ok case
     attribute_list = ["sample_name","sample_title","organism","host"]
-    ret = exec_validator("empty_column_name", "37", attribute_list, 1)
+    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ##only space
     attribute_list = ["sample_name", " ", "host"]
-    ret = exec_validator("empty_column_name", "37", attribute_list, 1)
+    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ##include nil
     attribute_list = ["sample_name", nil, "host"]
-    ret = exec_validator("empty_column_name", "37", attribute_list, 1)
+    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
