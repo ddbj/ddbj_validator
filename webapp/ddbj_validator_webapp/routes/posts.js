@@ -6,6 +6,8 @@ return validation results as JSON format.
 var express = require('express');
 var router = express.Router();
 var exec = require('child_process').exec;
+var execFile = require('child_process').execFile;
+var spawn = require('child_process').spawn;
 var fs = require('fs');
 var xml2js = require('xml2js');
 var libxml = require('libxmljs');
@@ -102,17 +104,18 @@ router.post('/upload', function(req, res, next){
             });
             break;
         case "tsv":
-            exec('perl ./validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl ' + json_path, function(error, stdout, stderr){
-                if(stdout){
-                    res.json(stdout)
-                    fs.writeFile("./tmp/stdout_perl.json", stdout);
-                }
-                if(stderr){
-                    fs.writeFile("./tmp/stderr_perl.txt", stderr);
-                }
-                if(error){
-                    fs.writeFile("./tmp/err_perl.txt", error);
-                }
+		exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl', {maxBuffer: 1024 * 3000}, function(error, stdout, stderr){
+               //exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl > /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/tmp/a_s_output', function(error, stdout, stderr){
+                var a_s_output = "";
+		if(stdout){
+		  fs.writeFile("./tmp/test_a_s", "stdout");
+		  a_s_output = stdout;
+		}
+		if(error){
+		  fs.writeFile("./tmp/test_a_s", "error");
+		  a_s_output = a_s_output + "exception occured: " + error 	
+		}
+		render_output(a_s_output);
             });
 
             break;
@@ -157,6 +160,20 @@ router.post('/upload', function(req, res, next){
         res.json(item);
         removeTmpFiles();
     }
+
+    function render_output(output_list){
+        fs.writeFile("./tmp/test_a_s", output_list);
+	original_name = req.file["originalname"];
+        var item = new Object();
+	item['messages'] = output_list;
+        //item['error_size'] = item["messages"].length;
+        item['method'] = "annotated sequence validator";
+        item['original_file'] = original_name;
+        item['xml_filename'] = file_name;
+        res.json(item);
+        removeTmpFiles();
+    }
+
     function removeTmpFiles(){
         //delete temporary json file
         exec('rm -f ' + json_path, function(error, stdout, stderr){});

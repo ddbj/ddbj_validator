@@ -13,7 +13,6 @@ use Data::Dumper;
 
 #
 # 本スクリプト実行するためには、TogoAnnotator実行環境が必要です。
-# https://bitbucket.org/yayamamo/togoannotator/wiki/Install
 # 以下のインストールが必要です。
 # * simstring
 # * simstring perlパッケージ
@@ -26,6 +25,15 @@ use Data::Dumper;
 my $sysroot = $FindBin::Bin;
 my $input_file = shift || "$sysroot/data/sample01_WGS_PRJDB4174.json";
 my $validator  = __FILE__;
+
+my @file_name;
+my $file_path;
+
+if (shift){
+   @file_name = split(/\//, $input_file);
+   $file_path = '/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/';
+   $input_file = $file_path . @file_name[1];
+}
 
 open my $fh, '<', $input_file
     or die "failed to open: $!";
