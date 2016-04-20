@@ -296,6 +296,15 @@
     "location": "collection_date",
     "correction": ""
   },
+  "rule41":{
+    "code": "41",
+    "scope": "",
+    "name": "Latlon versus country",
+    "method": "latlon_versus_country",
+    "message": "Values provided for 'latitude and longitude' and 'geographic location' contradict each other: <%=MESSAGE%>.",
+    "location": "lat_lon, geo_loc_name",
+    "correction": ""
+  },
   "rule43": {
     "code": "43",
     "scope": "",
