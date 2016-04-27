@@ -6,6 +6,8 @@ return validation results as JSON format.
 var express = require('express');
 var router = express.Router();
 var exec = require('child_process').exec;
+var execFile = require('child_process').execFile;
+var spawn = require('child_process').spawn;
 var fs = require('fs');
 var xml2js = require('xml2js');
 var libxml = require('libxmljs');
@@ -34,21 +36,27 @@ router.post('/upload', function(req, res, next){
         switch (type){
             case "xml":
                 xml2js_parser.parseString(data, function (err, result) {
-                    json_array.push(result);
-                    var root_key = Object.keys(json_array[0])[0];
-                    if (root_key == "BioSample"){
-                        biosample_obj = new Object();
-                        json_arrays = [];
-                        biosample_obj["BiosampleSet"] = {"BioSample": [json_array[0]["BioSample"]]};
-                        json_arrays.push(biosample_obj);
-                        json_string = JSON.stringify(json_arrays);
-                        fs.writeFile(json_path, json_string);
-                    }else if (root_key == "BioSampleSet"){
-                        json_string = JSON.stringify(json_array);
-                        fs.writeFile(json_path, json_string);
+                    if(!err) {
+                        json_array.push(result);
+                        var root_key = Object.keys(json_array[0])[0];
+                        if (root_key == "BioSample") {
+                            biosample_obj = new Object();
+                            json_arrays = [];
+                            biosample_obj["BioSampleSet"] = {"BioSample": [json_array[0]["BioSample"]]};
+                            json_arrays.push(biosample_obj);
+                            json_string = JSON.stringify(json_arrays);
+                            fs.writeFile(json_path, json_string);
+                        } else if (root_key == "BioSampleSet") {
+                            json_string = JSON.stringify(json_array);
+                            fs.writeFile(json_path, json_string);
+                        } else {
+                            type = "invalid_value"
+                        }
                     }else{
-                        type = "invalid_value"
+                        console.log(err);
+                        // xml2jsのparseStringできないxmlがinputで有った場合
                     }
+
                 });
                 break;
             case "tsv":
@@ -88,32 +96,36 @@ router.post('/upload', function(req, res, next){
             var original_name = req.file['originalname'];
             json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
             exec('ruby ./validator/biosample_validator.rb ' +  json_path, function(error, stdout, stderr){
+                //if response is {"undefined: 1!
+                // xx.json is invalid json file} call invalid input process
                 if(stdout){
+                    console.log(stdout);
                     var error_list = eval(stdout);
                     render_result(error_list);
                 }
                 if(stderr){
-                    console.log('stderr: ' + stderr);
-                    render_exception(stderr);
+                    //console.log('stderr: ' + stderr);
+                    //render_exception(stderr);
                 }
                 if(error !== null){
-                    console.log('Exec error: ' + error);
+                    //console.log('Exec error: ' + error);
                 }
             });
             break;
         case "tsv":
-            exec('perl ./validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl ' + json_path, function(error, stdout, stderr){
-                if(stdout){
-                    res.json(stdout)
-                    fs.writeFile("./tmp/stdout_perl.json", stdout);
-                }
-                if(stderr){
-                    fs.writeFile("./tmp/stderr_perl.txt", stderr);
-                }
-                if(error){
-                    fs.writeFile("./tmp/err_perl.txt", error);
-                }
-            });
+		exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl', {maxBuffer: 1024 * 5000}, function(error, stdout, stderr){
+               //exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl > /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/tmp/a_s_output', function(error, stdout, stderr){
+                var a_s_output = "";
+		if(stdout){
+		  fs.writeFile("./tmp/test_a_s", "stdout");
+		  a_s_output = stdout;
+		}
+		if(error){
+		  fs.writeFile("./tmp/test_a_s", "error");
+		  a_s_output = a_s_output + "exception occured: " + error 	
+		}
+		    render_output(a_s_output);
+        });
 
             break;
 
@@ -157,9 +169,23 @@ router.post('/upload', function(req, res, next){
         res.json(item);
         removeTmpFiles();
     }
+
+    function render_output(output_list){
+        //fs.writeFile("./tmp/test_a_s", output_list);
+	    original_name = req.file["originalname"];
+        var item = new Object();
+	    item['messages'] = output_list;
+        //item['error_size'] = item["messages"].length;
+        item['method'] = "annotated sequence validator";
+        item['original_file'] = original_name;
+        item['xml_filename'] = file_name;
+        res.json(item);
+        removeTmpFiles();
+    }
+
     function removeTmpFiles(){
         //delete temporary json file
-        exec('rm -f ' + json_path, function(error, stdout, stderr){});
+        //exec('rm -f ' + json_path, function(error, stdout, stderr){});
 
         //delete old xml files
         exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){});

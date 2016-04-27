@@ -159,8 +159,10 @@ class OrganismValidator < SPARQLBase
   # if the tax_id isn't appropriate for the package, returns a hash with rule_id as below
   #  {status: "error", error_code: rule_id}
   def org_vs_package_validate (tax_id, package_name)
-    package_name = package_name.split(".")[0] + "." + package_name.split(".")[1]
-    result = false
+    if package_name.split(".").size >= 2
+      package_name = package_name.split(".")[0] + "." + package_name.split(".")[1]
+    end
+    result = true
     rule_id = ""
     case package_name
     when "MIMS.me" #rule 83
