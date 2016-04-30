@@ -4,6 +4,7 @@ require 'erb'
 require 'ostruct'
 require 'geocoder'
 require 'date'
+require File.dirname(__FILE__) + "/biosample_xml_convertor.rb"
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
@@ -21,81 +22,9 @@ class MainValidator
     #TODO setting config from SPARQL?
     @validation_config = JSON.parse(File.read(@base_dir + "/../../conf/validation_config.json"))
     @error_list = []
+    @xml_convertor = BioSampleXmlConvertor.new
     @org_validator = OrganismValidator.new("http://staging-genome.annotation.jp/sparql") #TODO config
     #TODO load sub validator class or modules
-  end
-
-  
-  #
-  # Flattens and json data which is send from node
-  #
-  # ==== Args
-  # Converted object from input json   
-  #
-  # ==== Return
-  # An array of biosample data.
-  # [
-  #   {
-  #     "biosample_accession" => "SAMDXXXXXX",
-  #     "package" => "XXXXXXXXX",
-  #     "attributes" =>
-  #       {
-  #         "sample_name" => "XXXXXX", 
-  #         .....
-  #       }
-  #     "attribute_names_list" =>
-  #       [
-  #         "sample_name", "sample_title", ..
-  #       ]
-  #   },
-  #   {.....}, ....
-  # ]
-  def flatten_sample_json(json_data)
-    ###TODO 1.data schema check(rule: 18, 20, 25, 34, 61)
-    sample_list = []
-    biosample_list = json_data[0]["BioSampleSet"]["BioSample"]
-    biosample_list.each_with_index do |biosample, idx|
-      sample_data = {}
-      #sample_id
-      biosample["Ids"][0]["Id"].each do |sample_id|
-        if sample_id["@"]["namespace"] == "BioSample"
-          sample_data["biosample_accession"] = sample_id["text"]
-        end
-      end
-      #package
-      if !biosample["Models"].nil? && !biosample["Models"][0].nil? && !biosample["Models"][0]["Model"].nil?
-        sample_data["package"] = biosample["Models"][0]["Model"][0]
-      end
-      #attributes
-      attributes = {}
-      attribute_names_list = []
-      description = biosample["Description"][0]
-      if !description["Title"].nil?
-        attributes["sample_title"] = description["Title"][0]
-        attribute_names_list.push("sample_title");
-      end
-      if !description["Comment"].nil?
-        attributes["description"] = description["Comment"][0]["Paragraph"][0]
-      end
-      if !description["Organism"].nil?
-        organism = description["Organism"][0]
-        attributes["organism"] = organism["OrganismName"][0]
-        attributes["taxonomy_id"] = organism["@"]["taxonomy_id"]
-        attribute_names_list.push("organism");
-        attribute_names_list.push("taxonomy_id");
-      end
-      attributes_list = biosample["Attributes"][0]["Attribute"]
-      attributes_list.each do |attr|
-        key = attr["@"]["attribute_name"]
-        value = attr["text"]
-        attributes[key] = value
-        attribute_names_list.push(key);
-      end
-      sample_data["attributes"] = attributes
-      sample_data["attribute_names_list"] = attribute_names_list
-      sample_list.push(sample_data)
-    end
-    sample_list
   end
 
   #
@@ -103,26 +32,22 @@ class MainValidator
   # Error/warning list is stored to @error_list
   #
   # ==== Args
-  # data_json: json file path  
+  # data_xml: xml file path
   #
   #
-  def validate (data_json)
+  def validate (data_xml)
     #convert to object for validator
-    @data_file = File::basename(data_json)
-    begin
-      json_data = JSON.parse(File.read(data_json))
-      @biosample_list = flatten_sample_json(json_data)
-    rescue
-      puts @data_file + " is invalid json file!!"
-      exit(1)
-    end
+    @data_file = File::basename(data_xml)
+    xml_document = File.read(data_xml)
+    #TODO parse error
+    @biosample_list = @xml_convertor.xml2obj(xml_document)
 
-    ### 1.file format (rule: 29, 30, 37, 38)
+    ### 1.file format (rule: 29, 30, 34, 38)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       send("non_ascii_header_line", "30", biosample_data["attribute_names_list"], line_num)
-      send("empty_column_name", "37", biosample_data["attribute_names_list"], line_num)
+      send("missing_attribute_name", "34", biosample_data["attribute_names_list"], line_num)
     end
 
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -295,14 +220,14 @@ class MainValidator
   end
 
   #
-  # Validates empty attribute names
+  # Validates missing attribute names
   #
   # ==== Args
   # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
   # ==== Return
   # true/false
   #
-  def empty_column_name (rule_code, attribute_names, line_num)
+  def missing_attribute_name (rule_code, attribute_names, line_num)
     return if attribute_names.nil?
     result = true
     attribute_names.each do |attr_name|

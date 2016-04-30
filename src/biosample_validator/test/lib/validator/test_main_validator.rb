@@ -1,10 +1,12 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require '../../../lib/validator/main_validator.rb'
+require '../../../lib/validator/biosample_xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup
     @validator = MainValidator.new
+    @xml_convertor = BioSampleXmlConvertor.new
   end
 
   #
@@ -63,24 +65,13 @@ class TestMainValidator < Minitest::Test
     end
   end
 
-  def test_flatten_sample_json
-    json_data = JSON.parse(File.read("../../data/flatten_sample_json_SSUB001341.json"))
-    biosample_set = @validator.flatten_sample_json(json_data)
-    assert_equal 4, biosample_set.size
-    first_sample = biosample_set[0]
-    assert_equal "SAMD00010225", first_sample["biosample_accession"]
-    assert_equal "Generic", first_sample["package"]
-    assert_equal "DRS012892", first_sample["attributes"]["sample_name"]
-    #TODO has description("Comment/Paragraph1") case
-  end
-
   def test_save_auto_annotation_value
     # is not method test
     # test data: "geo_loc_name" => "  Jaaaapan"
     # expect:
     #     "  Jaaaapan" will be auto-annotated to "Jaaaapan" by the auto-annotation or rule 13.
     #     And, this value will be used on next validation method(rule46) as "geo_loc_name" attribute value
-    biosample_set = @validator.validate("../../data/save_auto_annotation_value.json")
+    biosample_set = @validator.validate("../../data/save_auto_annotation_value.xml")
     error_list = @validator.instance_variable_get (:@error_list)
     error =  error_list.find {|error| error[:id] == "41"}
     annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
@@ -101,21 +92,21 @@ class TestMainValidator < Minitest::Test
     assert_equal "Très, 生物種", ret[:error_list][0][:annotation][0][:value][0]
   end
 
-  def test_empty_column_name
+  def test_missing_attribute_name
     #ok case
     attribute_list = ["sample_name","sample_title","organism","host"]
-    ret = exec_validator("empty_column_name", "37", attribute_list, 1)
+    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ##only space
     attribute_list = ["sample_name", " ", "host"]
-    ret = exec_validator("empty_column_name", "37", attribute_list, 1)
+    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ##include nil
     attribute_list = ["sample_name", nil, "host"]
-    ret = exec_validator("empty_column_name", "37", attribute_list, 1)
+    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
@@ -127,14 +118,14 @@ class TestMainValidator < Minitest::Test
 
   def test_missing_package_information
     #ok case
-    json_data = JSON.parse(File.read("../../data/25_missing_package_information_ok.json"))
-    biosample_data = @validator.flatten_sample_json(json_data)
+    xml_data = File.read("../../data/25_missing_package_information_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
     ret = exec_validator("missing_package_information", "25", biosample_data[0], 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    json_data = JSON.parse(File.read("../../data/25_missing_package_information_ng.json"))
-    biosample_data = @validator.flatten_sample_json(json_data)
+    xml_data = File.read("../../data/25_missing_package_information_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
     ret = exec_validator("missing_package_information", "25", biosample_data[0], 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -157,15 +148,15 @@ class TestMainValidator < Minitest::Test
 
   def test_not_predefined_attribute_name
     #ok case
-    json_data = JSON.parse(File.read("../../data/14_not_predefined_attribute_name_SSUB000019_ok.json"))
-    biosample_data = @validator.flatten_sample_json(json_data)
+    xml_data = File.read("../../data/14_not_predefined_attribute_name_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    json_data = JSON.parse(File.read("../../data/14_not_predefined_attribute_name_SSUB000019_error.json"))
-    biosample_data = @validator.flatten_sample_json(json_data)
+    xml_data = File.read("../../data/14_not_predefined_attribute_name_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("not_predefined_attribute_name", "14", biosample_data[0]["attributes"], attr_list, 1)
     expect_msg = "Not predefined attribute name: attribute 'user_attr1,user_attr2'."
@@ -176,15 +167,15 @@ class TestMainValidator < Minitest::Test
 
   def test_missing_required_attribute_name
     #ok case
-    json_data = JSON.parse(File.read("../../data/92_missing_required_attribute_name_SSUB000019_ok.json"))
-    biosample_data = @validator.flatten_sample_json(json_data)
+    xml_data = File.read("../../data/92_missing_required_attribute_name_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    json_data = JSON.parse(File.read("../../data/92_missing_required_attribute_name_SSUB000019_error.json"))
-    biosample_data = @validator.flatten_sample_json(json_data)
+    xml_data = File.read("../../data/92_missing_required_attribute_name_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("missing_required_attribute_name", "92", biosample_data[0]["attributes"], attr_list, 1)
     expect_msg = "Required field 'env_feature,isol_growth_condt' is missing from the header line of the file."
