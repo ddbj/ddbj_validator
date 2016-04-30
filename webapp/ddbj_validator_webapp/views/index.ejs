@@ -31,22 +31,30 @@
 <div class="container user-input">
     <ul class="nav nav-tabs">
         <li role="presentation" class="active"><a href="#tab_file" data-toggle="tab">ファイルを登録</a></li>
+        <li role="presentation"><a href="#tab_id" data-toggle="tab">URLを入力</a></li>
     </ul>
 
     <!-- / タブ-->
-    <div id="myTabContent" class="tab-content">
+        <form action="./upload" id="submit_data" method="post" enctype="multipart/form-data">
+            <div id="myTabContent" class="tab-content">
+            <div class="tab-pane fade in active" id="tab_file">
 
-        <div class="tab-pane fade in active" id="tab_file">
-            <form action="./upload" id="submit_data" method="post" enctype="multipart/form-data">
                 <input id="xml_input" name="xml_input" type="file" style="display: none">
                 <div class="input-group">
                   <span class="input-group-btn">
                         <button id="select_file" class="btn btn-default" type="button"><i
                                     class="glyphicon glyphicon-folder-open"></i></button>
                   </span>
-                    <input id="file_name" type="text" class="form-control" placeholder="select file..." disabled>
+                    <input id="file_name" type="text" class="form-control" placeholder="select file ..." disabled>
                 </div>
 
+            </div>
+
+            <div class="tab-pane fade" id="tab_id">
+                <input id="url_input" name="url_inpu" class="form-control" placeholder="input URL ..." type="text">
+            </div>
+
+            <div class="sbmt">
                 <div class="row options">
                     <div class="col-sm-2 gutter-0">
                         <button type="button" id="check_data" class="btn btn-default btn-sm">validation</button>
@@ -54,37 +62,42 @@
                     <div class="col-sm-10 gutter-0">
                         <div class="accordion-group">
                             <div class="accordion-heading">
-                                <a href="#hidemenu" class="acordion-toggle" data-toggle="collapse" data-taget="#hidemenu">
+                                <a href="#hidemenu" class="acordion-toggle" data-toggle="collapse"
+                                   data-taget="#hidemenu">
                                     <span class="glyphicon glyphicon-chevron-right"></span> Options
                                 </a>
                             </div>
                             <div id="hidemenu" class="accordion-body collapse">
                                 <div id="list-option">
                                     <label>
-                                        <input type="radio" id="option-grouped" name="list-option" value="option-grouped" checked/>
+                                        <input type="radio" id="option-grouped" name="list-option"
+                                               value="option-grouped" checked/>
                                         Group Error Message
                                     </label>
                                     <label>
-                                        <input type="radio" id="option-sequential" name="list-option" value="option-sequential">
+                                        <input type="radio" id="option-sequential" name="list-option"
+                                               value="option-sequential">
                                         List Error Message sequentially
                                     </label>
                                 </div>
                                 <div id="output-option">
                                     <label>
-                                        <input id="edit-option" type="checkbox" name="ouptput-option" value="adopt-all"> Edit values
+                                        <input id="edit-option" type="checkbox" name="ouptput-option" value="adopt-all">
+                                        Edit values
                                     </label>
                                     <label>
-                                        <input id="auto-annotation-option" type="checkbox" name="ouptput-option" value="adopt-all"> Adopt all auto-annotation
+                                        <input id="auto-annotation-option" type="checkbox" name="ouptput-option"
+                                               value="adopt-all"> Adopt all auto-annotation
                                     </label>
-
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </form>
-        </div>
-    </div>
+            </div>
+            </div>
+        </form>
+
 </div>
 
 <div id="result"></div>
@@ -102,16 +115,16 @@
 <script src="./javascripts/d3.min.js"></script>
 <script src="./javascripts/app.js"></script>
 <script>
-    $(function(){
+    $(function () {
         $("#hidemenu")
-            .on('show.bs.collapse', function(){
-                $('a[href="#' + this.id + '"]').find('span.glyphicon-chevron-right')
-                        .removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
-            })
-            .on('hide.bs.collapse', function() { //< 折り畳み閉じる処理
-                $('a[href="#' + this.id + '"]').find('span.glyphicon-chevron-down')
-                        .removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
-        });
+                .on('show.bs.collapse', function () {
+                    $('a[href="#' + this.id + '"]').find('span.glyphicon-chevron-right')
+                            .removeClass('glyphicon-chevron-right').addClass('glyphicon-chevron-down');
+                })
+                .on('hide.bs.collapse', function () { //< 折り畳み閉じる処理
+                    $('a[href="#' + this.id + '"]').find('span.glyphicon-chevron-down')
+                            .removeClass('glyphicon-chevron-down').addClass('glyphicon-chevron-right');
+                });
 
     })
 </script>

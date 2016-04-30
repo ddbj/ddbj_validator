@@ -1,0 +1,12 @@
+*.iml
+.idea/
+memo/*
+memo/
+.gitignore
+tmp/*
+memo
+node_modules/*
+.*
+*_test_.*
+.DS_Store
+

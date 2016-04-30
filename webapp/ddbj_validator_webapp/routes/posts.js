@@ -1,7 +1,7 @@
 /*
-BioSample controller.
-Kick Biosample Validator with BioSample JSON and
-return validation results as JSON format.
+ BioSample controller.
+ Kick Biosample Validator with BioSample JSON and
+ return validation results as JSON format.
  */
 var express = require('express');
 var router = express.Router();
@@ -63,7 +63,7 @@ router.post('/upload', function(req, res, next){
                 //tsv2json
                 exec('ruby ./validator/annotated_sequence_validator/submission_tsv2json '  + conf.read_file_dir + file_name + '> ' + json_path, function(error, stdout, stderr){
                     if(stdout){
-                       
+
                     }
                     if(stderr){
                         fs.writeFile("./tmp/stderr.txt", stderr);
@@ -99,7 +99,6 @@ router.post('/upload', function(req, res, next){
                 //if response is {"undefined: 1!
                 // xx.json is invalid json file} call invalid input process
                 if(stdout){
-                    console.log(stdout);
                     var error_list = eval(stdout);
                     render_result(error_list);
                 }
@@ -113,19 +112,19 @@ router.post('/upload', function(req, res, next){
             });
             break;
         case "tsv":
-		exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl', {maxBuffer: 1024 * 5000}, function(error, stdout, stderr){
-               //exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl > /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/tmp/a_s_output', function(error, stdout, stderr){
+            exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl', {maxBuffer: 1024 * 5000}, function(error, stdout, stderr){
+                //exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl > /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/tmp/a_s_output', function(error, stdout, stderr){
                 var a_s_output = "";
-		if(stdout){
-		  fs.writeFile("./tmp/test_a_s", "stdout");
-		  a_s_output = stdout;
-		}
-		if(error){
-		  fs.writeFile("./tmp/test_a_s", "error");
-		  a_s_output = a_s_output + "exception occured: " + error 	
-		}
-		    render_output(a_s_output);
-        });
+                if(stdout){
+                    fs.writeFile("./tmp/test_a_s", "stdout");
+                    a_s_output = stdout;
+                }
+                if(error){
+                    fs.writeFile("./tmp/test_a_s", "error");
+                    a_s_output = a_s_output + "exception occured: " + error
+                }
+                render_output(a_s_output);
+            });
 
             break;
 
@@ -172,10 +171,11 @@ router.post('/upload', function(req, res, next){
 
     function render_output(output_list){
         //fs.writeFile("./tmp/test_a_s", output_list);
-	    original_name = req.file["originalname"];
+        original_name = req.file["originalname"];
         var item = new Object();
-	    item['messages'] = output_list;
-        //item['error_size'] = item["messages"].length;
+        item['messages'] = output_list;
+        item['error_size'] = 0;
+        item['exception'] = output_list;
         item['method'] = "annotated sequence validator";
         item['original_file'] = original_name;
         item['xml_filename'] = file_name;

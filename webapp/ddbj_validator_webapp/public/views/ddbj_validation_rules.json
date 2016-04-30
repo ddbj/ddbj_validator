@@ -113,7 +113,7 @@
     "name": "Not predefined Attribute name",
     "method": "not_predefined_attribute_name",
     "message": "Not predefined attribute name: attribute '<%= attribute_name %>'.",
-    "location": "#attribute",
+    "location": "#attribute_name",
     "correction": ""
   },
   "rule15": {

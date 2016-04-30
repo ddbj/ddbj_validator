@@ -38,7 +38,7 @@
             <span class="label label-danger error_level error">
                 <%= errors[i].level %>
             </span>
-            <% }else if(error[i].level == "warning"){ %>
+            <% } else if(errors[i].level == "warning"){ %>
             <span class="label label-danger error_level warning">
                 <%= errors[i].level %>
             </span>
@@ -47,9 +47,9 @@
         </h3>
         <ul>
             <li>
+                Sample Id: " ",
                 Key: <%= errors[i].annotation[0].key %>,
                 Value: <%= errors[i].annotation[0].value %>,
-                location: <%= errors[i].annotation[0].location %>,
             </li>
         </ul>
     </div>

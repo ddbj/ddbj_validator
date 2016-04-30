@@ -61,7 +61,7 @@
                         <td></td>
                         <td><%= errors[i].location %></td>
                         <td><%= errors[i].values[j].annotation[0].key %></td>
-                        <td><input type="text" name="<%= errors[i].values[j].annotation[0].key %>" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
+                        <td><input type="text" name="<%= errors[i].values[j].annotation[0].key %>" data-location="#attribute" data-sample="SAMDxxx" value="<%= errors[i].values[j].annotation[0].value %>" disabled></td>
                     </tr>
                     <% } %>
                 </table>
@@ -77,7 +77,7 @@
                     <% for(var j  =0; j < errors[i].values.length; j++){ %>
                     <td></td>
                     <td><%= errors[i].location %></td>
-                    <td><input type="text" value="<%= errors[i].values[j].annotation[0].key %>" disabled></td>
+                    <td><input type="text" name="<%= errors[i].location %>" data-location="bioproject_id" data-sample="SAMDxxx" value="<%= errors[i].values[j].annotation[0].key %>" disabled></td>
                     <% } %>
                 </tr>
             </table>
