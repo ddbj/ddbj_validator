@@ -4,6 +4,8 @@ require 'geocoder'
 
 class CommonUtils
 
+  @@null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../conf/null_accepted.json"))
+
   #
   # Returns text that had been binded the hash object as params parameter to the template
   #
@@ -59,6 +61,23 @@ class CommonUtils
              annotation: annotation
            }
     hash
+  end
+
+  #
+  # 引数がValidatorで値なしとみなされる値であればtrueを返す。
+  # nil, 空白文字, 値なしを意味する"not applicable"や"missing"であればtrueを返す
+  #
+  # ==== Args
+  # value: 検査する値
+  # ==== Return
+  # true/false
+  #
+  def self.null_value?(value)
+    if value.nil? || value.strip.empty? || @@null_accepted.include?(value)
+      true
+    else
+      false
+    end
   end
 
   #

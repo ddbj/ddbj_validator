@@ -98,13 +98,17 @@ class MainValidator
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
+      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
+      ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
+      int_attr = JSON.parse(File.read(@base_dir + "/../../conf/integer_attributes.json"))
       biosample_data["attributes"].each do|attribute_name, value|
         send("invalid_attribute_value_for_controlled_terms", "2", attribute_name.to_s, value, cv_attr, line_num)
+        #rule_11
+        send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
+        send("attribute_value_is_not_integer", "93", attribute_name.to_s, value, int_attr, line_num)
       end
 
       send("invalid_bioproject_accession", "5", biosample_data["attributes"]["bioproject_id"], line_num)
-
-      date_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json")) #for rule_id:7
 
       ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false #save auto annotation value
@@ -116,18 +120,11 @@ class MainValidator
 
       send("invalid_lat_lon_format", "9", biosample_data["attributes"]["lat_lon"], line_num)
 
-      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
-
       send("invalid_host_organism_name", "15", biosample_data["attributes"]["host"], line_num)
 
       send("taxonomy_error_warning", "45", biosample_data["attributes"]["organism"], line_num)
-      ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
-      biosample_data["attributes"].each do |attribute_name, value|
-        send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
-      end
 
       send("future_collection_date", "40", biosample_data["attributes"]["collection_date"], line_num)
-
 
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
@@ -138,7 +135,6 @@ class MainValidator
       send("package_versus_organism", "48", biosample_data["attributes"]["taxonomy_id"], biosample_data["package"], line_num)
 
       send("sex_for_bacteria", "59", biosample_data["attributes"]["taxonomy_id"], biosample_data["attributes"]["sex"], line_num)
-
 
       send("multiple_vouchers", "62", biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
 
@@ -1091,6 +1087,39 @@ class MainValidator
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result =  false
+    end
+    result
+  end
+
+  #
+  # 整数であるべき属性の場合に属性値を検証する
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # int_attr 整数であるべき属性名のリスト ["taxonomy_id", "num_replicons", ...]
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def attribute_value_is_not_integer(rule_code, attr_name, attr_val, int_attr, line_num)
+    return nil if attr_name.nil? || attr_val.nil?
+    result =  true
+    if int_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# 整数型の属性であり有効な入力値がある
+      begin
+        Integer(attr_val)
+      rescue ArgumentError
+        result = false
+      end
+      if result == false
+        annotation = []
+        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: [attr_val]})
+        rule = @validation_config["rule" + rule_code]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+      end
     end
     result
   end

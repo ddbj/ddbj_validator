@@ -7,6 +7,19 @@ class TestCommonUtils < Minitest::Test
     @common = CommonUtils.new
   end
 
+  def test_is_null_value?
+    ret = CommonUtils.null_value?(nil)
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("  ")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("missing")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("aaa")
+    assert_equal false, ret
+  end
+
   def test_format_insdc_latlon
     #ok case
     ret = @common.format_insdc_latlon("37.4435 N 6.254 W")

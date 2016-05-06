@@ -608,4 +608,35 @@ class TestMainValidator < Minitest::Test
 
   end
 
+  def test_attribute_value_is_not_integer
+    int_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/integer_attributes.json"))
+    #ok case
+    ret = exec_validator("attribute_value_is_not_integer", "93", "host_taxid", "9606", int_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##is null value
+    ret = exec_validator("attribute_value_is_not_integer", "93", "host_taxid", "", int_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("attribute_value_is_not_integer", "93", "host_taxid", "missing", int_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not integer attr
+    ret = exec_validator("attribute_value_is_not_integer", "93", "organism", "human", int_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ret = exec_validator("attribute_value_is_not_integer", "93", "host_taxid", "9606.6", int_attr, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #params are nil pattern
+    ret = exec_validator("attribute_value_is_not_integer", "93", "host_taxid", nil, int_attr, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
+  def test_format_of_geo_loc_name_is_invalid
+
+  end
 end
