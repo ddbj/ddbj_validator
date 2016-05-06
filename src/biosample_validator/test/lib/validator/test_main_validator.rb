@@ -78,6 +78,21 @@ class TestMainValidator < Minitest::Test
     assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
   end
 
+  def test_failure_to_parse_batch_submission_file
+    #ok case
+    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   def test_non_ascii_header_line
     #ok case
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]

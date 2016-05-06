@@ -46,6 +46,7 @@ class MainValidator
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
+      send("failure_to_parse_batch_submission_file", "29", biosample_data, line_num)
       send("non_ascii_header_line", "30", biosample_data["attribute_list"], line_num)
       send("missing_attribute_name", "34", biosample_data["attribute_list"], line_num)
       send("multiple_attribute_values", "61", biosample_data["attribute_list"], line_num)
@@ -189,6 +190,31 @@ class MainValidator
   end
 
 ### validate method ###
+
+  #
+  # 値に改行コードが含まれているかチェック
+  #
+  # ==== Args
+  # biosample_data : 1件分のbiosample_data
+  # ==== Return
+  # true/false
+  #
+  def failure_to_parse_batch_submission_file (rule_code, biosample_data, line_num)
+    return if biosample_data.nil?
+    result = true
+    invalid_headers = []
+    biosample_data["attributes"].each do |attr_name, attr_value|
+      replaced_return_char = attr_value.gsub(/(\r\n|\r|\n)/, "<<newline character>>")
+      if attr_value != replaced_return_char
+        annotation = [{key: attr_name, source: @data_file, location: line_num.to_s, value: [replaced_return_char]}]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
 
   #
   # Validates Non-ASCII attribute names
