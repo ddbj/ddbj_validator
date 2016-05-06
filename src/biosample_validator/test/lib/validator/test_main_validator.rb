@@ -149,6 +149,50 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_missing_sample_name
+    #ok case
+    xml_data = File.read("../../data/18_missing_sample_name_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("missing_sample_name", "18", biosample_data[0], 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##empty sample name
+    xml_data = File.read("../../data/18_missing_sample_name_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("missing_sample_name", "18", biosample_data[0], 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##nil sample name
+    xml_data = File.read("../../data/18_missing_sample_name_SSUB000019_error2.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("missing_sample_name", "18", biosample_data[0], 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_missing_organism
+    #ok case
+    xml_data = File.read("../../data/20_missing_organism_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("missing_organism", "20", biosample_data[0], 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##empty organism
+    xml_data = File.read("../../data/20_missing_organism_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("missing_organism", "20", biosample_data[0], 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##nil sample name
+    xml_data = File.read("../../data/20_missing_organism_SSUB000019_error2.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("missing_organism", "20", biosample_data[0], 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   def test_not_predefined_attribute_name
     #ok case
     xml_data = File.read("../../data/14_not_predefined_attribute_name_SSUB000019_ok.xml")

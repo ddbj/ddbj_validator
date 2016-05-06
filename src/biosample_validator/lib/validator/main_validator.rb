@@ -42,7 +42,7 @@ class MainValidator
     #TODO parse error
     @biosample_list = @xml_convertor.xml2obj(xml_document)
 
-    ### 1.file format (rule: 29, 30, 34, 38, 61)
+    ### 1.file format and attribute names (rule: 29, 30, 34, 61)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
@@ -78,6 +78,9 @@ class MainValidator
       ### 5.package check (rule: 26)
       send("missing_package_information", "25", biosample_data, line_num)
       send("unknown_package", "26", biosample_data["package"], line_num)
+
+      send("missing_sample_name", "18", biosample_data, line_num)
+      send("missing_organism", "20", biosample_data, line_num)
 
       #TODO get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data["package"])
@@ -331,6 +334,54 @@ class MainValidator
     else
       true
     end 
+  end
+
+  #
+  # sample_nameの値があるかどうかを検査する。"missing"などのNull相当の値は許容しない。
+  #
+  # ==== Args
+  # sample name ex."MTB313"
+  # ==== Return
+  # true/false
+  #
+  def missing_sample_name (rule_code, biosample_data, line_num)
+    result = true
+    if CommonUtils.null_value?(biosample_data["attributes"]["sample_name"])
+      result = false
+    end
+    if result == false
+      #TODO error message with sample_title?
+      annotation = [{key: "sample_name", source: @data_file, location: line_num.to_s, value: [""]}]
+      param = {COUNT: "1"}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # organismの値があるかどうかを検査する。"missing"などのNull相当の値は許容しない。
+  #
+  # ==== Args
+  # sample name ex."Streptococcus pyogenes"
+  # ==== Return
+  # true/false
+  #
+  def missing_organism (rule_code, biosample_data, line_num)
+    result = true
+    if CommonUtils.null_value?(biosample_data["attributes"]["organism"])
+      result = false
+    end
+    if result == false
+      #TODO error message with sample_name?
+      annotation = [{key: "organism", source: @data_file, location: line_num.to_s, value: [""]}]
+      param = {COUNT: "1"}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+    end
+    result
   end
 
   #
