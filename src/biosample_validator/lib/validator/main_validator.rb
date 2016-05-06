@@ -42,12 +42,13 @@ class MainValidator
     #TODO parse error
     @biosample_list = @xml_convertor.xml2obj(xml_document)
 
-    ### 1.file format (rule: 29, 30, 34, 38)
+    ### 1.file format (rule: 29, 30, 34, 38, 61)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      send("non_ascii_header_line", "30", biosample_data["attribute_names_list"], line_num)
-      send("missing_attribute_name", "34", biosample_data["attribute_names_list"], line_num)
+      send("non_ascii_header_line", "30", biosample_data["attribute_list"], line_num)
+      send("missing_attribute_name", "34", biosample_data["attribute_list"], line_num)
+      send("multiple_attribute_values", "61", biosample_data["attribute_list"], line_num)
     end
 
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -194,17 +195,17 @@ class MainValidator
   # Validates Non-ASCII attribute names
   #
   # ==== Args
-  # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
+  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
   # ==== Return
   # true/false
   #
-  def non_ascii_header_line (rule_code, attribute_names, line_num)
-    return if attribute_names.nil?
+  def non_ascii_header_line (rule_code, attribute_list, line_num)
+    return if attribute_list.nil?
     result = true
     invalid_headers = []
-    attribute_names.each do |attr_name|
-      if !attr_name.ascii_only?
-        invalid_headers.push(attr_name)
+    attribute_list.each do |attr|
+      if !attr.keys.first.ascii_only?
+        invalid_headers.push(attr.keys.first)
         result = false
       end
     end
@@ -223,23 +224,59 @@ class MainValidator
   # Validates missing attribute names
   #
   # ==== Args
-  # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
+  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
   # ==== Return
   # true/false
   #
-  def missing_attribute_name (rule_code, attribute_names, line_num)
-    return if attribute_names.nil?
+  def missing_attribute_name (rule_code, attribute_list, line_num)
+    return if attribute_list.nil?
     result = true
-    attribute_names.each do |attr_name|
-      if attr_name.nil? || attr_name.strip == ""
+    attribute_list.each do |attr|
+      if attr.keys.first.nil? || attr.keys.first == ""
         result = false
       end
     end
     if result
       result
     else
+      #TODO output error message each attr
       annotation = [{key: "_header", source: @data_file, location: line_num.to_s, value: [""]}]
       message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result
+    end
+  end
+
+  #
+  # 複数出現する属性名があるか
+  #
+  # ==== Args
+  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # ==== Return
+  # true/false
+  #
+  def multiple_attribute_values (rule_code, attribute_list, line_num)
+    return if attribute_list.nil?
+    result = true
+    grouped = attribute_list.group_by do |attr|
+      attr.keys.first
+    end
+    multiple_attr_names = []
+    grouped.each do |k, v|
+      multiple_attr_names.push(k) if v.size >= 2
+    end
+    if multiple_attr_names.size > 0
+      result = false
+    end
+
+    if result == true
+      result
+    else
+      #TODO エラーメッセージの見直し
+      annotation = [{key: "_header", source: @data_file, location: line_num.to_s, value: [""]}]
+      param = {ATTRIBUTE_NAME: multiple_attr_names.join(", "), VALUE: ""} #VALUEを埋める
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result
@@ -339,7 +376,27 @@ class MainValidator
   # true/false
   #
   def missing_mandatory_attribute (rule_code, sample_attr, package_attr_list , line_num)
-    #TODO
+    mandatory_attr_list = package_attr_list.map { |attr|
+      attr[:attribute_name] if attr[:require] == "mandatory"
+    }.compact
+    missing_attr_names = []
+    sample_attr.each do |attr_name, attr_value|
+      if mandatory_attr_list.include?(attr_name)
+        if attr_value.nil? || attr_value.empty?
+          missing_attr_names.push(attr_name)
+        end
+      end
+    end
+    if missing_attr_names.size <= 0
+      true
+    else
+      value = missing_attr_names.join(",")
+      annotation = [{key: "attributes", source: @data_file, location: line_num.to_s, value: [value]}]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end
   end
 
   #

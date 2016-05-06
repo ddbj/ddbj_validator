@@ -26,7 +26,6 @@ class BioSampleXmlConvertor
   #
   # ==== Return
   # 変換後のRubyオブジェクト
-  # attribute_names_listは属性名重複チェック用
   # スキーマは以下の通り
   # [
   #   {
@@ -39,13 +38,17 @@ class BioSampleXmlConvertor
   #         "sample_name" => "XXXXXX", 
   #         .....
   #       }
-  #     "attribute_names_list" =>
+  #     "attribute_list" =>
   #       [
-  #         "sample_name", "sample_title", ..
+  #         { "sample_name" => "XXXXXX" },
+  #         { "sample_title" => "XXXXXX" },
   #       ]
   #   },
   #   {.....}, ....
-  # ] 
+  # ]
+  #
+  # attributesは属性名に重複がないハッシュ(重複時は最初に出現した属性値がセットされる)
+  # attribute_listは属性名が重複している可能性があるリスト(属性名重複チェック(34.Multiple Attribute values)で仕様される)
   #
   def xml2obj(xml_document)
     #TODO xml parse error
@@ -88,37 +91,37 @@ class BioSampleXmlConvertor
     end
     #attributes 
     attributes = {}
-    attribute_names_list = []
+    attribute_list = []
     
     sample_title = REXML::XPath.first(biosample_element, "Description/Title")
     if !sample_title.nil?
       attributes["sample_title"] = sample_title.text
-      attribute_names_list.push("sample_title");
+      attribute_list.push({"sample_title" => sample_title.text});
     end
     description = REXML::XPath.first(biosample_element, "Description/Comment/Paragraph")
     if !description.nil?
       attributes["description"] = description.text
-      attribute_names_list.push("description");
+      attribute_list.push({"description" => description.text});
     end
     organism_name = REXML::XPath.first(biosample_element, "Description/Organism/OrganismName")
     if !organism_name.nil?
       attributes["organism"] = organism_name.text
-      attribute_names_list.push("organism");
+      attribute_list.push({"organism" => organism_name.text});
     end
     organism = REXML::XPath.first(biosample_element, "Description/Organism[@taxonomy_id]") 
     if !organism.nil?
       attributes["taxonomy_id"] = organism.attributes["taxonomy_id"]
-      attribute_names_list.push("taxonomy_id");
+      attribute_list.push({"taxonomy_id" => organism.attributes["taxonomy_id"]});
     end 
     attributes_list = REXML::XPath.each(biosample_element, "Attributes/Attribute")
     attributes_list.each do |attr|
       attr_name = attr.attributes["attribute_name"]
       attr_value = attr.text
       attributes[attr_name] = attr_value
-      attribute_names_list.push(attr_name);
+      attribute_list.push({attr_name => attr_value});
     end
     sample_obj["attributes"] = attributes
-    sample_obj["attribute_names_list"] = attribute_names_list
+    sample_obj["attribute_list"] = attribute_list
     return sample_obj
   end
 end

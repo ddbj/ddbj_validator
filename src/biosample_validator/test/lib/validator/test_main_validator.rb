@@ -80,12 +80,12 @@ class TestMainValidator < Minitest::Test
 
   def test_non_ascii_header_line
     #ok case
-    attribute_list = ["sample_name","sample_title","organism","host"]
+    attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
     ret = exec_validator("non_ascii_header_line", "30", attribute_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    attribute_list = ["sample_name", "Très", "生物種"]
+    attribute_list = [{"sample_name" => "a"}, {"Très" => "b"}, {"生物種" => "c"}]
     ret = exec_validator("non_ascii_header_line", "30", attribute_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -94,26 +94,29 @@ class TestMainValidator < Minitest::Test
 
   def test_missing_attribute_name
     #ok case
-    attribute_list = ["sample_name","sample_title","organism","host"]
+    attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
     ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ##only space
-    attribute_list = ["sample_name", " ", "host"]
-    ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ##include nil
-    attribute_list = ["sample_name", nil, "host"]
+    attribute_list = [{"sample_name" => "a"}, {"" => "b"}, {"organism" => "c"}, {"host" => "d"}]
     ret = exec_validator("missing_attribute_name", "34", attribute_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  def test_not_predefined_attribute_name
+  def test_multiple_attribute_values
     #ok case
-    #TODO
+    attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
+    ret = exec_validator("multiple_attribute_values", "61", attribute_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    attribute_list = [{"depth" => "1m"}, {"depth" => "2m"}, {"elev" => "-1m"}, {"elev" => "-2m"}]
+    ret = exec_validator("multiple_attribute_values", "61", attribute_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   def test_missing_package_information
@@ -182,6 +185,23 @@ class TestMainValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_message(ret[:error_list])
+  end
+
+  def test_missing_mandatory_attribute
+    #ok case
+    xml_data = File.read("../../data/27_missing_mandatory_attribute_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_mandatory_attribute", "27", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_data = File.read("../../data/27_missing_mandatory_attribute_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_mandatory_attribute", "27", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   def test_invalid_attribute_value_for_controlled_terms

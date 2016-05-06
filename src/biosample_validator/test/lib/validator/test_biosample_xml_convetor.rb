@@ -23,7 +23,7 @@ class TestBioSampleXmlConvertor < Minitest::Test
     assert_equal "1314", attr["taxonomy_id"]
     assert_equal "urban biome", attr["env_biome"]
     assert_equal nil, biosample_list[0]["attributes"]["description"]
-    assert_equal 18, biosample_list[0]["attribute_names_list"].size
+    assert_equal 18, biosample_list[0]["attribute_list"].size
 
     # with submit info
     xml_doc = File.read("../../data/xml2obj_SSUB000019_with_sub.xml")
