@@ -1,6 +1,7 @@
 require 'erb'
 require 'erubis'
 require 'geocoder'
+require 'net/http'
 
 class CommonUtils
 
@@ -201,4 +202,90 @@ class CommonUtils
       false
     end
   end
+
+  #
+  # 引数のPubMedIDが実在するか否かを返す
+  #
+  # ==== Args
+  # pubmed_id: PubMedID
+  # ==== Return
+  # returns true/false
+  #
+  # EtuilsAPI returns below scheme when pubmed_id is not exist.
+  #
+  # {
+  #   "header": {
+  #     "type": "esummary",
+  #     "version": "0.3"
+  #   },
+  #   "result": {
+  #     "uids": [
+  #       "99999999"
+  #     ],
+  #     "99999999": {
+  #       "uid": "99999999",
+  #       "error": "cannot get document summary"  ##if it's a valid id, reference information("author", "title", etc) is described here.
+  #     }
+  #   }
+  # }
+  #
+  def exist_pubmed_id? (pubmed_id)
+    return nil if pubmed_id.nil?
+    res = http_get_response("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json")
+    if res.code =~ /^5|^4/ #error
+      #raise error
+    else
+      #json parse error
+      pubmed_info = JSON.parse(res.body)
+      if !pubmed_info["result"].nil? && !pubmed_info["result"][pubmed_id].nil? && pubmed_info["result"][pubmed_id]["error"].nil?
+        return true
+      else
+        return false
+      end
+    end
+  end
+
+  #
+  # 引数のDOIが実在するか否かを返す
+  #
+  # ==== Args
+  # doi: DOI
+  # ==== Return
+  # returns true/false
+  #
+  # DOIの実在の判定にはCrossRefを使用。実在しなければ404が返される
+  # seeAlso: https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#overview
+  #
+  def exist_doi? (doi)
+    return nil if doi.nil?
+    res = http_get_response("http://api.crossref.org/works/#{doi}/agency")
+    if res.code =~ /^5/ #error
+      #raise error
+    elsif res.code == "404"
+      return false
+    else
+      #raise error if json parse error
+      pubmed_info = JSON.parse(res.body)
+      return true
+    end
+  end
+
+  #
+  # HTTPリクエスト(GET)を送り、そのレスポンスを返す
+  #
+  # ==== Args
+  # uri: uri
+  # ==== Return
+  # returns Net::HTTPResponse
+  #
+  def http_get_response (uri)
+    #error and cache
+    url = URI.parse(uri)
+    req = Net::HTTP::Get.new(url)
+    res = Net::HTTP.start(url.host, url.port) {|http|
+      http.request(req)
+    }
+    res
+  end
+
 end

@@ -81,6 +81,37 @@ class TestCommonUtils < Minitest::Test
     #ng 
     ret = @common.is_same_google_country_name("Japan", "United States")
     assert_equal true, ret
-    
   end
+
+  def test_exist_pubmed?
+    #ok
+    ret = @common.exist_pubmed_id?("27148491")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.exist_pubmed_id?("99999999")
+    assert_equal false, ret
+
+    ret = @common.exist_pubmed_id?("aiueo")
+    assert_equal false, ret
+
+    #nil
+    ret = @common.exist_pubmed_id?(nil)
+    assert_equal nil, ret
+  end
+
+  def test_exist_doi?
+    #ok
+    ret = @common.exist_doi?("10.3389/fcimb.2016.00042")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.exist_doi?("10.3389/fcimb.2016.99999")
+    assert_equal false, ret
+
+    #nil
+    ret = @common.exist_doi?(nil)
+    assert_equal nil, ret
+  end
+
 end

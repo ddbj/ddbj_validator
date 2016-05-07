@@ -4,6 +4,7 @@ require 'erb'
 require 'ostruct'
 require 'geocoder'
 require 'date'
+require 'net/http'
 require File.dirname(__FILE__) + "/biosample_xml_convertor.rb"
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
@@ -102,12 +103,12 @@ class MainValidator
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
-      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
+      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json"))
       ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
       int_attr = JSON.parse(File.read(@base_dir + "/../../conf/integer_attributes.json"))
       biosample_data["attributes"].each do|attribute_name, value|
         send("invalid_attribute_value_for_controlled_terms", "2", attribute_name.to_s, value, cv_attr, line_num)
-        #rule_11
+        send("invalid_publication_identifier", "11", attribute_name.to_s, value, ref_attr, line_num)
         send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
         send("attribute_value_is_not_integer", "93", attribute_name.to_s, value, int_attr, line_num)
       end
@@ -500,14 +501,16 @@ class MainValidator
       false
     end
   end
- 
+
   #
-  # Validates the attributes values in controlled term
+  # CV(controlled vocabulary)を使用するべき属性の場合に属性値を検証する
   #
   # ==== Args
   # rule_code
-  # project_id ex."PDBJ123456"
-  # line_num 
+  # attr_name 属性名
+  # attr_val 属性値
+  # cv_attr CVを使用する属性名とCVのハッシュ {"biotic_relationship"=>[cv_list], "cur_land_use"=>[cv_list], ...}
+  # line_num
   # ==== Return
   # true/false
   # 
@@ -524,6 +527,57 @@ class MainValidator
         error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
         @error_list.push(error_hash)
         result = false
+      end
+    end
+    result
+  end
+
+  #
+  # リファレンス型(PMID|DOI|URL)であるべき属性の場合に属性値を検証する
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # ref_attr リファレンスフォーマットであるべき属性名のリスト ["taxonomy_id", "num_replicons", ...]
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_publication_identifier(rule_code, attr_name, attr_val, ref_attr, line_num)
+    return nil if attr_name.nil? || attr_val.nil?
+    common = CommonUtils.new
+    result =  true
+    if ref_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# リファレンス型の属性であり有効な入力値がある
+      ref = attr_val.sub(/[ :]*P?M?ID[ :]*|[ :]*DOI[ :]*/i, "")
+      if attr_val != ref #auto-annotation
+        result = false
+      end
+
+      # check exist ref
+      if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
+        result = common.exist_pubmed_id?(ref) && result
+      elsif ref =~ /\./ && ref !~ /http/ #DOI
+        result = common.exist_doi?(ref) && result
+      else #ref !~ /^https?/ #URL
+        begin
+          url = URI.parse(ref)
+        rescue URI::InvalidURIError
+          result = false
+        end
+      end
+
+      if result == false
+        annotation = []
+        value = [attr_val]
+        if attr_val != ref
+          value.push(ref)
+        end
+        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: value})
+        rule = @validation_config["rule" + rule_code]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
       end
     end
     result

@@ -279,6 +279,52 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_invalid_publication_identifier
+    ref_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/reference_attributes.json"))
+    #ok case
+    ##pubmed id
+   ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", "27148491", ref_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##doi
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", "10.3389/fcimb.2016.00042", ref_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##url
+    url = "http://www.ncbi.nlm.nih.gov/pubmed/27148491"
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", url, ref_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##auto annotation
+    ###pubmed id
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", "PMID27148491", ref_attr, 1)
+    assert_equal false, ret[:result]
+  #  p ret[:error_list]
+    ###doi
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", "DOI: 10.3389/fcimb.2016.00042", ref_attr, 1)
+    assert_equal false, ret[:result]
+  #  p ret[:error_list]
+    ##invalid id
+    ###pubmed id
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", "99999999", ref_attr, 1)
+    assert_equal false, ret[:result]
+  #  p ret[:error_list]
+    ###doi
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", "10.3389/fcimb.2016.99999", ref_attr, 1)
+    assert_equal false, ret[:result]
+  #  p ret[:error_list]
+    ###url
+    url = "http://www.ncbi.nlm.nih.gov/pubmed/27148491, http://www.ncbi.nlm.nih.gov/pubmed/27148492"
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", url, ref_attr, 1)
+    assert_equal false, ret[:result]
+  #  p ret[:error_list]
+    #params are nil pattern
+    ret = exec_validator("invalid_publication_identifier", "11", "ref_biomaterial", nil, ref_attr, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
   def test_format_of_geo_loc_name_is_invalid
     #ok case
     ret = exec_validator("format_of_geo_loc_name_is_invalid", "94", "Japan:Kanagawa, Hakone, Lake Ashi", 1)
