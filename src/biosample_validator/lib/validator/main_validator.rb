@@ -153,8 +153,8 @@ class MainValidator
   # Returns error/warning list as the validation result
   #
   #
-  def get_error_json ()
-    JSON.generate(@error_list)
+  def get_error_list ()
+    @error_list
   end
 
   #
