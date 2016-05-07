@@ -56,8 +56,9 @@ class MainValidator
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       ### 2.auto correct (rule: 12, 13)
+      special_chars = JSON.parse(File.read(@base_dir + "/../../conf/special_characters.json"))
       biosample_data["attributes"].each do |attr_name, value|
-        ret = send("special_character_included", "12", attr_name, value, line_num)
+        ret = send("special_character_included", "12", attr_name, value, special_chars, line_num)
         if ret == false #save auto annotation value
           annotation = @error_list.last[:annotation].find{|anno| anno[:key] == attr_name }
           biosample_data["attributes"][attr_name] = annotation[:value][1]
@@ -1122,28 +1123,43 @@ class MainValidator
   #
   # ==== Args
   # rule_code
+  # attr_name
+  # attr_val
+  # special_chars 特殊文字の置換設定のハッシュ { "℃" => "degree Celsius", "μ" => "micrometer", ...}
   # line_num
   # ==== Return
   # true/false
   #
-  def special_character_included(rule_code, attr_name, attr_val, line_num)
+  def special_character_included(rule_code, attr_name, attr_val, special_chars, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result  = true
-    sp_character = ["℃", "μ"]
-    rep_table_sp_character = {
-        "℃" => "degree Celsius", "μ" => "micro"
-    }
-    sp_character.each do |char|
-      if attr_val.include?(char)
-        attr_val_rep = attr_val.sub(/℃|μ/, rep_table_sp_character)
-        annotation = []
-        attr_vals = [attr_val, attr_val_rep]
-        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
-        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-        error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
-        @error_list.push(error_hash)
-        result = false
+    replaced_attr_val = attr_val.clone #文字列コピー
+    special_chars.each do |target_val, replace_val|
+      pos = 0
+      while pos < replaced_attr_val.length
+        #再起的に置換してしまうためgsubは使用できない。
+        #"microm" => "micrometer"と置換する場合、ユーザ入力値が"micrometer"だった場合には"microm"にマッチするため"micrometereter"になってしまう
+        hit_pos = replaced_attr_val.index(target_val, pos)
+        break if hit_pos.nil?
+        target_str = replaced_attr_val.slice(hit_pos, replace_val.length)
+        if target_str == replace_val # "microm"はその後に"micrometer"と続くか。続くなら置換不要(再起置換の防止)
+          pos = hit_pos + target_val.length
+        else
+          #置換(delete & insert)
+          replaced_attr_val.slice!(hit_pos, target_val.length)
+          replaced_attr_val.insert(hit_pos, replace_val)
+          pos = hit_pos + replace_val.length
+        end
       end
+    end
+    if replaced_attr_val != attr_val
+      annotation = []
+      attr_vals = [attr_val, replaced_attr_val]
+      annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end
@@ -1206,11 +1222,7 @@ class MainValidator
   def non_ascii_attribute_value(rule_code, attr_name, attr_val, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
-    ords = []
-    attr_val.chars{|s|
-      ords.push(s.ord)
-    }
-    unless ords.max{|a, b| a.to_i <=> b.to_i} < 128
+    unless attr_val.ascii_only?
       annotation = []
       attr_vals = [attr_val]
       annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})

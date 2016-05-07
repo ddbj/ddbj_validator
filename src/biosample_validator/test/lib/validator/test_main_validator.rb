@@ -64,7 +64,7 @@ class TestMainValidator < Minitest::Test
       error_list[0][:annotation][anno_index][:value][1..-1]
     end
   end
-
+=begin
   def test_save_auto_annotation_value
     # is not method test
     # test data: "geo_loc_name" => "  Jaaaapan"
@@ -77,7 +77,7 @@ class TestMainValidator < Minitest::Test
     annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
     assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
   end
-
+=end
   def test_failure_to_parse_batch_submission_file
     #ok case
     xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_ok.xml")
@@ -648,25 +648,32 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_special_character_included
+    special_chars = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/special_characters.json"))
     # ok case
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.special_character_included("12", "title", "1.0 microm", 1)
+    ret = @validator.special_character_included("12", "title", "1.0 micrometer", special_chars, 1)
     assert_equal true, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
     # ng case
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.special_character_included("12", "title", "1.0 μm", 1)
+    ret = @validator.special_character_included("12", "title", "1.0 μm", special_chars, 1)
     assert_equal false, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 1, error_list.size
+   # p error_list
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.special_character_included("12", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+   # p error_list
     # params are nil pattern
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.special_character_included("12", "title", "", 1)
+    ret = @validator.special_character_included("12", "title", "", special_chars, 1)
     assert_equal nil, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
-
   end
 
   def test_invalid_data_format
