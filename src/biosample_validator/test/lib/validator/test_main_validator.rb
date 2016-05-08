@@ -588,4 +588,70 @@ class TestMainValidator < Minitest::Test
 
   end
 
+  def test_duplicate_sample_title_in_account
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicate_sample_title_in_account("3", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicate_sample_title_in_account("3", "sample_title1", ["sample_title1", "sample_tile2"], "test01", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicate_sample_title_in_account("3", "sample_title1", ["sample_title1", "sample_tile2"], "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
+  def test_bioproject_not_found
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.bioproject_not_found("6", "PSUB003946", "twada", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.bioproject_not_found("6", "PSUB003946", "test01", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.bioproject_not_found("6", "", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
+  def test_identical_attributes
+    @biosample_data_24_ok = JSON.parse(File.read(File.dirname(__FILE__) + "/../../data/24_identical_attributes_ok.json"))
+    @biosample_data_24_ng = JSON.parse(File.read(File.dirname(__FILE__) + "/../../data/24_identical_attributes_ng.json"))
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.identical_attributes("24", @biosample_data_24_ok)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    # ng calse
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.identical_attributes("24", @biosample_data_24_ng)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    # params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.identical_attributes("24", [])
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
 end

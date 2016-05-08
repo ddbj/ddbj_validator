@@ -17,12 +17,12 @@ require File.dirname(__FILE__) + "/../common_utils.rb"
 # ftp://ftp.ddbj.nig.ac.jp/ddbj_database/biosample/schema/biosample_exchange.1.1.xsd
 #
 class BioSampleXmlConvertor
- 
+
   #
   # 引数のXMLデータをRubyオブジェクトにして返す
   #
   # ==== Args
-  # 変換するBioSampleのXMLデータ   
+  # 変換するBioSampleのXMLデータ
   #
   # ==== Return
   # 変換後のRubyオブジェクト
@@ -36,7 +36,7 @@ class BioSampleXmlConvertor
   #     "package" => "XXXXXXXXX",
   #     "attributes" =>
   #       {
-  #         "sample_name" => "XXXXXX", 
+  #         "sample_name" => "XXXXXX",
   #         .....
   #       }
   #     "attribute_names_list" =>
@@ -45,26 +45,26 @@ class BioSampleXmlConvertor
   #       ]
   #   },
   #   {.....}, ....
-  # ] 
+  # ]
   #
   def xml2obj(xml_document)
     #TODO xml parse error
     doc = REXML::Document.new(xml_document)
     sample_list = []
     if doc.root.name == "BioSampleSet"
-      biosample_list = REXML::XPath.each(doc.root, "BioSample") 
+      biosample_list = REXML::XPath.each(doc.root, "BioSample")
       biosample_list.each do |biosample|
         sample_list.push(parseBioSample(biosample))
       end
-    elsif doc.root.name == "BioSample" 
+    elsif doc.root.name == "BioSample"
       sample_list.push(parseBioSample(doc.root))
     else
       puts "not biosample xml"
-      #TODO raise error 
-    end 
-    return sample_list  
+      #TODO raise error
+    end
+    return sample_list
   end
-   
+
   def parseBioSample(biosample_element)
     sample_obj = {}
     #biosample_submission_id
@@ -86,10 +86,10 @@ class BioSampleXmlConvertor
     if !model.nil?
       sample_obj["package"] = model.text
     end
-    #attributes 
+    #attributes
     attributes = {}
     attribute_names_list = []
-    
+
     sample_title = REXML::XPath.first(biosample_element, "Description/Title")
     if !sample_title.nil?
       attributes["sample_title"] = sample_title.text
@@ -105,11 +105,11 @@ class BioSampleXmlConvertor
       attributes["organism"] = organism_name.text
       attribute_names_list.push("organism");
     end
-    organism = REXML::XPath.first(biosample_element, "Description/Organism[@taxonomy_id]") 
+    organism = REXML::XPath.first(biosample_element, "Description/Organism[@taxonomy_id]")
     if !organism.nil?
       attributes["taxonomy_id"] = organism.attributes["taxonomy_id"]
       attribute_names_list.push("taxonomy_id");
-    end 
+    end
     attributes_list = REXML::XPath.each(biosample_element, "Attributes/Attribute")
     attributes_list.each do |attr|
       attr_name = attr.attributes["attribute_name"]

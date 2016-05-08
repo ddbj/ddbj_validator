@@ -8,6 +8,7 @@ require File.dirname(__FILE__) + "/biosample_xml_convertor.rb"
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
+require File.dirname(__FILE__) + "/postgre_connection.rb"
 
 #
 # A class for BioSample validation 
@@ -70,6 +71,18 @@ class MainValidator
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
+    @sample_title_list = []
+    @biosample_list.each do |biosample_data|
+      @sample_title_list.push(biosample_data["attributes"]["sample_title"])
+    end
+    @biosample_list.each_with_index do |biosample_data, idx|
+      line_num = idx + 1
+      @submitter_id = "" ### this attribute fill with null temporary
+      send("duplicate_sample_title_in_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
+      send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
+      send("Invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
+    end
+    send("identical_attributes", "24", @biosample_list)
 
 
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -1012,7 +1025,7 @@ class MainValidator
       attr_vals = [attr_val, attr_val_annotaed]
       annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
       message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result = false
     end
@@ -1034,6 +1047,115 @@ class MainValidator
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result =  false
+    end
+    result
+  end
+
+  def duplicate_sample_title_in_account(rule_code, biosample_title, sample_title_list, submitter_id, line_num)
+    @duplicated = []
+    @duplicated = sample_title_list.select do |title|
+      sample_title_list.index(title) != sample_title_list.rindex(title)
+    end
+
+    @duplicated.length > 0 ? result= false : result = true
+
+    if !submitter_id.empty?
+      get_submitter_item = GetSubmitterItem.new
+      items = get_submitter_item.getitems(submitter_id)
+
+      if @duplicated.length == 0 && !items
+        return nil
+      elsif items.length > 0
+        if items.include?(biosample_title)
+          result = false
+        end
+      elsif @duplicated.length == 0
+          result = true
+      end
+    elsif @duplicated.length == 0
+      return nil
+    end
+
+    unless result
+      annotation = []
+      annotation.push({key: "Title", source: @data_file, location: line_num.to_s, value: biosample_title})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  def bioproject_not_found(rule_code,  bioproject_id, submitter_id, line_num)
+    return nil if bioproject_id.nil? || bioproject_id.empty? || submitter_id.nil? || submitter_id.empty?
+    result = true
+
+    get_bioproject_item = GetBioProjectItem.new
+    @bp_info = get_bioproject_item.get_submitter(bioproject_id)
+    if @bp_info.length > 0
+      unless submitter_id == @bp_info[0]["submitter_id"]
+        annotation = []
+        annotation.push({key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    else
+      return nil
+    end
+    result
+
+  end
+
+  def identical_attributes(rule_code, biosample_datas)
+    puts biosample_datas.class, biosample_datas
+    return nil if biosample_datas.nil? || biosample_datas.empty?
+    biosample_datas.length == 1 ? result = true : result = false
+
+    if biosample_datas.length > 1
+      @keys_excluding = ["sample_title", "organism", "taxonomy_id", "sample_name"]
+      @items = []
+      # uniqueで有るべきhash(item)生成
+      biosample_datas.each do |item|
+        @keys_excluding.each do |k|
+          item["attributes"].delete(k)
+        end
+        item.delete("attribute_names_list")
+        @items.push(item)
+      end
+
+      unless @items.length == @items.uniq.length
+        annotation = []
+        annotation.push({key: "excluding sample name, title, bioproject accession, description", source: @data_file, location: "", value: []})
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+        @error_list.push(error_hash)
+        result = false
+      else
+        result = true
+      end
+
+    end
+    result
+  end
+
+  def Invalid_bioproject_type(rule_code, bioproject_id, line_num)
+    return nil if bioproject_id.nil? || bioproject_id.empty?
+    result  = true
+    is_umbrella_id = IsUmbrellaId.new
+    @umbrella = is_umbrella_id.is_umnrella(bioproject_id)
+    if @umbrella == 0
+      result = true
+    elsif @umbrella
+      annotation = []
+      annotation.push({key: "Invalid BioProject type", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result = false
+    else
+      return nil
     end
     result
   end
