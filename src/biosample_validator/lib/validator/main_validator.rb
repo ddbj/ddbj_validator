@@ -76,17 +76,20 @@ class MainValidator
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
     @sample_title_list = []
+    @sample_name_list = []
     @biosample_list.each do |biosample_data|
       @sample_title_list.push(biosample_data["attributes"]["sample_title"])
+      @sample_name_list.push(biosample_data["attributes"]["sample_name"])
     end
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       @submitter_id = "" ### this attribute fill with null temporary
+      @submission_id = "SSUB000001" ### this attribute fill with null temporary
       send("duplicate_sample_title_in_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
       send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
+      send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
     end
     send("identical_attributes", "24", @biosample_list)
-
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
@@ -1389,6 +1392,25 @@ class MainValidator
 
     end
     result
+  end
+
+  def duplicate_sample_names(rule_code, sample_name, sample_name_list, submission_id, line_num)
+    return nil if sample_name.nil? || sample_name.empty?
+    result = true
+    if sample_name_list.include?(sample_name)
+      result = false
+    end
+
+    if submission_id
+      get_submission_name = GetSampleNames.new
+      res = get_submission_name.getnames(submission_id)
+      names = []
+      res.each do |item|
+        names.push(item["sample_name"])
+      end
+    end
+
+  result
   end
 
 end

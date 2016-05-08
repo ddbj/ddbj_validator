@@ -46,12 +46,10 @@ class BioSampleXmlConvertor
   #   },
   #   {.....}, ....
   # ]
-<<<<<<< HEAD
-=======
+
   #
   # attributesは属性名に重複がないハッシュ(重複時は最初に出現した属性値がセットされる)
   # attribute_listは属性名が重複している可能性があるリスト(属性名重複チェック(34.Multiple Attribute values)で仕様される)
->>>>>>> 40703c2e32bedfef5ab8df3ce1239ac052e2799c
   #
   def xml2obj(xml_document)
     #TODO xml parse error
@@ -94,13 +92,8 @@ class BioSampleXmlConvertor
     end
     #attributes
     attributes = {}
-<<<<<<< HEAD
-    attribute_names_list = []
-
-=======
     attribute_list = []
     
->>>>>>> 40703c2e32bedfef5ab8df3ce1239ac052e2799c
     sample_title = REXML::XPath.first(biosample_element, "Description/Title")
     if !sample_title.nil?
       attributes["sample_title"] = sample_title.text
@@ -119,13 +112,9 @@ class BioSampleXmlConvertor
     organism = REXML::XPath.first(biosample_element, "Description/Organism[@taxonomy_id]")
     if !organism.nil?
       attributes["taxonomy_id"] = organism.attributes["taxonomy_id"]
-<<<<<<< HEAD
-      attribute_names_list.push("taxonomy_id");
-    end
-=======
+
       attribute_list.push({"taxonomy_id" => organism.attributes["taxonomy_id"]});
-    end 
->>>>>>> 40703c2e32bedfef5ab8df3ce1239ac052e2799c
+    end
     attributes_list = REXML::XPath.each(biosample_element, "Attributes/Attribute")
     attributes_list.each do |attr|
       attr_name = attr.attributes["attribute_name"]

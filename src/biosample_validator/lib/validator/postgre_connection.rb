@@ -121,3 +121,29 @@ class IsUmbrellaId
   result
   end
 end
+
+class GetSampleNames
+  def getnames(submission_id)
+    begin
+      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port)
+
+      q = "SELECT bs.sample_name
+        FROM mass.biosample_summary bs
+        WHERE bs.submission_id = '#{submission_id}'"
+
+      result = connection.exec(q)
+
+    rescue PG::Error => ex
+      #p ex.class, ex.message
+      resulst = nil
+
+    rescue => ex
+      #p ex.class, ex.message
+      result = nil
+
+    ensure
+      connection.close if connection
+    end
+
+  end
+end
