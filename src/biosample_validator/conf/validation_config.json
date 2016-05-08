@@ -148,10 +148,10 @@
   },
   "rule29": {
     "code": "29",
-    "level": "error",
+    "level": "warning",
     "name": "Failure to parse batch submission file",
     "method": "",
-    "message": "Unable to parse batch file: quoted text possibly split across multiple lines."
+    "message": "New line included: value possibly contains new line(s)."
   },
   "rule30": {
     "code": "30",
