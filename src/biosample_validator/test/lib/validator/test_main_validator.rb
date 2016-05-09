@@ -720,7 +720,6 @@ class TestMainValidator < Minitest::Test
 
   end
 
-<<<<<<< HEAD
   def test_duplicate_sample_title_in_account
     # ok case
     @validator.instance_variable_set :@error_list, [] #clear
@@ -787,7 +786,6 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, error_list.size
   end
 
-=======
   def test_attribute_value_is_not_integer
     int_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/integer_attributes.json"))
     #ok case
@@ -819,5 +817,48 @@ class TestMainValidator < Minitest::Test
   def test_format_of_geo_loc_name_is_invalid
 
   end
->>>>>>> 40703c2e32bedfef5ab8df3ce1239ac052e2799c
+
+  def test_Invalid_bioproject_type
+    #ok case
+    @validator.instance_variable_set :@error_list, []
+    ret = @validator.Invalid_bioproject_type("70", "PSUB000001", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    #ng case
+    @validator.instance_variable_set :@error_list, []
+    ret = @validator.Invalid_bioproject_type("70", "PSUB000606", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, []
+    ret = @validator.Invalid_bioproject_type("70", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+
+  end
+
+  def test_duplicate_samplename
+    #ok case
+    @validator.instance_variable_set :@error_list, []
+    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    #ng case
+    @validator.instance_variable_set :@error_list, []
+    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, []
+    ret = @validator.duplicate_sample_names("28", "", [], "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
 end

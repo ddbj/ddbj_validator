@@ -147,3 +147,38 @@ class GetSampleNames
 
   end
 end
+
+class GetPRJDBId
+  def get_id(psub_id)
+    connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_db_name, :port => $pg_port)
+
+    begin
+
+      q = "SELECT p.project_id_counter prjd, p.project_id_prefix
+    FROM mass.project p
+    WHERE p.submission_id = '#{psub_id}'"
+
+      res = connection.exec(q)
+
+      @items = []
+      res.each {|item|
+        @items.push(item)
+      }
+
+      @items
+
+    rescue PG::Error => ex
+      p ex.class, ex.message
+      @itemts = nil
+
+    rescue => ex
+      p ex.class, ex.message
+      @items = nil
+
+    ensure
+      connection.close if connection
+
+    end
+
+  end
+end

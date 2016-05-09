@@ -77,19 +77,22 @@ class MainValidator
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
     @sample_title_list = []
     @sample_name_list = []
+    @bioproject_id_list = []
     @biosample_list.each do |biosample_data|
       @sample_title_list.push(biosample_data["attributes"]["sample_title"])
       @sample_name_list.push(biosample_data["attributes"]["sample_name"])
+      @bioproject_id_list.push(biosample_data["attributes"]["bioproject_id"])
     end
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       @submitter_id = "" ### this attribute fill with null temporary
-      @submission_id = "SSUB000001" ### this attribute fill with null temporary
+      @submission_id = "" ### this attribute fill with null temporary
       send("duplicate_sample_title_in_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
       send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
       send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
     end
     send("identical_attributes", "24", @biosample_list)
+    send("warning_about_bioproject_increment", "69", @bioproject_id_list)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
@@ -612,10 +615,25 @@ class MainValidator
   #
   def invalid_bioproject_accession (rule_code, project_id, line_num)
     return nil if project_id.nil?
-    if /^PRJD/ =~ project_id || /^PSUB/ =~  project_id
+    if /^PRJD/ =~ project_id
       true
+    elsif /^PSUB/ =~ project_id
+      get_prjdb_id = GetPRJDBId.new
+      project_id_info = get_prjdb_id.get_id(project_id)
+      prjd_id = project_id_info[0]["prjd"]
+      if prjd_id
+        annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id, prjd_id]}]
+        rule = @validation_config["rule" + rule_code]
+        param = {VALUE: project_id}
+        message = CommonUtils::error_msg(@validation_config, rule_code, param)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        false
+      else
+        true
+      end
     else
-      annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id]}]
+      annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id, @prjd_id]}]
       rule = @validation_config["rule" + rule_code]
       param = {VALUE: project_id}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
@@ -1404,13 +1422,51 @@ class MainValidator
     if submission_id
       get_submission_name = GetSampleNames.new
       res = get_submission_name.getnames(submission_id)
-      names = []
-      res.each do |item|
-        names.push(item["sample_name"])
+      if res
+        names = []
+        res.each do |item|
+          names.push(item["sample_name"])
+        end
+      else
+        return nil
       end
+
+      @duplicated_name = names.select do |name|
+        names.index(name) != names.rindex(name)
+      end
+      @duplicated_name.length > 0 ? result = false : result = true
+      annotation = []
+      annotation.push({key: "sample name", source: @data_file, location: line_num.to_s, value: [sample_name]})
+      rule = @validation_config["rule" + rule_code]
+      param = {NAMES: sample_name}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+
     end
 
   result
+  end
+
+  def warning_about_bioproject_increment(rule_code, bioproject_id_list)
+    return nil if bioproject_id_list.length == 0 || bioproject_id_list.nil? || bioproject_id_list.empty?
+    result = true
+    if bioproject_id_list.length > 1
+      @sub = []
+      i = 0
+      until i >= bioproject_id_list.length - 1 do
+        if bioproject_id_list[i] =~ /^PRJDB\d+/
+          @sub.push( bioproject_id_list[i + 1].gsub("PRJDB", "").to_i - bioproject_id_list[i].gsub("PRJDB", "").to_i)
+        elsif bioproject_id_list[i] =~ /^PSUB\d{6}/
+          @sub.push( bioproject_id_list[i + 1].gsub("PSUB", "").to_i - bioproject_id_list[i].gsub("PSUB", "").to_i)
+        end
+        i += 1
+      end
+      @sub.uniq == [1] ? result = false : result = true
+    else
+      result = true
+    end
+    result
   end
 
 end
