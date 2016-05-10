@@ -134,9 +134,9 @@ class MainValidator
 
       send("Invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
       send("invalid_bioproject_accession", "5", biosample_data["attributes"]["bioproject_id"], line_num)
-      send("duplicated_locus_tag_prefix", "91", biosample_data["attributes"]["locus_tag_prefix"], line_num)
+      send("duplicated_locus_tag_prefix", "91", biosample_data["attributes"]["locus_tag_prefix"], @submission_id, line_num)
 
-      ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], @submission_id, line_num)
+      ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false #save auto annotation value
         annotation = @error_list.last[:annotation].find {|anno| anno[:key] == attribute_name }
         biosample_data["attributes"]["geo_loc_name"] = annotation[:value][1]
