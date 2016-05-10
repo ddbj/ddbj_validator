@@ -147,6 +147,22 @@ class OrganismValidator < SPARQLBase
   end
 
   #
+  # 指定したtax_idの分類のランクが指定したrankと同じか深ければtrueを返す
+  #
+  # ==== Args
+  # tax_id: target_tax_id ex. "1148"
+  # rank: NCBI taxonomy rank ex. "Species"
+  # ==== Return
+  # true/false
+  #
+  def is_deeper_tax_rank (tax_id, rank)
+    params = {tax_id: tax_id, rank: rank}
+    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_parent_rank.rq", params)
+    result = query(sparql_query)
+    return result.size > 0
+  end
+
+  #
   # Validates the organism specified is appropriate for package, or not.
   #
   # ==== Args

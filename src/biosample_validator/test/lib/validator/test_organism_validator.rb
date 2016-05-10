@@ -45,6 +45,11 @@ class TestOrganismValidator < Minitest::Test
     assert_equal false, @validator.has_linage("9606", ["2"])
   end
 
+  def test_is_deeper_tax_rank
+    assert_equal true, @validator.is_deeper_tax_rank("1148", "Species")
+    assert_equal false, @validator.is_deeper_tax_rank("1142", "Species") #1142 is genus level
+  end
+
   def test_org_vs_package_validate
     ret = @validator.org_vs_package_validate("103690", "MIGS.ba.microbial")
     assert_equal "ok", ret[:status]
