@@ -820,45 +820,91 @@ class TestMainValidator < Minitest::Test
 
   def test_Invalid_bioproject_type
     #ok case
-    @validator.instance_variable_set :@error_list, []
+    @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.Invalid_bioproject_type("70", "PSUB000001", 1)
     assert_equal true, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
     #ng case
-    @validator.instance_variable_set :@error_list, []
+    @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.Invalid_bioproject_type("70", "PSUB000606", 1)
     assert_equal false, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 1, error_list.size
     #params are nil pattern
-    @validator.instance_variable_set :@error_list, []
+    @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.Invalid_bioproject_type("70", "", 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+  end
+
+  def test_duplicate_sample_name
+    #ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
+    assert_equal true, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    #ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
+    assert_equal false, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, error_list.size
+    #params are nil pattern
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicate_sample_names("28", "", [], "", 1)
     assert_equal nil, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
 
   end
 
-  def test_duplicate_samplename
-    #ok case
-    @validator.instance_variable_set :@error_list, []
-    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
+  def test_duplicated_locus_tag_prefix
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicated_locus_tag_prefix("91", "XXA","SSUB000001", 1)
     assert_equal true, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
-    #ng case
-    @validator.instance_variable_set :@error_list, []
-    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicated_locus_tag_prefix("91", "AAAA", "SSUB000001", 1)
     assert_equal false, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 1, error_list.size
-    #params are nil pattern
-    @validator.instance_variable_set :@error_list, []
-    ret = @validator.duplicate_sample_names("28", "", [], "", 1)
+    # parameters are nil case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.duplicated_locus_tag_prefix("91", "", "", 1)
     assert_equal nil, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
+
+  end
+
+  def test_warning_about_bioproject_increment
+    # ok case
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.warning_about_bioproject_increment("69", ["PSUB000001", "PSUB000002", "PSUB000004"])
+    assert_equal true, ret
+    @error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, @error_list.size
+    # ng case
+    @validator.instance_variable_set :@error_list, [] #clear
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.warning_about_bioproject_increment("69", ["PSUB000001", "PSUB000002", "PSUB000003"])
+    assert_equal false, ret
+    @error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 1, @error_list.size
+    # params are nil case
+    @validator.instance_variable_set :@error_list, [] #clear
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.warning_about_bioproject_increment("69", [])
+    assert_equal nil, ret
+    @error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, @error_list.size
+
   end
 
 end

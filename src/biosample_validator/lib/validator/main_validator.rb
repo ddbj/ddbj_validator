@@ -134,8 +134,9 @@ class MainValidator
 
       send("Invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
       send("invalid_bioproject_accession", "5", biosample_data["attributes"]["bioproject_id"], line_num)
+      send("duplicated_locus_tag_prefix", "91", biosample_data["attributes"]["locus_tag_prefix"], line_num)
 
-      ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], line_num)
+      ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], @submission_id, line_num)
       if ret == false #save auto annotation value
         annotation = @error_list.last[:annotation].find {|anno| anno[:key] == attribute_name }
         biosample_data["attributes"]["geo_loc_name"] = annotation[:value][1]
@@ -1313,7 +1314,8 @@ class MainValidator
       unless submitter_id == @bp_info[0]["submitter_id"]
         annotation = []
         annotation.push({key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
-        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        param = {VALUE: bioproject_id}
+        message = CommonUtils::error_msg(@validation_config, rule_code, param)
         error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
         @error_list.push(error_hash)
         result = false
@@ -1326,7 +1328,6 @@ class MainValidator
   end
 
   def identical_attributes(rule_code, biosample_datas)
-    puts biosample_datas.class, biosample_datas
     return nil if biosample_datas.nil? || biosample_datas.empty?
     biosample_datas.length == 1 ? result = true : result = false
 
@@ -1361,13 +1362,15 @@ class MainValidator
     return nil if bioproject_id.nil? || bioproject_id.empty?
     result  = true
     is_umbrella_id = IsUmbrellaId.new
-    @umbrella = is_umbrella_id.is_umnrella(bioproject_id)
-    if @umbrella == 0
+    @is_umbrella = is_umbrella_id.is_umbrella(bioproject_id)
+
+    if @is_umbrella == 0
       result = true
-    elsif @umbrella
+    elsif @is_umbrella
       annotation = []
       annotation.push({key: "Invalid BioProject type", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
-      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      param = {VALUE: bioproject_id}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result = false
@@ -1406,18 +1409,22 @@ class MainValidator
         message = CommonUtils::error_msg(@validation_config, rule_code, nil)
         error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
         @error_list.push(error_hash)
+        result
       end
-
     end
     result
+
   end
 
   def duplicate_sample_names(rule_code, sample_name, sample_name_list, submission_id, line_num)
     return nil if sample_name.nil? || sample_name.empty?
     result = true
-    if sample_name_list.include?(sample_name)
-      result = false
+    @duplicated_sample_name = []
+    @duplicated_sample_name = sample_name_list.select do |name|
+      sample_name_list.index(name) != sample_name_list.rindex(name)
     end
+
+    @duplicated_sample_name.length > 0 ? result = false : result = true
 
     if submission_id
       get_submission_name = GetSampleNames.new
@@ -1437,15 +1444,13 @@ class MainValidator
       @duplicated_name.length > 0 ? result = false : result = true
       annotation = []
       annotation.push({key: "sample name", source: @data_file, location: line_num.to_s, value: [sample_name]})
-      rule = @validation_config["rule" + rule_code]
       param = {NAMES: sample_name}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
-
+      result
     end
 
-  result
   end
 
   def warning_about_bioproject_increment(rule_code, bioproject_id_list)
@@ -1463,8 +1468,32 @@ class MainValidator
         i += 1
       end
       @sub.uniq == [1] ? result = false : result = true
+      annotation = []
+      annotation.push({key: "BioProject ID", source: @data_file, location: "All Data", value: bioproject_id_list})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      @error_list.push(error_hash)
+      result
     else
       result = true
+    end
+  end
+
+  def duplicated_locus_tag_prefix(rule_code, locus_tag, submission_id, line_num)
+    return nil if locus_tag.nil? || locus_tag.empty?
+    result = true
+    get_locus_tag_prefix = GetLocusTagPrefix.new
+    result = get_locus_tag_prefix.unique_prefix?(locus_tag, submission_id)
+    if result == nil
+      return nil
+    elsif !result
+      annotation = []
+      annotation.push({key: "locus_tag_prefix", source: @data_file, location: line_num.to_s, value: [locus_tag]})
+      rule = @validation_config["rule" + rule_code]
+      param = {VALUE: locus_tag}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
     end
     result
   end

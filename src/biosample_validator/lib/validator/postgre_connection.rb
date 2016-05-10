@@ -94,7 +94,7 @@ class GetBioProjectItem
 end
 
 class IsUmbrellaId
-  def is_umnrella(bioproject_id)
+  def is_umbrella(bioproject_id)
 
     begin
       connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port)
@@ -105,11 +105,12 @@ class IsUmbrellaId
 
       res = connection.exec(q)
 
-      results = res[0]["count"]
+      # if "count" >= 1 this bioproject_id is  umbrella id
+      result = res[0]["count"].to_i
 
     rescue PG::Error => ex
       #p ex.class, ex.message
-      resulst = nil
+      result = nil
 
     rescue => ex
       #p ex.class, ex.message
@@ -150,9 +151,8 @@ end
 
 class GetPRJDBId
   def get_id(psub_id)
-    connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_db_name, :port => $pg_port)
-
     begin
+      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port)
 
       q = "SELECT p.project_id_counter prjd, p.project_id_prefix
     FROM mass.project p
@@ -168,16 +168,58 @@ class GetPRJDBId
       @items
 
     rescue PG::Error => ex
-      p ex.class, ex.message
+      #p ex.class, ex.message
       @itemts = nil
-
     rescue => ex
-      p ex.class, ex.message
+      #p ex.class, ex.message
       @items = nil
-
     ensure
       connection.close if connection
+    end
+  end
+end
 
+class GetLocusTagPrefix
+  def unique_prefix?(prefix, submission_id)
+    begin
+      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port)
+
+      q0 = "SELECT a.attribute_name, a.attribute_value, a.smp_id, s.submission_id
+    FROM mass.attribute a, mass.sample s
+    WHERE s.submission_id = '#{submission_id}' AND a.smp_id = s.smp_id AND attribute_name = 'locus_tag_prefix'"
+
+      q1 = "SELECT a.attribute_name, a.attribute_value
+    FROM mass.attribute a
+    WHERE a.attribute_name  = 'locus_tag_prefix'"
+
+      res0 = connection.exec(q0)
+      res1 = connection.exec(q1)
+
+      @own_items= []
+      res0.each do |item|
+        unless item["attribute_value"].empty?
+          @own_items.push(item["attribute_value"])
+        end
+      end
+
+      @items = []
+      res1.each do |item|
+        unless item["attribute_value"].empty?
+          @items.push(item["attribute_value"])
+        end
+      end
+      @item_oters =  @items - @own_items
+      @item_oters.include?(prefix) ? result = false : result = true
+      result
+
+    rescue
+      #p ex.class, ex.message
+      result = nil
+    rescue
+      #p ex.class, ex.message
+      result = nil
+    ensure
+      connection.close if connection
     end
 
   end
