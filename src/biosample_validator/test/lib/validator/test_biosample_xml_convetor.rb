@@ -12,8 +12,8 @@ class TestBioSampleXmlConvertor < Minitest::Test
     xml_doc = File.read("../../data/xml2obj_SSUB000019.xml")
     biosample_list = @convertor.xml2obj(xml_doc)
     assert_equal 1, biosample_list.size
-    assert_equal nil, biosample_list[0]["biosample_submission_id"]
-    assert_equal nil, biosample_list[0]["biosample_submitter_id"]
+    assert_equal nil, biosample_list[0]["submission_id"]
+    assert_equal nil, biosample_list[0]["submitter_id"]
     assert_equal "SAMD00000328", biosample_list[0]["biosample_accession"]
     assert_equal "MIGS.ba.microbial", biosample_list[0]["package"]
     attr = biosample_list[0]["attributes"]
@@ -28,8 +28,8 @@ class TestBioSampleXmlConvertor < Minitest::Test
     # with submit info
     xml_doc = File.read("../../data/xml2obj_SSUB000019_with_sub.xml")
     biosample_list = @convertor.xml2obj(xml_doc)
-    assert_equal "SSUBXXXXX", biosample_list[0]["biosample_submission_id"]
-    assert_equal "12345", biosample_list[0]["biosample_submitter_id"]
+    assert_equal "SSUBXXXXX", biosample_list[0]["submission_id"]
+    assert_equal "12345", biosample_list[0]["submitter_id"]
 
     # multiple samples
     xml_doc = File.read("../../data/xml2obj_SSUB002415.xml")

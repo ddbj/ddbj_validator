@@ -29,8 +29,8 @@ class BioSampleXmlConvertor
   # スキーマは以下の通り
   # [
   #   {
-  #     "biosample_submitter_id" => "XXXXX",
-  #     "biosample_submission_id" => "SSUBXXXXX",
+  #     "submitter_id" => "XXXXX",
+  #     "submission_id" => "SSUBXXXXX",
   #     "biosample_accession" => "SAMDXXXXXX",
   #     "package" => "XXXXXXXXX",
   #     "attributes" =>
@@ -71,13 +71,13 @@ class BioSampleXmlConvertor
 
   def parseBioSample(biosample_element)
     sample_obj = {}
-    #biosample_submission_id
-    if !biosample_element.attributes["biosample_submission_id"].nil?
-      sample_obj["biosample_submission_id"] = biosample_element.attributes["biosample_submission_id"]
+    #submission_id
+    if !biosample_element.attributes["submission_id"].nil?
+      sample_obj["submission_id"] = biosample_element.attributes["submission_id"]
     end
-    #biosample_submitter_id
-    if !biosample_element.attributes["biosample_submitter_id"].nil?
-      sample_obj["biosample_submitter_id"] = biosample_element.attributes["biosample_submitter_id"]
+    #submitter_id
+    if !biosample_element.attributes["submitter_id"].nil?
+      sample_obj["submitter_id"] = biosample_element.attributes["submitter_id"]
     end
 
     #biosample_accession
