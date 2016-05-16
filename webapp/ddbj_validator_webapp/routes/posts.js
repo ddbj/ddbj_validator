@@ -20,8 +20,6 @@ var file_name = "";
 var original_name = "";
 var format_type = "";
 
-//var filewriter = require("filewriter");
-
 router.post('/upload', function(req, res, next){
     original_name = req.file['originalname'];
     json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
@@ -35,29 +33,6 @@ router.post('/upload', function(req, res, next){
         var type = formattype(data)["type"];
         switch (type){
             case "xml":
-                xml2js_parser.parseString(data, function (err, result) {
-                    if(!err) {
-                        json_array.push(result);
-                        var root_key = Object.keys(json_array[0])[0];
-                        if (root_key == "BioSample") {
-                            biosample_obj = new Object();
-                            json_arrays = [];
-                            biosample_obj["BioSampleSet"] = {"BioSample": [json_array[0]["BioSample"]]};
-                            json_arrays.push(biosample_obj);
-                            json_string = JSON.stringify(json_arrays);
-                            fs.writeFile(json_path, json_string);
-                        } else if (root_key == "BioSampleSet") {
-                            json_string = JSON.stringify(json_array);
-                            fs.writeFile(json_path, json_string);
-                        } else {
-                            type = "invalid_value"
-                        }
-                    }else{
-                        console.log(err);
-                        // xml2jsのparseStringできないxmlがinputで有った場合
-                    }
-
-                });
                 break;
             case "tsv":
                 //tsv2json
@@ -79,7 +54,6 @@ router.post('/upload', function(req, res, next){
             default:
                 type = "invalid_value";
                 break;
-
         }
         go_next(type);
     });
@@ -94,20 +68,48 @@ router.post('/upload', function(req, res, next){
     switch(type){
         case "xml":
             var original_name = req.file['originalname'];
-            json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
-            exec('ruby ./validator/biosample_validator.rb ' +  json_path, function(error, stdout, stderr){
+            sample_file_path = conf.tmp_file_dir + file_name;
+            output_path = conf.tmp_file_dir + original_name;
+
+            exec('ruby ./validator/biosample_validator.rb ' +  sample_file_path + " xml " + output_path, function(error, stdout, stderr){
                 //if response is {"undefined: 1!
                 // xx.json is invalid json file} call invalid input process
                 if(stdout){
-                    var error_list = eval(stdout);
-                    render_result(error_list);
+                    console.log(stdout + " : stdout");
+                    // error response ファイル取得
+                    var obj = JSON.parse(fs.readFileSync(output_path, 'utf8'));
+
+                    if(obj["status"] == "error"){
+                        render_exception(error_list["message"])
+                    }else if(obj["status"] == "fail" ) {
+                        render_result(obj["failed_list"]);
+                    }else if(obj["status"] == "success") {
+                        render_result([])
+                    }else if(obj["status"] == "error"){
+                        render_exception(obj["message"])
+                    }else{
+                        render_exception("Uncatch exception occured")
+                    }
+                    //var error_list = eval(stdout);
+                    //render_result(error_list);
                 }
                 if(stderr){
-                    //console.log('stderr: ' + stderr);
-                    //render_exception(stderr);
+                    console.log('stderr: ' + stderr);
+                    var obj = JSON.parse(fs.readFileSync(output_path, 'utf8'));
+                    if(obj["status"] == "error"){
+                        render_exception(error_list["message"])
+                    }else if(obj["status"] == "fail" ) {
+                        render_result(obj["failed_list"]);
+                    }else if(obj["status"] == "success") {
+                        render_result([])
+                    }else if(obj["status"] == "error"){
+                        render_exception(obj["message"])
+                    }else{
+                        render_exception("Uncatch exception occured")
+                    }
                 }
                 if(error !== null){
-                    //console.log('Exec error: ' + error);
+                    console.log('Exec error: ' + error);
                 }
             });
             break;
@@ -142,12 +144,13 @@ router.post('/upload', function(req, res, next){
             break;
     }
 
-    function render_exception(stderr){
+    function render_exception(message){
         //res.render('validator_error', {message:"Exception occured",error: stderr });
+        console.log("f0");
         var item = new Object();
         item['errors'] = [];
         item['error_size'] = item['errors'].length;
-        item['exception'] =  "Exception occured, " + stderr;
+        item['exception'] =  "Exception occured, " + message;
         item['original_file'] = original_name;
         item['method'] = "biosample validator";
         item['xml_filename'] = file_name;
@@ -156,10 +159,10 @@ router.post('/upload', function(req, res, next){
     }
 
     // add some infos to validation message and return response
-    function render_result(error_list){
+    function render_result(errors){
         //var biosample_json = JSON.parse(fs.readFileSync(json_path, 'utf8'));
         var item = new Object();
-        item['errors'] = error_list;
+        item['errors'] = errors;
         item['error_size'] = item['errors'].length;
         item['exception'] = "";
         item['method'] = "biosample validator";
@@ -189,7 +192,6 @@ router.post('/upload', function(req, res, next){
 
         //delete old xml files
         exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){});
-
     }
 });
 

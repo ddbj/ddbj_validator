@@ -7,6 +7,19 @@ class TestCommonUtils < Minitest::Test
     @common = CommonUtils.new
   end
 
+  def test_is_null_value?
+    ret = CommonUtils.null_value?(nil)
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("  ")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("missing")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("aaa")
+    assert_equal false, ret
+  end
+
   def test_format_insdc_latlon
     #ok case
     ret = @common.format_insdc_latlon("37.4435 N 6.254 W")
@@ -68,6 +81,37 @@ class TestCommonUtils < Minitest::Test
     #ng 
     ret = @common.is_same_google_country_name("Japan", "United States")
     assert_equal true, ret
-    
   end
+
+  def test_exist_pubmed?
+    #ok
+    ret = @common.exist_pubmed_id?("27148491")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.exist_pubmed_id?("99999999")
+    assert_equal false, ret
+
+    ret = @common.exist_pubmed_id?("aiueo")
+    assert_equal false, ret
+
+    #nil
+    ret = @common.exist_pubmed_id?(nil)
+    assert_equal nil, ret
+  end
+
+  def test_exist_doi?
+    #ok
+    ret = @common.exist_doi?("10.3389/fcimb.2016.00042")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.exist_doi?("10.3389/fcimb.2016.99999")
+    assert_equal false, ret
+
+    #nil
+    ret = @common.exist_doi?(nil)
+    assert_equal nil, ret
+  end
+
 end

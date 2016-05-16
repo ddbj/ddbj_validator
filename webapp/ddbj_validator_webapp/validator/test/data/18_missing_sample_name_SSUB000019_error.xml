@@ -6,7 +6,7 @@
     <Description>
         <SampleName>MTB313</SampleName>
         <Title>MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes</Title>
-        <Organism taxonomy_id="9606">
+        <Organism taxonomy_id="1314">
             <OrganismName>Streptococcus pyogenes</OrganismName>
         </Organism>
     </Description>
@@ -25,7 +25,7 @@
         <Model>MIGS.ba.microbial</Model>
     </Models>
     <Attributes>
-        <Attribute attribute_name="sample_name">MTB313</Attribute>
+        <Attribute attribute_name="sample_name"></Attribute>
         <Attribute attribute_name="strain">MTB313</Attribute>
         <Attribute attribute_name="env_biome">urban biome</Attribute>
         <Attribute attribute_name="collection_date">2011</Attribute>
@@ -39,8 +39,6 @@
         <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
         <Attribute attribute_name="elev">88.8m</Attribute>
         <Attribute attribute_name="depth">0m</Attribute>
-        <Attribute attribute_name="bioproject_id">PDAAAAA1654</Attribute>
-        <Attribute attribute_name="rel_to_oxygen">aaaa</Attribute>
-        <Attribute attribute_name="oxy_stat_samp">bbbb</Attribute>
+        <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
     </Attributes>
 </BioSample>

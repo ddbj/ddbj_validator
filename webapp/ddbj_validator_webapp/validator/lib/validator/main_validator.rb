@@ -4,9 +4,12 @@ require 'erb'
 require 'ostruct'
 require 'geocoder'
 require 'date'
+require 'net/http'
+require File.dirname(__FILE__) + "/biosample_xml_convertor.rb"
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
+require File.dirname(__FILE__) + "/postgre_connection.rb"
 
 #
 # A class for BioSample validation 
@@ -21,81 +24,9 @@ class MainValidator
     #TODO setting config from SPARQL?
     @validation_config = JSON.parse(File.read(@base_dir + "/../../conf/validation_config.json"))
     @error_list = []
+    @xml_convertor = BioSampleXmlConvertor.new
     @org_validator = OrganismValidator.new("http://staging-genome.annotation.jp/sparql") #TODO config
     #TODO load sub validator class or modules
-  end
-
-  
-  #
-  # Flattens and json data which is send from node
-  #
-  # ==== Args
-  # Converted object from input json   
-  #
-  # ==== Return
-  # An array of biosample data.
-  # [
-  #   {
-  #     "biosample_accession" => "SAMDXXXXXX",
-  #     "package" => "XXXXXXXXX",
-  #     "attributes" =>
-  #       {
-  #         "sample_name" => "XXXXXX", 
-  #         .....
-  #       }
-  #     "attribute_names_list" =>
-  #       [
-  #         "sample_name", "sample_title", ..
-  #       ]
-  #   },
-  #   {.....}, ....
-  # ]
-  def flatten_sample_json(json_data)
-    ###TODO 1.data schema check(rule: 18, 20, 25, 34, 61)
-    sample_list = []
-    biosample_list = json_data[0]["BioSampleSet"]["BioSample"]
-    biosample_list.each_with_index do |biosample, idx|
-      sample_data = {}
-      #sample_id
-      biosample["Ids"][0]["Id"].each do |sample_id|
-        if sample_id["@"]["namespace"] == "BioSample"
-          sample_data["biosample_accession"] = sample_id["text"]
-        end
-      end
-      #package
-      if !biosample["Models"].nil? && !biosample["Models"][0].nil? && !biosample["Models"][0]["Model"].nil?
-        sample_data["package"] = biosample["Models"][0]["Model"][0]
-      end
-      #attributes
-      attributes = {}
-      attribute_names_list = []
-      description = biosample["Description"][0]
-      if !description["Title"].nil?
-        attributes["sample_title"] = description["Title"][0]
-        attribute_names_list.push("sample_title");
-      end
-      if !description["Comment"].nil?
-        attributes["description"] = description["Comment"][0]["Paragraph"][0]
-      end
-      if !description["Organism"].nil?
-        organism = description["Organism"][0]
-        attributes["organism"] = organism["OrganismName"][0]
-        attributes["taxonomy_id"] = organism["@"]["taxonomy_id"]
-        attribute_names_list.push("organism");
-        attribute_names_list.push("taxonomy_id");
-      end
-      attributes_list = biosample["Attributes"][0]["Attribute"]
-      attributes_list.each do |attr|
-        key = attr["@"]["attribute_name"]
-        value = attr["text"]
-        attributes[key] = value
-        attribute_names_list.push(key);
-      end
-      sample_data["attributes"] = attributes
-      sample_data["attribute_names_list"] = attribute_names_list
-      sample_list.push(sample_data)
-    end
-    sample_list
   end
 
   #
@@ -103,33 +34,32 @@ class MainValidator
   # Error/warning list is stored to @error_list
   #
   # ==== Args
-  # data_json: json file path  
+  # data_xml: xml file path
   #
   #
-  def validate (data_json)
+  def validate (data_xml)
     #convert to object for validator
-    @data_file = File::basename(data_json)
-    begin
-      json_data = JSON.parse(File.read(data_json))
-      @biosample_list = flatten_sample_json(json_data)
-    rescue
-      puts @data_file + " is invalid json file!!"
-      exit(1)
-    end
+    @data_file = File::basename(data_xml)
+    xml_document = File.read(data_xml)
+    #TODO parse error
+    @biosample_list = @xml_convertor.xml2obj(xml_document)
 
-    ### 1.file format (rule: 29, 30, 37, 38)
+    ### 1.file format and attribute names (rule: 29, 30, 34, 61)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      send("non_ascii_header_line", "30", biosample_data["attribute_names_list"], line_num)
-      send("empty_column_name", "37", biosample_data["attribute_names_list"], line_num)
+      send("failure_to_parse_batch_submission_file", "29", biosample_data, line_num)
+      send("non_ascii_header_line", "30", biosample_data["attribute_list"], line_num)
+      send("missing_attribute_name", "34", biosample_data["attribute_list"], line_num)
+      send("multiple_attribute_values", "61", biosample_data["attribute_list"], line_num)
     end
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       ### 2.auto correct (rule: 12, 13)
+      special_chars = JSON.parse(File.read(@base_dir + "/../../conf/special_characters.json"))
       biosample_data["attributes"].each do |attr_name, value|
-        ret = send("special_character_included", "12", attr_name, value, line_num)
+        ret = send("special_character_included", "12", attr_name, value, special_chars, line_num)
         if ret == false #save auto annotation value
           annotation = @error_list.last[:annotation].find{|anno| anno[:key] == attr_name }
           biosample_data["attributes"][attr_name] = annotation[:value][1]
@@ -145,13 +75,33 @@ class MainValidator
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
-
+    @sample_title_list = []
+    @sample_name_list = []
+    @bioproject_id_list = []
+    @biosample_list.each do |biosample_data|
+      @sample_title_list.push(biosample_data["attributes"]["sample_title"])
+      @sample_name_list.push(biosample_data["attributes"]["sample_name"])
+      @bioproject_id_list.push(biosample_data["attributes"]["bioproject_id"])
+    end
+    @biosample_list.each_with_index do |biosample_data, idx|
+      line_num = idx + 1
+      @submitter_id = "" ### this attribute fill with null temporary
+      @submission_id = "" ### this attribute fill with null temporary
+      send("duplicate_sample_title_in_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
+      send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
+      send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
+    end
+    send("identical_attributes", "24", @biosample_list)
+    send("warning_about_bioproject_increment", "69", @bioproject_id_list)
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       ### 5.package check (rule: 26)
       send("missing_package_information", "25", biosample_data, line_num)
       send("unknown_package", "26", biosample_data["package"], line_num)
+
+      send("missing_sample_name", "18", biosample_data, line_num)
+      send("missing_organism", "20", biosample_data, line_num)
 
       #TODO get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data["package"])
@@ -172,13 +122,19 @@ class MainValidator
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
+      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json"))
+      ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
+      int_attr = JSON.parse(File.read(@base_dir + "/../../conf/integer_attributes.json"))
       biosample_data["attributes"].each do|attribute_name, value|
         send("invalid_attribute_value_for_controlled_terms", "2", attribute_name.to_s, value, cv_attr, line_num)
+        send("invalid_publication_identifier", "11", attribute_name.to_s, value, ref_attr, line_num)
+        send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
+        send("attribute_value_is_not_integer", "93", attribute_name.to_s, value, int_attr, line_num)
       end
 
+      send("Invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
       send("invalid_bioproject_accession", "5", biosample_data["attributes"]["bioproject_id"], line_num)
-
-      date_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json")) #for rule_id:7
+      send("duplicated_locus_tag_prefix", "91", biosample_data["attributes"]["locus_tag_prefix"], @submission_id, line_num)
 
       ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false #save auto annotation value
@@ -190,18 +146,11 @@ class MainValidator
 
       send("invalid_lat_lon_format", "9", biosample_data["attributes"]["lat_lon"], line_num)
 
-      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json")) #for rule_id:11
-
       send("invalid_host_organism_name", "15", biosample_data["attributes"]["host"], line_num)
 
       send("taxonomy_error_warning", "45", biosample_data["attributes"]["organism"], line_num)
-      ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
-      biosample_data["attributes"].each do |attribute_name, value|
-        send("invalid_date_format", "7", attribute_name.to_s, value, ts_attr, line_num)
-      end
 
       send("future_collection_date", "40", biosample_data["attributes"]["collection_date"], line_num)
-
 
       ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
 
@@ -212,7 +161,6 @@ class MainValidator
       send("package_versus_organism", "48", biosample_data["attributes"]["taxonomy_id"], biosample_data["package"], line_num)
 
       send("sex_for_bacteria", "59", biosample_data["attributes"]["taxonomy_id"], biosample_data["attributes"]["sex"], line_num)
-
 
       send("multiple_vouchers", "62", biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
 
@@ -225,8 +173,8 @@ class MainValidator
   # Returns error/warning list as the validation result
   #
   #
-  def get_error_json ()
-    JSON.generate(@error_list)
+  def get_error_list ()
+    @error_list
   end
 
   #
@@ -266,20 +214,45 @@ class MainValidator
 ### validate method ###
 
   #
-  # Validates Non-ASCII attribute names
+  # 値に改行コードが含まれているかチェック
   #
   # ==== Args
-  # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
+  # biosample_data : 1件分のbiosample_data
   # ==== Return
   # true/false
   #
-  def non_ascii_header_line (rule_code, attribute_names, line_num)
-    return if attribute_names.nil?
+  def failure_to_parse_batch_submission_file (rule_code, biosample_data, line_num)
+    return if biosample_data.nil?
     result = true
     invalid_headers = []
-    attribute_names.each do |attr_name|
-      if !attr_name.ascii_only?
-        invalid_headers.push(attr_name)
+    biosample_data["attributes"].each do |attr_name, attr_value|
+      replaced_return_char = attr_value.gsub(/(\r\n|\r|\n)/, "<<newline character>>")
+      if attr_value != replaced_return_char
+        annotation = [{key: attr_name, source: @data_file, location: line_num.to_s, value: [replaced_return_char]}]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # Validates Non-ASCII attribute names
+  #
+  # ==== Args
+  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # ==== Return
+  # true/false
+  #
+  def non_ascii_header_line (rule_code, attribute_list, line_num)
+    return if attribute_list.nil?
+    result = true
+    invalid_headers = []
+    attribute_list.each do |attr|
+      if !attr.keys.first.ascii_only?
+        invalid_headers.push(attr.keys.first)
         result = false
       end
     end
@@ -295,26 +268,62 @@ class MainValidator
   end
 
   #
-  # Validates empty attribute names
+  # Validates missing attribute names
   #
   # ==== Args
-  # attribute_names : An array of attribute names ex.["sample_name", "sample_tilte", ...]
+  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
   # ==== Return
   # true/false
   #
-  def empty_column_name (rule_code, attribute_names, line_num)
-    return if attribute_names.nil?
+  def missing_attribute_name (rule_code, attribute_list, line_num)
+    return if attribute_list.nil?
     result = true
-    attribute_names.each do |attr_name|
-      if attr_name.nil? || attr_name.strip == ""
+    attribute_list.each do |attr|
+      if attr.keys.first.nil? || attr.keys.first == ""
         result = false
       end
     end
     if result
       result
     else
+      #TODO output error message each attr
       annotation = [{key: "_header", source: @data_file, location: line_num.to_s, value: [""]}]
       message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result
+    end
+  end
+
+  #
+  # 複数出現する属性名があるか
+  #
+  # ==== Args
+  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # ==== Return
+  # true/false
+  #
+  def multiple_attribute_values (rule_code, attribute_list, line_num)
+    return if attribute_list.nil?
+    result = true
+    grouped = attribute_list.group_by do |attr|
+      attr.keys.first
+    end
+    multiple_attr_names = []
+    grouped.each do |k, v|
+      multiple_attr_names.push(k) if v.size >= 2
+    end
+    if multiple_attr_names.size > 0
+      result = false
+    end
+
+    if result == true
+      result
+    else
+      #TODO エラーメッセージの見直し
+      annotation = [{key: "_header", source: @data_file, location: line_num.to_s, value: [""]}]
+      param = {ATTRIBUTE_NAME: multiple_attr_names.join(", "), VALUE: ""} #VALUEを埋める
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result
@@ -376,6 +385,54 @@ class MainValidator
   end
 
   #
+  # sample_nameの値があるかどうかを検査する。"missing"などのNull相当の値は許容しない。
+  #
+  # ==== Args
+  # sample name ex."MTB313"
+  # ==== Return
+  # true/false
+  #
+  def missing_sample_name (rule_code, biosample_data, line_num)
+    result = true
+    if CommonUtils.null_value?(biosample_data["attributes"]["sample_name"])
+      result = false
+    end
+    if result == false
+      #TODO error message with sample_title?
+      annotation = [{key: "sample_name", source: @data_file, location: line_num.to_s, value: [""]}]
+      param = {COUNT: "1"}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # organismの値があるかどうかを検査する。"missing"などのNull相当の値は許容しない。
+  #
+  # ==== Args
+  # sample name ex."Streptococcus pyogenes"
+  # ==== Return
+  # true/false
+  #
+  def missing_organism (rule_code, biosample_data, line_num)
+    result = true
+    if CommonUtils.null_value?(biosample_data["attributes"]["organism"])
+      result = false
+    end
+    if result == false
+      #TODO error message with sample_name?
+      annotation = [{key: "organism", source: @data_file, location: line_num.to_s, value: [""]}]
+      param = {COUNT: "1"}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
   # Validates biosample data has not predefined (user defined) attributes
   #
   # ==== Args
@@ -414,7 +471,27 @@ class MainValidator
   # true/false
   #
   def missing_mandatory_attribute (rule_code, sample_attr, package_attr_list , line_num)
-    #TODO
+    mandatory_attr_list = package_attr_list.map { |attr|
+      attr[:attribute_name] if attr[:require] == "mandatory"
+    }.compact
+    missing_attr_names = []
+    sample_attr.each do |attr_name, attr_value|
+      if mandatory_attr_list.include?(attr_name)
+        if attr_value.nil? || attr_value.empty?
+          missing_attr_names.push(attr_name)
+        end
+      end
+    end
+    if missing_attr_names.size <= 0
+      true
+    else
+      value = missing_attr_names.join(",")
+      annotation = [{key: "attributes", source: @data_file, location: line_num.to_s, value: [value]}]
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      false
+    end
   end
 
   #
@@ -445,14 +522,16 @@ class MainValidator
       false
     end
   end
- 
+
   #
-  # Validates the attributes values in controlled term
+  # CV(controlled vocabulary)を使用するべき属性の場合に属性値を検証する
   #
   # ==== Args
   # rule_code
-  # project_id ex."PDBJ123456"
-  # line_num 
+  # attr_name 属性名
+  # attr_val 属性値
+  # cv_attr CVを使用する属性名とCVのハッシュ {"biotic_relationship"=>[cv_list], "cur_land_use"=>[cv_list], ...}
+  # line_num
   # ==== Return
   # true/false
   # 
@@ -475,6 +554,57 @@ class MainValidator
   end
 
   #
+  # リファレンス型(PMID|DOI|URL)であるべき属性の場合に属性値を検証する
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # ref_attr リファレンスフォーマットであるべき属性名のリスト ["taxonomy_id", "num_replicons", ...]
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_publication_identifier(rule_code, attr_name, attr_val, ref_attr, line_num)
+    return nil if attr_name.nil? || attr_val.nil?
+    common = CommonUtils.new
+    result =  true
+    if ref_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# リファレンス型の属性であり有効な入力値がある
+      ref = attr_val.sub(/[ :]*P?M?ID[ :]*|[ :]*DOI[ :]*/i, "")
+      if attr_val != ref #auto-annotation
+        result = false
+      end
+
+      # check exist ref
+      if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
+        result = common.exist_pubmed_id?(ref) && result
+      elsif ref =~ /\./ && ref !~ /http/ #DOI
+        result = common.exist_doi?(ref) && result
+      else #ref !~ /^https?/ #URL
+        begin
+          url = URI.parse(ref)
+        rescue URI::InvalidURIError
+          result = false
+        end
+      end
+
+      if result == false
+        annotation = []
+        value = [attr_val]
+        if attr_val != ref
+          value.push(ref)
+        end
+        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: value})
+        rule = @validation_config["rule" + rule_code]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
+
+  #
   # Validates the bioproject_id format
   #
   # ==== Args
@@ -486,10 +616,25 @@ class MainValidator
   #
   def invalid_bioproject_accession (rule_code, project_id, line_num)
     return nil if project_id.nil?
-    if /^PRJD/ =~ project_id || /^PSUB/ =~  project_id
+    if /^PRJD/ =~ project_id
       true
+    elsif /^PSUB/ =~ project_id
+      get_prjdb_id = GetPRJDBId.new
+      project_id_info = get_prjdb_id.get_id(project_id)
+      prjd_id = project_id_info[0]["prjd"]
+      if prjd_id
+        annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id, prjd_id]}]
+        rule = @validation_config["rule" + rule_code]
+        param = {VALUE: project_id}
+        message = CommonUtils::error_msg(@validation_config, rule_code, param)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        false
+      else
+        true
+      end
     else
-      annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id]}]
+      annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id, @prjd_id]}]
       rule = @validation_config["rule" + rule_code]
       param = {VALUE: project_id}
       message = CommonUtils::error_msg(@validation_config, rule_code, param)
@@ -1013,28 +1158,43 @@ class MainValidator
   #
   # ==== Args
   # rule_code
+  # attr_name
+  # attr_val
+  # special_chars 特殊文字の置換設定のハッシュ { "℃" => "degree Celsius", "μ" => "micrometer", ...}
   # line_num
   # ==== Return
   # true/false
   #
-  def special_character_included(rule_code, attr_name, attr_val, line_num)
+  def special_character_included(rule_code, attr_name, attr_val, special_chars, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result  = true
-    sp_character = ["℃", "μ"]
-    rep_table_sp_character = {
-        "℃" => "degree Celsius", "μ" => "micro"
-    }
-    sp_character.each do |char|
-      if attr_val.include?(char)
-        attr_val_rep = attr_val.sub(/℃|μ/, rep_table_sp_character)
-        annotation = []
-        attr_vals = [attr_val, attr_val_rep]
-        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
-        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-        error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
-        @error_list.push(error_hash)
-        result = false
+    replaced_attr_val = attr_val.clone #文字列コピー
+    special_chars.each do |target_val, replace_val|
+      pos = 0
+      while pos < replaced_attr_val.length
+        #再起的に置換してしまうためgsubは使用できない。
+        #"microm" => "micrometer"と置換する場合、ユーザ入力値が"micrometer"だった場合には"microm"にマッチするため"micrometereter"になってしまう
+        hit_pos = replaced_attr_val.index(target_val, pos)
+        break if hit_pos.nil?
+        target_str = replaced_attr_val.slice(hit_pos, replace_val.length)
+        if target_str == replace_val # "microm"はその後に"micrometer"と続くか。続くなら置換不要(再起置換の防止)
+          pos = hit_pos + target_val.length
+        else
+          #置換(delete & insert)
+          replaced_attr_val.slice!(hit_pos, target_val.length)
+          replaced_attr_val.insert(hit_pos, replace_val)
+          pos = hit_pos + replace_val.length
+        end
       end
+    end
+    if replaced_attr_val != attr_val
+      annotation = []
+      attr_vals = [attr_val, replaced_attr_val]
+      annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end
@@ -1087,7 +1247,7 @@ class MainValidator
       attr_vals = [attr_val, attr_val_annotaed]
       annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
       message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result = false
     end
@@ -1097,11 +1257,7 @@ class MainValidator
   def non_ascii_attribute_value(rule_code, attr_name, attr_val, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
-    ords = []
-    attr_val.chars{|s|
-      ords.push(s.ord)
-    }
-    unless ords.max{|a, b| a.to_i <=> b.to_i} < 128
+    unless attr_val.ascii_only?
       annotation = []
       attr_vals = [attr_val]
       annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: attr_vals})
@@ -1109,6 +1265,235 @@ class MainValidator
       error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
       @error_list.push(error_hash)
       result =  false
+    end
+    result
+  end
+
+  def duplicate_sample_title_in_account(rule_code, biosample_title, sample_title_list, submitter_id, line_num)
+    @duplicated = []
+    @duplicated = sample_title_list.select do |title|
+      sample_title_list.index(title) != sample_title_list.rindex(title)
+    end
+
+    @duplicated.length > 0 ? result= false : result = true
+
+    if !submitter_id.empty?
+      get_submitter_item = GetSubmitterItem.new
+      items = get_submitter_item.getitems(submitter_id)
+
+      if @duplicated.length == 0 && !items
+        return nil
+      elsif items.length > 0
+        if items.include?(biosample_title)
+          result = false
+        end
+      elsif @duplicated.length == 0
+          result = true
+      end
+    elsif @duplicated.length == 0
+      return nil
+    end
+
+    unless result
+      annotation = []
+      annotation.push({key: "Title", source: @data_file, location: line_num.to_s, value: biosample_title})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  def bioproject_not_found(rule_code,  bioproject_id, submitter_id, line_num)
+    return nil if bioproject_id.nil? || bioproject_id.empty? || submitter_id.nil? || submitter_id.empty?
+    result = true
+
+    get_bioproject_item = GetBioProjectItem.new
+    @bp_info = get_bioproject_item.get_submitter(bioproject_id)
+    if @bp_info.length > 0
+      unless submitter_id == @bp_info[0]["submitter_id"]
+        annotation = []
+        annotation.push({key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
+        param = {VALUE: bioproject_id}
+        message = CommonUtils::error_msg(@validation_config, rule_code, param)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    else
+      return nil
+    end
+    result
+
+  end
+
+  def identical_attributes(rule_code, biosample_datas)
+    return nil if biosample_datas.nil? || biosample_datas.empty?
+    biosample_datas.length == 1 ? result = true : result = false
+
+    if biosample_datas.length > 1
+      @keys_excluding = ["sample_title", "organism", "taxonomy_id", "sample_name"]
+      @items = []
+      # uniqueで有るべきhash(item)生成
+      biosample_datas.each do |item|
+        @keys_excluding.each do |k|
+          item["attributes"].delete(k)
+        end
+        item.delete("attribute_names_list")
+        @items.push(item)
+      end
+
+      unless @items.length == @items.uniq.length
+        annotation = []
+        annotation.push({key: "excluding sample name, title, bioproject accession, description", source: @data_file, location: "", value: []})
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+        @error_list.push(error_hash)
+        result = false
+      else
+        result = true
+      end
+
+    end
+    result
+  end
+
+  def Invalid_bioproject_type(rule_code, bioproject_id, line_num)
+    return nil if bioproject_id.nil? || bioproject_id.empty?
+    result  = true
+    is_umbrella_id = IsUmbrellaId.new
+    @is_umbrella = is_umbrella_id.is_umbrella(bioproject_id)
+
+    if @is_umbrella == 0
+      result = true
+    elsif @is_umbrella
+      annotation = []
+      annotation.push({key: "Invalid BioProject type", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
+      param = {VALUE: bioproject_id}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result = false
+    else
+      return nil
+    end
+    result
+  end
+
+
+  #
+  # 整数であるべき属性の場合に属性値を検証する
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # int_attr 整数であるべき属性名のリスト ["taxonomy_id", "num_replicons", ...]
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def attribute_value_is_not_integer(rule_code, attr_name, attr_val, int_attr, line_num)
+    return nil if attr_name.nil? || attr_val.nil?
+    result =  true
+    if int_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# 整数型の属性であり有効な入力値がある
+      begin
+        Integer(attr_val)
+      rescue ArgumentError
+        result = false
+      end
+      if result == false
+        annotation = []
+        annotation.push({key: attr_name, source: @data_file, location: line_num.to_s, value: [attr_val]})
+        rule = @validation_config["rule" + rule_code]
+        message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+        error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+        @error_list.push(error_hash)
+        result
+      end
+    end
+    result
+
+  end
+
+  def duplicate_sample_names(rule_code, sample_name, sample_name_list, submission_id, line_num)
+    return nil if sample_name.nil? || sample_name.empty?
+    result = true
+    @duplicated_sample_name = []
+    @duplicated_sample_name = sample_name_list.select do |name|
+      sample_name_list.index(name) != sample_name_list.rindex(name)
+    end
+
+    @duplicated_sample_name.length > 0 ? result = false : result = true
+
+    if submission_id
+      get_submission_name = GetSampleNames.new
+      res = get_submission_name.getnames(submission_id)
+      if res
+        names = []
+        res.each do |item|
+          names.push(item["sample_name"])
+        end
+      else
+        return nil
+      end
+
+      @duplicated_name = names.select do |name|
+        names.index(name) != names.rindex(name)
+      end
+      @duplicated_name.length > 0 ? result = false : result = true
+      annotation = []
+      annotation.push({key: "sample name", source: @data_file, location: line_num.to_s, value: [sample_name]})
+      param = {NAMES: sample_name}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
+      result
+    end
+
+  end
+
+  def warning_about_bioproject_increment(rule_code, bioproject_id_list)
+    return nil if bioproject_id_list.length == 0 || bioproject_id_list.nil? || bioproject_id_list.empty?
+    result = true
+    if bioproject_id_list.length > 1
+      @sub = []
+      i = 0
+      until i >= bioproject_id_list.length - 1 do
+        if bioproject_id_list[i] =~ /^PRJDB\d+/
+          @sub.push( bioproject_id_list[i + 1].gsub("PRJDB", "").to_i - bioproject_id_list[i].gsub("PRJDB", "").to_i)
+        elsif bioproject_id_list[i] =~ /^PSUB\d{6}/
+          @sub.push( bioproject_id_list[i + 1].gsub("PSUB", "").to_i - bioproject_id_list[i].gsub("PSUB", "").to_i)
+        end
+        i += 1
+      end
+      @sub.uniq == [1] ? result = false : result = true
+      annotation = []
+      annotation.push({key: "BioProject ID", source: @data_file, location: "All Data", value: bioproject_id_list})
+      message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "warning", annotation)
+      @error_list.push(error_hash)
+      result
+    else
+      result = true
+    end
+  end
+
+  def duplicated_locus_tag_prefix(rule_code, locus_tag, submission_id, line_num)
+    return nil if locus_tag.nil? || locus_tag.empty?
+    result = true
+    get_locus_tag_prefix = GetLocusTagPrefix.new
+    result = get_locus_tag_prefix.unique_prefix?(locus_tag, submission_id)
+    if result == nil
+      return nil
+    elsif !result
+      annotation = []
+      annotation.push({key: "locus_tag_prefix", source: @data_file, location: line_num.to_s, value: [locus_tag]})
+      rule = @validation_config["rule" + rule_code]
+      param = {VALUE: locus_tag}
+      message = CommonUtils::error_msg(@validation_config, rule_code, param)
+      error_hash = CommonUtils::error_obj(rule_code, message, "", "error", annotation)
+      @error_list.push(error_hash)
     end
     result
   end
