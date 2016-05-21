@@ -41,24 +41,28 @@ class CommonUtils
   end
 
   #
-  # Returns an error object
-  #
+  # エラーオブジェクトを組み立てて返す
+  # フォーマット(JSON)は以下を参照
+  # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
   # ==== Args
-  # id: rule_no ex."48"
-  # message: error message for displaying
-  # reference: 
+  # config: ルール記載オブジェクト
+  # id: ルールID ex."48"
+  # message: 表示用メッセージ
+  # reference: 参照
   # level: error/warning 
   # annotation: annotation list for correcting the value 
   # ==== Return
+  # エラーのHashオブジェクト
   #
-  def self.error_obj (id, message, reference, level, annotation)
+  def self.error_obj (config, id, message, file_path, annotation)
+    rule = config["rule" + id]
     hash = {
              id: id,
              message: message,
-             message_ja: "",
-             reference: "",
-             level: level,
+             #reference: rule["reference"],
+             level: rule["level"],
              method: "biosample validator",
+             source: file_path,
              annotation: annotation
            }
     hash

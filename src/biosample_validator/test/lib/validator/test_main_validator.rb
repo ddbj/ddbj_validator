@@ -5,7 +5,7 @@ require '../../../lib/validator/biosample_xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup
-    @validator = MainValidator.new
+    @validator = MainValidator.new("public")
     @xml_convertor = BioSampleXmlConvertor.new
   end
 
