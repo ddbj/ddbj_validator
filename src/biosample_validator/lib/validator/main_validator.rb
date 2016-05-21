@@ -48,7 +48,7 @@ class MainValidator
 
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      send("failure_to_parse_batch_submission_file", "29", biosample_data, line_num)
+      ##TODO move to 13 send("failure_to_parse_batch_submission_file", "29", biosample_data, line_num)
       send("non_ascii_header_line", "30", biosample_data["attribute_list"], line_num)
       send("missing_attribute_name", "34", biosample_data["attribute_list"], line_num)
       send("multiple_attribute_values", "61", biosample_data["attribute_list"], line_num)
@@ -87,7 +87,7 @@ class MainValidator
       line_num = idx + 1
       @submitter_id = "" ### this attribute fill with null temporary
       @submission_id = "" ### this attribute fill with null temporary
-      send("duplicate_sample_title_in_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
+      send("duplicated_sample_title_in_this_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
       send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
       send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
     end
@@ -132,8 +132,11 @@ class MainValidator
         send("attribute_value_is_not_integer", "93", attribute_name.to_s, value, int_attr, line_num)
       end
 
-      send("Invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
+      send("invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
+
+      send("bioproject_submission_id_replacement", "95", biosample_data["attributes"]["bioproject_id"], line_num) #TODO move from rule5
       send("invalid_bioproject_accession", "5", biosample_data["attributes"]["bioproject_id"], line_num)
+
       send("duplicated_locus_tag_prefix", "91", biosample_data["attributes"]["locus_tag_prefix"], @submission_id, line_num)
 
       ret = send("format_of_geo_loc_name_is_invalid", "94", biosample_data["attributes"]["geo_loc_name"], line_num)
@@ -213,6 +216,7 @@ class MainValidator
 
 ### validate method ###
 
+  ##TODO move to rule 13
   #
   # 値に改行コードが含まれているかチェック
   #
@@ -535,7 +539,7 @@ class MainValidator
   # ==== Return
   # true/false
   # 
-  def invalid_attribute_value_for_controlled_terms(rule_code, attr_name, attr_val, cv_attr, line_num)
+  def invalid_attribute_value_for_controlled_terms (rule_code, attr_name, attr_val, cv_attr, line_num)
     return nil  if attr_name.nil? || attr_val.nil?
     result =  true
     if !cv_attr[attr_name].nil? # is contralled term attribute 
@@ -565,7 +569,7 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def invalid_publication_identifier(rule_code, attr_name, attr_val, ref_attr, line_num)
+  def invalid_publication_identifier (rule_code, attr_name, attr_val, ref_attr, line_num)
     return nil if attr_name.nil? || attr_val.nil?
     common = CommonUtils.new
     result =  true
@@ -1026,7 +1030,7 @@ class MainValidator
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null(rule_code, attr_name, attr_val, null_accepted_a, line_num)
+  def invalid_attribute_value_for_null (rule_code, attr_name, attr_val, null_accepted_a, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
     if null_accepted_a.include?attr_val.downcase
@@ -1065,7 +1069,7 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def invalid_date_format(rule_code, attr_name, attr_val, ts_attr, line_num )
+  def invalid_date_format (rule_code, attr_name, attr_val, ts_attr, line_num )
     return nil if attr_val.nil? || attr_val.empty?
     ori_attr_val = attr_val
     result = true
@@ -1165,7 +1169,7 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def special_character_included(rule_code, attr_name, attr_val, special_chars, line_num)
+  def special_character_included (rule_code, attr_name, attr_val, special_chars, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result  = true
     replaced_attr_val = attr_val.clone #文字列コピー
@@ -1235,7 +1239,7 @@ class MainValidator
   # true/false
   #
 
-  def invalid_data_format(rule_code, attr_name, attr_val, line_num)
+  def invalid_data_format (rule_code, attr_name, attr_val, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
     rep_table_ws = {
@@ -1254,7 +1258,7 @@ class MainValidator
     result
   end
 
-  def non_ascii_attribute_value(rule_code, attr_name, attr_val, line_num)
+  def non_ascii_attribute_value (rule_code, attr_name, attr_val, line_num)
     return nil if attr_val.nil? || attr_val.empty?
     result = true
     unless attr_val.ascii_only?
@@ -1269,7 +1273,7 @@ class MainValidator
     result
   end
 
-  def duplicate_sample_title_in_account(rule_code, biosample_title, sample_title_list, submitter_id, line_num)
+  def duplicated_sample_title_in_this_account (rule_code, biosample_title, sample_title_list, submitter_id, line_num)
     @duplicated = []
     @duplicated = sample_title_list.select do |title|
       sample_title_list.index(title) != sample_title_list.rindex(title)
@@ -1304,7 +1308,7 @@ class MainValidator
     result
   end
 
-  def bioproject_not_found(rule_code,  bioproject_id, submitter_id, line_num)
+  def bioproject_not_found (rule_code,  bioproject_id, submitter_id, line_num)
     return nil if bioproject_id.nil? || bioproject_id.empty? || submitter_id.nil? || submitter_id.empty?
     result = true
 
@@ -1327,7 +1331,7 @@ class MainValidator
 
   end
 
-  def identical_attributes(rule_code, biosample_datas)
+  def identical_attributes (rule_code, biosample_datas)
     return nil if biosample_datas.nil? || biosample_datas.empty?
     biosample_datas.length == 1 ? result = true : result = false
 
@@ -1358,7 +1362,7 @@ class MainValidator
     result
   end
 
-  def Invalid_bioproject_type(rule_code, bioproject_id, line_num)
+  def invalid_bioproject_type (rule_code, bioproject_id, line_num)
     return nil if bioproject_id.nil? || bioproject_id.empty?
     result  = true
     is_umbrella_id = IsUmbrellaId.new
@@ -1393,7 +1397,7 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def attribute_value_is_not_integer(rule_code, attr_name, attr_val, int_attr, line_num)
+  def attribute_value_is_not_integer (rule_code, attr_name, attr_val, int_attr, line_num)
     return nil if attr_name.nil? || attr_val.nil?
     result =  true
     if int_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# 整数型の属性であり有効な入力値がある
@@ -1416,7 +1420,7 @@ class MainValidator
 
   end
 
-  def duplicate_sample_names(rule_code, sample_name, sample_name_list, submission_id, line_num)
+  def duplicate_sample_names (rule_code, sample_name, sample_name_list, submission_id, line_num)
     return nil if sample_name.nil? || sample_name.empty?
     result = true
     @duplicated_sample_name = []
@@ -1453,7 +1457,7 @@ class MainValidator
 
   end
 
-  def warning_about_bioproject_increment(rule_code, bioproject_id_list)
+  def warning_about_bioproject_increment (rule_code, bioproject_id_list)
     return nil if bioproject_id_list.length == 0 || bioproject_id_list.nil? || bioproject_id_list.empty?
     result = true
     if bioproject_id_list.length > 1
@@ -1479,7 +1483,7 @@ class MainValidator
     end
   end
 
-  def duplicated_locus_tag_prefix(rule_code, locus_tag, submission_id, line_num)
+  def duplicated_locus_tag_prefix (rule_code, locus_tag, submission_id, line_num)
     return nil if locus_tag.nil? || locus_tag.empty?
     result = true
     get_locus_tag_prefix = GetLocusTagPrefix.new
