@@ -44,4 +44,26 @@ class TestBioSampleXmlConvertor < Minitest::Test
     # not biosample xml
     # TODO
   end
+
+  def test_xpath_from_attrname
+    xpath_sample_name = @convertor.xpath_from_attrname("sample_name" , 2)
+    assert_equal 2, xpath_sample_name.size
+    assert_equal "//BioSample[2]/Description/SampleName", xpath_sample_name[0]
+    assert_equal "//BioSample[2]/Attributes/Attribute[@attribute_name=\"sample_name\"]", xpath_sample_name[1]
+
+    xpath_sample_title = @convertor.xpath_from_attrname("sample_title" , 2)
+    assert_equal ["//BioSample[2]/Description/Title"], xpath_sample_title
+
+    xpath_description = @convertor.xpath_from_attrname("description" , 2)
+    assert_equal ["//BioSample[2]/Description/Comment/Paragraph"], xpath_description
+
+    xpath_organism = @convertor.xpath_from_attrname("organism" , 2)
+    assert_equal ["//BioSample[2]/Description/Organism/OrganismName"], xpath_organism
+
+    xpath_taxonomy_id = @convertor.xpath_from_attrname("taxonomy_id" , 2)
+    assert_equal ["//BioSample[2]/Description/Organism/@taxonomy_id"], xpath_taxonomy_id
+
+    xpath_bioproject_id = @convertor.xpath_from_attrname("bioproject_id" , 2)
+    assert_equal ["//BioSample[2]/Attributes/Attribute[@attribute_name=\"bioproject_id\"]"], xpath_bioproject_id
+  end
 end
