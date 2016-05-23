@@ -80,14 +80,14 @@ class MainValidator
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
     @sample_title_list = []
     @sample_name_list = []
+    @submitter_id = @biosample_list[0]["submitter_id"]
+    @submission_id = @biosample_list[0]["submission_id"]
     @biosample_list.each do |biosample_data|
       @sample_title_list.push(biosample_data["attributes"]["sample_title"])
       @sample_name_list.push(biosample_data["attributes"]["sample_name"])
     end
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      @submitter_id = "" ### this attribute fill with null temporary
-      @submission_id = "" ### this attribute fill with null temporary
 #      send("duplicated_sample_title_in_this_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
 #      send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
 #      send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
@@ -1313,17 +1313,18 @@ class MainValidator
     rep_table_ws = {
         /\s{2,}/ => " ", /^\s+/ => "", /\s$/ => "", /^\sor/ => "", /\sor$/ => ""
     }
+    attr_val_annotated = attr_val
     attr_val.match(/\s{2,}|^\s+|\s$|^\sor|\sor$/) do
-      attr_val_annotaed = attr_val.sub(/\s{2,}|^\s+|\s$|^\sor|\sor$/,rep_table_ws)
+      attr_val_annotated = attr_val.sub(/\s{2,}|^\s+|\s$|^\sor|\sor$/,rep_table_ws)
     end
-    if attr_val_annotaed != attr_val
+    if attr_val_annotated != attr_val
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([attr_val_annotaed], "Attribute value", location, true))
+      annotation.push(CommonUtils::create_suggested_annotation([attr_val_annotated], "Attribute value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false

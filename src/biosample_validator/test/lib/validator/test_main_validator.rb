@@ -93,6 +93,7 @@ class TestMainValidator < Minitest::Test
     end
   end
 =begin
+  # auto_annotationの補正が効いているかの検証。全てのvalidatorを実行するためコメントアウト
   def test_save_auto_annotation_value
     # is not method test
     # test data: "geo_loc_name" => "  Jaaaapan"
@@ -105,7 +106,8 @@ class TestMainValidator < Minitest::Test
     annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
     assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
   end
-
+=end
+=begin #TODO delete
   def test_failure_to_parse_batch_submission_file
     #ok case
     xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_ok.xml")
@@ -689,29 +691,28 @@ class TestMainValidator < Minitest::Test
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
   end
-=begin
+
   def test_invalid_data_format
     # ok case
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.invalid_data_format("13", "sample_name", "MTB313", 1)
+    ret = @validator.invalid_data_format("13", "SampleA", "sample_name", "MTB313", 1)
     assert_equal true, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
     # ng case
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.invalid_data_format("13", "sample_name", " MTB313 ", 1)
+    ret = @validator.invalid_data_format("13", "SampleA", "sample_name", " MTB313 ", 1)
     assert_equal false, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 1, error_list.size
     # params are nil pattern
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.invalid_data_format("13", "sample_name", "", 1)
+    ret = @validator.invalid_data_format("13", "SampleA", "sample_name", "", 1)
     assert_equal nil, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
-
   end
-=end
+
   def test_non_ascii_attribute_value
     # ok case
     @validator.instance_variable_set :@error_list, [] #clear

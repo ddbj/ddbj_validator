@@ -76,12 +76,13 @@
                         });
 
                         var error_view = new ErrorView({el: $("#result")});
-
+                    // biosample case
                     }else if(list_option == "option-grouped") {
                         // create nested data
                         // if option Group Error Message selected
                         var grouped_message = d3.nest().key(function(d){return d.id})
                             .entries(error_message.errors);
+                        console.dir(grouped_message);
 
                         //add message and attributions each grouped messages
                         $.each(grouped_message,function(i, v){
@@ -94,6 +95,7 @@
                             v["correction"] = rules[rule_num]["correction"];
                         });
 
+                        //add grouped messages to original error response
                         error_message["errors"] = grouped_message;
 
                         // initialize fixed data object
