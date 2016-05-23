@@ -4,20 +4,20 @@
     "level": "warning",
     "name": "Invalid Attribute value for null",
     "method": "invalid_attribute_value_for_null",
-    "message": "Invalid 'null' value for attribute <%=ATTRIBUTE_NAME%>, please provide value as either 'not collected', 'not applicable' or 'missing'."
+    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing'. An automatically-generated correction will be applied."
   },
   "rule2": {
     "code": "2",
     "level": "warning",
     "name": "Invalid Attribute value for controlled terms",
     "method": "invalid_attribute_value_for_controlled_terms",
-    "message": "Attribute value is not in controlled terms for attribute '<%=ATTRIBUTE_NAME%>'."
+    "message": "Attribute value is not in controlled terms."
   },
   "rule3": {
     "code": "3",
     "level": "error",
     "name": "Duplicated sample title in this account",
-    "method": "duplicate_sample_title_in_account",
+    "method": "duplicated_sample_title_in_this_account",
     "message": "Sample title is duplicated in the submission account."
   },
   "rule4": {
@@ -32,63 +32,63 @@
     "level": "error",
     "name": "Invalid BioProject accession",
     "method": "invalid_bioproject_accession",
-    "message": "Invalid BioProject accession: <%=VALUE%>. Please provide a valid BioProject accession with format PRJDxxxxxx or PSUBxxxxxx"
+    "message": "Invalid BioProject accession. Please provide a valid BioProject accession with format PRJ[D|E|N]xxxxxx or PSUBxxxxxx"
   },
   "rule6": {
     "code": "6",
-    "level": "error",
+    "level": "warning",
     "name": "BioProject not found",
     "method": "bioproject_not_found",
-    "message": "BioProject accession <%=VALUE%> does not exist. Please provide a valid BioProject accession."
+    "message": "BioProject accession is not registered in your account. Please provide a valid BioProject accession."
   },
   "rule7": {
     "code": "7",
     "level": "warning",
     "name": "Invalid date format",
     "method": "invalid_date_format",
-    "message": "Invalid date format."
+    "message": "Invalid date format. An automatically-generated correction will be applied."
   },
   "rule8": {
     "code": "8",
     "level": "warning",
     "name": "Invalid country",
     "method": "invalid_country",
-    "message": "Entered country is not in controlled terms for attribute '<%=ATTRIBUTE_NAME%>'."
+    "message": "Entered country is not in controlled terms."
   },
   "rule9": {
     "code": "9",
     "level": "warning",
     "name": "Invalid lat_lon format",
     "method": "invalid_lat_lon_format",
-    "message": "Invalid lat_lon format"
+    "message": "Invalid lat_lon format. An automatically-generated correction will be applied."
   },
   "rule11": {
     "code": "11",
     "level": "warning",
     "name": "Invalid publication identifier",
     "method": "invalid_publication_identifier",
-    "message": "Invalid publication identifier, enter pubmed id, DOI or URL."
+    "message": "Invalid publication identifier, enter pubmed id, DOI or URL. An automatically-generated correction will be applied."
   },
   "rule12": {
     "code": "12",
     "level": "warning",
     "name": "Special character included",
     "method": "special_character_included",
-    "message": "Special character is included"
+    "message": "Special character is included. An automatically-generated correction will be applied."
   },
   "rule13": {
     "code": "13",
     "level": "warning",
     "name": "Invalid data format",
     "method": "invalid_data_format",
-    "message": "Invalid data format"
+    "message": "Invalid data format. An automatically-generated correction will be applied."
   },
   "rule14": {
     "code": "14",
     "level": "warning",
     "name": "Not predefined Attribute name",
     "method": "not_predefined_attribute_name",
-    "message": "Not predefined attribute name: attribute '<%=ATTRIBUTE_NAME%>'."
+    "message": "Not predefined attribute name."
   },
   "rule15": {
     "code": "15",
@@ -101,15 +101,15 @@
     "code": "18",
     "level": "error",
     "name": "Missing sample name",
-    "method": "",
-    "message": "Sample name is missing for <%=COUNT%> sample(s)."
+    "method": "missing_sample_name",
+    "message": "Sample name is missing."
   },
   "rule20": {
     "code": "20",
     "level": "error",
     "name": "Missing organism",
-    "method": "",
-    "message": "Organism is missing for <%=COUNT%> sample(s)."
+    "method": "missing_organism",
+    "message": "Organism is missing."
   },
   "rule24": {
     "code": "24",
@@ -122,7 +122,7 @@
     "code": "25",
     "level": "error",
     "name": "Missing Package information",
-    "method": "",
+    "method": "missing_package_information",
     "message": "Package information is missing."
   },
   "rule26": {
@@ -130,7 +130,7 @@
     "level": "error",
     "name": "Unknown Package",
     "method": "unknown_package",
-    "message": "Sample refers to unknown Package '<%=PACKAGE%>'."
+    "message": "Sample refers to unknown Package."
   },
   "rule27": {
     "code": "27",
@@ -144,27 +144,20 @@
     "level": "error",
     "name": "Duplicate Sample Names",
     "method": "duplicate_sample_names",
-    "message": "The following Sample Names were used in submission more than one time: <%=NAMES%>. Please provide unique Sample Names."
-  },
-  "rule29": {
-    "code": "29",
-    "level": "warning",
-    "name": "Failure to parse batch submission file",
-    "method": "",
-    "message": "New line included: value possibly contains new line(s)."
+    "message": "The following Sample Names were used in submission more than one time. Please provide unique Sample Names."
   },
   "rule30": {
     "code": "30",
     "level": "error",
     "name": "Non-ASCII header line",
-    "method": "",
-    "message": "Unable to parse batch file: the header line contains non-ASCII characters. Please check that uploaded file is in text tab-delimited format, not Excel."
+    "method": "non_ascii_header_line",
+    "message": "Unable to parse file: the header line contains non-ASCII characters. Please check that uploaded file is in text format, not Excel."
   },
   "rule34": {
     "code": "34",
     "level": "error",
     "name": "Missing Attribute name",
-    "method": "",
+    "method": "missing_attribute_name",
     "message": "Attribute name is missing."
   },
   "rule36": {
@@ -172,28 +165,7 @@
     "level": "error",
     "name": "Missing group of at least one required Attributes",
     "method": "missing_group_of_at_least_one_required_attributes",
-    "message": "Sample has missing attribute(s), at least one of the following <%=GROUP_NAME%> attributes is required. If you do not have information for the required field(s), please provide value as either 'not collected', 'not applicable' or 'missing'."
-  },
-  "rule37": {
-    "code": "37",
-    "level": "error",
-    "name": "Empty column name",
-    "method": "",
-    "message": "Unable to parse batch file: the header line has empty column name."
-  },
-  "rule38": {
-    "code": "38",
-    "level": "error",
-    "name": "Non-UTF8 input",
-    "method": "",
-    "message": "Unable to parse batch file: some values cannot be converted to UTF8 encoding."
-  },
-  "rule39": {
-    "code": "39",
-    "level": "warning",
-    "name": "Invalid Attribute value with autofix",
-    "method": "",
-    "message": "These attribute values are not valid. An automatically-generated correction will be applied."
+    "message": "Sample has missing attribute(s), at least one of the following attributes is required. If you do not have information for the required field(s), please provide value as either 'not collected', 'not applicable' or 'missing'."
   },
   "rule40": {
     "code": "40",
@@ -207,14 +179,14 @@
     "level": "warning",
     "name": "Latlon versus country",
     "method": "latlon_versus_country",
-    "message": "Values provided for 'latitude and longitude' and 'geographic location' contradict each other: <%=MESSAGE%>."
+    "message": "Values provided for 'latitude and longitude' and 'geographic location' contradict each other."
   },
   "rule45": {
     "code": "45",
     "level": "warning",
     "name": "Taxonomy error warning",
     "method": "taxonomy_error_warning",
-    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult: <%=MESSAGE%>."
+    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult."
   },
   "rule48": {
     "code": "48",
@@ -235,21 +207,21 @@
     "level": "warning",
     "name": "Sex for bacteria",
     "method": "sex_for_bacteria",
-    "message": "Attribute 'sex' is not appropriate <%=MESSAGE%>"
+    "message": "Attribute 'sex' is not appropriate."
   },
   "rule61": {
     "code": "61",
     "level": "error",
     "name": "Multiple Attribute values",
-    "method": "",
-    "message": "Multiple values detected for '<%=ATTRIBUTE_NAME%>'. Only one <%=VALUE%> is allowed."
+    "method": "multiple_attribute_values",
+    "message": "Multiple values detected. Only one value is allowed. First value was used for subsequent validation."
   },
   "rule62": {
     "code": "62",
     "level": "warning",
     "name": "Multiple vouchers",
     "method": "multiple_vouchers",
-    "message": "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same <%=INSTITUTION_CODE%>. Only one value is allowed."
+    "message": "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same institution code. Only one value is allowed."
   },
   "rule69": {
     "code": "69",
@@ -262,8 +234,8 @@
     "code": "70",
     "level": "error",
     "name": "Invalid BioProject type",
-    "method": "Invalid_bioproject_type",
-    "message": "BioProject <%=VALUE%> is an Umbrella project, not a primary data type of BioProject. Please provide the accession of the correct primary data BioProject or create a new BioProject, if necessary."
+    "method": "invalid_bioproject_type",
+    "message": "BioProject is an Umbrella project, not a primary data type of BioProject. Please provide the accession of the correct primary data BioProject or create a new BioProject, if necessary."
   },
   "rule73": {
     "code": "73",
@@ -374,7 +346,7 @@
     "code": "90",
     "level": "warning",
     "name": "Invalid Attribute value format",
-    "method": "",
+    "method": "invalid_attribute_value_format",
     "message": "Attribute value format is invalid"
   },
   "rule91": {
@@ -382,14 +354,14 @@
     "level": "error",
     "name": "Duplicated locus tag prefix",
     "method": "duplicated_locus_tag_prefix",
-    "message": "Locus tag prefix <%=VALUE%> is duplicated."
+    "message": "Locus tag prefix is duplicated."
   },
   "rule92": {
     "code": "92",
     "level": "error",
     "name": "Missing required attribute name",
     "method": "missing_required_attribute_name",
-    "message": "Required field '<%=ATTRIBUTE_NAME%>' is missing from the header line of the file."
+    "message": "Required field is missing from the header line of the file."
   },
   "rule93": {
     "code": "93",
@@ -403,6 +375,13 @@
     "level": "warning",
     "name": "Format of geo_loc_name is invalid",
     "method": "format_of_geo_loc_name_is_invalid",
-    "message": "Format of geo_loc_name is invalid."
+    "message": "Format of geo_loc_name is invalid. An automatically-generated correction will be applied."
+  },
+  "rule95": {
+    "code": "95",
+    "level": "warning",
+    "name": "BioProject submission id replacement",
+    "method": "bioproject_submission_id_replacement",
+    "message": "BioProject submission id (PSUBxxxxxx) is replaced to PRJD accession number. An automatically-generated correction will be applied."
   }
 }
