@@ -1,4 +1,5 @@
 {
   "read_file_dir": "./tmp/",
-  "tmp_file_dir": "/Users/oec/Documents/ddbj/ddbj_validator/webapp/ddbj_validator_webapp/tmp/"
+  "tmp_file_dir": "/Users/oec/Documents/ddbj/ddbj_validator/webapp/ddbj_validator_webapp/tmp/",
+  "validator_mode": "private"
 }

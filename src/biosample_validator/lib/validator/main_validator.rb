@@ -78,6 +78,8 @@ class MainValidator
     @sample_title_list = []
     @sample_name_list = []
     @bioproject_id_list = []
+    @submitter_id = @biosample_list[0]["submitter_id"]
+    @submission_id = @biosample_list[0]["submission_id"]
     @biosample_list.each do |biosample_data|
       @sample_title_list.push(biosample_data["attributes"]["sample_title"])
       @sample_name_list.push(biosample_data["attributes"]["sample_name"])
@@ -85,8 +87,6 @@ class MainValidator
     end
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      @submitter_id = "" ### this attribute fill with null temporary
-      @submission_id = "" ### this attribute fill with null temporary
       send("duplicate_sample_title_in_account", "3", biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
       send("bioproject_not_found", "6", biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
       send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)

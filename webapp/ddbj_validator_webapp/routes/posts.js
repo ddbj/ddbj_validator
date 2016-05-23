@@ -71,7 +71,7 @@ router.post('/upload', function(req, res, next){
             sample_file_path = conf.tmp_file_dir + file_name;
             output_path = conf.tmp_file_dir + original_name;
 
-            exec('ruby ./validator/biosample_validator.rb ' +  sample_file_path + " xml " + output_path, function(error, stdout, stderr){
+            exec('ruby ./validator/biosample_validator.rb ' +  sample_file_path + " xml " + output_path + " " + conf.validator_mode, function(error, stdout, stderr){
                 //if response is {"undefined: 1!
                 // xx.json is invalid json file} call invalid input process
                 if(stdout){
