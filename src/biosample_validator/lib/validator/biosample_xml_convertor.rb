@@ -126,4 +126,35 @@ class BioSampleXmlConvertor
     sample_obj["attribute_list"] = attribute_list
     return sample_obj
   end
+
+  #
+  # 属性名からファイル情報XPathを返す
+  # sample_nameのようにXMLの複数箇所に記述される属性があるため配列で返す
+  #
+  # ==== Args
+  # attr_name: 属性名 ex. organism
+  # item_no: BioSampleの出現順のNo
+  # ==== Return
+  # XPathの配列
+  # ex. ["//BioSample[2]/Description/Organism/OrganismName"]
+  #
+  def xpath_from_attrname (attr_name, item_no)
+    xpath = []
+    case attr_name
+    when "sample_name"
+      xpath.push("//BioSample[" + item_no.to_s + "]/Description/SampleName")
+      xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"sample_name\"]")
+    when "sample_title"
+      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Title")
+    when "description"
+      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Comment/Paragraph")
+    when "organism"
+      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Organism/OrganismName")
+    when "taxonomy_id"
+      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Organism/@taxonomy_id")
+    else
+      xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]")
+    end
+    xpath
+  end
 end
