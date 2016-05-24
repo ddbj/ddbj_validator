@@ -1,22 +1,31 @@
 require 'sinatra/base'
+require 'sinatra/reloder' if development?
 require 'erb'
 require 'pg'
 require 'rexml/document'
+require 'yaml'
+
+config = YAML.load_file("../db_conf/db_conf.yaml")
 
 # db_user 運用環境のDBのOwner
 PG_USER = 'oec'
+$pg_user = config["pg_user"]
+$pg_port = config["pg_port"]
+$pg_host = config["pg_host"]
+$pg_bs_name = config["pg_bs_name"]
+$pg_pass = config["pg_pass"]
 
 class PGConn
   def conn
     db_user = PG_USER
-    connection = PG::connect(:host => "localhost", :user => db_user,  :dbname => "bstest", :port => "5432")
+    connection = PG::connect(:host => $pg_host, :user => $db_user,  :dbname => $pg_bs_name, :port => $pg_port, :password => $pg_pass)
   end
 end
 
 
 class MyApp < Sinatra::Application
   get '/' do
-    "We couldn't find this API"
+    "Please enter valid parameter"
   end
 
   get '/biosample/submission/:ssub' do
@@ -69,6 +78,6 @@ class MyApp < Sinatra::Application
   end
 
   not_found do
-    "We couldn't find this API"
+    "Please enter valid parameter"
   end
 end

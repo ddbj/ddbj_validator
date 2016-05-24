@@ -69,7 +69,7 @@ router.post('/upload', function(req, res, next){
         case "xml":
             var original_name = req.file['originalname'];
             sample_file_path = conf.tmp_file_dir + file_name;
-            output_path = conf.tmp_file_dir + original_name;
+            output_path = conf.tmp_file_dir + original_name.replace("xml", "json");
 
             exec('ruby ./validator/biosample_validator.rb ' +  sample_file_path + " xml " + output_path + " " + conf.validator_mode, function(error, stdout, stderr){
                 //if response is {"undefined: 1!
