@@ -1079,8 +1079,6 @@ class MainValidator
   # true/false
   def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_a, line_num)
     #TODO check and improve   null_accepted_a => null_accepted.json
-    puts attr_val
-    puts CommonUtils::null_value?(attr_val)
     return nil if CommonUtils::null_value?(attr_val)
 
     result = true
