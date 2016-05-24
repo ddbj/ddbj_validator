@@ -307,6 +307,14 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ##attr value is coequal null
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", "missing", cv_attr, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##attr name is blank
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", " ", "xxxxx", cv_attr, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   def test_invalid_publication_identifier
@@ -511,10 +519,6 @@ class TestMainValidator < Minitest::Test
 
   def test_sex_for_bacteria
     #ok case
-    ##bacteria
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", "", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
     ##human
     ret = exec_validator("sex_for_bacteria", "59", "SampleA", "9606", "male", 1)
     assert_equal true, ret[:result]
@@ -616,12 +620,6 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
-    # ok case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.invalid_attribute_value_for_null("1", "sampleA", "strain", "not applicable", null_accepted_a, 1)
-    assert_equal true, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
     # ng case
     @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.invalid_attribute_value_for_null("1", "sampleA", "strain", "N.A.", null_accepted_a, 1)
@@ -631,6 +629,12 @@ class TestMainValidator < Minitest::Test
     # params are nil pattern
     @validator.instance_variable_set :@error_list, [] #clear
     ret = @validator.invalid_attribute_value_for_null("1", "sampleA", "strain", "", null_accepted_a, 1)
+    assert_equal nil, ret
+    error_list = @validator.instance_variable_get (:@error_list)
+    assert_equal 0, error_list.size
+    ## null like value
+    @validator.instance_variable_set :@error_list, [] #clear
+    ret = @validator.invalid_attribute_value_for_null("1", "sampleA", "strain", "not applicable", null_accepted_a, 1)
     assert_equal nil, ret
     error_list = @validator.instance_variable_get (:@error_list)
     assert_equal 0, error_list.size
@@ -802,13 +806,6 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", "9606", int_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ##is null value
-    ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", "", int_attr, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", "missing", int_attr, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
     ## not integer attr
     ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "organism", "human", int_attr, 1)
     assert_equal true, ret[:result]
@@ -820,6 +817,13 @@ class TestMainValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
     ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", nil, int_attr, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##null like value
+    ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", "", int_attr, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", "missing", int_attr, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end

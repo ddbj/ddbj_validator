@@ -243,7 +243,7 @@ class MainValidator
   # 属性名に非ASCII文字が含まれていないかの検証
   #
   # ==== Args
-  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # attribute_list : ユーザ入力の属性リスト ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
   # ==== Return
   # true/false
   #
@@ -271,10 +271,10 @@ class MainValidator
   end
 
   #
-  # 属性値はあるが属性名がないもののチェック(csvでヘッダーを削除されたデータを想定)
+  # 属性値はあるが属性名がないものの検証(csvでヘッダーを削除されたデータを想定)
   #
   # ==== Args
-  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # attribute_list : ユーザ入力の属性リスト ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
   # ==== Return
   # true/false
   #
@@ -303,10 +303,10 @@ class MainValidator
   end
 
   #
-  # 複数出現する属性名があるか
+  # 複数出現する属性名がないかの検証
   #
   # ==== Args
-  # attribute_list : An array of attribute names ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # attribute_list : ユーザ入力の属性リスト ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
   # ==== Return
   # true/false
   #
@@ -339,7 +339,7 @@ class MainValidator
   end
 
   #
-  # packageの情報が欠落していないか検証
+  # packageの情報が欠落していないかの検証
   #
   # ==== Args
   # biosample_data object of a biosample
@@ -349,7 +349,7 @@ class MainValidator
   def missing_package_information (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil?
 
-    if !biosample_data["package"].nil?
+    if !CommonUtils::blank?(biosample_data["package"])
       true
     else
       annotation = [
@@ -371,7 +371,7 @@ class MainValidator
   # true/false
   #
   def unknown_package (rule_code, sample_name, package, line_num)
-    return nil if package.nil?
+    return nil if CommonUtils::blank?(package)
     package_name = package.gsub(".", "_")
     package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
     package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
@@ -396,7 +396,8 @@ class MainValidator
   end
 
   #
-  # sample_nameの値があるかどうかの検証。"missing"などのNull相当の値は許容しない。
+  # sample_nameの値があるかどうかの検証
+  # "missing"などのNull相当の値は許容しない
   #
   # ==== Args
   # sample name ex."MTB313"
@@ -404,6 +405,8 @@ class MainValidator
   # true/false
   #
   def missing_sample_name (rule_code, sample_name, biosample_data, line_num)
+    return nil if biosample_data.nil? || biosample_data["attributes"].nil?
+
     result = true
     if CommonUtils.null_value?(biosample_data["attributes"]["sample_name"])
       result = false
@@ -421,7 +424,8 @@ class MainValidator
   end
 
   #
-  # organismの値があるかどうかの検証。"missing"などのNull相当の値は許容しない。
+  # organismの値があるかどうかの検証
+  # "missing"などのNull相当の値は許容しない
   #
   # ==== Args
   # sample name ex."Streptococcus pyogenes"
@@ -429,6 +433,8 @@ class MainValidator
   # true/false
   #
   def missing_organism (rule_code, sample_name, biosample_data, line_num)
+    return nil if biosample_data.nil? || biosample_data["attributes"].nil?
+
     result = true
     if CommonUtils.null_value?(biosample_data["attributes"]["organism"])
       result = false
@@ -450,14 +456,16 @@ class MainValidator
   # ==== Args
   # rule_code
   # sample_attr ユーザ入力の属性リスト
-  # package_attr_list パッケージに対する属性リスト
+  # package_attr_list パッケージに紐づく属性リスト
   # line_num
   # ==== Return
   # true/false
   #
   def not_predefined_attribute_name (rule_code, sample_name, sample_attr, package_attr_list , line_num)
-    predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] }
-    not_predifined_attr_names = sample_attr.keys - predefined_attr_list
+    return nil if sample_attr.nil? || package_attr_list.nil?
+
+    predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] } #属性名だけを抽出
+    not_predifined_attr_names = sample_attr.keys - predefined_attr_list #属性名の差分をとる
     if not_predifined_attr_names.size <= 0
       true
     else
@@ -483,13 +491,15 @@ class MainValidator
   # true/false
   #
   def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list , line_num)
-    mandatory_attr_list = package_attr_list.map { |attr|
+    return nil if sample_attr.nil? || package_attr_list.nil?
+
+    mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
     missing_attr_names = []
     sample_attr.each do |attr_name, attr_value|
       if mandatory_attr_list.include?(attr_name)
-        if attr_value.nil? || attr_value.empty?
+        if CommonUtils::blank?(attr_value)
           missing_attr_names.push(attr_name)
         end
       end
@@ -519,7 +529,9 @@ class MainValidator
   # true/false
   #
   def missing_required_attribute_name (rule_code, sample_name, sample_attr, package_attr_list , line_num)
-    mandatory_attr_list = package_attr_list.map { |attr|
+    return nil if sample_attr.nil? || package_attr_list.nil?
+
+    mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
     missing_attr_names = mandatory_attr_list - sample_attr.keys 
@@ -537,7 +549,7 @@ class MainValidator
   end
 
   #
-  # CV(controlled vocabulary)を使用するべき属性の場合に属性値を検証する
+  # CV(controlled vocabulary)を使用するべき属性値の検証する
   #
   # ==== Args
   # rule_code
@@ -549,9 +561,10 @@ class MainValidator
   # true/false
   # 
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
-    return nil  if attr_name.nil? || attr_val.nil?
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     result =  true
-    if !cv_attr[attr_name].nil? # CVを仕様する属性か
+    if !cv_attr[attr_name].nil? # CVを使用する属性か
       if !cv_attr[attr_name].include?(attr_val) # CVリストに値であれば
         annotation = [
           {key: "Sample name", value: sample_name},
@@ -567,7 +580,7 @@ class MainValidator
   end
 
   #
-  # リファレンス型(PMID|DOI|URL)であるべき属性の場合に属性値を検証する
+  # リファレンス型(PMID|DOI|URL)であるべき属性値の検証する
   #
   # ==== Args
   # rule_code
@@ -579,10 +592,11 @@ class MainValidator
   # true/false
   #
   def invalid_publication_identifier (rule_code, sample_name, attr_name, attr_val, ref_attr, line_num)
-    return nil if attr_name.nil? || attr_val.nil?
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     common = CommonUtils.new
     result =  true
-    if ref_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# リファレンス型の属性であり有効な入力値がある
+    if ref_attr.include?(attr_name) # リファレンス型の属性か
       ref = attr_val.sub(/[ :]*P?M?ID[ :]*|[ :]*DOI[ :]*/i, "")
       if attr_val != ref #auto-annotation
         result = false
@@ -662,7 +676,7 @@ class MainValidator
   end
 
   #
-  # geo_loc_name属性のフォーマットをチェックして整形する
+  # geo_loc_name属性のフォーマットの空白除去等の補正
   #
   # ==== Args
   # rule_code
@@ -672,7 +686,7 @@ class MainValidator
   # true/false
   #
   def format_of_geo_loc_name_is_invalid (rule_code, sample_name, geo_loc_name, line_num)
-    return nil if geo_loc_name.nil?
+    return nil if CommonUtils::null_value?(geo_loc_name)
 
     annotated_name = geo_loc_name.sub(/\s+:\s+/, ":")
     annotated_name = annotated_name.gsub(/,\s+/, ', ')
@@ -695,7 +709,7 @@ class MainValidator
   end
 
   #
-  # 国名が妥当であるかの検証
+  # geo_loc_name属性に記載された国名が妥当であるかの検証
   #
   # ==== Args
   # rule_code
@@ -706,7 +720,7 @@ class MainValidator
   # true/false
   #
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
-    return nil if geo_loc_name.nil?
+    return nil if CommonUtils::null_value?(geo_loc_name)
 
     country_name = geo_loc_name.split(":").first.strip
     if country_list.include?(country_name)
@@ -724,7 +738,7 @@ class MainValidator
   end
 
   #
-  # 緯度経度のフォーマットチェック
+  # 緯度経度のフォーマットの検証
   #
   # ==== Args
   # rule_code
@@ -734,7 +748,8 @@ class MainValidator
   # true/false
   #
   def invalid_lat_lon_format (rule_code, sample_name, lat_lon, line_num)
-    return nil if lat_lon.nil?
+    return nil if CommonUtils::null_value?(lat_lon)
+
     common = CommonUtils.new
     insdc_latlon = common.format_insdc_latlon(lat_lon)
     if insdc_latlon == lat_lon
@@ -759,7 +774,7 @@ class MainValidator
   end
 
   #
-  # host属性に記載された生物種名がTaxonomy ontologyのscientific nameに存在するかを検証する
+  # host属性に記載された生物種名がTaxonomy ontologyにScientific nameとして存在するかの検証
   # 
   # ==== Args
   # rule_code
@@ -770,7 +785,8 @@ class MainValidator
   # true/false
   #
   def invalid_host_organism_name (rule_code, sample_name, host_name, line_num)
-    return nil if host_name.nil?
+    return nil if CommonUtils::null_value?(host_name)
+
     if @org_validator.exist_organism_name?(host_name)
       true
     else
@@ -788,7 +804,7 @@ class MainValidator
   end
 
   #
-  # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかのチェック
+  # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
   #
   # ==== Args
   # rule_code
@@ -798,7 +814,8 @@ class MainValidator
   # true/false
   #
   def taxonomy_error_warning (rule_code, sample_name, organism_name, line_num)
-    return nil if organism_name.nil?
+    return nil if CommonUtils::null_value?(organism_name)
+
     if @org_validator.exist_organism_name?(organism_name)
       true
     else
@@ -827,8 +844,8 @@ class MainValidator
   # true/false
   #
   def taxonomy_name_and_id_not_match (rule_code, sample_name, taxonomy_id, organism_name, line_num)
-    return nil if taxonomy_id.nil?
-    return nil if organism_name.nil?
+    return nil if CommonUtils::null_value?(organism_name) || CommonUtils::null_value?(taxonomy_id)
+
     if @org_validator.match_taxid_vs_organism?(taxonomy_id, organism_name) 
       true
     else
@@ -845,7 +862,7 @@ class MainValidator
 
   #
   # 緯度経度と国名が一致しているかの検証
-  # Google geocooder APIを使用してチェックする
+  # Google geocooder APIを使用して検証を行う
   #
   # ==== Args
   # rule_code
@@ -856,8 +873,7 @@ class MainValidator
   # true/false
   #
   def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, line_num)
-    return nil if geo_loc_name.nil?
-    return nil if lat_lon.nil?
+    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
 
     country_name = geo_loc_name.split(":").first.strip
 
@@ -904,8 +920,8 @@ class MainValidator
   # true/false
   # 
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, line_num)
-    return nil if taxonomy_id.nil?
-    return nil if package_name.nil?
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id)
+
     valid_result = @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name) 
     if valid_result[:status] == "error"
       #パッケージに適したルールのエラーメッセージを取得
@@ -926,7 +942,7 @@ class MainValidator
 
   #
   # 生物種とsex属性の整合性を検証
-  # bacteria, viruses, fungiの系統においてsex属性が入力されている場合にエラーとする
+  # bacteria, viruses, fungiの系統においてsex属性が入力されている場合はエラー
   #
   # ==== Args
   # rule_code
@@ -937,8 +953,8 @@ class MainValidator
   # true/false
   #
   def sex_for_bacteria (rule_code, sample_name, taxonomy_id, sex, line_num)
-    return nil if taxonomy_id.nil?
-    return nil if sex.nil?
+    return nil if CommonUtils::blank?(taxonomy_id) || CommonUtils::null_value?(sex)
+
     ret = true
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
     fungi_linages = [OrganismValidator::TAX_FUNGI]
@@ -976,9 +992,9 @@ class MainValidator
   # true/false
   #
   def multiple_vouchers (rule_code, sample_name, specimen_voucher, culture_collection, line_num)
-    if specimen_voucher.nil? && culture_collection.nil?
-      return nil
-    elsif !(!specimen_voucher.nil? && !culture_collection.nil?) #one only
+    return nil if CommonUtils::blank?(specimen_voucher) && CommonUtils::null_value?(culture_collection)
+
+    if !(!CommonUtils::blank?(specimen_voucher) && !CommonUtils::null_value?(culture_collection)) #片方だけ入力されていた場合はOK
       return true
     else
       specimen_inst = specimen_voucher.split(":").first.strip
@@ -1009,7 +1025,7 @@ class MainValidator
 
 
   #
-  # sample collection date が未来の日付ではないか検証
+  # sample collection date が未来の日付になっていないかの検証
   #
   # ==== Args
   # rule_code
@@ -1019,7 +1035,8 @@ class MainValidator
   # true/false
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
-    return nil if collection_date.nil?
+    return nil if CommonUtils::blank?(collection_date)
+
     result = true
     case collection_date
       when /\d{4}/
@@ -1053,7 +1070,7 @@ class MainValidator
   end
 
   #
-  # NAのようなnullに相当する値を規定の値(missing)に補正する
+  # NAのようなnullに相当する値を規定の値(missing)に補正
   #
   # ==== Args
   # rule_code
@@ -1062,7 +1079,10 @@ class MainValidator
   # true/false
   def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_a, line_num)
     #TODO check and improve   null_accepted_a => null_accepted.json
-    return nil if attr_val.nil? || attr_val.empty?
+    puts attr_val
+    puts CommonUtils::null_value?(attr_val)
+    return nil if CommonUtils::null_value?(attr_val)
+
     result = true
     if null_accepted_a.include?attr_val.downcase
       for null_accepted in null_accepted_a
@@ -1094,7 +1114,7 @@ class MainValidator
   end
 
   #
-  # 日付(time stamp)型の属性のフォーマットチェックを行う
+  # 日付(time stamp)型の属性のフォーマットの検証と補正
   #
   # ==== Args
   # rule_code
@@ -1106,7 +1126,8 @@ class MainValidator
   # true/false
   #
   def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil if attr_val.nil? || attr_val.empty?
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     ori_attr_val = attr_val
     result = true
 
@@ -1206,7 +1227,7 @@ class MainValidator
   end
 
   #
-  # 特殊文字が含まれていた場合に置き換える
+  # 特殊文字が含まれているかの検証と補正
   #
   # ===Args
   # rule_code
@@ -1218,7 +1239,8 @@ class MainValidator
   # true/false
   #
   def special_character_included (rule_code, sample_name, attr_name, attr_val, special_chars, line_num)
-    return nil if attr_val.nil? || attr_val.empty?
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     result  = true
     replaced_attr_val = attr_val.clone #文字列コピー
     special_chars.each do |target_val, replace_val|
@@ -1268,23 +1290,21 @@ class MainValidator
   # true/false
   #
   def redundant_taxonomy_attributes (rule_code, sample_name, organism, host, isolation_source, line_num)
-    #TODO nil判定がメソッド全域にあるので、全て直す
-    if organism.nil? && host.nil? && isolation_source.nil?
-      return nil
-    end
+    return nil  if CommonUtils::null_value?(organism) && CommonUtils::null_value?(host) && CommonUtils::null_value?(isolation_source)
+
     taxon_values = []
-    taxon_values.push(organism) unless organism.nil?
-    taxon_values.push(host) unless host.nil?
-    taxon_values.push(isolation_source) unless isolation_source.nil?
-    uniq_taxon_values = taxon_values.uniq {|tax_name|
+    taxon_values.push(organism) unless CommonUtils::null_value?(organism)
+    taxon_values.push(host) unless CommonUtils::null_value?(host)
+    taxon_values.push(isolation_source) unless CommonUtils::null_value?(isolation_source)
+    uniq_taxon_values = taxon_values.map {|tax_name|
       tax_name.strip.gsub(" ", "").downcase
-    }
-    if taxon_values.size <= uniq_taxon_values.size
+    }.uniq
+    if taxon_values.size == uniq_taxon_values.size
       return true
     else
-      organism = "" if organism.nil?
-      host = "" if host.nil?
-      isolation_source = "" if isolation_source.nil?
+      organism = "" if CommonUtils::blank?(organism)
+      host = "" if CommonUtils::blank?(host)
+      isolation_source = "" if CommonUtils::blank?(isolation_source)
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "organism", value: organism},
@@ -1298,16 +1318,18 @@ class MainValidator
   end
 
   #
-  # 不要な空白文字などを除去する
+  # 不要な空白文字などの除去
   #
   # ==== Args
   # rule_code
+  #
   # line_num
   # ==== Return
   # true/false
   #
   def invalid_data_format (rule_code, sample_name, attr_name, attr_val, line_num)
-    return nil if attr_val.nil? || attr_val.empty?
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     result = true
     #TODO add new line
     rep_table_ws = {
@@ -1333,7 +1355,7 @@ class MainValidator
   end
 
   #
-  # 属性値にNon-ascii文字列が含まれていないか検証する
+  # 属性値にNon-ascii文字列が含まれていないかの検証
   #
   # ==== Args
   # rule_code
@@ -1344,7 +1366,8 @@ class MainValidator
   # true/false
   #
   def non_ascii_attribute_value (rule_code, sample_name, attr_name, attr_val, line_num)
-    return nil if attr_val.nil? || attr_val.empty?
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     result = true
     unless attr_val.ascii_only?
       annotation = [
@@ -1418,7 +1441,8 @@ class MainValidator
   end
 
   #
-  # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject accession, description 以外でユニークな属性を持っているか検証
+  # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject accession, description 以外で
+  # ユニークな属性を持っている他のサンプルがないかの検証
   #
   # ==== Args
   # rule_code
@@ -1429,8 +1453,8 @@ class MainValidator
   #
   def identical_attributes (rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.size == 0
-    result = true
 
+    result = true
     keys_excluding = ["sample_name", "sample_title", "bioproject_id", "description"]
 
     biosample_list.each_with_index do |current_biosample_data, current_idx|
@@ -1488,7 +1512,7 @@ class MainValidator
   end
 
   #
-  # 整数であるべき属性の場合に属性値を検証する
+  # 整数であるべき属性値の検証
   #
   # ==== Args
   # rule_code
@@ -1500,7 +1524,8 @@ class MainValidator
   # true/false
   #
   def attribute_value_is_not_integer (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
-    return nil if attr_name.nil? || attr_val.nil?
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
     result =  true
     if int_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# 整数型の属性であり有効な入力値がある
       begin
