@@ -19,16 +19,48 @@ class MainValidator
   # Initializer
   #
   def initialize (mode)
-    @base_dir = File.dirname(__FILE__)
-    #TODO setting config from SPARQL?
-    @validation_config = JSON.parse(File.read(@base_dir + "/../../conf/validation_config.json"))
-    @error_list = []
-    @xml_convertor = BioSampleXmlConvertor.new
-    @org_validator = OrganismValidator.new("http://staging-genome.annotation.jp/sparql") #TODO config
-    #TODO load sub validator class or modules
     @mode = mode
     if mode == "private"
       require File.dirname(__FILE__) + "/postgre_connection.rb"
+    end
+    @conf = read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
+    CommonUtils::set_config(@conf)
+
+    @validation_config = @conf[:validation_config] #need?
+    @error_list = []
+    @xml_convertor = BioSampleXmlConvertor.new
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
+  end
+
+  #
+  # 各種設定ファイルの読み込み
+  #
+  # ==== Args
+  # config_file_dir: 設定ファイル設置ディレクトリ
+  #
+  #
+  def read_config (config_file_dir)
+    config = {}
+    begin
+      config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
+      config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
+      config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
+      config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
+      config[:int_attr] = JSON.parse(File.read(config_file_dir + "/integer_attributes.json"))
+      config[:special_chars] = JSON.parse(File.read(config_file_dir + "/special_characters.json"))
+      config[:country_list] = JSON.parse(File.read(config_file_dir + "/country_list.json"))
+      config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/validation_config.json"))
+      config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
+      if @mode == "private"
+        #TODO load PostgreSQL conf
+        #@db_config = JSON.parse(File.read(config_file_dir + "/db_config.json"))
+      end
+      config
+    rescue => ex
+      message = "Failed to parse the setting file. Please check the config file below.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
     end
   end
 
@@ -60,9 +92,8 @@ class MainValidator
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       ### 2.auto correct (rule: 12, 13)
-      special_chars = JSON.parse(File.read(@base_dir + "/../../conf/special_characters.json"))
       biosample_data["attributes"].each do |attr_name, value|
-        ret = send("special_character_included", "12", sample_name, attr_name, value, special_chars, line_num)
+        ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], line_num)
 	if ret == false #save auto annotation value
           annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
           biosample_data["attributes"][attr_name] = annotation[:value].first
@@ -110,9 +141,8 @@ class MainValidator
       attr_list = get_attributes_of_package(biosample_data["package"])
 
       ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
-      null_accepted_a = JSON.parse(File.read(@base_dir + "/../../conf/null_accepted_a"))
       biosample_data["attributes"].each do |attribute_name, value|
-        ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, null_accepted_a, line_num)
+        ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, @conf[:null_accepted], line_num)
         if ret == false #save auto annotation value #TODO test
           annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
           biosample_data["attributes"][attr_name] = annotation[:value].first
@@ -123,16 +153,12 @@ class MainValidator
       send("missing_required_attribute_name", "92", sample_name, biosample_data["attributes"], attr_list , line_num)
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
-      cv_attr = JSON.parse(File.read(@base_dir + "/../../conf/controlled_terms.json"))
-      ref_attr = JSON.parse(File.read(@base_dir + "/../../conf/reference_attributes.json"))
-      ts_attr = JSON.parse(File.read(@base_dir + "/../../conf/timestamp_attributes.json"))
-      int_attr = JSON.parse(File.read(@base_dir + "/../../conf/integer_attributes.json"))
       sample_name = biosample_data["attributes"]["sample_name"]
       biosample_data["attributes"].each do|attribute_name, value|
-        send("invalid_attribute_value_for_controlled_terms", "2", sample_name, attribute_name.to_s, value, cv_attr, line_num)
-        send("invalid_publication_identifier", "11", sample_name, attribute_name.to_s, value, ref_attr, line_num)
-        send("invalid_date_format", "7", sample_name, attribute_name.to_s, value, ts_attr, line_num)
-        send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, int_attr, line_num)
+        send("invalid_attribute_value_for_controlled_terms", "2", sample_name, attribute_name.to_s, value, @conf[:cv_attr], line_num)
+        send("invalid_publication_identifier", "11", sample_name, attribute_name.to_s, value, @conf[:ref_attr], line_num)
+        send("invalid_date_format", "7", sample_name, attribute_name.to_s, value, @conf[:ts_attr], line_num)
+        send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, @conf[:int_attr], line_num)
       end
 =begin
       send("invalid_bioproject_type", "70", biosample_data["attributes"]["bioproject_id"], line_num)
@@ -149,9 +175,7 @@ class MainValidator
         biosample_data["attributes"][attr_name] = annotation[:value].first
       end
 
-      country_list = JSON.parse(File.read(@base_dir + "/../../conf/country_list.json"))
-      send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], country_list, line_num)
-
+      send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:country_list], line_num)
       send("invalid_lat_lon_format", "9", sample_name, biosample_data["attributes"]["lat_lon"], line_num) #TODO auto-annotation
       send("invalid_host_organism_name", "15", sample_name, biosample_data["attributes"]["host"], line_num)
       send("taxonomy_error_warning", "45", sample_name, biosample_data["attributes"]["organism"], line_num)
@@ -1077,13 +1101,12 @@ class MainValidator
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_a, line_num)
-    #TODO check and improve   null_accepted_a => null_accepted.json
+  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, line_num)
     return nil if CommonUtils::null_value?(attr_val)
 
     result = true
-    if null_accepted_a.include?attr_val.downcase
-      for null_accepted in null_accepted_a
+    if null_accepted_list.include?attr_val.downcase
+      for null_accepted in null_accepted_list
         if /#{null_accepted}/i =~ attr_val
           attr_val_result = attr_val.downcase
           unless attr_val_result == attr_val
