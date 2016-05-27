@@ -11,7 +11,7 @@ require 'builder'
 ##
 
 # Package XML
-pac_xml_f = open("packages.xml")
+pac_xml_f = open("ddbj_packages.xml")
 pac_doc = Nokogiri::XML(pac_xml_f)
 pac_a = []
 pac_doc.css('Package').each do |pac|
@@ -72,9 +72,7 @@ for pacfull, pacname, pacver in pac_a
 	line_a = []
 	line_a.push(pacname)
 	line_a.push(pacver)
-	# DDBJ version
-	line_a.push("2.0")
-	
+
 	either_one_a = []
 
 	# 属性
@@ -124,7 +122,7 @@ end
 #end
 
 # ヘッダー
-table_a.unshift(["Package name", "NCBI Version", "DDBJ Version"] + header_a) 
+table_a.unshift(["Package name", "Version"] + header_a) 
 
 for line in table_a 
 	puts line.join("\t")
