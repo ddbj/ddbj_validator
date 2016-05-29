@@ -8,6 +8,7 @@ require 'net/http'
 require File.dirname(__FILE__) + "/biosample_xml_convertor.rb"
 require File.dirname(__FILE__) + "/organism_validator.rb"
 require File.dirname(__FILE__) + "/sparql_base.rb"
+require File.dirname(__FILE__) + "/validator_cache.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
 
 #
@@ -30,6 +31,7 @@ class MainValidator
     @error_list = []
     @xml_convertor = BioSampleXmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
+    @cache = ValidatorCache.new
   end
 
   #
@@ -76,7 +78,6 @@ class MainValidator
     #convert to object for validator
     @data_file = File::basename(data_xml)
     xml_document = File.read(data_xml)
-    #TODO parse error
     @biosample_list = @xml_convertor.xml2obj(xml_document)
     ### 1.file format and attribute names (rule: 29, 30, 34, 61)
 
@@ -221,18 +222,26 @@ class MainValidator
     package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
     package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
 
-    sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
-    params = {package_name: package_name}
-    template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
-    sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
-    result = sparql.query(sparql_query)
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
+      sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
+      params = {package_name: package_name}
+      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
+      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
+      result = sparql.query(sparql_query)
 
-    attr_list = []
-    result.each do |row|
-      attr = {attribute_name: row[:attribute], require: row[:require]}
-      attr_list.push(attr)
-    end 
-    attr_list
+      attr_list = []
+      result.each do |row|
+        attr = {attribute_name: row[:attribute], require: row[:require]}
+        attr_list.push(attr)
+      end
+      @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
+      attr_list
+    else
+      puts "use cache in get_attributes_of_package" if $DEBUG
+      attr_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
+      attr_list
+    end
   end
 
 ### validate method ###
@@ -400,12 +409,19 @@ class MainValidator
     package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
     package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
 
-    #TODO when package name isn't as url, occures erro.    
-    sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
-    params = {package_name: package_name}
-    template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
-    sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
-    result = sparql.query(sparql_query)
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
+      #TODO when package name isn't as url, occures error.
+      sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
+      params = {package_name: package_name}
+      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
+      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
+      result = sparql.query(sparql_query)
+      @cache.save(ValidatorCache::UNKNOWN_PACKAGE, package_name, result) unless @cache.nil?
+    else
+      puts "use cache in unknown_package" if $DEBUG
+      result = @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name)
+    end
     if result.first[:count].to_i <= 0
       annotation = [
         {key: "Sample name", value: sample_name},
@@ -628,9 +644,25 @@ class MainValidator
 
       # check exist ref
       if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
-        result = common.exist_pubmed_id?(ref) && result
+        #あればキャッシュを使用
+        if @cache.nil? || @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref).nil?
+          exist_pubchem = common.exist_pubmed_id?(ref)
+          @cache.save(ValidatorCache::EXIST_PUBCHEM_ID, ref, exist_pubchem) unless @cache.nil?
+        else
+          puts "use cache in invalid_publication_identifier(pubchem)" if $DEBUG
+          exist_pubchem = @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref)
+        end
+        result = exist_pubchem && result
       elsif ref =~ /\./ && ref !~ /http/ #DOI
-        result = common.exist_doi?(ref) && result
+        #あればキャッシュを使用
+        if @cache.nil? || @cache.check(ValidatorCache::EXIST_DOI, ref).nil?
+          exist_doi = common.exist_doi?(ref)
+          @cache.save(ValidatorCache::EXIST_DOI, ref, exist_doi) unless @cache.nil?
+        else
+          puts "use cache in invalid_publication_identifier(doi)" if $DEBUG
+          exist_doi = @cache.check(ValidatorCache::EXIST_DOI, ref)
+        end
+        result = exist_doi && result
       else #ref !~ /^https?/ #URL
         begin
           url = URI.parse(ref)
@@ -810,12 +842,18 @@ class MainValidator
   #
   def invalid_host_organism_name (rule_code, sample_name, host_name, line_num)
     return nil if CommonUtils::null_value?(host_name)
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::EXIST_HOST_NAME, host_name).nil?
+      ret = @org_validator.exist_organism_name?(host_name)
+      @cache.save(ValidatorCache::EXIST_HOST_NAME, host_name, ret) unless @cache.nil?
+    else
+      puts "use cache in invalid_host_organism_name" if $DEBUG
+      ret = @cache.check(ValidatorCache::EXIST_HOST_NAME, host_name)
+    end
 
-    if @org_validator.exist_organism_name?(host_name)
+    if ret
       true
     else
-      #suggest synonym hit #TODO over spec?
-      #organism_names = @org_validator.organism_name_of_synonym(host_name) #if it's synonym, suggests scientific name.
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: "host"},
@@ -839,8 +877,16 @@ class MainValidator
   #
   def taxonomy_error_warning (rule_code, sample_name, organism_name, line_num)
     return nil if CommonUtils::null_value?(organism_name)
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
+      ret = @org_validator.exist_organism_name?(organism_name)
+      @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret) unless @cache.nil?
+    else
+      puts "use cache in taxonomy_error_warning" if $DEBUG
+      ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
+    end
 
-    if @org_validator.exist_organism_name?(organism_name)
+    if ret
       true
     else
       annotation = [
@@ -857,7 +903,7 @@ class MainValidator
 
   #
   # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
-  # Taxonomy onotologyのScientific nameとの比較を行う
+  # Taxonomy ontologyのScientific nameとの比較を行う
   #
   # ==== Args
   # rule_code
@@ -870,7 +916,17 @@ class MainValidator
   def taxonomy_name_and_id_not_match (rule_code, sample_name, taxonomy_id, organism_name, line_num)
     return nil if CommonUtils::null_value?(organism_name) || CommonUtils::null_value?(taxonomy_id)
 
-    if @org_validator.match_taxid_vs_organism?(taxonomy_id, organism_name) 
+    #あればキャッシュを使用
+    cache_key = ValidatorCache::create_key(taxonomy_id, organism_name)
+    if @cache.nil? || @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, cache_key).nil?
+      valid_result = @org_validator.match_taxid_vs_organism?(taxonomy_id.to_i, organism_name)
+      @cache.save(ValidatorCache::TAX_MATCH_ORGANISM, cache_key, valid_result) unless @cache.nil?
+    else
+      puts "use cache in taxonomy_name_and_id_not_match" if $DEBG
+      valid_result = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, cache_key)
+    end
+
+    if valid_result
       true
     else
       annotation = [
@@ -902,14 +958,21 @@ class MainValidator
     country_name = geo_loc_name.split(":").first.strip
 
     common = CommonUtils.new
-    insdc_latlon = common.format_insdc_latlon(lat_lon) #TODO auto suggest後なら不要かも
-    iso_latlon = common.convert_latlon_insdc2iso(insdc_latlon)
-    if iso_latlon.nil?
-      latlon_for_google = lat_lon
+    if @cache.nil? || @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon) == false #cache値がnilの可能性があるためhas_keyでチェック
+      insdc_latlon = common.format_insdc_latlon(lat_lon) #TODO auto suggest後なら不要かも
+      iso_latlon = common.convert_latlon_insdc2iso(insdc_latlon)
+      if iso_latlon.nil?
+        latlon_for_google = lat_lon
+      else
+        latlon_for_google = "#{iso_latlon[:latitude].to_s}, #{iso_latlon[:longitude].to_s}"
+      end
+      latlon_country_name = common.geocode_country_from_latlon(latlon_for_google)
+      @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon, latlon_country_name) unless @cache.nil?
     else
-      latlon_for_google = "#{iso_latlon[:latitude].to_s}, #{iso_latlon[:longitude].to_s}"
+      puts "use cache in latlon_versus_country" if $DEBUG
+      latlon_country_name = @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon)
     end
-    latlon_country_name = common.geocode_country_from_latlon(latlon_for_google)
+
     if !latlon_country_name.nil? && common.is_same_google_country_name(country_name, latlon_country_name)
       true
     else
@@ -938,7 +1001,7 @@ class MainValidator
   # ==== Args
   # rule_code
   # taxonomy_id ex."103690"
-  # sex ex."MIGS.ba.microbial"
+  # package_name ex."MIGS.ba.microbial"
   # line_num 
   # ==== Return
   # true/false
@@ -946,7 +1009,16 @@ class MainValidator
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, line_num)
     return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id)
 
-    valid_result = @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name) 
+    #あればキャッシュを使用
+    cache_key = ValidatorCache::create_key(taxonomy_id, package_name)
+    if @cache.nil? || @cache.check(ValidatorCache::TAX_VS_PACKAGE, cache_key).nil?
+      valid_result = @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name)
+      @cache.save(ValidatorCache::TAX_VS_PACKAGE, cache_key, valid_result) unless @cache.nil?
+    else
+      puts "use cache in package_versus_organism" if $DEBUG
+      valid_result = @cache.check(ValidatorCache::TAX_VS_PACKAGE, cache_key)
+    end
+
     if valid_result[:status] == "error"
       #パッケージに適したルールのエラーメッセージを取得
       message = CommonUtils::error_msg(@validation_config, valid_result[:error_code], nil)
@@ -983,10 +1055,30 @@ class MainValidator
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
     fungi_linages = [OrganismValidator::TAX_FUNGI]
     unless sex == ""
-      if @org_validator.has_linage(taxonomy_id, bac_vir_linages)
+      #あればキャッシュを使用
+      #bacteria virus linage
+      cache_key_bac_vir = ValidatorCache::create_key(taxonomy_id, bac_vir_linages)
+      if @cache.nil? || @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir).nil?
+        has_linage_bac_vir = @org_validator.has_linage(taxonomy_id, bac_vir_linages)
+        @cache.save(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir, has_linage_bac_vir) unless @cache.nil?
+      else
+        puts "use cache in sex_for_bacteria(bacteria virus)" if $DEBUG
+        has_linage_bac_vir = @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir)
+      end
+      #fungi linage
+      cache_key_fungi = ValidatorCache::create_key(taxonomy_id, fungi_linages)
+      if @cache.nil? || @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi).nil?
+        has_linage_fungi = @org_validator.has_linage(taxonomy_id, fungi_linages)
+        @cache.save(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi, has_linage_fungi) unless @cache.nil?
+      else
+        puts "use cache in sex_for_bacteria(fungi)" if $DEBUG
+        has_linage_fungi = @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi)
+      end
+
+      if has_linage_bac_vir
         message = "bacterial or viral organisms; did you mean 'host sex'?"
         ret = false
-      elsif @org_validator.has_linage(taxonomy_id, fungi_linages)
+      elsif has_linage_fungi
         message = "fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"
         ret = false
       end
