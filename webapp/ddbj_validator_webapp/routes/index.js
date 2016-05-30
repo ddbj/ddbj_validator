@@ -2,6 +2,12 @@ var express = require('express');
 var router = express.Router();
 var fs = require('fs');
 var libxmljs = require('libxmljs');
+var exec = require('child_process').exec;
+var execFile = require('child_process').execFile;
+var spawn = require('child_process').spawn;
+var xml2js = require('xml2js');
+var conf = require('config');
+var jschardet = require('jschardet');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {

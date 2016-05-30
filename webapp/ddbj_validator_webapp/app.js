@@ -69,13 +69,4 @@ app.use(function(err, req, res, next) {
   });
 });
 
-/*
-app.post('/posts', function(req,res){
-  console.log(req.body);
-  res.render('index');
-  console.log("app post");
-});
-*/
-
-
 module.exports = app;

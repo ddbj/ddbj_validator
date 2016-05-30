@@ -26,18 +26,31 @@
         $.get("./views/error_message.ejs"),
         $.get("./views/error_message_group.ejs"),
         $.get("./views/annotated_sequence.ejs"),
-        $.get("./views/ddbj_validation_rules.json")
-    ).done(function(tmpl_bs, tmpl_bs_group, tmpl_as, rule_list){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_as, rule_list)});
+        $.get("./views/data_info.ejs")
+        //$.get("./views/ddbj_validation_rules.json")
+    ).done(function(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_info){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_info)});
 
-    function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_as, rule_list){
+    function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_as, tmpl_info){
         var error_tmpl = tmpl_bs[0];
         var group_tmpl = tmpl_bs_group[0];
-        var anottated_sequence_tmpl = tmpl_as[0]
-        var rules = rule_list[0];
+        var anottated_sequence_tmpl = tmpl_as[0];
+        var info_tmpl = tmpl_info[0];
+        //下記不要
+        //var rules = rule_list[0];
 
         var list_option = $("#hidemenu input[type=radio]:checked").val();
         $("#hidemenu input[type=radio]").change(function(){
             list_option = this.value;
+        });
+
+        $("#check_data_tmp").click(function () {
+            $.ajax({
+                url: "./upload",
+                method:"post",
+                dataType: "json"
+            }).done(function(res){
+                console.log(res);
+            })
         });
 
         $("#check_data").click(function () {
@@ -74,44 +87,43 @@
                                 this.$el.html(this.template(error_message))
                             }
                         });
-
                         var error_view = new ErrorView({el: $("#result")});
                     // biosample case
                     }else if(list_option == "option-grouped") {
                         // create nested data
-                        // if option Group Error Message selected
                         var grouped_message = d3.nest().key(function(d){return d.id})
                             .entries(error_message.errors);
-                        console.dir(grouped_message);
-
                         //add message and attributions each grouped messages
                         $.each(grouped_message,function(i, v){
-                            var rule_num = "rule" + v.key;
-                            var message = rules[rule_num]["message"];
-                            message = message.replace(/\:?\s?\'?<%=\s?\w+\s?%>\'?/g, '');
-                            v["message"] = message;
-                            v["location"] = rules[rule_num]["location"];
+                            v["message"] = v.values[0]["message"];
                             v["level"] = v.values[0]["level"];
-                            v["correction"] = rules[rule_num]["correction"];
                         });
 
-                        //add grouped messages to original error response
                         error_message["errors"] = grouped_message;
+
+                        console.log(error_message);
+                        switch (error_message["status"]){
+                            case "fail":
+                                tmpl = group_tmpl;
+                                break;
+                            default:
+                                tmpl = info_tmpl;
+                                break;
+                        }
 
                         // initialize fixed data object
                         var fixed_items =[];
                         var fixed_values = {};
                         var fixed_value = {};
-
                         var ErrorView = Backbone.View.extend({
                             initialize: function () {
                                 _.bindAll(this, "render");
                                 this.render();
                             },
-                            template: _.template(group_tmpl),
+                            template: _.template(tmpl),
                             render: function () {
                                 this.$el.html(this.template(error_message))
-                            },
+                            }/*,
                             events:{
                                 'change .result-group input[type=text]': 'onChange'
                             },
@@ -129,13 +141,16 @@
                                     fixed_value[input_name] = {"input_value":input_value,"location": input_location };
                                     fixed_values[biosample_id] = fixed_value;
                                 }
-                            }
+                            }*/
                         });
 
                         var error_view = new ErrorView({el: $("#result")});
 
                         $("#dl_xml").click(function(){
-                            error_message["fixed_values"] = fixed_values;
+                            console.log($("td[data-auto-annotation='true']").text());
+
+                            /*
+                            //error_message["fixed_values"] = fixed_values;
                             $.ajax({
                                 url: "./j2x",
                                 method: "post",
@@ -150,25 +165,34 @@
                                     a.click();
                                 }
                             });
+                            */
 
                         })
                     }else{
                         // biosample error response: sequential view
                         $.each(error_message.errors,function(i, v){
-                            var rule_num = "rule" + v.id;
-                            v["location"] = rules[rule_num]["location"];
-                            v["correction"] = rules[rule_num]["correction"];
+                            //var rule_num = "rule" + v.id;
+                            //v["location"] = rules[rule_num]["location"];
+                            //v["correction"] = rules[rule_num]["correction"];
                         });
-                        // if sequentilal view is selected
+                        console.log(error_message);
+                        switch (error_message["status"]){
+                            case "fail":
+                                tmpl = error_tmpl;
+                                break;
+                            default:
+                                tmpl = info_tmpl;
+                                break;
+                        }
                         var ErrorView = Backbone.View.extend({
                             initialize: function () {
                                 _.bindAll(this, "render");
                                 this.render();
                             },
-                            template: _.template(error_tmpl),
+                            template: _.template(tmpl),
                             render: function () {
                                 this.$el.html(this.template(error_message))
-                            },
+                            }/*,
                             events:{
                                 'change .result-group input[type=text]': 'onChange'
                             },
@@ -186,7 +210,7 @@
                                     fixed_value[input_name] = {"input_value":input_value,"location": input_location };
                                     fixed_values[biosample_id] = fixed_value;
                                 }
-                            }
+                            }*/
                         });
                         var error_view = new ErrorView({el: $("#result")});
                     }

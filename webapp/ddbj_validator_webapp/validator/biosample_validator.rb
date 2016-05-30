@@ -1,11 +1,11 @@
 require "./" +File.dirname(__FILE__) + "/lib/validator/main_validator.rb"
 
 #TODO args config file?
-if ARGV.size <= 2
-  puts "Usage: ruby biosample_validator.rb <input_file_path> <format> <output_file_path>"
+if ARGV.size <= 3
+  puts "Usage: ruby biosample_validator.rb <input_file_path> <format> <output_file_path> <mode>"
   exit(1);
 end
-validator = MainValidator.new
+validator = MainValidator.new (ARGV[3])
 data = ARGV[0]
 validator.validate(data);
 error_list = validator.get_error_list()

@@ -41,26 +41,61 @@ class CommonUtils
   end
 
   #
-  # Returns an error object
-  #
+  # エラーオブジェクトを組み立てて返す
+  # フォーマット(JSON)は以下を参照
+  # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
   # ==== Args
-  # id: rule_no ex."48"
-  # message: error message for displaying
-  # reference: 
+  # config: ルール記載オブジェクト { "code": "4", "level": "error", "name": "...", "method": "...",  "message": "...", "reference": "..."}
+  # reference: 参照
   # level: error/warning 
   # annotation: annotation list for correcting the value 
   # ==== Return
+  # エラーのHashオブジェクト
   #
-  def self.error_obj (id, message, reference, level, annotation)
+  def self.error_obj (rule, file_path, annotation)
     hash = {
-             id: id,
-             message: message,
-             message_ja: "",
-             reference: "",
-             level: level,
+             id: rule["code"],
+             message: rule["message"],
+             #reference: rule["reference"],
+             level: rule["level"],
              method: "biosample validator",
+             source: file_path,
              annotation: annotation
            }
+    hash
+  end
+
+  #
+  # Suggest形式のannotation情報のhashを組み立てて返す
+  # フォーマット(JSON)は以下を参照
+  # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
+  # ==== Args
+  # suggest_value_list: 候補値のリスト(配列)
+  # target_key: 適用する(表示用の)列名 ex. "Attribute value"
+  # location: 値を置き換える為のファイル内の位置情報(配列)
+  # is_auto_annotation: auto_annotationであればtrue
+  # ==== Return
+  # Suggest用Hashオブジェクト
+  # {
+  #   key: "Suggested value",
+  #   value: sugget_value_list,
+  #   is_auto_annotation: true, //or is_suggest: true
+  #   target_key: target_key,
+  #   location: location
+  # }
+  #
+  def self.create_suggested_annotation (suggest_value_list, target_key, location, is_auto_annotation)
+    hash = {
+             key: "Suggested value",
+             value: suggest_value_list,
+             target_key: target_key,
+             location: location
+           }
+    if is_auto_annotation == true
+      hash[:is_auto_annotation] = true
+    else
+      hash[:is_suggestion] = true
+    end
     hash
   end
 
