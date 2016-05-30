@@ -53,7 +53,13 @@ class BioSampleXmlConvertor
   #
   def xml2obj(xml_document)
     #TODO xml parse error
-    doc = REXML::Document.new(xml_document)
+    begin
+      doc = REXML::Document.new(xml_document)
+    rescue => ex
+      message = "Failed to parse the biosample xml file. Please check the xml format.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
     sample_list = []
     if doc.root.name == "BioSampleSet"
       biosample_list = REXML::XPath.each(doc.root, "BioSample")
@@ -62,9 +68,8 @@ class BioSampleXmlConvertor
       end
     elsif doc.root.name == "BioSample"
       sample_list.push(parseBioSample(doc.root))
-    else
-      puts "not biosample xml"
-      #TODO raise error
+    else # is not BioSample XML
+      raise "Failed to parse the biosample xml file. Excpected root tag are <BioSampleSet> or <BioSample>. Please check the format.\n"
     end
     return sample_list
   end

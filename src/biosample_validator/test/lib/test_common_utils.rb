@@ -14,7 +14,15 @@ class TestCommonUtils < Minitest::Test
     assert_equal true, ret
     ret = CommonUtils.null_value?("  ")
     assert_equal true, ret
+    ret = CommonUtils.null_value?("not applicable")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("not collected")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("not provided")
+    assert_equal true, ret
     ret = CommonUtils.null_value?("missing")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("restricted access")
     assert_equal true, ret
     ret = CommonUtils.null_value?("aaa")
     assert_equal false, ret

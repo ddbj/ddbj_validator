@@ -5,7 +5,10 @@ require 'net/http'
 
 class CommonUtils
 
-  @@null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../conf/null_accepted.json"))
+  def self.set_config (config_obj)
+    @@null_accepted = config_obj[:null_accepted]
+    @@exchange_country_list = config_obj[:exchange_country_list]
+  end
 
   #
   # Returns text that had been binded the hash object as params parameter to the template
@@ -97,6 +100,22 @@ class CommonUtils
       hash[:is_suggestion] = true
     end
     hash
+  end
+
+  #
+  # 引数がnilか空白文字であればtrueを返す
+  #
+  # ==== Args
+  # value: 検査する値
+  # ==== Return
+  # true/false
+  #
+  def self.blank?(value)
+    if value.nil? || value.strip.empty?
+      true
+    else
+      false
+    end
   end
 
   #
@@ -207,11 +226,21 @@ class CommonUtils
   #
   def geocode_country_from_latlon (iso_latlon)
     return nil if iso_latlon.nil?
-    geocode = geocode_address_from_latlon(iso_latlon)
-    if geocode.nil? || geocode.country.nil?
-      nil
-    else
-      geocode.country
+
+    # 200 ms 間隔を空ける
+    # free API の制約が 5 requests per second のため
+    # https://developers.google.com/maps/documentation/geocoding/intro?hl=ja#Limits
+    sleep(0.2)
+    begin
+      geocode = geocode_address_from_latlon(iso_latlon)
+      if geocode.nil? || geocode.country.nil?
+        nil
+      else
+        geocode.country
+      end
+    rescue => ex
+      message = "Failed to geocode with Google Geocoder API. Please check the latlon value or your internet connection. latlon: #{iso_latlon}\n"
+      raise StandardError, detail_message, ex.backtrace
     end
   end
 
@@ -225,8 +254,7 @@ class CommonUtils
   # returns true/false
   #
   def is_same_google_country_name (country_name, google_country_name)
-    exchange_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../conf/exchange_country_list.json"))#TODO conf
-    exchange_country_list.each do |row|
+    @@exchange_country_list.each do |row|
       if row["google_country_name"] == google_country_name
         google_country_name = row["insdc_country_name"]
       end
@@ -246,7 +274,7 @@ class CommonUtils
   # ==== Return
   # returns true/false
   #
-  # EtuilsAPI returns below scheme when pubmed_id is not exist.
+  # EutilsAPI returns below scheme when pubmed_id is not exist.
   #
   # {
   #   "header": {
@@ -266,17 +294,29 @@ class CommonUtils
   #
   def exist_pubmed_id? (pubmed_id)
     return nil if pubmed_id.nil?
-    res = http_get_response("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json")
-    if res.code =~ /^5|^4/ #error
-      #raise error
-    else
-      #json parse error
-      pubmed_info = JSON.parse(res.body)
-      if !pubmed_info["result"].nil? && !pubmed_info["result"][pubmed_id].nil? && pubmed_info["result"][pubmed_id]["error"].nil?
-        return true
+    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json"
+    begin
+      res = http_get_response(url)
+      if res.code =~ /^5/ # server error
+        raise "'NCBI eutils' returns a server error. Please retry later. url: #{url}\n"
+      elsif res.code =~ /^4/ # client error
+        raise "'NCBI eutils' returns a error. Please check the url. url: #{url}\n"
       else
-        return false
+        begin
+          pubmed_info = JSON.parse(res.body)
+          # responseデータにerrorキーがなければOK
+          if !pubmed_info["result"].nil? && !pubmed_info["result"][pubmed_id].nil? && pubmed_info["result"][pubmed_id]["error"].nil?
+            return true
+          else
+            return false
+          end
+        rescue
+          raise "Parse error: 'NCBI eutils' might not return a JSON format. Please check the url. url: #{url}\n response body: #{res.body}\n"
+        end
       end
+    rescue => ex
+      message = "Connection to 'NCBI eutils' server failed. Please check the url or your internet connection. url: #{url}\n"
+      raise StandardError, detail_message, ex.backtrace
     end
   end
 
@@ -293,15 +333,26 @@ class CommonUtils
   #
   def exist_doi? (doi)
     return nil if doi.nil?
-    res = http_get_response("http://api.crossref.org/works/#{doi}/agency")
-    if res.code =~ /^5/ #error
-      #raise error
-    elsif res.code == "404"
-      return false
-    else
-      #raise error if json parse error
-      pubmed_info = JSON.parse(res.body)
-      return true
+    url = "http://api.crossref.org/works/#{doi}/agency"
+    begin
+      res = http_get_response(url)
+      if res.code =~ /^5/ # server error
+        raise "'CrossRef' returns a server error. Please retry later. url: #{url}\n"
+      elsif res.code == "404" # invalid DOI
+        return false
+      elsif res.code =~ /^4/ # other client error
+        raise "'CrossRef' returns a error. Please check the url. url: #{url}\n"
+      else
+        begin
+          JSON.parse(res.body)
+          return true
+        rescue
+          raise "Parse error: 'CrossRef' might not return a JSON format. Please check the url. url: #{url}\n response body: #{res.body}\n"
+        end
+      end
+    rescue => ex
+      message = "Connection to 'CrossRef' server failed. Please check the url or your internet connection. url: #{url}\n"
+      raise StandardError, detail_message, ex.backtrace
     end
   end
 
