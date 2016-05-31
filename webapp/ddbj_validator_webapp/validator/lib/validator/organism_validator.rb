@@ -9,7 +9,7 @@ require File.dirname(__FILE__) + "/../common_utils.rb"
 # A class for BioSample validation that is relevant organism
 #
 class OrganismValidator < SPARQLBase 
-  #TODO tax_id is string of integer?
+
   TAX_BACTERIA = "2" #bacteria
   TAX_VIRUSES = "10239" #viruses
   TAX_FUNGI = "4751" #fungi

@@ -1,7 +1,7 @@
 require 'pg'
 require 'yaml'
 
-config = YAML.load_file("../db_conf/db_conf.yaml")
+config = YAML.load_file("../../../../db_conf/db_conf.yaml")
 
 # db_user 運用環境のDBのOwner
 $pg_user = config["pg_user"]

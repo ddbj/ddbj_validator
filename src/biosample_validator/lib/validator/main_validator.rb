@@ -123,7 +123,7 @@ class MainValidator
       sample_name = biosample_data["attributes"]["sample_name"]
       send("duplicated_sample_title_in_this_account", "3", sample_name, biosample_data["attributes"]["sample_title"], @sample_title_list, @submitter_id, line_num)
       send("bioproject_not_found", "6", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
-      send("duplicate_sample_names", "28", sample_name, biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
+      send("duplicate_sample_names", "28", biosample_data["attributes"]["sample_name"], @sample_name_list, @submission_id, line_num)
       send("identical_attributes", "24", sample_name, @biosample_list)
     end
     send("warning_about_bioproject_increment", "69", @biosample_list)
@@ -1504,7 +1504,7 @@ class MainValidator
     result
   end
 
-  def duplicated_sample_title_in_this_account (rule_code, biosample_title, sample_title_list, submitter_id, line_num)
+  def duplicated_sample_title_in_this_account (rule_code, sample_name, biosample_title, sample_title_list, submitter_id, line_num)
     @duplicated = []
     @duplicated = sample_title_list.select do |title|
       sample_title_list.index(title) != sample_title_list.rindex(title)
@@ -1512,7 +1512,7 @@ class MainValidator
 
     @duplicated.length > 0 ? result= false : result = true
 
-    if !submitter_id.empty? && @mode == "private"
+    if submitter_id != nil && @mode == "private"
       get_submitter_item = GetSubmitterItem.new
       @pg_response = get_submitter_item.getitems(submitter_id)
 
@@ -1760,7 +1760,7 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def warning_about_bioproject_increment (rule_code, sample_name, biosample_list)
+  def warning_about_bioproject_increment (rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.length == 0
     result = true
     bioproject_id_list = []

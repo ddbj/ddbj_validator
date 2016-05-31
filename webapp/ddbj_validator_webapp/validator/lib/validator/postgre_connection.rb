@@ -1,15 +1,13 @@
 require 'pg'
 require 'yaml'
 
-config = YAML.load_file("../db_conf/db_conf.yaml")
+#config = YAML.load_file("/home/vagrant/ddbj_validator/webapp/db_conf/db_conf.yaml")
+config = YAML.load_file("/Users/oec/Documents/ddbj/ddbj_validator/webapp/db_conf/db_conf.yaml")
 
 # db_user 運用環境のDBのOwner
 $pg_user = config["pg_user"]
 $pg_port = config["pg_port"]
 $pg_host = config["pg_host"]
-$pg_bs_name = config["pg_bs_name"]
-$pg_pass = config["pg_pass_wd"]
-
 $pg_bs_db_name = config["pg_bs_name"]
 $pg_bp_db_name = config["pg_bp_name"]
 
@@ -30,13 +28,15 @@ class GetSubmitterItem
       res.each do |item|
         @items.push(item["attribute_value"])
       end
-      @items
+      res = {:items => @items, :status => "success"}
 
-      rescue PG::Error => ex
-        @items = nil
-      rescue => ex
-        @items = nil
-      ensure
+    rescue PG::Error => ex
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
+    rescue => ex
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
+    ensure
         connection.close if connection
     end
   end
@@ -79,16 +79,15 @@ class GetBioProjectItem
       res.each {|item|
         @items.push(item)
       }
-
-      @items
+      res = {:items => @items, :status => "success"}
 
     rescue PG::Error => ex
-      #p ex.class, ex.message
-      @itemts = []
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
 
     rescue => ex
-      #p ex.class, ex.message
-      @items = []
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
 
     ensure
       connection.close if connection
@@ -112,14 +111,15 @@ class IsUmbrellaId
 
       # if "count" >= 1 this bioproject_id is  umbrella id
       result = res[0]["count"].to_i
+      res = {:items => result, :status => "success"}
 
     rescue PG::Error => ex
-      #p ex.class, ex.message
-      result = nil
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
 
     rescue => ex
-      #p ex.class, ex.message
-      result = nil
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
 
     ensure
       connection.close if connection
@@ -133,19 +133,20 @@ class GetSampleNames
     begin
       connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
 
-      q = "SELECT bs.sample_name
+      q = "SELECT bs.sample_name, bs.title
         FROM mass.biosample_summary bs
         WHERE bs.submission_id = '#{submission_id}'"
 
       result = connection.exec(q)
+      res = {:items => result, :status => "success"}
 
     rescue PG::Error => ex
-      #p ex.class, ex.message
-      resulst = nil
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
 
     rescue => ex
-      #p ex.class, ex.message
-      result = nil
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
 
     ensure
       connection.close if connection
@@ -170,14 +171,14 @@ class GetPRJDBId
         @items.push(item)
       }
 
-      @items
+      res = {:items => @items, :status => "success"}
 
     rescue PG::Error => ex
-      #p ex.class, ex.message
-      @itemts = nil
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
     rescue => ex
-      #p ex.class, ex.message
-      @items = nil
+      @error_message = ex.message.to_s
+      res = {:message => @error_message, :status => "error"}
     ensure
       connection.close if connection
     end
@@ -215,14 +216,14 @@ class GetLocusTagPrefix
       end
       @item_oters =  @items - @own_items
       @item_oters.include?(prefix) ? result = false : result = true
-      result
+      res = {:items => result, :status => "success"}
 
     rescue
-      #p ex.class, ex.message
-      result = nil
+      @error_message = ex.message.to_s
+      res = {:message => result, :status => "error"}
     rescue
-      #p ex.class, ex.message
-      result = nil
+      @error_message = ex.message.to_s
+      res = {:message => result, :status => "error"}
     ensure
       connection.close if connection
     end

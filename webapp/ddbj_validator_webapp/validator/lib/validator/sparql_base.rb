@@ -16,9 +16,6 @@ class SPARQLBase
   # endpoint: endpoint url
   #
   def initialize(endpoint)
-    #TODO get filepath from root
-    #config = JSON.parse(File.read(File.expand_path("../../conf/app_config.json", __FILE__)))
-    #@endpoint_url = config["sparql-endpoint"]  
     @endpoint_url = endpoint 
   end
 
@@ -33,15 +30,20 @@ class SPARQLBase
   #  [{:s=>"...", :p=>"...", :o=>"..."}, {:s=>"...", :p=>"...", :o=>"..."}, ....]
   def query (query)
     sparql_ep = SPARQL.new("#{@endpoint_url}")
-    result = sparql_ep.query(query, :format => 'json')
-    result_json = JSON.parse(result)
-    #TODO error handling
-    return [] if result_json['results']['bindings'].empty?
-    result = result_json['results']['bindings'].map do |b|
-      result_json['head']['vars'].each_with_object({}) do |key, hash|
-        hash[key.to_sym] = b[key]['value'] if b.has_key?(key)
-       end
+    begin
+      result = sparql_ep.query(query, :format => 'json')
+      result_json = JSON.parse(result)
+      return [] if result_json['results']['bindings'].empty?
+      result = result_json['results']['bindings'].map do |b|
+        result_json['head']['vars'].each_with_object({}) do |key, hash|
+          hash[key.to_sym] = b[key]['value'] if b.has_key?(key)
+         end
+      end
+      return result
+    rescue => ex
+      message = "Failed the sparql query. endpoint: '#{@endpoint_url}' sparql query: '#{query}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
     end
-    return result
   end
 end

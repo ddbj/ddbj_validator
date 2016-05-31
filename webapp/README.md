@@ -15,7 +15,7 @@ Vagrant upの後、サービスを開始するために環境内で下記コマ�
     forever start bin/www
     
     // Unicornの起動
-    cd /home/vagrant/ddbj_validator/webapp/Biosample_xml_api
+    cd /home/vagrant/ddbj_validator/webapp/BioSample_XML_API
     unicorn -c unicorn.rb -D -p 9292
     
 

@@ -156,12 +156,13 @@ router.post('/upload', function(req, res, next){
     function render_result(errors){
         //var errors = JSON.parse(fs.readFileSync(conf.read_file_dir + "test_failed_list.json", 'utf8'));
         var validator_res = new Object();
-        //console.log(erros)
+        errors["failed_list"] ? error_size = errors["failed_list"].length : error_size = 0;
+        errors["message"] ? error_message = errors["message"] : error_message = "";
         validator_res["status"] = errors["status"];
         validator_res["format"] = errors["format"];
         validator_res["errors"] = errors["failed_list"];
-        validator_res["error_size"] = errors["failed_list"].length;
-        validator_res["exception"] = errors["message"];
+        validator_res["error_size"] = error_size;
+        validator_res["exception"] = error_message;
         validator_res["method"] = "biosample validator";
         validator_res["original_file"] = original_name;
         validator_res["xml_filename"] = file_name;

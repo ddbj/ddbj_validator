@@ -91,22 +91,26 @@
                     // biosample case
                     }else if(list_option == "option-grouped") {
                         // create nested data
-                        var grouped_message = d3.nest().key(function(d){return d.id})
-                            .entries(error_message.errors);
-                        //add message and attributions each grouped messages
-                        $.each(grouped_message,function(i, v){
-                            v["message"] = v.values[0]["message"];
-                            v["level"] = v.values[0]["level"];
-                        });
-
-                        error_message["errors"] = grouped_message;
-
                         console.log(error_message);
+                        if(error_message["status"] == "fail") {
+                            var grouped_message = d3.nest().key(function (d) {
+                                    return d.id
+                                })
+                                .entries(error_message.errors);
+                            //add message and attributions each grouped messages
+                            $.each(grouped_message, function (i, v) {
+                                v["message"] = v.values[0]["message"];
+                                v["level"] = v.values[0]["level"];
+                            });
+                            error_message["errors"] = grouped_message;
+                        }
                         switch (error_message["status"]){
                             case "fail":
+                                console.log("f0");
                                 tmpl = group_tmpl;
                                 break;
                             default:
+                                console.log("f1");
                                 tmpl = info_tmpl;
                                 break;
                         }

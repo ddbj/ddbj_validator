@@ -9,7 +9,7 @@
                     <% if(status == "success"){ %>
                     No Errors Found
                     <% } else if(status == "error"){%>
-                        <%= message %>
+                        <%= exception %>
                     <% } else if(exception){%>
                         <%= exception.cmd %>
                     <% } %>
