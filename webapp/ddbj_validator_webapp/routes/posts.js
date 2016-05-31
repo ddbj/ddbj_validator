@@ -20,7 +20,18 @@ var file_name = "";
 var original_name = "";
 var format_type = "";
 
+router.post('/upload-tmp', function(req, res){
+    item = new Object();
+    item["errors"] = [];
+    item["exception"] =  "test";
+    item["original_file"] = req.file["originalname"];
+    item["method"] = "biosample validator";
+    item["xml_filename"] = file_name;
+    res.send(item)
+});
+
 router.post('/upload', function(req, res, next){
+    fs.writeFile("./tmp/ok_post.txt", "route.post /upload");
     original_name = req.file['originalname'];
     json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
     sample_path = conf.read_file_dir + original_name;
@@ -69,16 +80,18 @@ router.post('/upload', function(req, res, next){
         case "xml":
             var original_name = req.file['originalname'];
             sample_file_path = conf.tmp_file_dir + file_name;
-            output_path = conf.tmp_file_dir + original_name;
-
+            output_path = conf.tmp_file_dir + original_name.replace("xml", "json");
             exec('ruby ./validator/biosample_validator.rb ' +  sample_file_path + " xml " + output_path + " " + conf.validator_mode, function(error, stdout, stderr){
                 //if response is {"undefined: 1!
                 // xx.json is invalid json file} call invalid input process
-                if(stdout){
-                    console.log(stdout + " : stdout");
+                if(stderr){}
+                if(error){
+                    render_exception(error);
+                }else{
                     // error response ファイル取得
                     var obj = JSON.parse(fs.readFileSync(output_path, 'utf8'));
-
+                    render_result(obj);
+                    /*
                     if(obj["status"] == "error"){
                         render_exception(error_list["message"])
                     }else if(obj["status"] == "fail" ) {
@@ -90,27 +103,11 @@ router.post('/upload', function(req, res, next){
                     }else{
                         render_exception("Uncatch exception occured")
                     }
+                    */
                     //var error_list = eval(stdout);
                     //render_result(error_list);
                 }
-                if(stderr){
-                    console.log('stderr: ' + stderr);
-                    var obj = JSON.parse(fs.readFileSync(output_path, 'utf8'));
-                    if(obj["status"] == "error"){
-                        render_exception(error_list["message"])
-                    }else if(obj["status"] == "fail" ) {
-                        render_result(obj["failed_list"]);
-                    }else if(obj["status"] == "success") {
-                        render_result([])
-                    }else if(obj["status"] == "error"){
-                        render_exception(obj["message"])
-                    }else{
-                        render_exception("Uncatch exception occured")
-                    }
-                }
-                if(error !== null){
-                    console.log('Exec error: ' + error);
-                }
+
             });
             break;
         case "tsv":
@@ -118,11 +115,9 @@ router.post('/upload', function(req, res, next){
                 //exec('/home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/validator/annotated_sequence_validator/ddbj_annotated_sequence_validator.pl > /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp/tmp/a_s_output', function(error, stdout, stderr){
                 var a_s_output = "";
                 if(stdout){
-                    fs.writeFile("./tmp/test_a_s", "stdout");
                     a_s_output = stdout;
                 }
                 if(error){
-                    fs.writeFile("./tmp/test_a_s", "error");
                     a_s_output = a_s_output + "exception occured: " + error
                 }
                 render_output(a_s_output);
@@ -146,52 +141,58 @@ router.post('/upload', function(req, res, next){
 
     function render_exception(message){
         //res.render('validator_error', {message:"Exception occured",error: stderr });
-        console.log("f0");
         var item = new Object();
-        item['errors'] = [];
-        item['error_size'] = item['errors'].length;
-        item['exception'] =  "Exception occured, " + message;
-        item['original_file'] = original_name;
-        item['method'] = "biosample validator";
-        item['xml_filename'] = file_name;
+        //console.log(message);
+        item["errors"] = [];
+        item["exception"] =  message;
+        item["original_file"] = original_name;
+        item["method"] = "biosample validator";
+        item["xml_filename"] = file_name;
         res.json(item);
         removeTmpFiles();
     }
 
     // add some infos to validation message and return response
     function render_result(errors){
-        //var biosample_json = JSON.parse(fs.readFileSync(json_path, 'utf8'));
-        var item = new Object();
-        item['errors'] = errors;
-        item['error_size'] = item['errors'].length;
-        item['exception'] = "";
-        item['method'] = "biosample validator";
-        item['original_file'] = original_name;
-        item['xml_filename'] = file_name;
-        res.json(item);
+        //var errors = JSON.parse(fs.readFileSync(conf.read_file_dir + "test_failed_list.json", 'utf8'));
+        var validator_res = new Object();
+        //console.log(erros)
+        validator_res["status"] = errors["status"];
+        validator_res["format"] = errors["format"];
+        validator_res["errors"] = errors["failed_list"];
+        validator_res["error_size"] = errors["failed_list"].length;
+        validator_res["exception"] = errors["message"];
+        validator_res["method"] = "biosample validator";
+        validator_res["original_file"] = original_name;
+        validator_res["xml_filename"] = file_name;
+        res.json(validator_res);
         removeTmpFiles();
     }
 
     function render_output(output_list){
+        fs.writeFile("./tmp/render_output.txt", output_list);
+        console.log(output_ilst);
         //fs.writeFile("./tmp/test_a_s", output_list);
         original_name = req.file["originalname"];
-        var item = new Object();
-        item['messages'] = output_list;
-        item['error_size'] = 0;
-        item['exception'] = output_list;
-        item['method'] = "annotated sequence validator";
-        item['original_file'] = original_name;
-        item['xml_filename'] = file_name;
-        res.json(item);
+        var validator_res = new Object();
+        validator_res["status"] = "";
+        validator_res["messages"] = output_list;
+        validator_res["error_size"] = 0;
+        validator_res["exception"] = output_list;
+        validator_res["method"] = "annotated sequence validator";
+        validator_res["original_file"] = original_name;
+        validator_res["xml_filename"] = file_name;
+        res.json(validator_res);
         removeTmpFiles();
     }
 
     function removeTmpFiles(){
-        //delete temporary json file
+        //delete temporary file
         //exec('rm -f ' + json_path, function(error, stdout, stderr){});
 
         //delete old xml files
-        exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){});
+        //exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){});
+        //exec('find ./tmp/ -mtime +1', function(error, stdout, stderr){console.log(stdout)})
     }
 });
 

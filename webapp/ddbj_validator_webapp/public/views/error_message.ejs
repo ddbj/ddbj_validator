@@ -28,9 +28,9 @@
     </table>
 </div>
 
-<% if(error_size != 0){ %>
 <div class="container result-group">
     <h2>Validation Output</h2>
+
     <% for(var i=0; i< errors.length; i++){ %>
     <div class="error-item">
         <h3>
@@ -43,14 +43,22 @@
                 <%= errors[i].level %>
             </span>
             <% } %>
+
+            <%= errors[i].annotation[0].key %> : <%= errors[i].annotation[0].value %> ,
             <%= errors[i].message %>
         </h3>
         <ul>
-            <li>
-                Sample Id: " ",
-                Key: <%= errors[i].annotation[0].key %>,
-                Value: <%= errors[i].annotation[0].value %>,
-            </li>
+            <% for(var j = 1; j < errors[i].annotation.length; j++) { %>
+                <% if(errors[i].annotation[j].is_auto_annotation) { %>
+                <li data-auto-annotation="true">
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                </li>
+                <% }else{%>
+                <li>
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                </li>
+                <% } %>
+            <% } %>
         </ul>
     </div>
     <% } %>
@@ -62,5 +70,4 @@
     </div>
 </div>
 
-<% } %>
 

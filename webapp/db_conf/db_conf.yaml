@@ -1,0 +1,6 @@
+pg_user : "oec"
+pg_port : "5432"
+pg_host : "localhost"
+pg_bs_name : "bstest"
+pg_bp_name : "bptest"
+pg_pass_wd : ""

@@ -1,0 +1,12 @@
+PREFIX id_tax: <http://identifiers.org/taxonomy/>
+PREFIX ddbj_tax: <http://ddbj.nig.ac.jp/ontologies/taxonomy/>
+
+SELECT ?parent_tax
+FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy>
+{
+  VALUES ?tax_id { id_tax:<%= tax_id %> }
+  ?tax_id ddbj_tax:rank ?rank .
+  ?tax_id rdfs:subClassOf* ?parent_tax .
+  ?parent_tax ddbj_tax:rank ?parent_rank .
+  FILTER (?parent_rank = ddbj_tax:<%= rank %>)
+}

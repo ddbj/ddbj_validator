@@ -1,12 +1,34 @@
-# About DDBJ BioSample Validator
+# DDBJ Validation Service
+
+## 仮想環境の取得とサービスの起動
+
+DDBJ Validation Srviceは、Vagratn & Virtual BoxのBoxとして提供されます。
+
+最新のBoxは下記URLより取得してください
+
+[http://vagrant-file-dvs.bmu.jp/package.box](http://vagrant-file-dvs.bmu.jp/package.box)
+
+Vagrant upの後、サービスを開始するために環境内で下記コマンドを実行し手動で必用なサービスを起動してください。
+
+    // Expressの起動
+    cd /home/vagrant/ddbj_validator/webapp/ddbj_validator_webapp
+    forever start bin/www
+    
+    // Unicornの起動
+    cd /home/vagrant/ddbj_validator/webapp/Biosample_xml_api
+    unicorn -c unicorn.rb -D -p 9292
+    
 
 ## システム仕様
 
+- サーバOS：Ubuntu14.04LTS
+- 仮想環境：Vagrant & Virtual box
 - アプリケーション言語：Ruby（2.x）, Node.js(v0.10.x)
 - データベース：MongoDB
 - Webフレームワーク（サーバサイド）：Node.js - Express(v4.x)
 - Webフレームワーク（クライアントサイド）：Backbone.js
 - アプリケーションサーバ：Express - forever - nginx(リバースプロキシ、予定)
+
 
 ## ディレクトリ・ファイル構成
 
@@ -88,27 +110,10 @@
  - libxmljs (npm install)
  - node-gyp (npm install -g)
  
- 
-## アプリケーションの起動
 
-手動によるWebアプリケーションの起動は下記のようにアプリケーションのルートディレクトリでExpressの起動スクリプトを呼び出すことで開始します。
-アプリケーションはforeverによってデーモン化します。
+Webアプリケーションは3000番のportを利用します。下記の様なアドレスでローカルで起動したアプリケーションを利用することができます。
 
-    forever start bin/www
-
-foreverの自動起動を行うため下記のように /etc/rc.localに追記します。
-
-```
-/usr/local/bin/node /usr/local/bin/forever start \
-  -p /var/run/forever \
-  --pidfile /var/run/node-app.pid \
-  -l /var/log/node-app.log -a \
-  /home/ubuntu/ddbj_validator/webapp/bin/www
-```
-
-
-アプリケーションは3000番のportを利用します。下記のアドレスでローカルで起動したアプリケーションを利用することができます。
-
+    例）
     http://localhost:3000    
 
 配布するコンテナなどでは、nginxによるリバースプロキシの適応を予定しています。
@@ -130,6 +135,7 @@ validatorから返却されたerror responseはmongodbに保存されます。�
      "selected" : [{attribute_name: value} ], //値が変更されたattributeとvalueのセットを格納
      "__v" : 0 
      }
+
 
 
 
