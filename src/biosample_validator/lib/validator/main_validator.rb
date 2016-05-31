@@ -146,7 +146,7 @@ class MainValidator
         ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, @conf[:null_accepted], line_num)
         if ret == false #save auto annotation value #TODO test
           annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-          biosample_data["attributes"][attr_name] = annotation[:value].first
+          biosample_data["attributes"][attribute_name] = annotation[:value].first
         end
       end
       send("not_predefined_attribute_name", "14", sample_name, biosample_data["attributes"], attr_list , line_num)
@@ -173,7 +173,7 @@ class MainValidator
       ret = send("format_of_geo_loc_name_is_invalid", "94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false #save auto annotation value
         annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-        biosample_data["attributes"][attr_name] = annotation[:value].first
+        biosample_data["attributes"][attribute_name] = annotation[:value].first
       end
 
       send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:country_list], line_num)
