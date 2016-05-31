@@ -147,7 +147,7 @@ class MainValidator
         ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, @conf[:null_accepted], line_num)
         if ret == false #save auto annotation value #TODO test
           annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-          biosample_data["attributes"][attr_name] = annotation[:value].first
+          biosample_data["attributes"][attribute_name] = annotation[:value].first
         end
       end
       send("not_predefined_attribute_name", "14", sample_name, biosample_data["attributes"], attr_list , line_num)
@@ -170,7 +170,7 @@ class MainValidator
       ret = send("format_of_geo_loc_name_is_invalid", "94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false #save auto annotation value
         annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-        biosample_data["attributes"][attr_name] = annotation[:value].first
+        biosample_data["attributes"][attribute_name] = annotation[:value].first
       end
 
       send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:country_list], line_num)
@@ -1161,28 +1161,27 @@ class MainValidator
   # true/false
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
-    return nil if CommonUtils::blank?(collection_date)
+    return nil if CommonUtils::null_value?(collection_date)
 
     result = true
     case collection_date
       when /\d{4}/
         date_format = '%Y'
-
       when /\d{4}\/\d{1,2}\/\d{1,2}/
         date_format = "%Y-%m-%d"
-
       when /\d{4}\/\d{1,2}/
-        date_format = "%Y-%m"
-
+          date_format = "%Y-%m"
       when /\w{3}\/\d{4}/
         date_format = "%b-%Y"
-
+      else
+        result = false
     end
-    date_format = '%Y'
-    collection_date = Date.strptime(collection_date, date_format)
-    if (Date.today <=> collection_date) >= 0
-      result =  true
-    else
+    if result == true
+      collection_date = Date.strptime(collection_date, date_format)
+      result = (Date.today <=> collection_date) >= 0
+    end
+
+    if result == false
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: "collection_date"},
