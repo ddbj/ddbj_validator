@@ -1,5 +1,4 @@
 require 'sinatra/base'
-require 'sinatra/reloder' if development?
 require 'erb'
 require 'pg'
 require 'rexml/document'
@@ -17,14 +16,13 @@ $pg_pass = config["pg_pass"]
 
 class PGConn
   def conn
-    db_user = PG_USER
-    connection = PG::connect(:host => $pg_host, :user => $db_user,  :dbname => $pg_bs_name, :port => $pg_port, :password => $pg_pass)
+    connection = PG::connect(:host => $pg_host, :user => $pg_user,  :dbname => $pg_bs_name, :port => $pg_port, :password => $pg_pass)
   end
 end
 
-
 class MyApp < Sinatra::Application
   get '/' do
+    puts "user: #{$pg_user}, port: #{$pg_port}"
     "Please enter valid parameter"
   end
 

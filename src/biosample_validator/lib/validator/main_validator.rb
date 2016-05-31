@@ -707,7 +707,12 @@ class MainValidator
       true
     elsif /^PSUB/ =~ project_id && @mode == "private"
       get_prjdb_id = GetPRJDBId.new
-      project_id_info = get_prjdb_id.get_id(project_id)
+      @pg_response = get_prjdb_id.get_id(project_id)
+      if @pg_response[:status] == "error"
+        raise @pg_response[:message]
+      else
+        project_id_info = @pg_response[:items]
+      end
       prjd_id = project_id_info[0]["prjd"]
       if prjd_id
         annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id, prjd_id]}]
@@ -1505,7 +1510,13 @@ class MainValidator
 
     if !submitter_id.empty? && @mode == "private"
       get_submitter_item = GetSubmitterItem.new
-      items = get_submitter_item.getitems(submitter_id)
+      @pg_response = get_submitter_item.getitems(submitter_id)
+
+      if @pg_response[:status] == "error"
+        raise @pg_response[:message]
+      else
+        items = @pg_response[:items]
+      end
 
       if @duplicated.length == 0 && !items
         return nil
@@ -1535,7 +1546,14 @@ class MainValidator
     result = true
     if @mode == "private"
       get_bioproject_item = GetBioProjectItem.new
-      @bp_info = get_bioproject_item.get_submitter(bioproject_id)
+      @pg_response = get_bioproject_item.get_submitter(bioproject_id)
+
+      if @pg_response[:status] == "error"
+        raise @pg_response[:message]
+      else
+        @bp_info = @pg_response[:items]
+      end
+
       if @bp_info.length > 0
         unless submitter_id == @bp_info[0]["submitter_id"]
           annotation = []
@@ -1605,7 +1623,13 @@ class MainValidator
     result  = true
     if @mode == "private"
       is_umbrella_id = IsUmbrellaId.new
-      @is_umbrella = is_umbrella_id.is_umbrella(bioproject_id)
+      @pg_response = is_umbrella_id.is_umbrella(bioproject_id)
+
+      if @pg_response[:status] == "error"
+        raise @pg_response[:message]
+      else
+        @is_umbrella == @pg_response[:items]
+      end
 
       if @is_umbrella == 0
         result = true
@@ -1671,7 +1695,14 @@ class MainValidator
 
     if submission_id && @mode == "private"
       get_submission_name = GetSampleNames.new
-      res = get_submission_name.getnames(submission_id)
+      @pg_response = get_submission_name.getnames(submission_id)
+
+      if @pg_response[:status] == "error"
+        raise @pg_response[:message]
+      else
+        res = @pg_response[:items]
+      end
+
       if res
         names = []
         res.each do |item|
@@ -1753,7 +1784,14 @@ class MainValidator
     #TODO 複数サンプルがxmlで来た場合にファイル内での重複チェックができていないのでは?
     if @mode == "private"
       get_locus_tag_prefix = GetLocusTagPrefix.new
-      result = get_locus_tag_prefix.unique_prefix?(locus_tag, submission_id)
+      @pg_response = get_locus_tag_prefix.unique_prefix?(locus_tag, submission_id)
+
+      if @pg_response[:status] = "error"
+        raise @pg_response[:message]
+      else
+        result = @pg_response[:items]
+      end
+
       if result == nil
         return nil
       elsif !result
