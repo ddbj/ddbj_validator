@@ -132,7 +132,7 @@ class GetSampleNames
     begin
       connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
 
-      q = "SELECT bs.sample_name
+      q = "SELECT bs.sample_name, bs.title
         FROM mass.biosample_summary bs
         WHERE bs.submission_id = '#{submission_id}'"
 
