@@ -1156,28 +1156,27 @@ class MainValidator
   # true/false
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
-    return nil if CommonUtils::blank?(collection_date)
+    return nil if CommonUtils::null_value?(collection_date)
 
     result = true
     case collection_date
       when /\d{4}/
         date_format = '%Y'
-
       when /\d{4}\/\d{1,2}\/\d{1,2}/
         date_format = "%Y-%m-%d"
-
       when /\d{4}\/\d{1,2}/
-        date_format = "%Y-%m"
-
+          date_format = "%Y-%m"
       when /\w{3}\/\d{4}/
         date_format = "%b-%Y"
-
+      else
+        result = false
     end
-    date_format = '%Y'
-    collection_date = Date.strptime(collection_date, date_format)
-    if (Date.today <=> collection_date) >= 0
-      result =  true
-    else
+    if result == true
+      collection_date = Date.strptime(collection_date, date_format)
+      result = (Date.today <=> collection_date) >= 0
+    end
+
+    if result == false
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: "collection_date"},
