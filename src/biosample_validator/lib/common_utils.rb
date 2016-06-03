@@ -245,25 +245,20 @@ class CommonUtils
   end
 
   #
-  # Returns true if the country_name is valid in google_country_name(ignore case)
+  # Googleの国名からINSDCの国名へ変換して返す
   #
   # ==== Args
-  # country_name: country name(except INSDC country name)
   # google_country_name: country name in google
   # ==== Return
   # returns true/false
   #
-  def is_same_google_country_name (country_name, google_country_name)
+  def country_name_google2insdc (google_country_name)
     @@exchange_country_list.each do |row|
       if row["google_country_name"] == google_country_name
         google_country_name = row["insdc_country_name"]
       end
     end
-    if country_name.downcase == google_country_name.downcase
-      true
-    else
-      false
-    end
+    google_country_name
   end
 
   #

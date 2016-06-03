@@ -970,7 +970,7 @@ class MainValidator
 
     common = CommonUtils.new
     if @cache.nil? || @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon) == false #cache値がnilの可能性があるためhas_keyでチェック
-      insdc_latlon = common.format_insdc_latlon(lat_lon) #TODO auto suggest後なら不要かも
+      insdc_latlon = common.format_insdc_latlon(lat_lon)
       iso_latlon = common.convert_latlon_insdc2iso(insdc_latlon)
       if iso_latlon.nil?
         latlon_for_google = lat_lon
@@ -984,14 +984,13 @@ class MainValidator
       latlon_country_name = @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon)
     end
 
-    if !latlon_country_name.nil? && common.is_same_google_country_name(country_name, latlon_country_name)
+    if !latlon_country_name.nil? && country_name == common.country_name_google2insdc(latlon_country_name)
       true
     else
       if latlon_country_name.nil?
         message = "Geographic location is not retrieved by geocoding 'latitude and longitude'."
       else
-        #TODO USAなどの読み替え時の警告の値#{latlon_country_name}を読み替える必要がある
-        message = "Lat_lon '#{lat_lon}' maps to '#{latlon_country_name}' instead of '#{geo_loc_name}"
+        message = "Lat_lon '#{lat_lon}' maps to '#{common.country_name_google2insdc(latlon_country_name)}' instead of '#{country_name}'"
       end
       annotation = [
         {key: "Sample name", value: sample_name},

@@ -496,7 +496,7 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     # ng case
     ret = exec_validator("latlon_versus_country", "41", "SampleA", "Norway:Svalbard", "78.92267 N 11.98147 E", 1)
-    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway:Svalbard'"
+    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway'"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
