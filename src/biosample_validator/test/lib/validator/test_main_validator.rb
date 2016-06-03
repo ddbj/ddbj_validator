@@ -617,21 +617,21 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_invalid_attribute_value_for_null
-    null_accepted_a = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted_a"))
+    null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted.json"))
     # ok case
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "N.A.", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "N.A.", null_accepted, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "", null_accepted, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## null like value
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "not applicable", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "not applicable", null_accepted, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
