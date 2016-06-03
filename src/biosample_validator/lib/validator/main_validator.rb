@@ -51,6 +51,8 @@ class MainValidator
       config[:int_attr] = JSON.parse(File.read(config_file_dir + "/integer_attributes.json"))
       config[:special_chars] = JSON.parse(File.read(config_file_dir + "/special_characters.json"))
       config[:country_list] = JSON.parse(File.read(config_file_dir + "/country_list.json"))
+      config[:historical_country_list] = JSON.parse(File.read(config_file_dir + "/historical_country_list.json"))
+      config[:valid_country_list] = config[:country_list] - config[:historical_country_list]
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/validation_config.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
@@ -173,7 +175,7 @@ class MainValidator
         biosample_data["attributes"][attribute_name] = annotation[:value].first
       end
 
-      send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:country_list], line_num)
+      send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
       send("invalid_lat_lon_format", "9", sample_name, biosample_data["attributes"]["lat_lon"], line_num) #TODO auto-annotation
       send("invalid_host_organism_name", "15", sample_name, biosample_data["attributes"]["host"], line_num)
       send("taxonomy_error_warning", "45", sample_name, biosample_data["attributes"]["organism"], line_num)
@@ -787,7 +789,6 @@ class MainValidator
   #
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name)
-
     country_name = geo_loc_name.split(":").first.strip
     if country_list.include?(country_name)
       true

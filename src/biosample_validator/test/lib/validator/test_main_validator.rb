@@ -377,12 +377,18 @@ class TestMainValidator < Minitest::Test
 
   def test_invalid_country
     country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/historical_country_list.json"))
+    country_list = country_list - historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "8", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("invalid_country", "8", "sampleA", "Non exist country:Kanagawa, Hakone, Lake Ashi", country_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##histrical country
+    ret = exec_validator("invalid_country", "8", "sampleA", "Korea", country_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
@@ -751,7 +757,7 @@ class TestMainValidator < Minitest::Test
     # ok case
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", biosample_data)
+    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -759,7 +765,7 @@ class TestMainValidator < Minitest::Test
     #sample_nameとsample_titleが異なる同じ属性をもつ5つのサンプル
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", biosample_data)
+    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
   end
