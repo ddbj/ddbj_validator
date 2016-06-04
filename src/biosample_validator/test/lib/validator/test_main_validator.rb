@@ -92,22 +92,7 @@ class TestMainValidator < Minitest::Test
       ret
     end
   end
-=begin #TODO delete
-  def test_failure_to_parse_batch_submission_file
-    #ok case
-    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_ok.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_error.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-=end
+
   def test_non_ascii_header_line
     #ok case
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
@@ -677,10 +662,13 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", " MTB313", 1) 
+    # 前後に空白があり、引用符で囲まれ、タブと改行と繰り返し空白が含まれる文字列
+    ng_value = "    \"abc     def		ghi
+jkl\"  "
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "MTB313", get_auto_annotation(ret[:error_list])
+    assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", 1)
     assert_equal nil, ret[:result]

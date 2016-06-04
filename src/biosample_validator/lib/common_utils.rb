@@ -328,7 +328,7 @@ class CommonUtils
       end
     rescue => ex
       message = "Connection to 'NCBI eutils' server failed. Please check the url or your internet connection. url: #{url}\n"
-      raise StandardError, detail_message, ex.backtrace
+      raise StandardError, message, ex.backtrace
     end
   end
 
@@ -364,7 +364,7 @@ class CommonUtils
       end
     rescue => ex
       message = "Connection to 'CrossRef' server failed. Please check the url or your internet connection. url: #{url}\n"
-      raise StandardError, detail_message, ex.backtrace
+      raise StandardError, message, ex.backtrace
     end
   end
 
