@@ -92,21 +92,6 @@ class TestMainValidator < Minitest::Test
       ret
     end
   end
-=begin
-  # auto_annotationの補正が効いているかの検証。全てのvalidatorを実行するためコメントアウト
-  def test_save_auto_annotation_value
-    # is not method test
-    # test data: "geo_loc_name" => "  Jaaaapan"
-    # expect:
-    #     "  Jaaaapan" will be auto-annotated to "Jaaaapan" by the auto-annotation or rule 13.
-    #     And, this value will be used on next validation method(rule46) as "geo_loc_name" attribute value
-    biosample_set = @validator.validate("../../data/save_auto_annotation_value.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "41"}
-    annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
-    assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
-  end
-=end
 =begin #TODO delete
   def test_failure_to_parse_batch_submission_file
     #ok case

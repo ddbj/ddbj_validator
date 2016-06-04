@@ -98,14 +98,16 @@ class MainValidator
       ### 2.auto correct (rule: 12, 13)
       biosample_data["attributes"].each do |attr_name, value|
         ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], line_num)
-	if ret == false #save auto annotation value
-          annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-          biosample_data["attributes"][attr_name] = annotation[:value].first
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         ret = send("invalid_data_format", "13", sample_name, attr_name, value, line_num)
-	if ret == false #save auto annotation value
-          annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-          biosample_data["attributes"][attr_name] = annotation[:value].first
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        end
+        ret = send("invalid_attribute_value_for_null", "1", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         ### 3.non-ASCII check (rule: 58)
         send("non_ascii_attribute_value", "58", sample_name, attr_name, value, line_num)
@@ -145,24 +147,24 @@ class MainValidator
       #TODO get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data["package"])
 
-      ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
-      biosample_data["attributes"].each do |attribute_name, value|
-        ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
-        if ret == false #save auto annotation value #TODO test
-          annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-          biosample_data["attributes"][attribute_name] = annotation[:value].first
-        end
-      end
+      ### 6.check all attributes (rule: 14, 27, 92)
       send("not_predefined_attribute_name", "14", sample_name, biosample_data["attributes"], attr_list , line_num)
       send("missing_mandatory_attribute", "27", sample_name, biosample_data["attributes"], attr_list , line_num)
       send("missing_required_attribute_name", "92", sample_name, biosample_data["attributes"], attr_list , line_num)
+
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       sample_name = biosample_data["attributes"]["sample_name"]
       biosample_data["attributes"].each do|attribute_name, value|
         send("invalid_attribute_value_for_controlled_terms", "2", sample_name, attribute_name.to_s, value, @conf[:cv_attr], line_num)
-        send("invalid_publication_identifier", "11", sample_name, attribute_name.to_s, value, @conf[:ref_attr], line_num)
-        send("invalid_date_format", "7", sample_name, attribute_name.to_s, value, @conf[:ts_attr], line_num)
+        ret = send("invalid_publication_identifier", "11", sample_name, attribute_name.to_s, value, @conf[:ref_attr], line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attribute_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        end
+        ret = send("invalid_date_format", "7", sample_name, attribute_name.to_s, value, @conf[:ts_attr], line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attribute_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        end
         send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, @conf[:int_attr], line_num)
       end
       send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
@@ -171,13 +173,15 @@ class MainValidator
       send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @submission_id, line_num)
 
       ret = send("format_of_geo_loc_name_is_invalid", "94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
-      if ret == false #save auto annotation value
-        annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
-        biosample_data["attributes"][attribute_name] = annotation[:value].first
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
 
       send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      send("invalid_lat_lon_format", "9", sample_name, biosample_data["attributes"]["lat_lon"], line_num) #TODO auto-annotation
+      ret = send("invalid_lat_lon_format", "9", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
       send("invalid_host_organism_name", "15", sample_name, biosample_data["attributes"]["host"], line_num)
       send("taxonomy_error_warning", "45", sample_name, biosample_data["attributes"]["organism"], line_num)
       send("future_collection_date", "40", sample_name, biosample_data["attributes"]["collection_date"], line_num)
@@ -453,8 +457,9 @@ class MainValidator
     end
     if result == false
       sample_title = biosample_data["attributes"]["sample_title"].nil? ? "" : biosample_data["attributes"]["sample_title"]
+      sample_name = biosample_data["attributes"]["sample_name"].nil? ? "" : biosample_data["attributes"]["sample_name"]
       annotation = [
-        {key: "Sample name", value: ""},
+        {key: "Sample name", value: sample_name},
         {key: "sample_title", value: sample_title}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
@@ -480,9 +485,10 @@ class MainValidator
       result = false
     end
     if result == false
+      organism = biosample_data["attributes"]["organism"].nil? ? "" : biosample_data["attributes"]["organism"]
       annotation = [
         {key: "Sample name", value: sample_name},
-        {key: "organism", value: ""}
+        {key: "organism", value: organism}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
@@ -1178,8 +1184,8 @@ class MainValidator
         result = false
     end
     if result == true
-      collection_date = Date.strptime(collection_date, date_format)
-      result = (Date.today <=> collection_date) >= 0
+      formated_date = Date.strptime(collection_date, date_format)
+      result = (Date.today <=> formated_date) >= 0
     end
 
     if result == false

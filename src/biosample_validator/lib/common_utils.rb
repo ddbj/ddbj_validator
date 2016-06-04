@@ -103,6 +103,23 @@ class CommonUtils
   end
 
   #
+  # エラーオブジェクトにauto-annotationの値があればその値を返す。なければnilを返す
+  # ==== Args
+  # error_ojb: 1件のエラーオブジェクト
+  # ==== Return
+  # auto-annotationの値
+  #
+  def self.get_auto_annotation (error_obj)
+    return nil if error_obj.nil? || error_obj[:annotation].nil?
+    annotation = error_obj[:annotation].find {|anno| anno[:is_auto_annotation] == true }
+    if annotation.nil?
+      return nil
+    else
+      annotation[:value].first
+    end
+  end
+
+  #
   # 引数がnilか空白文字であればtrueを返す
   #
   # ==== Args
