@@ -45,6 +45,7 @@ class MainValidator
     config = {}
     begin
       config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
+      config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
       config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
       config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
       config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
@@ -146,7 +147,7 @@ class MainValidator
 
       ### 6.check all attributes (rule: 1, 14, 27, 36, 92)
       biosample_data["attributes"].each do |attribute_name, value|
-        ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, @conf[:null_accepted], line_num)
+        ret = send("invalid_attribute_value_for_null", "1", sample_name, attribute_name.to_s, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
         if ret == false #save auto annotation value #TODO test
           annotation = @error_list.last[:annotation].find {|anno| anno[:is_auto_annotation] == true }
           biosample_data["attributes"][attribute_name] = annotation[:value].first
@@ -1195,20 +1196,28 @@ class MainValidator
   end
 
   #
-  # NAのようなnullに相当する値を規定の値(missing)に補正
+  # "not applicable"のようなNULL値相当の値の表記ゆれ(大文字小文字)を補正
+  # "N.A."のような非推奨値を規定の値(missing)に補正
   #
   # ==== Args
   # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # null_accepted_list NULL値として推奨される値(正規表現)のリスト
+  # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, line_num)
+  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, line_num)
     return nil if CommonUtils::null_value?(attr_val)
 
     result = true
+
+    attr_val_result = ""
+    #推奨されている NULL 値の表記を揃える(小文字表記へ)
     if null_accepted_list.include?attr_val.downcase
-      for null_accepted in null_accepted_list
-        if /#{null_accepted}/i =~ attr_val
+      null_accepted_list.each do |null_accepted|
+        if attr_val =~ /#{null_accepted}/i
           attr_val_result = attr_val.downcase
           unless attr_val_result == attr_val
             result = false
@@ -1217,10 +1226,15 @@ class MainValidator
       end
     end
 
-    null_not_recommended = Regexp.new(/^(NA|N\/A|N\.A\.?|Unknown)$/i)
-    if attr_val =~ null_not_recommended
-      attr_val_result = "missing"
+    # NULL 値を推奨値に変換
+    null_not_recommended_list.each do |refexp|
+      if attr_val =~ /^(#{refexp})$/i
+        attr_val_result = "missing"
+        result = false
+      end
+    end
 
+    if result == false
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
