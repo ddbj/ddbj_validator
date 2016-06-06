@@ -16,7 +16,8 @@ $pg_pass = config["pg_pass"]
 
 class PGConn
   def conn
-    connection = PG::connect(:host => $pg_host, :user => $pg_user,  :dbname => $pg_bs_name, :port => $pg_port, :password => $pg_pass)
+    #connection = PG::connect(:host => $pg_host, :user => $pg_user,  :dbname => $pg_bs_name, :port => $pg_port, :password => $pg_pass)
+    connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bs_name, $pg_user,  $pg_pass)
   end
 end
 
@@ -45,6 +46,7 @@ class MyApp < Sinatra::Application
     end
 
     content_type 'text/xml'
+    response.headers["Access-Control-Allow-Origin"] = "*"
     @biosample_set.to_s
 
   end
@@ -71,6 +73,7 @@ class MyApp < Sinatra::Application
     end
 
     content_type 'text/xml'
+    response.headers["Access-Control-Allow-Origin"] = "*"
     @biosample_set.to_s
 
   end
