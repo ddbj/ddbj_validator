@@ -92,37 +92,7 @@ class TestMainValidator < Minitest::Test
       ret
     end
   end
-=begin
-  # auto_annotationの補正が効いているかの検証。全てのvalidatorを実行するためコメントアウト
-  def test_save_auto_annotation_value
-    # is not method test
-    # test data: "geo_loc_name" => "  Jaaaapan"
-    # expect:
-    #     "  Jaaaapan" will be auto-annotated to "Jaaaapan" by the auto-annotation or rule 13.
-    #     And, this value will be used on next validation method(rule46) as "geo_loc_name" attribute value
-    biosample_set = @validator.validate("../../data/save_auto_annotation_value.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "41"}
-    annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
-    assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
-  end
-=end
-=begin #TODO delete
-  def test_failure_to_parse_batch_submission_file
-    #ok case
-    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_ok.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_error.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-=end
+
   def test_non_ascii_header_line
     #ok case
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
@@ -377,12 +347,18 @@ class TestMainValidator < Minitest::Test
 
   def test_invalid_country
     country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/historical_country_list.json"))
+    country_list = country_list - historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "8", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("invalid_country", "8", "sampleA", "Non exist country:Kanagawa, Hakone, Lake Ashi", country_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##histrical country
+    ret = exec_validator("invalid_country", "8", "sampleA", "Korea", country_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
@@ -490,7 +466,7 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     # ng case
     ret = exec_validator("latlon_versus_country", "41", "SampleA", "Norway:Svalbard", "78.92267 N 11.98147 E", 1)
-    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway:Svalbard'"
+    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway'"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
@@ -611,21 +587,29 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_invalid_attribute_value_for_null
-    null_accepted_a = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted_a"))
+    null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted.json"))
+    null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_not_recommended.json"))
     # ok case
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted, null_not_recommended, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "N.A.", null_accepted_a, 1)
+    ## uppercase
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    assert_equal "not applicable", get_auto_annotation(ret[:error_list])
+    ## not recommended
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "n. a.", null_accepted, null_not_recommended, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "", null_accepted, null_not_recommended, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## null like value
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "not applicable", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "not applicable", null_accepted, null_not_recommended, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -678,10 +662,13 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", " MTB313", 1) 
+    # 前後に空白があり、引用符で囲まれ、タブと改行と繰り返し空白が含まれる文字列
+    ng_value = "    \"abc     def		ghi
+jkl\"  "
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "MTB313", get_auto_annotation(ret[:error_list])
+    assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", 1)
     assert_equal nil, ret[:result]
@@ -751,7 +738,7 @@ class TestMainValidator < Minitest::Test
     # ok case
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", biosample_data)
+    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -759,7 +746,7 @@ class TestMainValidator < Minitest::Test
     #sample_nameとsample_titleが異なる同じ属性をもつ5つのサンプル
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", biosample_data)
+    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
   end

@@ -103,6 +103,23 @@ class CommonUtils
   end
 
   #
+  # エラーオブジェクトにauto-annotationの値があればその値を返す。なければnilを返す
+  # ==== Args
+  # error_ojb: 1件のエラーオブジェクト
+  # ==== Return
+  # auto-annotationの値
+  #
+  def self.get_auto_annotation (error_obj)
+    return nil if error_obj.nil? || error_obj[:annotation].nil?
+    annotation = error_obj[:annotation].find {|anno| anno[:is_auto_annotation] == true }
+    if annotation.nil?
+      return nil
+    else
+      annotation[:value].first
+    end
+  end
+
+  #
   # 引数がnilか空白文字であればtrueを返す
   #
   # ==== Args
@@ -245,25 +262,20 @@ class CommonUtils
   end
 
   #
-  # Returns true if the country_name is valid in google_country_name(ignore case)
+  # Googleの国名からINSDCの国名へ変換して返す
   #
   # ==== Args
-  # country_name: country name(except INSDC country name)
   # google_country_name: country name in google
   # ==== Return
   # returns true/false
   #
-  def is_same_google_country_name (country_name, google_country_name)
+  def country_name_google2insdc (google_country_name)
     @@exchange_country_list.each do |row|
       if row["google_country_name"] == google_country_name
         google_country_name = row["insdc_country_name"]
       end
     end
-    if country_name.downcase == google_country_name.downcase
-      true
-    else
-      false
-    end
+    google_country_name
   end
 
   #
@@ -316,7 +328,7 @@ class CommonUtils
       end
     rescue => ex
       message = "Connection to 'NCBI eutils' server failed. Please check the url or your internet connection. url: #{url}\n"
-      raise StandardError, detail_message, ex.backtrace
+      raise StandardError, message, ex.backtrace
     end
   end
 
@@ -352,7 +364,7 @@ class CommonUtils
       end
     rescue => ex
       message = "Connection to 'CrossRef' server failed. Please check the url or your internet connection. url: #{url}\n"
-      raise StandardError, detail_message, ex.backtrace
+      raise StandardError, message, ex.backtrace
     end
   end
 
