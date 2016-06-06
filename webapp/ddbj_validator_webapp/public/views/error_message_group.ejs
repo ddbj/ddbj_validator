@@ -59,13 +59,9 @@
                 <tr>
                 <% for(var j = 0; j < errors[i].values[h].annotation.length; j++) { %>
                     <% if(errors[i].values[h].annotation[j].is_auto_annotation) { %>
-                    <td data-auto-annotation="true">
-                        <%= errors[i].values[h].annotation[j].value %>
-                    </td>
+                    <td data-auto-annotation='true' data-location='<%= errors[i].values[h].annotation[j].location %>'><%= errors[i].values[h].annotation[j].value %></td>
                     <% }else{ %>
-                    <td>
-                        <%= errors[i].values[h].annotation[j].value %>
-                    </td>
+                    <td><%= errors[i].values[h].annotation[j].value %></td>
                     <% } %>
                 <% } %>
                 </tr>

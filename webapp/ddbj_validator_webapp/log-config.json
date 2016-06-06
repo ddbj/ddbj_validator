@@ -1,0 +1,10 @@
+{
+  "appenders": [
+    {
+      "type": "dateFile",
+      "category": "response",
+      "filename": "./tmp/response.log",
+      "pattern": "-yyyy-MM-dd"
+    }
+  ]
+}

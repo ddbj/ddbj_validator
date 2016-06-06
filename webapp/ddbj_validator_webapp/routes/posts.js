@@ -19,28 +19,34 @@ var sample_path = "";
 var file_name = "";
 var original_name = "";
 var format_type = "";
-
-router.post('/upload-tmp', function(req, res){
-    item = new Object();
-    item["errors"] = [];
-    item["exception"] =  "test";
-    item["original_file"] = req.file["originalname"];
-    item["method"] = "biosample validator";
-    item["xml_filename"] = file_name;
-    res.send(item)
-});
+var data_source = "";
+var crypto = require('crypto');
+var Log4js = require('log4js');
+Log4js.configure('log-config.json');
+var responseLogger = Log4js.getLogger('response');
 
 router.post('/upload', function(req, res, next){
-    fs.writeFile("./tmp/ok_post.txt", "route.post /upload");
-    original_name = req.file['originalname'];
-    json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
-    sample_path = conf.read_file_dir + original_name;
-    file_name = req.file['filename'];
-    var xml2js_parser = new xml2js.Parser({attrkey: "@", charkey: "text"});
-    var parseString = require('xml2js').parseString;
-    var json_array = [];
+    data_source = req.query.source;
+    if(data_source == "api"){
+        original_name = req.query.id;
+        var date_obj = new Date().getTime();
+        var datenow = date_obj.toString();
+        var md5hash = crypto.createHash('md5');
+        md5hash.update(original_name + datenow, 'UTF-8');
+        file_name = md5hash.digest('hex');
+        fs.writeFileSync("./tmp/" + file_name, req.rawBody);
+    }else{
+        original_name = req.file['originalname'];
+        json_path = conf.read_file_dir + original_name.split(".")[0] + ".json";
+        sample_path = conf.read_file_dir + original_name;
+        file_name = req.file['filename'];
+    }
+    //var xml2js_parser = new xml2js.Parser({attrkey: "@", charkey: "text"});
+    //var parseString = require('xml2js').parseString;
+    //var json_array = [];
 
     fs.readFile(conf.read_file_dir + file_name, "utf8", function(err, data){
+        if(err){console.log("error: " + err)}
         var type = formattype(data)["type"];
         switch (type){
             case "xml":
@@ -78,7 +84,9 @@ router.post('/upload', function(req, res, next){
     var type = format_type;
     switch(type){
         case "xml":
-            var original_name = req.file['originalname'];
+            if(data_source != "api"){
+                original_name = req.file['originalname'];
+            }
             sample_file_path = conf.tmp_file_dir + file_name;
             output_path = conf.tmp_file_dir + original_name.replace("xml", "json");
             exec('ruby ./validator/biosample_validator.rb ' +  sample_file_path + " xml " + output_path + " " + conf.validator_mode, function(error, stdout, stderr){
@@ -87,6 +95,7 @@ router.post('/upload', function(req, res, next){
                 if(stderr){}
                 if(error){
                     render_exception(error);
+                    console.log(error);
                 }else{
                     // error response ファイル取得
                     var obj = JSON.parse(fs.readFileSync(output_path, 'utf8'));
@@ -126,29 +135,34 @@ router.post('/upload', function(req, res, next){
             break;
 
         case "invalid_value":
-            var item = {};
-            var original_name = req.file["originalname"];
-            item['errors'] = [];
-            item['error_size'] = 0;
-            item['exception'] =  "file format is not acceptable. please check your file.";
-            item['original_file'] = original_name;
-            item['method'] = "biosample validator";
-            item['xml_filename'] = file_name;
-            res.json(item);
+            var message = "Data format is not acceptable. please check your datas or api url.";
+            render_exception(message);
+            /*
+            var validator_res = {};
+            original_name = req.file["originalname"];
+            validator_res['errors'] = [];
+            validator_res['status'] = "error";
+            validator_res['error_size'] = 0;
+            validator_res['exception'] =  "file format is not acceptable. please check your file.";
+            validator_res['original_file'] = original_name;
+            validator_res['method'] = "biosample validator";
+            validator_res['xml_filename'] = file_name;
+            res.json(validator_res);
             removeTmpFiles();
             break;
+            */
     }
 
     function render_exception(message){
         //res.render('validator_error', {message:"Exception occured",error: stderr });
-        var item = new Object();
-        //console.log(message);
-        item["errors"] = [];
-        item["exception"] =  message;
-        item["original_file"] = original_name;
-        item["method"] = "biosample validator";
-        item["xml_filename"] = file_name;
-        res.json(item);
+        var validator_res = new Object();
+        validator_res["errors"] = [];
+        validator_res["status"] = "error",
+        validator_res["exception"] =  message;
+        validator_res["original_file"] = original_name;
+        validator_res["method"] = "biosample validator";
+        validator_res["xml_filename"] = file_name;
+        res.json(validator_res);
         removeTmpFiles();
     }
 
@@ -167,12 +181,13 @@ router.post('/upload', function(req, res, next){
         validator_res["original_file"] = original_name;
         validator_res["xml_filename"] = file_name;
         res.json(validator_res);
+        responseLogger.info(JSON.stringify(errors));
         removeTmpFiles();
     }
 
     function render_output(output_list){
         fs.writeFile("./tmp/render_output.txt", output_list);
-        console.log(output_ilst);
+        //console.log(output_ilst);
         //fs.writeFile("./tmp/test_a_s", output_list);
         original_name = req.file["originalname"];
         var validator_res = new Object();
@@ -189,11 +204,13 @@ router.post('/upload', function(req, res, next){
 
     function removeTmpFiles(){
         //delete temporary file
-        //exec('rm -f ' + json_path, function(error, stdout, stderr){});
-
-        //delete old xml files
-        //exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){});
-        //exec('find ./tmp/ -mtime +1', function(error, stdout, stderr){console.log(stdout)})
+        exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){
+            if(error){
+                console.log(error)
+            }else if(stderr){
+                console.log(stderr)
+            }
+        });
     }
 });
 

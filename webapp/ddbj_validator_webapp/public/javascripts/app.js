@@ -1,5 +1,6 @@
 (function(){
     //error_message_response model
+    /*
     var Message = Backbone.Model.extend({
         urlRoot: "/messages",
         idAttribute: "_id",
@@ -12,6 +13,7 @@
             updateTime: new Date()
         }
     });
+    */
 
     var output_f = "";
     $('#select_file').click(function(){
@@ -31,6 +33,7 @@
     ).done(function(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_info){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_info)});
 
     function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_as, tmpl_info){
+
         var error_tmpl = tmpl_bs[0];
         var group_tmpl = tmpl_bs_group[0];
         var anottated_sequence_tmpl = tmpl_as[0];
@@ -43,37 +46,67 @@
             list_option = this.value;
         });
 
-        $("#check_data_tmp").click(function () {
-            $.ajax({
-                url: "./upload",
-                method:"post",
-                dataType: "json"
-            }).done(function(res){
-                console.log(res);
-            })
+        var current_target = "file";
+        $("#select_source li").click(function(e){
+           current_target =e.target["dataset"]["source"];
+        });
+
+        var api_uri = ""
+        $("#url_input").change(function(){
+            api_uri = $("#url_input").val();
         });
 
         $("#check_data").click(function () {
-            if (output_f != "") {
+            if (output_f != "" || api_uri != "") {
                 showLoading("test_loading");
                 var form = $("#submit_data").get()[0];
                 var formData = new FormData(form);
+                var ajax_obj = {};
 
-                $.ajax({
-                    url: "./upload",
-                    method: "post",
-                    dataType: "json",
-                    data: formData,
-                    processData: false,
-                    contentType: false
-                }).done(function (error_message) {
-                    //error_message_response object
+                switch(current_target){
+                    case "file":
+                        ajax_obj = {
+                            url: "./upload",
+                            method: "post",
+                            dataType: "json",
+                            data: formData,
+                            processData: false,
+                            contentType: false
+                        };
+                        break;
+                    case "api":
+                        var xml_api_response = {};
+                        $.ajax({
+                            type: "GET",
+                            url: api_uri,
+                            async: false
+                        }).done(function(api_res){
+                            xml_api_response = api_res;
+                        });
+                        //
+                        api_param = api_uri.split(/\//).pop();
+                        ajax_obj = {
+                            url: "./upload?id=" + api_param + "&source=api",
+                            method: "post",
+                            dataType: "json",
+                            data: xml_api_response,
+                            processData: false,
+                            contentType: false
+                        };
+                        break;
+                }
+
+
+                $.ajax(ajax_obj).done(function (error_message) {
+                    console.log("l101");
+                    /*
                     var message = new Message();
                     message.save({
                         errors: error_message["errors"],
                         error_size:error_message["error_size"],
                         method: error_message["method"],
                         original_file: error_message["original_file"]});
+                        */
 
                     if(error_message["method"] == "annotated sequence validator"){
 
@@ -91,7 +124,7 @@
                     // biosample case
                     }else if(list_option == "option-grouped") {
                         // create nested data
-                        console.log(error_message);
+                        //console.log(error_message);
                         if(error_message["status"] == "fail") {
                             var grouped_message = d3.nest().key(function (d) {
                                     return d.id
@@ -102,15 +135,14 @@
                                 v["message"] = v.values[0]["message"];
                                 v["level"] = v.values[0]["level"];
                             });
+                            // "errors" is object grouped by validation rule type
                             error_message["errors"] = grouped_message;
                         }
                         switch (error_message["status"]){
                             case "fail":
-                                console.log("f0");
                                 tmpl = group_tmpl;
                                 break;
                             default:
-                                console.log("f1");
                                 tmpl = info_tmpl;
                                 break;
                         }
@@ -127,7 +159,8 @@
                             template: _.template(tmpl),
                             render: function () {
                                 this.$el.html(this.template(error_message))
-                            }/*,
+                            }
+                            /*,
                             events:{
                                 'change .result-group input[type=text]': 'onChange'
                             },
@@ -151,15 +184,26 @@
                         var error_view = new ErrorView({el: $("#result")});
 
                         $("#dl_xml").click(function(){
-                            console.log($("td[data-auto-annotation='true']").text());
-
-                            /*
+                            var auto_annotation_vals = [];
+                            $("td[data-auto-annotation='true']").each(function(){
+                                var obj = {}
+                                obj["val"] = $(this).text();
+                                obj["location"] = $(this).data("location");
+                                auto_annotation_vals.push(obj);
+                            });
+                            //auto_annotation_vals.push($("td[data-auto-annotation='true']").text().replace(/^\s+|\s+$/g));
+                            //console.log($("td[data-auto-annotation='true']").text());
                             //error_message["fixed_values"] = fixed_values;
+                            var auto_annotation_obj = {"annotaions": auto_annotation_vals, "file_name": error_message["xml_filename"], "original_name": error_message["original_file"]};
+                            //console.log(auto_annotation_obj);
                             $.ajax({
                                 url: "./j2x",
                                 method: "post",
-                                data: JSON.stringify(error_message),
-                                success:function(data){
+                                dataType: "json",
+                                data: auto_annotation_obj
+                            }).done(function(data){
+                                //success:function(data, status, xhr){
+                                    console.log("l206");
                                     var blob = new Blob([data], {"type": "application-xml"});
                                     var a = document.createElement("a");
                                     var filename = "validated_" + error_message["original_file"];
@@ -167,18 +211,24 @@
                                     a.target = "_blank";
                                     a.download = filename;
                                     a.click();
-                                }
-                            });
-                            */
 
+                            }).fail(function(data){
+                                var blob = new Blob([data["responseText"]], {"type": "application-xml"});
+                                var a = document.createElement("a");
+                                var filename = "validated_" + error_message["original_file"];
+                                a.href = URL.createObjectURL(blob);
+                                a.target = "_blank";
+                                a.download = filename;
+                                a.click();
+                            });
                         })
                     }else{
                         // biosample error response: sequential view
-                        $.each(error_message.errors,function(i, v){
+                        //$.each(error_message.errors,function(i, v){
                             //var rule_num = "rule" + v.id;
                             //v["location"] = rules[rule_num]["location"];
                             //v["correction"] = rules[rule_num]["correction"];
-                        });
+                        //});
                         console.log(error_message);
                         switch (error_message["status"]){
                             case "fail":

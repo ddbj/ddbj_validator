@@ -729,12 +729,16 @@ class MainValidator
         true
       end
     else
+
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: project_id}
+          {key: "Attribute value", value: project_id},
+          {key: "Test suggested columen",
+           value: "test value",
+           is_auto_annotation: true,
+           location: ["//BioSample[#{line_num}]/Attributes/Attribute[@attribute_name=\"bioproject_id\"]"]} #TODO remove this hash. it's only for development.
       ]
-      annotation = [{key: "bioproject_id", source: @data_file, location: line_num.to_s, value: [project_id, @prjd_id]}]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       false

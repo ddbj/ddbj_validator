@@ -14,7 +14,8 @@ class GetSubmitterItem
   def getitems(submitter_id)
     begin
       @submitter_id = submitter_id
-      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
+      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
+      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bs_db_name, $pg_user,  $pg_pass)
 
       q = "SELECT form.submission_id, attribute_name, attribute_value, submitter_id
         FROM mass.attribute attr, mass.submission_form form, mass.sample sample
@@ -44,7 +45,8 @@ end
 class GetBioProjectItem
   def get_submitter(bioproject_id)
     begin
-      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port, :password => $pg_pass)
+      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port, :password => $pg_pass)
+      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bp_db_name, $pg_user,  $pg_pass)
 
       # PSUB
       if bioproject_id =~ /^PSUB\d{6}/
@@ -100,7 +102,8 @@ class IsUmbrellaId
   def is_umbrella(bioproject_id)
 
     begin
-      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port, :password => $pg_pass)
+      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port, :password => $pg_pass)
+      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bp_db_name, $pg_user,  $pg_pass)
 
       q = "SELECT COUNT(*)
           FROM mass.umbrella_info u
@@ -130,7 +133,8 @@ end
 class GetSampleNames
   def getnames(submission_id)
     begin
-      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
+      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
+      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bs_db_name, $pg_user,  $pg_pass)
 
       q = "SELECT bs.sample_name, bs.title
         FROM mass.biosample_summary bs
@@ -157,7 +161,8 @@ end
 class GetPRJDBId
   def get_id(psub_id)
     begin
-      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port, :password => $pg_pass)
+      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bp_db_name, :port => $pg_port, :password => $pg_pass)
+      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bp_db_name, $pg_user,  $pg_pass)
 
       q = "SELECT p.project_id_counter prjd, p.project_id_prefix
     FROM mass.project p
@@ -187,7 +192,8 @@ end
 class GetLocusTagPrefix
   def unique_prefix?(prefix, submission_id)
     begin
-      connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
+      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
+      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bs_db_name, $pg_user,  $pg_pass)
 
       q0 = "SELECT a.attribute_name, a.attribute_value, a.smp_id, s.submission_id
     FROM mass.attribute a, mass.sample s
