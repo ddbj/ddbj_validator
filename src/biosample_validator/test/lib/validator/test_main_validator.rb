@@ -5,7 +5,7 @@ require '../../../lib/validator/biosample_xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup
-    @validator = MainValidator.new("public")
+    @validator = MainValidator.new("private")
     @xml_convertor = BioSampleXmlConvertor.new
   end
 
@@ -395,18 +395,33 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 =begin
-  def test_invalid_bioproject_accession
+=end
+  def test_bioproject_submission_id_replacement
     #ok case
-    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJD11111", 1)
+    ret = exec_validator("bioproject_submission_id_replacement", "95","", "PRJNA1", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
     #auto annotation
-    ret = exec_validator("invalid_bioproject_accession", "5", "", "PSUB000001", 1)
+    ret = exec_validator("bioproject_submission_id_replacement", "95", "", "PSUB000001", 1)
     expect_annotation = "PRJDB1"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    #params are nil pattern
+    ret = exec_validator("bioproject_submission_id_replacement", "95","", nil, 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
+  def test_invalid_bioproject_accession
+    #ok case
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJNA1", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ok case
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDA10", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("invalid_bioproject_accession", "5","", "PDBJA12345", 1)
     assert_equal false, ret[:result]
@@ -416,6 +431,8 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+
+=begin
 =end
   def test_invalid_host_organism_name
     #ok case
@@ -697,6 +714,7 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
   end
 =begin
+=end
   def test_duplicated_sample_title_in_this_account
     # ok case (Postgre DB)
     ret = exec_validator("duplicated_sample_title_in_this_account", "3", "", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
@@ -730,6 +748,7 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+=begin
 =end
 
   def test_identical_attributes
@@ -777,6 +796,7 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
   end
 =begin
+=end
   def test_invalid_bioproject_type
     #ok case (submission_id is not in parent_submission_id)
     @validator.instance_variable_set :@error_list, [] #clear
@@ -828,6 +848,7 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+=begin
 =end
 
   def test_warning_about_bioproject_increment

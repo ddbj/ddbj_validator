@@ -92,37 +92,7 @@ class TestMainValidator < Minitest::Test
       ret
     end
   end
-=begin
-  # auto_annotationの補正が効いているかの検証。全てのvalidatorを実行するためコメントアウト
-  def test_save_auto_annotation_value
-    # is not method test
-    # test data: "geo_loc_name" => "  Jaaaapan"
-    # expect:
-    #     "  Jaaaapan" will be auto-annotated to "Jaaaapan" by the auto-annotation or rule 13.
-    #     And, this value will be used on next validation method(rule46) as "geo_loc_name" attribute value
-    biosample_set = @validator.validate("../../data/save_auto_annotation_value.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "41"}
-    annotation = error[:annotation].find {|anno| anno[:key] == "geo_loc_name" }
-    assert_equal "Jaaaapan: Hikone-shi", annotation[:value][0]
-  end
-=end
-=begin #TODO delete
-  def test_failure_to_parse_batch_submission_file
-    #ok case
-    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_ok.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    xml_data = File.read("../../data/29_failure_to_parse_batch_submission_file_SSUB000019_error.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("failure_to_parse_batch_submission_file", "29", biosample_data[0], 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-=end
+
   def test_non_ascii_header_line
     #ok case
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
@@ -377,12 +347,18 @@ class TestMainValidator < Minitest::Test
 
   def test_invalid_country
     country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/historical_country_list.json"))
+    country_list = country_list - historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "8", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("invalid_country", "8", "sampleA", "Non exist country:Kanagawa, Hakone, Lake Ashi", country_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##histrical country
+    ret = exec_validator("invalid_country", "8", "sampleA", "Korea", country_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
@@ -421,15 +397,22 @@ class TestMainValidator < Minitest::Test
 =begin
   def test_invalid_bioproject_accession
     #ok case
-    ret = exec_validator("invalid_bioproject_accession", "5", "PRJD11111", 1)
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJD11111", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("invalid_bioproject_accession", "5", "PDBJA12345", 1)
+    #auto annotation
+    ret = exec_validator("invalid_bioproject_accession", "5", "", "PSUB000001", 1)
+    expect_annotation = "PRJDB1"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    #ng case
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PDBJA12345", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    ret = exec_validator("invalid_bioproject_accession", "5", nil, 1)
+    ret = exec_validator("invalid_bioproject_accession", "5","", nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -490,7 +473,7 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     # ng case
     ret = exec_validator("latlon_versus_country", "41", "SampleA", "Norway:Svalbard", "78.92267 N 11.98147 E", 1)
-    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway:Svalbard'"
+    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway'"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
@@ -611,21 +594,29 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_invalid_attribute_value_for_null
-    null_accepted_a = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted_a"))
+    null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted.json"))
+    null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_not_recommended.json"))
     # ok case
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted, null_not_recommended, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "N.A.", null_accepted_a, 1)
+    ## uppercase
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    assert_equal "not applicable", get_auto_annotation(ret[:error_list])
+    ## not recommended
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "n. a.", null_accepted, null_not_recommended, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "", null_accepted, null_not_recommended, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## null like value
-    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "not applicable", null_accepted_a, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "not applicable", null_accepted, null_not_recommended, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -678,10 +669,13 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", " MTB313", 1) 
+    # 前後に空白があり、引用符で囲まれ、タブと改行と繰り返し空白が含まれる文字列
+    ng_value = "    \"abc     def		ghi
+jkl\"  "
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "MTB313", get_auto_annotation(ret[:error_list])
+    assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", 1)
     assert_equal nil, ret[:result]
@@ -703,47 +697,38 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 =begin
-  def test_duplicate_sample_title_in_account
-    # ok case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicate_sample_title_in_account("3", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
-    assert_equal true, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
-    # ng case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicate_sample_title_in_account("3", "sample_title1", ["sample_title1", "sample_tile2"], "test01", 1)
-    assert_equal false, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 1, error_list.size
+  def test_duplicated_sample_title_in_this_account
+    # ok case (Postgre DB)
+    ret = exec_validator("duplicated_sample_title_in_this_account", "3", "", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case (Same title items in DB)
+    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "sample_title1", ["sample_title1", "sample_tile2"], "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # ng case (Sami title items in local submission lilst)
+    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "sample_title_1", ["sample_title_1", "sample_tile_2", "sample_title_1"], "", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicate_sample_title_in_account("3", "sample_title1", ["sample_title1", "sample_tile2"], "", 1)
-    assert_equal nil, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
+    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "", ["sample_title1", "sample_tile2"], "", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   def test_bioproject_not_found
-    # ok case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.bioproject_not_found("6", "PSUB003946", "twada", 1)
-    assert_equal true, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
+    # ok case (given submitter_id matches DB response submitter_id)
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990110", "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     # ng case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.bioproject_not_found("6", "PSUB003946", "test01", 1)
-    assert_equal false, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 1, error_list.size
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB003946", "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.bioproject_not_found("6", "", "", 1)
-    assert_equal nil, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
-
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "", "", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 =end
 
@@ -751,7 +736,7 @@ class TestMainValidator < Minitest::Test
     # ok case
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", biosample_data)
+    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -759,7 +744,7 @@ class TestMainValidator < Minitest::Test
     #sample_nameとsample_titleが異なる同じ属性をもつ5つのサンプル
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", biosample_data)
+    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
   end
@@ -792,73 +777,59 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 =begin
-
-  def test_Invalid_bioproject_type
-    #ok case
+  def test_invalid_bioproject_type
+    #ok case (submission_id is not in parent_submission_id)
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.Invalid_bioproject_type("70", "PSUB000001", 1)
-    assert_equal true, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
-    #ng case
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB000001", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case (submission_id is in parent_submission_id)
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.Invalid_bioproject_type("70", "PSUB000606", 1)
-    assert_equal false, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 1, error_list.size
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB000606", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     #params are nil pattern
     @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.Invalid_bioproject_type("70", "", 1)
-    assert_equal nil, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
+    ret = exec_validator("invalid_bioproject_type", "70", "", "", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
-  def test_duplicate_sample_name
+  def test_duplicate_sample_names
     #ok case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
-    assert_equal true, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
-    #ng case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicate_sample_names("28", "Sample 1 (SAMD00000001)", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
-    assert_equal false, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 1, error_list.size
+    ret = exec_validator("duplicate_sample_names", "28", "Sample 1 (SAMD00000001)", "sample_title_1", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case (Same sample names in local data)
+    ret = exec_validator("duplicate_sample_names", "28", "Sample 1 (SAMD00000001)", "sample_title_1", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicate_sample_names("28", "", [], "", 1)
-    assert_equal nil, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
-
+    ret = exec_validator("duplicate_sample_names", "28", "", "", [], "", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   def test_duplicated_locus_tag_prefix
     # ok case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicated_locus_tag_prefix("91", "XXA","SSUB000001", 1)
-    assert_equal true, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB"], "SSUB000001", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     # ng case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicated_locus_tag_prefix("91", "AAAA", "SSUB000001", 1)
-    assert_equal false, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 1, error_list.size
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB","XXA"], "SSUB000001", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # ng case (prefix already used in other submission)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "AAAA", ["XXA", "XXB"], "SSUB000001", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     # parameters are nil case
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = @validator.duplicated_locus_tag_prefix("91", "", "", 1)
-    assert_equal nil, ret
-    error_list = @validator.instance_variable_get (:@error_list)
-    assert_equal 0, error_list.size
-
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "",[], "", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
-
 =end
+
   def test_warning_about_bioproject_increment
     # ok case
     xml_data = File.read("../../data/69_warning_about_bioproject_increment_SSUB004321_ok.xml")

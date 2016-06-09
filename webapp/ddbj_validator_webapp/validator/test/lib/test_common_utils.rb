@@ -5,6 +5,10 @@ require '../../lib/common_utils.rb'
 class TestCommonUtils < Minitest::Test
   def setup
     @common = CommonUtils.new
+    config_obj = {}
+    config_obj[:null_accepted] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/null_accepted.json"))
+    config_obj[:exchange_country_list] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/exchange_country_list.json"))
+    CommonUtils::set_config (config_obj)
   end
 
   def test_is_null_value?
@@ -14,7 +18,15 @@ class TestCommonUtils < Minitest::Test
     assert_equal true, ret
     ret = CommonUtils.null_value?("  ")
     assert_equal true, ret
+    ret = CommonUtils.null_value?("not applicable")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("not collected")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("not provided")
+    assert_equal true, ret
     ret = CommonUtils.null_value?("missing")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("restricted access")
     assert_equal true, ret
     ret = CommonUtils.null_value?("aaa")
     assert_equal false, ret
@@ -67,20 +79,12 @@ class TestCommonUtils < Minitest::Test
     assert_nil ret
   end
 
-  def test_is_same_google_country_name
-    #ok
-    ret = @common.is_same_google_country_name("Japan", "Japan")
-    assert_equal true, ret
+  def test_country_name_google2insdc
+    ret = @common.country_name_google2insdc("Japan")
+    assert_equal "Japan", ret
 
-    ret = @common.is_same_google_country_name("japan", "Japan")
-    assert_equal true, ret
-    
-    ret = @common.is_same_google_country_name("USA", "United States")
-    assert_equal true, ret
-
-    #ng 
-    ret = @common.is_same_google_country_name("Japan", "United States")
-    assert_equal true, ret
+    ret = @common.country_name_google2insdc("United States")
+    assert_equal "USA", ret
   end
 
   def test_exist_pubmed?

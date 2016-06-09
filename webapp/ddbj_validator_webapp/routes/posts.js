@@ -204,6 +204,7 @@ router.post('/upload', function(req, res, next){
 
     function removeTmpFiles(){
         //delete temporary file
+        /*
         exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){
             if(error){
                 console.log(error)
@@ -211,6 +212,7 @@ router.post('/upload', function(req, res, next){
                 console.log(stderr)
             }
         });
+        */
     }
 });
 

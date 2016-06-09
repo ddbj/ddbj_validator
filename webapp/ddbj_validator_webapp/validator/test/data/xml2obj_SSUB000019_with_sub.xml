@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<BioSample access="public" publication_date="2015-02-25T09:59:23+09:00" last_update="2015-02-25T09:59:23+09:00" biosample_submitter_id="12345" biosample_submission_id="SSUBXXXXX">
+<BioSample access="public" publication_date="2015-02-25T09:59:23+09:00" last_update="2015-02-25T09:59:23+09:00" submitter_id="12345" submission_id="SSUBXXXXX">
     <Ids>
         <Id is_primary="1" namespace="BioSample">SAMD00000328</Id>
     </Ids>

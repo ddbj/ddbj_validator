@@ -170,7 +170,7 @@ class MainValidator
         send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, @conf[:int_attr], line_num)
       end
       send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      #send("bioproject_submission_id_replacement", "95", biosample_data["attributes"]["bioproject_id"], line_num) #TODO move from rule5
+      send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
       send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
       send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @locus_tag_list, @submission_id, line_num)
 
@@ -685,33 +685,10 @@ class MainValidator
   #
   def invalid_bioproject_accession (rule_code, sample_name, project_id, line_num)
     return nil if project_id.nil?
-    if /^PRJD/ =~ project_id
-      true
-    elsif /^PSUB/ =~ project_id && @mode == "private"
-      get_prjdb_id = GetPRJDBId.new
-      @pg_response = get_prjdb_id.get_id(project_id)
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
-      else
-        project_id_info = @pg_response[:items]
-      end
-      prjd_id = project_id_info[0]["prjd"]
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: project_id}
-      ]
-      if !prjd_id
-        location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
-      else
-        annotation.push({key: "Suggested value", value: ""})
-      end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      false
-
-    else #BioProject idが/^PRJD/にも/^PSUB/にも一致しない or /^PSUB/と一致するがpublicのケース
+    result = true
+    if project_id =~ /^PRJ[D|E|N]\w?\d{1,}$/ || project_id =~ /^PSUB\d{6}$/
+      result = true
+    else
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "bioproject_id"},
@@ -719,9 +696,9 @@ class MainValidator
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      false
-
+      result = false
     end
+    result
   end
 
   #
@@ -1500,14 +1477,23 @@ class MainValidator
   end
 
   def duplicated_sample_title_in_this_account (rule_code, sample_name, biosample_title, sample_title_list, submitter_id, line_num)
+    return nil if biosample_title.nil? || biosample_title.empty?
+    result = true
     @duplicated = []
     @duplicated = sample_title_list.select do |title|
       sample_title_list.index(title) != sample_title_list.rindex(title)
     end
 
-    @duplicated.length > 0 ? result= false : result = true
-
-    if submitter_id != nil && @mode == "private"
+    if @duplicated.length > 0
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Title", value: biosample_title}
+      ]
+      #message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result= false
+    elsif submitter_id != nil && @mode == "private"
       get_submitter_item = GetSubmitterItem.new
       @pg_response = get_submitter_item.getitems(submitter_id)
 
@@ -1517,27 +1503,18 @@ class MainValidator
         items = @pg_response[:items]
       end
 
-      if @duplicated.length == 0 && !items
-        return nil
-      elsif items.length > 0
-        if items.include?(biosample_title)
+      if items.length > 0
+        if items.count(biosample_title) > 1
+          annotation = [
+              {key: "Sample name", value: sample_name},
+              {key: "Title", value: biosample_title}
+          ]
+          #message = CommonUtils::error_msg(@validation_config, rule_code, nil)
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
           result = false
         end
-      elsif @duplicated.length == 0
-          result = true
       end
-    elsif @duplicated.length == 0
-      return nil
-    end
-
-    unless result
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Title", value: biosample_title}
-      ]
-      #message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
     end
     result
   end
@@ -1556,7 +1533,7 @@ class MainValidator
       end
 
       if @bp_info.length > 0
-        unless submitter_id == @bp_info[0]["submitter_id"]
+        if submitter_id != @bp_info[0]["submitter_id"]
           annotation = [
               {key: "Sample name", value: sample_name},
               {key: "Submitter ID", value: submitter_id},
@@ -1568,9 +1545,7 @@ class MainValidator
           @error_list.push(error_hash)
           result = false
         end
-      else
-    end
-      return nil
+      end
     end
     result
   end
@@ -1633,12 +1608,10 @@ class MainValidator
       if @pg_response[:status] == "error"
         raise @pg_response[:message]
       else
-        @is_umbrella == @pg_response[:items]
+        @is_umbrella = @pg_response[:items]
       end
 
-      if @is_umbrella == 0
-        result = true
-      elsif @is_umbrella
+      if @is_umbrella != "0"
         annotation = [
             {key: "Sample name", value: sample_name},
             {key: "BioProject ID", value: bioproject_id}
@@ -1647,11 +1620,9 @@ class MainValidator
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         result = false
-      else
-        return nil
       end
-      result
     end
+    result
   end
 
   #
@@ -1689,14 +1660,14 @@ class MainValidator
     result
   end
 
-  def duplicate_sample_names (rule_code, sample_name, sample_title, sample_name_list, submission_id, line_num)
-    return nil if sample_name.nil?
-    result = true
+  def duplicate_sample_names(rule_code, sample_name, sample_title, sample_name_list, submission_id, line_num)
+    return nil if sample_name.nil? || sample_name.empty?
     @duplicated_sample_name = []
     @duplicated_sample_name = sample_name_list.select do |name|  #sample_nameがsample_name_listに２つ以上含まれるケース
       sample_name_list.index(name) != sample_name_list.rindex(name)
     end
 
+    result = true
     if @duplicated_sample_name.length > 0
       annotation = [
           {key: "Sample name", value: sample_name},
@@ -1818,13 +1789,13 @@ class MainValidator
       get_locus_tag_prefix = GetLocusTagPrefix.new
       @pg_response = get_locus_tag_prefix.unique_prefix?(locus_tag, submission_id)
 
-      if @pg_response[:status] = "error"
+      if @pg_response[:status] == "error"
         raise @pg_response[:message]
       else
         result = @pg_response[:items]
       end
 
-      if !result
+      if result == false
         annotation = [
             {key: "Sample name", value: sample_name},
             {key: "Attribute", value: "locus_tag_prefix"},
@@ -1837,4 +1808,37 @@ class MainValidator
     result
   end
 
+  def bioproject_submission_id_replacement (rule_code, sample_name, project_id, line_num)
+    return nil if project_id.nil?
+    result = true
+    if project_id =~ /^PRJ[D|E|N]\w?\d{1,}$/ || project_id =~ /^PSUB\d{6}$/
+      if /^PRJD/ =~ project_id
+        result = true
+      elsif /^PSUB/ =~ project_id && @mode == "private"
+        get_prjdb_id = GetPRJDBId.new
+        @pg_response = get_prjdb_id.get_id(project_id)
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          project_id_info = @pg_response[:items]
+        end
+        prjd_id = project_id_info[0]["project_id_prefix"] + project_id_info[0]["prjd"]
+        annotation = [
+            {key: "Sample name", value: sample_name},
+            {key: "Attribute", value: "bioproject_id"},
+            {key: "Attribute value", value: project_id}
+        ]
+        if prjd_id
+          location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
+          annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
+        else
+          annotation.push({key: "Suggested value", value: ""})
+        end
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
 end

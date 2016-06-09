@@ -98,7 +98,7 @@
 
 
                 $.ajax(ajax_obj).done(function (error_message) {
-                    console.log("l101");
+                    console.log(error_message);
                     /*
                     var message = new Message();
                     message.save({

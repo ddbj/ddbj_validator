@@ -1,7 +1,9 @@
 require 'pg'
 require 'yaml'
 
-config = YAML.load_file("../../../../db_conf/db_conf.yaml")
+#config = YAML.load_file("../../../../db_conf/db_conf.yaml")
+config = YAML.load_file("/Users/oec/Documents/ddbj/ddbj_validator/webapp/db_conf/db_conf.yaml")
+#config = YAML.load_file("/home/vagrant/ddbj_validator/webapp/db_conf/db_conf.yaml")
 
 # db_user 運用環境のDBのOwner
 $pg_user = config["pg_user"]
@@ -9,6 +11,7 @@ $pg_port = config["pg_port"]
 $pg_host = config["pg_host"]
 $pg_bs_db_name = config["pg_bs_name"]
 $pg_bp_db_name = config["pg_bp_name"]
+$pg_pass = config["pg_pass"]
 
 class GetSubmitterItem
   def getitems(submitter_id)
@@ -37,7 +40,7 @@ class GetSubmitterItem
       @error_message = ex.message.to_s
       res = {:message => @error_message, :status => "error"}
     ensure
-        connection.close if connection
+      connection.close if connection
     end
   end
 end
@@ -60,10 +63,9 @@ class GetBioProjectItem
         GROUP BY submission_id)
         ORDER BY submission_id"
 
-      # PRJDB
+        # PRJDB
       elsif bioproject_id =~ /^PRJDB\d+/
-        bp = bp.sub("PRJDB", "").to_i
-        prjd_query_id_a = bp
+        prjd_query_id = bioproject_id.gsub("PRJDB", "").to_i
 
         q = "SELECT 'PRJDB' || p.project_id_counter prjd, x.submission_id, p.status_id, sub.submitter_id
        FROM mass.project p
@@ -75,9 +77,9 @@ class GetBioProjectItem
 
       end
 
-      res = connection.exec(q)
+      resp = connection.exec(q)
       @items = []
-      res.each {|item|
+      resp.each {|item|
         @items.push(item)
       }
       res = {:items => @items, :status => "success"}
@@ -85,7 +87,6 @@ class GetBioProjectItem
     rescue PG::Error => ex
       @error_message = ex.message.to_s
       res = {:message => @error_message, :status => "error"}
-
     rescue => ex
       @error_message = ex.message.to_s
       res = {:message => @error_message, :status => "error"}
@@ -109,24 +110,21 @@ class IsUmbrellaId
           FROM mass.umbrella_info u
           WHERE u.parent_submission_id = '#{bioproject_id}'"
 
-      res = connection.exec(q)
+      response = connection.exec(q)
 
       # if "count" >= 1 this bioproject_id is  umbrella id
-      result = res[0]["count"].to_i
-      res = {:items => result, :status => "success"}
+      @count = response[0]["count"].to_s
+      res = {:items => @count, :status => "success"}
 
     rescue PG::Error => ex
       @error_message = ex.message.to_s
       res = {:message => @error_message, :status => "error"}
-
     rescue => ex
       @error_message = ex.message.to_s
       res = {:message => @error_message, :status => "error"}
-
     ensure
       connection.close if connection
     end
-  result
   end
 end
 
@@ -136,11 +134,13 @@ class GetSampleNames
       #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
       connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bs_db_name, $pg_user,  $pg_pass)
 
-      q = "SELECT bs.sample_name, bs.title
-        FROM mass.biosample_summary bs
-        WHERE bs.submission_id = '#{submission_id}'"
+      q1 = "SELECT smpl.sample_name, attr.attribute_value
+      From mass.sample smpl, mass.attribute attr
+      WHERE smpl.submission_id = '#{submission_id}'
+      AND attr.attribute_name = 'sample_title'
+      AND attr.smp_id = smpl.smp_id"
 
-      result = connection.exec(q)
+      result = connection.exec(q1)
       res = {:items => result, :status => "success"}
 
     rescue PG::Error => ex
@@ -154,7 +154,6 @@ class GetSampleNames
     ensure
       connection.close if connection
     end
-
   end
 end
 
@@ -174,7 +173,6 @@ class GetPRJDBId
       res.each {|item|
         @items.push(item)
       }
-
       res = {:items => @items, :status => "success"}
 
     rescue PG::Error => ex
@@ -223,12 +221,10 @@ class GetLocusTagPrefix
       @item_oters.include?(prefix) ? result = false : result = true
       res = {:items => result, :status => "success"}
 
-    rescue
-      @error_message = ex.message.to_s
-      res = {:message => result, :status => "error"}
-    rescue
-      @error_message = ex.message.to_s
-      res = {:message => result, :status => "error"}
+    rescue PG::Error => ex
+      res = {:message => ex.message, :status => "error"}
+    rescue => ex
+      res = {:message => ex.message, :status => "error"}
     ensure
       connection.close if connection
     end
