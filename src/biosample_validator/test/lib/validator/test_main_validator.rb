@@ -5,7 +5,7 @@ require '../../../lib/validator/biosample_xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup
-    @validator = MainValidator.new("private")
+    @validator = MainValidator.new("public")
     @xml_convertor = BioSampleXmlConvertor.new
   end
 
@@ -395,7 +395,6 @@ class TestMainValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 =begin
-=end
   def test_bioproject_submission_id_replacement
     #ok case
     ret = exec_validator("bioproject_submission_id_replacement", "95","", "PRJNA1", 1)
@@ -431,8 +430,6 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-
-=begin
 =end
   def test_invalid_host_organism_name
     #ok case
@@ -714,7 +711,6 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
   end
 =begin
-=end
   def test_duplicated_sample_title_in_this_account
     # ok case (Postgre DB)
     ret = exec_validator("duplicated_sample_title_in_this_account", "3", "", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
@@ -748,7 +744,6 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
 =end
 
   def test_identical_attributes
@@ -796,7 +791,6 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
   end
 =begin
-=end
   def test_invalid_bioproject_type
     #ok case (submission_id is not in parent_submission_id)
     @validator.instance_variable_set :@error_list, [] #clear
@@ -848,7 +842,6 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
 =end
 
   def test_warning_about_bioproject_increment
