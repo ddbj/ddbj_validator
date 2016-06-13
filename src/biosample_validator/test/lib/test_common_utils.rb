@@ -8,6 +8,8 @@ class TestCommonUtils < Minitest::Test
     config_obj = {}
     config_obj[:null_accepted] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/null_accepted.json"))
     config_obj[:exchange_country_list] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/exchange_country_list.json"))
+#    c1onfig_obj[:convert_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/convert_date_format.json"))
+    config_obj[:collection_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/collection_date_format.json"))
     CommonUtils::set_config (config_obj)
   end
 
@@ -115,6 +117,68 @@ class TestCommonUtils < Minitest::Test
 
     #nil
     ret = @common.exist_doi?(nil)
+    assert_equal nil, ret
+  end
+
+  def test_collection_date_format
+    #ok
+    ret = @common.collection_date_format("21-Oct-1952")
+    assert_equal true, ret
+    ret = @common.collection_date_format("Oct-1952")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21T11:43:49Z")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21T11:43Z")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21T11Z")
+    assert_equal true, ret
+    ret = @common.collection_date_format("21-Oct-1952/21-Oct-1952")
+    assert_equal true, ret
+    ret = @common.collection_date_format("Oct-1952/Oct-1952")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952/1952")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21/1952-10-21")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10/1952-10")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21T11:43:49Z/1952-10-21T11:43:49Z")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21T11:43Z/1952-10-21T11:43Z")
+    assert_equal true, ret
+    ret = @common.collection_date_format("1952-10-21T11Z/1952-10-21T11Z")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.collection_date_format("21-October-1952")
+    assert_equal false, ret
+    ret = @common.collection_date_format("1952.10.21")
+    assert_equal false, ret
+  end
+
+  def test_is_future_collection_date
+    #ok
+    ret = @common.is_future_collection_date("1952-10-21")
+    assert_equal true, ret
+    ret = @common.is_future_collection_date("1952-10-21/1955-10-21")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.is_future_collection_date("2052-10-21")
+    assert_equal false, ret
+    ret = @common.is_future_collection_date("1952-10-21/2052-10-21")
+    assert_equal false, ret
+    ret = @common.is_future_collection_date("2052-10-21/1952-10-21")
+    assert_equal false, ret
+
+    #invalid format
+    ret = @common.is_future_collection_date("1952.10.21")
     assert_equal nil, ret
   end
 

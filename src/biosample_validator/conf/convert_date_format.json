@@ -1,0 +1,51 @@
+[
+  {
+    "regex": "/\d{4}\/\d{1,2}\/\d{1,2}/",
+    "parse_format": "%Y/%m/%d",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "regex": "/\d{4}\/\d{1,2}/",
+    "parse_format": "%Y/%m",
+    "output_format": "%Y-%m"
+  },
+  {
+    "regex": "/\d{1,2}\/\d{1,2}\/\d{4}/",
+    "parse_format": ""%d/%m/%Y"",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "regex": "/\w{3}\/\d{4}/",
+    "parse_format": "%b/%Y",
+    "output_format": "%b-%Y"
+  },
+  {
+    "regex": "/\d{4}\.\d{1,2}\.\d{1,2}/",
+    "parse_format": "%Y.%m.%d",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "regex": "/\d{4}\.\d{1,2}/",
+    "parse_format": "%Y.%m",
+    "output_format": "%Y-%m"
+  },
+  {
+    "regex": "/\d{1,2}\.\d{1,2}\.\d{4}/",
+    "parse_format": "%d.%m.%Y",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "regex": "/^(\d{1,2})-(\d{1,2})$/",
+    "output_format": "%Y-%m"
+  },
+  {
+    "regex": "/^\d{1,2}-\d{1,2}-\d{4}$/",
+    "parse_format": "%d-%m-%Y",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "regex": "/^\d{4}-\d{1,2}-\d{1,2}$/",
+    "parse_format": "%Y-%m-%d",
+    "output_format": "%Y-%m-%d"
+  }
+}

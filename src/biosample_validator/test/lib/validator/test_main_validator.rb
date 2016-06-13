@@ -587,22 +587,42 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_future_collection_date
-    # ok case
+    #ok case
     ret = exec_validator("future_collection_date", "40", "sampleA", "2015", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ret = exec_validator("future_collection_date", "40", "sampleA", "2016", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # ng case
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952-10-21", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952-10-21/1955-10-21", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
     ret = exec_validator("future_collection_date", "40", "sampleA", "2019", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    #parameter are nil pattern
+    ret = exec_validator("future_collection_date", "40", "sampleA", "2052-10-21", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952-10-21/2052-10-21", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "2052-10-21/1952-10-21", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #parameter are nil pattern or invalid format
     ret = exec_validator("future_collection_date", "40", "sampleA", nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
     ret = exec_validator("future_collection_date", "40", "sampleA", "missing", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952.10.21", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end

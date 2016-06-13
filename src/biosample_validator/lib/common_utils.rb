@@ -2,12 +2,15 @@ require 'erb'
 require 'erubis'
 require 'geocoder'
 require 'net/http'
+require 'date'
 
 class CommonUtils
 
   def self.set_config (config_obj)
     @@null_accepted = config_obj[:null_accepted]
     @@exchange_country_list = config_obj[:exchange_country_list]
+    @@convert_date_format = config_obj[:convert_date_format]
+    @@collection_date_format = config_obj[:collection_date_format]
   end
 
   #
@@ -384,6 +387,21 @@ class CommonUtils
       http.request(req)
     }
     res
+  end
+
+  def collection_date_format(str_date)
+    ret = false
+    @@collection_date_format.each do |format|
+      regex = Regexp.new(format["regex"])
+      if str_date =~ regex
+        ret = true
+      end
+      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
+      if str_date =~ regex
+        ret = true
+      end
+    end
+    ret
   end
 
 end

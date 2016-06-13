@@ -57,6 +57,8 @@ class MainValidator
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/validation_config.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
+      #config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
+      config[:collection_date_format] = JSON.parse(File.read(config_file_dir + "/collection_date_format.json"))
       if @mode == "private"
         #TODO load PostgreSQL conf
         #@db_config = JSON.parse(File.read(config_file_dir + "/db_config.json"))
@@ -1110,6 +1112,9 @@ class MainValidator
 
   #
   # sample collection date が未来の日付になっていないかの検証
+  # 有効な日付のフォーマットでなければnilを返す
+  # 受け付けるフォーマットは以下を参照
+  # https://www.ddbj.nig.ac.jp/FT/full_index.html#collection_date
   #
   # ==== Args
   # rule_code
@@ -1120,23 +1125,35 @@ class MainValidator
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
     return nil if CommonUtils::null_value?(collection_date)
+    result = nil
+    @conf[:collection_date_format].each do |format|
+      parse_format = format["parse_format"]
 
-    result = true
-    case collection_date
-      when /\d{4}/
-        date_format = '%Y'
-      when /\d{4}\/\d{1,2}\/\d{1,2}/
-        date_format = "%Y-%m-%d"
-      when /\d{4}\/\d{1,2}/
-          date_format = "%Y-%m"
-      when /\w{3}\/\d{4}/
-        date_format = "%b-%Y"
-      else
-        result = false
-    end
-    if result == true
-      formated_date = Date.strptime(collection_date, date_format)
-      result = (Date.today <=> formated_date) >= 0
+      ## single date format
+      regex = Regexp.new(format["regex"])
+      if collection_date =~ regex
+        begin
+          formated_date = DateTime.strptime(collection_date, parse_format)
+          result = (Date.today <=> formated_date) >= 0
+        rescue ArgumentError
+          result = nil
+        end
+      end
+
+      ## range date format
+      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
+      if collection_date =~ regex
+        range_date_list = collection_date.split("/")
+        range_date_list.each do |date|
+          begin
+            formated_date = DateTime.strptime(date, parse_format)
+            result = (Date.today <=> formated_date) >= 0
+            break if result == false
+          rescue ArgumentError
+            result = nil
+          end
+       end
+      end
     end
 
     if result == false
