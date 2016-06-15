@@ -429,7 +429,7 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_bioproject_accession", "5","", nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
-  end
+    end
 =end
   def test_invalid_host_organism_name
     #ok case
