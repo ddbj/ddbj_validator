@@ -385,16 +385,12 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def unknown_package (rule_code, sample_name, package, line_num)
-    return nil if CommonUtils::blank?(package)
-    package_name = package.gsub(".", "_")
-    package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
-    package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
+  def unknown_package (rule_code, sample_name, package_name, line_num)
+    return nil if CommonUtils::blank?(package_name)
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
-      #TODO when package name isn't as url, occures error.
-      sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
+      sparql = SPARQLBase.new(@conf[:sparql_config]["endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
@@ -407,7 +403,7 @@ class MainValidator
     if result.first[:count].to_i <= 0
       annotation = [
         {key: "Sample name", value: sample_name},
-        {key: "package", value: package}
+        {key: "package", value: package_name}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
