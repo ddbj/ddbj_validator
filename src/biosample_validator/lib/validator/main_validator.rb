@@ -1501,23 +1501,27 @@ class MainValidator
       sample_title_list.index(title) != sample_title_list.rindex(title)
     end
 
+    # ファイル内でタイトルが重複している場合
     if @duplicated.length > 0
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Title", value: biosample_title}
       ]
-      #message = CommonUtils::error_msg(@validation_config, rule_code, nil)
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result= false
     elsif submitter_id != nil && @mode == "private"
-      get_submitter_item = GetSubmitterItem.new
-      @pg_response = get_submitter_item.getitems(submitter_id)
-
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+      if @cache.nil? || @cache.check(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id).nil?
+        get_submitter_item = GetSubmitterItem.new
+        ret = get_submitter_item.getitems(submitter_id)
+        if ret[:status] == "error"
+          raise ret[:message]
+        else
+          items = ret[:items]
+          @cache.save(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id, items)
+        end
       else
-        items = @pg_response[:items]
+        items = @cache.check(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id)
       end
 
       if items.length > 0
@@ -1540,24 +1544,27 @@ class MainValidator
     return nil if bioproject_id.nil? || bioproject_id.empty? || submitter_id.nil? || submitter_id.empty?
     result = true
     if @mode == "private"
-      get_bioproject_item = GetBioProjectItem.new
-      @pg_response = get_bioproject_item.get_submitter(bioproject_id)
+      if @cache.nil? || @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id).nil?
+        get_bioproject_item = GetBioProjectItem.new
+        @pg_response = get_bioproject_item.get_submitter(bioproject_id)
 
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          ret = @pg_response[:items]
+          @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id, ret)
+        end
       else
-        @bp_info = @pg_response[:items]
+        ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id)
       end
 
-      if @bp_info.length > 0
-        if submitter_id != @bp_info[0]["submitter_id"]
+      if ret.length > 0
+        if submitter_id != ret[0]["submitter_id"]
           annotation = [
               {key: "Sample name", value: sample_name},
               {key: "Submitter ID", value: submitter_id},
               {key: "BioProject ID", value: bioproject_id}
           ]
-          param = {VALUE: bioproject_id}
-          #message = CommonUtils::error_msg(@validation_config, rule_code, param)
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
           result = false
@@ -1619,16 +1626,21 @@ class MainValidator
     return nil if bioproject_id.nil? || bioproject_id.empty?
     result  = true
     if @mode == "private"
-      is_umbrella_id = IsUmbrellaId.new
-      @pg_response = is_umbrella_id.is_umbrella(bioproject_id)
+      if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_id).nil?
+        is_umbrella_id = IsUmbrellaId.new
+        @pg_response = is_umbrella_id.is_umbrella(bioproject_id)
 
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          ret = @pg_response[:items]
+          @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_id, ret)
+        end
       else
-        @is_umbrella = @pg_response[:items]
+        ret = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_id)
       end
 
-      if @is_umbrella != "0"
+      if ret != "0"
         annotation = [
             {key: "Sample name", value: sample_name},
             {key: "BioProject ID", value: bioproject_id}
@@ -1694,20 +1706,24 @@ class MainValidator
       @error_list.push(error_hash)
       result = false
     elsif submission_id && @mode == "private"
-      get_submission_name = GetSampleNames.new
-      @pg_response = get_submission_name.getnames(submission_id)
-
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
+        get_submission_name = GetSampleNames.new
+        @pg_response = get_submission_name.getnames(submission_id)
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          ret = @pg_response[:items]
+        end
+        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, ret)
       else
-        res = @pg_response[:items]
+        ret = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
       end
 
-      if res # DBよりsubmission_idに紐づくsample_name,titleが取得出来た場合
+      if ret # DBよりsubmission_idに紐づくsample_name,titleが取得出来た場合
         names = []
         titles = []
         @samples = {}
-        res.each do |item|
+        ret.each do |item|
           names.push(item["sample_name"]) # DBよりsubmission_idに紐づくsample_nameのリストを生成
           @samples[item["sample_name"]] = item["title"] #{sample_name: title, ..}
         end
@@ -1832,14 +1848,20 @@ class MainValidator
       if /^PRJD/ =~ project_id
         result = true
       elsif /^PSUB/ =~ project_id && @mode == "private"
-        get_prjdb_id = GetPRJDBId.new
-        @pg_response = get_prjdb_id.get_id(project_id)
-        if @pg_response[:status] == "error"
-          raise @pg_response[:message]
+        if @cache.nil? || @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, project_id).nil?
+          get_prjdb_id = GetPRJDBId.new
+          @pg_response = get_prjdb_id.get_id(project_id)
+          if @pg_response[:status] == "error"
+            raise @pg_response[:message]
+          else
+            ret = @pg_response[:items]
+          end
+          @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, project_id, ret)
         else
-          project_id_info = @pg_response[:items]
+          ret = @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, project_id)
         end
-        prjd_id = project_id_info[0]["project_id_prefix"] + project_id_info[0]["prjd"]
+
+        prjd_id = ret[0]["project_id_prefix"] + ret[0]["prjd"]
         annotation = [
             {key: "Sample name", value: sample_name},
             {key: "Attribute", value: "bioproject_id"},

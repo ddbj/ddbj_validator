@@ -57,6 +57,8 @@ class MainValidator
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/validation_config.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
+      #config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
+      config[:collection_date_format] = JSON.parse(File.read(config_file_dir + "/collection_date_format.json"))
       if @mode == "private"
         #TODO load PostgreSQL conf
         #@db_config = JSON.parse(File.read(config_file_dir + "/db_config.json"))
@@ -170,7 +172,7 @@ class MainValidator
         send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, @conf[:int_attr], line_num)
       end
       send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) #TODO move from rule5
+      send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
       send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
       send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @locus_tag_list, @submission_id, line_num)
 
@@ -209,7 +211,7 @@ class MainValidator
   end
 
   #
-  # Returns attribute list in the specified package 
+  # Returns attribute list in the specified package
   #
   # ==== Args
   # package name ex."MIGS.ba.soil"
@@ -581,7 +583,7 @@ class MainValidator
   # line_num
   # ==== Return
   # true/false
-  # 
+  #
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
@@ -679,40 +681,16 @@ class MainValidator
   # ==== Args
   # rule_code
   # project_id ex."PDBJ123456"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
   def invalid_bioproject_accession (rule_code, sample_name, project_id, line_num)
     return nil if project_id.nil?
     result = true
-    if /^PRJD/ =~ project_id
-      true
-    elsif /^PSUB/ =~ project_id && @mode == "private"
-      get_prjdb_id = GetPRJDBId.new
-      @pg_response = get_prjdb_id.get_id(project_id)
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
-      else
-        project_id_info = @pg_response[:items]
-      end
-      prjd_id = project_id_info[0]["project_id_prefix"] + project_id_info[0]["prjd"]
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: project_id}
-      ]
-      if prjd_id
-        location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
-      else
-        annotation.push({key: "Suggested value", value: ""})
-      end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      result = false
-
-    else #BioProject idが/^PRJD/にも/^PSUB/にも一致しない or /^PSUB/と一致するがpublicのケース
+    if project_id =~ /^PRJ[D|E|N]\w?\d{1,}$/ || project_id =~ /^PSUB\d{6}$/
+      result = true
+    else
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "bioproject_id"},
@@ -824,12 +802,12 @@ class MainValidator
 
   #
   # host属性に記載された生物種名がTaxonomy ontologyにScientific nameとして存在するかの検証
-  # 
+  #
   # ==== Args
   # rule_code
   # sample_name
   # host_name ex."Homo sapiens"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -902,7 +880,7 @@ class MainValidator
   # rule_code
   # taxonomy_id ex."103690"
   # organism_name ex."Nostoc sp. PCC 7120"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -994,10 +972,10 @@ class MainValidator
   # rule_code
   # taxonomy_id ex."103690"
   # package_name ex."MIGS.ba.microbial"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
-  # 
+  #
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, line_num)
     return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id)
 
@@ -1036,7 +1014,7 @@ class MainValidator
   # rule_code
   # taxonomy_id ex."103690"
   # sex ex."male"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1134,6 +1112,9 @@ class MainValidator
 
   #
   # sample collection date が未来の日付になっていないかの検証
+  # 有効な日付のフォーマットでなければnilを返す
+  # 受け付けるフォーマットは以下を参照
+  # https://www.ddbj.nig.ac.jp/FT/full_index.html#collection_date
   #
   # ==== Args
   # rule_code
@@ -1144,23 +1125,35 @@ class MainValidator
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
     return nil if CommonUtils::null_value?(collection_date)
+    result = nil
+    @conf[:collection_date_format].each do |format|
+      parse_format = format["parse_format"]
 
-    result = true
-    case collection_date
-      when /\d{4}/
-        date_format = '%Y'
-      when /\d{4}\/\d{1,2}\/\d{1,2}/
-        date_format = "%Y-%m-%d"
-      when /\d{4}\/\d{1,2}/
-        date_format = "%Y-%m"
-      when /\w{3}\/\d{4}/
-        date_format = "%b-%Y"
-      else
-        result = false
-    end
-    if result == true
-      formated_date = Date.strptime(collection_date, date_format)
-      result = (Date.today <=> formated_date) >= 0
+      ## single date format
+      regex = Regexp.new(format["regex"])
+      if collection_date =~ regex
+        begin
+          formated_date = DateTime.strptime(collection_date, parse_format)
+          result = (Date.today <=> formated_date) >= 0
+        rescue ArgumentError
+          result = nil
+        end
+      end
+
+      ## range date format
+      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
+      if collection_date =~ regex
+        range_date_list = collection_date.split("/")
+        range_date_list.each do |date|
+          begin
+            formated_date = DateTime.strptime(date, parse_format)
+            result = (Date.today <=> formated_date) >= 0
+            break if result == false
+          rescue ArgumentError
+            result = nil
+          end
+        end
+      end
     end
 
     if result == false
@@ -1508,23 +1501,27 @@ class MainValidator
       sample_title_list.index(title) != sample_title_list.rindex(title)
     end
 
+    # ファイル内でタイトルが重複している場合
     if @duplicated.length > 0
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Title", value: biosample_title}
       ]
-      #message = CommonUtils::error_msg(@validation_config, rule_code, nil)
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result= false
     elsif submitter_id != nil && @mode == "private"
-      get_submitter_item = GetSubmitterItem.new
-      @pg_response = get_submitter_item.getitems(submitter_id)
-
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+      if @cache.nil? || @cache.check(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id).nil?
+        get_submitter_item = GetSubmitterItem.new
+        ret = get_submitter_item.getitems(submitter_id)
+        if ret[:status] == "error"
+          raise ret[:message]
+        else
+          items = ret[:items]
+          @cache.save(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id, items)
+        end
       else
-        items = @pg_response[:items]
+        items = @cache.check(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id)
       end
 
       if items.length > 0
@@ -1547,24 +1544,27 @@ class MainValidator
     return nil if bioproject_id.nil? || bioproject_id.empty? || submitter_id.nil? || submitter_id.empty?
     result = true
     if @mode == "private"
-      get_bioproject_item = GetBioProjectItem.new
-      @pg_response = get_bioproject_item.get_submitter(bioproject_id)
+      if @cache.nil? || @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id).nil?
+        get_bioproject_item = GetBioProjectItem.new
+        @pg_response = get_bioproject_item.get_submitter(bioproject_id)
 
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          ret = @pg_response[:items]
+          @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id, ret)
+        end
       else
-        @bp_info = @pg_response[:items]
+        ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id)
       end
 
-      if @bp_info.length > 0
-        if submitter_id != @bp_info[0]["submitter_id"]
+      if ret.length > 0
+        if submitter_id != ret[0]["submitter_id"]
           annotation = [
               {key: "Sample name", value: sample_name},
               {key: "Submitter ID", value: submitter_id},
               {key: "BioProject ID", value: bioproject_id}
           ]
-          param = {VALUE: bioproject_id}
-          #message = CommonUtils::error_msg(@validation_config, rule_code, param)
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
           result = false
@@ -1626,16 +1626,21 @@ class MainValidator
     return nil if bioproject_id.nil? || bioproject_id.empty?
     result  = true
     if @mode == "private"
-      is_umbrella_id = IsUmbrellaId.new
-      @pg_response = is_umbrella_id.is_umbrella(bioproject_id)
+      if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_id).nil?
+        is_umbrella_id = IsUmbrellaId.new
+        @pg_response = is_umbrella_id.is_umbrella(bioproject_id)
 
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          ret = @pg_response[:items]
+          @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_id, ret)
+        end
       else
-        @is_umbrella = @pg_response[:items]
+        ret = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_id)
       end
 
-      if @is_umbrella != "0"
+      if ret != "0"
         annotation = [
             {key: "Sample name", value: sample_name},
             {key: "BioProject ID", value: bioproject_id}
@@ -1701,20 +1706,24 @@ class MainValidator
       @error_list.push(error_hash)
       result = false
     elsif submission_id && @mode == "private"
-      get_submission_name = GetSampleNames.new
-      @pg_response = get_submission_name.getnames(submission_id)
-
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
+      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
+        get_submission_name = GetSampleNames.new
+        @pg_response = get_submission_name.getnames(submission_id)
+        if @pg_response[:status] == "error"
+          raise @pg_response[:message]
+        else
+          ret = @pg_response[:items]
+        end
+        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, ret)
       else
-        res = @pg_response[:items]
+        ret = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
       end
 
-      if res # DBよりsubmission_idに紐づくsample_name,titleが取得出来た場合
+      if ret # DBよりsubmission_idに紐づくsample_name,titleが取得出来た場合
         names = []
         titles = []
         @samples = {}
-        res.each do |item|
+        ret.each do |item|
           names.push(item["sample_name"]) # DBよりsubmission_idに紐づくsample_nameのリストを生成
           @samples[item["sample_name"]] = item["title"] #{sample_name: title, ..}
         end
@@ -1835,33 +1844,40 @@ class MainValidator
   def bioproject_submission_id_replacement (rule_code, sample_name, project_id, line_num)
     return nil if project_id.nil?
     result = true
-    if /^PRJD/ =~ project_id
-      result = true
-    elsif /^PSUB/ =~ project_id && @mode == "private"
-      get_prjdb_id = GetPRJDBId.new
-      @pg_response = get_prjdb_id.get_id(project_id)
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
-      else
-        project_id_info = @pg_response[:items]
+    if project_id =~ /^PRJ[D|E|N]\w?\d{1,}$/ || project_id =~ /^PSUB\d{6}$/
+      if /^PRJD/ =~ project_id
+        result = true
+      elsif /^PSUB/ =~ project_id && @mode == "private"
+        if @cache.nil? || @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, project_id).nil?
+          get_prjdb_id = GetPRJDBId.new
+          @pg_response = get_prjdb_id.get_id(project_id)
+          if @pg_response[:status] == "error"
+            raise @pg_response[:message]
+          else
+            ret = @pg_response[:items]
+          end
+          @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, project_id, ret)
+        else
+          ret = @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, project_id)
+        end
+
+        prjd_id = ret[0]["project_id_prefix"] + ret[0]["prjd"]
+        annotation = [
+            {key: "Sample name", value: sample_name},
+            {key: "Attribute", value: "bioproject_id"},
+            {key: "Attribute value", value: project_id}
+        ]
+        if prjd_id
+          location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
+          annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
+        else
+          annotation.push({key: "Suggested value", value: ""})
+        end
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
       end
-      prjd_id = project_id_info[0]["project_id_prefix"] + project_id_info[0]["prjd"]
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: project_id}
-      ]
-      if prjd_id
-        location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
-      else
-        annotation.push({key: "Suggested value", value: ""})
-      end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      result = false
     end
     result
   end
-
 end
