@@ -1,7 +1,6 @@
 require 'pg'
 require 'yaml'
 
-config = YAML.load_file("../../../../db_conf/db_conf.yaml")
 config = YAML.load_file("/home/vagrant/ddbj_validator/webapp/db_conf/db_conf.yaml")
 #config = YAML.load_file("/Users/oec/Documents/ddbj/ddbj_validator/webapp/db_conf/db_conf.yaml")
 

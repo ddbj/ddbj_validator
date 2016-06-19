@@ -11,6 +11,11 @@ class ValidatorCache
   TAX_VS_PACKAGE = "tax_vs_package"
   TAX_MATCH_ORGANISM = "tax_match_organism"
   TAX_HAS_LINAGE = "tax_has_linage"
+  SUBMITTERS_SAMPLE_TITLE = "submitters_sample_title"
+  BIOPROJECT_SUBMITTER = "bioproject_submitter"
+  SUBMISSIONS_SAMPLE_NAME = "submissions_sample_name"
+  IS_UMBRELLA_ID = "is_umbrella_id"
+  BIOPROJECT_PRJD_ID = "bioproject_prjd_id"
 
   #
   # Initializer
