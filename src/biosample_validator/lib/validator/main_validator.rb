@@ -57,7 +57,7 @@ class MainValidator
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/validation_config.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
-      #config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
+      config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:collection_date_format] = JSON.parse(File.read(config_file_dir + "/collection_date_format.json"))
       if @mode == "private"
         #TODO load PostgreSQL conf
@@ -1238,93 +1238,44 @@ class MainValidator
     result = true
 
     if ts_attr.include?(attr_name) #日付型の属性であれば
+      #月の表現を揃える
       rep_table_month = {
-          "January" => "Jan", "February" => "Feb", "March" => "Mar", "April" => "Apr", "May" => "May", "June" => "Jun", "July" => "Jul", "August" => "Aug", "September" => "Sep", "October" => "Oct", "November" => "Nov", "December" => "Dec",
-          "january" => "Jan", "february" => "Feb", "march" => "Mar", "april" => "Apr", "may" => "May", "june" => "Jun", "july" => "Jul", "august" => "Aug", "september" => "Sep", "october" => "Oct", "november" => "Nov", "december" => "Dec"
+        "January" => "Jan", "February" => "Feb", "March" => "Mar", "April" => "Apr", "May" => "May", "June" => "Jun", "July" => "Jul", "August" => "Aug", "September" => "Sep", "October" => "Oct", "November" => "Nov", "December" => "Dec",
+        "january" => "Jan", "february" => "Feb", "march" => "Mar", "april" => "Apr", "may" => "May", "june" => "Jun", "july" => "Jul", "august" => "Aug", "september" => "Sep", "october" => "Oct", "november" => "Nov", "december" => "Dec"
       }
-
-        def format_date(date, formats)
-          dateobj = DateTime.new
-          formats.each do |format|
-            begin
-              dateobj = DateTime.strptime(date, format)
-              break
-            rescue ArgumentError
-            end
-          end
-          dateobj
-        end
-
-        if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/i)
-          attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/i,rep_table_month)
-          reslut = false
-        end
-
-        if attr_val.include?("/")
-          case attr_val
-            when /\d{4}\/\d{1,2}\/\d{1,2}/
-              formats = ["%Y/%m/%d"]
-              dateobj = format_date(attr_val, formats)
-              attr_val= dateobj.strftime("%Y-%m-%d")
-
-            when /\d{4}\/\d{1,2}/
-              formats = ["%Y/%m"]
-              dateobj = format_date(attr_val, formats)
-              attr_val = dateobj.strftime("%Y-%m")
-
-            when /\d{1,2}\/\d{1,2}\/\d{4}/
-              formats = ["%d/%m/%Y"]
-              dateobj = format_date(attr_val, formats)
-              attr_val = dateobj.strftime("%Y-%m-%d")
-
-            when /\w{3}\/\d{4}/
-              formats = ["%b/%Y"]
-              dateobj = format_date(attr_val, formats)
-              attr_val = dateobj.strftime("%b-%Y")
-          end
-          result = false
-
-#TODO check dot(.)
-
-        elsif attr_val =~ /^(\d{1,2})-(\d{1,2})$/
-          if $1.to_i.between?(13, 15)
-            formats = ["%y-%m"]
-          else
-            formats = ["%m-%y"]
-          end
-
-          dateobj = format_date(attr_val, formats)
-          attr_val= dateobj.strftime("%Y-%m")
-          result = false
-
-        elsif attr_val =~ /^\d{1,2}-\d{1,2}-\d{4}$/
-          formats = ["%d-%m-%Y"]
-          dateobj = format_date(attr_val, formats)
-          attr_val = dateobj.strftime("%Y-%m-%d")
-          result = false
-
-        elsif attr_val =~ /^\d{4}-\d{1,2}-\d{1,2}$/
-          formats = ["%Y-%m-%d"]
-          dateobj = format_date(attr_val, formats)
-          attr_val = dateobj.strftime("%Y-%m-%d")
-
-        else
-          result = false #can't replace
-        end
-
+      if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/i)
+        attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/i,rep_table_month)
       end
-    unless result
+
+      #区切り文字の表記を揃える
+      @conf[:convert_date_format].each do |format|
+        regex = Regexp.new(format["regex"])
+        if attr_val =~ regex
+          begin
+            if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"
+              if $1.to_i > 12 #is not month
+                formated_date = DateTime.strptime(attr_val, "%y-%m")
+              else
+                formated_date = DateTime.strptime(attr_val, "%m-%y")
+              end
+            else
+              formated_date = DateTime.strptime(attr_val, format["parse_format"])
+            end
+             attr_val = formated_date.strftime(format["output_format"])
+          rescue ArgumentError
+          end
+        end
+      end
+    end
+
+    if ori_attr_val != attr_val #replace_candidate
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: ori_attr_val}
       ]
-      if ori_attr_val != attr_val #replace_candidate
-        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-      else
-        annotation.push({key: "Suggested value", value: ""})
-      end
+      location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+      annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false

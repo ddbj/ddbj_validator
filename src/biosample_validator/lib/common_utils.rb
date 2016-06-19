@@ -389,19 +389,4 @@ class CommonUtils
     res
   end
 
-  def collection_date_format(str_date)
-    ret = false
-    @@collection_date_format.each do |format|
-      regex = Regexp.new(format["regex"])
-      if str_date =~ regex
-        ret = true
-      end
-      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
-      if str_date =~ regex
-        ret = true
-      end
-    end
-    ret
-  end
-
 end

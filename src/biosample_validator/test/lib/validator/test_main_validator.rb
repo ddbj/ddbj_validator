@@ -661,15 +661,38 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "2016-01-01", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # ng case
-    ##auto annotation
-    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "January/2016", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ##invalid format
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-Oct-1952", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##invalid format 補正がなければtrue
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "No Date", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##ng = auto annotation
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/October/21", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    assert_equal "1952/Oct/21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/october/21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952/Oct/21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10/21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-11", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2021-11", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "11-21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2021-11", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "", ts_attr,  1)
     assert_equal nil, ret[:result]
