@@ -1,4 +1,3 @@
-#$:.unshift File.dirname(__FILE__)
 require 'rubygems'
 require 'json'
 require 'erb'
@@ -175,46 +174,99 @@ class OrganismValidator < SPARQLBase
   # if the tax_id isn't appropriate for the package, returns a hash with rule_id as below
   #  {status: "error", error_code: rule_id}
   def org_vs_package_validate (tax_id, package_name)
-    if package_name.split(".").size >= 2
-      package_name = package_name.split(".")[0] + "." + package_name.split(".")[1]
-    end
     result = true
     rule_id = ""
-    case package_name
-    when "MIMS.me" #rule 83
+    if package_name == "Pathogen.cl" #rule 74
+      rule_id = "74"
+      linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
+      has_linage = has_linage(tax_id, linages)
+      is_species = is_deeper_tax_rank(tax_id, "Species")
+      unless (has_linage && is_species)
+        result = false
+      end
+    elsif package_name == "Pathogen.env" #rule 75
+      rule_id = "75"
+      linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
+      has_linage = has_linage(tax_id, linages)
+      is_species = is_deeper_tax_rank(tax_id, "Species")
+      unless (has_linage && is_species)
+        result = false
+      end
+    elsif package_name == "Microbe" #rule 76
+      rule_id = "76"
+      prokaryota_linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_VIROIDS]
+      is_prokaryota = has_linage(tax_id, prokaryota_linages)
+      #eukaryotesでありMETAZOAとEMBRYOPHYTA以外であればtrue
+      eukaryotes_linages = [TAX_EUKARYOTA]
+      multicellular_linages = [TAX_METAZOA, TAX_EMBRYOPHYTA]
+      is_unicellular_eukaryotes = has_linage(tax_id, eukaryotes_linages) && !has_linage(tax_id, multicellular_linages)
+
+      unless (is_prokaryota || is_unicellular_eukaryotes)
+        result = false
+      end
+    elsif package_name == "Model.organism.animal" #rule 77
+      rule_id = "77"
+      linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_FUNGI, TAX_VIROIDS, TAX_UNCLASSIFIED_SEQUENCES, TAX_OTHER_SEQUENCES]
+      has_linage = has_linage(tax_id, linages)
+      if (tax_id == "9606" || has_linage)
+        result = false
+      end
+    elsif package_name == "Metagenome.environmental" #rule 78
+      rule_id = "78"
+      linages = [TAX_UNCLASSIFIED_SEQUENCES]
+      result = has_linage(tax_id, linages)
+      unless get_organism_name(tax_id).end_with?("metagenome")
+        result = false
+      end
+    elsif package_name == "Human" #rule 80
+      rule_id = "80"
+      unless tax_id == "9606"
+        result = false
+      end
+    elsif package_name == "Plant" #rule 81
+      rule_id = "81"
+      linages = [TAX_VIRIDIPLANTAE]
+      result = has_linage(tax_id, linages)
+    elsif package_name == "Virus" #rule 82
+      rule_id = "82"
+      linages = [TAX_VIRUSES]
+      result = has_linage(tax_id, linages)
+    elsif package_name.start_with?("MIMS.me") #rule 83
       rule_id = "83"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       unless get_organism_name(tax_id).end_with?("metagenome")
         result = false
       end 
-    when "MIGS.ba" #rule 84
+    elsif package_name.start_with?("MIGS.ba") #rule 84
       rule_id = "84"
       linages = [TAX_BACTERIA, TAX_ARCHAEA]
       result = has_linage(tax_id, linages) 
-    when "MIGS.eu" #rule 85
+    elsif package_name.start_with?("MIGS.eu") #rule 85
       rule_id = "85"
       linages = [TAX_EUKARYOTA]
       result = has_linage(tax_id, linages) 
-    when "MIGS.vi" #rule 86
+    elsif package_name.start_with?("MIGS.vi") #rule 86
       rule_id = "86"
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages) 
-    when "MIMARKS.specimen" #rule 87
+    elsif package_name.start_with?("MIMARKS.specimen") #rule 87
       #no check
-    when "MIMARKS.survey" #rule 88
+    elsif package_name.start_with?("MIMARKS.survey") #rule 88
       rule_id = "88"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       unless get_organism_name(tax_id).end_with?("metagenome")
         result = false
       end 
+    elsif package_name == "Beta-lactamase" #rule 89
+      rule_id = "89"
+      linages = [TAX_BACTERIA]
+      result = has_linage(tax_id, linages)
     end
     if result
-      #TODO define constant object
       return {status: "ok"}
     else
-      #TODO create util method to build error object
       return {status: "error", error_code: rule_id}
     end
   end
