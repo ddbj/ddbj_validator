@@ -3382,7 +3382,7 @@
     <DescriptionJa/>
     <ShortDescription>information about growth media for growing the plants or tissue cultured samples</ShortDescription>
     <ShortDescriptionJa/>
-    <Format>{text}</Format>
+    <Format>['', 'soil', 'liquid']</Format>
     <Synonym>growth med</Synonym>
     <Package use="optional" group_name="Plant-associated">MIGS.ba.plant-associated.4.0</Package>
     <Package use="optional" group_name="Plant-associated">MIGS.eu.plant-associated.4.0</Package>
@@ -8836,7 +8836,7 @@
     <DescriptionJa>サンプル生物の性別</DescriptionJa>
     <ShortDescription>physical sex of sampled organism</ShortDescription>
     <ShortDescriptionJa/>
-    <Format>['', 'male', 'female', 'pooled male and female', 'neuter', 'hermaphrodite', 'intersex', 'not determined', 'missing', 'not applicable', 'not collected']</Format>
+    <Format>['', 'male', 'female', 'neuter', 'hermaphrodite', 'not determined', 'missing', 'not applicable', 'not collected']</Format>
     <Synonym>donor sex</Synonym>
     <Synonym>experimental factor: sex</Synonym>
     <Synonym>gender</Synonym>
