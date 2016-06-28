@@ -801,9 +801,9 @@
   <Attribute>
     <Name>body product</Name>
     <HarmonizedName>body_product</HarmonizedName>
-    <Description>substance produced by the plant where the sample was obtained from</Description>
+    <Description>substance produced by the body, e.g. stool, mucus, where the sample was obtained from</Description>
     <DescriptionJa/>
-    <ShortDescription>substance produced by the plant</ShortDescription>
+    <ShortDescription>substance produced by the body</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{text}</Format>
   </Attribute>
@@ -1301,7 +1301,7 @@
     <Name>collection date</Name>
     <HarmonizedName>collection_date</HarmonizedName>
     <Description>Time of sampling (single instance or interval, eg., 2008-01-23T19:23:10, 2008-01-23, 2008-01, 2008, 1952-10-21T11:43Z/1952-10-21T17:43Z, 1952-10-21/1953-02-15, 1952-10/1953-02, 1952/1953)</Description>
-    <DescriptionJa>サンプルを採取した日付 (例: 2008-01-23T19:23:10, 2008-01-23, 2008-01, 2008, 1952-10-21T11:43Z/1952-10-21T17:43Z, 1952-10-21/1953-02-15, 1952-10/1953-02, 1952/1953)</DescriptionJa>
+    <DescriptionJa>サンプルを採取した日付 (例: 2008-01-23T19:23:10，2008-01-23，2008-01，2008，1952-10-21T11:43Z/1952-10-21T17:43Z，1952-10-21/1953-02-15，1952-10/1953-02，1952/1953)</DescriptionJa>
     <ShortDescription>Time of sampling (eg, 2008-01-23, 2008-01)</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{timestamp}</Format>
@@ -1518,7 +1518,7 @@
     <Name>culture collection</Name>
     <HarmonizedName>culture_collection</HarmonizedName>
     <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-    <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系, および細胞株を記載するのに用います。書式は institute のリストを参照, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
+    <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
     <ShortDescription>Name of source institute and unique culture identifier. See http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>culturecollection</Synonym>
@@ -1805,9 +1805,9 @@
   <Attribute>
     <Name>disease</Name>
     <HarmonizedName>disease</HarmonizedName>
-    <Description>Name of relevant disease.</Description>
-    <DescriptionJa>関連する病気の名称</DescriptionJa>
-    <ShortDescription>Name of relevant disease.</ShortDescription>
+    <Description>list of diseases diagnosed; can include multiple diagnoses. the value of the field depends on host; for humans the terms should be chosen from DO (Disease Ontology), free text for non-human. For DO terms, please see http://gemina.svn.sourceforge.net/viewvc/gemina/trunk/Gemina/ontologies/gemina_symptom.obo?view=log</Description>
+    <DescriptionJa>診断された病名リストで複数の診断を含めることができる。値は宿主に依存する。ヒトの場合，DO (Disease Ontology) から用語を選択。ヒト以外の場合はフリーテキストで記載。DO 用語については次を参照，http://gemina.svn.sourceforge.net/viewvc/gemina/trunk/Gemina/ontologies/gemina_symptom.obo?view=log</DescriptionJa>
+    <ShortDescription>list of diseases diagnosed</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{term}</Format>
     <Synonym>disease stat</Synonym>
@@ -2342,7 +2342,7 @@
     <Name>environment biome</Name>
     <HarmonizedName>env_biome</HarmonizedName>
     <Description>Descriptor of the broad ecological context of a sample. Examples include: desert, taiga or deciduous woodland. FAQ, http://trace.ddbj.nig.ac.jp/biosample/faq_e.html#biome-feature-material EnvO (v 2013-06-14) terms can be found via the link: http://www.environmentontology.org/Browse-EnvO</Description>
-    <DescriptionJa>サンプルに関する広い生態学的な環境。例: desert, taiga, deciduous woodland。FAQ, http://trace.ddbj.nig.ac.jp/biosample/faq.html#biome-feature-material EnvO (v 2013-06-14) 用語は次のリストから探すことができます: http://www.environmentontology.org/Browse-EnvO</DescriptionJa>
+    <DescriptionJa>サンプルに関する広い生態学的な環境。例: desert，taiga，deciduous woodland。FAQ，http://trace.ddbj.nig.ac.jp/biosample/faq.html#biome-feature-material EnvO (v 2013-06-14) 用語は次のリストから探すことができます: http://www.environmentontology.org/Browse-EnvO</DescriptionJa>
     <ShortDescription>Descriptor of the broad ecological context of a sample</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{term}</Format>
@@ -2451,7 +2451,7 @@
     <Name>environment feature</Name>
     <HarmonizedName>env_feature</HarmonizedName>
     <Description>Descriptor of the local environment. Examples include: harbor, cliff, or lake. FAQ, http://trace.ddbj.nig.ac.jp/biosample/faq_e.html#biome-feature-material EnvO (v 2013-06-14) terms can be found via the link: http://www.environmentontology.org/Browse-EnvO</Description>
-    <DescriptionJa>局所的な環境。例：harbor, cliff, lake。FAQ, http://trace.ddbj.nig.ac.jp/biosample/faq.html#biome-feature-material EnvO (v 2013-06-14) 用語は次のリストから探すことができます: http://www.environmentontology.org/Browse-EnvO</DescriptionJa>
+    <DescriptionJa>局所的な環境。例：harbor，cliff，lake。FAQ，http://trace.ddbj.nig.ac.jp/biosample/faq.html#biome-feature-material EnvO (v 2013-06-14) 用語は次のリストから探すことができます: http://www.environmentontology.org/Browse-EnvO</DescriptionJa>
     <ShortDescription>Descriptor of the local environment.</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{term}</Format>
@@ -2557,7 +2557,7 @@
     <Name>environment material</Name>
     <HarmonizedName>env_material</HarmonizedName>
     <Description>Material that was displaced by the sample, or material in which a sample was embedded, prior to the sampling event. Examples include: air, soil, or water. FAQ, http://trace.ddbj.nig.ac.jp/biosample/faq_e.html#biome-feature-material EnvO (v 2013-06-14) terms can be found via the link: http://www.environmentontology.org/Browse-EnvO</Description>
-    <DescriptionJa>サンプリングする前、サンプルによって置換されていた物質やサンプルが埋め込まれていた物質。例: air, soil, water。FAQ, http://trace.ddbj.nig.ac.jp/biosample/faq.html#biome-feature-material EnvO (v 2013-06-14) 用語は次のリストから探すことができます: http://www.environmentontology.org/Browse-EnvO</DescriptionJa>
+    <DescriptionJa>サンプリングする前、サンプルによって置換されていた物質やサンプルが埋め込まれていた物質。例: air，soil，water。FAQ，http://trace.ddbj.nig.ac.jp/biosample/faq.html#biome-feature-material EnvO (v 2013-06-14) 用語は次のリストから探すことができます: http://www.environmentontology.org/Browse-EnvO</DescriptionJa>
     <ShortDescription>Material that was displaced by the sample, or material in which a sample was embedded, prior to the sampling event.</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{term}</Format>
@@ -2878,9 +2878,9 @@
   <Attribute>
     <Name>family role</Name>
     <HarmonizedName>family_relationship</HarmonizedName>
-    <Description>relationships to other hosts in the same study; can include multiple relationships</Description>
+    <Description>relationships to other samples in the same study; can include multiple relationships</Description>
     <DescriptionJa/>
-    <ShortDescription>relationships to other hosts in the same study</ShortDescription>
+    <ShortDescription>relationships to other samples in the same study</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{text};{text}</Format>
     <Synonym>family member</Synonym>
@@ -3164,7 +3164,7 @@
     <Name>geographic location</Name>
     <HarmonizedName>geo_loc_name</HarmonizedName>
     <Description>Geographical origin of the sample; use the appropriate name from the list, http://www.ddbj.nig.ac.jp/sub/country-e.html. Use a colon to separate the country or ocean from more detailed information about the location, eg "Japan:Kanagawa, Hakone, Lake Ashi" </Description>
-    <DescriptionJa>サンプルを得た地域。国, 大洋, または, 海, の名称を次のリストから選択します, http://www.ddbj.nig.ac.jp/sub/country-e.html コロンに続けて地方・地域を示します。 例：Japan:Kanagawa, Hakone, Lake Ashi</DescriptionJa>
+    <DescriptionJa>サンプルを得た地域。国，大洋，または，海，の名称を次のリストから選択します，http://www.ddbj.nig.ac.jp/sub/country-e.html コロンに続けて地方・地域を示します。 例：Japan:Kanagawa，Hakone，Lake Ashi</DescriptionJa>
     <ShortDescription>Geographical origin of the sample (eg, "Japan:Kanagawa, Hakone, Lake Ashi")</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{term}:{term}:{text}</Format>
@@ -3432,9 +3432,6 @@
     <DescriptionJa>収集時におけるサンプルの健康あるいは病気の状態</DescriptionJa>
     <ShortDescription>Information regarding health state of the individual</ShortDescription>
     <ShortDescriptionJa/>
-    <DescriptionJa>収集時の宿主の健康状態</DescriptionJa>
-    <ShortDescription>Health or disease status of specific host at time of collection</ShortDescription>
-    <ShortDescriptionJa/>
     <Format>{term}</Format>
     <Synonym>health disease stat</Synonym>
     <Synonym>health disease status</Synonym>
@@ -3617,12 +3614,9 @@
   <Attribute>
     <Name>host</Name>
     <HarmonizedName>host</HarmonizedName>
-    <Description>common name of the host, e.g. human</Description>
-    <DescriptionJa/>
-    <ShortDescription>common name of the host, e.g. human</ShortDescription>
-    <ShortDescriptionJa/>
-    <DescriptionJa>生物の(実験室ではない)自然界における宿主の学名 (例: Homo sapiens)</DescriptionJa>
-    <ShortDescription>The full taxonomic name (eg, "Homo sapiens") of the natural (as opposed to laboratory) host to the organism</ShortDescription>
+    <Description>The natural (as opposed to laboratory) host to the organism from which the sample was obtained. Use the full taxonomic name, eg, "Homo sapiens".</Description>
+    <DescriptionJa>サンプルが取得された生物の (ラボではなく) 自然界での宿主。"Homo sapiens" のように学名を記載。</DescriptionJa>
+    <ShortDescription>The natural (as opposed to laboratory) host to the organism from which the sample was obtained</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>host (scientific name)</Synonym>
     <Synonym>host common name</Synonym>
@@ -4014,7 +4008,7 @@
     <Name>host disease</Name>
     <HarmonizedName>host_disease</HarmonizedName>
     <Description>Name of relevant disease, e.g. Salmonella gastroenteritis. For the controlled vocabulary, please see Human Disease Ontology, http://bioportal.bioontology.org/ontologies/1009 or MeSH, http://www.ncbi.nlm.nih.gov/mesh</Description>
-    <DescriptionJa>宿主の病気の名称。(例：Salmonella gastroenteritis) Controlled vocabulary としては以下のオントロジーを参照: Human Disease Ontology, http://bioportal.bioontology.org/ontologies/1009, MeSH, http://www.ncbi.nlm.nih.gov/mesh</DescriptionJa>
+    <DescriptionJa>宿主の病気の名称。(例：Salmonella gastroenteritis) Controlled vocabulary としては以下のオントロジーを参照: Human Disease Ontology，http://bioportal.bioontology.org/ontologies/1009，MeSH，http://www.ncbi.nlm.nih.gov/mesh</DescriptionJa>
     <ShortDescription>Name of relevant disease</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>host disease stat</Synonym>
@@ -4066,7 +4060,7 @@
     <Name>host disease outcome</Name>
     <HarmonizedName>host_disease_outcome</HarmonizedName>
     <Description>Final outcome of disease, e.g., death, chronic disease, recovery</Description>
-    <DescriptionJa>病気の最終的な結果。(例：death, chronic disease, recovery)</DescriptionJa>
+    <DescriptionJa>病気の最終的な結果。(例：death，chronic disease，recovery)</DescriptionJa>
     <ShortDescription>Final outcome of disease, e.g., death, chronic disease, recovery</ShortDescription>
     <ShortDescriptionJa/>
     <Package use="optional">Pathogen.cl.1.0</Package>
@@ -4671,9 +4665,9 @@
   <Attribute>
     <Name>host taxonomy ID</Name>
     <HarmonizedName>host_taxid</HarmonizedName>
-    <Description>NCBI taxon id of the host, e.g. 9606</Description>
+    <Description>NCBI taxonomy ID of the host, e.g. 9606</Description>
     <DescriptionJa>宿主の NCBI Taxonomy identifier</DescriptionJa>
-    <ShortDescription>NCBI taxon id of the host</ShortDescription>
+    <ShortDescription>NCBI taxonomy ID of the host</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{integer}</Format>
     <Synonym>host id</Synonym>
@@ -4745,9 +4739,6 @@
     <Description>Type of tissue the initial sample was taken from. Controlled vocabulary, http://bioportal.bioontology.org/ontologies/1005</Description>
     <DescriptionJa/>
     <ShortDescription>Type of tissue the initial sample was taken from</ShortDescription>
-    <ShortDescriptionJa/>
-    <DescriptionJa/>
-    <ShortDescription>name of body site where the sample was obtained from</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>host body site</Synonym>
     <Package use="optional">Invertebrate.1.0</Package>
@@ -5028,7 +5019,7 @@
   <Attribute>
     <Name>infra specific name</Name>
     <HarmonizedName>infra_specific_name</HarmonizedName>
-    <Description>taxonomic information about the host below subspecies level</Description>
+    <Description>taxonomic information below subspecies level</Description>
     <DescriptionJa/>
     <ShortDescription>taxonomic information about the host below subspecies level</ShortDescription>
     <ShortDescriptionJa/>
@@ -5037,7 +5028,7 @@
   <Attribute>
     <Name>infra specific rank</Name>
     <HarmonizedName>infra_specific_rank</HarmonizedName>
-    <Description>taxonomic rank information about the host below subspecies level, such as variety, form, rank etc.</Description>
+    <Description>taxonomic rank information below subspecies level, such as variety, form, rank etc.</Description>
     <DescriptionJa/>
     <ShortDescription>taxonomic rank information about the host below subspecies level</ShortDescription>
     <ShortDescriptionJa/>
@@ -5080,7 +5071,7 @@
     <Name>isolation and growth condition</Name>
     <HarmonizedName>isol_growth_condt</HarmonizedName>
     <Description>Publication reference in the form of pubmed ID, DOI or URL for isolation and growth condition specifications of the organism/material</Description>
-    <DescriptionJa>単離や生育条件の詳細を記載している pubmed ID, DOI,  あるいは URL</DescriptionJa>
+    <DescriptionJa>単離や生育条件の詳細を記載している pubmed ID，DOI， あるいは URL</DescriptionJa>
     <ShortDescription>Pubmed ID, DOI or URL of publication for isolation and growth condition specifications of the organism/material</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{PMID|DOI|URL}</Format>
@@ -5228,7 +5219,7 @@
     <Name>isolation source</Name>
     <HarmonizedName>isolation_source</HarmonizedName>
     <Description>Describes the physical, environmental and/or local geographical source of the biological sample from which the sample was derived.</Description>
-    <DescriptionJa>サンプルが得られた生物学的サンプルに関する, 物理的, 環境的, かつまたは, 地理的な由来</DescriptionJa>
+    <DescriptionJa>サンプルが得られた生物学的サンプルに関する，物理的，環境的，かつまたは，地理的な由来</DescriptionJa>
     <ShortDescription>Describes the physical, environmental and/or local geographical source of the biological sample</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>isolate source</Synonym>
@@ -5366,9 +5357,9 @@
   <Attribute>
     <Name>lab host</Name>
     <HarmonizedName>lab_host</HarmonizedName>
-    <Description>Originally meaning host on which a parasite is maintained in the lab, which may not be the same as the natural host (example hamster cells used to support a parasite normally found in mouse in the wild). </Description>
-    <DescriptionJa>配列決定した分子を得た生物を増殖させるために実験室で使われた宿主の学名</DescriptionJa>
-    <ShortDescription>Originally meaning host on which a parasite is maintained in the lab, which may not be the same as the natural host (example hamster cells used to support a parasite normally found in mouse in the wild). </ShortDescription>
+    <Description>Scientific name and description of the laboratory host used to propagate the source organism or material from which the sample was obtained, e.g., Escherichia coli DH5a, or Homo sapiens HeLa cells</Description>
+    <DescriptionJa>サンプルが得られた生物や実験材料をラボで増殖させるために使われた宿主の学名。例: Escherichia coli DH5a，Homo sapiens HeLa cells</DescriptionJa>
+    <ShortDescription>Scientific name and description of the laboratory host used to propagate the source organism or material from which the sample was obtained</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>labhost</Synonym>
     <Package use="optional">Beta-lactamase.1.0</Package>
@@ -5394,9 +5385,9 @@
   <Attribute>
     <Name>latitude and longitude</Name>
     <HarmonizedName>lat_lon</HarmonizedName>
-    <Description>The geographical coordinates of the location where the sample was collected. Specify as decimal degrees latitude and longitude in format "d[d.dddd] N|S d[dd.dddd] W|E", eg, “47.94 N 28.12 W” “45.0123 S 4.1234 E”</Description>
-    <DescriptionJa>サンプルが採取された位置の地理的座標。 (書式：d[d.dddd] N|S d[dd.dddd] W|E) (例： "47.94 N 28.12 W", "45.0123 S 4.1234 E")  小数点以下の数字は分秒ではなく小数で記載してください。</DescriptionJa>
-    <ShortDescription>The geographical coordinates of the location in decimal degrees latitude and longitude (eg, “47.94 N 28.12 W” “45.0123 S 4.1234 E”)</ShortDescription>
+    <Description>The geographical coordinates of the location where the sample was collected. Specify as decimal degrees latitude and longitude in format "d[d.dddd] N|S d[dd.dddd] W|E", eg, 47.94 N 28.12 W</Description>
+    <DescriptionJa>サンプルが採取された位置の地理的座標。 (書式：d[d.dddd] N|S d[dd.dddd] W|E) (例: 47.94 N 28.12 W)  小数点以下の数字は分秒ではなく小数で記載してください。</DescriptionJa>
+    <ShortDescription>The geographical coordinates of the location in decimal degrees latitude and longitude (eg, 47.94 N 28.12 W)</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{float} {float}</Format>
     <Synonym>geographic location (latitude and longitude)</Synonym>
@@ -5650,7 +5641,7 @@
     <Name>locus tag prefix</Name>
     <HarmonizedName>locus_tag_prefix</HarmonizedName>
     <Description>A locus tag prefix required for an annotated genome, http://www.ddbj.nig.ac.jp/sub/locus_tag-e.html</Description>
-    <DescriptionJa>アノテーションを記載するゲノムに対するユニークな locus_tag_prefix, http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html</DescriptionJa>
+    <DescriptionJa>アノテーションを記載するゲノムに対するユニークな locus_tag_prefix，http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html</DescriptionJa>
     <ShortDescription>A locus tag prefix for an annotated genome</ShortDescription>
     <ShortDescriptionJa/>
     <Package use="optional">Pathogen.cl.1.0</Package>
@@ -6478,7 +6469,7 @@
     <Name>organism</Name>
     <HarmonizedName>organism</HarmonizedName>
     <Description>The most descriptive organism name for this sample (to the species, if relevant) in the NCBI Taxonomy database, http://www.ncbi.nlm.nih.gov/taxonomy If it is not in the database, provide as much information about the organism as possible and the DDBJ staff apply a new organism name to NCBI Taxonomy.</Description>
-    <DescriptionJa>NCBI Taxonomy database, http://www.ncbi.nlm.nih.gov/taxonomy  に登録されている最も下位のランクの生物名 (適切な場合は species まで)。データベースに登録されていない場合，未登録の生物に関する情報をできるだけ記入してください。 DDBJ スタッフが NCBI Taxonomy に未登録の生物を申請します。</DescriptionJa>
+    <DescriptionJa>NCBI Taxonomy database，http://www.ncbi.nlm.nih.gov/taxonomy  に登録されている最も下位のランクの生物名 (適切な場合は species まで)。データベースに登録されていない場合，未登録の生物に関する情報をできるだけ記入してください。 DDBJ スタッフが NCBI Taxonomy に未登録の生物を申請します。</DescriptionJa>
     <ShortDescription>Organism name in the NCBI Taxonomy database</ShortDescription>
     <ShortDescriptionJa/>
     <Package use="mandatory" group_name="Common">Common</Package>
@@ -7209,7 +7200,7 @@
   <Attribute>
     <Name>plant body site</Name>
     <HarmonizedName>plant_body_site</HarmonizedName>
-    <Description>name of body site that the sample was obtained from. For PO (v819) terms please see http://bioportal.bioontology.org/visualize/42737</Description>
+    <Description>name of body site that the sample was obtained from. For Plant Ontology (PO) (v 20) terms, see http://purl.bioontology.org/ontology/PO</Description>
     <DescriptionJa/>
     <ShortDescription>name of body site that the sample was obtained from</ShortDescription>
     <ShortDescriptionJa/>
@@ -7240,7 +7231,7 @@
     <Name>ploidy</Name>
     <HarmonizedName>ploidy</HarmonizedName>
     <Description>The ploidy level of the genome (e.g. allopolyploid, haploid, diploid, triploid, tetraploid). </Description>
-    <DescriptionJa>ゲノムの倍数性レベル (例: allopolyploid, haploid, diploid, triploid, tetraploid)</DescriptionJa>
+    <DescriptionJa>ゲノムの倍数性レベル (例: allopolyploid，haploid，diploid，triploid，tetraploid)</DescriptionJa>
     <ShortDescription>The ploidy level of the genome (eg, allopolyploid, haploid, diploid, triploid, tetraploid). </ShortDescription>
     <ShortDescriptionJa/>
     <Format>{term}</Format>
@@ -7666,9 +7657,9 @@
   <Attribute>
     <Name>reference for biomaterial</Name>
     <HarmonizedName>ref_biomaterial</HarmonizedName>
-    <Description>Primary publication if isolated before genome publication; otherwise, primary genome report in the form of pubmed ID, DOI or URL</Description>
-    <DescriptionJa>Primary publication か primary genome report の pubmed ID, DOI, URL</DescriptionJa>
-    <ShortDescription>Primary publication if isolated before genome publication; otherwise, primary genome report in the form of pubmed ID, DOI or URL</ShortDescription>
+    <Description>Primary publication or genome report in the form of pubmed ID, DOI or URL</Description>
+    <DescriptionJa>Primary publication か genome report の pubmed ID，DOI，URL</DescriptionJa>
+    <ShortDescription>Primary publication or genome report in the form of pubmed ID, DOI or URL</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{PMID|DOI|URL}</Format>
     <Synonym>ref biomaterial</Synonym>
@@ -8217,9 +8208,9 @@
   <Attribute>
     <Name>sample size</Name>
     <HarmonizedName>samp_size</HarmonizedName>
-    <Description>Amount or size of sample</Description>
+    <Description>Amount or size of sample (volume, mass or area) that was collected</Description>
     <DescriptionJa/>
-    <ShortDescription>Amount or size of sample</ShortDescription>
+    <ShortDescription>Amount or size of sample (volume, mass or area) that was collected</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{float} {unit}</Format>
     <Synonym>samp size</Synonym>
@@ -8601,9 +8592,9 @@
   <Attribute>
     <Name>sample volume or weight for DNA extraction</Name>
     <HarmonizedName>samp_vol_we_dna_ext</HarmonizedName>
-    <Description>weight (g) of soil processed</Description>
+    <Description>volume (mL) or weight (g) of sample processed for DNA extraction</Description>
     <DescriptionJa/>
-    <ShortDescription>weight (g) of soil processed</ShortDescription>
+    <ShortDescription>volume (mL) or weight (g) of sample processed for DNA extraction</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{float} {unit}</Format>
     <Synonym>samp vol we dna ext</Synonym>
@@ -8795,7 +8786,7 @@
     <Name>serotype</Name>
     <HarmonizedName>serotype</HarmonizedName>
     <Description>Taxonomy below subspecies; a variety (in bacteria, fungi or virus) usually based on its antigenic properties. Same as serovar and serogroup. e.g. serotype="H1N1" in Influenza A virus CY098518.</Description>
-    <DescriptionJa>subspecies 以下の分類。配列の得られた生物, ウイルスなどの血清学的タイプ。例: serotype="H1N1" (インフルエンザ A 型 の場合)</DescriptionJa>
+    <DescriptionJa>subspecies 以下の分類。配列の得られた生物，ウイルスなどの血清学的タイプ。例: serotype="H1N1" (インフルエンザ A 型 の場合)</DescriptionJa>
     <ShortDescription>Taxonomy below subspecies; a variety (in bacteria, fungi or virus) usually based on its antigenic properties. Same as serovar and serogroup</ShortDescription>
     <ShortDescriptionJa/>
     <Package use="optional">Microbe.1.0</Package>
@@ -8917,7 +8908,7 @@
     <HarmonizedName>slope_aspect</HarmonizedName>
     <Description>the direction a slope faces. While looking down a slope use a compass to record the direction you are facing (direction or degrees); e.g., NW or 315&amp;deg;. This measure provides an indication of sun and wind exposure that will influence soil temperature and evapotranspiration.</Description>
     <DescriptionJa/>
-    <shortdescription>the direction a slope faces. While looking down a slope use a compass to record the direction you are facing (direction or degrees); e.g., NW or 315°. This measure provides an indication of sun and wind exposure that will influence soil temperature and evapotranspiration.</shortdescription>
+    <ShortDescription/>
     <ShortDescriptionJa/>
     <Format>{float} {unit}</Format>
     <Package use="optional" group_name="Soil">MIGS.ba.soil.4.0</Package>
@@ -9255,8 +9246,8 @@
     <Name>specimen voucher</Name>
     <HarmonizedName>specimen_voucher</HarmonizedName>
     <Description>Identifier for the physical specimen. Use format: "[&amp;lt;institution-code&amp;gt;:[&amp;lt;collection-code&amp;gt;:]]&amp;lt;specimen_id&amp;gt;", eg, "UAM:Mamm:52179". Intended as a reference to the physical specimen that remains after it was analyzed. If the specimen was destroyed in the process of analysis, electronic images (e-vouchers) are an adequate substitute for a physical voucher specimen. Ideally the specimens will be deposited in a curated museum, herbarium, or frozen tissue collection, but often they will remain in a personal or laboratory collection for some time before they are deposited in a curated collection. There are three forms of specimen_voucher qualifiers. If the text of the qualifier includes one or more colons it is a 'structured voucher'. Structured vouchers include institution-codes (and optional collection-codes) taken from a controlled vocabulary maintained by the INSDC that denotes the museum or herbarium collection where the specimen resides, please visit the INSDC website, http://www.insdc.org/controlled-vocabulary-specimenvoucher-qualifier</Description>
-    <DescriptionJa>配列の得られた標本(動植物個体の一部 または 全体)が維持管理されている管理団体とＩＤ。(書式：[&lt;institution_code&gt;:[&lt;collection_code&gt;:]]&lt;specimen_id&gt;)(例：UAM:Mamm:52179) &lt;collection_code&gt; が存在しない場合は記載不要です。&lt;institution_code&gt; はこちらを参照, http://www.insdc.org/controlled-vocabulary-specimenvoucher-qualifier</DescriptionJa>
-    <ShortDescription>Identifier for the physical specimen. Use format: "[&lt;institution-code&gt;:[&lt;collection-code&gt;:]]&lt;specimen_id&gt;", eg, "UAM:Mamm:52179". See http://www.insdc.org/controlled-vocabulary-specimenvoucher-qualifier</ShortDescription>
+    <DescriptionJa>配列の得られた標本(動植物個体の一部 または 全体)が維持管理されている管理団体とＩＤ。(書式：[&amp;lt;institution_code&amp;gt;:[&amp;lt;collection_code&amp;gt;:]]&amp;lt;specimen_id&amp;gt;)(例：UAM:Mamm:52179) &amp;lt;collection_code&amp;gt; が存在しない場合は記載不要です。&amp;lt;institution_code&amp;gt; はこちらを参照，http://www.insdc.org/controlled-vocabulary-specimenvoucher-qualifier</DescriptionJa>
+    <ShortDescription>Identifier for the physical specimen. Use format: "[&amp;lt;institution-code&amp;gt;:[&amp;lt;collection-code&amp;gt;:]]&amp;lt;specimen_id&amp;gt;", eg, "UAM:Mamm:52179". See http://www.insdc.org/controlled-vocabulary-specimenvoucher-qualifier</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>specimenvoucher</Synonym>
     <Package use="optional">Invertebrate.1.0</Package>
@@ -9304,9 +9295,9 @@
   <Attribute>
     <Name>strain</Name>
     <HarmonizedName>strain</HarmonizedName>
-    <Description>Microbial/eukaryotic strain name</Description>
+    <Description>microbial or eukaryotic strain name</Description>
     <DescriptionJa>微生物や真核生物の株名。</DescriptionJa>
-    <ShortDescription>Microbial/eukaryotic strain name</ShortDescription>
+    <ShortDescription>microbial or eukaryotic strain name</ShortDescription>
     <ShortDescriptionJa/>
     <Synonym>organism strain</Synonym>
     <Synonym>strain id</Synonym>
@@ -9588,9 +9579,9 @@
   <Attribute>
     <Name>substrate</Name>
     <HarmonizedName>substrate</HarmonizedName>
-    <Description>the growth substrate of the host</Description>
+    <Description/>
     <DescriptionJa/>
-    <ShortDescription>the growth substrate of the host</ShortDescription>
+    <ShortDescription/>
     <ShortDescriptionJa/>
   </Attribute>
   <Attribute>
@@ -9688,7 +9679,7 @@
   <Attribute>
     <Name>Super Population Code</Name>
     <HarmonizedName>super_population_code</HarmonizedName>
-    <Description>The 3 letter super population abbreviation from the Coriell Institute indicating ancestry	</Description>
+    <Description>The 3 letter super population abbreviation from the Coriell Institute indicating ancestry</Description>
     <DescriptionJa/>
     <ShortDescription/>
     <ShortDescriptionJa/>
@@ -9839,7 +9830,7 @@
     <Name>taxonomy id</Name>
     <HarmonizedName>taxonomy_id</HarmonizedName>
     <Description>NCBI Taxonomy identifier. This is appropriate for individual organisms, some metagenomes and environmental samples (http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Undef&amp;id=12908&amp;lvl=3&amp;lin=f&amp;keep=1&amp;srchmode=1&amp;unlock).  If it is not in the database, enter a tentative ID (e.g., 1). The DDBJ staff apply a new organism name to NCBI Taxonomy, and then the tentative ID is replaced by an assigned TaxID.</Description>
-    <descriptionja>NCBI Taxonomy identifier. 個別の生物、メタゲノムや環境サンプル: http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?mode=Undef&amp;id=12908&amp;lvl=3&amp;lin=f&amp;keep=1&amp;srchmode=1&amp;unlock に割り当てられています。データベースに登録されていない場合，仮の ID (例: 1) を記入してください。 DDBJ スタッフが NCBI Taxonomy に未登録の生物を申請後、割り当てられた TaxID に差し替えます。</descriptionja>
+    <DescriptionJa/>
     <ShortDescription>NCBI Taxonomy identifier</ShortDescription>
     <ShortDescriptionJa/>
   </Attribute>
@@ -9963,7 +9954,7 @@
     <HarmonizedName>texture</HarmonizedName>
     <Description>the relative proportion of different grain sizes of mineral particles in a soil, as described using a standard system; express as % sand (50 um to 2 mm), silt (2 um to 50 um), and clay (&amp;lt;2 um) with textural name (e.g., silty clay loam) optional.</Description>
     <DescriptionJa/>
-    <ShortDescription>the relative proportion of different grain sizes of mineral particles in a soil, as described using a standard system; express as % sand (50 um to 2 mm), silt (2 um to 50 um), and clay (&lt;2 um) with textural name (e.g., silty clay loam) optional.</ShortDescription>
+    <ShortDescription>the relative proportion of different grain sizes of mineral particles in a soil, as described using a standard system; express as % sand (50 um to 2 mm), silt (2 um to 50 um), and clay (&amp;lt;2 um) with textural name (e.g., silty clay loam) optional.</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{float} {unit}</Format>
     <Package use="optional" group_name="Soil">MIGS.ba.soil.4.0</Package>
@@ -10175,9 +10166,9 @@
   <Attribute>
     <Name>total mass</Name>
     <HarmonizedName>tot_mass</HarmonizedName>
-    <Description>total mass of the host at collection, the unit depends on host</Description>
+    <Description/>
     <DescriptionJa/>
-    <ShortDescription>total mass of the host at collection, the unit depends on host</ShortDescription>
+    <ShortDescription/>
     <ShortDescriptionJa/>
     <Synonym>tot mass</Synonym>
   </Attribute>
@@ -10201,9 +10192,9 @@
   <Attribute>
     <Name>total nitrogen</Name>
     <HarmonizedName>tot_nitro</HarmonizedName>
-    <Description>total nitrogen concentration, calculated by: total nitrogen = total dissolved nitrogen + particulate nitrogen. Can also be measured without filtering, reported as nitrogen</Description>
+    <Description>total nitrogen content of the sample</Description>
     <DescriptionJa/>
-    <ShortDescription>total nitrogen concentration, calculated by: total nitrogen = total dissolved nitrogen + particulate nitrogen. Can also be measured without filtering, reported as nitrogen</ShortDescription>
+    <ShortDescription>total nitrogen content of the sample</ShortDescription>
     <ShortDescriptionJa/>
     <Format>{float} {unit}</Format>
     <Synonym>tot n</Synonym>
