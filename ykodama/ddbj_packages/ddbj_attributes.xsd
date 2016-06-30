@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DDBJ BioSample Attribute XML specification 2016-06-30 v1.0 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="BioSampleAttributes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Attribute" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" type="xs:string"/>
+              <xs:element name="HarmonizedName" type="xs:string"/>
+              <xs:element name="Description" type="xs:string"/>
+              <xs:element name="DescriptionJa" type="xs:string"/>
+              <xs:element name="ShortDescription" type="xs:string"/>
+              <xs:element name="ShortDescriptionJa" type="xs:string"/>
+              <xs:element name="Format" type="xs:string" minOccurs="0"/>
+              <xs:element name="Synonym" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+              <xs:element name="Package" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:simpleContent>
+                    <xs:extension base="xs:string">
+                      <xs:attribute name="use" type="useType" use="required"/>
+                      <xs:attribute name="group_name" type="groupnameType" use="optional"/>
+                    </xs:extension>
+                  </xs:simpleContent>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="useType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="mandatory"/>
+      <xs:enumeration value="optional"/>
+      <xs:enumeration value="either_one_mandatory"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="groupnameType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="Age/stage"/>
+      <xs:enumeration value="Air"/>
+      <xs:enumeration value="Built"/>
+      <xs:enumeration value="Common"/>
+      <xs:enumeration value="Environment"/>
+      <xs:enumeration value="Host"/>
+      <xs:enumeration value="Host-associated"/>
+      <xs:enumeration value="Human-associated"/>
+      <xs:enumeration value="Human-gut"/>
+      <xs:enumeration value="Human-oral"/>
+      <xs:enumeration value="Human-skin"/>
+      <xs:enumeration value="Human-vaginal"/>
+      <xs:enumeration value="Microbial"/>
+      <xs:enumeration value="Miscellaneous"/>
+      <xs:enumeration value="Nucleic Acid Sequence Source"/>
+      <xs:enumeration value="Organism"/>
+      <xs:enumeration value="Plant-associated"/>
+      <xs:enumeration value="Sediment"/>
+      <xs:enumeration value="Soil"/>
+      <xs:enumeration value="Source"/>
+      <xs:enumeration value="Wastewater"/>
+      <xs:enumeration value="Water"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
