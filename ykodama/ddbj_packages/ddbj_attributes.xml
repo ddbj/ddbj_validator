@@ -9833,6 +9833,7 @@
     <DescriptionJa/>
     <ShortDescription>NCBI Taxonomy identifier</ShortDescription>
     <ShortDescriptionJa/>
+    <Package use="optional" group_name="Common">Common</Package>
   </Attribute>
   <Attribute>
     <Name>teleomorph</Name>
