@@ -148,7 +148,7 @@ class MainValidator
       send("missing_sample_name", "18", sample_name, biosample_data, line_num)
       send("missing_organism", "20", sample_name, biosample_data, line_num)
 
-      #TODO get mandatory attribute from sparql
+      #get mandatory attribute from sparql
       attr_list = get_attributes_of_package(biosample_data["package"])
 
       ### 6.check all attributes (rule: 14, 27, 92)
@@ -225,19 +225,15 @@ class MainValidator
   #   },
   #   {...}, ...
   # ]
-  def get_attributes_of_package (package)
-    package_name = package.gsub(".", "_")
-    package_name = "MIGS_eu_water" if package_name == "MIGS_eu" #TODO delete after data will be fixed
-    package_name = "MIGS_ba_soil" if package_name == "MIGS_ba" #TODO delete after data will be fixed
+  def get_attributes_of_package (package_name)
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
-      sparql = SPARQLBase.new("http://52.69.96.109/ddbj_sparql") #TODO config
+      sparql = SPARQLBase.new(@conf[:sparql_config]["endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql") #TODO config
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
       result = sparql.query(sparql_query)
-
       attr_list = []
       result.each do |row|
         attr = {attribute_name: row[:attribute], require: row[:require]}
@@ -962,7 +958,6 @@ class MainValidator
 
   #
   # パッケージに対して生物種(TaxonomyID)が適切であるかの検証
-  # #TODO organism name?
   #
   # ==== Args
   # rule_code

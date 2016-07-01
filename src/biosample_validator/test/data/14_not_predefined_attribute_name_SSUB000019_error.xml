@@ -40,7 +40,7 @@
         <Attribute attribute_name="elev">88.8m</Attribute>
         <Attribute attribute_name="user_attr1">user_data1</Attribute>
         <Attribute attribute_name="depth">0m</Attribute>
-        <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
+        <Attribute attribute_name="bioproject_accession">PRJDB1654</Attribute>
         <Attribute attribute_name="user_attr2">user_data2</Attribute>
     </Attributes>
 </BioSample>

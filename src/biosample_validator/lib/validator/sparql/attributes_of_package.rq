@@ -1,7 +1,34 @@
-SELECT ?attribute ?require
+PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+SELECT DISTINCT
+ (REPLACE(?attr_name, " attribute", "") AS ?attribute) ?require
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample>
 WHERE
 {
-  ?attr ?mandatory <http://ddbj.nig.ac.jp/ontologies/biosample/<%= package_name %>> .
-  BIND(REPLACE(STR(?attr),"http://ddbj.nig.ac.jp/ontologies/biosample/","") AS ?attribute)
-  BIND(if(?mandatory = <http://ddbj.nig.ac.jp/ontologies/biosample/mandatory_package>,"mandatory","optional") AS ?require)
+  ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
+    rdfs:label "<%= package_name %> package"@en .
+  {
+    ?package dbs:has_mandatory_attribute ?attr .
+     ?attr dc:identifier ?attr_name .
+     BIND ("mandatory" AS ?require)
+  }
+  UNION
+  {
+    ?package dbs:has_either_one_mandatory_attribute ?attr .
+     ?attr dc:identifier ?attr_name .
+     BIND ("either_one_mandatory" AS ?require)
+  }
+  UNION
+  {
+    ?package dbs:has_optional_attribute ?attr .
+     ?attr dc:identifier ?attr_name .
+     BIND ("optional" AS ?require)
+  }
+  UNION
+  {
+    ?package dbs:has_attribute ?attr .
+     ?attr dc:identifier ?attr_name .
+     BIND ("other" AS ?require)
+  }
 }

@@ -34,7 +34,7 @@ class TestValidatorCache < Minitest::Test
   end
 
   def test_cache_get_attributes_of_package
-    package_name = "MIGS_ba_soil"
+    package_name = "MIGS.ba.soil"
     ret1 = @validator.send("get_attributes_of_package", package_name)
     cache = @validator.instance_variable_get (:@cache)
     #p cache.instance_variable_get (:@cache_data)
@@ -46,7 +46,7 @@ class TestValidatorCache < Minitest::Test
   end
 
   def test_cache_unknown_package
-    package_name = "MIGS_ba_soil"
+    package_name = "MIGS.ba.soil"
     ret1 = @validator.send("unknown_package", "26", "sampleA", package_name, 1)
     cache = @validator.instance_variable_get (:@cache)
     #p cache.instance_variable_get (:@cache_data)
