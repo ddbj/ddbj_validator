@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- DDBJ BioSample Package XML specification 2016-06-30 v1.0 -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="BioSamplePackages">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Package" maxOccurs="unbounded">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="Name" type="xs:string"/>
+              <xs:element name="DisplayName" type="xs:string"/>
+              <xs:element name="ShortName" type="xs:string"/>
+              <xs:element name="Version" type="xs:decimal"/>
+              <xs:element name="EnvPackage" type="xs:string"/>
+              <xs:element name="EnvPackageDisplay" type="xs:string"/>
+              <xs:element name="Description" type="xs:string" minOccurs="0"/>
+              <xs:element name="Example" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+            <xs:attributeGroup ref="packageAttrs"/>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="packageAttrs">
+    <xs:attribute name="group" type="xs:string"/>
+    <xs:attribute name="antibiogram" type="xs:string"/>
+    <xs:attribute name="antibiogram_class" type="xs:string"/>
+    <xs:attribute name="antibiogram_template" type="xs:string"/>
+  </xs:attributeGroup>
+</xs:schema>
