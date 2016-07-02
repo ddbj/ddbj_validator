@@ -7,7 +7,7 @@ FROM <http://ddbj.nig.ac.jp/ontologies/biosample>
 WHERE
 {
   ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
-    rdfs:label "<%= package_name %> package"@en .
+    dc:identifier "<%= package_name %>" .
   {
     ?package dbs:has_mandatory_attribute ?attr .
      ?attr dc:identifier ?attr_name .

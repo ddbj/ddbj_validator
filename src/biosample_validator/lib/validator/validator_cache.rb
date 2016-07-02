@@ -4,6 +4,7 @@ class ValidatorCache
   EXIST_HOST_NAME = "exist_host_name"
   EXIST_ORGANISM_NAME = "exist_organism_name"
   PACKAGE_ATTRIBUTES = "package_attributes"
+  PACKAGE_ATTRIBUTE_GROUPS = "package_attribute_groups"
   UNKNOWN_PACKAGE = "unknown_package"
   COUNTRY_FROM_LATLON = "country_from_latlon"
   EXIST_PUBCHEM_ID = "exist_pubchem_id"

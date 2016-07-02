@@ -9,6 +9,8 @@ class TestMainValidator < Minitest::Test
     @xml_convertor = BioSampleXmlConvertor.new
   end
 
+#### テスト用共通メソッド ####
+
   #
   # Executes validation method
   #
@@ -92,6 +94,37 @@ class TestMainValidator < Minitest::Test
       ret
     end
   end
+
+
+#### 属性取得メソッドのユニットテスト ####
+
+  def test_get_attributes_of_package
+    attr_list = @validator.send("get_attributes_of_package", "Microbe")
+    assert_equal true, attr_list.size > 0
+    assert_equal false, attr_list.first[:attribute_name].nil?
+    assert_equal false, attr_list.first[:require].nil?
+    attr_list = @validator.send("get_attributes_of_package", "Invalid Package")
+    assert_equal 0, attr_list.size
+  end
+
+  def test_get_attribute_groups_of_package
+    expect_value1 = {
+      :group_name => "Source group attribute in Microbe",
+      :attribute_set => ["host", "isolation_source"]
+    }
+    expect_value2 = {
+      :group_name => "Organism group attribute in Microbe",
+      :attribute_set => ["isolate", "strain"]
+    }
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Microbe")
+    assert_equal 2, attr_group_list.size
+    assert_equal expect_value1, attr_group_list[0]
+    assert_equal expect_value2, attr_group_list[1]
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package")
+    assert_equal 0, attr_group_list.size
+  end
+
+#### 各validationメソッドのユニットテスト ####
 
   def test_non_ascii_header_line
     #ok case
@@ -225,6 +258,36 @@ class TestMainValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
+  end
+
+  def test_missing_group_of_at_least_one_required_attributes
+    #ok case
+    xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    expect_error_msg = "[ host, isolation_source ], [ isolate, strain ]"
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_error_msg, get_error_column_value(ret[:error_list], "Attribute groups")
+
+    #host attribute is exist but value is blank
+    xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ng2.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    expect_error_msg = "[ host, isolation_source ]"
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_error_msg, get_error_column_value(ret[:error_list], "Attribute groups")
   end
 
   def test_missing_required_attribute_name
