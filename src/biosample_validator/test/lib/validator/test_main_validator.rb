@@ -336,6 +336,12 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ##auto annotation 大文字小文字が異なる場合の修正
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "horizon", "o horizon", cv_attr, 1)
+    expect_annotation = "O horizon"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
     assert_equal nil, ret[:result]

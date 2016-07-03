@@ -666,13 +666,31 @@ class MainValidator
 
     result =  true
     if !cv_attr[attr_name].nil? # CVを使用する属性か
-      if !cv_attr[attr_name].include?(attr_val) # CVリストに値であれば
+      is_cv_term = false
+      replace_value = ""
+      cv_attr[attr_name].each do |term|
+        if term.casecmp(attr_val) == 0 #大文字小文字を区別せず一致
+          is_cv_term = true
+          if term != attr_val #大文字小文字で異なる
+            replace_value = term #置換が必要
+            is_cv_term = false
+          end
+        end
+      end
+
+      if !is_cv_term # CVリストに値がない
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        if replace_value != "" #置換候補があればAuto annotationをつける
+          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+          annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
+        else #置換候補がないエラー
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+        end
         @error_list.push(error_hash)
         result = false
       end
