@@ -61,7 +61,7 @@ class CommonUtils
   # エラーのHashオブジェクト
   #
   def self.error_obj (rule, file_path, annotation, *auto_annotaion)
-    if auto_annotaion
+    if auto_annotaion.first == true
       message = rule["message"] + " " + @@AUTO_ANNOTAION_MSG
     else
       message = rule["message"]
