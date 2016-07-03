@@ -506,6 +506,12 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    #auto annotation
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Human", 1)
+    expect_annotation = "Homo sapiens"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("invalid_host_organism_name", "15", "sampleA", nil, 1)
     assert_equal nil, ret[:result]

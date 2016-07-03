@@ -900,8 +900,12 @@ class MainValidator
   #
   def invalid_host_organism_name (rule_code, sample_name, host_name, line_num)
     return nil if CommonUtils::null_value?(host_name)
-    #あればキャッシュを使用
-    if @cache.nil? || @cache.check(ValidatorCache::EXIST_HOST_NAME, host_name).nil?
+
+    replace_value = ""
+    if host_name.casecmp("human") == 0
+      ret = false
+      replace_value = "Homo sapiens"
+    elsif @cache.nil? || @cache.check(ValidatorCache::EXIST_HOST_NAME, host_name).nil? #あればキャッシュを使用
       ret = @org_validator.exist_organism_name?(host_name)
       @cache.save(ValidatorCache::EXIST_HOST_NAME, host_name, ret) unless @cache.nil?
     else
@@ -917,7 +921,13 @@ class MainValidator
         {key: "Attribute", value: "host"},
         {key: "Attribute value", value: host_name}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      if replace_value != "" #置換候補があればAuto annotationをつける
+        location = @xml_convertor.xpath_from_attrname("host", line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
+      else #置換候補がないエラー
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      end
       @error_list.push(error_hash)
       false
     end 
