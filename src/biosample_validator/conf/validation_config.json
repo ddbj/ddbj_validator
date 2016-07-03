@@ -16,9 +16,9 @@
   "rule3": {
     "code": "3",
     "level": "error",
-    "name": "Duplicated sample title in this account",
-    "method": "duplicated_sample_title_in_this_account",
-    "message": "Sample title is duplicated in the submission account."
+    "name": "Duplicated sample title in this submission",
+    "method": "duplicated_sample_title_in_this_submission",
+    "message": "Sample title is duplicated in the submission."
   },
   "rule4": {
     "code": "4",

@@ -12,38 +12,6 @@ $pg_bs_db_name = config["pg_bs_name"]
 $pg_bp_db_name = config["pg_bp_name"]
 $pg_pass = config["pg_pass"]
 
-class GetSubmitterItem
-  def getitems(submitter_id)
-    begin
-      @submitter_id = submitter_id
-      #connection = PG::connect(:host => $pg_host, :user => $pg_user, :dbname => $pg_bs_db_name, :port => $pg_port, :password => $pg_pass)
-      connection = PGconn.connect($pg_host, $pg_port, '', '',  $pg_bs_db_name, $pg_user,  $pg_pass)
-
-      q = "SELECT form.submission_id, attribute_name, attribute_value, submitter_id
-        FROM mass.attribute attr, mass.submission_form form, mass.sample sample
-        WHERE form.submitter_id = '#{@submitter_id}' AND sample.submission_id = form.submission_id
-          AND attr.smp_id = sample.smp_id
-          AND attr.attribute_name = 'sample_title'"
-
-      res = connection.exec(q)
-      @items = []
-      res.each do |item|
-        @items.push(item["attribute_value"])
-      end
-      res = {:items => @items, :status => "success"}
-
-    rescue PG::Error => ex
-      @error_message = ex.message.to_s
-      res = {:message => @error_message, :status => "error"}
-    rescue => ex
-      @error_message = ex.message.to_s
-      res = {:message => @error_message, :status => "error"}
-    ensure
-      connection.close if connection
-    end
-  end
-end
-
 class GetBioProjectItem
   def get_submitter(bioproject_id)
     begin

@@ -825,26 +825,29 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
-  def test_duplicated_sample_title_in_this_account
-    # ok case (Postgre DB)
-    ret = exec_validator("duplicated_sample_title_in_this_account", "3", "", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
+
+  def test_duplicated_sample_title_in_this_submission
+    # ok case
+    xml_data = File.read("../../data/3_duplicated_sample_title_in_this_submission_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_sample_title_in_this_submission", "3", "sampleA", "sample_title1", biosample_data, 1 )
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # ng case (Same title items in DB)
-    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "sample_title1", ["sample_title1", "sample_tile2"], "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
     # ng case (Sami title items in local submission lilst)
-    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "sample_title_1", ["sample_title_1", "sample_tile_2", "sample_title_1"], "", 1)
+    xml_data = File.read("../../data/3_duplicated_sample_title_in_this_submission_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_sample_title_in_this_submission", "3", "sampleA", "sample_title1", biosample_data, 1 )
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "", ["sample_title1", "sample_tile2"], "", 1)
+    xml_data = File.read("../../data/3_duplicated_sample_title_in_this_submission_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_sample_title_in_this_submission", "3", "sampleA", "", biosample_data, 1 )
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
+=begin
   def test_bioproject_not_found
     # ok case (given submitter_id matches DB response submitter_id)
     ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990110", "test01", 1)

@@ -116,13 +116,11 @@ class MainValidator
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
-    @sample_title_list = []
     @sample_name_list = []
     @locus_tag_list = []
     @submitter_id = @biosample_list[0]["submitter_id"]
     @submission_id = @biosample_list[0]["submission_id"]
     @biosample_list.each do |biosample_data|
-      @sample_title_list.push(biosample_data["attributes"]["sample_title"])
       @sample_name_list.push(biosample_data["attributes"]["sample_name"])
       @locus_tag_list.push(biosample_data["attributes"]["locus_tag_prefix"])
     end
@@ -130,7 +128,7 @@ class MainValidator
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
-      send("duplicated_sample_title_in_this_account", "3", sample_name, sample_title, @sample_title_list, @submitter_id, line_num)
+      send("duplicated_sample_title_in_this_submission", "3", sample_name, sample_title, @biosample_list, line_num)
       send("bioproject_not_found", "6", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
       send("duplicate_sample_names", "28", sample_name, sample_title, @sample_name_list, @submission_id, line_num)
       send("identical_attributes", "24", sample_name, @biosample_list)
@@ -1540,49 +1538,33 @@ class MainValidator
     result
   end
 
-  def duplicated_sample_title_in_this_account (rule_code, sample_name, biosample_title, sample_title_list, submitter_id, line_num)
-    return nil if biosample_title.nil? || biosample_title.empty?
+  #
+  # submission内でsample_titleが重複していないかの検証
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # sample_title サンプル名
+  # biosample_list サブミッション内の全biosampleオブジェクトのリスト
+  # ==== Return
+  # true/false
+  #
+  def duplicated_sample_title_in_this_submission (rule_code, sample_name, sample_title, biosample_list, line_num)
+    return nil if CommonUtils::blank?(sample_title)
+
     result = true
-    @duplicated = []
-    @duplicated = sample_title_list.select do |title|
-      sample_title_list.index(title) != sample_title_list.rindex(title)
+    duplicated = biosample_list.select do |biosample_data|
+      sample_title == biosample_data["attributes"]["sample_title"]
     end
 
-    # ファイル内でタイトルが重複している場合
-    if @duplicated.length > 0
+    if duplicated.length > 1 #自身以外に同一タイトルもつサンプルがある
       annotation = [
           {key: "Sample name", value: sample_name},
-          {key: "Title", value: biosample_title}
+          {key: "Title", value: sample_title}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result= false
-    elsif submitter_id != nil && @mode == "private"
-      if @cache.nil? || @cache.check(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id).nil?
-        get_submitter_item = GetSubmitterItem.new
-        ret = get_submitter_item.getitems(submitter_id)
-        if ret[:status] == "error"
-          raise ret[:message]
-        else
-          items = ret[:items]
-          @cache.save(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id, items)
-        end
-      else
-        items = @cache.check(ValidatorCache::SUBMITTERS_SAMPLE_TITLE, submitter_id)
-      end
-
-      if items.length > 0
-        if items.count(biosample_title) > 1
-          annotation = [
-              {key: "Sample name", value: sample_name},
-              {key: "Title", value: biosample_title}
-          ]
-          #message = CommonUtils::error_msg(@validation_config, rule_code, nil)
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-          result = false
-        end
-      end
     end
     result
   end
