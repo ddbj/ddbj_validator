@@ -714,16 +714,8 @@ class MainValidator
           exist_pubchem = @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref)
         end
         result = exist_pubchem && result
-      elsif ref =~ /\./ && ref !~ /http/ #DOI
-        #あればキャッシュを使用
-        if @cache.nil? || @cache.check(ValidatorCache::EXIST_DOI, ref).nil?
-          exist_doi = common.exist_doi?(ref)
-          @cache.save(ValidatorCache::EXIST_DOI, ref, exist_doi) unless @cache.nil?
-        else
-          puts "use cache in invalid_publication_identifier(doi)" if $DEBUG
-          exist_doi = @cache.check(ValidatorCache::EXIST_DOI, ref)
-        end
-        result = exist_doi && result
+      elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ #DOI
+        # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
       else #ref !~ /^https?/ #URL
         begin
           url = URI.parse(ref)

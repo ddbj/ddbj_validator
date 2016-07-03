@@ -378,9 +378,6 @@ class TestMainValidator < Minitest::Test
     ###pubmed id
     ret = exec_validator("invalid_publication_identifier", "11", "SampleA", "ref_biomaterial", "99999999", ref_attr, 1)
     assert_equal false, ret[:result]
-    ###doi
-    ret = exec_validator("invalid_publication_identifier", "11", "SampleA", "ref_biomaterial", "10.3389/fcimb.2016.99999", ref_attr, 1)
-    assert_equal false, ret[:result]
     ###url
     url = "http://www.ncbi.nlm.nih.gov/pubmed/27148491, http://www.ncbi.nlm.nih.gov/pubmed/27148492"
     ret = exec_validator("invalid_publication_identifier", "11", "SampleA",  "ref_biomaterial", url, ref_attr, 1)

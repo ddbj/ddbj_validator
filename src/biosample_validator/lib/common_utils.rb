@@ -343,42 +343,6 @@ class CommonUtils
   end
 
   #
-  # 引数のDOIが実在するか否かを返す
-  #
-  # ==== Args
-  # doi: DOI
-  # ==== Return
-  # returns true/false
-  #
-  # DOIの実在の判定にはCrossRefを使用。実在しなければ404が返される
-  # seeAlso: https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#overview
-  #
-  def exist_doi? (doi)
-    return nil if doi.nil?
-    url = "http://api.crossref.org/works/#{doi}/agency"
-    begin
-      res = http_get_response(url)
-      if res.code =~ /^5/ # server error
-        raise "'CrossRef' returns a server error. Please retry later. url: #{url}\n"
-      elsif res.code == "404" # invalid DOI
-        return false
-      elsif res.code =~ /^4/ # other client error
-        raise "'CrossRef' returns a error. Please check the url. url: #{url}\n"
-      else
-        begin
-          JSON.parse(res.body)
-          return true
-        rescue
-          raise "Parse error: 'CrossRef' might not return a JSON format. Please check the url. url: #{url}\n response body: #{res.body}\n"
-        end
-      end
-    rescue => ex
-      message = "Connection to 'CrossRef' server failed. Please check the url or your internet connection. url: #{url}\n"
-      raise StandardError, message, ex.backtrace
-    end
-  end
-
-  #
   # HTTPリクエスト(GET)を送り、そのレスポンスを返す
   #
   # ==== Args

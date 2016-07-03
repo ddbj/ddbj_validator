@@ -8,7 +8,6 @@ class ValidatorCache
   UNKNOWN_PACKAGE = "unknown_package"
   COUNTRY_FROM_LATLON = "country_from_latlon"
   EXIST_PUBCHEM_ID = "exist_pubchem_id"
-  EXIST_DOI = "exist_doi"
   TAX_VS_PACKAGE = "tax_vs_package"
   TAX_MATCH_ORGANISM = "tax_match_organism"
   TAX_HAS_LINAGE = "tax_has_linage"
