@@ -4,7 +4,7 @@
     "level": "warning",
     "name": "Invalid Attribute value for null",
     "method": "invalid_attribute_value_for_null",
-    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing'. An automatically-generated correction will be applied."
+    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing'."
   },
   "rule2": {
     "code": "2",
@@ -46,7 +46,7 @@
     "level": "warning",
     "name": "Invalid date format",
     "method": "invalid_date_format",
-    "message": "Invalid date format. An automatically-generated correction will be applied."
+    "message": "Invalid date format."
   },
   "rule8": {
     "code": "8",
@@ -60,28 +60,28 @@
     "level": "warning",
     "name": "Invalid lat_lon format",
     "method": "invalid_lat_lon_format",
-    "message": "Invalid lat_lon format. An automatically-generated correction will be applied."
+    "message": "Invalid lat_lon format."
   },
   "rule11": {
     "code": "11",
     "level": "warning",
     "name": "Invalid publication identifier",
     "method": "invalid_publication_identifier",
-    "message": "Invalid publication identifier, enter pubmed id, DOI or URL. An automatically-generated correction will be applied."
+    "message": "Invalid publication identifier, enter pubmed id, DOI or URL."
   },
   "rule12": {
     "code": "12",
     "level": "warning",
     "name": "Special character included",
     "method": "special_character_included",
-    "message": "Special character is included. An automatically-generated correction will be applied."
+    "message": "Special character is included."
   },
   "rule13": {
     "code": "13",
     "level": "warning",
     "name": "Invalid data format",
     "method": "invalid_data_format",
-    "message": "Invalid data format. An automatically-generated correction will be applied."
+    "message": "Invalid data format."
   },
   "rule14": {
     "code": "14",
@@ -375,13 +375,13 @@
     "level": "warning",
     "name": "Format of geo_loc_name is invalid",
     "method": "format_of_geo_loc_name_is_invalid",
-    "message": "Format of geo_loc_name is invalid. An automatically-generated correction will be applied."
+    "message": "Format of geo_loc_name is invalid."
   },
   "rule95": {
     "code": "95",
     "level": "warning",
     "name": "BioProject submission id replacement",
     "method": "bioproject_submission_id_replacement",
-    "message": "BioProject submission id (PSUBxxxxxx) is replaced to PRJD accession number. An automatically-generated correction will be applied."
+    "message": "BioProject submission id (PSUBxxxxxx) is replaced to PRJD accession number."
   }
 }

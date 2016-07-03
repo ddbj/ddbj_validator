@@ -5,6 +5,7 @@ require 'net/http'
 require 'date'
 
 class CommonUtils
+  @@AUTO_ANNOTAION_MSG = "An automatically-generated correction will be applied."
 
   def self.set_config (config_obj)
     @@null_accepted = config_obj[:null_accepted]
@@ -55,13 +56,19 @@ class CommonUtils
   # reference: 参照
   # level: error/warning 
   # annotation: annotation list for correcting the value 
+  # auto_annotation: true/false Auto annotationかどうか
   # ==== Return
   # エラーのHashオブジェクト
   #
-  def self.error_obj (rule, file_path, annotation)
+  def self.error_obj (rule, file_path, annotation, *auto_annotaion)
+    if auto_annotaion
+      message = rule["message"] + " " + @@AUTO_ANNOTAION_MSG
+    else
+      message = rule["message"]
+    end
     hash = {
              id: rule["code"],
-             message: rule["message"],
+             message: message,
              #reference: rule["reference"],
              level: rule["level"],
              method: "biosample validator",

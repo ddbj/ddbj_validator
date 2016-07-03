@@ -738,13 +738,13 @@ class MainValidator
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        if attr_val != ref #replace_candidate
+        if attr_val != ref #置換候補があればAuto annotationをつける
           location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
           annotation.push(CommonUtils::create_suggested_annotation([ref], "Attribute value", location, true));
-        else
-          annotation.push({key: "Suggested value", value: ""})
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+        else #置換候補がないエラー
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
         end
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         result = false
       end
@@ -806,7 +806,7 @@ class MainValidator
       ]
       location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
       annotation.push(CommonUtils::create_suggested_annotation([annotated_name], "Attribute value", location, true));
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
       false
@@ -865,13 +865,13 @@ class MainValidator
         {key: "Attribute", value: "lat_lon"},
         {key: "Attribute value", value: lat_lon}
       ]
-      if !insdc_latlon.nil? #replace_candidate
+      if !insdc_latlon.nil? #置換候補があればAuto annotationをつける
         location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
         annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
-      else
-        annotation.push({key: "Suggested value", value: ""})
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
+      else #置換候補がないエラー
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       false
     end
@@ -1292,7 +1292,7 @@ class MainValidator
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([attr_val_result], "Attribute value", location, true));
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
     end
@@ -1356,7 +1356,7 @@ class MainValidator
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
     end
@@ -1406,7 +1406,7 @@ class MainValidator
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([replaced_attr_val], "Attribute value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
     end
@@ -1485,7 +1485,7 @@ class MainValidator
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([attr_val_annotated], "Attribute value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
     end
@@ -1897,10 +1897,10 @@ class MainValidator
         if prjd_id
           location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
           annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
         else
-          annotation.push({key: "Suggested value", value: ""})
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
         end
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         result = false
       end
