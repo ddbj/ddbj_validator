@@ -44,6 +44,7 @@ class MainValidator
   def read_config (config_file_dir)
     config = {}
     begin
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_biosample.json")) #TODO auto update when genereted
       config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
       config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
       config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
@@ -55,7 +56,6 @@ class MainValidator
       config[:historical_country_list] = JSON.parse(File.read(config_file_dir + "/historical_country_list.json"))
       config[:valid_country_list] = config[:country_list] - config[:historical_country_list]
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/validation_config.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:collection_date_format] = JSON.parse(File.read(config_file_dir + "/collection_date_format.json"))

@@ -1,0 +1,13 @@
+{
+  "rule96": {
+    "rule_class": "Annotated_sequence",
+    "code": "96",
+    "level": "warning",
+    "name": "product value validation",
+    "method": "product_value_validation",
+    "message": "The value provided for product qualifier is $status by TogoAnnotator.",
+    "reference": [
+      "http://www.ddbj.nig.ac.jp/sub/ref6-e.html#product"
+    ]
+  }
+}
