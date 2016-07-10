@@ -1,0 +1,32 @@
+[
+  {
+    "_example": "2016",
+    "regex": "^\\d{4}$",
+    "parse_format": "%Y"
+  },
+  {
+    "_example": "2016-07",
+    "regex": "^\\d{4}-\\d{2}$",
+    "parse_format": "%Y-%m"
+  },
+  {
+    "_example": "2016-07-10",
+    "regex": "^\\d{4}-\\d{2}-\\d{2}$",
+    "parse_format": "%Y-%m-%d"
+  },
+  {
+    "_example": "2016-07-10T11Z",
+    "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}Z$",
+    "parse_format": "%Y-%m-%dT%HZ"
+  },
+  {
+    "_example": "2016-07-10T11:43Z",
+    "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}Z$",
+    "parse_format": "%Y-%m-%dT%H:%MZ"
+  },
+  {
+    "_example": "2016-07-10T11:43:30Z",
+    "regex": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$",
+    "parse_format": "%Y-%m-%dT%H:%M:%SZ"
+  }
+]

@@ -11,7 +11,7 @@ class CommonUtils
     @@null_accepted = config_obj[:null_accepted]
     @@exchange_country_list = config_obj[:exchange_country_list]
     @@convert_date_format = config_obj[:convert_date_format]
-    @@collection_date_format = config_obj[:collection_date_format]
+    @@ddbj_date_format = config_obj[:ddbj_date_format]
   end
 
   #
@@ -360,4 +360,24 @@ class CommonUtils
     res
   end
 
+  def ddbj_date_format? (date_text)
+    return nil if date_text.nil?
+    result = false
+    @@ddbj_date_format.each do |format|
+      parse_format = format["parse_format"]
+
+      ## single date format
+      regex = Regexp.new(format["regex"])
+      if date_text =~ regex
+        result = true
+      end
+
+      ## range date format
+      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
+      if date_text =~ regex
+        result = true
+      end
+    end
+    result
+  end
 end

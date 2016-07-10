@@ -9,7 +9,7 @@ class TestCommonUtils < Minitest::Test
     config_obj[:null_accepted] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/null_accepted.json"))
     config_obj[:exchange_country_list] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/exchange_country_list.json"))
     config_obj[:convert_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/convert_date_format.json"))
-    config_obj[:collection_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/collection_date_format.json"))
+    config_obj[:ddbj_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/ddbj_date_format.json"))
     CommonUtils::set_config (config_obj)
   end
 
@@ -106,18 +106,43 @@ class TestCommonUtils < Minitest::Test
     assert_equal nil, ret
   end
 
-  def test_exist_doi?
+  def test_ddbj_date_format?
     #ok
-    ret = @common.exist_doi?("10.3389/fcimb.2016.00042")
+    ret = @common.ddbj_date_format?("2016")
     assert_equal true, ret
-
-    #ng
-    ret = @common.exist_doi?("10.3389/fcimb.2016.99999")
+    ret = @common.ddbj_date_format?("2016-07")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10T23Z")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10T23:10Z")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10T23:10:43Z")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016/2017")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07/2016-08")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10/2016-07-11")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10T23Z/2016-07-11T10Z")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10T23:10Z/2016-07-10T23:20Z")
+    assert_equal true, ret
+    ret = @common.ddbj_date_format?("2016-07-10T23:10:43Z/2016-07-10T23:10:45Z")
+    assert_equal true, ret
+    # ng
+    ret = @common.ddbj_date_format?("2016-7")
     assert_equal false, ret
-
-    #nil
-    ret = @common.exist_doi?(nil)
+    ret = @common.ddbj_date_format?("2016/07")
+    assert_equal false, ret
+    ret = @common.ddbj_date_format?("2016.07.10")
+    assert_equal false, ret
+    ret = @common.ddbj_date_format?("2016-Jul-10T23Z")
+    assert_equal false, ret
+    # nil
+    ret = @common.ddbj_date_format?(nil)
     assert_equal nil, ret
   end
-
 end

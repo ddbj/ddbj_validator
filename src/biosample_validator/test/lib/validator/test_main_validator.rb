@@ -733,23 +733,35 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "2016-01-01", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-Oct-1952", ts_attr,  1)
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952-10-21T23:10:02Z/2052-10-21T23:44:30Z", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ##invalid format 補正がなければtrue
+    # ng case
+    ##invalid format
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "No Date", ts_attr,  1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ##ng = auto annotation
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##auto annotation
+    ### 桁揃え
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.9.7T3:8:2Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-09-07T03:08:02Z", get_auto_annotation(ret[:error_list])
+    ### 月の略称を補正
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-Oct-1952", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/October/21", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1952/Oct/21", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/october/21", ts_attr,  1)
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.october.21", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1952/Oct/21", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10", ts_attr,  1)
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ### 区切り文字修正
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.10", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10", get_auto_annotation(ret[:error_list])
@@ -757,6 +769,22 @@ class TestMainValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ### 範囲
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10/21/1952/11/20", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21/1952-11-20", get_auto_annotation(ret[:error_list])
+    ### 範囲の区切りに空白がある　
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.10.21T23:10:02Z /  2052.10.21T23:44:30Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21T23:10:02Z/2052-10-21T23:44:30Z", get_auto_annotation(ret[:error_list])
+    ### 範囲の大小が逆
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952-10-22T23:10:02Z /  1952-10-21T23:44:30Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21T23:44:30Z/1952-10-22T23:10:02Z", get_auto_annotation(ret[:error_list])
+    ### 西暦の2桁入力
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-11", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size

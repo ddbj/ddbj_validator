@@ -58,7 +58,7 @@ class MainValidator
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
-      config[:collection_date_format] = JSON.parse(File.read(config_file_dir + "/collection_date_format.json"))
+      config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
       if @mode == "private"
         #TODO load PostgreSQL conf
         #@db_config = JSON.parse(File.read(config_file_dir + "/db_config.json"))
@@ -1208,7 +1208,7 @@ class MainValidator
   # sample collection date が未来の日付になっていないかの検証
   # 有効な日付のフォーマットでなければnilを返す
   # 受け付けるフォーマットは以下を参照
-  # https://www.ddbj.nig.ac.jp/FT/full_index.html#collection_date
+  # http://www.ddbj.nig.ac.jp/sub/ref6-j.html#collection_date
   #
   # ==== Args
   # rule_code
@@ -1220,7 +1220,7 @@ class MainValidator
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
     return nil if CommonUtils::null_value?(collection_date)
     result = nil
-    @conf[:collection_date_format].each do |format|
+    @conf[:ddbj_date_format].each do |format|
       parse_format = format["parse_format"]
 
       ## single date format
@@ -1229,7 +1229,7 @@ class MainValidator
         begin
           formated_date = DateTime.strptime(collection_date, parse_format)
           result = (Date.today <=> formated_date) >= 0
-        rescue ArgumentError
+        rescue ArgumentError #invalid ddbj date format
           result = nil
         end
       end
@@ -1244,7 +1244,7 @@ class MainValidator
             result = (Date.today <=> formated_date) >= 0
             break if result == false
           rescue ArgumentError
-            result = nil
+            result = nil  #invalid ddbj date format
           end
        end
       end
@@ -1320,6 +1320,8 @@ class MainValidator
   #
   # 日付(time stamp)型の属性のフォーマットの検証と補正
   #
+  # http://www.ddbj.nig.ac.jp/sub/ref6-j.html#collection_date
+  #
   # ==== Args
   # rule_code
   # attr_name 属性名
@@ -1332,26 +1334,33 @@ class MainValidator
   def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
-    ori_attr_val = attr_val
+    attr_val_org = attr_val
     result = true
 
     if ts_attr.include?(attr_name) #日付型の属性であれば
+      #TODO auto-annotationの部分のコードを分離
       #月の表現を揃える
       rep_table_month = {
-        "January" => "Jan", "February" => "Feb", "March" => "Mar", "April" => "Apr", "May" => "May", "June" => "Jun", "July" => "Jul", "August" => "Aug", "September" => "Sep", "October" => "Oct", "November" => "Nov", "December" => "Dec",
-        "january" => "Jan", "february" => "Feb", "march" => "Mar", "april" => "Apr", "may" => "May", "june" => "Jun", "july" => "Jul", "august" => "Aug", "september" => "Sep", "october" => "Oct", "november" => "Nov", "december" => "Dec"
+        "January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12",
+        "january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12",
+        "Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12",
+        "jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"
       }
       if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/i)
         attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/i,rep_table_month)
+      end
+      if attr_val.match(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/i)
+        attr_val = attr_val.sub(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/i,rep_table_month)
       end
 
       #区切り文字の表記を揃える
       @conf[:convert_date_format].each do |format|
         regex = Regexp.new(format["regex"])
+        ## single date format
         if attr_val =~ regex
           begin
-            if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"
-              if $1.to_i > 12 #is not month
+            if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"  #この書式場合、前半が12より大きければ西暦の下2桁とみなす
+              if $1.to_i > 12
                 formated_date = DateTime.strptime(attr_val, "%y-%m")
               else
                 formated_date = DateTime.strptime(attr_val, "%m-%y")
@@ -1363,18 +1372,66 @@ class MainValidator
           rescue ArgumentError
           end
         end
+        ## range date format
+        regex = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #行末行頭の^と$を除去して"/"で連結
+        if attr_val =~ regex
+          range_start =  Regexp.last_match[:start]
+          range_end =  Regexp.last_match[:end]
+          range_date_list = [range_start, range_end]
+          begin
+            range_date_list = range_date_list.map do |range_date|  #範囲のstart/endのformatを補正
+              range_date = range_date.strip
+              if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$" #この書式場合、前半が12より大きければ西暦の下2桁とみなす
+                if $1.to_i > 12
+                  formated_date = DateTime.strptime(range_date, "%y-%m")
+                else
+                  formated_date = DateTime.strptime(range_date, "%m-%y")
+                end
+              else
+                formated_date = DateTime.strptime(range_date, format["parse_format"])
+              end
+              range_date = formated_date.strftime(format["output_format"])
+              range_date
+            end
+            attr_val = range_date_list.join("/")
+          rescue ArgumentError
+          end
+        end
       end
     end
 
-    if ori_attr_val != attr_val #replace_candidate
+    # 範囲の大小が逆であれば入れ替える
+    @conf[:ddbj_date_format].each do |format|
+      regex = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #行末行頭の^と$を除去して"/"で連結
+      parse_format = format["parse_format"]
+      if attr_val =~ regex
+        range_start =  Regexp.last_match[:start]
+        range_end =  Regexp.last_match[:end]
+        if DateTime.strptime(range_start, parse_format) <= DateTime.strptime(range_end, parse_format)
+          attr_val = Regexp.last_match[:start] + "/" +  Regexp.last_match[:end]
+        else
+          attr_val = Regexp.last_match[:end] + "/" +  Regexp.last_match[:start]
+        end
+      end
+    end
+
+    # (補正後の)値がDDBJフォーマットであるか
+    common = CommonUtils.new
+    is_ddbj_format = common.ddbj_date_format?(attr_val)
+
+    if !is_ddbj_format || attr_val_org != attr_val
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: ori_attr_val}
+        {key: "Attribute value", value: attr_val_org}
       ]
-      location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      if attr_val_org != attr_val #replace_candidate
+        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+      end
       @error_list.push(error_hash)
       result = false
     end
