@@ -438,10 +438,13 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "45.0123 S 4.1234 E", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "47.94345678 N 28.12345678 W", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     #ng case
     ##dec format(auto annotation)
-    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "47.94345678 N 28.12345678 W", 1)
-    expect_annotation = "47.9435 N 28.1235 W"
+    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "-23.00279 ,   -120.21840", 1)
+    expect_annotation = "23.00279 S 120.21840 W"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
@@ -452,7 +455,7 @@ class TestMainValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ##can't parse format as lat lon
-    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "47.9456 28.1212", 1)
+    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "invalid latlon format", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern

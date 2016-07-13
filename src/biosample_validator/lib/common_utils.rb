@@ -173,8 +173,12 @@ class CommonUtils
   #
   def format_insdc_latlon (lat_lon)
     return nil if lat_lon.nil?
+    # 37°26′36.42″N 06°15′14.28″W
     deg_latlon_reg = %r{(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+))\D+(?<lat_hemi>[NS])[ ,_]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+))\D+(?<lng_hemi>[EW])}
-    dec_latlon_reg = %r{(?<lat_dec>\d{1,2}(\.\d+))\s*(?<lat_dec_hemi>[NS])[ ,_]+(?<lng_dec>\d{1,3}(\.\d+))\s*(?<lng_dec_hemi>[EW])}
+    # 37.443501234 N 6.25401234 W
+    dec_insdc_latlon_reg = %r{(?<lat_dec>\d{1,2}(\.\d+))\s*(?<lat_dec_hemi>[NS])[ ,_]+(?<lng_dec>\d{1,3}(\.\d+))\s*(?<lng_dec_hemi>[EW])}
+    # -23.00279, -120.21840
+    dec_latlon_reg = %r{(?<lat_dec>[\-]*\d{1,2}(\.\d+))[\D&&[^\-]]+(?<lng_dec>[\-]*\d{1,3}(\.\d+))}
 
     insdc_latlon =  nil
     if deg_latlon_reg.match(lat_lon)
@@ -182,11 +186,16 @@ class CommonUtils
       lat = (g['lat_deg'].to_i + g['lat_min'].to_f/60 + g['lat_sec'].to_f/3600).round(4)
       lng = (g['lng_deg'].to_i + g['lng_min'].to_f/60 + g['lng_sec'].to_f/3600).round(4)
       insdc_latlon = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
+    elsif dec_insdc_latlon_reg.match(lat_lon) #期待するformatであり変更は無し
+      d = dec_insdc_latlon_reg.match(lat_lon)
+      insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
     elsif dec_latlon_reg.match(lat_lon)
       d = dec_latlon_reg.match(lat_lon)
-      lat_dec = (d['lat_dec'].to_f).round(4)
-      lng_dec = (d['lng_dec'].to_f).round(4)
-      insdc_latlon = "#{lat_dec} #{d['lat_dec_hemi']} #{lng_dec} #{d['lng_dec_hemi']}"
+      lat = d['lat_dec']
+      lng = d['lng_dec']
+      lat_dec = lat.start_with?("-") ? lat[1..-1] + " S" : lat + " N"
+      lng_dec = lng.start_with?("-") ? lng[1..-1] + " W" : lng + " E"
+      insdc_latlon = "#{lat_dec} #{lng_dec}"
     end
     if insdc_latlon.nil?
       nil

@@ -44,10 +44,16 @@ class TestCommonUtils < Minitest::Test
     assert_equal "37.4435 N 6.254 W", ret
 
     ret = @common.format_insdc_latlon("37.443501234 N 6.25401234 W")
-    assert_equal "37.4435 N 6.254 W", ret
+    assert_equal "37.443501234 N 6.25401234 W", ret
+
+    ret = @common.format_insdc_latlon("23.00279,120.21840")
+    assert_equal "23.00279 N 120.21840 E", ret
+
+    ret = @common.format_insdc_latlon("-23.00279,-120.21840")
+    assert_equal "23.00279 S 120.21840 W", ret
 
     #ng case
-    ret = @common.format_insdc_latlon("37.443501234 6.25401234")
+    ret = @common.format_insdc_latlon("missing")
     assert_nil ret
   end
 
