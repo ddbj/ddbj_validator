@@ -46,6 +46,9 @@ class TestCommonUtils < Minitest::Test
     ret = @common.format_insdc_latlon("37.443501234 N 6.25401234 W")
     assert_equal "37.443501234 N 6.25401234 W", ret
 
+    ret = @common.format_insdc_latlon("N 37.443501234   W 6.25401234")
+    assert_equal "37.443501234 N 6.25401234 W", ret
+
     ret = @common.format_insdc_latlon("23.00279,120.21840")
     assert_equal "23.00279 N 120.21840 E", ret
 

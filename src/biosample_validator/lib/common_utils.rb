@@ -174,11 +174,13 @@ class CommonUtils
   def format_insdc_latlon (lat_lon)
     return nil if lat_lon.nil?
     # 37°26′36.42″N 06°15′14.28″W
-    deg_latlon_reg = %r{(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+))\D+(?<lat_hemi>[NS])[ ,_]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+))\D+(?<lng_hemi>[EW])}
+    deg_latlon_reg = %r{^(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+)*)\D+(?<lat_hemi>[NS])[ ,_;]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+)*)\D+(?<lng_hemi>[EW])$}
     # 37.443501234 N 6.25401234 W
-    dec_insdc_latlon_reg = %r{(?<lat_dec>\d{1,2}(\.\d+))\s*(?<lat_dec_hemi>[NS])[ ,_]+(?<lng_dec>\d{1,3}(\.\d+))\s*(?<lng_dec_hemi>[EW])}
+    dec_insdc_latlon_reg = %r{^(?<lat_dec>\d{1,2}(\.\d+)*)\s*(?<lat_dec_hemi>[NS])[ ,_;]+(?<lng_dec>\d{1,3}(\.\d+)*)\s*(?<lng_dec_hemi>[EW])$}
+    # N37.443501234 W6.25401234
+    dec_insdc_reversed_latlon_reg = %r{^(?<lat_dec_hemi>[NS])\s*(?<lat_dec>\d{1,2}(\.\d+)*)[ ,_;]+(?<lng_dec_hemi>[EW])\s*(?<lng_dec>\d{1,3}(\.\d+)*)$}
     # -23.00279, -120.21840
-    dec_latlon_reg = %r{(?<lat_dec>[\-]*\d{1,2}(\.\d+))[\D&&[^\-]]+(?<lng_dec>[\-]*\d{1,3}(\.\d+))}
+    dec_latlon_reg = %r{^(?<lat_dec>[\-]*\d{1,2}(\.\d+))[\D&&[^\-]]+(?<lng_dec>[\-]*\d{1,3}(\.\d+))$}
 
     insdc_latlon =  nil
     if deg_latlon_reg.match(lat_lon)
@@ -188,6 +190,9 @@ class CommonUtils
       insdc_latlon = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
     elsif dec_insdc_latlon_reg.match(lat_lon) #期待するformatであり変更は無し
       d = dec_insdc_latlon_reg.match(lat_lon)
+      insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
+    elsif dec_insdc_reversed_latlon_reg.match(lat_lon)
+      d = dec_insdc_reversed_latlon_reg.match(lat_lon)
       insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
     elsif dec_latlon_reg.match(lat_lon)
       d = dec_latlon_reg.match(lat_lon)
