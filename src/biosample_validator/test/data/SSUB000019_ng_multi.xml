@@ -40,7 +40,7 @@
             <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
             <Attribute attribute_name="elev">88.8m</Attribute>
             <Attribute attribute_name="depth">0m</Attribute>
-            <Attribute attribute_name="bioproject_id">PRJD0001654</Attribute>
+            <Attribute attribute_name="bioproject_accession">PRJD0001654</Attribute>
             <Attribute attribute_name="rel_to_oxygen">aaaa</Attribute>
             <Attribute attribute_name="oxy_stat_samp">bbbb</Attribute>
         </Attributes>
@@ -85,7 +85,7 @@
             <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
             <Attribute attribute_name="elev">88.8m</Attribute>
             <Attribute attribute_name="depth">0m</Attribute>
-            <Attribute attribute_name="bioproject_id">PRJD0001654</Attribute>
+            <Attribute attribute_name="bioproject_accession">PRJD0001654</Attribute>
             <Attribute attribute_name="rel_to_oxygen">cccc</Attribute>
             <Attribute attribute_name="oxy_stat_samp">dddd</Attribute>
         </Attributes>
