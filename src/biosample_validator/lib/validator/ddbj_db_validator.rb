@@ -178,46 +178,42 @@ class DDBJDbValidator
     result
   end
 
-  def get_locus_tag_prefix(prefix, submission_id)
+  #
+  # biosample databaseに存在するlocus_tag_prefixを取得してリストで返す
+  #
+  # ==== Args
+  # ==== Return
+  # locus_tag_prefixのリスト。一つもない場合にも空のリストを返す
+  # [ "XXC","XXA", ...]
+  #
+  def get_all_locus_tag_prefix
+    prefix_list = []
     begin
       connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
-      #TODO submission idが必要?INSDC全体でチェックするのでは?
-      q0 = "SELECT a.attribute_name, a.attribute_value, a.smp_id, s.submission_id
-    FROM mass.attribute a, mass.sample s
-    WHERE s.submission_id = '#{submission_id}' AND a.smp_id = s.smp_id AND attribute_name = 'locus_tag_prefix'"
 
-      q1 = "SELECT a.attribute_name, a.attribute_value
-    FROM mass.attribute a
-    WHERE a.attribute_name  = 'locus_tag_prefix'"
+      q = "SELECT attr.attribute_value
+           FROM mass.attribute attr
+            JOIN mass.sample smp USING (smp_id)
+           WHERE attribute_name = 'locus_tag_prefix' AND attribute_value <> ''
+            AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
 
-      res0 = connection.exec(q0)
-      res1 = connection.exec(q1)
+      res = connection.exec(q)
 
-      own_items= []
-      res0.each do |item|
+      res.each do |item|
         unless item["attribute_value"].empty?
-          own_items.push(item["attribute_value"])
+          prefix_list.push(item["attribute_value"])
         end
       end
 
-      items = []
-      res1.each do |item|
-        unless item["attribute_value"].empty?
-          items.push(item["attribute_value"])
-        end
-      end
-      item_oters =  items - own_items
-      item_oters.include?(prefix) ? result = false : result = true
-      res = {:items => result, :status => "success"}
-
-    rescue PG::Error => ex
-      res = {:message => ex.message, :status => "error"}
     rescue => ex
-      res = {:message => ex.message, :status => "error"}
+      message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
     ensure
       connection.close if connection
     end
 
+    prefix_list
   end
 
 end

@@ -1004,19 +1004,31 @@ jkl\"  "
 
   def test_duplicated_locus_tag_prefix
     # ok case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB"], "SSUB000001", 1)
+    xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ## xmlファイル内にもDB内にも同一のprefixがない
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "NONEXISTPREFIX", biosample_data, nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## DB内に同一のprefixがあるが、SubmissionIDがあるため(DBから取得したデータ)同一prefixが一つあってもOK
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "AB1", biosample_data, "SSUB000001", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB","XXA"], "SSUB000001", 1)
+    ## xmlファイル内に同一のprefixがある
+    xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "WN1", biosample_data, nil, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    # ng case (prefix already used in other submission)
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "AAAA", ["XXA", "XXB"], "SSUB000001", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
+    ## DB内に同一のprefixが2つ以上ある #このテストはDBに重複データを登録しないと通らない
+    #xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
+    #biosample_data = @xml_convertor.xml2obj(xml_data)
+    #ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "Ato01", biosample_data, "SSUB000001", 1)
+    #assert_equal false, ret[:result]
+    #assert_equal 1, ret[:error_list].size
     # parameters are nil case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "",[], "", 1)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "missing", biosample_data, nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end

@@ -78,4 +78,8 @@ class TestDDBJDbValidator < Minitest::Test
     assert_equal nil, ret
   end
 
+  def test_get_all_locus_tag_prefix
+    ret = @db_validator.get_all_locus_tag_prefix()
+    assert_equal true, ret.size > 200
+  end
 end

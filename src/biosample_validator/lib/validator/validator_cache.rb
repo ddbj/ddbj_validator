@@ -16,6 +16,7 @@ class ValidatorCache
   SUBMISSIONS_SAMPLE_NAME = "submissions_sample_name"
   IS_UMBRELLA_ID = "is_umbrella_id"
   BIOPROJECT_PRJD_ID = "bioproject_prjd_id"
+  LOCUS_TAG_PREFIX = "locus_tag_prefix"
 
   #
   # Initializer

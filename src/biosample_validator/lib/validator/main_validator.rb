@@ -119,19 +119,15 @@ class MainValidator
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
     @sample_name_list = []
-    @locus_tag_list = []
-    @submitter_id = @biosample_list[0]["submitter_id"]
-    @submission_id = @biosample_list[0]["submission_id"]
     @biosample_list.each do |biosample_data|
       @sample_name_list.push(biosample_data["attributes"]["sample_name"])
-      @locus_tag_list.push(biosample_data["attributes"]["locus_tag_prefix"])
     end
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
       send("duplicated_sample_title_in_this_submission", "3", sample_name, sample_title, @biosample_list, line_num)
-      send("duplicate_sample_names", "28", sample_name, sample_title, @sample_name_list, @submission_id, line_num)
+      send("duplicate_sample_names", "28", sample_name, sample_title, @sample_name_list, biosample_data["submission_id"], line_num)
       send("identical_attributes", "24", sample_name, @biosample_list)
     end
     send("warning_about_bioproject_increment", "69", @biosample_list)
@@ -179,9 +175,7 @@ class MainValidator
       send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
       send("bioproject_not_found", "6", sample_name,  biosample_data["attributes"]["bioproject_accession"], biosample_data["submitter_id"], line_num)
       send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
-      #TODO biosampleのsubmission_idでいい?
-      send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @locus_tag_list, @submission_id, line_num)
-
+      send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, biosample_data["submission_id"], line_num)
       ret = send("format_of_geo_loc_name_is_invalid", "94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
@@ -1924,21 +1918,39 @@ class MainValidator
   # rule_code
   # sample_name サンプル名
   # locus_tag locus_tag
-  # locus_tag_list 同一ファイル内のlocus_tagのリスト
-  # submission_id
+  # biosample_list サブミッション内の全biosampleオブジェクトのリスト
+  # submission_id "SSUBXXXXXX" またはnil
   # line_num
   # ==== Return
   # true/false
   #
-  def duplicated_locus_tag_prefix (rule_code, sample_name, locus_tag, locus_tag_list, submission_id, line_num)
-    return nil if locus_tag.nil? || locus_tag.empty?
+  def duplicated_locus_tag_prefix (rule_code, sample_name, locus_tag, biosample_list, submission_id, line_num)
+    return nil if CommonUtils::null_value?(locus_tag)
     result = true
-    duplicated_locus_tag_list = []
-    duplicated_locus_tag_list = locus_tag_list.select do |tag|
-      locus_tag_list.index(tag) != locus_tag_list.rindex(tag)
+
+    # 同一ファイル内での重複チェック
+    duplicated = biosample_list.select do |biosample_data|
+      locus_tag == biosample_data["attributes"]["locus_tag_prefix"]
+    end
+    result = false if duplicated.length > 1 #自身以外に同一タイトルもつサンプルがある
+
+    # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
+    if @mode == "private"
+      if @cache.nil? || @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all").nil?
+        # biosample DBから全locus_tag_prefixのリストを取得
+        all_prefix_list = @db_validator.get_all_locus_tag_prefix()
+        @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, "all", all_prefix_list)
+      else
+        all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all")
+      end
+
+      # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じprefixがあるとNG
+      result = false if submission_id.nil? && all_prefix_list.count(locus_tag) >= 1
+      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+      result = false if !submission_id.nil? && all_prefix_list.count(locus_tag) >= 2
     end
 
-    if duplicated_locus_tag_list.include?(locus_tag)
+    if result == false
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "locus_tag_prefix"},
@@ -1946,25 +1958,6 @@ class MainValidator
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      result = false
-    elsif @mode == "private"
-      pg_response = @db_validator.get_locus_tag_prefix(locus_tag, submission_id)
-
-      if pg_response[:status] == "error"
-        raise pg_response[:message]
-      else
-        result = pg_response[:items]
-      end
-
-      if result == false
-        annotation = [
-            {key: "Sample name", value: sample_name},
-            {key: "Attribute", value: "locus_tag_prefix"},
-            {key: "Attribute value", value: locus_tag}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-      end
     end
     result
   end
