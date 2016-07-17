@@ -116,31 +116,40 @@ class DDBJDbValidator
     result
   end
 
+  #
+  # 指定されたsubmission_idのサンプルのサンプル名をリストで返す
+  #
+  # ==== Args
+  # submission_id ex. "SSUB003677"
+  # ==== Return
+  # サンプル名のリスト。一つもない場合にも空のリストを返す
+  # [ "sample 1", "sample 2", ...]
+  #
   def get_sample_names (submission_id)
+    sample_name_list = []
     begin
       connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
 
-      q1 = "SELECT smpl.sample_name, attr.attribute_value
-      From mass.sample smpl, mass.attribute attr
-      WHERE smpl.submission_id = '#{submission_id}'
-      AND attr.attribute_name = 'sample_title'
-      AND attr.smp_id = smpl.smp_id"
+      q = "SELECT smp.sample_name
+            FROM mass.sample smp
+            WHERE smp.submission_id = '#{submission_id}'
+              AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
 
-      result = connection.exec(q1)
-      #TODO PG::Resultオブジェクトのまま返さない
-      res = {:items => result, :status => "success"}
-
-    rescue PG::Error => ex
-      @error_message = ex.message.to_s
-      res = {:message => @error_message, :status => "error"}
+      res = connection.exec(q)
+      res.each do |item|
+        unless item["sample_name"].empty?
+          sample_name_list.push(item["sample_name"])
+        end
+      end
 
     rescue => ex
-      @error_message = ex.message.to_s
-      res = {:message => @error_message, :status => "error"}
-
+      message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
     ensure
       connection.close if connection
     end
+    sample_name_list
   end
 
   #

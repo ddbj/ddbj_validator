@@ -118,16 +118,12 @@ class MainValidator
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
-    @sample_name_list = []
-    @biosample_list.each do |biosample_data|
-      @sample_name_list.push(biosample_data["attributes"]["sample_name"])
-    end
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
       send("duplicated_sample_title_in_this_submission", "3", sample_name, sample_title, @biosample_list, line_num)
-      send("duplicate_sample_names", "28", sample_name, sample_title, @sample_name_list, biosample_data["submission_id"], line_num)
+      send("duplicate_sample_names", "28", sample_name, sample_title, @biosample_list, biosample_data["submission_id"], line_num)
       send("identical_attributes", "24", sample_name, @biosample_list)
     end
     send("warning_about_bioproject_increment", "69", @biosample_list)
@@ -1793,69 +1789,42 @@ class MainValidator
   # rule_code
   # sample_name サンプル名
   # sample_title サンプルタイトル
-  # sample_name_list 同一ファイル内のサンプル名のリスト
+  # biosample_list サブミッション内の全biosampleオブジェクトのリスト
   # submission_id
   # line_num
   # ==== Return
   # true/false
   #
-  def duplicate_sample_names(rule_code, sample_name, sample_title, sample_name_list, submission_id, line_num)
+  def duplicate_sample_names(rule_code, sample_name, sample_title, biosample_list, submission_id, line_num)
     return nil if CommonUtils::blank?(sample_name)
-    duplicated_sample_name = []
-    duplicated_sample_name = sample_name_list.select do |name|  #sample_nameがsample_name_listに２つ以上含まれるケース
-      sample_name_list.index(name) != sample_name_list.rindex(name)
+    result = true
+
+    # 同一ファイル内での重複チェック
+    duplicated = biosample_list.select do |biosample_data|
+      sample_name == biosample_data["attributes"]["sample_name"]
+    end
+    result = false if duplicated.length > 1 #自身以外に同一のsample_nameをもつサンプルがある
+
+    # DB内の同一submissionで重複チェック
+    if result == true && !submission_id.nil? && @mode == "private"
+      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
+        sample_name_list = @db_validator.get_sample_names(submission_id)
+        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, sample_name_list)
+      else
+        sample_name_list = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
+      end
+
+      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+      result = false if sample_name_list.count(sample_name) >= 2
     end
 
-    result = true
-    if duplicated_sample_name.length > 0
+    if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Sample title", value: sample_title} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
+        {key: "Sample name", value: sample_name},
+        {key: "Sample title", value: sample_title} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      result = false
-    elsif submission_id && @mode == "private"
-      #TODO ここのテストを書けていない
-      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
-        pg_response = @db_validator.get_sample_names(submission_id)
-        if pg_response[:status] == "error"
-          raise pg_response[:message]
-        else
-          ret = pg_response[:items]
-        end
-        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, ret)
-      else
-        ret = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
-      end
-
-      if ret # DBよりsubmission_idに紐づくsample_name,titleが取得出来た場合
-        names = []
-        titles = []
-        samples = {}
-        ret.each do |item|
-          names.push(item["sample_name"]) # DBよりsubmission_idに紐づくsample_nameのリストを生成
-          samples[item["sample_name"]] = item["title"] #{sample_name: title, ..}
-        end
-
-        duplicated_name = names.select do |name| # 同一のsample_nameが有った場合＠duplicated_nameにpushする
-          names.index(name) != names.rindex(name)
-        end
-
-        if duplicated_name.length > 0
-          duplicated_sample_title = []
-          duplicated_name.each do |name|
-            duplicated_sample_title.push(@samples[name])
-          end
-          annotation = [
-              {key: "Sample name", value: sample_name},
-              {key: "Sample title", value: duplicated_sample_title.join(",")}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-          result = false
-        end
-      end
     end
     result
   end
@@ -1932,7 +1901,7 @@ class MainValidator
     duplicated = biosample_list.select do |biosample_data|
       locus_tag == biosample_data["attributes"]["locus_tag_prefix"]
     end
-    result = false if duplicated.length > 1 #自身以外に同一タイトルもつサンプルがある
+    result = false if duplicated.length > 1 #自身以外に同一のlocus_tag_prefixをもつサンプルがある
 
     # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
     if @mode == "private"

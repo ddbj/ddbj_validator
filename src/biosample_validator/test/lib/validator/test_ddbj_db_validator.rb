@@ -59,12 +59,22 @@ class TestDDBJDbValidator < Minitest::Test
 
   end
 
+  def test_get_sample_names
+    # exist data
+    ret = @db_validator.get_sample_names("SSUB003677")
+    assert_equal 4, ret.size
+
+    # not exist
+    ret = @db_validator.get_sample_names("SSUB000000")
+    assert_equal 0, ret.size
+  end
+
   def test_get_bioproject_accession
-    # ok case
+    # exist data
     ret = @db_validator.get_bioproject_accession("PSUB004142")
     assert_equal "PRJDB3490", ret
 
-    # ng case
+    # not exist
     ## project accession IS NULL
     ret = @db_validator.get_bioproject_accession("PSUB004148")
     assert_equal nil, ret
