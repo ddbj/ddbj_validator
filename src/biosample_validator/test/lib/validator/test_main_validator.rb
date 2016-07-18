@@ -921,7 +921,7 @@ jkl\"  "
     # ok case
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -929,9 +929,15 @@ jkl\"  "
     #sample_nameとsample_titleが異なる同じ属性をもつ5つのサンプル
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
+    #多数の重複がある実際のデータ
+    xml_data = File.read("../../data/24_identical_attributes_SSUB003016_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
+    assert_equal false, ret[:result]
+    assert_equal 131, ret[:error_list].size
   end
 
   def test_attribute_value_is_not_integer

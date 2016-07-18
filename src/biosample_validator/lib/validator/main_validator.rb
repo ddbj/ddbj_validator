@@ -118,13 +118,13 @@ class MainValidator
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
+    send("identical_attributes", "24", @biosample_list)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
       send("duplicated_sample_title_in_this_submission", "3", sample_name, sample_title, @biosample_list, line_num)
       send("duplicate_sample_names", "28", sample_name, sample_title, @biosample_list, biosample_data["submission_id"], line_num)
-      send("identical_attributes", "24", sample_name, @biosample_list)
     end
     send("warning_about_bioproject_increment", "69", @biosample_list)
 
@@ -1666,6 +1666,7 @@ class MainValidator
   #
   # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject accession, description 以外で
   # ユニークな属性を持っている他のサンプルがないかの検証
+  # 全サンプルを対象に検証し、同値であるサンプルには同じグループIDを降り、どのサンプルのセットが重複しているかを示す
   #
   # ==== Args
   # rule_code
@@ -1674,39 +1675,59 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def identical_attributes (rule_code, sample_name, biosample_list)
+  def identical_attributes (rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.size == 0
 
     result = true
+    # 同値比較しない基本属性
     keys_excluding = ["sample_name", "sample_title", "bioproject_accession", "description"]
 
+    duplicate_sample_error_list = [] #エラー出力用データ
+    duplicate_groups = {} #同値データのグループ情報
+
     biosample_list.each_with_index do |current_biosample_data, current_idx|
-      dup_sample_list = []
+      has_dup_data = false #他のサンプルと重複しているかのフラグ
+      current_sample = current_biosample_data["attributes"].dup #オブジェクトclone
       biosample_list.each_with_index do |target_biosample_data, target_index|
         if current_idx != target_index
-          #オブジェクトclone
-          current_sample = current_biosample_data["attributes"].dup
-          target_sample = target_biosample_data["attributes"].dup
+          target_sample = target_biosample_data["attributes"].dup #オブジェクトclone
           keys_excluding.each do |ex_key| #基本属性を除去
             current_sample.delete(ex_key)
             target_sample.delete(ex_key)
           end
           if current_sample == target_sample #基本属性を除去した上で同一の内容
-            dup_sample_list.push(target_biosample_data["attributes"]["sample_name"])
+            has_dup_data = true
           end
         end
       end
-      # ユニークではない場合にsample単位でエラーを出す
-      if dup_sample_list.size > 0
+      if has_dup_data == true #重複していれば
+        hash = { sample_name: current_biosample_data["attributes"]["sample_name"] }
+        exist_group = duplicate_groups.select do |key, dup_data| #同値を持ったグループが既にあるか検索
+          dup_data == current_sample
+        end
+        if exist_group.size > 0 #同値を持ったグループがある
+          hash[:group] = exist_group.keys.first
+        else #なければ新しいグループIDを振って追加する
+          # グループID は"1", "2",...
+          max_group_id = duplicate_groups.size == 0 ? 0 : duplicate_groups.keys.max {|a, b| a.to_i <=> b.to_i }
+          new_group_id = (max_group_id.to_i + 1).to_s
+          duplicate_groups[new_group_id] = current_sample #グループリストに追加
+          hash[:group] = new_group_id
+        end
+        duplicate_sample_error_list.push(hash)
+      end
+    end
+    if duplicate_sample_error_list.size > 0
+      # ユニークではない場合にsample毎にエラーを出す
+      duplicate_sample_error_list.each do |error_list|
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "sample_name"},
-          {key: "Same attribute samples", value: dup_sample_list.join(", ")}
+          {key: "Sample name", value: error_list[:sample_name]},
+          {key: "Sample group without distinguishing attribute", value: error_list[:group]}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
-        result = false
       end
+      result = false
     end
     result
   end
