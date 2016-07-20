@@ -5,7 +5,7 @@ require '../../../lib/validator/biosample_xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup
-    @validator = MainValidator.new("public")
+    @validator = MainValidator.new("private")
     @xml_convertor = BioSampleXmlConvertor.new
   end
 
@@ -463,20 +463,27 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
+
   def test_bioproject_submission_id_replacement
     #ok case
+    ## not psub_id
     ret = exec_validator("bioproject_submission_id_replacement", "95","", "PRJNA1", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## not exist project accession
+    ret = exec_validator("bioproject_submission_id_replacement", "95","", "PSUB004148", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
     #auto annotation
-    ret = exec_validator("bioproject_submission_id_replacement", "95", "", "PSUB000001", 1)
-    expect_annotation = "PRJDB1"
+    ret = exec_validator("bioproject_submission_id_replacement", "95", "", "PSUB004142", 1)
+    expect_annotation = "PRJDB3490"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+
     #params are nil pattern
-    ret = exec_validator("bioproject_submission_id_replacement", "95","", nil, 1)
+    ret = exec_validator("bioproject_submission_id_replacement", "95", "", "missing", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -490,16 +497,20 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDA10", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    #ok case
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PSUB004142", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     #ng case
     ret = exec_validator("invalid_bioproject_accession", "5","", "PDBJA12345", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    ret = exec_validator("invalid_bioproject_accession", "5","", nil, 1)
+    ret = exec_validator("invalid_bioproject_accession", "5","", "missing", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
     end
-=end
+
   def test_invalid_host_organism_name
     #ok case
     ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Homo sapiens", 1)
@@ -878,28 +889,39 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
   end
 
-=begin
   def test_bioproject_not_found
     # ok case (given submitter_id matches DB response submitter_id)
-    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990110", "test01", 1)
+    ## valid data
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990080", "test04", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not ddbj bioproject
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJNA90080", "test04", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not exist bioproject id
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJDB0000", "test04", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB003946", "test01", 1)
+    ## mismatch submitter id
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB990080", "test01", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    ret = exec_validator("bioproject_not_found","6", "Sample A", "", "", 1)
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "missing", "test04", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB990080", nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=end
 
   def test_identical_attributes
     # ok case
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -907,9 +929,15 @@ jkl\"  "
     #sample_nameとsample_titleが異なる同じ属性をもつ5つのサンプル
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
+    #多数の重複がある実際のデータ
+    xml_data = File.read("../../data/24_identical_attributes_SSUB003016_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
+    assert_equal false, ret[:result]
+    assert_equal 131, ret[:error_list].size
   end
 
   def test_attribute_value_is_not_integer
@@ -939,59 +967,94 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
+
   def test_invalid_bioproject_type
-    #ok case (submission_id is not in parent_submission_id)
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB000001", 1)
+    #ok case
+    #PSUB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB004142", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case (submission_id is in parent_submission_id)
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB000606", 1)
+    #PRJDB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PRJDB3490", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #PSUB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB990036", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #PRJDB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PRJDB3549", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = exec_validator("invalid_bioproject_type", "70", "", "", 1)
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "missing", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_duplicate_sample_names
     #ok case
-    ret = exec_validator("duplicate_sample_names", "28", "Sample 1 (SAMD00000001)", "sample_title_1", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
+    xml_data = File.read("../../data/28_duplicate_sample_names_SSUB005454_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ## xmlファイル内に同一のsample_nameがない(submissionがなくDBは検索しない)
+    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## xmlファイル内に同一のsample_nameがない。DB内でも重複がない
+    ret = exec_validator("duplicate_sample_names", "28", "sample 1", "sample_title_1", biosample_data, "SSUB003677", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
     #ng case (Same sample names in local data)
-    ret = exec_validator("duplicate_sample_names", "28", "Sample 1 (SAMD00000001)", "sample_title_1", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
-    assert_equal false, ret[:result]
+    xml_data = File.read("../../data/28_duplicate_sample_names_SSUB005454_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, nil, 1)
+    assert_equal false , ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## xmlファイル内に同一のsample_nameがないがDB内で重複している #このテストはDBに重複データを登録しないと通らない
+    #xml_data = File.read("../../data/28_duplicate_sample_names_SSUB005454_ok.xml")
+    #biosample_data = @xml_convertor.xml2obj(xml_data)
+    #ret = exec_validator("duplicate_sample_names", "28", "sample 1", "sample_title_1", biosample_data, "SSUB003677", 1)
+    #assert_equal false, ret[:result]
+    #assert_equal 1, ret[:error_list].size
+
     #params are nil pattern
-    ret = exec_validator("duplicate_sample_names", "28", "", "", [], "", 1)
+    ret = exec_validator("duplicate_sample_names", "28", "", "title", biosample_data, nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_duplicated_locus_tag_prefix
     # ok case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB"], "SSUB000001", 1)
+    xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ## xmlファイル内にもDB内にも同一のprefixがない
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "NONEXISTPREFIX", biosample_data, nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## DB内に同一のprefixがあるが、SubmissionIDがあるため(DBから取得したデータ)同一prefixが一つあってもOK
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "AB1", biosample_data, "SSUB000001", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB","XXA"], "SSUB000001", 1)
+    ## xmlファイル内に同一のprefixがある
+    xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "WN1", biosample_data, nil, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    # ng case (prefix already used in other submission)
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "AAAA", ["XXA", "XXB"], "SSUB000001", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
+    ## DB内に同一のprefixが2つ以上ある #このテストはDBに重複データを登録しないと通らない
+    #xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
+    #biosample_data = @xml_convertor.xml2obj(xml_data)
+    #ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "Ato01", biosample_data, "SSUB000001", 1)
+    #assert_equal false, ret[:result]
+    #assert_equal 1, ret[:error_list].size
     # parameters are nil case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "",[], "", 1)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "missing", biosample_data, nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=end
 
   def test_warning_about_bioproject_increment
     # ok case

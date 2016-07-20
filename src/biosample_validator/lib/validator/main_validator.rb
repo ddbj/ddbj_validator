@@ -22,7 +22,7 @@ class MainValidator
   def initialize (mode)
     @mode = mode
     if mode == "private"
-      require File.dirname(__FILE__) + "/postgre_connection.rb"
+      require File.dirname(__FILE__) + "/ddbj_db_validator.rb"
     end
     @conf = read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
     CommonUtils::set_config(@conf)
@@ -31,6 +31,9 @@ class MainValidator
     @error_list = []
     @xml_convertor = BioSampleXmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
+    if mode == "private"
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    end
     @cache = ValidatorCache.new
   end
 
@@ -60,8 +63,7 @@ class MainValidator
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
       if @mode == "private"
-        #TODO load PostgreSQL conf
-        #@db_config = JSON.parse(File.read(config_file_dir + "/db_config.json"))
+        config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))
       end
       config
     rescue => ex
@@ -116,22 +118,13 @@ class MainValidator
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
-    @sample_name_list = []
-    @locus_tag_list = []
-    @submitter_id = @biosample_list[0]["submitter_id"]
-    @submission_id = @biosample_list[0]["submission_id"]
-    @biosample_list.each do |biosample_data|
-      @sample_name_list.push(biosample_data["attributes"]["sample_name"])
-      @locus_tag_list.push(biosample_data["attributes"]["locus_tag_prefix"])
-    end
+    send("identical_attributes", "24", @biosample_list)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
       send("duplicated_sample_title_in_this_submission", "3", sample_name, sample_title, @biosample_list, line_num)
-      send("bioproject_not_found", "6", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
-      send("duplicate_sample_names", "28", sample_name, sample_title, @sample_name_list, @submission_id, line_num)
-      send("identical_attributes", "24", sample_name, @biosample_list)
+      send("duplicate_sample_names", "28", sample_name, sample_title, @biosample_list, biosample_data["submission_id"], line_num)
     end
     send("warning_about_bioproject_increment", "69", @biosample_list)
 
@@ -170,12 +163,15 @@ class MainValidator
           biosample_data["attributes"][attribute_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, @conf[:int_attr], line_num)
+        ret = send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"]["bioproject_accession"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        end
       end
-      send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @locus_tag_list, @submission_id, line_num)
-
+      send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+      send("bioproject_not_found", "6", sample_name,  biosample_data["attributes"]["bioproject_accession"], biosample_data["submitter_id"], line_num)
+      send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+      send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, biosample_data["submission_id"], line_num)
       ret = send("format_of_geo_loc_name_is_invalid", "94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
@@ -761,25 +757,26 @@ class MainValidator
   end
 
   #
-  # Validates the bioproject_id format
+  # bioproject_accession のID体系が正しいかの検証
   #
   # ==== Args
   # rule_code
-  # project_id ex."PDBJ123456"
+  # bioproject_accession ex."PDBJ123456"
   # line_num 
   # ==== Return
   # true/false
   #
-  def invalid_bioproject_accession (rule_code, sample_name, project_id, line_num)
-    return nil if project_id.nil?
+  def invalid_bioproject_accession (rule_code, sample_name, bioproject_accession, line_num)
+    return nil if CommonUtils::null_value?(bioproject_accession)
+
     result = true
-    if project_id =~ /^PRJ[D|E|N]\w?\d{1,}$/ || project_id =~ /^PSUB\d{6}$/
+    if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
       result = true
     else
       annotation = [
           {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: project_id}
+          {key: "Attribute", value: "bioproject_accession"},
+          {key: "Attribute value", value: bioproject_accession}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
@@ -1601,7 +1598,7 @@ class MainValidator
   # ==== Args
   # rule_code
   # sample_name サンプル名
-  # sample_title サンプル名
+  # sample_title サンプルのタイトル
   # biosample_list サブミッション内の全biosampleオブジェクトのリスト
   # ==== Return
   # true/false
@@ -1626,35 +1623,41 @@ class MainValidator
     result
   end
 
-  def bioproject_not_found (rule_code, sample_name, bioproject_id, submitter_id, line_num)
-    return nil if bioproject_id.nil? || bioproject_id.empty? || submitter_id.nil? || submitter_id.empty?
+  #
+  # 指定されたbioproject_accessionのsubmitterが引数のsubmitter_idと一致するかの検証
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # bioproject_accession ex. "PSUB004142", "PRJDB3490"
+  # submitter_id ex."test01"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def bioproject_not_found (rule_code, sample_name, bioproject_accession, submitter_id, line_num)
+    return nil if CommonUtils::null_value?(bioproject_accession)
+    return nil if submitter_id.nil?
+
     result = true
     if @mode == "private"
-      if @cache.nil? || @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id).nil?
-        get_bioproject_item = GetBioProjectItem.new
-        @pg_response = get_bioproject_item.get_submitter(bioproject_id)
-
-        if @pg_response[:status] == "error"
-          raise @pg_response[:message]
-        else
-          ret = @pg_response[:items]
-          @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id, ret)
-        end
+      if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession) == false #cache値がnilの可能性があるためhas_keyでチェック
+        ret = @db_validator.get_bioproject_submitter_id(bioproject_accession)
+        @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession, ret)
       else
-        ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_id)
+        ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
       end
 
-      if ret.length > 0
-        if submitter_id != ret[0]["submitter_id"]
-          annotation = [
-              {key: "Sample name", value: sample_name},
-              {key: "Submitter ID", value: submitter_id},
-              {key: "BioProject ID", value: bioproject_id}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-          result = false
-        end
+      #SubmitterIDが一致しない場合はNG
+      result = false if !ret.nil? && ret["submitter_id"] != submitter_id
+      if result == false
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Submitter ID", value: submitter_id},
+          {key: "bioproject_acession", value: bioproject_accession}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
       end
     end
     result
@@ -1663,6 +1666,7 @@ class MainValidator
   #
   # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject accession, description 以外で
   # ユニークな属性を持っている他のサンプルがないかの検証
+  # 全サンプルを対象に検証し、同値であるサンプルには同じグループIDを降り、どのサンプルのセットが重複しているかを示す
   #
   # ==== Args
   # rule_code
@@ -1671,67 +1675,91 @@ class MainValidator
   # ==== Return
   # true/false
   #
-  def identical_attributes (rule_code, sample_name, biosample_list)
+  def identical_attributes (rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.size == 0
 
     result = true
-    keys_excluding = ["sample_name", "sample_title", "bioproject_id", "description"]
+    # 同値比較しない基本属性
+    keys_excluding = ["sample_name", "sample_title", "bioproject_accession", "description"]
+
+    duplicate_sample_error_list = [] #エラー出力用データ
+    duplicate_groups = {} #同値データのグループ情報
 
     biosample_list.each_with_index do |current_biosample_data, current_idx|
-      dup_sample_list = []
+      has_dup_data = false #他のサンプルと重複しているかのフラグ
+      current_sample = current_biosample_data["attributes"].dup #オブジェクトclone
       biosample_list.each_with_index do |target_biosample_data, target_index|
         if current_idx != target_index
-          #オブジェクトclone
-          current_sample = current_biosample_data["attributes"].dup
-          target_sample = target_biosample_data["attributes"].dup
+          target_sample = target_biosample_data["attributes"].dup #オブジェクトclone
           keys_excluding.each do |ex_key| #基本属性を除去
             current_sample.delete(ex_key)
             target_sample.delete(ex_key)
           end
           if current_sample == target_sample #基本属性を除去した上で同一の内容
-            dup_sample_list.push(target_biosample_data["attributes"]["sample_name"])
+            has_dup_data = true
           end
         end
       end
-      # ユニークではない場合にsample単位でエラーを出す
-      if dup_sample_list.size > 0
+      if has_dup_data == true #重複していれば
+        hash = { sample_name: current_biosample_data["attributes"]["sample_name"] }
+        exist_group = duplicate_groups.select do |key, dup_data| #同値を持ったグループが既にあるか検索
+          dup_data == current_sample
+        end
+        if exist_group.size > 0 #同値を持ったグループがある
+          hash[:group] = exist_group.keys.first
+        else #なければ新しいグループIDを振って追加する
+          # グループID は"1", "2",...
+          max_group_id = duplicate_groups.size == 0 ? 0 : duplicate_groups.keys.max {|a, b| a.to_i <=> b.to_i }
+          new_group_id = (max_group_id.to_i + 1).to_s
+          duplicate_groups[new_group_id] = current_sample #グループリストに追加
+          hash[:group] = new_group_id
+        end
+        duplicate_sample_error_list.push(hash)
+      end
+    end
+    if duplicate_sample_error_list.size > 0
+      # ユニークではない場合にsample毎にエラーを出す
+      duplicate_sample_error_list.each do |error_list|
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "sample_name"},
-          {key: "Same attribute samples", value: dup_sample_list.join(", ")}
+          {key: "Sample name", value: error_list[:sample_name]},
+          {key: "Sample group without distinguishing attribute", value: error_list[:group]}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
-        result = false
       end
+      result = false
     end
     result
   end
 
-  def invalid_bioproject_type (rule_code, sample_name, bioproject_id, line_num)
-    return nil if bioproject_id.nil? || bioproject_id.empty?
+  #
+  # 指定されたbioproject_accessionがUmbrellaプロジェクトでないかの検証
+  # Umbrellaプロジェクトであればfalseを返す
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # bioproject_accession ex. "PSUB004142", "PRJDB3490"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
+    return nil if CommonUtils::null_value?(bioproject_accession)
     result  = true
     if @mode == "private"
-      if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_id).nil?
-        is_umbrella_id = IsUmbrellaId.new
-        @pg_response = is_umbrella_id.is_umbrella(bioproject_id)
-
-        if @pg_response[:status] == "error"
-          raise @pg_response[:message]
-        else
-          ret = @pg_response[:items]
-          @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_id, ret)
-        end
+      if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession).nil?
+        is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
+        @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession, is_umbrella)
       else
-        ret = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_id)
+        is_umbrella = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession)
       end
 
-      if ret != "0"
+      if is_umbrella == true #NG
         annotation = [
             {key: "Sample name", value: sample_name},
-            {key: "BioProject ID", value: bioproject_id}
+            {key: "bioproject_accession", value: bioproject_accession}
         ]
-        annotation.push({key: "Invalid BioProject type", source: @data_file, location: line_num.to_s, value: [bioproject_id]})
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         result = false
@@ -1775,63 +1803,49 @@ class MainValidator
     result
   end
 
-  def duplicate_sample_names(rule_code, sample_name, sample_title, sample_name_list, submission_id, line_num)
-    return nil if sample_name.nil? || sample_name.empty?
-    @duplicated_sample_name = []
-    @duplicated_sample_name = sample_name_list.select do |name|  #sample_nameがsample_name_listに２つ以上含まれるケース
-      sample_name_list.index(name) != sample_name_list.rindex(name)
+  #
+  # submission単位でsample_nameが重複していないか検証
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # sample_title サンプルタイトル
+  # biosample_list サブミッション内の全biosampleオブジェクトのリスト
+  # submission_id
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def duplicate_sample_names(rule_code, sample_name, sample_title, biosample_list, submission_id, line_num)
+    return nil if CommonUtils::blank?(sample_name)
+    result = true
+
+    # 同一ファイル内での重複チェック
+    duplicated = biosample_list.select do |biosample_data|
+      sample_name == biosample_data["attributes"]["sample_name"]
+    end
+    result = false if duplicated.length > 1 #自身以外に同一のsample_nameをもつサンプルがある
+
+    # DB内の同一submissionで重複チェック
+    if result == true && !submission_id.nil? && @mode == "private"
+      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
+        sample_name_list = @db_validator.get_sample_names(submission_id)
+        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, sample_name_list)
+      else
+        sample_name_list = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
+      end
+
+      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+      result = false if sample_name_list.count(sample_name) >= 2
     end
 
-    result = true
-    if @duplicated_sample_name.length > 0
+    if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Sample title", value: sample_title} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
+        {key: "Sample name", value: sample_name},
+        {key: "Sample title", value: sample_title} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      result = false
-    elsif submission_id && @mode == "private"
-      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
-        get_submission_name = GetSampleNames.new
-        @pg_response = get_submission_name.getnames(submission_id)
-        if @pg_response[:status] == "error"
-          raise @pg_response[:message]
-        else
-          ret = @pg_response[:items]
-        end
-        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, ret)
-      else
-        ret = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
-      end
-
-      if ret # DBよりsubmission_idに紐づくsample_name,titleが取得出来た場合
-        names = []
-        titles = []
-        @samples = {}
-        ret.each do |item|
-          names.push(item["sample_name"]) # DBよりsubmission_idに紐づくsample_nameのリストを生成
-          @samples[item["sample_name"]] = item["title"] #{sample_name: title, ..}
-        end
-
-        @duplicated_name = names.select do |name| # 同一のsample_nameが有った場合＠duplicated_nameにpushする
-          names.index(name) != names.rindex(name)
-        end
-
-        if @duplicated_name.length > 0
-          @duplicated_sample_title = []
-          @duplicated_name.each do |name|
-            @duplicated_sample_title.push(@samples[name])
-          end
-          annotation = [
-              {key: "Sample name", value: sample_name},
-              {key: "Sample title", value: @duplicated_sample_title.join(",")}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-          result = false
-        end
-      end
     end
     result
   end
@@ -1849,33 +1863,33 @@ class MainValidator
   def warning_about_bioproject_increment (rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.length == 0
     result = true
-    bioproject_id_list = []
+    bioproject_accession_list = []
     biosample_list.each do |biosample_data|
-      bioproject_id_list.push(biosample_data["attributes"]["bioproject_id"])
+      bioproject_accession_list.push(biosample_data["attributes"]["bioproject_accession"])
     end
-    compact_list = bioproject_id_list.compact
-    if bioproject_id_list.size != compact_list.size #nilが含まれていた場合には連続値ではないものとする
+    compact_list = bioproject_accession_list.compact
+    if bioproject_accession_list.size != compact_list.size #nilが含まれていた場合には連続値ではないものとする
       result = true
     elsif biosample_list.size >= 3 #最低3サンプルから連続値チェック
-      #前後のサンプルのbioproject_id(数値部分)の差分を配列に格納する
+      #前後のサンプルのbioproject_accession(数値部分)の差分を配列に格納する
       @sub = []
       i = 0
-      until i >= bioproject_id_list.length - 1 do
-        if bioproject_id_list[i] =~ /^PRJDB\d+/
-          @sub.push( bioproject_id_list[i + 1].gsub("PRJDB", "").to_i - bioproject_id_list[i].gsub("PRJDB", "").to_i)
-        elsif bioproject_id_list[i] =~ /^PSUB\d{6}/
-          @sub.push( bioproject_id_list[i + 1].gsub("PSUB", "").to_i - bioproject_id_list[i].gsub("PSUB", "").to_i)
+      until i >= bioproject_accession_list.length - 1 do
+        if bioproject_accession_list[i] =~ /^PRJDB\d+/ #TODO PRJDNの場合
+          @sub.push( bioproject_accession_list[i + 1].gsub("PRJDB", "").to_i - bioproject_accession_list[i].gsub("PRJDB", "").to_i)
+        elsif bioproject_accession_list[i] =~ /^PSUB\d{6}/
+          @sub.push( bioproject_accession_list[i + 1].gsub("PSUB", "").to_i - bioproject_accession_list[i].gsub("PSUB", "").to_i)
         end
         i += 1
       end
       @sub.uniq == [1] ? result = false : result = true #差分が常に1であれば連続値
 
       if result == false
-        #連続値であれば全てのSample nameとbioproject_idを出力する
+        #連続値であれば全てのSample nameとbioproject_accessionを出力する
         biosample_list.each do |biosample_data|
           annotation = [
             {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
-            {key: "Attribute", value: biosample_data["attributes"]["bioproject_id"]}
+            {key: "Attribute", value: biosample_data["attributes"]["bioproject_accession"]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
@@ -1887,15 +1901,46 @@ class MainValidator
     result
   end
 
-  def duplicated_locus_tag_prefix (rule_code, sample_name, locus_tag, locus_tag_list, submission_id, line_num)
-    return nil if locus_tag.nil? || locus_tag.empty?
+  #
+  # locus_tag_prefixが一意であるかの検証
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # locus_tag locus_tag
+  # biosample_list サブミッション内の全biosampleオブジェクトのリスト
+  # submission_id "SSUBXXXXXX" またはnil
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def duplicated_locus_tag_prefix (rule_code, sample_name, locus_tag, biosample_list, submission_id, line_num)
+    return nil if CommonUtils::null_value?(locus_tag)
     result = true
-    duplicated_locus_tag_list = []
-    duplicated_locus_tag_list = locus_tag_list.select do |tag|
-      locus_tag_list.index(tag) != locus_tag_list.rindex(tag)
+
+    # 同一ファイル内での重複チェック
+    duplicated = biosample_list.select do |biosample_data|
+      locus_tag == biosample_data["attributes"]["locus_tag_prefix"]
+    end
+    result = false if duplicated.length > 1 #自身以外に同一のlocus_tag_prefixをもつサンプルがある
+
+    # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
+    if @mode == "private"
+      if @cache.nil? || @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all").nil?
+        # biosample DBから全locus_tag_prefixのリストを取得
+        all_prefix_list = @db_validator.get_all_locus_tag_prefix()
+        @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, "all", all_prefix_list)
+      else
+        all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all")
+      end
+
+      # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じprefixがあるとNG
+      result = false if submission_id.nil? && all_prefix_list.count(locus_tag) >= 1
+      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+      result = false if !submission_id.nil? && all_prefix_list.count(locus_tag) >= 2
     end
 
-    if duplicated_locus_tag_list.include?(locus_tag)
+    if result == false
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "locus_tag_prefix"},
@@ -1903,63 +1948,46 @@ class MainValidator
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      result = false
-    elsif @mode == "private"
-      get_locus_tag_prefix = GetLocusTagPrefix.new
-      @pg_response = get_locus_tag_prefix.unique_prefix?(locus_tag, submission_id)
-
-      if @pg_response[:status] == "error"
-        raise @pg_response[:message]
-      else
-        result = @pg_response[:items]
-      end
-
-      if result == false
-        annotation = [
-            {key: "Sample name", value: sample_name},
-            {key: "Attribute", value: "locus_tag_prefix"},
-            {key: "Attribute value", value: locus_tag}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-      end
     end
     result
   end
 
-  def bioproject_submission_id_replacement (rule_code, sample_name, project_id, line_num)
-    return nil if project_id.nil?
+  #
+  # psub_idの値がSubmissionID(PSUB)であれば、BioSample Accession(PRJDXXX)形式に補正する
+  # 補正の必要がない(PSUBではない)、またはDB検索した結果補正値がない(AccessionIDが振られていない)場合はtrueを返す
+  # AccessionIDがあればAuto-annotationの値を取得しfalseを返す
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # psub_id  ex. "PSUB004142"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def bioproject_submission_id_replacement (rule_code, sample_name, psub_id, line_num)
+    return nil if CommonUtils::null_value?(psub_id)
     result = true
-    if project_id =~ /^PRJ[D|E|N]\w?\d{1,}$/ || project_id =~ /^PSUB\d{6}$/
-      if /^PRJD/ =~ project_id
-        result = true
-      elsif /^PSUB/ =~ project_id && @mode == "private"
-        if @cache.nil? || @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, project_id).nil?
-          get_prjdb_id = GetPRJDBId.new
-          @pg_response = get_prjdb_id.get_id(project_id)
-          if @pg_response[:status] == "error"
-            raise @pg_response[:message]
-          else
-            ret = @pg_response[:items]
-          end
-          @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, project_id, ret)
-        else
-          ret = @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, project_id)
-        end
 
-        prjd_id = ret[0]["project_id_prefix"] + ret[0]["prjd"]
-        annotation = [
-            {key: "Sample name", value: sample_name},
-            {key: "Attribute", value: "bioproject_id"},
-            {key: "Attribute value", value: project_id}
-        ]
-        if prjd_id
-          location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
-          annotation.push(CommonUtils::create_suggested_annotation([prjd_id], "Attribute value", location, true))
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-        else
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
-        end
+    if /^PSUB/ =~ psub_id && @mode == "private"
+      if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id) == false #cache値がnilの可能性があるためhas_keyでチェック
+        biosample_accession = @db_validator.get_bioproject_accession(psub_id)
+        @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id, biosample_accession)
+      else
+        biosample_accession = @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id)
+      end
+
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: "bioproject_accession"},
+          {key: "Attribute value", value: psub_id}
+      ]
+
+      # biosample_accessionにAuto-annotationできる
+      if !biosample_accession.nil?
+        location = @xml_convertor.xpath_from_attrname("bioproject_accession", line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([biosample_accession], "Attribute value", location, true))
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
         @error_list.push(error_hash)
         result = false
       end

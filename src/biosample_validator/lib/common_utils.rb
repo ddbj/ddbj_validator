@@ -281,7 +281,7 @@ class CommonUtils
       end
     rescue => ex
       message = "Failed to geocode with Google Geocoder API. Please check the latlon value or your internet connection. latlon: #{iso_latlon}\n"
-      raise StandardError, detail_message, ex.backtrace
+      raise StandardError, message, ex.backtrace
     end
   end
 
