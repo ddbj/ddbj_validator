@@ -349,12 +349,37 @@ cultivar
 ecotype
 
 3. Organism グループ以外の either one mandatory。グループはアルファベット順。グループ内の属性もアルファベット順。
+Age/stage
+Host
+Source
 
 4. 必須属性はアルファベット順。
 
 5. 任意属性はアルファベット順。
 
 =end
+
+#pp package_attr_a
+#pp packages_h
+
+# 共通属性
+common_attr_a = [
+	"sample_name",
+	"sample_title",
+	"description",
+	"organism",
+	"taxonomy_id",
+	"bioproject_accession"
+]
+
+# Organism group either_one_mandatory
+attrs_in_organism_group_a = [
+	"strain",
+	"isolate",
+	"breed",
+	"cultivar",
+	"ecotype"
+]
 
 # パッケージ定義 XML
 xml_package = Builder::XmlMarkup.new(:indent=>4)
@@ -385,6 +410,83 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 		    package.Description(item[6])
 		    package.Example(item[7])
 		    package.TemplateHeader(item[8])
+
+		    # tsv の並び順で属性をリスト
+
+			mandatory_a = Array.new
+			either_one_organism_a = Array.new(5, "")
+			either_one_age_stage_a = Array.new
+			either_one_host_a = Array.new
+			either_one_source_a = Array.new
+			optional_a = Array.new
+			
+			for pac_line in package_attr_a
+
+				# パッケージ名 + バージョンが一致
+				if pac_full_name == "#{pac_line[0]}.#{pac_line[1]}"
+					
+					# 属性定義
+					i = 0
+					for attrdef in pac_line[2..-1]
+						
+						attrname = attrs_in_table_a[i]
+
+						# 共通属性でなければ
+						unless common_attr_a.include?(attrname)
+
+							case attrdef
+
+							# 必須
+							when "M"
+								mandatory_a.push(attrname)
+							when "O"
+								optional_a.push(attrname)
+							when /E:Organism/
+						
+								case attrname
+								
+								when "strain"
+									either_one_organism_a[0] = attrname
+								when "isolate"
+									either_one_organism_a[1] = attrname
+								when "breed"
+									either_one_organism_a[2] = attrname
+								when "cultivar"
+									either_one_organism_a[3] = attrname
+								when "ecotype"
+									either_one_organism_a[4] = attrname
+								end								
+								
+							when /E:Age\/stage/
+								either_one_age_stage_a.push(attrname)
+							when /E:Host/
+								either_one_host_a.push(attrname)
+							when /E:Source/
+								either_one_source_a.push(attrname)
+							end
+
+						end # unless common_attr_a.include?(attrname)
+						
+						i += 1
+					
+					end # for attrdef in pac_line[2..-1]
+
+					pp pac_full_name
+					pp mandatory_a
+					pp optional_a
+
+					either_one_organism_a = either_one_organism_a.reject{|e|
+						e.empty?
+					}
+
+					pp either_one_organism_a
+					pp either_one_age_stage_a
+					pp either_one_host_a
+					pp either_one_source_a
+
+				end # if pac_full_name == "#{pac_line[0]}.#{pac_line[1]}"
+
+			end
 
 		} # Package
 
