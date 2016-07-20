@@ -14,15 +14,18 @@ require 'optparse'
 
 # 作成 2016-07-15 児玉
 # DDBJ BioSample 定義エクセル表の "package-attribute" と "attribute" シートから 
-# 属性定義 "ddbj_attributes.xml" を生成する。
-# 生成した XML を　"ddbj_attributes.xsd" で検証する。
-# XML は "temp.xml" という名前で生成される。
+# 属性定義 "ddbj_attributes.xml" とパッケージ定義 "ddbj_packages.xml" を生成する。
+# 生成した XML を　"ddbj_packages.xsd" で検証する。
+# XML は "temp_attributes.xml" と "temp_packages.xml" という名前で生成される。
 #
 
 # 変更履歴
 #
 
 ### 設定
+# モード
+$debug = true
+
 # XML 宣言
 instruction = '<?xml version="1.0" encoding="UTF-8"?>'
 
@@ -34,7 +37,7 @@ rescue
 end
 
 # エクセル中のシート名
-sheet_object = ['package-attribute', 'attribute']
+sheet_object = ['package-attribute', 'attribute', 'package']
 
 # シートの各表を格納する配列
 package_attr_a = Array.new
@@ -44,6 +47,11 @@ packages_h = Hash.new
 attr_a = Array.new
 attrs_defined_a = Array.new
 
+package_a = Array.new
+package_name_a = Array.new
+package_name_in_table_a = Array.new
+
+
 # シートを開いてデータを配列に格納する
 for sheet in sheet_object
 
@@ -51,10 +59,12 @@ for sheet in sheet_object
 
 	pl = 1 # 行番号
 	al = 1 # 行番号
+	ap = 1 # 行番号
 	for line in s
 
 		case sheet
 
+		# パッケージと属性の対応表
 		when "package-attribute"
 			package_attr_a.push(line)
 			attrs_in_table_a = line[2..-1] if pl == 1
@@ -62,14 +72,30 @@ for sheet in sheet_object
 			# パッケージ名を行番号とともに格納
 			packages_h.store(pl - 1, "#{line[0]}.#{line[1]}") if pl > 1
 
+			# パッケージ名とバージョン番号を格納
+			package_name_in_table_a.push([line[0], line[1]]) if pl > 1
+
 			pl += 1
 
+		# 属性定義表
 		when "attribute"
+			
 			attr_a.push(line) if al > 1
 			attrs_defined_a.push(line[1]) if al > 1
 
 			al += 1
-		
+
+		# パッケージ定義表
+		when "package"
+			
+			# 行を格納
+			package_a.push(line) if ap > 1
+
+			# パッケージ名とバージョン番号を格納
+			package_name_a.push([line[0], line[1]]) if ap > 1
+
+			ap += 1
+
 		end
 
 	end
@@ -77,12 +103,22 @@ for sheet in sheet_object
 end
 
 # 対応表と属性定義表中の属性セットが一致しているかどうかチェック
-unless attrs_defined_a == attrs_in_table_a
+unless (attrs_in_table_a - attrs_defined_a).empty?
 
 	not_in_table = (attrs_defined_a - attrs_in_table_a).join(", ")
 	not_in_attr = (attrs_in_table_a - attrs_defined_a).join(", ")
 	
-	raise "対応表と属性定義表で属性セットが一致していません。対応表にない属性: #{not_in_table}, 定義表にない属性: #{not_in_attr}"
+	raise "対応表と属性定義表で属性セットが一致していません。対応表にない属性: #{not_in_table}, 定義表にない属性: #{not_in_attr}" unless $debug
+
+end
+
+# 対応表とパッケージ定義表中のパッケージ名とバージョンが一致しているかどうかチェック
+unless (package_name_in_table_a - package_name_a).empty?
+
+	not_in_table = (package_name_a - package_name_in_table_a).join(", ")
+	not_in_attr = (package_name_in_table_a - package_name_a).join(", ")
+	
+	raise "対応表とパッケージ定義表でパッケージセットが一致していません。対応表にない属性: #{not_in_table}, 定義表にない属性: #{not_in_attr}" unless $debug
 
 end
 
@@ -162,7 +198,7 @@ attr_vs_package_a = package_attr_a.transpose[2..-1]
 # 属性定義表から temp.xml を生成
 # temp.xml
 xml_attribute = Builder::XmlMarkup.new(:indent=>4)
-xml_attribute_f = open("temp.xml", "w")
+xml_attribute_f = open("temp_attributes.xml", "w")
 xml_attribute_f.puts instruction
 
 # XML 生成、自動で内容はエスケープされる
@@ -175,9 +211,10 @@ xml_attribute_f.puts xml_attribute.BioSampleAttributes{|biosampleattributes|
 		
 		biosampleattributes.Attribute{|attribute|
 			
-			attribute.Name(item[0])
+			# DDBJ BioSample では Harmonized name のみなので Harmonized name → Name の順番
 		    attribute.HarmonizedName(item[1])
-		    
+		    attribute.Name(item[0])
+
 		    attribute.Description(item[4])
 		    attribute.DescriptionJa(item[5])
 		    attribute.ShortDescription(item[6])
@@ -268,7 +305,6 @@ xml_attribute_f.puts xml_attribute.BioSampleAttributes{|biosampleattributes|
 						# either_one_mandatory はどれか一つの範囲定義に必須なので、最後に上書き
 						when /E:(\S+)/
 							attribute.Package(pacname, "use" => "either_one_mandatory", "group_name" => $1)
-						
 						end
 
 						x += 1
@@ -286,4 +322,73 @@ xml_attribute_f.puts xml_attribute.BioSampleAttributes{|biosampleattributes|
 } # BioSampleAttributes
 
 # xsd で検証
-`xmllint --noout --schema ddbj_attributes.xsd temp.xml`
+`xmllint --noout --schema ddbj_attributes.xsd temp_attributes.xml` unless $debug
+
+##
+## Package 定義 XML の生成
+##
+
+# tsv における属性の順番
+=begin
+1. 共通属性。順番は固定。
+sample_name
+sample_title
+description
+organism
+taxonomy_id
+bioproject_accession
+
+2. Organism グループの either one mandatory 属性。順番は固定。
+参照:
+http://www.ncbi.nlm.nih.gov/biosample/docs/packages/Model.organism.animal.1.0/
+
+strain
+isolate
+breed
+cultivar
+ecotype
+
+3. Organism グループ以外の either one mandatory。グループはアルファベット順。グループ内の属性もアルファベット順。
+
+4. 必須属性はアルファベット順。
+
+5. 任意属性はアルファベット順。
+
+=end
+
+# パッケージ定義 XML
+xml_package = Builder::XmlMarkup.new(:indent=>4)
+xml_package_f = open("temp_packages.xml", "w")
+xml_package_f.puts instruction
+xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
+
+	for item in package_a
+
+		# XML 生成、自動で内容はエスケープされる
+		pac_full_name = "#{item[0]}.#{item[1]}"
+
+		# 属性
+		package_attributes_h = Hash.new
+		package_attributes_h.store("group", item[9]) if item[9]
+		package_attributes_h.store("antibiogram", item[10]) if item[10]
+		package_attributes_h.store("antibiogram_class", item[11]) if item[11]
+		package_attributes_h.store("antibiogram_template", item[12]) if item[12]
+
+		biosamplepackages.Package(package_attributes_h){|package|		
+
+		    package.Name(item[0])
+		    package.DisplayName(item[2])
+		    package.ShortName(item[3])
+		    package.Version(item[1])
+		    package.EnvPackage(item[4])
+		    package.EnvPackageDisplay(item[5])
+		    package.Description(item[6])
+		    package.Example(item[7])
+		    package.TemplateHeader(item[8])
+
+		} # Package
+
+	end
+
+} # BioSamplePackages
+
