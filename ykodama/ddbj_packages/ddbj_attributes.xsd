@@ -7,8 +7,8 @@
         <xs:element name="Attribute" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="Name" type="xs:string"/>
               <xs:element name="HarmonizedName" type="xs:string"/>
+              <xs:element name="Name" type="xs:string"/>
               <xs:element name="Description" type="xs:string"/>
               <xs:element name="DescriptionJa" type="xs:string"/>
               <xs:element name="ShortDescription" type="xs:string"/>
