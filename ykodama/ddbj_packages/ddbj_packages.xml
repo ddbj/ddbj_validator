@@ -9,7 +9,6 @@
         <EnvPackageDisplay/>
         <Description>Generic</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -56,7 +55,6 @@
         <EnvPackageDisplay/>
         <Description>Clinical or host-associated pathogen</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -265,7 +263,6 @@
         <EnvPackageDisplay/>
         <Description>Environmental, food or other pathogen</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -414,7 +411,6 @@
         <EnvPackageDisplay/>
         <Description>Use for bacteria or other unicellular microbes when it is not appropriate or advantageous to use MIxS, Pathogen or Virus packages.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -611,7 +607,6 @@
         <EnvPackageDisplay/>
         <Description>Use for multicellular samples or cell lines derived from common laboratory model organisms, e.g., mouse, rat, Drosophila, worm, fish, frog, or large mammals including zoo and farm animals.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -868,7 +863,6 @@
         <EnvPackageDisplay/>
         <Description>Use for metagenomic and environmental samples when it is not appropriate or advantageous to use MIxS packages.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -981,7 +975,6 @@
         <EnvPackageDisplay/>
         <Description>Use for any invertebrate sample.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -1148,7 +1141,6 @@
         <EnvPackageDisplay/>
         <Description>WARNING: Only use for human samples or cell lines that have no privacy concerns. For all studies involving human subjects, it is the submitter's responsibility to ensure that the information supplied protects participant privacy in accordance with all applicable laws, regulations and institutional policies. Make sure to remove any direct personal identifiers from your submission. If there are patient privacy concerns regarding making data fully public, please submit samples and data to DDBJ's Japanese Genotype-phenotype Archive (JGA) database. JGA has controlled access mechanisms and is an appropriate resource for hosting sensitive patient data. For samples isolated from humans use the Pathogen, Microbe or appropriate MIxS package.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -1315,7 +1307,6 @@
         <EnvPackageDisplay/>
         <Description>Use for any plant sample or cell line.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -1524,7 +1515,6 @@
         <EnvPackageDisplay/>
         <Description>Use for all virus samples not directly associated with disease. Viral pathogens should be submitted using the Pathogen: Clinical or host-associated pathogen package.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -1709,7 +1699,6 @@
         <EnvPackageDisplay>air</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -1996,7 +1985,6 @@
         <EnvPackageDisplay>built</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -2283,7 +2271,6 @@
         <EnvPackageDisplay>host-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -2666,7 +2653,6 @@
         <EnvPackageDisplay>human-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -3097,7 +3083,6 @@
         <EnvPackageDisplay>human-gut</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -3432,7 +3417,6 @@
         <EnvPackageDisplay>human-oral</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -3761,7 +3745,6 @@
         <EnvPackageDisplay>human-skin</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -4096,7 +4079,6 @@
         <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -4473,7 +4455,6 @@
         <EnvPackageDisplay>microbial mat/biofilm</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -4976,7 +4957,6 @@
         <EnvPackageDisplay>miscellaneous or artificial</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -5365,7 +5345,6 @@
         <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -5820,7 +5799,6 @@
         <EnvPackageDisplay>sediment</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -6353,7 +6331,6 @@
         <EnvPackageDisplay>soil</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -6796,7 +6773,6 @@
         <EnvPackageDisplay>wastewater/sludge</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -7149,7 +7125,6 @@
         <EnvPackageDisplay>water</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -7754,7 +7729,6 @@
         <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -7963,7 +7937,6 @@
         <EnvPackageDisplay>air</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -8334,7 +8307,6 @@
         <EnvPackageDisplay>built</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -8705,7 +8677,6 @@
         <EnvPackageDisplay>host-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -9160,7 +9131,6 @@
         <EnvPackageDisplay>human-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -9669,7 +9639,6 @@
         <EnvPackageDisplay>human-gut</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -10082,7 +10051,6 @@
         <EnvPackageDisplay>human-oral</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -10489,7 +10457,6 @@
         <EnvPackageDisplay>human-skin</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -10902,7 +10869,6 @@
         <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -11357,7 +11323,6 @@
         <EnvPackageDisplay>microbial mat/biofilm</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -11944,7 +11909,6 @@
         <EnvPackageDisplay>miscellaneous or artificial</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -12417,7 +12381,6 @@
         <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -12944,7 +12907,6 @@
         <EnvPackageDisplay>sediment</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -13561,7 +13523,6 @@
         <EnvPackageDisplay>soil</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -14088,7 +14049,6 @@
         <EnvPackageDisplay>wastewater/sludge</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -14525,7 +14485,6 @@
         <EnvPackageDisplay>water</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -15214,7 +15173,6 @@
         <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -15441,7 +15399,6 @@
         <EnvPackageDisplay>air</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -15830,7 +15787,6 @@
         <EnvPackageDisplay>built</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -16219,7 +16175,6 @@
         <EnvPackageDisplay>host-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -16692,7 +16647,6 @@
         <EnvPackageDisplay>human-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -17219,7 +17173,6 @@
         <EnvPackageDisplay>human-gut</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -17650,7 +17603,6 @@
         <EnvPackageDisplay>human-oral</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -18075,7 +18027,6 @@
         <EnvPackageDisplay>human-skin</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -18506,7 +18457,6 @@
         <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -18979,7 +18929,6 @@
         <EnvPackageDisplay>microbial mat/biofilm</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -19584,7 +19533,6 @@
         <EnvPackageDisplay>miscellaneous or artificial</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -20075,7 +20023,6 @@
         <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -20620,7 +20567,6 @@
         <EnvPackageDisplay>sediment</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -21255,7 +21201,6 @@
         <EnvPackageDisplay>soil</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -21800,7 +21745,6 @@
         <EnvPackageDisplay>wastewater/sludge</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -22255,7 +22199,6 @@
         <EnvPackageDisplay>water</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -22962,7 +22905,6 @@
         <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -23159,7 +23101,6 @@
         <EnvPackageDisplay>air</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -23518,7 +23459,6 @@
         <EnvPackageDisplay>built</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -23877,7 +23817,6 @@
         <EnvPackageDisplay>host-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -24320,7 +24259,6 @@
         <EnvPackageDisplay>human-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -24817,7 +24755,6 @@
         <EnvPackageDisplay>human-gut</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -25218,7 +25155,6 @@
         <EnvPackageDisplay>human-oral</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -25613,7 +25549,6 @@
         <EnvPackageDisplay>human-skin</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -26014,7 +25949,6 @@
         <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -26457,7 +26391,6 @@
         <EnvPackageDisplay>microbial mat/biofilm</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -27032,7 +26965,6 @@
         <EnvPackageDisplay>miscellaneous or artificial</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -27493,7 +27425,6 @@
         <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -28008,7 +27939,6 @@
         <EnvPackageDisplay>sediment</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -28613,7 +28543,6 @@
         <EnvPackageDisplay>soil</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -29128,7 +29057,6 @@
         <EnvPackageDisplay>wastewater/sludge</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -29553,7 +29481,6 @@
         <EnvPackageDisplay>water</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -30230,7 +30157,6 @@
         <EnvPackageDisplay>No environmental package</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -30403,7 +30329,6 @@
         <EnvPackageDisplay>air</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -30738,7 +30663,6 @@
         <EnvPackageDisplay>built</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -31073,7 +30997,6 @@
         <EnvPackageDisplay>host-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -31504,7 +31427,6 @@
         <EnvPackageDisplay>human-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -31983,7 +31905,6 @@
         <EnvPackageDisplay>human-gut</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -32366,7 +32287,6 @@
         <EnvPackageDisplay>human-oral</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -32743,7 +32663,6 @@
         <EnvPackageDisplay>human-skin</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -33126,7 +33045,6 @@
         <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -33551,7 +33469,6 @@
         <EnvPackageDisplay>microbial mat/biofilm</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -34102,7 +34019,6 @@
         <EnvPackageDisplay>miscellaneous or artificial</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -34539,7 +34455,6 @@
         <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -35042,7 +34957,6 @@
         <EnvPackageDisplay>sediment</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -35623,7 +35537,6 @@
         <EnvPackageDisplay>soil</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -36114,7 +36027,6 @@
         <EnvPackageDisplay>wastewater/sludge</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -36515,7 +36427,6 @@
         <EnvPackageDisplay>water</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -37168,7 +37079,6 @@
         <EnvPackageDisplay>air</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -37449,7 +37359,6 @@
         <EnvPackageDisplay>built</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -37730,7 +37639,6 @@
         <EnvPackageDisplay>host-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -38107,7 +38015,6 @@
         <EnvPackageDisplay>human-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -38532,7 +38439,6 @@
         <EnvPackageDisplay>human-gut</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -38861,7 +38767,6 @@
         <EnvPackageDisplay>human-oral</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -39184,7 +39089,6 @@
         <EnvPackageDisplay>human-skin</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -39513,7 +39417,6 @@
         <EnvPackageDisplay>human-vaginal</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -39884,7 +39787,6 @@
         <EnvPackageDisplay>microbial mat/biofilm</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -40381,7 +40283,6 @@
         <EnvPackageDisplay>miscellaneous or artificial</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -40764,7 +40665,6 @@
         <EnvPackageDisplay>plant-associated</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -41213,7 +41113,6 @@
         <EnvPackageDisplay>sediment</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -41740,7 +41639,6 @@
         <EnvPackageDisplay>soil</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -42177,7 +42075,6 @@
         <EnvPackageDisplay>wastewater/sludge</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -42524,7 +42421,6 @@
         <EnvPackageDisplay>water</EnvPackageDisplay>
         <Description/>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
@@ -43123,7 +43019,6 @@
         <EnvPackageDisplay/>
         <Description>Use for beta-lactamase gene transformants that have sequence and antibiotic resistance data. Please use the 'Supplementary Files' wizard to submit corresponding Sequin and Antibiogram files.</Description>
         <Example/>
-        <TemplateHeader/>
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
