@@ -398,10 +398,10 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 
 		# 属性
 		package_attributes_h = Hash.new
-		package_attributes_h.store("group", item[9]) if item[9]
-		package_attributes_h.store("antibiogram", item[10]) if item[10]
-		package_attributes_h.store("antibiogram_class", item[11]) if item[11]
-		package_attributes_h.store("antibiogram_template", item[12]) if item[12]
+		package_attributes_h.store("group", item[8]) if item[8]
+		package_attributes_h.store("antibiogram", item[9]) if item[9]
+		package_attributes_h.store("antibiogram_class", item[10]) if item[10]
+		package_attributes_h.store("antibiogram_template", item[11]) if item[11]
 
 		biosamplepackages.Package(package_attributes_h){|package|		
 
@@ -413,7 +413,6 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 		    package.EnvPackageDisplay(item[5])
 		    package.Description(item[6])
 		    package.Example(item[7])
-		    package.TemplateHeader(item[8])
 
 		    # tsv の並び順で属性をリスト
 
