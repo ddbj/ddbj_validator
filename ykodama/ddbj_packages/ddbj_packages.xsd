@@ -15,7 +15,6 @@
               <xs:element name="EnvPackageDisplay" type="xs:string"/>
               <xs:element name="Description" type="xs:string"/>
               <xs:element name="Example" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-              <xs:element name="TemplateHeader" type="xs:string" minOccurs="0"/>
               <xs:element name="Attribute" minOccurs="0" maxOccurs="unbounded">
                 <xs:complexType>
                   <xs:sequence>
