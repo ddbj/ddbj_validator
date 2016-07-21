@@ -24,7 +24,8 @@ require 'optparse'
 
 ### 設定
 # モード
-$debug = true
+$debug = false
+$long = false
 
 # XML 宣言
 instruction = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -46,6 +47,7 @@ packages_h = Hash.new
 
 attr_a = Array.new
 attrs_defined_a = Array.new
+attr_h = Hash.new
 
 package_a = Array.new
 package_name_a = Array.new
@@ -81,6 +83,8 @@ for sheet in sheet_object
 		when "attribute"
 			
 			attr_a.push(line) if al > 1
+			attr_h.store(line[1], line) if al > 1
+
 			attrs_defined_a.push(line[1]) if al > 1
 
 			al += 1
@@ -355,7 +359,7 @@ Source
 
 4. 必須属性はアルファベット順。
 
-5. 任意属性はアルファベット順。
+5. 任意属性は strain があれば最初、他はアルファベット順。
 
 =end
 
@@ -471,18 +475,188 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 					
 					end # for attrdef in pac_line[2..-1]
 
-					pp pac_full_name
-					pp mandatory_a
-					pp optional_a
-
+					# 空要素を除去
 					either_one_organism_a = either_one_organism_a.reject{|e|
 						e.empty?
 					}
 
-					pp either_one_organism_a
-					pp either_one_age_stage_a
-					pp either_one_host_a
-					pp either_one_source_a
+					# 必須属性に strain がある場合は先頭に移動
+					if mandatory_a.index("strain")					
+						
+						# strain を削除
+						mandatory_a.delete_at(mandatory_a.index("strain"))
+						
+						# strain を先頭に移動
+						mandatory_a.unshift("strain")
+
+					end
+
+					## XML 出力処理
+
+					# 順番1. 共通属性
+					for attribute in common_attr_a
+						
+						attr_array = attr_h[attribute]
+
+						# Attribute 要素出力
+						case attribute
+						
+						when "sample_name"
+							package.Attribute("use" => "mandatory", "group_name" => "Common"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+
+						when "sample_title"
+							package.Attribute("use" => "mandatory", "group_name" => "Common"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+						when "description"
+							package.Attribute("use" => "optional", "group_name" => "Common"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+						when "organism"
+							package.Attribute("use" => "mandatory", "group_name" => "Common"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+						when "taxonomy_id"
+							package.Attribute("use" => "optional", "group_name" => "Common"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+						when "bioproject_accession"
+							package.Attribute("use" => "optional", "group_name" => "Common"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+						end
+
+					end
+
+
+					# 順番2: どれか一つ必須 Organism
+					unless either_one_organism_a.empty?
+	
+						for attribute in either_one_organism_a
+							
+							attr_array = attr_h[attribute]
+
+							# Attribute 要素出力
+							package.Attribute("use" => "either_one_mandatory", "group_name" => "Organism"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+
+
+						end # for attribute in either_one_organism_a
+
+					end # unless either_one_organism_a.empty?
+
+					# 順番3: どれか一つ必須 Organism 以外、アルファベット順
+					group_no = 0
+					for either_one_not_organism_a in [either_one_age_stage_a, either_one_host_a, either_one_source_a]
+					
+						group_name_a = ["Age/stage", "Host", "Source"]
+
+						unless either_one_not_organism_a.empty?
+		
+							for attribute in either_one_not_organism_a
+								
+								attr_array = attr_h[attribute]
+
+								# Attribute 要素出力
+								package.Attribute("use" => "either_one_mandatory", "group_name" => group_name_a[group_no]){|attribute|
+									attribute.HarmonizedName(attr_array[1])
+									attribute.Name(attr_array[0])
+									attribute.Description(attr_array[4]) if $long
+									attribute.DescriptionJa(attr_array[5]) if $long
+									attribute.ShortDescription(attr_array[6])
+									attribute.ShortDescriptionJa(attr_array[7])
+								}
+
+
+							end # for attribute in either_one_organism_a
+
+						end # unless either_one_not_organism_a.empty?
+
+						group_no += 1
+
+					end # for either_one_not_organism_a in [either_one_age_stage_a, either_one_host_a, either_one_source_a]
+
+					# 順番4: 必須属性。strain があれば最初、他はアルファベット順
+					unless mandatory_a.empty?
+						
+						for attribute in mandatory_a
+							
+							attr_array = attr_h[attribute]
+
+							# Attribute 要素出力
+							package.Attribute("use" => "mandatory"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+
+
+						end # for attribute in mandatory_a
+
+					end # unless mandatory_a.empty?
+
+					# 順番5: 任意属性、アルファベット順
+					unless optional_a.empty?
+	
+						for attribute in optional_a
+							
+							attr_array = attr_h[attribute]
+
+							# Attribute 要素出力
+							package.Attribute("use" => "optional"){|attribute|
+								attribute.HarmonizedName(attr_array[1])
+								attribute.Name(attr_array[0])
+								attribute.Description(attr_array[4]) if $long
+								attribute.DescriptionJa(attr_array[5]) if $long
+								attribute.ShortDescription(attr_array[6])
+								attribute.ShortDescriptionJa(attr_array[7])
+							}
+
+
+						end # for attribute in optional_a
+
+					end # unless optional_a.empty?
 
 				end # if pac_full_name == "#{pac_line[0]}.#{pac_line[1]}"
 
@@ -494,3 +668,5 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 
 } # BioSamplePackages
 
+# xsd で検証
+`xmllint --noout --schema ddbj_packages.xsd temp_packages.xml` unless $debug
