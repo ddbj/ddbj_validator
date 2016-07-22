@@ -193,7 +193,7 @@ for packagename, filename, attribute_a in package_a:
 
 		# comment y_scale
 		y_scale_h = {}
-		y_scale_h['y_scale'] = 0.6
+		y_scale_h['y_scale'] = 1.4
 
 		# either_one_mandatory 用の comment 
 		either_one_mandatory_comment = ""
