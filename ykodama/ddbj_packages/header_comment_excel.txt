@@ -1,4 +1,4 @@
-# This is a submission template for batch deposit of #{ShortName of the sample package} samples to the DDBJ BioSample database (http://trace.ddbj.nig.ac.jp/biosample).
+# This is a submission template for batch deposit of 'package_displayname' samples to the DDBJ BioSample database (http://trace.ddbj.nig.ac.jp/biosample).
 # Hover over field name to view definition, or see the attributes page in Japanese: http://trace.ddbj.nig.ac.jp/biosample/attribute.html, or in English: http://trace.ddbj.nig.ac.jp/biosample/attribute_e.html
 # GREEN fields are mandatory. Your submission will fail if any mandatory fields are not completed. If information is unavailable for any mandatory field, please enter 'not collected', 'not applicable' or 'missing' as appropriate.
 # BLUE fields indicate that at least one of those fields is mandatory. If information is unavailable, please enter 'not collected', 'not applicable' or 'missing' as appropriate.
