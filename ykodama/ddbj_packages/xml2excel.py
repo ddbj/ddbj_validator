@@ -28,9 +28,9 @@ for package in root.iter("Package"):
 		harmonizedname = attribute.find("HarmonizedName").text
 		use = attribute.get("use")
 		group_name = attribute.get("group_name")
-		shortdescription = attribute.find("ShortDescription").text
-		shortdescriptionja = attribute.find("ShortDescriptionJa").text
-		attribute_a.append([harmonizedname, use, group_name, shortdescription, shortdescriptionja])
+		description = attribute.find("Description").text
+		descriptionja = attribute.find("DescriptionJa").text
+		attribute_a.append([harmonizedname, use, group_name, description, descriptionja])
 
 	# パッケージ名と属性リストを格納
 	package_a.append([packagename, filename, attribute_a])
@@ -181,7 +181,7 @@ for packagename, filename, attribute_a in package_a:
 		if gname not in groups_uniq_a:
 			groups_uniq_a.append(gname)
 
-	# 必須、どれか一つ必須、任意で色分け。shortdescription をコメントで付ける。
+	# 必須、どれか一つ必須、任意で色分け。description をコメントで付ける。
 	i = 0
 	tsv_a = []
 	for item in attribute_a:
