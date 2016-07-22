@@ -1,7 +1,7 @@
 # This is a submission template for batch deposit of 'MIMS: metagenome/environmental, wastewater; version 4.0' samples to the DDBJ BioSample database (http://trace.ddbj.nig.ac.jp/biosample).
 # The BioSample attributes page in Japanese: http://trace.ddbj.nig.ac.jp/biosample/attribute.html, and in English: http://trace.ddbj.nig.ac.jp/biosample/attribute_e.html
 # Fields with an asterisk (*) are mandatory. Your submission will fail if any mandatory fields are not completed. If information is unavailable for any mandatory field, please enter 'not collected', 'not applicable' or 'missing' as appropriate.
-# All other fields are "at least one of the fields is mandatory" or optional. Leave optional fields empty if no information is available.
+# All other fields are 'at least one of the fields is mandatory' or optional. Leave optional fields empty if no information is available.
 # Do NOT DELETE any of supplied fields.
 # You can add any number of custom fields to fully describe your BioSamples, simply add them to the right of the last field. 
 # CAUTION: Be aware that Excel may automatically apply formatting to your data. In particular, take care with dates, incrementing autofills and special characters like / or -. Doublecheck that your text file is accurate before uploading to BioSample.
