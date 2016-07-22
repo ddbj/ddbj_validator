@@ -25,7 +25,6 @@ require 'optparse'
 ### 設定
 # モード
 $debug = false
-$long = false
 
 # XML 宣言
 instruction = '<?xml version="1.0" encoding="UTF-8"?>'
@@ -221,8 +220,8 @@ xml_attribute_f.puts xml_attribute.BioSampleAttributes{|biosampleattributes|
 
 		    attribute.Description(item[4])
 		    attribute.DescriptionJa(item[5])
-		    attribute.ShortDescription(item[6])
-		    attribute.ShortDescriptionJa(item[7])
+		    #attribute.ShortDescription(item[6])
+		    #attribute.ShortDescriptionJa(item[7])
 			attribute.Format(item[3]) if item[3]
 
 			# synonym 中に "," があるので区切り文字を ";" に変更。2016-07-15 児玉
@@ -504,56 +503,56 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 							package.Attribute("use" => "mandatory", "group_name" => "Common"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 
 						when "sample_title"
 							package.Attribute("use" => "mandatory", "group_name" => "Common"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 						when "description"
 							package.Attribute("use" => "optional", "group_name" => "Common"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 						when "organism"
 							package.Attribute("use" => "mandatory", "group_name" => "Common"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 						when "taxonomy_id"
 							package.Attribute("use" => "optional", "group_name" => "Common"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 						when "bioproject_accession"
 							package.Attribute("use" => "optional", "group_name" => "Common"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 						end
 
@@ -571,10 +570,10 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 							package.Attribute("use" => "either_one_mandatory", "group_name" => "Organism"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 
 
@@ -598,10 +597,10 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 								package.Attribute("use" => "either_one_mandatory", "group_name" => group_name_a[group_no]){|attribute|
 									attribute.HarmonizedName(attr_array[1])
 									attribute.Name(attr_array[0])
-									attribute.Description(attr_array[4]) if $long
-									attribute.DescriptionJa(attr_array[5]) if $long
-									attribute.ShortDescription(attr_array[6])
-									attribute.ShortDescriptionJa(attr_array[7])
+									attribute.Description(attr_array[4])
+									attribute.DescriptionJa(attr_array[5])
+									#attribute.ShortDescription(attr_array[6])
+									#attribute.ShortDescriptionJa(attr_array[7])
 								}
 
 
@@ -624,10 +623,10 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 							package.Attribute("use" => "mandatory"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 
 
@@ -646,10 +645,10 @@ xml_package_f.puts xml_package.BioSamplePackages{|biosamplepackages|
 							package.Attribute("use" => "optional"){|attribute|
 								attribute.HarmonizedName(attr_array[1])
 								attribute.Name(attr_array[0])
-								attribute.Description(attr_array[4]) if $long
-								attribute.DescriptionJa(attr_array[5]) if $long
-								attribute.ShortDescription(attr_array[6])
-								attribute.ShortDescriptionJa(attr_array[7])
+								attribute.Description(attr_array[4])
+								attribute.DescriptionJa(attr_array[5])
+								#attribute.ShortDescription(attr_array[6])
+								#attribute.ShortDescriptionJa(attr_array[7])
 							}
 
 
