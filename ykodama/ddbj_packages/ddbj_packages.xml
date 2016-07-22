@@ -12,7 +12,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -58,7 +58,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -266,7 +266,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -414,7 +414,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -610,7 +610,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -866,7 +866,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -978,7 +978,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -1144,7 +1144,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -1310,7 +1310,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -1518,7 +1518,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -1702,7 +1702,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -1988,7 +1988,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -2274,7 +2274,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -2656,7 +2656,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -3086,7 +3086,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -3420,7 +3420,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -3748,7 +3748,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -4082,7 +4082,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -4458,7 +4458,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -4960,7 +4960,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -5348,7 +5348,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -5802,7 +5802,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -6334,7 +6334,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -6776,7 +6776,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -7128,7 +7128,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -7732,7 +7732,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -7940,7 +7940,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -8310,7 +8310,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -8680,7 +8680,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -9134,7 +9134,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -9642,7 +9642,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -10054,7 +10054,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -10460,7 +10460,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -10872,7 +10872,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -11326,7 +11326,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -11912,7 +11912,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -12384,7 +12384,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -12910,7 +12910,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -13526,7 +13526,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -14052,7 +14052,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -14488,7 +14488,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -15176,7 +15176,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -15402,7 +15402,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -15790,7 +15790,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -16178,7 +16178,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -16650,7 +16650,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -17176,7 +17176,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -17606,7 +17606,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -18030,7 +18030,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -18460,7 +18460,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -18932,7 +18932,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -19536,7 +19536,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -20026,7 +20026,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -20570,7 +20570,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -21204,7 +21204,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -21748,7 +21748,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -22202,7 +22202,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -22908,7 +22908,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -23104,7 +23104,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -23462,7 +23462,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -23820,7 +23820,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -24262,7 +24262,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -24758,7 +24758,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -25158,7 +25158,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -25552,7 +25552,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -25952,7 +25952,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -26394,7 +26394,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -26968,7 +26968,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -27428,7 +27428,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -27942,7 +27942,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -28546,7 +28546,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -29060,7 +29060,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -29484,7 +29484,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -30160,7 +30160,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -30332,7 +30332,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -30666,7 +30666,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -31000,7 +31000,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -31430,7 +31430,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -31908,7 +31908,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -32290,7 +32290,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -32666,7 +32666,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -33048,7 +33048,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -33472,7 +33472,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -34022,7 +34022,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -34458,7 +34458,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -34960,7 +34960,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -35540,7 +35540,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -36030,7 +36030,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -36430,7 +36430,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -37082,7 +37082,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -37362,7 +37362,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -37642,7 +37642,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -38018,7 +38018,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -38442,7 +38442,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -38770,7 +38770,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -39092,7 +39092,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -39420,7 +39420,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -39790,7 +39790,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -40286,7 +40286,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -40668,7 +40668,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -41116,7 +41116,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -41642,7 +41642,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -42078,7 +42078,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -42424,7 +42424,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">
@@ -43022,7 +43022,7 @@
         <Attribute use="mandatory" group_name="Common">
             <HarmonizedName>sample_name</HarmonizedName>
             <Name>sample name</Name>
-            <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+            <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
             <ShortDescriptionJa/>
         </Attribute>
         <Attribute use="mandatory" group_name="Common">

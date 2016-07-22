@@ -8695,7 +8695,7 @@
         <Name>sample name</Name>
         <Description>The sample name is a name that you choose for the sample, it works as an ID.  Each sample name must be unique in samples submitted from a submission account.</Description>
         <DescriptionJa>sample name は登録者がサンプルに付ける名前で ID として機能します。sample name は Submission においてユニークである必要があります。</DescriptionJa>
-        <ShortDescription>Unique name for each sample (used as an ID and cannot be changed)</ShortDescription>
+        <ShortDescription>Unique name for each sample (used as an ID)</ShortDescription>
         <ShortDescriptionJa/>
         <Package use="mandatory" group_name="Common">Common</Package>
     </Attribute>
