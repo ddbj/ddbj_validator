@@ -157,16 +157,16 @@ for packagename, filename, attribute_a in package_a:
 		l += 1
 
 	## tsv、ヘッダーを付加
-	l = 0
+	tl = 0
 	for line in open('header_comment_tsv.txt', 'r'):
 		
 		# パッケージ名で置換
-		if l == 0:
+		if tl == 0:
 			line = line.replace("package_displayname", packagename)
 
 		tsv_f.write(line)
 		
-		l += 1
+		tl += 1
 
 	## 属性を出力
 	# どれか一つ必須で段階的に背景色を変えるための前準備、グループ名を全て取得しておく。
@@ -184,8 +184,11 @@ for packagename, filename, attribute_a in package_a:
 	# 必須、どれか一つ必須、任意で色分け。description をコメントで付ける。
 	i = 0
 	tsv_a = []
+
+	# 属性の出力
 	for item in attribute_a:
 
+		# ヘッダーとの間に空行を挿入するため + 1
 		attrl = l
 
 		# group name
@@ -193,7 +196,7 @@ for packagename, filename, attribute_a in package_a:
 
 		# comment y_scale
 		y_scale_h = {}
-		y_scale_h['y_scale'] = 1.4
+		y_scale_h['y_scale'] = 1.6
 
 		# either_one_mandatory 用の comment 
 		either_one_mandatory_comment = ""
