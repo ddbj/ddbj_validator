@@ -32,5 +32,5 @@
   "tidal_stage": ["", "low", "high"],
   "tillage": ["", "drill", "cutting disc", "ridge till", "strip tillage", "zonal tillage", "chisel", "tined", "mouldboard", "disc plough"],
   "trophic_level": ["", "autotroph", "carboxydotroph", "chemoautotroph", "chemoheterotroph", "chemolithoautotroph", "chemolithotroph", "chemoorganoheterotroph", "chemoorganotroph", "chemosynthetic", "chemotroph", "copiotroph", "diazotroph", "facultative", "heterotroph", "lithoautotroph", "lithoheterotroph", "lithotroph", "methanotroph", "methylotroph", "mixotroph", "obligate", "chemoautolithotroph", "oligotroph", "organoheterotroph", "organotroph", "photoautotroph", "photoheterotroph", "photolithoautotroph", "photolithotroph", "photosynthetic", "phototroph"],
-  "urine_collect_meth": ["", "clean catch", "catheter"]"
+  "urine_collect_meth": ["", "clean catch", "catheter"]
 }
