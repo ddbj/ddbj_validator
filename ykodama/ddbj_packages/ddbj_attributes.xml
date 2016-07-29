@@ -8365,7 +8365,7 @@
         <HarmonizedName>source_material_id</HarmonizedName>
         <Name>source material identifiers</Name>
         <Description>unique identifier assigned to a material sample used for extracting nucleic acids, and subsequent sequencing. The identifier can refer either to the original material collected or to any derived sub-samples.</Description>
-        <DescriptionJa/>
+        <DescriptionJa>核酸抽出とシークエンスに使用された実験材料に対する ID。採取された元々の材料，もしくは，そこから派生したサンプルを参照する ID を記載することができます。</DescriptionJa>
         <Format>{text}</Format>
         <Synonym>source mat id</Synonym>
         <Synonym>source material id</Synonym>
