@@ -781,6 +781,7 @@ class MainValidator
 
   #
   # bioproject_accession のID体系が正しいかの検証
+  # DDBJ管理(PDBJD orf PSUB)の場合にはDBにIDがあるか検証する
   #
   # ==== Args
   # rule_code
@@ -794,8 +795,19 @@ class MainValidator
 
     result = true
     if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-      result = true
+      #DDBJ管理の場合にはDBにIDがあるか検証する
+      if @mode == "private"
+        if bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
+          if @db_validator.get_bioproject_submitter_id(bioproject_accession).nil?
+            result = false
+          end
+        end
+      end
     else
+      result = false
+    end
+
+    if result == false
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "bioproject_accession"},
@@ -803,7 +815,6 @@ class MainValidator
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      result = false
     end
     result
   end

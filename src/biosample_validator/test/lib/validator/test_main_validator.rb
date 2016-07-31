@@ -490,19 +490,29 @@ class TestMainValidator < Minitest::Test
 
   def test_invalid_bioproject_accession
     #ok case
+    ## ncbi
     ret = exec_validator("invalid_bioproject_accession", "5","", "PRJNA1", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ok case
+    ## ddbj
     ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDA10", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ok case
+    ## PRJDB and exist in db
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDB1", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## psub
     ret = exec_validator("invalid_bioproject_accession", "5","", "PSUB004142", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
+    ## invalid format
     ret = exec_validator("invalid_bioproject_accession", "5","", "PDBJA12345", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist in db
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDB0000", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
