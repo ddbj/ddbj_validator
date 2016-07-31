@@ -91,20 +91,37 @@ class MainValidator
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
-      send("non_ascii_header_line", "30", sample_name, biosample_data["attribute_list"], line_num)
-      send("missing_attribute_name", "34", sample_name, biosample_data["attribute_list"], line_num)
-      send("multiple_attribute_values", "61", sample_name, biosample_data["attribute_list"], line_num)
-    end
-    @biosample_list.each_with_index do |biosample_data, idx|
-      line_num = idx + 1
-      sample_name = biosample_data["attributes"]["sample_name"]
       ### 2.auto correct (rule: 12, 13)
-      biosample_data["attributes"].each do |attr_name, value|
-        ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], line_num)
+      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
+        attr_name = attr.keys.first
+        value = attr[attr_name]
+        #attr name
+        ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
+          #attrbutes(hash)の置換
+          biosample_data["attributes"][replaced_attr_name] = biosample_data["attributes"][attr_name]
+          biosample_data["attributes"].delete(attr_name)
+          #attrbute_list(array)の置換
+          biosample_data["attribute_list"][attr_idx] = {replaced_attr_name => value}
+          attr_name = replaced_attr_name
+        end
+        ret = send("invalid_data_format", "13", sample_name, attr_name, value, "attr_name", line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
+          #attrbutes(hash)の置換
+          biosample_data["attributes"][replaced_attr_name] = biosample_data["attributes"][attr_name]
+          biosample_data["attributes"].delete(attr_name)
+          #attrbute_list(array)の置換
+          biosample_data["attribute_list"][attr_idx] = {replaced_attr_name => value}
+          attr_name = replaced_attr_name
+        end
+        #attr value
+        ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = send("invalid_data_format", "13", sample_name, attr_name, value, line_num)
+        ret = send("invalid_data_format", "13", sample_name, attr_name, value, "attr_value", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
@@ -112,9 +129,14 @@ class MainValidator
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ### 3.non-ASCII check (rule: 58)
-        send("non_ascii_attribute_value", "58", sample_name, attr_name, value, line_num)
       end
+    end
+    @biosample_list.each_with_index do |biosample_data, idx|
+      line_num = idx + 1
+      sample_name = biosample_data["attributes"]["sample_name"]
+      send("non_ascii_header_line", "30", sample_name, biosample_data["attribute_list"], line_num)
+      send("missing_attribute_name", "34", sample_name, biosample_data["attribute_list"], line_num)
+      send("multiple_attribute_values", "61", sample_name, biosample_data["attribute_list"], line_num)
     end
 
     ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
@@ -152,17 +174,18 @@ class MainValidator
       ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
       #pending rule 39, 90. These rules can be obtained from BioSample ontology?
       sample_name = biosample_data["attributes"]["sample_name"]
-      biosample_data["attributes"].each do|attribute_name, value|
-        send("invalid_attribute_value_for_controlled_terms", "2", sample_name, attribute_name.to_s, value, @conf[:cv_attr], line_num)
-        ret = send("invalid_publication_identifier", "11", sample_name, attribute_name.to_s, value, @conf[:ref_attr], line_num)
+      biosample_data["attributes"].each do|attr_name, value|
+        send("non_ascii_attribute_value", "58", sample_name, attr_name, value, line_num)
+        send("invalid_attribute_value_for_controlled_terms", "2", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        ret = send("invalid_publication_identifier", "11", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attribute_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = send("invalid_date_format", "7", sample_name, attribute_name.to_s, value, @conf[:ts_attr], line_num)
+        ret = send("invalid_date_format", "7", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attribute_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        send("attribute_value_is_not_integer", "93", sample_name, attribute_name.to_s, value, @conf[:int_attr], line_num)
+        send("attribute_value_is_not_integer", "93", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
         ret = send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["bioproject_accession"] = value = CommonUtils::get_auto_annotation(@error_list.last)
@@ -1443,41 +1466,59 @@ class MainValidator
   # attr_name
   # attr_val
   # special_chars 特殊文字の置換設定のハッシュ { "℃" => "degree Celsius", "μ" => "micrometer", ...}
+  # target 検証対象 "attr_name" or "attr_value"
   # line_num
   # ==== Return
   # true/false
   #
-  def special_character_included (rule_code, sample_name, attr_name, attr_val, special_chars, line_num)
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+  def special_character_included (rule_code, sample_name, attr_name, attr_val, special_chars, target, line_num)
+    if target == "attr_name" #属性名の検証
+      return nil if CommonUtils::blank?(attr_name)
+      replaced = attr_name.dup
+    elsif target == "attr_value" #属性値の検証
+      return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+      replaced = attr_val.dup
+    else
+      return nil
+    end
 
     result  = true
-    replaced_attr_val = attr_val.clone #文字列コピー
     special_chars.each do |target_val, replace_val|
       pos = 0
-      while pos < replaced_attr_val.length
+      while pos < replaced.length
         #再起的に置換してしまうためgsubは使用できない。
         #"microm" => "micrometer"と置換する場合、ユーザ入力値が"micrometer"だった場合には"microm"にマッチするため"micrometereter"になってしまう
-        hit_pos = replaced_attr_val.index(target_val, pos)
+        hit_pos = replaced.index(target_val, pos)
         break if hit_pos.nil?
-        target_str = replaced_attr_val.slice(hit_pos, replace_val.length)
+        target_str = replaced.slice(hit_pos, replace_val.length)
         if target_str == replace_val # "microm"はその後に"micrometer"と続くか。続くなら置換不要(再起置換の防止)
           pos = hit_pos + target_val.length
         else
           #置換(delete & insert)
-          replaced_attr_val.slice!(hit_pos, target_val.length)
-          replaced_attr_val.insert(hit_pos, replace_val)
+          replaced.slice!(hit_pos, target_val.length)
+          replaced.insert(hit_pos, replace_val)
           pos = hit_pos + replace_val.length
         end
       end
     end
-    if replaced_attr_val != attr_val
+    if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute name", value: attr_name}
+      ]
+      location = @xml_convertor.xpath_of_attrname(attr_name, line_num)
+      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      @error_list.push(error_hash)
+      result = false
+    elsif target == "attr_value" && replaced != attr_val #属性値のAuto-annotationが必要
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced_attr_val], "Attribute value", location, true))
+      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
@@ -1531,32 +1572,52 @@ class MainValidator
   #
   # ==== Args
   # rule_code
-  #
+  # sample_name
+  # attr_name
+  # attr_val
+  # target 検証対象 "attr_name" or "attr_value"
   # line_num
   # ==== Return
   # true/false
   #
-  def invalid_data_format (rule_code, sample_name, attr_name, attr_val, line_num)
-    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+  def invalid_data_format (rule_code, sample_name, attr_name, attr_val, target, line_num)
+    if target == "attr_name" #属性名の検証
+      return nil if CommonUtils::blank?(attr_name)
+      replaced = attr_name.dup
+    elsif target == "attr_value" #属性値の検証
+      return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+      replaced = attr_val.dup
+    else
+      return nil
+    end
 
     result = true
-    attr_val_annotated = String.new(attr_val)
-    attr_val_annotated.strip!  #セル内の前後の空白文字を除去
-    attr_val_annotated.gsub!(/\t/, " ") #セル内部のタブを空白1個に
-    attr_val_annotated.gsub!(/\s+/, " ") #二個以上の連続空白を１個に
-    attr_val_annotated.gsub!(/(\r\n|\r|\n)/, " ") #セル内部の改行を空白1個に
+    replaced.strip!  #セル内の前後の空白文字を除去
+    replaced.gsub!(/\t/, " ") #セル内部のタブを空白1個に
+    replaced.gsub!(/\s+/, " ") #二個以上の連続空白を１個に
+    replaced.gsub!(/(\r\n|\r|\n)/, " ") #セル内部の改行を空白1個に
     #セル内の最初と最後が ' or " で囲われていたら削除
-    if (attr_val_annotated =~ /^"/ && attr_val_annotated =~ /"$/) || (attr_val_annotated =~ /^'/ && attr_val_annotated =~ /'$/)
-      attr_val_annotated = attr_val_annotated[1..-2]
+    if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
+      replaced = replaced[1..-2]
     end
-    if attr_val_annotated != attr_val
+    if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute name", value: attr_name}
+      ]
+      location = @xml_convertor.xpath_of_attrname(attr_name, line_num)
+      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      @error_list.push(error_hash)
+      result = false
+    elsif target == "attr_value" && replaced != attr_val #属性値のAuto-annotationが必要
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([attr_val_annotated], "Attribute value", location, true))
+      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
