@@ -104,7 +104,7 @@ class OrganismValidator < SPARQLBase
     result.map do |row|
       row[:tax_no]
     end
-  end 
+  end
 
   #
   # Returns an organism(scientific) name of specified taxonomy_id

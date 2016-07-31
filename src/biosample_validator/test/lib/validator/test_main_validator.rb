@@ -815,40 +815,72 @@ class TestMainValidator < Minitest::Test
 
   def test_special_character_included
     special_chars = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/special_characters.json"))
+    ### attribute name
     # ok case
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 micrometer", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "temperature", "value", special_chars, "attr_name", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 μm", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "temperature(°C)", "value", special_chars, "attr_name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "temperature(degree Celsius)", get_auto_annotation(ret[:error_list])
+    # nil case
+    ret = exec_validator("special_character_included", "12", "SampleA", "", "value", special_chars, "attr_name", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ### attribute value
+    # ok case
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 micrometer", special_chars, "attr_value", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 μm", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1.0 micrometer", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1st: 39 degree Celsius, 2nd: 38 degree Celsius, 3rd: 37 degree Celsius", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "", special_chars, "attr_value", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_invalid_data_format
+    ### attribute name
     # ok case
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "MTB313", 1) 
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "MTB313", "attr_name", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample    comment", "MTB313", "attr_name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "sample comment", get_auto_annotation(ret[:error_list])
+    # nil case
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "", "MTB313", "attr_name", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ### attribute value
+    # ok case
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "MTB313", "attr_value", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     # 前後に空白があり、引用符で囲まれ、タブと改行と繰り返し空白が含まれる文字列
     ng_value = "    \"abc     def		ghi
 jkl\"  "
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, 1)
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", 1)
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", "attr_value", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
