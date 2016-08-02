@@ -109,15 +109,16 @@ class TestMainValidator < Minitest::Test
 
   def test_get_attribute_groups_of_package
     expect_value1 = {
-      :group_name => "Source group attribute in Microbe",
-      :attribute_set => ["host", "isolation_source"]
-    }
-    expect_value2 = {
       :group_name => "Organism group attribute in Microbe",
       :attribute_set => ["isolate", "strain"]
     }
+    expect_value2 = {
+      :group_name => "Source group attribute in Microbe",
+      :attribute_set => ["host", "isolation_source"]
+    }
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Microbe")
     assert_equal 2, attr_group_list.size
+    attr_group_list.sort!{|a, b| a[:group_name] <=> b[:group_name] }
     assert_equal expect_value1, attr_group_list[0]
     assert_equal expect_value2, attr_group_list[1]
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package")
@@ -273,7 +274,8 @@ class TestMainValidator < Minitest::Test
     xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
-    expect_error_msg = "[ host, isolation_source ], [ isolate, strain ]"
+    #expect_error_msg = "[ host, isolation_source ], [ isolate, strain ]"
+    expect_error_msg = "[ isolate, strain ], [ host, isolation_source ]"
     ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
