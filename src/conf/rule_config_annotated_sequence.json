@@ -1,7 +1,7 @@
 {
-  "rule96": {
+  "rule97": {
     "rule_class": "Annotated_sequence",
-    "code": "96",
+    "code": "97",
     "level": "warning",
     "name": "product value validation",
     "method": "product_value_validation",

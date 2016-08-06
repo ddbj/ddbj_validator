@@ -72,7 +72,7 @@ class TestMainValidator < Minitest::Test
   end
 
   #
-  # 指定されたエラーリストのauto-annotationの値を返す
+  # 指定されたエラーリストの最初のauto-annotationの値を返す
   #
   # ==== Args
   # error_list
@@ -545,11 +545,40 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_taxonomy_error_warning
-    #ok case
-    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Homo sapiens", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
+    #このメソッドではokになるケースはない
     #ng case
+    ## exist
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Homo sapiens", 1)
+    expect_taxid_annotation = "9606"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    ## exist but not correct as scientific name
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Anabaena sp. PCC 7120", 1)
+    expect_taxid_annotation = "103690"
+    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
+    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    ## exist but not correct caracter case
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "nostoc sp. pcc 7120", 1)
+    expect_taxid_annotation = "103690"
+    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
+    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    ## multiple exist
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "mouse", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist
     ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -565,7 +594,13 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
+    ##exist tax_id
     ret = exec_validator("taxonomy_name_and_id_not_match", "4", "sampleA", "103690", "Not exist taxonomy name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "Nostoc sp. PCC 7120",  get_auto_annotation(ret[:error_list])
+    ##not exist tax_id
+    ret = exec_validator("taxonomy_name_and_id_not_match", "4", "sampleA", "-1", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
@@ -594,18 +629,18 @@ class TestMainValidator < Minitest::Test
 
   def test_package_versus_organism
     #ok case
-    ret = exec_validator("package_versus_organism", "48", "SampleA", "103690", "MIGS.ba.microbial", 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", "103690", "MIGS.ba.microbial", "Nostoc sp. PCC 7120", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", "MIGS.ba.microbial", 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", "MIGS.ba.microbial", "Homo sapiens", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    ret = exec_validator("package_versus_organism", "48", "SampleA", nil, "MIGS.ba.microbial", 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", nil, "MIGS.ba.microbial", "", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", nil, 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", nil, "Homo sapiens", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -613,32 +648,32 @@ class TestMainValidator < Minitest::Test
   def test_sex_for_bacteria
     #ok case
     ##human
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "9606", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "9606", "male", "Homo sapiens", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     ##bacteria
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", "male", "Nostoc sp. PCC 7120", 1)
     expect_msg = "bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
     ##viral
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "510903", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "510903", "male", "Hepatitis delta virus dFr2210", 1)
     expect_msg = "bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
     #fungi
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "1445577", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "1445577", "male", "Colletotrichum fioriniae PJ7", 1)
     expect_msg = "fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
 
     #params are nil pattern
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", nil, 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", nil, "Nostoc sp. PCC 7120", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -1128,5 +1163,30 @@ jkl\"  "
     ret = exec_validator("warning_about_bioproject_increment", "69", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
+  end
+
+  def test_taxonomy_at_species_or_infraspecific_rank
+    # ok case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "562", "Escherichia coli", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##Subspecies rank (not has Species rank)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "1416348", "Telinga mara", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "561", "Escherichia", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "-1", "not exist taxon", 1 )
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "", "Escherichia coli", 1 )
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
   end
 end

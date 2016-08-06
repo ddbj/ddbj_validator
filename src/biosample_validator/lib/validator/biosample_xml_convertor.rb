@@ -52,7 +52,6 @@ class BioSampleXmlConvertor
   # attribute_listは属性名が重複している可能性があるリスト(属性名重複チェック(34.Multiple Attribute values)で仕様される)
   #
   def xml2obj(xml_document)
-    #TODO xml parse error
     begin
       doc = REXML::Document.new(xml_document)
     rescue => ex

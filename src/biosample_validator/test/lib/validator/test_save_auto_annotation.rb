@@ -104,6 +104,32 @@ class TestSaveAutoAnnotation < Minitest::Test
     assert_equal "37.4435 N 6.254 W", annotation[:value]
   end
 
+  #
+  # 45(taxonomy_error_warning)のauto annotationの保存が効いているかの検証
+  # taxonomy_idの値が無かった場合の確認
+  def test_save_annotation_45
+    #"escherichia"からtaxonomy_idの値が"561"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
+    biosample_set = @validator.validate("../../data/save_auto_annotation_value_45.xml")
+    error_list = @validator.instance_variable_get (:@error_list)
+    error =  error_list.find {|error| error[:id] == "96"}
+    annotation = error[:annotation].find {|anno| anno[:key] == "taxonomy_id" }
+    assert_equal "561", annotation[:value] #taxonomy_idが追加されている
+    annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
+    assert_equal "Escherichia", annotation[:value] #organism name が"escherichia" => "Escherichia"に補正されている
+  end
+
+  #
+  # 4(taxonomy_error_warning)のauto annotationの保存が効いているかの検証
+  # taxonomy_idとorganismに整合性がなく、organismが自動補正されるケース
+  def test_save_annotation_4
+    #tax_id:561によって"eschericha coli"=>"Escherichia"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
+    biosample_set = @validator.validate("../../data/save_auto_annotation_value_4.xml")
+    error_list = @validator.instance_variable_get (:@error_list)
+    error =  error_list.find {|error| error[:id] == "96"}
+    annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
+    assert_equal "Escherichia", annotation[:value] #organism name が"escherichia coli" => "Escherichia"に補正されている
+  end
+
 =begin
   #
   # 11(invalid_publication_identifier)のauto annotationの保存が効いているかの検証

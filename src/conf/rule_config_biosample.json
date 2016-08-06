@@ -393,7 +393,7 @@
     "level": "error",
     "name": "package_vs_organism > Pathogen: clinical or host-associated",
     "method": "package_vs_organism___pathogen:_clinical_or_host_associated",
-    "message": "Must have lineage Bacteria, Viruses or Fungi, to species-level",
+    "message": "Must have lineage Bacteria, Viruses or Fungi",
     "reference": [
       "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
     ]
@@ -404,7 +404,7 @@
     "level": "error",
     "name": "package_vs_organism > Pathogen: environmental/food/other",
     "method": "package_vs_organism___pathogen:_environmental_food_other",
-    "message": "Must have lineage Bacteria, Viruses or Fungi, to species-level",
+    "message": "Must have lineage Bacteria, Viruses or Fungi",
     "reference": [
       "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
     ]
@@ -602,9 +602,20 @@
     "level": "warning",
     "name": "BioProject submission id replacement",
     "method": "bioproject_submission_id_replacement",
-    "message": "BioProject submission id (PSUBxxxxxx) is replaced to PRJD accession number.",
+    "message": "BioProject submission id (PSUBxxxxxx) is replaced to the PRJD accession number if available.",
     "reference": [
       "http://trace.ddbj.nig.ac.jp/biosample/attribute_e.html?all=all#bioproject_id"
+    ]
+  },
+  "rule96": {
+    "rule_class": "BioSample",
+    "code": "96",
+    "level": "error",
+    "name": "Taxonomy at species or infraspecific rank",
+    "method": "taxonomy_at_species_or_infraspecific_rank",
+    "message": "Taxonomy should be species or infraspecific level.",
+    "reference": [
+      "http://www.ddbj.nig.ac.jp/sub/ref8-j.html"
     ]
   }
 }

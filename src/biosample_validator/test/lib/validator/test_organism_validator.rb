@@ -4,7 +4,8 @@ require '../../../lib/validator/organism_validator.rb'
 
 class TestOrganismValidator < Minitest::Test
   def setup
-    @validator = OrganismValidator.new("http://staging-genome.annotation.jp/sparql") #TODO config
+    conf = JSON.parse(File.read("../../../conf/sparql_config.json"))
+    @validator = OrganismValidator.new(conf["endpoint"])
   end
 
   def test_get_organism_name
@@ -17,12 +18,104 @@ class TestOrganismValidator < Minitest::Test
     assert_equal false, @validator.exist_organism_name?("Not Home sapiens")
   end
 
-  def test_match_taxid_vs_organism
-    assert_equal true, @validator.match_taxid_vs_organism?("9606", "Homo sapiens")
-    assert_equal false, @validator.match_taxid_vs_organism?("9606", "Not Home sapiens")
-    assert_equal false, @validator.match_taxid_vs_organism?("2", "Homo sapiens")
-    assert_equal false, @validator.match_taxid_vs_organism?("11111111111111", "Not exist tax_id")
+  def test_search_tax_from_name_ignore_case
+    ret = @validator.search_tax_from_name_ignore_case("bacteria")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("mouse")
+    assert_equal true, ret.size > 0
+    #記号が含まれていても検索できるかのテスト ' , . [ ] ( ) - & / : _  + ; * = # % ? ^ { } < >  ` ~ "
+    ret = @validator.search_tax_from_name_ignore_case("escherichia coli 'BL21-Gold(DE3)pLysS AG'")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("oxybaphus L'Her. ex Willd., 1797")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Chloroidium nadson, 1906")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("sicyoeae schrad., 1838")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("atcc 6260 [[Candida guilliermondii]]")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Verticillium lateritium (Ehrenb.) Rabenh.")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("drechslera tritici-repentis")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("strigomonas Lwoff & Lwoff1931")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("barnadesioideae (D.Don) Bremer & Jansen, 1992")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Escherichia/shigella fergusonii")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Pyropia j. Agardh 1899: 149-53")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Fusarium SP. FSSC_16b")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("low g+c Gram-positive bacteria")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("papaya leaf curl virus [vinca;Lahore]")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("retroviral vector pCX4gfp*")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Achillea micrantha Willd. (=achillea biebersteinii Afan.)")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Cloning vector pALTER#-max")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Bacterium 'A1-UMH 8% pond'")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Influenza A virus (A/common teal/Chany/N2/02(H3/n?))")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("halorubrum sp. 11-10^6")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("P-element Cloning system vector pP{CaSpeR4-lo-}")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("transposon vector EPICENTRE EZ-Tn5 <oriV/KAN-2>")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Mimetes cucullatus (L.) R.Br. << mimetes cucullata")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("Blue fox parvovirus isolate tai`an")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case("kalmanozyma brasiliensis (J.V.C. Oliveira, T.A. Borges, R.A.C. Santos, L.F.D. Freitas, C.A. Rosa, G.H. Goldman & D.M. Ria~no- Pach on) Q.M. Wang, F.Y. Bai, Begerow & Boekhout, 2015")
+    assert_equal true, ret.size > 0
+    ret = @validator.search_tax_from_name_ignore_case('Heros "common"')
+    assert_equal true, ret.size > 0
+    # not exist name
+    ret = @validator.search_tax_from_name_ignore_case('not exist organism name')
+    assert_equal true, ret.size == 0
   end
+
+  def test_suggest_taxid_from_name
+    #no exist
+    expect_value = {status: "no exist", tax_id: "-1"}
+    ret = @validator.suggest_taxid_from_name("not exist name")
+    assert_equal expect_value, ret
+    #exist one tax
+    expect_value = {status: "exist", tax_id: "562", scientific_name: "Escherichia coli"}
+    ret = @validator.suggest_taxid_from_name("escherichia coli")
+    assert_equal expect_value, ret
+    #exist one tax(unpublished tax)
+    expect_value = {status: "no exist", tax_id: "-1"}
+    ret = @validator.suggest_taxid_from_name("Actinomyces polynesiensis")
+    assert_equal expect_value, ret
+    #multiple
+    expect_value = {status: "multiple exist", tax_id: "10088, 10090"}
+    ret = @validator.suggest_taxid_from_name("mouse")
+    assert_equal expect_value, ret
+  end
+=begin
+#exist one tax(unpublished tax)のテスト値は流動性があるため、以下のクエリでテスト可能なorganism_nameを調べる
+DEFINE sql:select-option "order"
+PREFIX id-tax: <http://identifiers.org/taxonomy/>
+PREFIX tax: <http://ddbj.nig.ac.jp/ontologies/taxonomy/>
+
+SELECT DISTINCT ?name
+FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy>
+WHERE
+{
+  VALUES ?name_prop { tax:scientificName  tax:synonym tax:genbankSynonym tax:equivalentName
+                      tax:authority tax:commonName tax:genbankCommonName tax:anamorph
+                      tax:genbankAnamorph tax:teleomorph tax:unpublishedName}
+    id-tax:1274375 tax:unpublishedName ?name .
+    MINUS {?tax_id tax:unpublishedName ?name FILTER (! ?tax_id = id-tax:1274375)}
+} ORDER BY ?namein
+=end
 
   def test_organism_name_of_synonym
     org_name_list = @validator.organism_name_of_synonym("Anabaena sp. 7120")
@@ -45,9 +138,11 @@ class TestOrganismValidator < Minitest::Test
     assert_equal false, @validator.has_linage("9606", ["2"])
   end
 
-  def test_is_deeper_tax_rank
-    assert_equal true, @validator.is_deeper_tax_rank("1148", "Species")
-    assert_equal false, @validator.is_deeper_tax_rank("1142", "Species") #1142 is genus level
+  def test_is_infraspecific_rank
+    assert_equal true, @validator.is_infraspecific_rank("1148") #species rank
+    assert_equal true, @validator.is_infraspecific_rank("1111708") #no rank, has species rank
+    assert_equal true, @validator.is_infraspecific_rank("1416348") #subspecies rank, has not species rank
+    assert_equal false, @validator.is_infraspecific_rank("1142") #genus rank
   end
 
   def test_org_vs_packagea_74
@@ -59,8 +154,6 @@ class TestOrganismValidator < Minitest::Test
     assert_equal "ok", ret[:status]
     ret = @validator.org_vs_package_validate("109903", "Pathogen.cl") #fungi
     assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1117", "Pathogen.cl") #phylum rank
-    assert_equal "error", ret[:status]
     ret = @validator.org_vs_package_validate("1406378", "Pathogen.cl") #archaea
     assert_equal "error", ret[:status]
     ret = @validator.org_vs_package_validate("10228", "Pathogen.cl") #metazoa linage
@@ -76,8 +169,6 @@ class TestOrganismValidator < Minitest::Test
     assert_equal "ok", ret[:status]
     ret = @validator.org_vs_package_validate("109903", "Pathogen.env") #fungi
     assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1117", "Pathogen.env") #phylum rank
-    assert_equal "error", ret[:status]
     ret = @validator.org_vs_package_validate("1406378", "Pathogen.env") #archaea
     assert_equal "error", ret[:status]
     ret = @validator.org_vs_package_validate("10228", "Pathogen.env") #metazoa

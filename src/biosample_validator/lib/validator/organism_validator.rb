@@ -53,24 +53,6 @@ class OrganismValidator < SPARQLBase
   end
 
   #
-  # Returns true if the tax_id and organism_name specified are correct set in taxonomy onotology.
-  #
-  # ==== Args
-  # tax_id ex."9606"
-  # organism_name ex."Homo sapiens"
-  #
-  # ==== Return
-  # true/false
-  #
-  def match_taxid_vs_organism? (tax_id, organism_name)
-    if get_organism_name(tax_id) == organism_name
-       true
-    else
-       false
-    end   
-  end
-
-  #
   # Returns organism(scientific) names if the organisms that has the synonym specified are exist.
   #
   # ==== Args
@@ -127,6 +109,72 @@ class OrganismValidator < SPARQLBase
   end
 
   #
+  # 大文字小文字を区別せずorganism_nameでTaxonomyオントロジーを検索し、tax_no, 生物名、名前の種類("scientific name", "common name"etc)の配列を返す
+  # 何もヒットしなければ空の配列を返す
+  #
+  # ==== Args
+  # organism_name ex. "mouse"
+  # ==== Return
+  # returns list of taxonomy info
+  # [
+  #  {:tax_no=>"10088", :organism_name=>"mouse", :name_type=>"common name", tax_type=>"taxon"},
+  #  {:tax_no=>"10090", :organism_name=>"mouse", :name_type=>"common name", tax_type=>"taxon"}
+  # ]
+  # *tax_type: "taxon" or "dummy taxon"
+  #
+  def search_tax_from_name_ignore_case(organism_name)
+    #特殊文字のエスケープ https://www.w3.org/TR/sparql11-query/#grammarEscapes
+    organism_name = organism_name.gsub("\t", '\\t').gsub("\n", '\\n').gsub("\r", '\\r').gsub("\b", '\\b').gsub("\f", '\\f')
+    organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub("\"", "")
+    organism_name = organism_name.gsub("'", "\\\\'").gsub("\"", "\\\\\\\\\\\"")
+    params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search }
+    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/search_taxid_from_fuzzy_name.rq", params)
+    result = query(sparql_query)
+  end
+
+  #
+  # organism_nameから提案されるtax_idを返す
+  #
+  # ==== Args
+  # organism_name ex. "escherichia coli"
+  # ==== Return
+  # 該当するtax_idがない場合
+  # {status: "no exist", tax_id: "-1"}
+  # 該当するtax_idが一つある場合
+  # {status: "exist", tax_id: "562", scientific_name: "Escherichia coli"}
+  # 該当するtax_idが複数ある場合(複数のtax_idはカンマで連結)
+  # {status: "multiple exist", tax_id: "NNN,NNN"}
+  #
+  def suggest_taxid_from_name(organism_name)
+    tax_list = search_tax_from_name_ignore_case(organism_name)
+    ret = {}
+    #該当するtax_idがない
+    if tax_list.size == 0
+      ret[:status] = "no exist"
+      ret [:tax_id] = "-1"
+      return ret
+    end
+    #synonymやcommon nameが同一の場合は同じtaxで複数候補がヒットするためグループ化
+    grouped_list = tax_list.group_by {|row| row[:tax_no]}
+    if grouped_list.size == 1 #候補のtax_id がひとつだけ
+      tax_id = grouped_list.keys.first
+      #候補がdummyデータだった場合、そのtaxonomyは使用できない
+      if grouped_list[tax_id].first[:tax_type] == "dummy taxon"
+        ret[:status] = "no exist"
+        ret[:tax_id] = "-1"
+      else
+        ret[:status] = "exist"
+        ret[:tax_id] = tax_id
+        ret[:scientific_name] = grouped_list[tax_id].first[:scientific_name]
+      end
+    else ##候補が二つある
+      ret[:status] = "multiple exist"
+      ret[:tax_id] = grouped_list.keys.join(", ")
+    end
+    ret
+  end
+
+  #
   # Returns true if the specified tax_id has the lineages specified
   #
   # ==== Args
@@ -146,18 +194,40 @@ class OrganismValidator < SPARQLBase
   end
 
   #
-  # 指定したtax_idの分類のランクが指定したrankと同じか深ければtrueを返す
+  # 指定されたtax_idがplastidを持つ生物として知られていればtrueを返す
+  #
+  # ==== Args
+  # tax_id: target_tax_id ex. "132459"
+  #
+  # ==== Return
+  # returns true if tax_id has plastid flag(has geneticCodePt 4 or 11)
+  #
+  def has_plastids(tax_id)
+    params = {tax_id: tax_id}
+    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_plastid.rq", params)
+    result = query(sparql_query)
+    return result.size > 0
+  end
+
+  #
+  # 指定したtax_idの分類のランクがSpecies以下ならばtrueを返す
   #
   # ==== Args
   # tax_id: target_tax_id ex. "1148"
-  # rank: NCBI taxonomy rank ex. "Species"
   # ==== Return
   # true/false
   #
-  def is_deeper_tax_rank (tax_id, rank)
-    params = {tax_id: tax_id, rank: rank}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_parent_rank.rq", params)
-    result = query(sparql_query)
+  def is_infraspecific_rank (tax_id)
+    infraspecific_rank = ["Species", "Subspecies", "Varietas", "Forma"]
+    params = {tax_id: tax_id}
+    #いずれかのランク以下であるかを検証
+    result = []
+    infraspecific_rank.each do |rank|
+      params[:rank] = rank
+      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_parent_rank.rq", params)
+      result = query(sparql_query)
+      break if result.size > 0
+    end
     return result.size > 0
   end
 
@@ -179,19 +249,11 @@ class OrganismValidator < SPARQLBase
     if package_name == "Pathogen.cl" #rule 74
       rule_id = "74"
       linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
-      has_linage = has_linage(tax_id, linages)
-      is_species = is_deeper_tax_rank(tax_id, "Species")
-      unless (has_linage && is_species)
-        result = false
-      end
+      result = has_linage(tax_id, linages)
     elsif package_name == "Pathogen.env" #rule 75
       rule_id = "75"
       linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
-      has_linage = has_linage(tax_id, linages)
-      is_species = is_deeper_tax_rank(tax_id, "Species")
-      unless (has_linage && is_species)
-        result = false
-      end
+      result = has_linage(tax_id, linages)
     elsif package_name == "Microbe" #rule 76
       rule_id = "76"
       prokaryota_linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_VIROIDS]
@@ -226,6 +288,10 @@ class OrganismValidator < SPARQLBase
     elsif package_name == "Plant" #rule 81
       rule_id = "81"
       linages = [TAX_VIRIDIPLANTAE]
+      has_plastids = has_plastids(tax_id)
+      unless (linages && has_plastids)
+        result = false
+      end
       result = has_linage(tax_id, linages)
     elsif package_name == "Virus" #rule 82
       rule_id = "82"
