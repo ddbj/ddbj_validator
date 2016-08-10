@@ -1119,7 +1119,7 @@ class MainValidator
       true
     else
       if latlon_country_name.nil?
-        message = "Geographic location is not retrieved by geocoding 'latitude and longitude'."
+        message = "Geographic location is not retrieved by geocoding '#{lat_lon}'."
       else
         message = "Lat_lon '#{lat_lon}' maps to '#{common.country_name_google2insdc(latlon_country_name)}' instead of '#{country_name}'"
       end
@@ -1477,42 +1477,42 @@ class MainValidator
           end
         end
       end
-    end
 
-    # 範囲の大小が逆であれば入れ替える
-    @conf[:ddbj_date_format].each do |format|
-      regex = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #行末行頭の^と$を除去して"/"で連結
-      parse_format = format["parse_format"]
-      if attr_val =~ regex
-        range_start =  Regexp.last_match[:start]
-        range_end =  Regexp.last_match[:end]
-        if DateTime.strptime(range_start, parse_format) <= DateTime.strptime(range_end, parse_format)
-          attr_val = Regexp.last_match[:start] + "/" +  Regexp.last_match[:end]
-        else
-          attr_val = Regexp.last_match[:end] + "/" +  Regexp.last_match[:start]
+      # 範囲の大小が逆であれば入れ替える
+      @conf[:ddbj_date_format].each do |format|
+        regex = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #行末行頭の^と$を除去して"/"で連結
+        parse_format = format["parse_format"]
+        if attr_val =~ regex
+          range_start =  Regexp.last_match[:start]
+          range_end =  Regexp.last_match[:end]
+          if DateTime.strptime(range_start, parse_format) <= DateTime.strptime(range_end, parse_format)
+            attr_val = Regexp.last_match[:start] + "/" +  Regexp.last_match[:end]
+          else
+            attr_val = Regexp.last_match[:end] + "/" +  Regexp.last_match[:start]
+          end
         end
       end
-    end
 
-    # (補正後の)値がDDBJフォーマットであるか
-    common = CommonUtils.new
-    is_ddbj_format = common.ddbj_date_format?(attr_val)
+      # (補正後の)値がDDBJフォーマットであるか
+      common = CommonUtils.new
+      is_ddbj_format = common.ddbj_date_format?(attr_val)
 
-    if !is_ddbj_format || attr_val_org != attr_val
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val_org}
-      ]
-      if attr_val_org != attr_val #replace_candidate
-        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+      if !is_ddbj_format || attr_val_org != attr_val
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: attr_name},
+          {key: "Attribute value", value: attr_val_org}
+        ]
+        if attr_val_org != attr_val #replace_candidate
+          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+          annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+        else
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+        end
+        @error_list.push(error_hash)
+        result = false
       end
-      @error_list.push(error_hash)
-      result = false
     end
     result
   end

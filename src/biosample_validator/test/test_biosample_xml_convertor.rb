@@ -4,7 +4,13 @@ require 'minitest/autorun'
 require '../lib/validator/main_validator.rb'
 
 class TestBiosampleValidator < Minitest::Test
-  
+  PRIVETE_MODE = "private"
+  PUBLIC_MODE = "public"
+
+  def setup
+    @mode = PRIVETE_MODE
+  end
+
   def test_ok
     base_dir = File.dirname(__FILE__)
     input_file = File.absolute_path(base_dir + "/data/SSUB000019_ok.xml")
@@ -13,10 +19,10 @@ class TestBiosampleValidator < Minitest::Test
     validator = base_dir + "/../biosample_validator.rb"
  
     system("rm #{output_file}")
-    system("ruby #{validator} #{input_file} xml #{output_file} public")
+    system("ruby #{validator} #{input_file} xml #{output_file} #{@mode}")
 
     result = JSON.parse(File.read(output_file))
-    assert_equal result["status"], "success"
+    assert_equal  "success", result["status"]
   end
 
   def test_ng
@@ -27,10 +33,10 @@ class TestBiosampleValidator < Minitest::Test
     validator = base_dir + "/../biosample_validator.rb"
  
     system("rm #{output_file}")
-    system("ruby #{validator} #{input_file} xml #{output_file} public")
+    system("ruby #{validator} #{input_file} xml #{output_file} #{@mode}")
 
     result = JSON.parse(File.read(output_file))
-    assert_equal result["status"], "fail"
+    assert_equal "fail", result["status"]
   end
 
   def test_error_xml_schema
@@ -41,9 +47,9 @@ class TestBiosampleValidator < Minitest::Test
     validator = base_dir + "/../biosample_validator.rb"
  
     system("rm #{output_file}")
-    system("ruby #{validator} #{input_file} xml #{output_file} public")
+    system("ruby #{validator} #{input_file} xml #{output_file} #{@mode}")
 
     result = JSON.parse(File.read(output_file))
-    assert_equal result["status"], "error"
+    assert_equal "error", result["status"]
   end
 end
