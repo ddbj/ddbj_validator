@@ -90,17 +90,17 @@ class MainValidator
     @data_file = File::basename(data_xml)
     xml_document = File.read(data_xml)
     @biosample_list = @xml_convertor.xml2obj(xml_document)
-    ### 1.file format and attribute names (rule: 29, 30, 34, 61)
 
+    ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 12, 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
-      ### 2.auto correct (rule: 12, 13)
       biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
         attr_name = attr.keys.first
         value = attr[attr_name]
+
         #attr name
-        ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
+        ret = special_character_included("12", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
           #attrbutes(hash)の置換
@@ -110,7 +110,7 @@ class MainValidator
           biosample_data["attribute_list"][attr_idx] = {replaced_attr_name => value}
           attr_name = replaced_attr_name
         end
-        ret = send("invalid_data_format", "13", sample_name, attr_name, value, "attr_name", line_num)
+        ret = invalid_data_format("13", sample_name, attr_name, value, "attr_name", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
           #attrbutes(hash)の置換
@@ -120,85 +120,88 @@ class MainValidator
           biosample_data["attribute_list"][attr_idx] = {replaced_attr_name => value}
           attr_name = replaced_attr_name
         end
+
         #attr value
-        ret = send("special_character_included", "12", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
+        ret = special_character_included("12", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = send("invalid_data_format", "13", sample_name, attr_name, value, "attr_value", line_num)
+        ret = invalid_data_format("13", sample_name, attr_name, value, "attr_value", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = send("invalid_attribute_value_for_null", "1", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
+        ret = invalid_attribute_value_for_null("1", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
       end
     end
+
+    ### データスキーマに関連する検証
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
-      send("non_ascii_header_line", "30", sample_name, biosample_data["attribute_list"], line_num)
-      send("missing_attribute_name", "34", sample_name, biosample_data["attribute_list"], line_num)
-      send("multiple_attribute_values", "61", sample_name, biosample_data["attribute_list"], line_num)
+      non_ascii_header_line("30", sample_name, biosample_data["attribute_list"], line_num)
+      missing_attribute_name("34", sample_name, biosample_data["attribute_list"], line_num)
+      multiple_attribute_values("61", sample_name, biosample_data["attribute_list"], line_num)
     end
 
-    ### 4.multiple samples & account data check (rule: 3,  6, 24, 28, 69)
-    send("identical_attributes", "24", @biosample_list)
+    ### 複数のサンプル間の関係(一意性など)の検証
+    identical_attributes("24", @biosample_list)
+    warning_about_bioproject_increment("69", @biosample_list)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
-      send("duplicated_sample_title_in_this_submission", "3", sample_name, sample_title, @biosample_list, line_num)
-      send("duplicate_sample_names", "28", sample_name, sample_title, @biosample_list, biosample_data["submission_id"], line_num)
+      duplicated_sample_title_in_this_submission("3", sample_name, sample_title, @biosample_list, line_num)
+      duplicate_sample_names("28", sample_name, sample_title, @biosample_list, biosample_data["submission_id"], line_num)
     end
-    send("warning_about_bioproject_increment", "69", @biosample_list)
 
+    ### それ以外
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
 
-      ### 5.package check (rule: 26)
-      send("missing_package_information", "25", sample_name, biosample_data, line_num)
-      send("unknown_package", "26", sample_name, biosample_data["package"], line_num)
+      ### パッケージの関する検証
+      missing_package_information("25", sample_name, biosample_data, line_num)
+      unknown_package("26", sample_name, biosample_data["package"], line_num)
 
-      send("missing_sample_name", "18", sample_name, biosample_data, line_num)
-      send("missing_organism", "20", sample_name, biosample_data, line_num)
+      ### 重要属性の欠損検証
+      missing_sample_name("18", sample_name, biosample_data, line_num)
+      missing_organism("20", sample_name, biosample_data, line_num)
 
-      #get mandatory attribute from sparql
+      ### 属性名や必須項目に関する検証
+      # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
       attr_group_list = get_attribute_groups_of_package(biosample_data["package"])
+      not_predefined_attribute_name("14", sample_name, biosample_data["attributes"], attr_list , line_num)
+      missing_mandatory_attribute("27", sample_name, biosample_data["attributes"], attr_list , line_num)
+      missing_group_of_at_least_one_required_attributes("36", sample_name, biosample_data["attributes"], attr_group_list, line_num)
+      missing_required_attribute_name("92", sample_name, biosample_data["attributes"], attr_list , line_num)
 
-      ### 6.check all attributes (rule: 14, 27,36, 92)
-      send("not_predefined_attribute_name", "14", sample_name, biosample_data["attributes"], attr_list , line_num)
-      send("missing_mandatory_attribute", "27", sample_name, biosample_data["attributes"], attr_list , line_num)
-      send("missing_group_of_at_least_one_required_attributes", "36", sample_name, biosample_data["attributes"], attr_group_list, line_num)
-      send("missing_required_attribute_name", "92", sample_name, biosample_data["attributes"], attr_list , line_num)
-
-      ### 7.check individual attributes (rule 2, 5, 7, 8, 9, 11, 15, 31, 39, 40, 45, 70, 90, 91, 94)
-      #pending rule 39, 90. These rules can be obtained from BioSample ontology?
-      sample_name = biosample_data["attributes"]["sample_name"]
+      ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
-        send("non_ascii_attribute_value", "58", sample_name, attr_name, value, line_num)
-        send("invalid_attribute_value_for_controlled_terms", "2", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
-        ret = send("invalid_publication_identifier", "11", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
+        non_ascii_attribute_value("58", sample_name, attr_name, value, line_num)
+        invalid_attribute_value_for_controlled_terms("2", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        ret = invalid_publication_identifier("11", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = send("invalid_date_format", "7", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        ret = invalid_date_format("7", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        send("attribute_value_is_not_integer", "93", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
-        ret = send("bioproject_submission_id_replacement", "95", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+        attribute_value_is_not_integer("93", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
+        ret = bioproject_submission_id_replacement("95", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["bioproject_accession"] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
       end
-      #taxonomy_idを検索して確定させる
+
+      ### organismの検証とtaxonomy_idの確定
       taxonomy_id = OrganismValidator::TAX_ROOT
       if biosample_data["attributes"]["taxonomy_id"].nil? || biosample_data["attributes"]["taxonomy_id"].strip == "" #taxonomy_id記述なし
-        ret = send("taxonomy_error_warning", "45", sample_name, biosample_data["attributes"]["organism"], line_num)
+        ret = taxonomy_error_warning("45", sample_name, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
           taxid_annotation = @error_list.last[:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
           unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
@@ -211,38 +214,42 @@ class MainValidator
         end
       else #taxonomy_id記述あり
         taxonomy_id = biosample_data["attributes"]["taxonomy_id"]
-        ret = send("taxonomy_name_and_id_not_match", "4", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+        ret = taxonomy_name_and_id_not_match("4", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["organism"] = CommonUtils::get_auto_annotation(@error_list.last)
         else ret == false #auto annotationできないエラーであればtax_idが不正な可能性がある
           taxonomy_id = OrganismValidator::TAX_ROOT
         end
       end
-      send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
-      send("bioproject_not_found", "6", sample_name,  biosample_data["attributes"]["bioproject_accession"], biosample_data["submitter_id"], line_num)
-      send("invalid_bioproject_type", "70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
-      send("duplicated_locus_tag_prefix", "91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, biosample_data["submission_id"], line_num)
-      ret = send("format_of_geo_loc_name_is_invalid", "94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
+
+      ### 特定の属性値に対する検証
+      invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+      bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_accession"], biosample_data["submitter_id"], line_num)
+      invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+      duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, biosample_data["submission_id"], line_num)
+      ret = format_of_geo_loc_name_is_invalid("94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
 
-      send("invalid_country", "8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      ret = send("invalid_lat_lon_format", "9", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
+      invalid_country("8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
+      ret = invalid_lat_lon_format("9", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
-      send("invalid_host_organism_name", "15", sample_name, biosample_data["attributes"]["host"], line_num)
-      send("future_collection_date", "40", sample_name, biosample_data["attributes"]["collection_date"], line_num)
+      invalid_host_organism_name("15", sample_name, biosample_data["attributes"]["host"], line_num)
+      future_collection_date("40", sample_name, biosample_data["attributes"]["collection_date"], line_num)
 
-      ### 8.multiple attr check(rule 4, 46, 48(74-89), 59, 62, 73)
-      send("latlon_versus_country", "41", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
-      send("multiple_vouchers", "62", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
-      send("redundant_taxonomy_attributes", "73", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
-      if taxonomy_id != OrganismValidator::TAX_ROOT
-        send("package_versus_organism", "48", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
-        send("sex_for_bacteria", "59", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
-        send("taxonomy_at_species_or_infraspecific_rank", "96", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+      ### 複数属性の組合せの検証
+      latlon_versus_country("41", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
+      multiple_vouchers("62", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
+      redundant_taxonomy_attributes("73", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
+
+      ### taxonomy_idの値を使う検証
+      if taxonomy_id != OrganismValidator::TAX_ROOT #無効なtax_idでなければ実行
+        package_versus_organism("48", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
+        sex_for_bacteria("59", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
+        taxonomy_at_species_or_infraspecific_rank("96", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
       end
     end
   end

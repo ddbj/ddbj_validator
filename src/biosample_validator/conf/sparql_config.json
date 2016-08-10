@@ -1,4 +1,4 @@
 {
-  "endpoint": "http://staging-genome.annotation.jp/sparql",
+  "endpoint": "http://localhost:8890/sparql",
   "query_file_dir": ""
 }
