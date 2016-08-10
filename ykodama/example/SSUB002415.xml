@@ -132,7 +132,7 @@
       <Attribute attribute_name="teleomorph">N. A.</Attribute>
       <Attribute attribute_name="tissue_type">N. A.</Attribute>
       <Attribute attribute_name="pathovar">N. A.</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB2884</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB2884</Attribute>
     </Attributes>
   </BioSample>
 </BioSampleSet>

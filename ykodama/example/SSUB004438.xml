@@ -42,7 +42,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">001_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -93,7 +93,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">002_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -144,7 +144,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">003_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -195,7 +195,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">004_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -246,7 +246,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">005_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -297,7 +297,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">006_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -348,7 +348,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">007_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -399,7 +399,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">008_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -450,7 +450,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">009_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -501,7 +501,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">010_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -552,7 +552,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">011_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -603,7 +603,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">012_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -654,7 +654,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">013_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -705,7 +705,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">014_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -756,7 +756,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">015_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -807,7 +807,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">016_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -858,7 +858,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">017_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -909,7 +909,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">018_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -960,7 +960,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">019_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1011,7 +1011,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">020_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1062,7 +1062,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">021_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1113,7 +1113,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">022_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1164,7 +1164,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">023_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1215,7 +1215,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">024_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1266,7 +1266,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">025_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1317,7 +1317,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">026_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1368,7 +1368,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">027_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1419,7 +1419,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">028_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1470,7 +1470,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">029_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1521,7 +1521,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">030_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1572,7 +1572,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">031_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1623,7 +1623,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">032_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1674,7 +1674,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">033_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1725,7 +1725,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">034_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1776,7 +1776,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">035_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1827,7 +1827,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">036_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1878,7 +1878,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">037_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1929,7 +1929,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">038_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -1980,7 +1980,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">039_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2031,7 +2031,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">040_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2082,7 +2082,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">041_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2133,7 +2133,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">042_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2184,7 +2184,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">043_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2235,7 +2235,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">044_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2286,7 +2286,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">045_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2337,7 +2337,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">046_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2388,7 +2388,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">047_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2439,7 +2439,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">048_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2490,7 +2490,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">049_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2541,7 +2541,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">050_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2592,7 +2592,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">051_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2643,7 +2643,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">052_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2694,7 +2694,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">053_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2745,7 +2745,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">054_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2796,7 +2796,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">055_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2847,7 +2847,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">056_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2898,7 +2898,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">057_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -2949,7 +2949,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">058_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3000,7 +3000,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">059_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3051,7 +3051,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">060_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3102,7 +3102,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">061_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3153,7 +3153,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">062_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3204,7 +3204,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">063_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3255,7 +3255,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">064_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3306,7 +3306,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">065_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3357,7 +3357,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">066_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3408,7 +3408,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">067_SC_female_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3459,7 +3459,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">068_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3510,7 +3510,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">069_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3561,7 +3561,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">070_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3612,7 +3612,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">071_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3663,7 +3663,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">072_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3714,7 +3714,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">073_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3765,7 +3765,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">074_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3816,7 +3816,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">075_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3867,7 +3867,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">076_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3918,7 +3918,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">077_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -3969,7 +3969,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">078_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4020,7 +4020,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">079_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4071,7 +4071,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">080_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4122,7 +4122,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">081_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4173,7 +4173,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">082_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4224,7 +4224,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">083_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4275,7 +4275,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">084_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4326,7 +4326,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">085_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4377,7 +4377,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">086_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4428,7 +4428,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">087_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4479,7 +4479,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">088_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4530,7 +4530,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">089_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4581,7 +4581,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">090_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4632,7 +4632,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">091_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4683,7 +4683,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">092_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4734,7 +4734,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">093_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4785,7 +4785,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">094_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4836,7 +4836,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">095_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4887,7 +4887,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">096_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4938,7 +4938,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">097_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -4989,7 +4989,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">098_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5040,7 +5040,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">099_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5091,7 +5091,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">100_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5142,7 +5142,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">101_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5193,7 +5193,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">102_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5244,7 +5244,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">103_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5295,7 +5295,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">104_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5346,7 +5346,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">105_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5397,7 +5397,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">106_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5448,7 +5448,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">107_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5499,7 +5499,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">108_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5550,7 +5550,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">109_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5601,7 +5601,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">110_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5652,7 +5652,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">111_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5703,7 +5703,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">112_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5754,7 +5754,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">113_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5805,7 +5805,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">114_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5856,7 +5856,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">115_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5907,7 +5907,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">116_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -5958,7 +5958,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">117_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6009,7 +6009,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">118_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6060,7 +6060,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">119_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6111,7 +6111,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">120_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6162,7 +6162,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">121_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6213,7 +6213,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">122_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6264,7 +6264,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">123_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6315,7 +6315,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">124_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6366,7 +6366,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">125_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6417,7 +6417,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">126_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6468,7 +6468,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">127_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6519,7 +6519,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">128_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6570,7 +6570,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">129_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6621,7 +6621,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6672,7 +6672,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">131_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6723,7 +6723,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">132_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6774,7 +6774,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">133_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6825,7 +6825,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">134_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6876,7 +6876,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">135_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6927,7 +6927,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">136_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -6978,7 +6978,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">137_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7029,7 +7029,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">138_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7080,7 +7080,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">139_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7131,7 +7131,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">140_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7182,7 +7182,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">141_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7233,7 +7233,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">142_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7284,7 +7284,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">143_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>
@@ -7335,7 +7335,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">144_SC_male_sample</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3916</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3916</Attribute>
       <Attribute attribute_name="strain">C57BL/6N</Attribute>
       <Attribute attribute_name="breed">Inbred</Attribute>
       <Attribute attribute_name="cell_type">primordial germ cell</Attribute>

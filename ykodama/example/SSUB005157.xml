@@ -30,7 +30,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">32-1</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">32-1</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -77,7 +77,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">32-2</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">32-2</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -124,7 +124,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">32-4</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">32-4</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -171,7 +171,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">34-1</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">34-1</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -218,7 +218,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">34-2</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">34-2</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -265,7 +265,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">34-3</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">34-3</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -312,7 +312,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">34-4</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">34-4</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -359,7 +359,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">36-1</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">36-1</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -406,7 +406,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">36-2</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">36-2</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -453,7 +453,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">36-5</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">36-5</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -500,7 +500,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">36-6</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">36-6</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -547,7 +547,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-1</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-1</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -594,7 +594,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-2</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-2</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -641,7 +641,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-3</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-3</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -688,7 +688,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-4</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-4</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -735,7 +735,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-5</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-5</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -782,7 +782,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-6</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-6</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -829,7 +829,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-7</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-7</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -876,7 +876,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">38-8</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">38-8</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>
@@ -923,7 +923,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">MT8-1</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB4375</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB4375</Attribute>
       <Attribute attribute_name="strain">MT8-1</Attribute>
       <Attribute attribute_name="collection_date">2014</Attribute>
       <Attribute attribute_name="env_biome">missing</Attribute>

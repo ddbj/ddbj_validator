@@ -26,7 +26,7 @@
     </Models>
     <Attributes>
         <Attribute attribute_name="sample_name">QA2_cryo</Attribute>
-        <Attribute attribute_name="bioproject_id">PRJDB3974</Attribute>
+        <Attribute attribute_name="bioproject_accession">PRJDB3974</Attribute>
         <Attribute attribute_name="collection_date">2012-07</Attribute>
         <Attribute attribute_name="env_biome">glacier</Attribute>
         <Attribute attribute_name="env_feature">ice surface</Attribute>

@@ -27,7 +27,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 100056</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB246</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB246</Attribute>
       <Attribute attribute_name="locus_tag_prefix">WN1</Attribute>
       <Attribute attribute_name="strain">NBRC 100056</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -73,7 +73,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 102051</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB313</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB313</Attribute>
       <Attribute attribute_name="locus_tag_prefix">NN5</Attribute>
       <Attribute attribute_name="strain">NBRC 102051</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -119,7 +119,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 102152</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB411</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB411</Attribute>
       <Attribute attribute_name="locus_tag_prefix">PP14</Attribute>
       <Attribute attribute_name="strain">NBRC 102152</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -165,7 +165,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 102154</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB432</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB432</Attribute>
       <Attribute attribute_name="locus_tag_prefix">ML1</Attribute>
       <Attribute attribute_name="strain">NBRC 102154</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -211,7 +211,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 102517</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB456</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB456</Attribute>
       <Attribute attribute_name="locus_tag_prefix">SC4</Attribute>
       <Attribute attribute_name="strain">NBRC 102517</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -257,7 +257,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 102518</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB459</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB459</Attribute>
       <Attribute attribute_name="locus_tag_prefix">SAM01S</Attribute>
       <Attribute attribute_name="strain">NBRC 102518</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -303,7 +303,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 102523</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB421</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB421</Attribute>
       <Attribute attribute_name="locus_tag_prefix">HR1</Attribute>
       <Attribute attribute_name="strain">NBRC 102523</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -349,7 +349,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 107847</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB312</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB312</Attribute>
       <Attribute attribute_name="locus_tag_prefix">NL2</Attribute>
       <Attribute attribute_name="strain">NBRC 107847</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -395,7 +395,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 14588</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB434</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB434</Attribute>
       <Attribute attribute_name="locus_tag_prefix">MA2</Attribute>
       <Attribute attribute_name="strain">NBRC 14588</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -441,7 +441,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 14940</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB272</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB272</Attribute>
       <Attribute attribute_name="locus_tag_prefix">KP2</Attribute>
       <Attribute attribute_name="strain">NBRC 14940</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -487,7 +487,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 15208</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB332</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB332</Attribute>
       <Attribute attribute_name="locus_tag_prefix">SR3</Attribute>
       <Attribute attribute_name="strain">NBRC 15208</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -533,7 +533,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 15645</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB340</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB340</Attribute>
       <Attribute attribute_name="locus_tag_prefix">VIBVU1</Attribute>
       <Attribute attribute_name="strain">NBRC 15645</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -579,7 +579,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 16172</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB323</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB323</Attribute>
       <Attribute attribute_name="locus_tag_prefix">SC6</Attribute>
       <Attribute attribute_name="strain">NBRC 16172</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -625,7 +625,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 16415</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB324</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB324</Attribute>
       <Attribute attribute_name="locus_tag_prefix">SH1</Attribute>
       <Attribute attribute_name="strain">NBRC 16415</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>
@@ -671,7 +671,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">NBRC 3908</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB463</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB463</Attribute>
       <Attribute attribute_name="locus_tag_prefix">SP3</Attribute>
       <Attribute attribute_name="strain">NBRC 3908</Attribute>
       <Attribute attribute_name="collection_date">missing</Attribute>

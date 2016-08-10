@@ -36,7 +36,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_21_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">ovary</Attribute>
     </Attributes>
   </BioSample>
@@ -76,7 +76,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_22_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">ovary</Attribute>
     </Attributes>
   </BioSample>
@@ -116,7 +116,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_23_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">testis</Attribute>
     </Attributes>
   </BioSample>
@@ -156,7 +156,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_24_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">testis</Attribute>
     </Attributes>
   </BioSample>
@@ -196,7 +196,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_27_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">liver</Attribute>
     </Attributes>
   </BioSample>
@@ -236,7 +236,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_28_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">liver</Attribute>
     </Attributes>
   </BioSample>
@@ -276,7 +276,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_43_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">brain</Attribute>
     </Attributes>
   </BioSample>
@@ -316,7 +316,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_44_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">brain</Attribute>
     </Attributes>
   </BioSample>
@@ -356,7 +356,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_45_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">eye</Attribute>
     </Attributes>
   </BioSample>
@@ -396,7 +396,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_46_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">eye</Attribute>
     </Attributes>
   </BioSample>
@@ -436,7 +436,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_57_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">hind intestine</Attribute>
     </Attributes>
   </BioSample>
@@ -476,7 +476,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">PR0070_62_a</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3903</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3903</Attribute>
       <Attribute attribute_name="tissue_type">hind intestine</Attribute>
     </Attributes>
   </BioSample>

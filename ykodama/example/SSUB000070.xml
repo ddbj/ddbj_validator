@@ -55,7 +55,7 @@
         <Attribute attribute_name="num_replicons">missing</Attribute>
         <Attribute attribute_name="ref_biomaterial">2112896</Attribute>
         <Attribute attribute_name="depth">missing</Attribute>
-        <Attribute attribute_name="bioproject_id">PRJDB1723</Attribute>
+        <Attribute attribute_name="bioproject_accession">PRJDB1723</Attribute>
         <Attribute attribute_name="locus_tag_prefix">BG2</Attribute>
     </Attributes>
 </BioSample>

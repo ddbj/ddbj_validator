@@ -30,7 +30,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R1</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-01</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -70,7 +70,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R10</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -110,7 +110,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R11</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -150,7 +150,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R12</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -190,7 +190,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R13</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -230,7 +230,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R14</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -270,7 +270,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R15</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -310,7 +310,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R16</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -350,7 +350,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R17</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -390,7 +390,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R18</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -430,7 +430,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R19</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -470,7 +470,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R2</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-01</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -510,7 +510,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R20</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -550,7 +550,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R21</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -590,7 +590,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R22</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -630,7 +630,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R23</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -670,7 +670,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R24</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -710,7 +710,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R25</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -750,7 +750,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R26</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -790,7 +790,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R27</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -830,7 +830,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R28</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -870,7 +870,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R29</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -910,7 +910,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R3</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-01</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -950,7 +950,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R30</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -990,7 +990,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R31</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1030,7 +1030,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R32</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1070,7 +1070,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R33</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1110,7 +1110,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R34</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-09</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1150,7 +1150,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R35</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-09</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1190,7 +1190,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R36</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-09</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1230,7 +1230,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R37</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-09</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1270,7 +1270,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R38</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-09</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1310,7 +1310,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R39</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-09</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1350,7 +1350,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R4</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-01</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1390,7 +1390,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R40</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-31</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1430,7 +1430,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R41</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-31</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1470,7 +1470,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R42</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-05-31</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1510,7 +1510,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R5</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1550,7 +1550,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R53</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1590,7 +1590,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R54</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1630,7 +1630,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R55</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1670,7 +1670,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R56</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1710,7 +1710,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R57</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1750,7 +1750,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R58</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1790,7 +1790,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R59</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1830,7 +1830,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R6</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1870,7 +1870,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R60</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1910,7 +1910,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R61</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-10</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1950,7 +1950,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R62</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-10</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -1990,7 +1990,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R63</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-10</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2030,7 +2030,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R64</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-10</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2070,7 +2070,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R65</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-10</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2110,7 +2110,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R66</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-10</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2150,7 +2150,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R7</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2190,7 +2190,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R8</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2230,7 +2230,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">R9</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2270,7 +2270,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">Ran_A7</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-04-26</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
@@ -2310,7 +2310,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">Ran_A9</Attribute>
-      <Attribute attribute_name="bioproject_id">PRJDB3842</Attribute>
+      <Attribute attribute_name="bioproject_accession">PRJDB3842</Attribute>
       <Attribute attribute_name="collection_date">2014-06-08</Attribute>
       <Attribute attribute_name="env_biome">NA</Attribute>
       <Attribute attribute_name="env_feature">wastewater treatment plant</Attribute>
