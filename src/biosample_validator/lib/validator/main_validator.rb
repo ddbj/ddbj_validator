@@ -196,12 +196,12 @@ class MainValidator
         end
       end
       #taxonomy_idを検索して確定させる
-      taxonomy_id = "-1"
+      taxonomy_id = OrganismValidator::TAX_ROOT
       if biosample_data["attributes"]["taxonomy_id"].nil? || biosample_data["attributes"]["taxonomy_id"].strip == "" #taxonomy_id記述なし
         ret = send("taxonomy_error_warning", "45", sample_name, biosample_data["attributes"]["organism"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
           taxid_annotation = @error_list.last[:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
-          unless taxid_annotation.nil? #taxonomy_idが取得できたなら値を保持
+          unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
             taxonomy_id = taxid_annotation[:value][0]
           end
           organism_annotation = @error_list.last[:annotation].find{|anno| anno[:target_key] == "organism" }
@@ -214,6 +214,8 @@ class MainValidator
         ret = send("taxonomy_name_and_id_not_match", "4", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["organism"] = CommonUtils::get_auto_annotation(@error_list.last)
+        else ret == false #auto annotationできないエラーであればtax_idが不正な可能性がある
+          taxonomy_id = OrganismValidator::TAX_ROOT
         end
       end
       send("invalid_bioproject_accession", "5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
@@ -237,7 +239,7 @@ class MainValidator
       send("latlon_versus_country", "41", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
       send("multiple_vouchers", "62", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
       send("redundant_taxonomy_attributes", "73", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
-      if taxonomy_id != "-1"
+      if taxonomy_id != OrganismValidator::TAX_ROOT
         send("package_versus_organism", "48", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
         send("sex_for_bacteria", "59", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
         send("taxonomy_at_species_or_infraspecific_rank", "96", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
@@ -1059,8 +1061,8 @@ class MainValidator
       puts "use cache in taxonomy_name_from_id" if $DEBG
       scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id)
     end
-
-    if !scientific_name.nil? && scientific_name == organism_name
+    #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
+    if !scientific_name.nil? && scientific_name == organism_name && taxonomy_id != OrganismValidator::TAX_ROOT
       true
     else
       annotation = [
@@ -1068,12 +1070,12 @@ class MainValidator
         {key: "organism", value: organism_name},
         {key: "taxonomy_id", value: taxonomy_id}
       ]
-      if !scientific_name.nil? #taxonomy_idのscientific_nameで自動補正する
+      if scientific_name.nil? || taxonomy_id == OrganismValidator::TAX_ROOT
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      else #taxonomy_idのscientific_nameで自動補正する
         location = @xml_convertor.xpath_from_attrname("organism", line_num)
         annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "organism", location, true));
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       end
       @error_list.push(error_hash)
       false
@@ -1146,7 +1148,7 @@ class MainValidator
   # true/false
   # 
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
-    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == "-1"
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_ROOT
 
     #あればキャッシュを使用
     cache_key = ValidatorCache::create_key(taxonomy_id, package_name)
@@ -1189,7 +1191,7 @@ class MainValidator
   # true/false
   #
   def sex_for_bacteria (rule_code, sample_name, taxonomy_id, sex, organism, line_num)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == "-1" || CommonUtils::null_value?(sex)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_ROOT || CommonUtils::null_value?(sex)
 
     ret = true
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
@@ -2126,7 +2128,7 @@ class MainValidator
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, sample_name, taxonomy_id, organism, line_num)
-    return nil if CommonUtils::null_value?(taxonomy_id) || taxonomy_id == "-1"
+    return nil if CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_ROOT
     result = @org_validator.is_infraspecific_rank(taxonomy_id)
     if result == false
       annotation = [

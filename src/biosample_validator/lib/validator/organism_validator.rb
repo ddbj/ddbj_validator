@@ -9,6 +9,7 @@ require File.dirname(__FILE__) + "/../common_utils.rb"
 #
 class OrganismValidator < SPARQLBase 
 
+  TAX_ROOT = "1" #root
   TAX_BACTERIA = "2" #bacteria
   TAX_VIRUSES = "10239" #viruses
   TAX_FUNGI = "4751" #fungi
@@ -151,22 +152,16 @@ class OrganismValidator < SPARQLBase
     #該当するtax_idがない
     if tax_list.size == 0
       ret[:status] = "no exist"
-      ret [:tax_id] = "-1"
+      ret [:tax_id] = TAX_ROOT
       return ret
     end
     #synonymやcommon nameが同一の場合は同じtaxで複数候補がヒットするためグループ化
     grouped_list = tax_list.group_by {|row| row[:tax_no]}
     if grouped_list.size == 1 #候補のtax_id がひとつだけ
       tax_id = grouped_list.keys.first
-      #候補がdummyデータだった場合、そのtaxonomyは使用できない
-      if grouped_list[tax_id].first[:tax_type] == "dummy taxon"
-        ret[:status] = "no exist"
-        ret[:tax_id] = "-1"
-      else
-        ret[:status] = "exist"
-        ret[:tax_id] = tax_id
-        ret[:scientific_name] = grouped_list[tax_id].first[:scientific_name]
-      end
+      ret[:status] = "exist"
+      ret[:tax_id] = tax_id
+      ret[:scientific_name] = grouped_list[tax_id].first[:scientific_name]
     else ##候補が二つある
       ret[:status] = "multiple exist"
       ret[:tax_id] = grouped_list.keys.join(", ")

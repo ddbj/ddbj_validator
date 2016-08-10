@@ -83,7 +83,7 @@ class TestOrganismValidator < Minitest::Test
 
   def test_suggest_taxid_from_name
     #no exist
-    expect_value = {status: "no exist", tax_id: "-1"}
+    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
     ret = @validator.suggest_taxid_from_name("not exist name")
     assert_equal expect_value, ret
     #exist one tax
@@ -91,7 +91,7 @@ class TestOrganismValidator < Minitest::Test
     ret = @validator.suggest_taxid_from_name("escherichia coli")
     assert_equal expect_value, ret
     #exist one tax(unpublished tax)
-    expect_value = {status: "no exist", tax_id: "-1"}
+    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
     ret = @validator.suggest_taxid_from_name("Actinomyces polynesiensis")
     assert_equal expect_value, ret
     #multiple
