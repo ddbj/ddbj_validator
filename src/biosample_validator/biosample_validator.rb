@@ -18,8 +18,8 @@ begin
     ret = {status: "fail", format: ARGV[1], failed_list: error_list}
   end
 rescue => ex
-  message = "#{ex.message}\n"
-  message += ex.backtrace.map {|row| row}.join("\n")
+  message = "#{ex.message}"
+#  message += ex.backtrace.map {|row| row}.join("\n")
   ret = {status: "error", format: ARGV[1], message: message}
 end
 
