@@ -41,6 +41,7 @@ for packagename, filename, attribute_a in package_a:
 
 	# エクセルファイルを生成し、ワークシートを作成
 	workbook = xlsxwriter.Workbook('excel/%s.xlsx' % filename)
+	#workbook = xlsxwriter.Workbook('testexcel/%s.xlsx' % filename)
 	worksheet = workbook.add_worksheet()
 
 	# tsv
@@ -48,6 +49,8 @@ for packagename, filename, attribute_a in package_a:
 	
 	# フォントの設定
 	font_format = workbook.add_format()
+	# セルを文字列に設定　http://xlsxwriter.readthedocs.io/format.html#format
+	font_format = workbook.add_format({'num_format': '@'})
 	font_format.set_font_name("Arial Unicode MS")
 	font_format.set_font_size(10)
 	font_format.set_align("vcenter")
@@ -251,9 +254,8 @@ for packagename, filename, attribute_a in package_a:
 	# tsv に出力
 	tsv_f.write("\t".join(tsv_a))
 
-	# フォント 0-200列を設定
+	# 0-200列のフォントと書式を文字列に設定
 	worksheet.set_column(0, 200, 20, font_format)
-	#worksheet.set_column(0, 200, 12, font_format)
 
 	# 背景色
 	worksheet.set_row(2, None, green_format)
@@ -265,19 +267,6 @@ for packagename, filename, attribute_a in package_a:
 	tsv_f.close()
 
 """
-# Widen the first column to make the text clearer.
-worksheet.set_column('A:A', 20)
-
-# Add a bold format to use to highlight cells.
-bold = workbook.add_format({'bold': True})
-
-
-
-# Text with formatting.
-worksheet.write('A2', 'World', bold)
-
-# Write some numbers, with row/column notation.
-worksheet.write(2, 0, 123)
-worksheet.write(3, 0, 123.456)
+comment block
 """
 
