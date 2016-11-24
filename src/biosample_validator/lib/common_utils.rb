@@ -2,6 +2,7 @@ require 'erb'
 require 'erubis'
 require 'geocoder'
 require 'net/http'
+require 'net/https'
 require 'date'
 
 class CommonUtils
@@ -330,7 +331,7 @@ class CommonUtils
   #
   def exist_pubmed_id? (pubmed_id)
     return nil if pubmed_id.nil?
-    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json"
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json"
     begin
       res = http_get_response(url)
       if res.code =~ /^5/ # server error
@@ -368,7 +369,9 @@ class CommonUtils
     #error and cache
     url = URI.parse(uri)
     req = Net::HTTP::Get.new(url)
-    res = Net::HTTP.start(url.host, url.port) {|http|
+    ssl_flag = false
+    ssl_flag = true if uri.start_with?("https")
+    res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag) {|http|
       http.request(req)
     }
     res
