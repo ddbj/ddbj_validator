@@ -3,7 +3,7 @@
     {
       "type": "dateFile",
       "category": "response",
-      "filename": "./tmp/response.log",
+      "filename": "./tmp/logs/response.log",
       "pattern": "-yyyy-MM-dd"
     }
   ]

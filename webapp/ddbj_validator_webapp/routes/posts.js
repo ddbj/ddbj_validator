@@ -168,7 +168,6 @@ router.post('/upload', function(req, res, next){
 
     // add some infos to validation message and return response
     function render_result(errors){
-        //var errors = JSON.parse(fs.readFileSync(conf.read_file_dir + "test_failed_list.json", 'utf8'));
         var validator_res = new Object();
         errors["failed_list"] ? error_size = errors["failed_list"].length : error_size = 0;
         errors["message"] ? error_message = errors["message"] : error_message = "";
@@ -187,8 +186,6 @@ router.post('/upload', function(req, res, next){
 
     function render_output(output_list){
         fs.writeFile("./tmp/render_output.txt", output_list);
-        //console.log(output_ilst);
-        //fs.writeFile("./tmp/test_a_s", output_list);
         original_name = req.file["originalname"];
         var validator_res = new Object();
         validator_res["status"] = "";
@@ -204,15 +201,16 @@ router.post('/upload', function(req, res, next){
 
     function removeTmpFiles(){
         //delete temporary file
-        /*
-        exec('find ./tmp/ -mtime +1 -exec rm -f {} \;', function(error, stdout, stderr){
+        //exec('find ./tmp/ -mtime +1 -exec rm {} \;', function(error, stdout, stderr){
+        //exec('rm ./tmp/response* ', function(error, stdout, stderr){
+        exec('find ./tmp -type f -mtime +1 | xargs rm -f \;', function(error, stdout, stderr){
             if(error){
-                console.log(error)
+                console.log("exec error: " + error);
             }else if(stderr){
-                console.log(stderr)
+                console.log("exec stderr: " + stderr)
             }
+
         });
-        */
     }
 });
 

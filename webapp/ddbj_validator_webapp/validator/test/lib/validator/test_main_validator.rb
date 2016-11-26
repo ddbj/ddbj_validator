@@ -5,9 +5,11 @@ require '../../../lib/validator/biosample_xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup
-    @validator = MainValidator.new("public")
+    @validator = MainValidator.new("private")
     @xml_convertor = BioSampleXmlConvertor.new
   end
+
+#### テスト用共通メソッド ####
 
   #
   # Executes validation method
@@ -70,7 +72,7 @@ class TestMainValidator < Minitest::Test
   end
 
   #
-  # 指定されたエラーリストのauto-annotationの値を返す
+  # 指定されたエラーリストの最初のauto-annotationの値を返す
   #
   # ==== Args
   # error_list
@@ -92,6 +94,38 @@ class TestMainValidator < Minitest::Test
       ret
     end
   end
+
+
+#### 属性取得メソッドのユニットテスト ####
+
+  def test_get_attributes_of_package
+    attr_list = @validator.send("get_attributes_of_package", "Microbe")
+    assert_equal true, attr_list.size > 0
+    assert_equal false, attr_list.first[:attribute_name].nil?
+    assert_equal false, attr_list.first[:require].nil?
+    attr_list = @validator.send("get_attributes_of_package", "Invalid Package")
+    assert_equal 0, attr_list.size
+  end
+
+  def test_get_attribute_groups_of_package
+    expect_value1 = {
+      :group_name => "Organism group attribute in Microbe",
+      :attribute_set => ["isolate", "strain"]
+    }
+    expect_value2 = {
+      :group_name => "Source group attribute in Microbe",
+      :attribute_set => ["host", "isolation_source"]
+    }
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Microbe")
+    assert_equal 2, attr_group_list.size
+    attr_group_list.sort!{|a, b| a[:group_name] <=> b[:group_name] }
+    assert_equal expect_value1, attr_group_list[0]
+    assert_equal expect_value2, attr_group_list[1]
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package")
+    assert_equal 0, attr_group_list.size
+  end
+
+#### 各validationメソッドのユニットテスト ####
 
   def test_non_ascii_header_line
     #ok case
@@ -227,6 +261,37 @@ class TestMainValidator < Minitest::Test
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
   end
 
+  def test_missing_group_of_at_least_one_required_attributes
+    #ok case
+    xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    #expect_error_msg = "[ host, isolation_source ], [ isolate, strain ]"
+    expect_error_msg = "[ isolate, strain ], [ host, isolation_source ]"
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_error_msg, get_error_column_value(ret[:error_list], "Attribute groups")
+
+    #host attribute is exist but value is blank
+    xml_data = File.read("../../data/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ng2.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_group_list = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    expect_error_msg = "[ host, isolation_source ]"
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "36", "SampleA", biosample_data[0]["attributes"], attr_group_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_error_msg, get_error_column_value(ret[:error_list], "Attribute groups")
+  end
+
   def test_missing_required_attribute_name
     #ok case
     xml_data = File.read("../../data/92_missing_required_attribute_name_SSUB000019_ok.xml")
@@ -273,6 +338,12 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ##auto annotation 大文字小文字が異なる場合の修正
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "horizon", "o horizon", cv_attr, 1)
+    expect_annotation = "O horizon"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
     assert_equal nil, ret[:result]
@@ -314,9 +385,6 @@ class TestMainValidator < Minitest::Test
     ##invalid id
     ###pubmed id
     ret = exec_validator("invalid_publication_identifier", "11", "SampleA", "ref_biomaterial", "99999999", ref_attr, 1)
-    assert_equal false, ret[:result]
-    ###doi
-    ret = exec_validator("invalid_publication_identifier", "11", "SampleA", "ref_biomaterial", "10.3389/fcimb.2016.99999", ref_attr, 1)
     assert_equal false, ret[:result]
     ###url
     url = "http://www.ncbi.nlm.nih.gov/pubmed/27148491, http://www.ncbi.nlm.nih.gov/pubmed/27148492"
@@ -372,10 +440,13 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "45.0123 S 4.1234 E", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "47.94345678 N 28.12345678 W", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     #ng case
     ##dec format(auto annotation)
-    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "47.94345678 N 28.12345678 W", 1)
-    expect_annotation = "47.9435 N 28.1235 W"
+    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "-23.00279 ,   -120.21840", 1)
+    expect_annotation = "23.00279 S 120.21840 W"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
@@ -386,7 +457,7 @@ class TestMainValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ##can't parse format as lat lon
-    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "47.9456 28.1212", 1)
+    ret = exec_validator("invalid_lat_lon_format", "9", "sampleA", "invalid latlon format", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
@@ -394,29 +465,64 @@ class TestMainValidator < Minitest::Test
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
-  def test_invalid_bioproject_accession
+
+  def test_bioproject_submission_id_replacement
     #ok case
-    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJD11111", 1)
+    ## not psub_id
+    ret = exec_validator("bioproject_submission_id_replacement", "95","", "PRJNA1", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
+    ## not exist project accession
+    ret = exec_validator("bioproject_submission_id_replacement", "95","", "PSUB004148", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
     #auto annotation
-    ret = exec_validator("invalid_bioproject_accession", "5", "", "PSUB000001", 1)
-    expect_annotation = "PRJDB1"
+    ret = exec_validator("bioproject_submission_id_replacement", "95", "", "PSUB004142", 1)
+    expect_annotation = "PRJDB3490"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
-    #ng case
-    ret = exec_validator("invalid_bioproject_accession", "5","", "PDBJA12345", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
+
     #params are nil pattern
-    ret = exec_validator("invalid_bioproject_accession", "5","", nil, 1)
+    ret = exec_validator("bioproject_submission_id_replacement", "95", "", "missing", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=end
+
+  def test_invalid_bioproject_accession
+    #ok case
+    ## ncbi
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJNA1", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ddbj
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDA10", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## PRJDB and exist in db
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDB1", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## psub
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PSUB004142", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ## invalid format
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PDBJA12345", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist in db
+    ret = exec_validator("invalid_bioproject_accession", "5","", "PRJDB0000", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #params are nil pattern
+    ret = exec_validator("invalid_bioproject_accession", "5","", "missing", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    end
+
   def test_invalid_host_organism_name
     #ok case
     ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Homo sapiens", 1)
@@ -426,6 +532,12 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    #auto annotation
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Human", 1)
+    expect_annotation = "Homo sapiens"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("invalid_host_organism_name", "15", "sampleA", nil, 1)
     assert_equal nil, ret[:result]
@@ -433,11 +545,40 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_taxonomy_error_warning
-    #ok case
-    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Homo sapiens", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
+    #このメソッドではokになるケースはない
     #ng case
+    ## exist
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Homo sapiens", 1)
+    expect_taxid_annotation = "9606"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    ## exist but not correct as scientific name
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Anabaena sp. PCC 7120", 1)
+    expect_taxid_annotation = "103690"
+    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
+    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    ## exist but not correct caracter case
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "nostoc sp. pcc 7120", 1)
+    expect_taxid_annotation = "103690"
+    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
+    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    ## multiple exist
+    ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "mouse", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist
     ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -453,9 +594,21 @@ class TestMainValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
+    ##exist tax_id
     ret = exec_validator("taxonomy_name_and_id_not_match", "4", "sampleA", "103690", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    assert_equal "Nostoc sp. PCC 7120",  get_auto_annotation(ret[:error_list])
+    ##not exist tax_id
+    ret = exec_validator("taxonomy_name_and_id_not_match", "4", "sampleA", "-1", "Not exist taxonomy name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal nil,  get_auto_annotation(ret[:error_list])
+    ##tax_id=1(new organism)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "4", "sampleA", "1", "root", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal nil,  get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("taxonomy_name_and_id_not_match", "4", "sampleA", "103690", nil, 1)
     assert_equal nil, ret[:result]
@@ -482,18 +635,18 @@ class TestMainValidator < Minitest::Test
 
   def test_package_versus_organism
     #ok case
-    ret = exec_validator("package_versus_organism", "48", "SampleA", "103690", "MIGS.ba.microbial", 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", "103690", "MIGS.ba.microbial", "Nostoc sp. PCC 7120", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", "MIGS.ba.microbial", 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", "MIGS.ba.microbial", "Homo sapiens", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    ret = exec_validator("package_versus_organism", "48", "SampleA", nil, "MIGS.ba.microbial", 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", nil, "MIGS.ba.microbial", "", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", nil, 1)
+    ret = exec_validator("package_versus_organism", "48", "SampleA", "9606", nil, "Homo sapiens", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -501,32 +654,32 @@ class TestMainValidator < Minitest::Test
   def test_sex_for_bacteria
     #ok case
     ##human
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "9606", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "9606", "male", "Homo sapiens", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     ##bacteria
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", "male", "Nostoc sp. PCC 7120", 1)
     expect_msg = "bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
     ##viral
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "510903", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "510903", "male", "Hepatitis delta virus dFr2210", 1)
     expect_msg = "bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
     #fungi
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "1445577", "male", 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "1445577", "male", "Colletotrichum fioriniae PJ7", 1)
     expect_msg = "fungal organisms; did you mean 'mating type' for the fungus or 'host sex' for the host organism?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
 
     #params are nil pattern
-    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", nil, 1)
+    ret = exec_validator("sex_for_bacteria", "59", "SampleA", "103690", nil, "Nostoc sp. PCC 7120", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -573,22 +726,42 @@ class TestMainValidator < Minitest::Test
   end
 
   def test_future_collection_date
-    # ok case
+    #ok case
     ret = exec_validator("future_collection_date", "40", "sampleA", "2015", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ret = exec_validator("future_collection_date", "40", "sampleA", "2016", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # ng case
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952-10-21", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952-10-21/1955-10-21", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
     ret = exec_validator("future_collection_date", "40", "sampleA", "2019", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    #parameter are nil pattern
+    ret = exec_validator("future_collection_date", "40", "sampleA", "2052-10-21", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952-10-21/2052-10-21", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "2052-10-21/1952-10-21", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #parameter are nil pattern or invalid format
     ret = exec_validator("future_collection_date", "40", "sampleA", nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
     ret = exec_validator("future_collection_date", "40", "sampleA", "missing", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("future_collection_date", "40", "sampleA", "1952.10.21", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -627,15 +800,66 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "2016-01-01", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952-10-21T23:10:02Z/2052-10-21T23:44:30Z", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     # ng case
-    ##auto annotation
-    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "January/2016", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
     ##invalid format
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "No Date", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ##auto annotation
+    ### 桁揃え
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.9.7T3:8:2Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-09-07T03:08:02Z", get_auto_annotation(ret[:error_list])
+    ### 月の略称を補正
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-Oct-1952", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/October/21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.october.21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ### 区切り文字修正
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.10", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10/21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ### 範囲
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10/21/1952/11/20", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21/1952-11-20", get_auto_annotation(ret[:error_list])
+    ### 範囲の区切りに空白がある　
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952.10.21T23:10:02Z /  2052.10.21T23:44:30Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21T23:10:02Z/2052-10-21T23:44:30Z", get_auto_annotation(ret[:error_list])
+    ### 範囲の大小が逆
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952-10-22T23:10:02Z /  1952-10-21T23:44:30Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21T23:44:30Z/1952-10-22T23:10:02Z", get_auto_annotation(ret[:error_list])
+    ### 西暦の2桁入力
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-11", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2021-11", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "11-21", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2021-11", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "", ts_attr,  1)
     assert_equal nil, ret[:result]
@@ -644,40 +868,72 @@ class TestMainValidator < Minitest::Test
 
   def test_special_character_included
     special_chars = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/special_characters.json"))
+    ### attribute name
     # ok case
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 micrometer", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "temperature", "value", special_chars, "attr_name", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 μm", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "temperature(°C)", "value", special_chars, "attr_name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "temperature(degree Celsius)", get_auto_annotation(ret[:error_list])
+    # nil case
+    ret = exec_validator("special_character_included", "12", "SampleA", "", "value", special_chars, "attr_name", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ### attribute value
+    # ok case
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 micrometer", special_chars, "attr_value", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 μm", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1.0 micrometer", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1st: 39 degree Celsius, 2nd: 38 degree Celsius, 3rd: 37 degree Celsius", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "", special_chars, 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "", special_chars, "attr_value", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_invalid_data_format
+    ### attribute name
     # ok case
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "MTB313", 1) 
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "MTB313", "attr_name", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample    comment", "MTB313", "attr_name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "sample comment", get_auto_annotation(ret[:error_list])
+    # nil case
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "", "MTB313", "attr_name", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ### attribute value
+    # ok case
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "MTB313", "attr_value", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     # 前後に空白があり、引用符で囲まれ、タブと改行と繰り返し空白が含まれる文字列
     ng_value = "    \"abc     def		ghi
 jkl\"  "
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, 1)
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", ng_value, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", 1)
+    ret = exec_validator("invalid_data_format", "13", "SampleA", "sample_name", "", "attr_value", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -696,47 +952,61 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
-  def test_duplicated_sample_title_in_this_account
-    # ok case (Postgre DB)
-    ret = exec_validator("duplicated_sample_title_in_this_account", "3", "", "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", ["MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"], "test01", 1)
+
+  def test_duplicated_sample_title_in_this_submission
+    # ok case
+    xml_data = File.read("../../data/3_duplicated_sample_title_in_this_submission_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_sample_title_in_this_submission", "3", "sampleA", "sample_title1", biosample_data, 1 )
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # ng case (Same title items in DB)
-    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "sample_title1", ["sample_title1", "sample_tile2"], "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
     # ng case (Sami title items in local submission lilst)
-    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "sample_title_1", ["sample_title_1", "sample_tile_2", "sample_title_1"], "", 1)
+    xml_data = File.read("../../data/3_duplicated_sample_title_in_this_submission_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_sample_title_in_this_submission", "3", "sampleA", "sample_title1", biosample_data, 1 )
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    ret = exec_validator("duplicated_sample_title_in_this_account","3", "", "", ["sample_title1", "sample_tile2"], "", 1)
+    xml_data = File.read("../../data/3_duplicated_sample_title_in_this_submission_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_sample_title_in_this_submission", "3", "sampleA", "", biosample_data, 1 )
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_bioproject_not_found
     # ok case (given submitter_id matches DB response submitter_id)
-    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990110", "test01", 1)
+    ## valid data
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990080", "test04", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not ddbj bioproject
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJNA90080", "test04", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not exist bioproject id
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJDB0000", "test04", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB003946", "test01", 1)
+    ## mismatch submitter id
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB990080", "test01", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # params are nil pattern
-    ret = exec_validator("bioproject_not_found","6", "Sample A", "", "", 1)
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "missing", "test04", 1)
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB990080", nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=end
 
   def test_identical_attributes
     # ok case
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -744,9 +1014,15 @@ jkl\"  "
     #sample_nameとsample_titleが異なる同じ属性をもつ5つのサンプル
     xml_data = File.read("../../data/24_identical_attributes_SSUB004321_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("identical_attributes", "24", "sampleA", biosample_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
+    #多数の重複がある実際のデータ
+    xml_data = File.read("../../data/24_identical_attributes_SSUB003016_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("identical_attributes", "24", biosample_data)
+    assert_equal false, ret[:result]
+    assert_equal 131, ret[:error_list].size
   end
 
   def test_attribute_value_is_not_integer
@@ -776,59 +1052,94 @@ jkl\"  "
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=begin
+
   def test_invalid_bioproject_type
-    #ok case (submission_id is not in parent_submission_id)
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB000001", 1)
+    #ok case
+    #PSUB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB004142", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case (submission_id is in parent_submission_id)
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB000606", 1)
+    #PRJDB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PRJDB3490", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #PSUB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB990036", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #PRJDB
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PRJDB3549", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    @validator.instance_variable_set :@error_list, [] #clear
-    ret = exec_validator("invalid_bioproject_type", "70", "", "", 1)
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "missing", 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_duplicate_sample_names
     #ok case
-    ret = exec_validator("duplicate_sample_names", "28", "Sample 1 (SAMD00000001)", "sample_title_1", ["Sample 1 (SAMD00000001)", "Sample 2 (SAMD00000002)"], "SSUB000001", 1)
+    xml_data = File.read("../../data/28_duplicate_sample_names_SSUB005454_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ## xmlファイル内に同一のsample_nameがない(submissionがなくDBは検索しない)
+    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## xmlファイル内に同一のsample_nameがない。DB内でも重複がない
+    ret = exec_validator("duplicate_sample_names", "28", "sample 1", "sample_title_1", biosample_data, "SSUB003677", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
     #ng case (Same sample names in local data)
-    ret = exec_validator("duplicate_sample_names", "28", "Sample 1 (SAMD00000001)", "sample_title_1", ["Sample 1 (SAMD00000001)", "Sample 1 (SAMD00000001)"], "SSUB000001", 1)
-    assert_equal false, ret[:result]
+    xml_data = File.read("../../data/28_duplicate_sample_names_SSUB005454_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, nil, 1)
+    assert_equal false , ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## xmlファイル内に同一のsample_nameがないがDB内で重複している #このテストはDBに重複データを登録しないと通らない
+    #xml_data = File.read("../../data/28_duplicate_sample_names_SSUB005454_ok.xml")
+    #biosample_data = @xml_convertor.xml2obj(xml_data)
+    #ret = exec_validator("duplicate_sample_names", "28", "sample 1", "sample_title_1", biosample_data, "SSUB003677", 1)
+    #assert_equal false, ret[:result]
+    #assert_equal 1, ret[:error_list].size
+
     #params are nil pattern
-    ret = exec_validator("duplicate_sample_names", "28", "", "", [], "", 1)
+    ret = exec_validator("duplicate_sample_names", "28", "", "title", biosample_data, nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_duplicated_locus_tag_prefix
     # ok case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB"], "SSUB000001", 1)
+    xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ## xmlファイル内にもDB内にも同一のprefixがない
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "NONEXISTPREFIX", biosample_data, nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## DB内に同一のprefixがあるが、SubmissionIDがあるため(DBから取得したデータ)同一prefixが一つあってもOK
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "AB1", biosample_data, "SSUB000001", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "XXA", ["XXA", "XXB","XXA"], "SSUB000001", 1)
+    ## xmlファイル内に同一のprefixがある
+    xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "WN1", biosample_data, nil, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    # ng case (prefix already used in other submission)
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "AAAA", ["XXA", "XXB"], "SSUB000001", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
+    ## DB内に同一のprefixが2つ以上ある #このテストはDBに重複データを登録しないと通らない
+    #xml_data = File.read("../../data/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
+    #biosample_data = @xml_convertor.xml2obj(xml_data)
+    #ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "Ato01", biosample_data, "SSUB000001", 1)
+    #assert_equal false, ret[:result]
+    #assert_equal 1, ret[:error_list].size
     # parameters are nil case
-    ret = exec_validator("duplicated_locus_tag_prefix", "91", "", "",[], "", 1)
+    ret = exec_validator("duplicated_locus_tag_prefix", "91", "Sample A", "missing", biosample_data, nil, 1)
     assert_equal nil, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
-=end
 
   def test_warning_about_bioproject_increment
     # ok case
@@ -858,5 +1169,30 @@ jkl\"  "
     ret = exec_validator("warning_about_bioproject_increment", "69", biosample_data)
     assert_equal false, ret[:result]
     assert_equal 5, ret[:error_list].size
+  end
+
+  def test_taxonomy_at_species_or_infraspecific_rank
+    # ok case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "562", "Escherichia coli", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##Subspecies rank (not has Species rank)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "1416348", "Telinga mara", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "561", "Escherichia", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "1", "not exist taxon", 1 )
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "96", "Sample A", "", "Escherichia coli", 1 )
+    assert_equal nil, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
   end
 end

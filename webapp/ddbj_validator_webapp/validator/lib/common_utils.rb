@@ -2,12 +2,17 @@ require 'erb'
 require 'erubis'
 require 'geocoder'
 require 'net/http'
+require 'net/https'
+require 'date'
 
 class CommonUtils
+  @@AUTO_ANNOTAION_MSG = "An automatically-generated correction will be applied."
 
   def self.set_config (config_obj)
     @@null_accepted = config_obj[:null_accepted]
     @@exchange_country_list = config_obj[:exchange_country_list]
+    @@convert_date_format = config_obj[:convert_date_format]
+    @@ddbj_date_format = config_obj[:ddbj_date_format]
   end
 
   #
@@ -52,13 +57,19 @@ class CommonUtils
   # reference: 参照
   # level: error/warning 
   # annotation: annotation list for correcting the value 
+  # auto_annotation: true/false Auto annotationかどうか
   # ==== Return
   # エラーのHashオブジェクト
   #
-  def self.error_obj (rule, file_path, annotation)
+  def self.error_obj (rule, file_path, annotation, *auto_annotaion)
+    if auto_annotaion.first == true
+      message = rule["message"] + " " + @@AUTO_ANNOTAION_MSG
+    else
+      message = rule["message"]
+    end
     hash = {
              id: rule["code"],
-             message: rule["message"],
+             message: message,
              #reference: rule["reference"],
              level: rule["level"],
              method: "biosample validator",
@@ -163,8 +174,14 @@ class CommonUtils
   #
   def format_insdc_latlon (lat_lon)
     return nil if lat_lon.nil?
-    deg_latlon_reg = %r{(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+))\D+(?<lat_hemi>[NS])[ ,_]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+))\D+(?<lng_hemi>[EW])}
-    dec_latlon_reg = %r{(?<lat_dec>\d{1,2}(\.\d+))\s*(?<lat_dec_hemi>[NS])[ ,_]+(?<lng_dec>\d{1,3}(\.\d+))\s*(?<lng_dec_hemi>[EW])}
+    # 37°26′36.42″N 06°15′14.28″W
+    deg_latlon_reg = %r{^(?<lat_deg>\d{1,2})\D+(?<lat_min>\d{1,2})\D+(?<lat_sec>\d{1,2}(\.\d+)*)\D+(?<lat_hemi>[NS])[ ,_;]+(?<lng_deg>\d{1,3})\D+(?<lng_min>\d{1,2})\D+(?<lng_sec>\d{1,2}(\.\d+)*)\D+(?<lng_hemi>[EW])$}
+    # 37.443501234 N 6.25401234 W
+    dec_insdc_latlon_reg = %r{^(?<lat_dec>\d{1,2}(\.\d+)*)\s*(?<lat_dec_hemi>[NS])[ ,_;]+(?<lng_dec>\d{1,3}(\.\d+)*)\s*(?<lng_dec_hemi>[EW])$}
+    # N37.443501234 W6.25401234
+    dec_insdc_reversed_latlon_reg = %r{^(?<lat_dec_hemi>[NS])\s*(?<lat_dec>\d{1,2}(\.\d+)*)[ ,_;]+(?<lng_dec_hemi>[EW])\s*(?<lng_dec>\d{1,3}(\.\d+)*)$}
+    # -23.00279, -120.21840
+    dec_latlon_reg = %r{^(?<lat_dec>[\-]*\d{1,2}(\.\d+))[\D&&[^\-]]+(?<lng_dec>[\-]*\d{1,3}(\.\d+))$}
 
     insdc_latlon =  nil
     if deg_latlon_reg.match(lat_lon)
@@ -172,11 +189,19 @@ class CommonUtils
       lat = (g['lat_deg'].to_i + g['lat_min'].to_f/60 + g['lat_sec'].to_f/3600).round(4)
       lng = (g['lng_deg'].to_i + g['lng_min'].to_f/60 + g['lng_sec'].to_f/3600).round(4)
       insdc_latlon = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
+    elsif dec_insdc_latlon_reg.match(lat_lon) #期待するformatであり変更は無し
+      d = dec_insdc_latlon_reg.match(lat_lon)
+      insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
+    elsif dec_insdc_reversed_latlon_reg.match(lat_lon)
+      d = dec_insdc_reversed_latlon_reg.match(lat_lon)
+      insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
     elsif dec_latlon_reg.match(lat_lon)
       d = dec_latlon_reg.match(lat_lon)
-      lat_dec = (d['lat_dec'].to_f).round(4)
-      lng_dec = (d['lng_dec'].to_f).round(4)
-      insdc_latlon = "#{lat_dec} #{d['lat_dec_hemi']} #{lng_dec} #{d['lng_dec_hemi']}"
+      lat = d['lat_dec']
+      lng = d['lng_dec']
+      lat_dec = lat.start_with?("-") ? lat[1..-1] + " S" : lat + " N"
+      lng_dec = lng.start_with?("-") ? lng[1..-1] + " W" : lng + " E"
+      insdc_latlon = "#{lat_dec} #{lng_dec}"
     end
     if insdc_latlon.nil?
       nil
@@ -257,7 +282,7 @@ class CommonUtils
       end
     rescue => ex
       message = "Failed to geocode with Google Geocoder API. Please check the latlon value or your internet connection. latlon: #{iso_latlon}\n"
-      raise StandardError, detail_message, ex.backtrace
+      raise StandardError, message, ex.backtrace
     end
   end
 
@@ -306,7 +331,7 @@ class CommonUtils
   #
   def exist_pubmed_id? (pubmed_id)
     return nil if pubmed_id.nil?
-    url = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json"
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json"
     begin
       res = http_get_response(url)
       if res.code =~ /^5/ # server error
@@ -333,42 +358,6 @@ class CommonUtils
   end
 
   #
-  # 引数のDOIが実在するか否かを返す
-  #
-  # ==== Args
-  # doi: DOI
-  # ==== Return
-  # returns true/false
-  #
-  # DOIの実在の判定にはCrossRefを使用。実在しなければ404が返される
-  # seeAlso: https://github.com/CrossRef/rest-api-doc/blob/master/rest_api.md#overview
-  #
-  def exist_doi? (doi)
-    return nil if doi.nil?
-    url = "http://api.crossref.org/works/#{doi}/agency"
-    begin
-      res = http_get_response(url)
-      if res.code =~ /^5/ # server error
-        raise "'CrossRef' returns a server error. Please retry later. url: #{url}\n"
-      elsif res.code == "404" # invalid DOI
-        return false
-      elsif res.code =~ /^4/ # other client error
-        raise "'CrossRef' returns a error. Please check the url. url: #{url}\n"
-      else
-        begin
-          JSON.parse(res.body)
-          return true
-        rescue
-          raise "Parse error: 'CrossRef' might not return a JSON format. Please check the url. url: #{url}\n response body: #{res.body}\n"
-        end
-      end
-    rescue => ex
-      message = "Connection to 'CrossRef' server failed. Please check the url or your internet connection. url: #{url}\n"
-      raise StandardError, message, ex.backtrace
-    end
-  end
-
-  #
   # HTTPリクエスト(GET)を送り、そのレスポンスを返す
   #
   # ==== Args
@@ -380,10 +369,32 @@ class CommonUtils
     #error and cache
     url = URI.parse(uri)
     req = Net::HTTP::Get.new(url)
-    res = Net::HTTP.start(url.host, url.port) {|http|
+    ssl_flag = false
+    ssl_flag = true if uri.start_with?("https")
+    res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag) {|http|
       http.request(req)
     }
     res
   end
 
+  def ddbj_date_format? (date_text)
+    return nil if date_text.nil?
+    result = false
+    @@ddbj_date_format.each do |format|
+      parse_format = format["parse_format"]
+
+      ## single date format
+      regex = Regexp.new(format["regex"])
+      if date_text =~ regex
+        result = true
+      end
+
+      ## range date format
+      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
+      if date_text =~ regex
+        result = true
+      end
+    end
+    result
+  end
 end

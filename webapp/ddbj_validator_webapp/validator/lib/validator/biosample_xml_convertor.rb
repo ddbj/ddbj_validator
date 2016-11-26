@@ -52,7 +52,6 @@ class BioSampleXmlConvertor
   # attribute_listは属性名が重複している可能性があるリスト(属性名重複チェック(34.Multiple Attribute values)で仕様される)
   #
   def xml2obj(xml_document)
-    #TODO xml parse error
     begin
       doc = REXML::Document.new(xml_document)
     rescue => ex
@@ -133,7 +132,7 @@ class BioSampleXmlConvertor
   end
 
   #
-  # 属性名からファイル情報XPathを返す
+  # 属性名からXPathを返す
   # sample_nameのようにXMLの複数箇所に記述される属性があるため配列で返す
   #
   # ==== Args
@@ -160,6 +159,24 @@ class BioSampleXmlConvertor
     else
       xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]")
     end
+    xpath
+  end
+
+  #
+  # 属性名のXPathを返す
+  # rule12(special_character_included),13(invalid_data_format)において属性名のAuto-annotationが発生する場合に使用する
+  # ユーザの自由書式であるAttributesタグでしかAuto-annotationが発生しないため、Attributesタグしか参照しない
+  #
+  # ==== Args
+  # attr_name: 属性名 ex. sample comment
+  # item_no: BioSampleの出現順のNo
+  # ==== Return
+  # XPathの配列
+  # ex. ["//BioSample[2]/Attributes/Attribute[@attribute_name=\"sample   comment\"]/@attribute_name"]
+  #
+  def xpath_of_attrname (attr_name, item_no)
+    xpath = []
+    xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]/@attribute_name")
     xpath
   end
 end
