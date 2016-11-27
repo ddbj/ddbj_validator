@@ -203,7 +203,7 @@ router.post('/upload', function(req, res, next){
         //delete temporary file
         //exec('find ./tmp/ -mtime +1 -exec rm {} \;', function(error, stdout, stderr){
         //exec('rm ./tmp/response* ', function(error, stdout, stderr){
-        exec('find ./tmp -type f -mtime +1 | xargs rm -f \;', function(error, stdout, stderr){
+        exec('find ./tmp -type f -mtime +1 -exec rm {} \;', function(error, stdout, stderr){
             if(error){
                 console.log("exec error: " + error);
             }else if(stderr){

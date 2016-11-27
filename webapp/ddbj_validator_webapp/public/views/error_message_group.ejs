@@ -48,13 +48,15 @@
         <div class="tbl_warning">
         <% } %>
 
-            <table>
+            <table class="grouped">
+                <thead>
                 <tr>
                     <% for (var j = 0; j < errors[i].values[0].annotation.length; j++) { %>
                     <th><%= errors[i].values[0].annotation[j].key %></th>
                     <% } %>
                 </tr>
-
+                </thead>
+                <tbody>
                 <% for(var h = 0; h < errors[i].values.length; h++) { %>
                 <tr>
                 <% for(var j = 0; j < errors[i].values[h].annotation.length; j++) { %>
@@ -66,6 +68,7 @@
                 <% } %>
                 </tr>
                 <% } %>
+                </tbody>
 
             </table>
 
@@ -90,6 +93,9 @@
             })
             */
         }
+        $(".grouped").DataTable();
+
+
     })
 </script>
 

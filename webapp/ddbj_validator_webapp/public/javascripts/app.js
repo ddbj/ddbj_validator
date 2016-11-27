@@ -98,7 +98,6 @@
 
 
                 $.ajax(ajax_obj).done(function (error_message) {
-                    console.log(error_message);
                     /*
                     var message = new Message();
                     message.save({
