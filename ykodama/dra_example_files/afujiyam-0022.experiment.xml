@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EXPERIMENT_SET>
+    <EXPERIMENT alias="afujiyam-0022_Experiment_0001" center_name="NIG" accession="DRX007648">
+        <TITLE>Whole genome sequencing of Strongyloides venezuelensis by 300bp paired-end library.</TITLE>
+        <STUDY_REF accession="PRJDB2590">
+            <IDENTIFIERS>
+                <PRIMARY_ID label="BioProject ID">PRJDB2590</PRIMARY_ID>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR accession="SAMD00012916">
+                <IDENTIFIERS>
+                    <PRIMARY_ID label="BioSample ID">SAMD00012916</PRIMARY_ID>
+                </IDENTIFIERS>
+            </SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <PAIRED NOMINAL_LENGTH="300"/>
+                </LIBRARY_LAYOUT>
+            </LIBRARY_DESCRIPTOR>
+            <SPOT_DESCRIPTOR>
+                <SPOT_DECODE_SPEC>
+                    <SPOT_LENGTH>220</SPOT_LENGTH>
+                    <READ_SPEC>
+                        <READ_INDEX>0</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Forward</READ_TYPE>
+                        <BASE_COORD>1</BASE_COORD>
+                    </READ_SPEC>
+                    <READ_SPEC>
+                        <READ_INDEX>1</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Reverse</READ_TYPE>
+                        <BASE_COORD>111</BASE_COORD>
+                    </READ_SPEC>
+                </SPOT_DECODE_SPEC>
+            </SPOT_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina Genome Analyzer IIx</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION>
+                    <STEP_INDEX>1</STEP_INDEX>
+                    <PREV_STEP_INDEX>NIL</PREV_STEP_INDEX>
+                    <PROGRAM></PROGRAM>
+                    <VERSION></VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+        </PROCESSING>
+    </EXPERIMENT>
+    <EXPERIMENT alias="afujiyam-0022_Experiment_0002" center_name="NIG" accession="DRX007649">
+        <TITLE>Whole genome sequencing of Strongyloides venezuelensis by 500bp paired-end library.</TITLE>
+        <STUDY_REF accession="PRJDB2590">
+            <IDENTIFIERS>
+                <PRIMARY_ID label="BioProject ID">PRJDB2590</PRIMARY_ID>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR accession="SAMD00012916">
+                <IDENTIFIERS>
+                    <PRIMARY_ID label="BioSample ID">SAMD00012916</PRIMARY_ID>
+                </IDENTIFIERS>
+            </SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <PAIRED NOMINAL_LENGTH="500"/>
+                </LIBRARY_LAYOUT>
+            </LIBRARY_DESCRIPTOR>
+            <SPOT_DESCRIPTOR>
+                <SPOT_DECODE_SPEC>
+                    <SPOT_LENGTH>200</SPOT_LENGTH>
+                    <READ_SPEC>
+                        <READ_INDEX>0</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Forward</READ_TYPE>
+                        <BASE_COORD>1</BASE_COORD>
+                    </READ_SPEC>
+                    <READ_SPEC>
+                        <READ_INDEX>1</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Reverse</READ_TYPE>
+                        <BASE_COORD>101</BASE_COORD>
+                    </READ_SPEC>
+                </SPOT_DECODE_SPEC>
+            </SPOT_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION>
+                    <STEP_INDEX>1</STEP_INDEX>
+                    <PREV_STEP_INDEX>NIL</PREV_STEP_INDEX>
+                    <PROGRAM></PROGRAM>
+                    <VERSION></VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+        </PROCESSING>
+    </EXPERIMENT>
+    <EXPERIMENT alias="afujiyam-0022_Experiment_0003" center_name="NIG" accession="DRX007650">
+        <TITLE>Whole genome sequencing of Strongyloides venezuelensis by 3kb mate-pair library.</TITLE>
+        <STUDY_REF accession="PRJDB2590">
+            <IDENTIFIERS>
+                <PRIMARY_ID label="BioProject ID">PRJDB2590</PRIMARY_ID>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR accession="SAMD00012916">
+                <IDENTIFIERS>
+                    <PRIMARY_ID label="BioSample ID">SAMD00012916</PRIMARY_ID>
+                </IDENTIFIERS>
+            </SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <PAIRED NOMINAL_LENGTH="3000"/>
+                </LIBRARY_LAYOUT>
+            </LIBRARY_DESCRIPTOR>
+            <SPOT_DESCRIPTOR>
+                <SPOT_DECODE_SPEC>
+                    <SPOT_LENGTH>200</SPOT_LENGTH>
+                    <READ_SPEC>
+                        <READ_INDEX>0</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Reverse</READ_TYPE>
+                        <BASE_COORD>1</BASE_COORD>
+                    </READ_SPEC>
+                    <READ_SPEC>
+                        <READ_INDEX>1</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Forward</READ_TYPE>
+                        <BASE_COORD>101</BASE_COORD>
+                    </READ_SPEC>
+                </SPOT_DECODE_SPEC>
+            </SPOT_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION>
+                    <STEP_INDEX>1</STEP_INDEX>
+                    <PREV_STEP_INDEX>NIL</PREV_STEP_INDEX>
+                    <PROGRAM></PROGRAM>
+                    <VERSION></VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+        </PROCESSING>
+    </EXPERIMENT>
+    <EXPERIMENT alias="afujiyam-0022_Experiment_0004" center_name="NIG" accession="DRX007651">
+        <TITLE>Whole genome sequencing of Strongyloides venezuelensis by 5kb mate-pair library.</TITLE>
+        <STUDY_REF accession="PRJDB2590">
+            <IDENTIFIERS>
+                <PRIMARY_ID label="BioProject ID">PRJDB2590</PRIMARY_ID>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR accession="SAMD00012916">
+                <IDENTIFIERS>
+                    <PRIMARY_ID label="BioSample ID">SAMD00012916</PRIMARY_ID>
+                </IDENTIFIERS>
+            </SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <PAIRED NOMINAL_LENGTH="5000"/>
+                </LIBRARY_LAYOUT>
+            </LIBRARY_DESCRIPTOR>
+            <SPOT_DESCRIPTOR>
+                <SPOT_DECODE_SPEC>
+                    <SPOT_LENGTH>200</SPOT_LENGTH>
+                    <READ_SPEC>
+                        <READ_INDEX>0</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Reverse</READ_TYPE>
+                        <BASE_COORD>1</BASE_COORD>
+                    </READ_SPEC>
+                    <READ_SPEC>
+                        <READ_INDEX>1</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Forward</READ_TYPE>
+                        <BASE_COORD>101</BASE_COORD>
+                    </READ_SPEC>
+                </SPOT_DECODE_SPEC>
+            </SPOT_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <ILLUMINA>
+                <INSTRUMENT_MODEL>Illumina HiSeq 2000</INSTRUMENT_MODEL>
+            </ILLUMINA>
+        </PLATFORM>
+        <PROCESSING>
+            <PIPELINE>
+                <PIPE_SECTION>
+                    <STEP_INDEX>1</STEP_INDEX>
+                    <PREV_STEP_INDEX>NIL</PREV_STEP_INDEX>
+                    <PROGRAM></PROGRAM>
+                    <VERSION></VERSION>
+                </PIPE_SECTION>
+            </PIPELINE>
+        </PROCESSING>
+    </EXPERIMENT>
+</EXPERIMENT_SET>

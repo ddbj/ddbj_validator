@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN alias="yosukeyamada-0001_Run_0001" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : 129</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0001" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="129_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="8a39cb563c261d8354947b24cd463e9c"/>
+                <FILE filename="129_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="513d86390255419e977ef4334ee6e105"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0002" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : BL6</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0002" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="BL6_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="8f0642552bd95992916815ffc139953a"/>
+                <FILE filename="BL6_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="05c08e3870b2a69153dc37a433901c28"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0003" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC1_1</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0003" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC1_1_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="2d603a2845ad48927265e6ccb4e04fc5"/>
+                <FILE filename="RTC1_1_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="6a6376eddaf2302015e0eb2b56451cb4"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0004" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC1_2</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0004" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC1_2_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="b7ef90348f6ab5161ca0d8b4eb7c0e39"/>
+                <FILE filename="RTC1_2_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="4563edabab0f990036138315bdd0506d"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0005" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC1_3</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0005" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC1_3_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="8138f14c5304486f9095bb46f39bd014"/>
+                <FILE filename="RTC1_3_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="cd477b8ddde4ea88ab4e96e660229712"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0006" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC1_4</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0006" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC1_4_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="4066f5894c673885be0c870627d66eb4"/>
+                <FILE filename="RTC1_4_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="b415cbcfaa08ffca16617477ba52b192"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0007" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC2_1</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0007" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC2_1_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="22c3d54800a6bf49642fddbe55882283"/>
+                <FILE filename="RTC2_1_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="86a22648efffb5550af90806e2deec9a"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0008" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC2_2</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0008" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC2_2_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="b76b0a899e11e4ede1cee9873d78bfde"/>
+                <FILE filename="RTC2_2_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="248415fc9b010ad6ced1590c3fbc4ffe"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0009" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : RTC2_3</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0009" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="RTC2_3_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="3bc3d8f3607bece92aa3c186c1c6aa26"/>
+                <FILE filename="RTC2_3_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="3bf901e28994fc07ae565ddd4b6e5348"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="yosukeyamada-0001_Run_0010" center_name="CIRA">
+        <TITLE>Illumina HiSeq 2500 paired end sequencing of SSUB007248 : V65</TITLE>
+        <EXPERIMENT_REF refname="yosukeyamada-0001_Experiment_0010" refcenter="CIRA"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="V65_R1.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="eb960ce0e4dd8c425ac26961ac54ec7d"/>
+                <FILE filename="V65_R2.fastq.gz" filetype="fastq" checksum_method="MD5" checksum="7f5562a883f3bc59a5ecda4d16bfcdd4"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+</RUN_SET>

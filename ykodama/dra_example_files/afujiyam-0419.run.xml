@@ -1,0 +1,1023 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN alias="afujiyam-0419_Run_0001" center_name="UT-GALS" accession="DRR063940">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="68a5d94cb81c047837ada8c8ffc16b91"/>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="616079f473841320c732a1518b4fbec4"/>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="103d6077ec4108349d8f4138c32b9db1"/>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d705a769e6fadf621a3b95cfdfa63e0f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0002" center_name="UT-GALS" accession="DRR063941">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1e4a7aa7abf539a88c660d232496460c"/>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ee7660d219157edb62c5ae2329e0d3b0"/>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5d150c5ddf683160f4a336ceef177db0"/>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="bbf29a0b3e2a9c9216cdec55177b47b9"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0003" center_name="UT-GALS" accession="DRR063942">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131120_124618_42192_c100585382550000001823104004281402_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b2ca21dba5c03c313353595eaaa46891"/>
+                <FILE filename="m131120_124618_42192_c100585382550000001823104004281402_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5df450f55ff982f0093dd0d64fbb697b"/>
+                <FILE filename="m131120_124618_42192_c100585382550000001823104004281402_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4e10c8e6fce05e49db070f4796145883"/>
+                <FILE filename="m131120_124618_42192_c100585382550000001823104004281402_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="df3ff0b1c7e62ffd2e484af6ae7253c1"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0004" center_name="UT-GALS" accession="DRR063943">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_073742_42192_c100585382550000001823104004281403_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9b6d6aee871449924d9d879bd56c39f9"/>
+                <FILE filename="m131121_073742_42192_c100585382550000001823104004281403_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1eef3073fcabe080c48e8235dfe6b2f6"/>
+                <FILE filename="m131121_073742_42192_c100585382550000001823104004281403_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="324f4b68050fff0033342762e12c1fd9"/>
+                <FILE filename="m131121_073742_42192_c100585382550000001823104004281403_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4c3e64c32a9b84e404ebc97bd3a60d2c"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0005" center_name="UT-GALS" accession="DRR063944">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_095655_42192_c100585382550000001823104004281404_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8993022bda53dae59747e7310ff3c495"/>
+                <FILE filename="m131121_095655_42192_c100585382550000001823104004281404_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="aa7fd99ec11730989573005a2cbc9fec"/>
+                <FILE filename="m131121_095655_42192_c100585382550000001823104004281404_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="eddadf724bccfb0a50fa61a53c149ec4"/>
+                <FILE filename="m131121_095655_42192_c100585382550000001823104004281404_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e58fdb5f5441814414f1e5fd026d7cdc"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0006" center_name="UT-GALS" accession="DRR063945">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_121608_42192_c100585382550000001823104004281405_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e45c96da97297aaf44863b593e7cc8ac"/>
+                <FILE filename="m131121_121608_42192_c100585382550000001823104004281405_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7675876cb18a96dbbb40f3f8949bc768"/>
+                <FILE filename="m131121_121608_42192_c100585382550000001823104004281405_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="729f26ca3cbfffe10cfc37c8aa8a8bed"/>
+                <FILE filename="m131121_121608_42192_c100585382550000001823104004281405_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2a773a69d80ee23a773a106b13b0fae3"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0007" center_name="UT-GALS" accession="DRR063946">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_143521_42192_c100585382550000001823104004281406_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="65f3ebf2cff85e834a670a49cbda944c"/>
+                <FILE filename="m131121_143521_42192_c100585382550000001823104004281406_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="644631894fddab1748565e7eb6e72d7a"/>
+                <FILE filename="m131121_143521_42192_c100585382550000001823104004281406_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c2d9ab204922779555f53b4abd530fd5"/>
+                <FILE filename="m131121_143521_42192_c100585382550000001823104004281406_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5d721a6898f1331403fc0fcfd2464ba5"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0008" center_name="UT-GALS" accession="DRR063947">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_165434_42192_c100585382550000001823104004281407_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="af31f3fe6fb174ed6cc64b077aef3fe7"/>
+                <FILE filename="m131121_165434_42192_c100585382550000001823104004281407_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="bbebabd943712f3e22a639116ef60231"/>
+                <FILE filename="m131121_165434_42192_c100585382550000001823104004281407_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="535217a413c78c0bfb2b8bad24c16cb5"/>
+                <FILE filename="m131121_165434_42192_c100585382550000001823104004281407_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="844b537228660983e3fdfa7c415800c2"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0009" center_name="UT-GALS" accession="DRR063948">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_191347_42192_c100582692550000001823096104281420_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a536159a0b283c8180256c1a1abb103c"/>
+                <FILE filename="m131121_191347_42192_c100582692550000001823096104281420_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4072753d07b3d5f144406a250baa29db"/>
+                <FILE filename="m131121_191347_42192_c100582692550000001823096104281420_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="909f1445a693cd732f4acaac5131f025"/>
+                <FILE filename="m131121_191347_42192_c100582692550000001823096104281420_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="555cd60edd3fe860c52123264203dc1c"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0010" center_name="UT-GALS" accession="DRR063949">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_213641_42192_c100582692550000001823096104281421_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="01e414c523b55c4f8524403285a0e3c0"/>
+                <FILE filename="m131121_213641_42192_c100582692550000001823096104281421_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="010df08cf149cb5ea5757e535363fa14"/>
+                <FILE filename="m131121_213641_42192_c100582692550000001823096104281421_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a2433f9723c52d4c28132f021333ffc1"/>
+                <FILE filename="m131121_213641_42192_c100582692550000001823096104281421_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3adc72a88ad078a3cf494e860e076d4b"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0011" center_name="UT-GALS" accession="DRR063950">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131121_235213_42192_c100582692550000001823096104281422_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d962a6f56ee33b03e168cde9c02f62ce"/>
+                <FILE filename="m131121_235213_42192_c100582692550000001823096104281422_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8a7abd57f941dc02ae23a6b34321efd1"/>
+                <FILE filename="m131121_235213_42192_c100582692550000001823096104281422_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5fcc30f5230f7def4578e914fb20b45a"/>
+                <FILE filename="m131121_235213_42192_c100582692550000001823096104281422_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9c2ba648393c8af49dc8d0819f887822"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0012" center_name="UT-GALS" accession="DRR063951">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_082836_42192_c100585252550000001823104004281460_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="35c31a7a37d1262bf32b0d1a16a4da3f"/>
+                <FILE filename="m131122_082836_42192_c100585252550000001823104004281460_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="88a0c047944a6eb2c1c7057894fe1768"/>
+                <FILE filename="m131122_082836_42192_c100585252550000001823104004281460_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="aaf7046ce531e17478e0706e370e0e67"/>
+                <FILE filename="m131122_082836_42192_c100585252550000001823104004281460_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="678195e7eecd812efc976a605856d268"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0013" center_name="UT-GALS" accession="DRR063952">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_104749_42192_c100585252550000001823104004281461_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="83f329d0180d51b5c6a619d30108bfea"/>
+                <FILE filename="m131122_104749_42192_c100585252550000001823104004281461_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a7757c7f1537dca8aa859d2ff21f83a4"/>
+                <FILE filename="m131122_104749_42192_c100585252550000001823104004281461_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="69ce38e65d243f1c5a7423b0b0add6c1"/>
+                <FILE filename="m131122_104749_42192_c100585252550000001823104004281461_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1edc07c6f35a4c6e79ffec6d9484d208"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0014" center_name="UT-GALS" accession="DRR063953">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_130709_42192_c100585252550000001823104004281462_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5072007c97a15707cec882b9e127ba5b"/>
+                <FILE filename="m131122_130709_42192_c100585252550000001823104004281462_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cf7236e91e3f77e0d67c776c1a15d486"/>
+                <FILE filename="m131122_130709_42192_c100585252550000001823104004281462_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="0fc0393eb998e9751dca1623daef841c"/>
+                <FILE filename="m131122_130709_42192_c100585252550000001823104004281462_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d365e069671c40f08ab0c7d9bba4c94f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0015" center_name="UT-GALS" accession="DRR063954">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_152615_42192_c100585252550000001823104004281463_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="0a316eabbf04c7552f52873fc191f423"/>
+                <FILE filename="m131122_152615_42192_c100585252550000001823104004281463_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cfcd6d8115efa49cd54a9f2f3d86c6bd"/>
+                <FILE filename="m131122_152615_42192_c100585252550000001823104004281463_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9f28657aa47c71c965ab3858cc356d1f"/>
+                <FILE filename="m131122_152615_42192_c100585252550000001823104004281463_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="22fd392c57ef58af6c9663595e95269e"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0016" center_name="UT-GALS" accession="DRR063955">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_174528_42192_c100585252550000001823104004281464_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="40d54abc700e8b4211b853ca634d4d54"/>
+                <FILE filename="m131122_174528_42192_c100585252550000001823104004281464_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="071b578987dccd45639b5db0f6f6c652"/>
+                <FILE filename="m131122_174528_42192_c100585252550000001823104004281464_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="01dc9d6af5575512c5e4b130ed6fa8c5"/>
+                <FILE filename="m131122_174528_42192_c100585252550000001823104004281464_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ebc722428c5bdafa939ec002818f43a1"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0017" center_name="UT-GALS" accession="DRR063956">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_200442_42192_c100585252550000001823104004281465_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ac23aea08383e3333875448801debd9c"/>
+                <FILE filename="m131122_200442_42192_c100585252550000001823104004281465_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="39a05048ab79786b14993d41328b9b2e"/>
+                <FILE filename="m131122_200442_42192_c100585252550000001823104004281465_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4b0848520ba75ce75f40ee902b5ab913"/>
+                <FILE filename="m131122_200442_42192_c100585252550000001823104004281465_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9915972fc1ff9bc50e4b414da1f0f61c"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0018" center_name="UT-GALS" accession="DRR063957">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131122_222727_42192_c100585252550000001823104004281466_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8ffe435ed840b916a94caaa9455113bb"/>
+                <FILE filename="m131122_222727_42192_c100585252550000001823104004281466_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ce41e59d34f4a88361743ad2867753d7"/>
+                <FILE filename="m131122_222727_42192_c100585252550000001823104004281466_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="31723b797371d0731ff3b1b934e62355"/>
+                <FILE filename="m131122_222727_42192_c100585252550000001823104004281466_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="60ed60f4d0d59c8b84b674af4c65d12a"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0019" center_name="UT-GALS" accession="DRR063958">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131123_004307_42192_c100585252550000001823104004281467_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7e64708b3a701878a627fb2e54157806"/>
+                <FILE filename="m131123_004307_42192_c100585252550000001823104004281467_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="eff3000478448ed8d6ae01cf7a5eddf4"/>
+                <FILE filename="m131123_004307_42192_c100585252550000001823104004281467_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="eb13eccdb9a8d415124ff723863f4934"/>
+                <FILE filename="m131123_004307_42192_c100585252550000001823104004281467_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="0a8ce72500213b82685e43f4fb43b0c3"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0020" center_name="UT-GALS" accession="DRR063959">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140716_083830_42192_c100629172550000001823105008061450_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="87280f537ba047f37e3148b6f59884a9"/>
+                <FILE filename="m140716_083830_42192_c100629172550000001823105008061450_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c8c7e43ab3fc12b0e78f68fd9a32ebf1"/>
+                <FILE filename="m140716_083830_42192_c100629172550000001823105008061450_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ecd5ad2e2b168138078e506bb9a62387"/>
+                <FILE filename="m140716_083830_42192_c100629172550000001823105008061450_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d74fff25c0f529889ca5351017533de6"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0021" center_name="UT-GALS" accession="DRR063960">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140716_115743_42192_c100629172550000001823105008061451_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e8ac053069c5ad87451d29ebb61abfa9"/>
+                <FILE filename="m140716_115743_42192_c100629172550000001823105008061451_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="63c7b8d0fae16a840b49e1a812ed2435"/>
+                <FILE filename="m140716_115743_42192_c100629172550000001823105008061451_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="fa6e30d978aa31d122017f1f68cb27f6"/>
+                <FILE filename="m140716_115743_42192_c100629172550000001823105008061451_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="62c7bc86a4d7ebff5e294097ae4513de"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0022" center_name="UT-GALS" accession="DRR063961">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140716_151656_42192_c100629172550000001823105008061452_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3daf26a7c4910a0505597db5845b259d"/>
+                <FILE filename="m140716_151656_42192_c100629172550000001823105008061452_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7e43b6ef06f6cab3ef4e4b3e7832a312"/>
+                <FILE filename="m140716_151656_42192_c100629172550000001823105008061452_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2cc9ceff9a7cdc72ca454cc2e4d529f7"/>
+                <FILE filename="m140716_151656_42192_c100629172550000001823105008061452_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="730eaa90fa21c34e01158f19fb59e6d8"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0023" center_name="UT-GALS" accession="DRR063962">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140716_183609_42192_c100629172550000001823105008061453_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e4ec0218714b3c19f00d77539ea84525"/>
+                <FILE filename="m140716_183609_42192_c100629172550000001823105008061453_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="818ef5fed29a4041c632e0c4be79fadb"/>
+                <FILE filename="m140716_183609_42192_c100629172550000001823105008061453_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c62cf2a200660a74fb74053c5cc10783"/>
+                <FILE filename="m140716_183609_42192_c100629172550000001823105008061453_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8c1b2ca0468cea0afc6496eb1509fad3"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0024" center_name="UT-GALS" accession="DRR063963">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140717_082942_42192_c100629172550000001823105008061454_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6119dd07a0b6366060592bb52bc6534e"/>
+                <FILE filename="m140717_082942_42192_c100629172550000001823105008061454_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3b5227601f613ac88f9dde891bf5c61a"/>
+                <FILE filename="m140717_082942_42192_c100629172550000001823105008061454_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d21cc8ae6dad3832f015bdf01a78e8ef"/>
+                <FILE filename="m140717_082942_42192_c100629172550000001823105008061454_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="12daf5cdab55467c983fafb88bd17829"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0025" center_name="UT-GALS" accession="DRR063964">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140717_114841_42192_c100629172550000001823105008061455_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8e11a1f721c9b1b63ffbfe6179c4f803"/>
+                <FILE filename="m140717_114841_42192_c100629172550000001823105008061455_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2180af5fb32a12cd590d61839a23aa6a"/>
+                <FILE filename="m140717_114841_42192_c100629172550000001823105008061455_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="fad2a20a2e2e1ed8b6c1983a3a8a8ba9"/>
+                <FILE filename="m140717_114841_42192_c100629172550000001823105008061455_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="fb22eab04ec1e63727ce0ea54eed2788"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0026" center_name="UT-GALS" accession="DRR063965">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140717_150754_42192_c100629172550000001823105008061456_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="519fcc11ba20163c2555057c91cec91f"/>
+                <FILE filename="m140717_150754_42192_c100629172550000001823105008061456_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cf95bc6597add1c7d4752d92f9f1d184"/>
+                <FILE filename="m140717_150754_42192_c100629172550000001823105008061456_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7bb5c64dd93baa6e176f0955d97433eb"/>
+                <FILE filename="m140717_150754_42192_c100629172550000001823105008061456_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9904f59c4960cce1c8c2106d5f16f0c4"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0027" center_name="UT-GALS" accession="DRR063966">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140717_182707_42192_c100629172550000001823105008061457_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e60761785bda1c51b9958b295f0da2f0"/>
+                <FILE filename="m140717_182707_42192_c100629172550000001823105008061457_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="080fdbe442a9a6518dc3fd86360d9651"/>
+                <FILE filename="m140717_182707_42192_c100629172550000001823105008061457_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="936fcc02203e7d43f9713e8547a60e0e"/>
+                <FILE filename="m140717_182707_42192_c100629172550000001823105008061457_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8cc3faf84a1cd5875fe5458880d56c10"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0028" center_name="UT-GALS" accession="DRR063967">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140718_084016_42192_c100629162550000001823105008061460_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="325dc1d2cbac919447c5fe66fbb4471c"/>
+                <FILE filename="m140718_084016_42192_c100629162550000001823105008061460_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="39ed1702b91356a08b545fc4de2ed336"/>
+                <FILE filename="m140718_084016_42192_c100629162550000001823105008061460_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9f49a717aecf993af427074231aacb05"/>
+                <FILE filename="m140718_084016_42192_c100629162550000001823105008061460_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e43d634ee1937aac890847e896eec779"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0029" center_name="UT-GALS" accession="DRR063968">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140718_115929_42192_c100629162550000001823105008061461_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1694c8dc84659f03e8cf0cdebe411e2c"/>
+                <FILE filename="m140718_115929_42192_c100629162550000001823105008061461_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="520bfd2b41ab4f1d99df746069009c2c"/>
+                <FILE filename="m140718_115929_42192_c100629162550000001823105008061461_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d25bbd3299f521c0eb88773e303e6df7"/>
+                <FILE filename="m140718_115929_42192_c100629162550000001823105008061461_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7e9b5dcfe652b7bb6938d7afa871ef13"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0030" center_name="UT-GALS" accession="DRR063969">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140718_151842_42192_c100629162550000001823105008061462_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8380a53979231a1b937ddfb74fe0898a"/>
+                <FILE filename="m140718_151842_42192_c100629162550000001823105008061462_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="98c5fe2fbfefc0571fb3a55d3cf257bf"/>
+                <FILE filename="m140718_151842_42192_c100629162550000001823105008061462_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8e381d5b4f29f0e202e211f188e3db6c"/>
+                <FILE filename="m140718_151842_42192_c100629162550000001823105008061462_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6c57b0df98de2f3dcc1860aaca8d9f3d"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0031" center_name="UT-GALS" accession="DRR063970">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140718_183755_42192_c100629162550000001823105008061463_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b8a941aa09d5397d21f0bc8a5505ab71"/>
+                <FILE filename="m140718_183755_42192_c100629162550000001823105008061463_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d6c268624181219e979fc512dc93286c"/>
+                <FILE filename="m140718_183755_42192_c100629162550000001823105008061463_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7dfd9289e97a32c5f72898959c2cd96b"/>
+                <FILE filename="m140718_183755_42192_c100629162550000001823105008061463_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1ed3519d9ee5ad7220cd14d8fc452dfb"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0032" center_name="UT-GALS" accession="DRR063971">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140718_215708_42192_c100629162550000001823105008061464_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="70a0c1a19a03e798957e0500a1cbde0c"/>
+                <FILE filename="m140718_215708_42192_c100629162550000001823105008061464_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="27d38790876ada95343c1d59068780d2"/>
+                <FILE filename="m140718_215708_42192_c100629162550000001823105008061464_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2c5830eac846748d72b33aeff542e8a8"/>
+                <FILE filename="m140718_215708_42192_c100629162550000001823105008061464_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="f44470fa296cfedb6f554e6a8ea080a8"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0033" center_name="UT-GALS" accession="DRR063972">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140719_011621_42192_c100629162550000001823105008061465_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9f422648f1e0ac6c7993dea1cd172c6f"/>
+                <FILE filename="m140719_011621_42192_c100629162550000001823105008061465_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="04a587a2739c35c4aafc09c401daf663"/>
+                <FILE filename="m140719_011621_42192_c100629162550000001823105008061465_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9d833992a616da11964e8a187861e448"/>
+                <FILE filename="m140719_011621_42192_c100629162550000001823105008061465_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6ca4694376ab824ca234470a1e3ca7d7"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0034" center_name="UT-GALS" accession="DRR063973">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140804_095417_42192_c100635042550000001823116409121440_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="aebcbbcac03427e2f1688d415c60c422"/>
+                <FILE filename="m140804_095417_42192_c100635042550000001823116409121440_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d9a3f6a203536a7ea59d4cce2de27990"/>
+                <FILE filename="m140804_095417_42192_c100635042550000001823116409121440_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5bacf20f44528de079164f31c848a124"/>
+                <FILE filename="m140804_095417_42192_c100635042550000001823116409121440_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="de3201439cd7efdf72a5c6eaa004ab9f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0035" center_name="UT-GALS" accession="DRR063974">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140804_131300_42192_c100635042550000001823116409121441_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ffcdb56222fcd862e44367492bb4dc64"/>
+                <FILE filename="m140804_131300_42192_c100635042550000001823116409121441_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e664eb502531875d3cf93db589edf296"/>
+                <FILE filename="m140804_131300_42192_c100635042550000001823116409121441_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9bbc9398c88440eac76bd00d38149806"/>
+                <FILE filename="m140804_131300_42192_c100635042550000001823116409121441_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="685cd15ac3215e1c4d33a7e522ae8b89"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0036" center_name="UT-GALS" accession="DRR063975">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140804_163213_42192_c100635042550000001823116409121442_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="30a19fdc476be8dea3547958ea61e222"/>
+                <FILE filename="m140804_163213_42192_c100635042550000001823116409121442_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b208e78af7f9142fde747f621ea3b9e9"/>
+                <FILE filename="m140804_163213_42192_c100635042550000001823116409121442_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d58e836d57ed1816c6018073e6d72b4e"/>
+                <FILE filename="m140804_163213_42192_c100635042550000001823116409121442_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b0405748bd4e9b0a8015c2cfbe26084a"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0037" center_name="UT-GALS" accession="DRR063976">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140806_082409_42192_c100634912550000001823116409121410_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5b366a2a2543e028e74b0e7361c9ed8b"/>
+                <FILE filename="m140806_082409_42192_c100634912550000001823116409121410_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="861b93e3b7488a610b6fc74b4f9265db"/>
+                <FILE filename="m140806_082409_42192_c100634912550000001823116409121410_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="f9d78f207b784608a75f361050c5d260"/>
+                <FILE filename="m140806_082409_42192_c100634912550000001823116409121410_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a43925d873b579a9280ac7e31850d643"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0038" center_name="UT-GALS" accession="DRR063977">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140806_114302_42192_c100634912550000001823116409121411_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6bb2d35758f0e6367e68c9b3425794af"/>
+                <FILE filename="m140806_114302_42192_c100634912550000001823116409121411_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a597ac1d1b70c18e0eff618661ee3c00"/>
+                <FILE filename="m140806_114302_42192_c100634912550000001823116409121411_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="515d39497a71eb819d19b4bb85b75bca"/>
+                <FILE filename="m140806_114302_42192_c100634912550000001823116409121411_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ecc660b016ff07a58c7d7b97c53ac034"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0039" center_name="UT-GALS" accession="DRR063978">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140806_150215_42192_c100634912550000001823116409121412_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e75f127834b4164d702d063b4fa85ace"/>
+                <FILE filename="m140806_150215_42192_c100634912550000001823116409121412_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="0e5a7b34528ce45bd320a6a724b76e76"/>
+                <FILE filename="m140806_150215_42192_c100634912550000001823116409121412_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5e1acb9cd4e3a8050212e0d6bfb8c79d"/>
+                <FILE filename="m140806_150215_42192_c100634912550000001823116409121412_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1147744e682048cedac0dc22f4bc77fd"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0040" center_name="UT-GALS" accession="DRR063979">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140806_182128_42192_c100634912550000001823116409121413_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d96e2b3ac1e89770219902de69641896"/>
+                <FILE filename="m140806_182128_42192_c100634912550000001823116409121413_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="38406ab1466763dd07d62f5e52991a4b"/>
+                <FILE filename="m140806_182128_42192_c100634912550000001823116409121413_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="015bc4672f9d0d80851d513ed8ab6c01"/>
+                <FILE filename="m140806_182128_42192_c100634912550000001823116409121413_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cd8f9142efbb9097b6ba1caa539bf98c"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0041" center_name="UT-GALS" accession="DRR063980">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140806_214041_42192_c100634912550000001823116409121414_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="78bd384a0f6aac19775dbd485cbc9b80"/>
+                <FILE filename="m140806_214041_42192_c100634912550000001823116409121414_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e0d6426312db203fa30c864cd4600c34"/>
+                <FILE filename="m140806_214041_42192_c100634912550000001823116409121414_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1da28079ef0751b492d479d296533322"/>
+                <FILE filename="m140806_214041_42192_c100634912550000001823116409121414_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1a973be4200ef487b6910a30b21008dd"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0042" center_name="UT-GALS" accession="DRR063981">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_005954_42192_c100634912550000001823116409121415_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="367de68ea278d911c6580165d44b9bbb"/>
+                <FILE filename="m140807_005954_42192_c100634912550000001823116409121415_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a7ab0ffc8c549261d94c949d9fb803ad"/>
+                <FILE filename="m140807_005954_42192_c100634912550000001823116409121415_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="51fa7fdc76e1498749ac274161ed90c3"/>
+                <FILE filename="m140807_005954_42192_c100634912550000001823116409121415_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="769b8bb9205f47900d76658f12357cf7"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0043" center_name="UT-GALS" accession="DRR063982">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_042251_42192_c100634912550000001823116409121416_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="de4083f48dbbde6ce40a62de2d6b2f85"/>
+                <FILE filename="m140807_042251_42192_c100634912550000001823116409121416_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="49196a4de27930a54bd554588e7f7003"/>
+                <FILE filename="m140807_042251_42192_c100634912550000001823116409121416_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8a72ba4bd3255c9a881354bf403ee8a5"/>
+                <FILE filename="m140807_042251_42192_c100634912550000001823116409121416_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7b6acda1cda5743f8ba059d982926941"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0044" center_name="UT-GALS" accession="DRR063983">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_073825_42192_c100634912550000001823116409121417_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="67909a96b18d1c2b4712ea3ba27de031"/>
+                <FILE filename="m140807_073825_42192_c100634912550000001823116409121417_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d7b1c93d03a3beb62e81048d999dcb6f"/>
+                <FILE filename="m140807_073825_42192_c100634912550000001823116409121417_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a8c58d22910eee9c08e639fe73f6432f"/>
+                <FILE filename="m140807_073825_42192_c100634912550000001823116409121417_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c7cd395543019e73dc6db7cdcdc70d5f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0045" center_name="UT-GALS" accession="DRR063984">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_130526_42192_c100634602550000001823116409121410_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8d79c0152caa0356921ac4afc62f2cc1"/>
+                <FILE filename="m140807_130526_42192_c100634602550000001823116409121410_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ccd8388834cd5eacfbec2901ea82173d"/>
+                <FILE filename="m140807_130526_42192_c100634602550000001823116409121410_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="da83e1ee0e379aa277132b4aaa043aa6"/>
+                <FILE filename="m140807_130526_42192_c100634602550000001823116409121410_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="42de246a0fe7257df5967588eee6edb1"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0046" center_name="UT-GALS" accession="DRR063985">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_162334_42192_c100634602550000001823116409121411_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="93a5f53131c1524c0e1ea2c153757fa6"/>
+                <FILE filename="m140807_162334_42192_c100634602550000001823116409121411_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="624e041382b4445802b15b449294b2a8"/>
+                <FILE filename="m140807_162334_42192_c100634602550000001823116409121411_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="85c30799dc6271a5e8eaf074d0d2576b"/>
+                <FILE filename="m140807_162334_42192_c100634602550000001823116409121411_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="77008fe6e044af168f0549d1d7590d44"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0047" center_name="UT-GALS" accession="DRR063986">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_194247_42192_c100634602550000001823116409121412_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2bb0b40978acab1a64c5ab15e6347acb"/>
+                <FILE filename="m140807_194247_42192_c100634602550000001823116409121412_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1068c6bcb878da461febf4acf7285d5e"/>
+                <FILE filename="m140807_194247_42192_c100634602550000001823116409121412_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6c319a3c08bc65fa7bbd8cde3c67813c"/>
+                <FILE filename="m140807_194247_42192_c100634602550000001823116409121412_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="bd0ffb6b95ea53ebbd7513e0d7453965"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0048" center_name="UT-GALS" accession="DRR063987">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140807_230200_42192_c100634602550000001823116409121413_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="affc786b238c56cb9f85213eccf87b74"/>
+                <FILE filename="m140807_230200_42192_c100634602550000001823116409121413_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2bc7b2eaee145a24613f219b86ebf251"/>
+                <FILE filename="m140807_230200_42192_c100634602550000001823116409121413_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3abb07b6aa596834d17aae5262d12fae"/>
+                <FILE filename="m140807_230200_42192_c100634602550000001823116409121413_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="99fd2d92c6f7521bd0f480c845e1d799"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0049" center_name="UT-GALS" accession="DRR063988">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140808_022113_42192_c100634602550000001823116409121414_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e3250f08d33d69852925db75e2c23506"/>
+                <FILE filename="m140808_022113_42192_c100634602550000001823116409121414_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8f8164dd967e8a88178414c50bc7d9fc"/>
+                <FILE filename="m140808_022113_42192_c100634602550000001823116409121414_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="36d2c2df08c084d612a1ad4c7be6f776"/>
+                <FILE filename="m140808_022113_42192_c100634602550000001823116409121414_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="36ab0984842bb4fd8f42e8a9fec9cddf"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0050" center_name="UT-GALS" accession="DRR063989">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140808_054026_42192_c100634602550000001823116409121415_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4c2ed52bf014510ed3f25576ab01d40b"/>
+                <FILE filename="m140808_054026_42192_c100634602550000001823116409121415_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="856f6de5a945eaa89fdba3a0385fd2f1"/>
+                <FILE filename="m140808_054026_42192_c100634602550000001823116409121415_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8c59a95478ecf92fd73e408e007f3319"/>
+                <FILE filename="m140808_054026_42192_c100634602550000001823116409121415_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="bdabac71d63c05e4feabdf15245ae4bb"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0051" center_name="UT-GALS" accession="DRR063990">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140808_090300_42192_c100634602550000001823116409121416_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9a9052bd1afb6eb510f9172e3c4f57d1"/>
+                <FILE filename="m140808_090300_42192_c100634602550000001823116409121416_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="77a8f77fddb862fa7c4ac6d71bb0980f"/>
+                <FILE filename="m140808_090300_42192_c100634602550000001823116409121416_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8c14ebb73485d54ac54d649495019836"/>
+                <FILE filename="m140808_090300_42192_c100634602550000001823116409121416_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="fc99acb9b6d6d4259af83916df4b9627"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0052" center_name="UT-GALS" accession="DRR063991">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140808_122127_42192_c100634602550000001823116409121417_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b22ce3063903577390a0f9a62ad90fc0"/>
+                <FILE filename="m140808_122127_42192_c100634602550000001823116409121417_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4e35a307ec02772d840a8dc4a7dd9039"/>
+                <FILE filename="m140808_122127_42192_c100634602550000001823116409121417_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="f1e1a5d01819589c764da04820bef291"/>
+                <FILE filename="m140808_122127_42192_c100634602550000001823116409121417_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9938204a646f0046808ba35de6173c8f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0053" center_name="UT-GALS" accession="DRR063992">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140812_082228_42192_c100635212550000001823116409121410_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="444515bec68dda746f695bc9092d0235"/>
+                <FILE filename="m140812_082228_42192_c100635212550000001823116409121410_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="89329f273065b485459c7f1c52e3b6f2"/>
+                <FILE filename="m140812_082228_42192_c100635212550000001823116409121410_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ace14c84b2534639dab815d381003833"/>
+                <FILE filename="m140812_082228_42192_c100635212550000001823116409121410_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="783afa12168c284ef27dc32200c57bb7"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0054" center_name="UT-GALS" accession="DRR063993">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140812_114133_42192_c100635212550000001823116409121411_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2d677f9378a6d722a4cce69b343e34ab"/>
+                <FILE filename="m140812_114133_42192_c100635212550000001823116409121411_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9f77a4fe5828880f6e4aa2e8348f69a8"/>
+                <FILE filename="m140812_114133_42192_c100635212550000001823116409121411_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="47fd4768a81aeef97b4a6a7d56a12923"/>
+                <FILE filename="m140812_114133_42192_c100635212550000001823116409121411_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b5ef26d00355a3a6f03d72a847fad5b8"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0055" center_name="UT-GALS" accession="DRR063994">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140812_150041_42192_c100635212550000001823116409121412_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="43e833fa0c2f0687e20bde2711d56a1f"/>
+                <FILE filename="m140812_150041_42192_c100635212550000001823116409121412_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="bd743e21fb50b0fde687f84248abe4ac"/>
+                <FILE filename="m140812_150041_42192_c100635212550000001823116409121412_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c9f36b660042d826b49f19ab38b497f1"/>
+                <FILE filename="m140812_150041_42192_c100635212550000001823116409121412_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e72d8c4d27e06ea8d2cdf5368d0824cb"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0056" center_name="UT-GALS" accession="DRR063995">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140812_181958_42192_c100635212550000001823116409121413_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a7c9de6248e48258c698e133ba6caafa"/>
+                <FILE filename="m140812_181958_42192_c100635212550000001823116409121413_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="015ff11605c5cf6c602053fd3d3c77e2"/>
+                <FILE filename="m140812_181958_42192_c100635212550000001823116409121413_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="337d6ee991b5f0c027f5826a39d56b8f"/>
+                <FILE filename="m140812_181958_42192_c100635212550000001823116409121413_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9b7a6bf7827e10431d3718d5a14767f0"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0057" center_name="UT-GALS" accession="DRR063996">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140812_213913_42192_c100635212550000001823116409121414_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cdb1a37769374ac688b3c61c987043c0"/>
+                <FILE filename="m140812_213913_42192_c100635212550000001823116409121414_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="51240de83583a78add66c55e07b39fcd"/>
+                <FILE filename="m140812_213913_42192_c100635212550000001823116409121414_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="44891587d65777d129fbb7dfa93badc3"/>
+                <FILE filename="m140812_213913_42192_c100635212550000001823116409121414_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d549444d48d9cbf6a802cac6c2e933cd"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0058" center_name="UT-GALS" accession="DRR063997">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_005814_42192_c100635212550000001823116409121415_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="840225bc4b9383d6927e7c07a57cd618"/>
+                <FILE filename="m140813_005814_42192_c100635212550000001823116409121415_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3b205025db782c729f9a48bad1c4533c"/>
+                <FILE filename="m140813_005814_42192_c100635212550000001823116409121415_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b3578c9452ef6956ac2f49e9dc849535"/>
+                <FILE filename="m140813_005814_42192_c100635212550000001823116409121415_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="64aedfa4f8fea9b07a0ca674fe47c0f4"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0059" center_name="UT-GALS" accession="DRR063998">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_042108_42192_c100635212550000001823116409121416_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ba98bfb94f408f2e01635c57e54dc4c4"/>
+                <FILE filename="m140813_042108_42192_c100635212550000001823116409121416_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9f3f765165a52216d2f686801c64dbd3"/>
+                <FILE filename="m140813_042108_42192_c100635212550000001823116409121416_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3cc36a109120ac80ff8bde56aa0aa2d2"/>
+                <FILE filename="m140813_042108_42192_c100635212550000001823116409121416_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8b4036aab5ed591b86e758f75e30846a"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0060" center_name="UT-GALS" accession="DRR063999">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_073952_42192_c100635212550000001823116409121417_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="22d4a1e0cfd0d88ceea9fc31ccb99e0a"/>
+                <FILE filename="m140813_073952_42192_c100635212550000001823116409121417_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8283931bfd56a97f5c169e7d6b422e2b"/>
+                <FILE filename="m140813_073952_42192_c100635212550000001823116409121417_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="20368ba0d6f516d56159e719dd7bc8fe"/>
+                <FILE filename="m140813_073952_42192_c100635212550000001823116409121417_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1848bc230b8c43b610b09a0ba842fe1b"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0061" center_name="UT-GALS" accession="DRR064000">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_130631_42192_c100635102550000001823116409121450_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ea05058b304dcffe0d03a4ea8bb2d770"/>
+                <FILE filename="m140813_130631_42192_c100635102550000001823116409121450_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="11195373b5682698717159b87fe33be5"/>
+                <FILE filename="m140813_130631_42192_c100635102550000001823116409121450_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ad6a17c11827affcbdbadb9a668c909d"/>
+                <FILE filename="m140813_130631_42192_c100635102550000001823116409121450_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="0d7c40475407eb105fc0243b4973f2c4"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0062" center_name="UT-GALS" accession="DRR064001">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_162427_42192_c100635102550000001823116409121451_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ec9b9ea9deb379a850f8a937baabb390"/>
+                <FILE filename="m140813_162427_42192_c100635102550000001823116409121451_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8d1da57fe104324a9657331a59f0656e"/>
+                <FILE filename="m140813_162427_42192_c100635102550000001823116409121451_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cce313c90f910af933951ac75b3a250e"/>
+                <FILE filename="m140813_162427_42192_c100635102550000001823116409121451_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e2f0ff3c37c52f2a2d514b3a852515ef"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0063" center_name="UT-GALS" accession="DRR064002">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_194331_42192_c100635102550000001823116409121452_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e7bd106da318b11f4d417ba3c647ce4a"/>
+                <FILE filename="m140813_194331_42192_c100635102550000001823116409121452_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="79846984f9a3151e20a77a9537c090be"/>
+                <FILE filename="m140813_194331_42192_c100635102550000001823116409121452_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="76bdbeb7c04a4d467152a9d90887835f"/>
+                <FILE filename="m140813_194331_42192_c100635102550000001823116409121452_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="987c0399c7bd28158394c712de353cbe"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0064" center_name="UT-GALS" accession="DRR064003">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140813_230243_42192_c100635102550000001823116409121453_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="47575a59224f5f366ddafc10a4d3c03a"/>
+                <FILE filename="m140813_230243_42192_c100635102550000001823116409121453_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ab7d16ba11042f82f8c54eeca7453f29"/>
+                <FILE filename="m140813_230243_42192_c100635102550000001823116409121453_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="699ea968963c1cc3e8659abd0c0c654f"/>
+                <FILE filename="m140813_230243_42192_c100635102550000001823116409121453_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="14c7ca66194e22348d1b66a2eee1fecb"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0065" center_name="UT-GALS" accession="DRR064004">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140814_022156_42192_c100635102550000001823116409121454_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9e2143fdce987f2ab623b14c33204f09"/>
+                <FILE filename="m140814_022156_42192_c100635102550000001823116409121454_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2cc447ae388c848b82e8a77c8c12613d"/>
+                <FILE filename="m140814_022156_42192_c100635102550000001823116409121454_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7db8aab8179dba816d4f5bf8e6d3779e"/>
+                <FILE filename="m140814_022156_42192_c100635102550000001823116409121454_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="949545f27fa6c2ff05abd6ed85ba0030"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0066" center_name="UT-GALS" accession="DRR064005">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140814_054109_42192_c100635102550000001823116409121455_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a4b44f9e6a8aa056c690aea472ea70ac"/>
+                <FILE filename="m140814_054109_42192_c100635102550000001823116409121455_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8eadfbb948e51e7bcba26eec29e42bce"/>
+                <FILE filename="m140814_054109_42192_c100635102550000001823116409121455_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3be0da3957de85b7c436507bbe0607ea"/>
+                <FILE filename="m140814_054109_42192_c100635102550000001823116409121455_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="fad94b8b51e82ad0fb665cb32b222d74"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0067" center_name="UT-GALS" accession="DRR064006">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140814_090349_42192_c100635102550000001823116409121456_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="81996149fb684cf6e6a41a65a3b93d22"/>
+                <FILE filename="m140814_090349_42192_c100635102550000001823116409121456_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ac2606aaa6d06679dc634802f123901d"/>
+                <FILE filename="m140814_090349_42192_c100635102550000001823116409121456_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="f1282001083fa18a17ae99f1ed9ec12c"/>
+                <FILE filename="m140814_090349_42192_c100635102550000001823116409121456_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="16ce6e58f9d9d30f9dc9657b8bb21f93"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0068" center_name="UT-GALS" accession="DRR064007">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140814_122223_42192_c100635102550000001823116409121457_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="83f71daa390dde5bcf4d62d585ce7614"/>
+                <FILE filename="m140814_122223_42192_c100635102550000001823116409121457_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c0201d79909d67a32da360833e75d448"/>
+                <FILE filename="m140814_122223_42192_c100635102550000001823116409121457_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="30e9157311ad39caa9682574efd93009"/>
+                <FILE filename="m140814_122223_42192_c100635102550000001823116409121457_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9b711384bf480b0790bbcb749f499c21"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0069" center_name="UT-GALS" accession="DRR064008">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140913_075526_42192_c100634742550000001823116409121447_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a96358a88e30754f1856078b098eb74a"/>
+                <FILE filename="m140913_075526_42192_c100634742550000001823116409121447_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="f44e4351e9a1827455c5108636ae4c95"/>
+                <FILE filename="m140913_075526_42192_c100634742550000001823116409121447_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6d087ca29a245d416adc4fb550191983"/>
+                <FILE filename="m140913_075526_42192_c100634742550000001823116409121447_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="cf5692690463e05b40fe1a012c73fd71"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0070" center_name="UT-GALS" accession="DRR064009">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140916_083954_42192_c100634772550000001823116409121410_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="be6912adafd20736c8f3e4d52f118e34"/>
+                <FILE filename="m140916_083954_42192_c100634772550000001823116409121410_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="be9e9915fd83792ccdf009014ff021b8"/>
+                <FILE filename="m140916_083954_42192_c100634772550000001823116409121410_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="09a5e007e0070120f78b15ca8e723d17"/>
+                <FILE filename="m140916_083954_42192_c100634772550000001823116409121410_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a79826811a85d2d062b4520a647fe833"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0071" center_name="UT-GALS" accession="DRR064010">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140916_115917_42192_c100634772550000001823116409121411_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9e8ad4fbd5968d4019221c9c94235b33"/>
+                <FILE filename="m140916_115917_42192_c100634772550000001823116409121411_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b202f191e1cd7a9532fefe3ef22ddc05"/>
+                <FILE filename="m140916_115917_42192_c100634772550000001823116409121411_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2d1605fe1fd462cc60f0023617e066df"/>
+                <FILE filename="m140916_115917_42192_c100634772550000001823116409121411_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="4788eb37be436fcf2ea15deb9296833f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0072" center_name="UT-GALS" accession="DRR064011">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140916_151820_42192_c100634772550000001823116409121412_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a861fc24843980e478688b587a7049dd"/>
+                <FILE filename="m140916_151820_42192_c100634772550000001823116409121412_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="eb53907fbf5247be66c5d6dd0d43c6fc"/>
+                <FILE filename="m140916_151820_42192_c100634772550000001823116409121412_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ef4d82c79d0bc3baf806015d2172b4bb"/>
+                <FILE filename="m140916_151820_42192_c100634772550000001823116409121412_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a2590ef2d36184b81a0ff50cfeb20009"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0073" center_name="UT-GALS" accession="DRR064012">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140916_183733_42192_c100634772550000001823116409121413_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="3c1ea9bd75e5358cf2c5de0bec2c9936"/>
+                <FILE filename="m140916_183733_42192_c100634772550000001823116409121413_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c3c3bf5f0d37ffafe53c5acce4bd5e8e"/>
+                <FILE filename="m140916_183733_42192_c100634772550000001823116409121413_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1f989ce52a59eb42816ea8f2316fd474"/>
+                <FILE filename="m140916_183733_42192_c100634772550000001823116409121413_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e1aec536af181eb4165c235093b3ab0c"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0074" center_name="UT-GALS" accession="DRR064013">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140916_215658_42192_c100634772550000001823116409121414_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="29b286840b07115f9053c987855bc3ee"/>
+                <FILE filename="m140916_215658_42192_c100634772550000001823116409121414_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="57cf6860cc2065aa530c09ed596afebf"/>
+                <FILE filename="m140916_215658_42192_c100634772550000001823116409121414_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ea929b343c71f341f20ac4c310ecfaef"/>
+                <FILE filename="m140916_215658_42192_c100634772550000001823116409121414_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="eb81d93ed28c2b559fd1eff3588ecefb"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0075" center_name="UT-GALS" accession="DRR064014">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140917_011600_42192_c100634772550000001823116409121415_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5fa5059a98559e1072ad595115d304d9"/>
+                <FILE filename="m140917_011600_42192_c100634772550000001823116409121415_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e2d952297f0accb86ed0c31eacd161f0"/>
+                <FILE filename="m140917_011600_42192_c100634772550000001823116409121415_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="14d805120e661de6741ad9a302330d78"/>
+                <FILE filename="m140917_011600_42192_c100634772550000001823116409121415_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6a6012909f70b205a2cf75c482b9f5b0"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0076" center_name="UT-GALS" accession="DRR064015">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140917_043819_42192_c100634772550000001823116409121416_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="dbd9fdb5a5e837e20ef24dc25673bcf8"/>
+                <FILE filename="m140917_043819_42192_c100634772550000001823116409121416_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="25a8c0608306b8f1966d979eab6441db"/>
+                <FILE filename="m140917_043819_42192_c100634772550000001823116409121416_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a115b53b937843b6feee074c8a4a7ca9"/>
+                <FILE filename="m140917_043819_42192_c100634772550000001823116409121416_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e93c3306b568e38a05506a33fee51b37"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0077" center_name="UT-GALS" accession="DRR064016">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140917_075425_42192_c100634772550000001823116409121417_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="22ceadf553c4bca49c6443f5cbbd51a3"/>
+                <FILE filename="m140917_075425_42192_c100634772550000001823116409121417_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ced8ef77d9533d750bfca096e163920a"/>
+                <FILE filename="m140917_075425_42192_c100634772550000001823116409121417_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b28eb9fccc9c87f98d7d0fe26d522425"/>
+                <FILE filename="m140917_075425_42192_c100634772550000001823116409121417_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="56b806de7d2f213defeca9e15d7a2b8e"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0078" center_name="UT-GALS" accession="DRR064017">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140919_083246_42192_c100635082550000001823116409121400_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9396d907968b2a3ca6b69a7f2888761c"/>
+                <FILE filename="m140919_083246_42192_c100635082550000001823116409121400_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="db43b8bf1dc27c852601f6ebd909dc74"/>
+                <FILE filename="m140919_083246_42192_c100635082550000001823116409121400_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="32773fe1d05f64cf84b0ef1e18224497"/>
+                <FILE filename="m140919_083246_42192_c100635082550000001823116409121400_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b4fdc69b4fca017ddaa91d434927de1d"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0079" center_name="UT-GALS" accession="DRR064018">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140919_115159_42192_c100635082550000001823116409121401_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="6a9ce904e98311216918ded1047ae81a"/>
+                <FILE filename="m140919_115159_42192_c100635082550000001823116409121401_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="368659d34af0a7953b525624c174e910"/>
+                <FILE filename="m140919_115159_42192_c100635082550000001823116409121401_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="da694f540b75489ad86bdc0e6b621c0a"/>
+                <FILE filename="m140919_115159_42192_c100635082550000001823116409121401_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="f61daa872635aa82a6a8ea65367863c8"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0080" center_name="UT-GALS" accession="DRR064019">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140919_151112_42192_c100635082550000001823116409121402_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="144b22d0163e66d408b2dc62f1417be4"/>
+                <FILE filename="m140919_151112_42192_c100635082550000001823116409121402_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="79b712c76af35c17e479ec22ff5cd187"/>
+                <FILE filename="m140919_151112_42192_c100635082550000001823116409121402_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b9185ebd6629dc6b990112d81f7984e6"/>
+                <FILE filename="m140919_151112_42192_c100635082550000001823116409121402_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1d0a28281aebf25d5f576aeb59326796"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0081" center_name="UT-GALS" accession="DRR064020">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140919_183025_42192_c100635082550000001823116409121403_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1483b8009c562806de77b7138e278425"/>
+                <FILE filename="m140919_183025_42192_c100635082550000001823116409121403_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="48623478de089d14a7b13875a68bcf2f"/>
+                <FILE filename="m140919_183025_42192_c100635082550000001823116409121403_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="7a17777c29a005e7db92c3aee2723fdb"/>
+                <FILE filename="m140919_183025_42192_c100635082550000001823116409121403_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="2646dbc17e57fda64225595130df6ada"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0082" center_name="UT-GALS" accession="DRR064021">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140919_214938_42192_c100635082550000001823116409121404_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="93f5e2820fd7a3f1a7cf3339d0b96ff4"/>
+                <FILE filename="m140919_214938_42192_c100635082550000001823116409121404_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d4afd7ebef00ea318923048df8453306"/>
+                <FILE filename="m140919_214938_42192_c100635082550000001823116409121404_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="0d9ba7a8729bc6e4c89b51ecf13fe9b5"/>
+                <FILE filename="m140919_214938_42192_c100635082550000001823116409121404_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="827ee32eccefa40425e096f641810ae5"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0083" center_name="UT-GALS" accession="DRR064022">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140920_010851_42192_c100635082550000001823116409121405_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a18917c89f7848ce15e50f03e55b6620"/>
+                <FILE filename="m140920_010851_42192_c100635082550000001823116409121405_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="c1393261726fecdbe1c7aeb86511fc67"/>
+                <FILE filename="m140920_010851_42192_c100635082550000001823116409121405_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="a121f5f2033d07dd14984bb8515374b1"/>
+                <FILE filename="m140920_010851_42192_c100635082550000001823116409121405_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b9fcad23076da09085b58b8b5789b52d"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0084" center_name="UT-GALS" accession="DRR064023">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140920_043047_42192_c100635082550000001823116409121406_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="af2d9b9431b76e77449b3da96c121c3d"/>
+                <FILE filename="m140920_043047_42192_c100635082550000001823116409121406_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="9cb76d610738f25966249646fbf94198"/>
+                <FILE filename="m140920_043047_42192_c100635082550000001823116409121406_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="b7aeea1c0b076e61e8aba3bef6e0fa5c"/>
+                <FILE filename="m140920_043047_42192_c100635082550000001823116409121406_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ed1a48babad42cb315a56e1a0f90329c"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN alias="afujiyam-0419_Run_0085" center_name="UT-GALS" accession="DRR064024">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <EXPERIMENT_REF refname="afujiyam-0419_Experiment_0001" refcenter="NIG" accession="DRX058175"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m140920_074717_42192_c100635082550000001823116409121407_s1_X0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="8fd182175c739e44ed92819e8bfe4093"/>
+                <FILE filename="m140920_074717_42192_c100635082550000001823116409121407_s1_X0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="80cd1550ce9b8e94c30f9182b1aef53a"/>
+                <FILE filename="m140920_074717_42192_c100635082550000001823116409121407_s1_X0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="801534a1c5c85a44e66ebb953e6bc17f"/>
+                <FILE filename="m140920_074717_42192_c100635082550000001823116409121407_s1_X0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="e7ac7ff17038b4ae34bc99ed8e45569a"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+</RUN_SET>

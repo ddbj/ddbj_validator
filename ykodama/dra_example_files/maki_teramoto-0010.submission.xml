@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SUBMISSION submission_date="2016-07-06T18:07:55.612+09:00" lab_name="Deep seawater Laboratory, Kochi University" alias="maki_teramoto-0010_Submission" center_name="KOCHI" accession="DRA005075">
+    <CONTACTS>
+        <CONTACT name="Maki Teramoto" inform_on_status="maki.teramoto@kochi-u.ac.jp" inform_on_error="maki.teramoto@kochi-u.ac.jp"/>
+    </CONTACTS>
+    <ACTIONS>
+        <ACTION>
+            <ADD source="maki_teramoto-0010.Experiment.xml" schema="experiment"/>
+        </ACTION>
+        <ACTION>
+            <ADD source="maki_teramoto-0010.Run.xml" schema="run"/>
+        </ACTION>
+        <ACTION>
+            <ADD source="maki_teramoto-0010.Analysis.xml" schema="analysis"/>
+        </ACTION>
+        <ACTION>
+            <HOLD HoldUntilDate="2018-07-06+09:00"/>
+        </ACTION>
+    </ACTIONS>
+</SUBMISSION>

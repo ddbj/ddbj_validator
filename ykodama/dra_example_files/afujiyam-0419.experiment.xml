@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EXPERIMENT_SET>
+    <EXPERIMENT alias="afujiyam-0419_Experiment_0001" center_name="UT-GALS" accession="DRX058175">
+        <TITLE>PacBio RS II sequencing of SAMD00054089</TITLE>
+        <STUDY_REF accession="PRJDB4947">
+            <IDENTIFIERS>
+                <PRIMARY_ID label="BioProject ID">PRJDB4947</PRIMARY_ID>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR accession="SAMD00054089">
+                <IDENTIFIERS>
+                    <PRIMARY_ID label="BioSample ID">SAMD00054089</PRIMARY_ID>
+                </IDENTIFIERS>
+            </SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_NAME></LIBRARY_NAME>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <SINGLE/>
+                </LIBRARY_LAYOUT>
+                <LIBRARY_CONSTRUCTION_PROTOCOL></LIBRARY_CONSTRUCTION_PROTOCOL>
+            </LIBRARY_DESCRIPTOR>
+            <SPOT_DESCRIPTOR>
+                <SPOT_DECODE_SPEC>
+                    <SPOT_LENGTH>6879</SPOT_LENGTH>
+                    <READ_SPEC>
+                        <READ_INDEX>0</READ_INDEX>
+                        <READ_CLASS>Application Read</READ_CLASS>
+                        <READ_TYPE>Forward</READ_TYPE>
+                        <BASE_COORD>1</BASE_COORD>
+                    </READ_SPEC>
+                </SPOT_DECODE_SPEC>
+            </SPOT_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <PACBIO_SMRT>
+                <INSTRUMENT_MODEL>PacBio RS II</INSTRUMENT_MODEL>
+            </PACBIO_SMRT>
+        </PLATFORM>
+    </EXPERIMENT>
+</EXPERIMENT_SET>

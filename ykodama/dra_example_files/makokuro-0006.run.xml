@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN run_date="2009-03-23T09:00:00+09:00" run_center="NIID" alias="makokuro-0006_Run_0001" center_name="NIID" accession="DRR000189">
+        <EXPERIMENT_REF refname="makokuro-0006_Experiment_0001" refcenter="NIID" accession="DRX000096"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="Ssalivarius-50mer.fastq.bz2" filetype="fastq" checksum_method="MD5" checksum="a37f498650966fe59ea2a84e28896ef9"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+</RUN_SET>

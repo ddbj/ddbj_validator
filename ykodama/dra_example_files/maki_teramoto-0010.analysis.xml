@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ANALYSIS_SET>
+    <ANALYSIS alias="maki_teramoto-0010_Analysis_0001" center_name="KOCHI" accession="DRZ007637">
+        <TITLE>lib1cut-blank-rdnonbac-1chimera(1321seq)</TITLE>
+        <STUDY_REF accession="PRJDB4968">
+            <IDENTIFIERS>
+                <PRIMARY_ID label="BioProject ID">PRJDB4968</PRIMARY_ID>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESCRIPTION>1321 sequences finally analyzed in the published paper.</DESCRIPTION>
+        <ANALYSIS_TYPE>
+            <SEQUENCE_ANNOTATION>
+                <PROCESSING>
+                    <PIPELINE>
+                        <PIPE_SECTION>
+                            <STEP_INDEX>1</STEP_INDEX>
+                            <PREV_STEP_INDEX>NIL</PREV_STEP_INDEX>
+                            <PROGRAM></PROGRAM>
+                            <VERSION></VERSION>
+                        </PIPE_SECTION>
+                    </PIPELINE>
+                </PROCESSING>
+            </SEQUENCE_ANNOTATION>
+        </ANALYSIS_TYPE>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="lib1cut-blank-rdnonbac-1chimera(1321seq) .txt" filetype="fasta" checksum_method="MD5" checksum="8EB6DED7FFE88938026281DF32044527"/>
+            </FILES>
+        </DATA_BLOCK>
+    </ANALYSIS>
+</ANALYSIS_SET>

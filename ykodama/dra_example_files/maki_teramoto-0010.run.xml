@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN alias="maki_teramoto-0010_Run_0001" center_name="KOCHI" accession="DRR068667">
+        <TITLE>454 GS Junior sequencing of SAMD00054233</TITLE>
+        <EXPERIMENT_REF refname="maki_teramoto-0010_Experiment_0001" refcenter="KOCHI" accession="DRX062617"/>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="454Reads.MID1.sff" filetype="sff" checksum_method="MD5" checksum="E1BEC8FCD1302AF80A22EE0052C91122"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+</RUN_SET>

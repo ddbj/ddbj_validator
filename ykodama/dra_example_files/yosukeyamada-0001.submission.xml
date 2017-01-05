@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SUBMISSION submission_date="2017-01-04T21:24:50.911+09:00" lab_name="Yamada-lab" alias="yosukeyamada-0001_Submission" center_name="CIRA">
+    <CONTACTS>
+        <CONTACT name="Yosuke Yamada" inform_on_status="yosuke.yamada@cira.kyoto-u.ac.jp" inform_on_error="yosuke.yamada@cira.kyoto-u.ac.jp"/>
+        <CONTACT name="Yasuhiro Yamada" inform_on_status="y-yamada@cira.kyoto-u.ac.jp" inform_on_error="y-yamada@cira.kyoto-u.ac.jp"/>
+    </CONTACTS>
+    <ACTIONS>
+        <ACTION>
+            <ADD source="yosukeyamada-0001.Experiment.xml" schema="experiment"/>
+        </ACTION>
+        <ACTION>
+            <ADD source="yosukeyamada-0001.Run.xml" schema="run"/>
+        </ACTION>
+        <ACTION>
+            <HOLD HoldUntilDate="2017-04-01+09:00"/>
+        </ACTION>
+    </ACTIONS>
+</SUBMISSION>

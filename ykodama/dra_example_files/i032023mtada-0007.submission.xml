@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SUBMISSION submission_date="2016-12-28T13:36:35.765+09:00" lab_name="Department of Infectious Diseases, National Center for Global Health and Medicine" alias="i032023mtada-0007_Submission" center_name="NCGM">
+    <CONTACTS>
+        <CONTACT name="Tatsuya Tada" inform_on_status="ttada@ri.ncgm.go.jp" inform_on_error="ttada@ri.ncgm.go.jp"/>
+    </CONTACTS>
+    <ACTIONS>
+        <ACTION>
+            <ADD source="i032023mtada-0007.Experiment.xml" schema="experiment"/>
+        </ACTION>
+        <ACTION>
+            <ADD source="i032023mtada-0007.Run.xml" schema="run"/>
+        </ACTION>
+        <ACTION>
+            <RELEASE/>
+        </ACTION>
+    </ACTIONS>
+</SUBMISSION>
