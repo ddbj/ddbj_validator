@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+	<Package>
+		<Project>
+			<Project>
+				<ProjectID>
+					<ArchiveID accession="PRJDB5317" archive="DDBJ" />
+				</ProjectID>
+				<ProjectDescr>
+					<Title>Dissemination of Carbapenem-Resistant Klebsiella pneumoniae Clinical Isolates with Various Combinations of Carbapenemases and 16S rRNA Methylases in Vietnam</Title>
+					<Description>Twenty-seven clinical isolates of carbapenem-resistant Klebsiella pneumoniae for imipenem or meropenem were obtained from inpatients in a hospital in Vietnam. All the isolates harbored one of genes encoding carbapenemases, including KPC-2, NDM-1, NDM-4 and OXA-48. Of the isolates, 13 were resistant to arbekacin harbored a gene encoding a 16S rRNA methylase, either RmtB or RmtC. Eighteen and 4 isolates belonged to international clones, ST15 and ST16, respectively. These results suggest that carbapenem-resistant K. pneumoniae isolates belonged to international clones spread in medical settings in Vietnam, and that these isolates harbored genes encoding various combinations of carbapenemases and 16S rRNA methylases. This is the first report of KPC-2, NDM-4 and OXA-48 producers in a medical setting in Vietnam.</Description>
+					<ProjectReleaseDate>2016-11-22T10:22:25.351+09:00</ProjectReleaseDate>
+				</ProjectDescr>
+				<ProjectType>
+					<ProjectTypeSubmission>
+						<Target sample_scope="eMonoisolate" material="eGenome" capture="eWhole">
+							<Organism taxID="573">
+								<OrganismName>Klebsiella pneumoniae</OrganismName>
+							</Organism>
+						</Target>
+						<Method method_type="eSequencing" />
+						<Objectives>
+							<Data data_type="eRawSequenceReads" />
+							<Data data_type="eSequence" />
+						</Objectives>
+						<ProjectDataTypeSet>
+							<DataType>Genome Sequencing</DataType>
+						</ProjectDataTypeSet>
+					</ProjectTypeSubmission>
+				</ProjectType>
+			</Project>
+		</Project>
+		<Submission>
+			<Submission submitted="2016-11-21">
+				<Description>
+					<Organization type="center" role="owner">
+						<Name>Department of Infectious Diseases, National Center for Global Health and Medicine</Name>
+						<Contact email="ttada@ri.ncgm.go.jp">
+							<Name>
+								<First>Tatsuya</First>
+								<Last>Tada</Last>
+							</Name>
+						</Contact>
+					</Organization>
+					<Access>public</Access>
+				</Description>
+			</Submission>
+		</Submission>
+	</Package>
+</PackageSet>
