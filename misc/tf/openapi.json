@@ -1,0 +1,178 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "DDBJ Data Validation API",
+        "description": "DDBJ Data Validation API",
+        "version": "dev"
+    },
+    "host": "localhost",
+    "schemes": [
+        "https"
+    ],
+    "basePath": "/api/dev/",
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/validation/": {
+            "post": {
+                "tags": [
+                    "Validation"
+                ],
+                "summary": "DDBJ validation main API",
+                "description": "DDBJ validation main API",
+                "operationId": "validation",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "multipart/form-data",
+                    "application/x-www-form-urlencoded"
+                ],
+                "parameters": [
+                    {
+                        "name": "submission",
+                        "in": "formData",
+                        "description": "Upload DRA submission XML file.",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "study",
+                        "in": "formData",
+                        "description": "Upload DRA study XML file.",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "sample",
+                        "in": "formData",
+                        "description": "Upload DRA sample XML file.",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "expreriment",
+                        "in": "formData",
+                        "description": "Upload DRA sample XML file.",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "run",
+                        "in": "formData",
+                        "description": "Upload DRA run XML file.",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "trad-ann",
+                        "in": "formData",
+                        "description": "Upload sequence fasta format file for MSS",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "trad-seq",
+                        "in": "formData",
+                        "description": "Upload DDBJ submission format file for MSS",
+                        "required": false,
+                        "type": "file"
+                    },
+                    {
+                        "name": "user",
+                        "in": "formData",
+                        "description": "Input D-way user name.",
+                        "required": true,
+                        "type": "string"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "description": "Input D-way user password.",
+                        "required": true,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Result"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Invalid input file supplied.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "Result": {
+            "type": "object",
+            "properties": {
+                "Job ID": {
+                    "type": "string",
+                    "description": "Job ID."
+                },
+                "email": {
+                    "type": "string",
+                    "description": "email."
+                }
+            },
+            "example": {
+                "Job ID": "1eb83b69-154e-4d94-8cb9-2ab7c4a45634",
+                "email": "hoge@nig.ac.jp"
+            }
+        },
+        "Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "fields": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "security": [
+        {
+            "BasicSecurity": []
+        },
+        {
+            "ApiSecurity": []
+        },
+        {
+            "OauthSecurity": []
+        }
+    ],
+    "securityDefinitions": {
+        "BasicSecurity": {
+            "type": "basic"
+        },
+        "ApiSecurity": {
+            "type": "apiKey",
+            "in": "header",
+            "name": "SIMPLE-API-KEY"
+        },
+        "OauthSecurity": {
+            "type": "oauth2",
+            "flow": "accessCode",
+            "authorizationUrl": "https://oauth.simple.api/authorization",
+            "tokenUrl": "https://oauth.simple.api/token"
+        }
+    }
+}
