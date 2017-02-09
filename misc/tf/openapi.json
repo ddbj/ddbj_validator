@@ -34,10 +34,10 @@
                         "$ref": "#/parameters/submission"
                     },
                     {
-                        "$ref": "#/parameters/study"
+                        "$ref": "#/parameters/bioproject"
                     },
                     {
-                        "$ref": "#/parameters/sample"
+                        "$ref": "#/parameters/biosample"
                     },
                     {
                         "$ref": "#/parameters/expreriment"
@@ -76,6 +76,84 @@
                     }
                 }
             }
+        },
+        "/validation/bioproject/": {
+            "post": {
+                "tags": [
+                    "Validation"
+                ],
+                "summary": "DDBJ BioProject validation API",
+                "description": "DDBJ BioProject validation API",
+                "operationId": "validation.bioproject",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "multipart/form-data",
+                    "application/x-www-form-urlencoded"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/bioproject"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Result"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Invalid input file supplied.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/validation/biosample/": {
+            "post": {
+                "tags": [
+                    "Validation"
+                ],
+                "summary": "DDBJ BioSample validation API",
+                "description": "DDBJ BioProject validation API",
+                "operationId": "validation.biosample",
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "multipart/form-data",
+                    "application/x-www-form-urlencoded"
+                ],
+                "parameters": [
+                    {
+                        "$ref": "#/parameters/biosample"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Operation",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Result"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request. Invalid input file supplied.",
+                        "schema": {
+                            "$ref": "#/definitions/Error"
+                        }
+                    }
+                }
+            }
         }
     },
     "parameters": {
@@ -83,6 +161,20 @@
             "name": "submission",
             "in": "formData",
             "description": "Upload DRA submission XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "bioproject": {
+            "name": "bioproject",
+            "in": "formData",
+            "description": "Upload BioProject XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "biosample": {
+            "name": "biosample",
+            "in": "formData",
+            "description": "Upload BioSample XML file.",
             "required": false,
             "type": "file"
         },
@@ -97,6 +189,13 @@
             "name": "sample",
             "in": "formData",
             "description": "Upload DRA sample XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "analysis": {
+            "name": "analysis",
+            "in": "formData",
+            "description": "Upload DRA analysis XML file.",
             "required": false,
             "type": "file"
         },
