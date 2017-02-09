@@ -31,67 +31,31 @@
                 ],
                 "parameters": [
                     {
-                        "name": "submission",
-                        "in": "formData",
-                        "description": "Upload DRA submission XML file.",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/submission"
                     },
                     {
-                        "name": "study",
-                        "in": "formData",
-                        "description": "Upload DRA study XML file.",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/study"
                     },
                     {
-                        "name": "sample",
-                        "in": "formData",
-                        "description": "Upload DRA sample XML file.",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/sample"
                     },
                     {
-                        "name": "expreriment",
-                        "in": "formData",
-                        "description": "Upload DRA sample XML file.",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/expreriment"
                     },
                     {
-                        "name": "run",
-                        "in": "formData",
-                        "description": "Upload DRA run XML file.",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/run"
                     },
                     {
-                        "name": "trad-ann",
-                        "in": "formData",
-                        "description": "Upload sequence fasta format file for MSS",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/trad-ann"
                     },
                     {
-                        "name": "trad-seq",
-                        "in": "formData",
-                        "description": "Upload DDBJ submission format file for MSS",
-                        "required": false,
-                        "type": "file"
+                        "$ref": "#/parameters/trad-seq"
                     },
                     {
-                        "name": "user",
-                        "in": "formData",
-                        "description": "Input D-way user name.",
-                        "required": true,
-                        "type": "string"
+                        "$ref": "#/parameters/user"
                     },
                     {
-                        "name": "password",
-                        "in": "formData",
-                        "description": "Input D-way user password.",
-                        "required": true,
-                        "type": "string"
+                        "$ref": "#/parameters/password"
                     }
                 ],
                 "responses": {
@@ -112,6 +76,71 @@
                     }
                 }
             }
+        }
+    },
+    "parameters": {
+        "submission": {
+            "name": "submission",
+            "in": "formData",
+            "description": "Upload DRA submission XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "study": {
+            "name": "study",
+            "in": "formData",
+            "description": "Upload DRA study XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "sample": {
+            "name": "sample",
+            "in": "formData",
+            "description": "Upload DRA sample XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "expreriment": {
+            "name": "expreriment",
+            "in": "formData",
+            "description": "Upload DRA expreriment XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "run": {
+            "name": "run",
+            "in": "formData",
+            "description": "Upload DRA run XML file.",
+            "required": false,
+            "type": "file"
+        },
+        "trad-ann": {
+            "name": "trad-ann",
+            "in": "formData",
+            "description": "Upload sequence fasta format file for MSS",
+            "required": false,
+            "type": "file"
+        },
+        "trad-seq": {
+            "name": "trad-seq",
+            "in": "formData",
+            "description": "Upload DDBJ submission format file for MSS",
+            "required": false,
+            "type": "file"
+        },
+        "user": {
+            "name": "user",
+            "in": "formData",
+            "description": "Input D-way user name.",
+            "required": true,
+            "type": "string"
+        },
+        "password": {
+            "name": "password",
+            "in": "formData",
+            "description": "Input D-way user password.",
+            "required": true,
+            "type": "string"
         }
     },
     "definitions": {
