@@ -10,4 +10,4 @@
 #     2. Save the worksheet as a Text (Tab-delimited) file - use 'File, Save as, Save as type: Text (Tab-delimited)'
 #     3. Upload the file on the 'Attributes' tab of the BioSample Submission Portal at https://trace.ddbj.nig.ac.jp/D-way/.
 #     4. If you have any questions, please contact us at biosample@ddbj.nig.ac.jp.
-*sample_name	*sample_title	description	*organism	taxonomy_id	bioproject_accession	host	lab_host	*collection_date	*geo_loc_name	*isolate	*isolation_source
+*sample_name	*sample_title	description	*organism	taxonomy_id	bioproject_accession	host	lab_host	*collection_date	*geo_loc_name	*isolate	*isolation_source	altitude	biomaterial_provider	collected_by	culture_collection	depth	disease	env_biome	genotype	host_tissue_sampled	identified_by	lat_lon	passage_history	samp_size	serotype	specimen_voucher	strain	temperature

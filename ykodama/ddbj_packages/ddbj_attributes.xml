@@ -9036,12 +9036,11 @@
         <DescriptionJa/>
     </Attribute>
     <Attribute>
-        <HarmonizedName>temp</HarmonizedName>
+        <HarmonizedName>temperature</HarmonizedName>
         <Name>temperature</Name>
         <Description>temperature of the sample at time of sampling</Description>
         <DescriptionJa/>
         <Format>{float} {unit}</Format>
-        <Synonym>temp</Synonym>
         <Package use="optional">Microbe.1.0</Package>
         <Package use="optional">Invertebrate.1.0</Package>
         <Package use="optional">Plant.1.0</Package>
