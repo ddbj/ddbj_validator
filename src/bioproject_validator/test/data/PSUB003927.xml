@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+	<Package>
+		<Project>
+			<Project>
+				<ProjectID>
+					<ArchiveID accession="PRJDB3323" archive="DDBJ" />
+				</ProjectID>
+				<ProjectDescr>
+					<Title>Floral transcriptome of Ylang Ylang (Cananga odorata var. fruticosa) uncovers the biosynthetic pathways for volatile organic compounds and a  multifunctional and novel sesquiterpene synthase</Title>
+					<Description>The pleasant fragrance of ylang ylang varieties (Cananga odorata) are mainly due to volatile organic compounds (VOCs) produced by the flowers. Floral scents are a key factor in plantinsect interactions and are vital for successful pollination.  C. odorata var. fruticosa or dwarf ylang ylang, is a variety of ylang ylang which is popularly grown in Southeast Asia as a small and compact shrub with aromatic flowers.</Description>
+					<Publication id="25956881">
+						<Reference />
+						<DbType>ePubmed</DbType>
+					</Publication>
+					<ProjectReleaseDate>2016-10-06T15:20:16.697+09:00</ProjectReleaseDate>
+					<Relevance>
+						<Industrial>yes</Industrial>
+					</Relevance>
+				</ProjectDescr>
+				<ProjectType>
+					<ProjectTypeSubmission>
+						<Target sample_scope="eMonoisolate" material="eTranscriptome" capture="eWhole">
+							<Organism taxID="941538">
+								<OrganismName>Cananga odorata var. fruticosa</OrganismName>
+							</Organism>
+						</Target>
+						<Method method_type="eSequencing" />
+						<Objectives>
+							<Data data_type="eRawSequenceReads" />
+							<Data data_type="eSequence" />
+							<Data data_type="eAssembly" />
+							<Data data_type="eAnnotation" />
+							<Data data_type="eExpression" />
+						</Objectives>
+						<ProjectDataTypeSet>
+							<DataType>Transcriptome or Gene Expression</DataType>
+						</ProjectDataTypeSet>
+					</ProjectTypeSubmission>
+				</ProjectType>
+			</Project>
+		</Project>
+		<Submission>
+			<Submission submitted="2014-11-20">
+				<Description>
+					<Organization type="center" role="owner" url="http://www.tll.org.sg/">
+						<Name>Temasek Life Sciences Laboratory</Name>
+						<Contact email="jjjscuedu@gmail.com">
+							<Name>
+								<First>JINGJING</First>
+								<Last>JIN</Last>
+							</Name>
+						</Contact>
+					</Organization>
+					<Access>public</Access>
+				</Description>
+			</Submission>
+		</Submission>
+	</Package>
+</PackageSet>
