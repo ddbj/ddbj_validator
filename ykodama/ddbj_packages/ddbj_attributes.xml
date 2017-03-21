@@ -4208,6 +4208,13 @@
         <Package use="optional" group_name="Host-associated">MIMARKS.survey.host-associated.4.0</Package>
     </Attribute>
     <Attribute>
+        <HarmonizedName>host_strain</HarmonizedName>
+        <Name>host strain</Name>
+        <Description>strain of host</Description>
+        <DescriptionJa>宿主の strain 名</DescriptionJa>
+        <Format>{text}</Format>
+    </Attribute>
+    <Attribute>
         <HarmonizedName>host_subject_id</HarmonizedName>
         <Name>host subject id</Name>
         <Description>a unique identifier by which each subject can be referred to, de-identified, e.g. #131</Description>
@@ -9037,7 +9044,7 @@
     </Attribute>
     <Attribute>
         <HarmonizedName>temperature</HarmonizedName>
-        <Name>temperature</Name>
+        <Name>Fhost</Name>
         <Description>temperature of the sample at time of sampling</Description>
         <DescriptionJa/>
         <Format>{float} {unit}</Format>

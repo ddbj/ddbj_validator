@@ -593,7 +593,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -1127,7 +1127,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -1495,7 +1495,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -1685,7 +1685,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -1941,7 +1941,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -2639,7 +2639,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -3039,7 +3039,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -3403,7 +3403,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -3725,7 +3725,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -4059,7 +4059,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -4435,7 +4435,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -4913,7 +4913,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -5325,7 +5325,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -5767,7 +5767,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -6281,7 +6281,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -7087,7 +7087,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -7667,7 +7667,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -8257,7 +8257,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -9111,7 +9111,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -9589,7 +9589,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -10031,7 +10031,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -10431,7 +10431,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -10843,7 +10843,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -11297,7 +11297,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -11859,7 +11859,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -12355,7 +12355,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -12869,7 +12869,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -13467,7 +13467,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -14441,7 +14441,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -15105,7 +15105,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -15737,7 +15737,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -16627,7 +16627,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -17123,7 +17123,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -17583,7 +17583,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -18001,7 +18001,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -18431,7 +18431,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -18903,7 +18903,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -19483,7 +19483,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -19997,7 +19997,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -20529,7 +20529,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -21145,7 +21145,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -22155,7 +22155,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -22837,7 +22837,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -23415,7 +23415,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -24245,7 +24245,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -24711,7 +24711,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -25141,7 +25141,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -25529,7 +25529,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -25929,7 +25929,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -26371,7 +26371,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -26921,7 +26921,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -27405,7 +27405,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -27907,7 +27907,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -28493,7 +28493,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -29443,7 +29443,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -30095,7 +30095,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -30613,7 +30613,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -31407,7 +31407,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -31855,7 +31855,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -32267,7 +32267,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -32637,7 +32637,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -33019,7 +33019,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -33443,7 +33443,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -33969,7 +33969,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -34429,7 +34429,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -34919,7 +34919,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -35481,7 +35481,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -36383,7 +36383,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -37011,7 +37011,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -37315,7 +37315,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -38001,7 +38001,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -38395,7 +38395,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -38753,7 +38753,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -39069,7 +39069,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -39397,7 +39397,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -39767,7 +39767,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -40239,7 +40239,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -40645,7 +40645,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -41081,7 +41081,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -41589,7 +41589,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -42383,7 +42383,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
@@ -42957,7 +42957,7 @@
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>temperature</HarmonizedName>
-            <Name>temperature</Name>
+            <Name>Fhost</Name>
             <Description>temperature of the sample at time of sampling</Description>
             <DescriptionJa/>
         </Attribute>
