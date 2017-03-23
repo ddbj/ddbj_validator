@@ -1,0 +1,306 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "DDBJ Data Validation API",
+    "description": "DDBJ Data Validation API",
+    "version": "dev"
+  },
+  "host": "localhost",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/api/dev/",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/validation/": {
+      "post": {
+        "tags": [
+          "Validation"
+        ],
+        "summary": "DDBJ validation main API",
+        "description": "DDBJ validation main API",
+        "operationId": "validation",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data",
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/submission"
+          },
+          {
+            "$ref": "#/parameters/bioproject"
+          },
+          {
+            "$ref": "#/parameters/biosample"
+          },
+          {
+            "$ref": "#/parameters/expreriment"
+          },
+          {
+            "$ref": "#/parameters/run"
+          },
+          {
+            "$ref": "#/parameters/trad-ann"
+          },
+          {
+            "$ref": "#/parameters/trad-seq"
+          },
+          {
+            "$ref": "#/parameters/user"
+          },
+          {
+            "$ref": "#/parameters/password"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Result"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Invalid input file supplied.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/validation/bioproject/": {
+      "post": {
+        "tags": [
+          "Validation"
+        ],
+        "summary": "DDBJ BioProject validation API",
+        "description": "DDBJ BioProject validation API",
+        "operationId": "validation.bioproject",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data",
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/bioproject"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Result"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Invalid input file supplied.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/validation/biosample/": {
+      "post": {
+        "tags": [
+          "Validation"
+        ],
+        "summary": "DDBJ BioSample validation API",
+        "description": "DDBJ BioProject validation API",
+        "operationId": "validation.biosample",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "multipart/form-data",
+          "application/x-www-form-urlencoded"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/biosample"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Result"
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request. Invalid input file supplied.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "submission": {
+      "name": "submission",
+      "in": "formData",
+      "description": "Upload DRA submission XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "bioproject": {
+      "name": "bioproject",
+      "in": "formData",
+      "description": "Upload BioProject XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "biosample": {
+      "name": "biosample",
+      "in": "formData",
+      "description": "Upload BioSample XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "study": {
+      "name": "study",
+      "in": "formData",
+      "description": "Upload DRA study XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "sample": {
+      "name": "sample",
+      "in": "formData",
+      "description": "Upload DRA sample XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "analysis": {
+      "name": "analysis",
+      "in": "formData",
+      "description": "Upload DRA analysis XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "expreriment": {
+      "name": "expreriment",
+      "in": "formData",
+      "description": "Upload DRA expreriment XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "run": {
+      "name": "run",
+      "in": "formData",
+      "description": "Upload DRA run XML file.",
+      "required": false,
+      "type": "file"
+    },
+    "trad-ann": {
+      "name": "trad-ann",
+      "in": "formData",
+      "description": "Upload sequence fasta format file for MSS",
+      "required": false,
+      "type": "file"
+    },
+    "trad-seq": {
+      "name": "trad-seq",
+      "in": "formData",
+      "description": "Upload DDBJ submission format file for MSS",
+      "required": false,
+      "type": "file"
+    },
+    "user": {
+      "name": "user",
+      "in": "formData",
+      "description": "Input D-way user name.",
+      "required": true,
+      "type": "string"
+    },
+    "password": {
+      "name": "password",
+      "in": "formData",
+      "description": "Input D-way user password.",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "Result": {
+      "type": "object",
+      "properties": {
+        "Job ID": {
+          "type": "string",
+          "description": "Job ID."
+        },
+        "email": {
+          "type": "string",
+          "description": "email."
+        }
+      },
+      "example": {
+        "Job ID": "1eb83b69-154e-4d94-8cb9-2ab7c4a45634",
+        "email": "hoge@nig.ac.jp"
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BasicSecurity": []
+    },
+    {
+      "ApiSecurity": []
+    },
+    {
+      "OauthSecurity": []
+    }
+  ],
+  "securityDefinitions": {
+    "BasicSecurity": {
+      "type": "basic"
+    },
+    "ApiSecurity": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "SIMPLE-API-KEY"
+    },
+    "OauthSecurity": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://oauth.simple.api/authorization",
+      "tokenUrl": "https://oauth.simple.api/token"
+    }
+  }
+}
