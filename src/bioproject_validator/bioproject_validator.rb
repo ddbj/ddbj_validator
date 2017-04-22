@@ -1,14 +1,14 @@
 require "./" +File.dirname(__FILE__) + "/lib/validator/main_validator.rb"
 
 
-if ARGV.size <= 3
-  puts "Usage: ruby biosample_validator.rb <input_file_path> <format> <output_file_path> <mode>"
+if ARGV.size <= 2
+  puts "Usage: ruby bioproject_validator.rb <input_file_path> <format> <output_file_path>"
   exit(1);
 end
 
 ret = {}
 begin
-  validator = MainValidator.new (ARGV[3])
+  validator = MainValidator.new
   data = ARGV[0]
 
   validator.validate(data);
@@ -21,6 +21,7 @@ begin
 rescue => ex
   message = "#{ex.message}"
 #  message += ex.backtrace.map {|row| row}.join("\n")
+#  puts message
   ret = {status: "error", format: ARGV[1], message: message}
 end
 

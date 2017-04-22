@@ -1,0 +1,332 @@
+{
+  "rule1": {
+    "rule_class": "BioProject",
+    "code": "1",
+    "level": "error",
+    "name": "Not well-formed XML",
+    "method": "not_well_formed_xml",
+    "message": "XML document is not well-formed.",
+    "reference": [
+      "http://www.w3schools.com/xml/xml_validator.asp"
+    ]
+  },
+  "rule2": {
+    "rule_class": "BioProject",
+    "code": "2",
+    "level": "error",
+    "name": "Invalid XML against schema",
+    "method": "invalid_xml_against_schema",
+    "message": "XML document is invalid against the schema.",
+    "reference": [
+      "https://github.com/ddbj/docs/tree/master/bioproject/xsd"
+    ]
+  },
+  "rule3": {
+    "rule_class": "BioProject",
+    "code": "3",
+    "level": "error",
+    "name": "Duplicated project name",
+    "method": "duplicated_project_name",
+    "message": "The following project name was used in the submitted projects more than one time. Please provide unique project name.",
+    "reference": [
+
+    ]
+  },
+  "rule4": {
+    "rule_class": "BioProject",
+    "code": "4",
+    "level": "warning",
+    "name": "Duplicated project title and description",
+    "method": "duplicated_project_title_and_description",
+    "message": "Both project title and description are duplicated with the submitted projects. Duplicated project should not be submitted.",
+    "reference": [
+
+    ]
+  },
+  "rule5": {
+    "rule_class": "BioProject",
+    "code": "5",
+    "level": "error",
+    "name": "Identical project title and description",
+    "method": "identical_project_title_and_description",
+    "message": "Project title and description are identical. Please provide more detailed description.",
+    "reference": [
+
+    ]
+  },
+  "rule6": {
+    "rule_class": "BioProject",
+    "code": "6",
+    "level": "error",
+    "name": "Short project description",
+    "method": "short_project_description",
+    "message": "Project description is too short. Description text must be more than 100 characters.",
+    "reference": [
+
+    ]
+  },
+  "rule7": {
+    "rule_class": "BioProject",
+    "code": "7",
+    "level": "error",
+    "name": "Empty description for other relevance",
+    "method": "empty_description_for_other_relevance",
+    "message": "Text description for the Relevance 'Other' is not provided. Please provide description of the Relevance 'Other'.",
+    "reference": [
+
+    ]
+  },
+  "rule8": {
+    "rule_class": "BioProject",
+    "code": "8",
+    "level": "error",
+    "name": "Empty description for other subtype",
+    "method": "empty_description_for_other_subtype",
+    "message": "Text description for the subtype 'Other' is not provided. Please provide DescriptionSubtypeOther.",
+    "reference": [
+
+    ]
+  },
+  "rule9": {
+    "rule_class": "BioProject",
+    "code": "9",
+    "level": "error",
+    "name": "Empty target description for other sample_scope",
+    "method": "empty_target_description_for_other_sample_scope",
+    "message": "Text description for the sample_scope 'Other' is not provided. Please provide description of target.",
+    "reference": [
+
+    ]
+  },
+  "rule10": {
+    "rule_class": "BioProject",
+    "code": "10",
+    "level": "error",
+    "name": "Empty target description for other material",
+    "method": "empty_target_description_for_other_material",
+    "message": "Text description for the material 'Other' is not provided. Please provide description of target.",
+    "reference": [
+
+    ]
+  },
+  "rule11": {
+    "rule_class": "BioProject",
+    "code": "11",
+    "level": "error",
+    "name": "Empty target description for other capture",
+    "method": "empty_target_description_for_other_capture",
+    "message": "Text description for the capture 'Other' is not provided. Please provide description of target.",
+    "reference": [
+
+    ]
+  },
+  "rule12": {
+    "rule_class": "BioProject",
+    "code": "12",
+    "level": "error",
+    "name": "Empty method description for other method_type",
+    "method": "empty_method_description_for_other_method_type",
+    "message": "Text description for the method_type 'Other' is not provided. Please provide description of method.",
+    "reference": [
+
+    ]
+  },
+  "rule13": {
+    "rule_class": "BioProject",
+    "code": "13",
+    "level": "error",
+    "name": "Empty data description for other data_type",
+    "method": "empty_data_description_for_other_data_type",
+    "message": "Text description for the data_type 'Other' is not provided. Please provide description of data.",
+    "reference": [
+
+    ]
+  },
+  "rule14": {
+    "rule_class": "BioProject",
+    "code": "14",
+    "level": "warning",
+    "name": "Invalid publication identifier",
+    "method": "invalid_publication_identifier",
+    "message": "Invalid publication identifier, enter valid pubmed id, pmc id or DOI.",
+    "reference": [
+
+    ]
+  },
+  "rule15": {
+    "rule_class": "BioProject",
+    "code": "15",
+    "level": "error",
+    "name": "Empty publication reference",
+    "method": "empty_publication_reference",
+    "message": "Publication reference is not provided. Please provide reference in free-text when id is not available.",
+    "reference": [
+
+    ]
+  },
+  "rule16": {
+    "rule_class": "BioProject",
+    "code": "16",
+    "level": "error",
+    "name": "Invalid umbrella project",
+    "method": "invalid_umbrella_project",
+    "message": "Invalid project is selected as an umbrella project. Please select a valid umbrella project.",
+    "reference": [
+
+    ]
+  },
+  "rule17": {
+    "rule_class": "BioProject",
+    "code": "17",
+    "level": "error",
+    "name": "Missing strain/isolate/cultivar",
+    "method": "missing_strain_isolate_cultivar",
+    "message": "At least one of strain/isolate/cultivar is required for monoisolate organism.",
+    "reference": [
+
+    ]
+  },
+  "rule18": {
+    "rule_class": "BioProject",
+    "code": "18",
+    "level": "error",
+    "name": "Taxonomy at species or infraspecific rank",
+    "method": "taxonomy_at_species_or_infraspecific_rank",
+    "message": "Taxonomy should be species or infraspecific level.",
+    "reference": [
+
+    ]
+  },
+  "rule19": {
+    "rule_class": "BioProject",
+    "code": "19",
+    "level": "error",
+    "name": "Empty organism description for multi-species",
+    "method": "empty_organism_description_for_multi_species",
+    "message": "Organism description is required when sample scope is multi-species.",
+    "reference": [
+
+    ]
+  },
+  "rule20": {
+    "rule_class": "BioProject",
+    "code": "20",
+    "level": "error",
+    "name": "Metagenome or environmental",
+    "method": "metagenome_or_environmental",
+    "message": "When sample_scope is \"Environment\", taxonomy must be a metagenome where lineage starts with unclassified sequences and scientific name ends with 'metagenome'.",
+    "reference": [
+
+    ]
+  },
+  "rule21": {
+    "rule_class": "BioProject",
+    "code": "21",
+    "level": "error",
+    "name": "Invalid locus tag prefix",
+    "method": "invalid_locus_tag_prefix",
+    "message": "Locus tag prefix format is invalid. Locus tag must consist of at least three alpha-numeric characters (the first character can not be a number).",
+    "reference": [
+      "http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html"
+    ]
+  },
+  "rule22": {
+    "rule_class": "BioProject",
+    "code": "22",
+    "level": "error",
+    "name": "Invalid BioSample accession",
+    "method": "invalid_biosample_accession",
+    "message": "Invalid BioSample accession. Please provide a valid BioSample accession with format SAM(D|E|N)[A-Z]?\\d+",
+    "reference": [
+
+    ]
+  },
+  "rule28": {
+    "rule_class": "BioProject",
+    "code": "28",
+    "level": "error",
+    "name": "Invalid value for controlled terms: Relevance",
+    "method": "invalid_value_for_controlled_terms:_relevance",
+    "message": "Invalid value for controlled terms: Relevance",
+    "reference": [
+
+    ]
+  },
+  "rule29": {
+    "rule_class": "BioProject",
+    "code": "29",
+    "level": "error",
+    "name": "Invalid value for controlled terms: subtype",
+    "method": "invalid_value_for_controlled_terms:_subtype",
+    "message": "Invalid value for controlled terms: subtype",
+    "reference": [
+
+    ]
+  },
+  "rule30": {
+    "rule_class": "BioProject",
+    "code": "30",
+    "level": "error",
+    "name": "Invalid value for controlled terms: sample_scope",
+    "method": "invalid_value_for_controlled_terms:_sample_scope",
+    "message": "Invalid value for controlled terms: sample_scope",
+    "reference": [
+
+    ]
+  },
+  "rule31": {
+    "rule_class": "BioProject",
+    "code": "31",
+    "level": "error",
+    "name": "Invalid value for controlled terms: material",
+    "method": "invalid_value_for_controlled_terms:_material",
+    "message": "Invalid value for controlled terms: material",
+    "reference": [
+
+    ]
+  },
+  "rule32": {
+    "rule_class": "BioProject",
+    "code": "32",
+    "level": "error",
+    "name": "Invalid value for controlled terms: capture",
+    "method": "invalid_value_for_controlled_terms:_capture",
+    "message": "Invalid value for controlled terms: capture",
+    "reference": [
+
+    ]
+  },
+  "rule33": {
+    "rule_class": "BioProject",
+    "code": "33",
+    "level": "error",
+    "name": "Invalid value for controlled terms: method_type",
+    "method": "invalid_value_for_controlled_terms:_method_type",
+    "message": "Invalid value for controlled terms: method_type",
+    "reference": [
+
+    ]
+  },
+  "rule34": {
+    "rule_class": "BioProject",
+    "code": "34",
+    "level": "error",
+    "name": "Invalid value for controlled terms: data_type",
+    "method": "invalid_value_for_controlled_terms:_data_type",
+    "message": "Invalid value for controlled terms: data_type",
+    "reference": [
+
+    ]
+  },
+  "rule35": {
+    "rule_class": "BioProject",
+    "code": "35",
+    "level": "error",
+    "name": "Invalid value for controlled terms: DbType for Publication",
+    "method": "invalid_value_for_controlled_terms:_dbtype_for_publication",
+    "message": "Invalid value for controlled terms: DbType for Publication",
+    "reference": [
+
+    ]
+  }
+}
