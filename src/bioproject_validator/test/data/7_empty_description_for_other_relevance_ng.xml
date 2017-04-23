@@ -13,9 +13,9 @@
 						<URL>http://www.bio.nite.go.jp/ngac/e/project_wgs-e.html</URL>
 					</ExternalLink>
 					<ProjectReleaseDate>2013-04-05T10:32:41.051+09:00</ProjectReleaseDate>
-                                        <Relevance>
-                                                <Other>Biotechnological</Other>
-                                        </Relevance>
+					<Relevance>
+						<Other></Other>
+					</Relevance>
 					<LocusTagPrefix>BDR01S</LocusTagPrefix>
 				</ProjectDescr>
 				<ProjectType>
@@ -56,27 +56,5 @@
 				</ProjectType>
 			</Project>
 		</Project>
-		<Submission>
-			<Submission submitted="2013-04-02">
-				<Description>
-					<Organization type="center" role="owner" url="http://www.bio.nite.go.jp/ngac/e/index.html">
-						<Name>National Institute of Technology and Evaluation</Name>
-						<Contact email="genome@nite.go.jp">
-							<Name>
-								<First>Nobuyuki</First>
-								<Last>Fujita</Last>
-							</Name>
-						</Contact>
-						<Contact email="genome@nite.go.jp">
-							<Name>
-								<First>Atsushi</First>
-								<Last>Yamazoe</Last>
-							</Name>
-						</Contact>
-					</Organization>
-					<Access>public</Access>
-				</Description>
-			</Submission>
-		</Submission>
 	</Package>
 </PackageSet>

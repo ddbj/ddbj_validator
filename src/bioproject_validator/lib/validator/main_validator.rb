@@ -61,9 +61,20 @@ class MainValidator
   #
   def validate (data_xml)
     @data_file = File::basename(data_xml)
-    not_well_format_xml("1", data_xml)
-    xml_data_schema("2", data_xml, @conf[:xsd_path])
-    xml_document = File.read(data_xml)
+    valid_xml = not_well_format_xml("1", data_xml)
+    # xml検証が通った場合のみ実行
+    if valid_xml
+      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+      doc = Nokogiri::XML(File.read(data_xml))
+      project_set = doc.xpath("//PackageSet/Package/Project")
+
+      #各プロジェクト毎の検証
+      project_set.each_with_index do |project_node, idx|
+        idx += 1
+        project_name = get_bioporject_name(project_node, idx)
+        empty_description_for_other_relevance("7", project_name, project_node, idx)
+      end
+    end
   end
 
   #
@@ -74,11 +85,63 @@ class MainValidator
     @error_list
   end
 
+
+  #
+  # Projectを一意識別するためのlabelを返す
+  # Project Name, Project Title, Accession IDの順に採用される
+  # いずれもない場合には何番目のprojectかを示すためラベルを返す(例:"1st project")
+  #
+  # ==== Args
+  # project_node: 1projectのxml nodeset オプジェクト
+  # line_num
+  #
+  def get_bioporject_label (project_node, line_num)
+    project_name = ""
+    #Project Name
+    name_node = project_node.xpath("Project/ProjectDescr/Name")
+    if !name_node.empty? && name_node.text.strip != ""
+      project_name = name_node.text
+    elsif
+      #Project Title
+      title_node = project_node.xpath("Project/ProjectDescr/Title")
+      if !title_node.empty? && title_node.text.strip != ""
+        project_name = title_node.text
+      elsif
+        #Accession ID
+        archive_node = project_node.xpath("Project/ProjectID/ArchiveID[@accession]")
+        if !archive_node.empty? && archive_node.attr("accession").text.strip != ""
+          project_name = archive_node.attr("accession").text
+        end
+      end
+    end
+    # いずれの記述もない場合には何番目のprojectであるかを示す
+    if project_name == ""
+      ordinal_num = ""
+      if line_num == 11
+        ordinal_num = "11th"
+      elsif line_num.to_s[-1] == "1"
+        ordinal_num = line_num.to_s + "st"
+      elsif line_num.to_s[-1] == "2"
+        ordinal_num = line_num.to_s + "nd"
+      elsif line_num.to_s[-1] == "3"
+        ordinal_num = line_num.to_s + "rd"
+      else
+        ordinal_num = line_num.to_s + "th"
+      end
+      project_name = ordinal_num + " project"
+    end
+    project_name
+  end
+
 ### validate method ###
 
   #
   # 正しいXML文書であるかの検証
   #
+  # ==== Args
+  # xml_file: xml file path
+  # ==== Return
+  # true/false
   #
   def not_well_format_xml (rule_code, xml_file)
     result = true
@@ -105,6 +168,11 @@ class MainValidator
   #
   # XSDで規定されたXMLに違反していないかの検証
   #
+  # ==== Args
+  # xml_file: xml file path
+  # xsd_path: xsd file path
+  # ==== Return
+  # true/false
   #
   def xml_data_schema (rule_code, xml_file, xsd_path)
     result = true
@@ -127,4 +195,31 @@ class MainValidator
     end
   end
 
+
+  #
+  # XSDで規定されたXMLに違反していないかの検証
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_description_for_other_relevance (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectDescr/Relevance/Other"
+    other_node = project_node.xpath(node_path)
+    if !other_node.empty?
+      if other_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
 end
