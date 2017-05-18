@@ -1377,6 +1377,38 @@
         <Package use="optional">Human.1.0</Package>
         <Package use="optional">Plant.1.0</Package>
         <Package use="optional">Virus.1.0</Package>
+        <Package use="optional">MIGS.ba.4.0</Package>
+        <Package use="optional" group_name="Air">MIGS.ba.air.4.0</Package>
+        <Package use="optional" group_name="Built">MIGS.ba.built.4.0</Package>
+        <Package use="optional" group_name="Host-associated">MIGS.ba.host-associated.4.0</Package>
+        <Package use="optional" group_name="Human-associated">MIGS.ba.human-associated.4.0</Package>
+        <Package use="optional" group_name="Human-gut">MIGS.ba.human-gut.4.0</Package>
+        <Package use="optional" group_name="Human-oral">MIGS.ba.human-oral.4.0</Package>
+        <Package use="optional" group_name="Human-skin">MIGS.ba.human-skin.4.0</Package>
+        <Package use="optional" group_name="Human-vaginal">MIGS.ba.human-vaginal.4.0</Package>
+        <Package use="optional" group_name="Microbial">MIGS.ba.microbial.4.0</Package>
+        <Package use="optional" group_name="Miscellaneous">MIGS.ba.miscellaneous.4.0</Package>
+        <Package use="optional" group_name="Plant-associated">MIGS.ba.plant-associated.4.0</Package>
+        <Package use="optional" group_name="Sediment">MIGS.ba.sediment.4.0</Package>
+        <Package use="optional" group_name="Soil">MIGS.ba.soil.4.0</Package>
+        <Package use="optional" group_name="Wastewater">MIGS.ba.wastewater.4.0</Package>
+        <Package use="optional" group_name="Water">MIGS.ba.water.4.0</Package>
+        <Package use="optional">MIGS.eu.4.0</Package>
+        <Package use="optional" group_name="Air">MIGS.eu.air.4.0</Package>
+        <Package use="optional" group_name="Built">MIGS.eu.built.4.0</Package>
+        <Package use="optional" group_name="Host-associated">MIGS.eu.host-associated.4.0</Package>
+        <Package use="optional" group_name="Human-associated">MIGS.eu.human-associated.4.0</Package>
+        <Package use="optional" group_name="Human-gut">MIGS.eu.human-gut.4.0</Package>
+        <Package use="optional" group_name="Human-oral">MIGS.eu.human-oral.4.0</Package>
+        <Package use="optional" group_name="Human-skin">MIGS.eu.human-skin.4.0</Package>
+        <Package use="optional" group_name="Human-vaginal">MIGS.eu.human-vaginal.4.0</Package>
+        <Package use="optional" group_name="Microbial">MIGS.eu.microbial.4.0</Package>
+        <Package use="optional" group_name="Miscellaneous">MIGS.eu.miscellaneous.4.0</Package>
+        <Package use="optional" group_name="Plant-associated">MIGS.eu.plant-associated.4.0</Package>
+        <Package use="optional" group_name="Sediment">MIGS.eu.sediment.4.0</Package>
+        <Package use="optional" group_name="Soil">MIGS.eu.soil.4.0</Package>
+        <Package use="optional" group_name="Wastewater">MIGS.eu.wastewater.4.0</Package>
+        <Package use="optional" group_name="Water">MIGS.eu.water.4.0</Package>
     </Attribute>
     <Attribute>
         <HarmonizedName>cur_land_use</HarmonizedName>
@@ -8511,6 +8543,38 @@
         <Package use="optional">Invertebrate.1.0</Package>
         <Package use="optional">Plant.1.0</Package>
         <Package use="optional">Virus.1.0</Package>
+        <Package use="optional">MIGS.eu.4.0</Package>
+        <Package use="optional" group_name="Air">MIGS.eu.air.4.0</Package>
+        <Package use="optional" group_name="Built">MIGS.eu.built.4.0</Package>
+        <Package use="optional" group_name="Host-associated">MIGS.eu.host-associated.4.0</Package>
+        <Package use="optional" group_name="Human-associated">MIGS.eu.human-associated.4.0</Package>
+        <Package use="optional" group_name="Human-gut">MIGS.eu.human-gut.4.0</Package>
+        <Package use="optional" group_name="Human-oral">MIGS.eu.human-oral.4.0</Package>
+        <Package use="optional" group_name="Human-skin">MIGS.eu.human-skin.4.0</Package>
+        <Package use="optional" group_name="Human-vaginal">MIGS.eu.human-vaginal.4.0</Package>
+        <Package use="optional" group_name="Microbial">MIGS.eu.microbial.4.0</Package>
+        <Package use="optional" group_name="Miscellaneous">MIGS.eu.miscellaneous.4.0</Package>
+        <Package use="optional" group_name="Plant-associated">MIGS.eu.plant-associated.4.0</Package>
+        <Package use="optional" group_name="Sediment">MIGS.eu.sediment.4.0</Package>
+        <Package use="optional" group_name="Soil">MIGS.eu.soil.4.0</Package>
+        <Package use="optional" group_name="Wastewater">MIGS.eu.wastewater.4.0</Package>
+        <Package use="optional" group_name="Water">MIGS.eu.water.4.0</Package>
+        <Package use="optional">MIMARKS.specimen.4.0</Package>
+        <Package use="optional" group_name="Air">MIMARKS.specimen.air.4.0</Package>
+        <Package use="optional" group_name="Built">MIMARKS.specimen.built.4.0</Package>
+        <Package use="optional" group_name="Host-associated">MIMARKS.specimen.host-associated.4.0</Package>
+        <Package use="optional" group_name="Human-associated">MIMARKS.specimen.human-associated.4.0</Package>
+        <Package use="optional" group_name="Human-gut">MIMARKS.specimen.human-gut.4.0</Package>
+        <Package use="optional" group_name="Human-oral">MIMARKS.specimen.human-oral.4.0</Package>
+        <Package use="optional" group_name="Human-skin">MIMARKS.specimen.human-skin.4.0</Package>
+        <Package use="optional" group_name="Human-vaginal">MIMARKS.specimen.human-vaginal.4.0</Package>
+        <Package use="optional" group_name="Microbial">MIMARKS.specimen.microbial.4.0</Package>
+        <Package use="optional" group_name="Miscellaneous">MIMARKS.specimen.miscellaneous.4.0</Package>
+        <Package use="optional" group_name="Plant-associated">MIMARKS.specimen.plant-associated.4.0</Package>
+        <Package use="optional" group_name="Sediment">MIMARKS.specimen.sediment.4.0</Package>
+        <Package use="optional" group_name="Soil">MIMARKS.specimen.soil.4.0</Package>
+        <Package use="optional" group_name="Wastewater">MIMARKS.specimen.wastewater.4.0</Package>
+        <Package use="optional" group_name="Water">MIMARKS.specimen.water.4.0</Package>
     </Attribute>
     <Attribute>
         <HarmonizedName>standing_water_regm</HarmonizedName>
