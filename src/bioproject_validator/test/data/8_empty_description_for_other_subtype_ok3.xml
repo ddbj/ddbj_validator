@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+	<Package>
+		<Project>
+			<Project>
+				<ProjectID>
+					<ArchiveID accession="PRJDB1539" archive="DDBJ" />
+				</ProjectID>
+				<ProjectDescr>
+					<Title>Fungal diversity in natural environment</Title>
+					<Description>The goal of this project is to elucidate the diversity and composition of fungal community under various natural environments. Our project includes various samples from terrestrial environments such as soil, leaf, and roots. Soil, leaves and roots samples are from forests and agricultural fields.</Description>
+					<ProjectReleaseDate>2014-06-05T14:47:36.592+09:00</ProjectReleaseDate>
+					<Relevance>
+						<Environmental>yes</Environmental>
+					</Relevance>
+				</ProjectDescr>
+				<ProjectType>
+					<ProjectTypeTopSingleOrganism>
+						<Organism taxID="1348798">
+							<OrganismName>terrestrial metagenome</OrganismName>
+						</Organism>
+					</ProjectTypeTopSingleOrganism>
+				</ProjectType>
+			</Project>
+		</Project>
+		<Submission>
+			<Submission submitted="2013-11-21">
+				<Description>
+					<Organization type="center" role="owner">
+						<Name>Kyoto university</Name>
+						<Contact email="smatsuoka@ecology.kyoto-u.ac.jp">
+							<Name>
+								<First>Shunsuke</First>
+								<Last>Matsuoka</Last>
+							</Name>
+						</Contact>
+					</Organization>
+					<Access>public</Access>
+				</Description>
+			</Submission>
+		</Submission>
+	</Package>
+</PackageSet>

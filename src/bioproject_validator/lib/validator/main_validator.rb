@@ -72,7 +72,9 @@ class MainValidator
       project_set.each_with_index do |project_node, idx|
         idx += 1
         project_name = get_bioporject_name(project_node, idx)
+        short_project_description("6", project_name, project_node, idx)
         empty_description_for_other_relevance("7", project_name, project_node, idx)
+        empty_description_for_other_subtype("8", project_name, project_node, idx)
       end
     end
   end
@@ -195,9 +197,35 @@ class MainValidator
     end
   end
 
+  #
+  # description が空白文字を除いて 100 文字以下でエラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def short_project_description (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectDescr/Description"
+    target_node = project_node.xpath(node_path)
+    if !target_node.empty?
+      if target_node.text.gsub(" ", "").size <= 100
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
 
   #
-  # XSDで規定されたXMLに違反していないかの検証
+  # Relevance が Other のとき要素テキストとして説明が提供されていない
   #
   # ==== Args
   # project_label: project label for error displaying
@@ -211,6 +239,34 @@ class MainValidator
     other_node = project_node.xpath(node_path)
     if !other_node.empty?
       if other_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # ProjectTypeTopAdminのsubtype属性がeOtherのとき要素テキストとして説明が提供されているか
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_description_for_other_subtype (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeTopAdmin"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("subtype").text.strip == "eOther"
+      target_node = condition_node.xpath("DescriptionSubtypeOther")
+      if target_node.empty? || target_node.text.strip == ""
         annotation = [
           {key: "Project name", value: project_label},
           {key: "Path", value: node_path}

@@ -62,7 +62,26 @@ class TestMainValidator < Minitest::Test
   end
 
 #### 各validationメソッドのユニットテスト ####
+  # rule:6
+  def test_short_project_description
+    #ok case
+    project_set = get_project_set_node("../../data/6_short_project_description_ok.xml")
+    ret = exec_validator("short_project_description", "6", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not use Description element
+    project_set = get_project_set_node("../../data/6_short_project_description_ok2.xml")
+    ret = exec_validator("short_project_description", "6", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    project_set = get_project_set_node("../../data/6_short_project_description_ng.xml")
+    ret = exec_validator("short_project_description", "6", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
 
+  # rule:7
   def test_empty_description_for_other_relevance
     #ok case
     project_set = get_project_set_node("../../data/7_empty_description_for_other_relevance_ok.xml")
@@ -77,6 +96,30 @@ class TestMainValidator < Minitest::Test
     #ng case
     project_set = get_project_set_node("../../data/7_empty_description_for_other_relevance_ng.xml")
     ret = exec_validator("empty_description_for_other_relevance", "7", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:8
+  def test_empty_description_for_other_subtype
+    #ok case
+    project_set = get_project_set_node("../../data/8_empty_description_for_other_subtype_ok.xml")
+    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not eOther attribute
+    project_set = get_project_set_node("../../data/8_empty_description_for_other_subtype_ok2.xml")
+    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not use ProjectTypeTopAdmin element
+    project_set = get_project_set_node("../../data/8_empty_description_for_other_subtype_ok3.xml")
+    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    project_set = get_project_set_node("../../data/8_empty_description_for_other_subtype_ng.xml")
+    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

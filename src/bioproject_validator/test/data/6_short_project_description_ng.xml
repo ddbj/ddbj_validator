@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+	<Package>
+		<Project>
+			<Project>
+				<ProjectID>
+					<ArchiveID accession="PRJDB5419" archive="DDBJ" />
+				</ProjectID>
+				<ProjectDescr>
+					<Title>16S rRNA gene amplicon sequences of high-pressure bioelectrode microbiotas</Title>
+					<Description>Phylogenetic analysis of bioelectrode microbiotas of a high-pressure thermophilic electromethanogenic reactor</Description>
+					<Grant GrantId="26850045">
+						<Title>Grant-in-Aid for Young Scientists (B)</Title>
+						<Agency abbr="JSPS">Japan Society for the Promotion of Science</Agency>
+					</Grant>
+					<ProjectReleaseDate>2016-12-28T22:01:24.484+09:00</ProjectReleaseDate>
+				</ProjectDescr>
+				<ProjectType>
+					<ProjectTypeSubmission>
+						<Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci">
+							<Organism taxID="1604023">
+								<OrganismName>electrolysis cell metagenome</OrganismName>
+								<BiologicalProperties>
+									<Environment>
+										<OxygenReq>eAnaerobic</OxygenReq>
+										<TemperatureRange>eThermophilic</TemperatureRange>
+										<Habitat>eSpecialized</Habitat>
+									</Environment>
+								</BiologicalProperties>
+							</Organism>
+						</Target>
+						<Method method_type="eSequencing" />
+						<Objectives>
+							<Data data_type="eRawSequenceReads" />
+						</Objectives>
+						<ProjectDataTypeSet>
+							<DataType>Targeted Locus (Loci)</DataType>
+						</ProjectDataTypeSet>
+					</ProjectTypeSubmission>
+				</ProjectType>
+			</Project>
+		</Project>
+		<Submission>
+			<Submission submitted="2016-12-26">
+				<Description>
+					<Organization type="center" role="owner">
+						<Name>Department of System Innovation, Graduate School of Engineering, the University of Tokyo, Tokyo, Japan</Name>
+						<Contact email="kobayashi@frcer.t.u-tokyo.ac.jp">
+							<Name>
+								<First>Hajime</First>
+								<Last>Kobayashi</Last>
+							</Name>
+						</Contact>
+					</Organization>
+					<Access>public</Access>
+				</Description>
+			</Submission>
+		</Submission>
+	</Package>
+</PackageSet>
