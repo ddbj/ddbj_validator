@@ -1,60 +1,28 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <PackageSet>
-	<Package>
-		<Project>
-			<Project>
-				<ProjectID>
-					<ArchiveID accession="PRJDB1082" archive="DDBJ" />
-				</ProjectID>
-				<ProjectDescr>
-					<Title>Bacillus drentensis NBRC 102427 genome sequencing project</Title>
-					<Description>The NBRC Whole Genome Shotgun Project aims to provide "reference genomes" of NBRC culture collection strains for identifying useful genes for taxonomic classification, risk/safety assessment, and industrial application, and for understanding the structure and evolution of microbial genomes. One of our goals is to sequence 2,000 representative strains in the NBRC culture collection. The sequence information will be released to the society through the NBRC web site (http://www.bio.nite.go.jp/ngac/e/project_wgs-e.html) and DDBJ/EMBL/GeneBank databases.</Description>
-					<ExternalLink label="Project Description">
-						<URL>http://www.bio.nite.go.jp/ngac/e/project_wgs-e.html</URL>
-					</ExternalLink>
-					<ProjectReleaseDate>2013-04-05T10:32:41.051+09:00</ProjectReleaseDate>
-					<Relevance>
-						<Other>Biotechnological</Other>
-					</Relevance>
-					<LocusTagPrefix>BDR01S</LocusTagPrefix>
-				</ProjectDescr>
-				<ProjectType>
-					<ProjectTypeSubmission>
-						<Target sample_scope="eMonoisolate" material="eGenome" capture="eWhole">
-							<Organism taxID="1314752">
-								<OrganismName>Bacillus drentensis NBRC 102427</OrganismName>
-								<Strain>NBRC 102427</Strain>
-								<BiologicalProperties>
-									<Morphology>
-										<Gram>ePositive</Gram>
-										<Shape>eBacilli</Shape>
-										<Motility>eYes</Motility>
-									</Morphology>
-									<Environment>
-										<OxygenReq>eFacultative</OxygenReq>
-										<OptimumTemperature>30</OptimumTemperature>
-										<TemperatureRange>eMesophilic</TemperatureRange>
-									</Environment>
-									<Phenotype>
-										<BioticRelationship>eFreeLiving</BioticRelationship>
-									</Phenotype>
-								</BiologicalProperties>
-							</Organism>
-							<Provider>NBRC 102427</Provider>
-							<Description>Strain NBRC 102427 is the type strain of Bacillus drentensis.</Description>
-						</Target>
-						<Method method_type="eSequencing" />
-						<Objectives>
-							<Data data_type="eSequence" />
-							<Data data_type="eAnalysis" />
-							<Data data_type="eAssembly" />
-						</Objectives>
-						<ProjectDataTypeSet>
-							<DataType>Genome Sequencing</DataType>
-						</ProjectDataTypeSet>
-					</ProjectTypeSubmission>
-				</ProjectType>
-			</Project>
-		</Project>
-	</Package>
+  <Package>
+    <Project>
+      <Project>
+        <ProjectID>
+          <ArchiveID accession="" archive="DDBJ" />
+        </ProjectID>
+        <ProjectDescr>
+          <Title>Title text</Title>
+          <Description>Description text</Description>
+          <Relevance>
+            <Other>Relevance other text</Other>
+          </Relevance>
+        </ProjectDescr>
+        <ProjectType>
+          <ProjectTypeSubmission>
+            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
+            <Method method_type="eSequencing" />
+            <Objectives>
+              <Data data_type="eRawSequenceReads" />
+            </Objectives>
+          </ProjectTypeSubmission>
+        </ProjectType>
+      </Project>
+    </Project>
+  </Package>
 </PackageSet>

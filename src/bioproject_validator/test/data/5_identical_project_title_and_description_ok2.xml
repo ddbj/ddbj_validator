@@ -7,8 +7,8 @@
           <ArchiveID accession="" archive="DDBJ" />
         </ProjectID>
         <ProjectDescr>
-          <Title>Descripcion text is 100 characters or less</Title>
-          <Description>1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890</Description>
+          <Title>Title text and Description text is empty</Title>
+          <Description></Description>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>

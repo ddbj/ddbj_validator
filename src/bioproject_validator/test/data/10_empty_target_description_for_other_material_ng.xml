@@ -7,12 +7,14 @@
           <ArchiveID accession="" archive="DDBJ" />
         </ProjectID>
         <ProjectDescr>
-          <Title>Descripcion text is 100 characters or less</Title>
-          <Description>1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890 1234567890</Description>
+          <Title>Title text. Target/Description is blank</Title>
+          <Description>Description text</Description>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>
-            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
+            <Target sample_scope="eEnvironment" material="eOther" capture="eTargetedLocusLoci">
+              <Description></Description>
+            </Target>
             <Method method_type="eSequencing" />
             <Objectives>
               <Data data_type="eRawSequenceReads" />
