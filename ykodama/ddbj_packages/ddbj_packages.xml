@@ -7832,12 +7832,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>encoded_traits</HarmonizedName>
             <Name>encoded traits</Name>
             <Description>Traits like antibiotic resistance/xenobiotic degration phenotypes/converting phage genes</Description>
@@ -8074,12 +8068,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>elev</HarmonizedName>
@@ -8518,12 +8506,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>dew_point</HarmonizedName>
             <Name>dew point</Name>
             <Description>temperature to which a given parcel of humid air must be cooled, at constant barometric pressure, for water vapor to condense into water.</Description>
@@ -8814,12 +8796,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>depth</HarmonizedName>
@@ -9280,12 +9256,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>diet_last_six_month</HarmonizedName>
@@ -9784,12 +9754,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>encoded_traits</HarmonizedName>
             <Name>encoded traits</Name>
             <Description>Traits like antibiotic resistance/xenobiotic degration phenotypes/converting phage genes</Description>
@@ -10202,12 +10166,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>encoded_traits</HarmonizedName>
             <Name>encoded traits</Name>
             <Description>Traits like antibiotic resistance/xenobiotic degration phenotypes/converting phage genes</Description>
@@ -10612,12 +10570,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>dermatology_disord</HarmonizedName>
@@ -11036,12 +10988,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>douche</HarmonizedName>
@@ -11574,12 +11520,6 @@
             <Name>chlorophyll</Name>
             <Description>concentration of chlorophyll</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>diether_lipids</HarmonizedName>
@@ -12126,12 +12066,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>density</HarmonizedName>
             <Name>density</Name>
             <Description>density of sample</Description>
@@ -12590,12 +12524,6 @@
             <Name>climate environment</Name>
             <Description>treatment involving an exposure to a particular climate; can include multiple climates</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>depth</HarmonizedName>
@@ -13178,12 +13106,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>density</HarmonizedName>
             <Name>density</Name>
             <Description>density of sample</Description>
@@ -13758,12 +13680,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>cur_land_use</HarmonizedName>
             <Name>current land use</Name>
             <Description>present state of sample site</Description>
@@ -14258,12 +14174,6 @@
             <Name>chemical oxygen demand</Name>
             <Description>a measure of the relative oxygen-depletion effect of a waste contaminant</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>depth</HarmonizedName>
@@ -14790,12 +14700,6 @@
             <Name>conductivity</Name>
             <Description>electrical conductivity of water</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>density</HarmonizedName>
@@ -15402,12 +15306,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>extrachrom_elements</HarmonizedName>
             <Name>extrachromosomal elements</Name>
             <Description>Plasmids that have significance phenotypic consequence</Description>
@@ -15668,12 +15566,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>elev</HarmonizedName>
@@ -16136,12 +16028,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>dew_point</HarmonizedName>
             <Name>dew point</Name>
             <Description>temperature to which a given parcel of humid air must be cooled, at constant barometric pressure, for water vapor to condense into water.</Description>
@@ -16456,12 +16342,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>depth</HarmonizedName>
@@ -16946,12 +16826,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>diet_last_six_month</HarmonizedName>
@@ -17474,12 +17348,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>ethnicity</HarmonizedName>
             <Name>ethnicity</Name>
             <Description>ethnicity of the subject</Description>
@@ -17916,12 +17784,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>ethnicity</HarmonizedName>
             <Name>ethnicity</Name>
             <Description>ethnicity of the subject</Description>
@@ -18350,12 +18212,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>dermatology_disord</HarmonizedName>
@@ -18798,12 +18654,6 @@
             <Name>chemical administration</Name>
             <Description>list of chemical compounds administered to the host or site where sampling occurred, and when (e.g. antibiotics, N fertilizer, air filter); can include multiple compounds. For Chemical Entities of Biological Interest ontology (CHEBI) (v1.72), please see http://bioportal.bioontology.org/visualize/44603</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>douche</HarmonizedName>
@@ -19360,12 +19210,6 @@
             <Name>chlorophyll</Name>
             <Description>concentration of chlorophyll</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>diether_lipids</HarmonizedName>
@@ -19936,12 +19780,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>density</HarmonizedName>
             <Name>density</Name>
             <Description>density of sample</Description>
@@ -20424,12 +20262,6 @@
             <Name>climate environment</Name>
             <Description>treatment involving an exposure to a particular climate; can include multiple climates</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>depth</HarmonizedName>
@@ -21036,12 +20868,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>density</HarmonizedName>
             <Name>density</Name>
             <Description>density of sample</Description>
@@ -21640,12 +21466,6 @@
             <DescriptionJa/>
         </Attribute>
         <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
-        </Attribute>
-        <Attribute use="optional">
             <HarmonizedName>cur_land_use</HarmonizedName>
             <Name>current land use</Name>
             <Description>present state of sample site</Description>
@@ -22164,12 +21984,6 @@
             <Name>chemical oxygen demand</Name>
             <Description>a measure of the relative oxygen-depletion effect of a waste contaminant</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>depth</HarmonizedName>
@@ -22720,12 +22534,6 @@
             <Name>conductivity</Name>
             <Description>electrical conductivity of water</Description>
             <DescriptionJa/>
-        </Attribute>
-        <Attribute use="optional">
-            <HarmonizedName>culture_collection</HarmonizedName>
-            <Name>culture collection</Name>
-            <Description>Name of source institute and unique culture identifier. See the description for the proper format and list of allowed institutes, http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</Description>
-            <DescriptionJa>配列の得られた培養細胞の保管施設と ID (例: ATCC:26370)。生きている微生物やウイルスの培養系，および細胞株を記載するのに用います。書式は institute のリストを参照，http://www.insdc.org/controlled-vocabulary-culturecollection-qualifier</DescriptionJa>
         </Attribute>
         <Attribute use="optional">
             <HarmonizedName>density</HarmonizedName>
