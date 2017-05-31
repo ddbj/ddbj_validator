@@ -72,7 +72,16 @@ class MainValidator
       project_set.each_with_index do |project_node, idx|
         idx += 1
         project_name = get_bioporject_name(project_node, idx)
+        identical_project_title_and_description("5", project_name, project_node, idx)
+        short_project_description("6", project_name, project_node, idx)
         empty_description_for_other_relevance("7", project_name, project_node, idx)
+        empty_description_for_other_subtype("8", project_name, project_node, idx)
+        empty_target_description_for_other_sample_scope("9", project_name, project_node, idx)
+        empty_target_description_for_other_material("10", project_name, project_node, idx)
+        empty_target_description_for_other_capture("11", project_name, project_node, idx)
+        empty_method_description_for_other_method_type("12", project_name, project_node, idx)
+        empty_data_description_for_other_data_type("13", project_name, project_node, idx)
+        empty_publication_reference("15", project_name, project_node, idx)
       end
     end
   end
@@ -195,9 +204,65 @@ class MainValidator
     end
   end
 
+  #
+  # プロジェクトの description と title が完全一致でエラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def identical_project_title_and_description (rule_code, project_label, project_node, line_num)
+    result = true
+    title_path = "Project/ProjectDescr/Title"
+    desc_path = "Project/ProjectDescr/Description"
+    title_node = project_node.xpath(title_path)
+    desc_node = project_node.xpath(desc_path)
+    if !title_node.empty?  && !desc_node.empty?
+      if title_node.text.strip == desc_node.text.strip
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Title", value: title_node.text},
+          {key: "Description", value: desc_node.text},
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
 
   #
-  # XSDで規定されたXMLに違反していないかの検証
+  # description が空白文字を除いて 100 文字以下でエラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def short_project_description (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectDescr/Description"
+    target_node = project_node.xpath(node_path)
+    if !target_node.empty?
+      if target_node.text.gsub(" ", "").size <= 100
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # Relevance が Other のとき要素テキストとして説明が提供されていない
   #
   # ==== Args
   # project_label: project label for error displaying
@@ -222,4 +287,201 @@ class MainValidator
     end
     result
   end
+
+  #
+  # ProjectTypeTopAdminのsubtype属性がeOtherのとき要素テキストとして説明が提供されているか
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_description_for_other_subtype (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeTopAdmin"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("subtype").text.strip == "eOther"
+      target_node = condition_node.xpath("DescriptionSubtypeOther")
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # Targetのsample_scope属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_target_description_for_other_sample_scope (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeSubmission/Target"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("sample_scope").text.strip == "eOther"
+      target_node = condition_node.xpath("Description")
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  # TODO:sample_scopeとメソッド共通化した方が良いか
+  # Targetのmaterial属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_target_description_for_other_material (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeSubmission/Target"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("material").text.strip == "eOther"
+      target_node = condition_node.xpath("Description")
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  # TODO:sample_scopeとメソッド共通化した方が良いか
+  # Targetのcapture属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_target_description_for_other_capture (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeSubmission/Target"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("capture").text.strip == "eOther"
+      target_node = condition_node.xpath("Description")
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # Methodのmethod_type属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_method_description_for_other_method_type (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeSubmission/Method"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("method_type").text.strip == "eOther"
+      target_node = condition_node
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # Objectives/Dataのdata_type属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_data_description_for_other_data_type (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectType/ProjectTypeSubmission/Objectives/Data"
+    condition_node = project_node.xpath(node_path)
+    if !condition_node.empty? && condition_node.attr("data_type").text.strip == "eOther"
+      target_node = condition_node
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # DbTypeがeNotAvailableのときReference要素で説明が提供されていない場合エラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: xsd file path
+  # ==== Return
+  # true/false
+  #
+  def empty_publication_reference (rule_code, project_label, project_node, line_num)
+    result = true
+    node_path = "Project/ProjectDescr/Publication"
+    condition_node = project_node.xpath(node_path + "/DbType")
+    if !condition_node.empty? && condition_node.text.strip == "eNotAvailable"
+      target_node = project_node.xpath(node_path + "/Reference")
+      if target_node.empty? || target_node.text.strip == ""
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
 end

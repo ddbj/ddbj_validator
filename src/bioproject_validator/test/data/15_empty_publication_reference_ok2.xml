@@ -7,11 +7,11 @@
           <ArchiveID accession="" archive="DDBJ" />
         </ProjectID>
         <ProjectDescr>
-          <Title>Title text</Title>
+          <Title>Title text. DbType is not eNotAvailable</Title>
           <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
+          <Publication id="">
+            <DbType>ePubmed</DbType>
+          </Publication>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>

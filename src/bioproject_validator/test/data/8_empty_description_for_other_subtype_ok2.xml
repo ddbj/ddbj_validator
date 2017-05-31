@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+  <Package>
+    <Project>
+      <Project>
+        <ProjectID>
+          <ArchiveID accession="" archive="DDBJ" />
+        </ProjectID>
+        <ProjectDescr>
+          <Title>Title text. subtype is not eOther</Title>
+          <Description>Description text</Description>
+        </ProjectDescr>
+        <ProjectType>
+          <ProjectTypeTopAdmin subtype="eMetagenome">
+          </ProjectTypeTopAdmin>
+        </ProjectType>
+      </Project>
+    </Project>
+  </Package>
+</PackageSet>

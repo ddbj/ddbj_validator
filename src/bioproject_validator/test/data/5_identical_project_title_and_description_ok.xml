@@ -9,9 +9,6 @@
         <ProjectDescr>
           <Title>Title text</Title>
           <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>

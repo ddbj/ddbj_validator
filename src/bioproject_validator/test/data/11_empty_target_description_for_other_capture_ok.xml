@@ -9,13 +9,12 @@
         <ProjectDescr>
           <Title>Title text</Title>
           <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>
-            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
+            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eOther">
+              <Description>eOther description text</Description>
+            </Target>
             <Method method_type="eSequencing" />
             <Objectives>
               <Data data_type="eRawSequenceReads" />

@@ -7,16 +7,15 @@
           <ArchiveID accession="" archive="DDBJ" />
         </ProjectID>
         <ProjectDescr>
-          <Title>Title text</Title>
+          <Title>Title text. method_type is not eOther</Title>
           <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>
-            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
-            <Method method_type="eSequencing" />
+            <Target sample_scope="eOther" material="ePartialGenome" capture="eTargetedLocusLoci">
+            <Description>eOther description text</Description>
+            </Target>
+            <Method method_type="eSequencing"></Method>
             <Objectives>
               <Data data_type="eRawSequenceReads" />
             </Objectives>

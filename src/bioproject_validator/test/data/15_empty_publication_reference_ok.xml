@@ -9,9 +9,10 @@
         <ProjectDescr>
           <Title>Title text</Title>
           <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
+          <Publication id="">
+            <Reference>Reference description text</Reference>
+            <DbType>eNotAvailable</DbType>
+          </Publication>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>

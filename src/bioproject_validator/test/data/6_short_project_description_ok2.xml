@@ -7,11 +7,7 @@
           <ArchiveID accession="" archive="DDBJ" />
         </ProjectID>
         <ProjectDescr>
-          <Title>Title text</Title>
-          <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
+          <Title>Descripcion text is not exist</Title>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>

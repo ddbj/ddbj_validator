@@ -7,18 +7,15 @@
           <ArchiveID accession="" archive="DDBJ" />
         </ProjectID>
         <ProjectDescr>
-          <Title>Title text</Title>
+          <Title>Title text. ProjectTypeTopAdmin  is not used</Title>
           <Description>Description text</Description>
-          <Relevance>
-            <Other>Relevance other text</Other>
-          </Relevance>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>
-            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
-            <Method method_type="eSequencing" />
+            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"/>
+            <Method method_type="eSequencing"/>
             <Objectives>
-              <Data data_type="eRawSequenceReads" />
+              <Data data_type="eRawSequenceReads"/>
             </Objectives>
           </ProjectTypeSubmission>
         </ProjectType>
