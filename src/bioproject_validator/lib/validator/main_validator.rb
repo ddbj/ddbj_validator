@@ -6,6 +6,7 @@ require 'geocoder'
 require 'date'
 require 'net/http'
 require 'nokogiri'
+require File.dirname(__FILE__) + "/../../../biosample_validator/lib/validator/organism_validator.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
 
 #
@@ -23,9 +24,9 @@ class MainValidator
   def initialize
     @conf = read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
     CommonUtils::set_config(@conf)
-    @conf[:xsd_path] = File.absolute_path(File.dirname(__FILE__) + "/../../conf/xsd/Package.xsd")
 
     @validation_config = @conf[:validation_config] #need?
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
     @error_list = []
 #    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
@@ -42,7 +43,8 @@ class MainValidator
     config = {}
     begin
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_bioproject.json")) #TODO auto update when genereted
-#      config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))
+      config[:xsd_path] = File.absolute_path(File.read(config_file_dir + "/xsd/Package.xsd"))
+      config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -82,6 +84,10 @@ class MainValidator
         empty_method_description_for_other_method_type("12", project_name, project_node, idx)
         empty_data_description_for_other_data_type("13", project_name, project_node, idx)
         empty_publication_reference("15", project_name, project_node, idx)
+        missing_strain_isolate_cultivar("17", project_name, project_node, idx)
+        taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
+        empty_organism_description_for_multi_species("19", project_name, project_node, idx)
+        metagenome_or_environmental("20", project_name, project_node, idx)
       end
     end
   end
@@ -205,11 +211,12 @@ class MainValidator
   end
 
   #
+  # rule:5
   # プロジェクトの description と title が完全一致でエラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -235,11 +242,12 @@ class MainValidator
   end
 
   #
+  # rule:6
   # description が空白文字を除いて 100 文字以下でエラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -262,11 +270,12 @@ class MainValidator
   end
 
   #
+  # rule:7
   # Relevance が Other のとき要素テキストとして説明が提供されていない
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -289,11 +298,12 @@ class MainValidator
   end
 
   #
+  # rule:8
   # ProjectTypeTopAdminのsubtype属性がeOtherのとき要素テキストとして説明が提供されているか
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -317,11 +327,12 @@ class MainValidator
   end
 
   #
+  # rule:9
   # Targetのsample_scope属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -345,11 +356,12 @@ class MainValidator
   end
 
   # TODO:sample_scopeとメソッド共通化した方が良いか
+  # rule:10
   # Targetのmaterial属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -373,11 +385,12 @@ class MainValidator
   end
 
   # TODO:sample_scopeとメソッド共通化した方が良いか
+  # rule:11
   # Targetのcapture属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -401,11 +414,12 @@ class MainValidator
   end
 
   #
+  # rule:12
   # Methodのmethod_type属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -429,11 +443,12 @@ class MainValidator
   end
 
   #
+  # rule:13
   # Objectives/Dataのdata_type属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -457,11 +472,12 @@ class MainValidator
   end
 
   #
+  # rule:15
   # DbTypeがeNotAvailableのときReference要素で説明が提供されていない場合エラー
   #
   # ==== Args
   # project_label: project label for error displaying
-  # project_node: xsd file path
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -482,6 +498,186 @@ class MainValidator
       end
     end
     result
+  end
+
+  #
+  # rule:17
+  # organism: sample scope = "mono-isolate" の場合は strain or breed or cultivar or isolate or label 必須
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def missing_strain_isolate_cultivar (rule_code, project_label, project_node, line_num)
+    result = true
+    sample_scope_attr = "//Target[@sample_scope='eMonoisolate']"
+    monoisolate = project_node.xpath(sample_scope_attr)
+    if !monoisolate.empty? #eMonoisolateである場合にチェック
+      if ( node_blank?(project_node, "//Organism/Label") \
+           && node_blank?(project_node, "//Organism/Strain") \
+           && node_blank?(project_node, "//Organism/Strain/IsolateName") \
+           && node_blank?(project_node, "//Organism/Strain/Breed") \
+           && node_blank?(project_node, "//Organism/Strain/Cultivar"))
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: "//Organism/Label | //Organism/Strain | //Organism/Strain/IsolateName | //Organism/Strain/Breed | //Organism/Strain/Cultivar"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # rule:18
+  # organism: sample scope = "multi-species" 以外の場合、species レベル以下の taxonomy が必須 (multi-species の場合、任意で species レベル以上を許容)
+  # biosample rule:4,45,96と関連
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_at_species_or_infraspecific_rank (rule_code, project_label, project_node, line_num)
+    result = true
+    #eMultispeciesでない場合にチェック. sample_scopeが他の値やsample_scope属性がない場合も含む
+    tax_id = nil
+    unless node_blank?(project_node, "//Organism/@taxID")
+      tax_id = project_node.xpath("//Organism/@taxID").text.chomp.strip
+    else
+      unless node_blank?(project_node, "//OrganismName")
+        organism_name = project_node.xpath("//OrganismName").text.chomp.strip
+        ret = @org_validator.suggest_taxid_from_name(organism_name)
+        if ret[:status] == "exist"
+          tax_id = ret[:tax_id]
+        end
+      end
+    end
+    unless tax_id.nil? #taxID,OrganismName共に記述がない場合はチェックしない
+      multispecies = project_node.xpath("//Target[@sample_scope='eMultispecies']")
+      if multispecies.empty? #eMultispeciesではない場合にチェックする
+        # tax_idが記述されていればtax_idを記載し、なければorganism_nameからtax_idを取得する
+        result = @org_validator.is_infraspecific_rank(tax_id)
+        if result == false
+          annotation = [
+            {key: "Project name", value: project_label},
+            {key: "Path", value: "//Organism/@taxID | //OrganismName"}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:19
+  # organism: sample scope = "multi-species" の場合 Target > Description が必須、要素があり、内容が空の場合にエラー
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def empty_organism_description_for_multi_species (rule_code, project_label, project_node, line_num)
+    result = true
+    sample_scope_attr = "//Target[@sample_scope='eMultispecies']"
+    multispecies = project_node.xpath(sample_scope_attr)
+    unless multispecies.empty? #eMultispeciesである場合にチェック
+      node_path = "//Target/Description"
+      if node_blank?(project_node, node_path)
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: node_path}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # rule:20
+  # organism: sample scope = "environment" の場合は biosample と同様にmetagenome などのチェック
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def metagenome_or_environmental (rule_code, project_label, project_node, line_num)
+    result = true
+    # tax_idが記述されていればtax_idを記載し、なければorganism_nameからtax_idを取得する
+    # TODO rule18と同じコードまとめたい
+    tax_id = nil
+    unless node_blank?(project_node, "//Organism/@taxID")
+      tax_id = project_node.xpath("//Organism/@taxID").text.chomp.strip
+    else
+      unless node_blank?(project_node, "//OrganismName")
+        organism_name = project_node.xpath("//OrganismName").text.chomp.strip
+        ret = @org_validator.suggest_taxid_from_name(organism_name)
+        if ret[:status] == "exist"
+          tax_id = ret[:tax_id]
+        end
+      end
+    end
+    unless tax_id.nil? #taxID,OrganismName共に記述がない場合はチェックしない
+      environment = project_node.xpath("//Target[@sample_scope='eEnvironment']")
+      unless environment.empty? #eEnvironmentである場合にチェック
+        #TODO tax_id がmetagenome配下かどうか
+        linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
+        unless @org_validator.has_linage(tax_id, linages) &&  @org_validator.get_organism_name(tax_id).end_with?("metagenome")
+          annotation = [
+            {key: "Project name", value: project_label},
+            {key: "Path", value: "//Organism/@taxID | //OrganismName"}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # 指定されたxPathのノードが存在しない、またはテキストが空白だった場合にtrueを返す
+  # TODO commonに移してテストコードを書く
+  def node_blank? (node_obj, xpath)
+    ret = false
+    target_node = node_obj.xpath(xpath)
+    if target_node.empty?
+      ret = true
+    else
+      text_value = ""
+      target_node.each do |node|
+        if node.class == Nokogiri::XML::Element
+          #elementの場合にはelementの要素自身のテキストを検索
+          target_text_node = node.xpath("text()") #子供のテキストを含まないテキスト要素を取得
+          text_value += target_text_node.map {|text_node|
+            text_node.text.chomp.strip
+          }.join  #前後の空白を除去した文字列を繋げて返す
+        elsif node.class == Nokogiri::XML::Attr
+          #attributeの場合にはattributeの値を検索
+          text_value += node.text.chomp.strip
+        end
+      end
+      if text_value == "" #要素/属性はあるが、テキスト/値が空白である
+        ret =  true
+      end
+    end
+    ret
   end
 
 end

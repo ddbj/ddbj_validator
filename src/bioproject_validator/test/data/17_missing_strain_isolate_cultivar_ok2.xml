@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+  <Package>
+    <Project>
+      <Project>
+        <ProjectID>
+          <ArchiveID accession="" archive="DDBJ" />
+        </ProjectID>
+        <ProjectDescr>
+          <Title>Title text</Title>
+          <Description>Description text</Description>
+        </ProjectDescr>
+        <ProjectType>
+          <ProjectTypeSubmission>
+            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
+            <Method method_type="eSequencing" />
+            <Objectives>
+              <Data data_type="eRawSequenceReads" />
+            </Objectives>
+          </ProjectTypeSubmission>
+        </ProjectType>
+      </Project>
+    </Project>
+  </Package>
+</PackageSet>

@@ -257,4 +257,124 @@ class TestMainValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:17
+  def test_missing_strain_isolate_cultivar
+    #ok case
+    # exist Label text
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ok_has_label.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist Strain text
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ok_has_strain.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist isolateName text
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ok_has_isolatename.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist Breed text
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ok_has_breed.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist Cultivar text
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ok_has_cultivar.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not eMonoisolate attribute
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ok2.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    project_set = get_project_set_node("../../data/17_missing_strain_isolate_cultivar_ng.xml")
+    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:18
+  def test_taxonomy_at_species_or_infraspecific_rank
+    #ok case
+    # exist tax_id
+    project_set = get_project_set_node("../../data/18_taxonomy_at_species_or_infraspecific_rank_ok.xml")
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist only organism name
+    project_set = get_project_set_node("../../data/18_taxonomy_at_species_or_infraspecific_rank_ok2.xml")
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
+    project_set = get_project_set_node("../../data/18_taxonomy_at_species_or_infraspecific_rank_ok3.xml")
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not infraspecific_rank, but sample_scope = eMultispecies. validation =>  ok
+    project_set = get_project_set_node("../../data/18_taxonomy_at_species_or_infraspecific_rank_ok4.xml")
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    project_set = get_project_set_node("../../data/18_taxonomy_at_species_or_infraspecific_rank_ng.xml")
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:19
+  def test_empty_organism_description_for_multi_species
+    #ok case
+    # exist Label text
+    project_set = get_project_set_node("../../data/19_empty_organism_description_for_multi_species_ok.xml")
+    ret = exec_validator("empty_organism_description_for_multi_species", "19", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not eMultispecies attribute
+    project_set = get_project_set_node("../../data/19_empty_organism_description_for_multi_species_ok2.xml")
+    ret = exec_validator("empty_organism_description_for_multi_species", "19", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    project_set = get_project_set_node("../../data/19_empty_organism_description_for_multi_species_ng.xml")
+    ret = exec_validator("empty_organism_description_for_multi_species", "19", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:20
+  def test_metagenome_or_environmental
+    #ok case
+    # exist tax_id
+    project_set = get_project_set_node("../../data/20_metagenome_or_environmental_ok.xml")
+    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist only organism name
+    project_set = get_project_set_node("../../data/20_metagenome_or_environmental_ok2.xml")
+    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
+    project_set = get_project_set_node("../../data/20_metagenome_or_environmental_ok3.xml")
+    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not metagenome tax_id, but sample_scope is not eEnvironment. validation =>  ok
+    project_set = get_project_set_node("../../data/20_metagenome_or_environmental_ok4.xml")
+    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    project_set = get_project_set_node("../../data/20_metagenome_or_environmental_ng.xml")
+    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
 end

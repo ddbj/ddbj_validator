@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+  <Package>
+    <Project>
+      <Project>
+        <ProjectID>
+          <ArchiveID accession="" archive="DDBJ" />
+        </ProjectID>
+        <ProjectDescr>
+          <Title>Title text</Title>
+          <Description>Description text</Description>
+        </ProjectDescr>
+        <ProjectType>
+          <ProjectTypeSubmission>
+            <Target sample_scope="eMonoisolate" material="ePartialGenome" capture="eTargetedLocusLoci">
+              <Organism taxID="1314752">
+                <OrganismName>Bacillus drentensis NBRC 102427</OrganismName>
+                <Strain>NBRC 102427</Strain>
+              </Organism>
+            </Target>
+            <Method method_type="eSequencing" />
+            <Objectives>
+              <Data data_type="eRawSequenceReads" />
+            </Objectives>
+          </ProjectTypeSubmission>
+        </ProjectType>
+      </Project>
+    </Project>
+  </Package>
+</PackageSet>
