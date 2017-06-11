@@ -36,6 +36,12 @@ class TestMainValidator < Minitest::Test
     doc.xpath("//PackageSet/Package/Project")
   end
 
+  def get_link_set_node (xml_file_path)
+    xml_data = File.read(xml_file_path)
+    doc = Nokogiri::XML(xml_data)
+    doc.xpath("//PackageSet/Package/ProjectLinks")
+  end
+
 ####
 
   def test_get_bioporject_label
@@ -253,6 +259,30 @@ class TestMainValidator < Minitest::Test
     #ng case
     project_set = get_project_set_node("../../data/15_empty_publication_reference_ng.xml")
     ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:16
+  def test_invalid_umbrella_project
+    #ok case
+    link_set = get_link_set_node("../../data/16_invalid_umbrella_project_ok.xml")
+    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not exist node
+    link_set = get_link_set_node("../../data/16_invalid_umbrella_project_ok2.xml")
+    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # attribute blank
+    link_set = get_link_set_node("../../data/16_invalid_umbrella_project_ok3.xml")
+    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case(not umbrella id)
+    link_set = get_link_set_node("../../data/16_invalid_umbrella_project_ng.xml")
+    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

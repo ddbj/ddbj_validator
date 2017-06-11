@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+  <Package>
+    <ProjectLinks>
+      <Link>
+        <ProjectIDRef accession="" archive="DDBJ" />
+        <Hierarchical type="TopSingle">
+          <MemberID accession="PRJDB3549" archive="DDBJ" />
+          <MemberID accession="PSUB990036" archive="DDBJ" />
+        </Hierarchical>
+      </Link>
+    </ProjectLinks>
+  </Package>
+</PackageSet>

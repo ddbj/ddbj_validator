@@ -7,6 +7,7 @@ require 'date'
 require 'net/http'
 require 'nokogiri'
 require File.dirname(__FILE__) + "/../../../biosample_validator/lib/validator/organism_validator.rb"
+require File.dirname(__FILE__) + "/../../../biosample_validator/lib/validator/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/../common_utils.rb"
 
 #
@@ -28,7 +29,7 @@ class MainValidator
     @validation_config = @conf[:validation_config] #need?
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
     @error_list = []
-#    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 
 
@@ -44,7 +45,8 @@ class MainValidator
     begin
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_bioproject.json")) #TODO auto update when genereted
       config[:xsd_path] = File.absolute_path(File.read(config_file_dir + "/xsd/Package.xsd"))
-      config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
+      config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))#TODO common setting
+      config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))#TODO common setting
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -72,6 +74,7 @@ class MainValidator
 
       #各プロジェクト毎の検証
       project_set.each_with_index do |project_node, idx|
+        #TODO 各プロジェクトでxpathに複数ヒットする可能性のあるものは全てをチェックするようにeachで回す事
         idx += 1
         project_name = get_bioporject_name(project_node, idx)
         identical_project_title_and_description("5", project_name, project_node, idx)
@@ -88,6 +91,12 @@ class MainValidator
         taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
         empty_organism_description_for_multi_species("19", project_name, project_node, idx)
         metagenome_or_environmental("20", project_name, project_node, idx)
+      end
+
+      link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
+      #各リンク毎の検証
+      link_set.each_with_index do |link_node, idx|
+        invalid_umbrella_project("16", "Link", link_node, idx)
       end
     end
   end
@@ -495,6 +504,41 @@ class MainValidator
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         result = false
+      end
+    end
+    result
+  end
+
+  #
+  # rule:16
+  # 選択された Umbrella BioProject が実在しない、指定されている Umbrella が DDBJ DB に存在すれば OK
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_umbrella_project (rule_code, link_label, link_node, line_num)
+    result = true
+    accession_path = "//Link/Hierarchical/MemberID/@accession"
+    unless node_blank?(link_node, accession_path)
+      accession_node = link_node.xpath(accession_path)
+      accession_node.each do |accession_attr_node|
+        unless accession_attr_node.text.chomp.strip == ""
+          bioproject_accession = accession_attr_node.text.chomp.strip
+          is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
+          if !is_umbrella
+            annotation = [
+             {key: "Project name", value: "None"},
+             {key: "BioProject accession", value: bioproject_accession},
+             {key: "Path", value: accession_path}
+            ]
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+            @error_list.push(error_hash)
+            result = false
+          end
+        end
       end
     end
     result

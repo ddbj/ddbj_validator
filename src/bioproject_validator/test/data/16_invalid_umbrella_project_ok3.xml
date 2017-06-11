@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+  <Package>
+    <ProjectLinks>
+      <Link>
+        <ProjectIDRef accession="" archive="DDBJ" />
+      </Link>
+    </ProjectLinks>
+  </Package>
+</PackageSet>
