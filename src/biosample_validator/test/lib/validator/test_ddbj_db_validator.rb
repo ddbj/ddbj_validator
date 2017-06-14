@@ -25,11 +25,9 @@ class TestDDBJDbValidator < Minitest::Test
 
     # not exist data
     ##invalid ID
-    ret = @db_validator.get_bioproject_submitter_id("not id")
-    assert_equal nil, ret
+    assert_nil @db_validator.get_bioproject_submitter_id("not id")
     ## not exist id
-    ret = @db_validator.get_bioproject_submitter_id("PRJDB00000")
-    assert_equal nil, ret
+    assert_nil @db_validator.get_bioproject_submitter_id("PRJDB00000")
 
   end
 
@@ -76,20 +74,59 @@ class TestDDBJDbValidator < Minitest::Test
 
     # not exist
     ## project accession IS NULL
-    ret = @db_validator.get_bioproject_accession("PSUB004148")
-    assert_equal nil, ret
+    assert_nil @db_validator.get_bioproject_accession("PSUB004148")
 
     ## not exist psub id
-    ret = @db_validator.get_bioproject_accession("PSUB000000")
-    assert_equal nil, ret
+    assert_nil @db_validator.get_bioproject_accession("PSUB000000")
 
     ## status 5700(deleted?)
-    ret = @db_validator.get_bioproject_accession("PSUB000078")
-    assert_equal nil, ret
+    assert_nil @db_validator.get_bioproject_accession("PSUB000078")
   end
 
   def test_get_all_locus_tag_prefix
     ret = @db_validator.get_all_locus_tag_prefix()
     assert_equal true, ret.size > 200
+  end
+
+  def test_get_biosample_locus_tag_prefix
+    # exist data
+    ret = @db_validator.get_biosample_locus_tag_prefix("SAMD00000007")
+    assert_equal "ATW", ret[0]["locus_tag_prefix"]
+    ret = @db_validator.get_biosample_locus_tag_prefix("SSUB000020")
+    assert_equal "ATW", ret[0]["locus_tag_prefix"]
+
+    # not exist
+    ## not exist sample id
+    assert_nil @db_validator.get_biosample_locus_tag_prefix("SAMD0000000")
+    ## not exist psub id
+    assert_nil @db_validator.get_biosample_locus_tag_prefix("SSUB000000")
+
+    ## sample exit but has not locus_tag_prefix attr
+    assert_nil @db_validator.get_biosample_locus_tag_prefix("SAMD00023002")
+
+  end
+
+  def test_is_valid_biosample_id
+    # exist data
+    ret = @db_validator.is_valid_biosample_id?("SAMD00025188")
+    assert_equal true, ret
+    ret = @db_validator.is_valid_biosample_id?("SSUB003675")
+    assert_equal true, ret
+
+    # not exist
+    ## not exist sample id
+    ret = @db_validator.is_valid_biosample_id?("SAMD0000000")
+    assert_equal false, ret
+    ## not exist psub id
+    ret = @db_validator.is_valid_biosample_id?("SSUB000000")
+    assert_equal false, ret
+
+    ## status 5700(deleted?)
+    ret = @db_validator.is_valid_biosample_id?("SSUB000001")
+    assert_equal false, ret
+  end
+
+  def test_get_all_locus_tag_prefix
+    ret = @db_validator.get_all_locus_tag_prefix()
   end
 end

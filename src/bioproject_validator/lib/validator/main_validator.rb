@@ -696,6 +696,101 @@ class MainValidator
   end
 
   #
+  # rule:21
+  # LocusTagPrefix要素の記述がある場合にbiosample_id属性とLocusTagPrefixのテキストが正しい組合せで記述されているかチェック
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_locus_tag_prefix (rule_code, project_label, project_node, line_num)
+    result = true
+    locus_tag_nodes = project_node.xpath("//ProjectDescr/LocusTagPrefix")
+    locus_tag_nodes.each do |locus_tag_node| #XSD定義では複数記述可能
+      isvalid = true
+      # locus_tagとbiosampleのどちらか指定が欠けているればエラー
+      if (node_blank?(locus_tag_node, ".") || node_blank?(locus_tag_node, "@biosample_id"))
+        isvalid = result = false #複数ノードの一つでもエラーがあればresultをfalseとする
+      else
+        # biosample_idからDB検索してlocus_tag_prefixが取得できない、値が異なる場合にエラー
+        biosample_accession = locus_tag_node.xpath("@biosample_id").text
+        locus_tag_prefix = locus_tag_node.xpath("text()").text
+        bp_locus_tag_prefix =  @db_validator.get_biosample_locus_tag_prefix(biosample_accession)
+        if bp_locus_tag_prefix.nil?
+          isvalid = result = false
+        else
+          # get_biosample_locus_tag_prefixはハッシュの配列で返ってくる.findで検索して一つも合致しなければエラー
+          if bp_locus_tag_prefix.find{|row| row["locus_tag_prefix"] == locus_tag_node.xpath("text()").text}.nil?
+            isvalid = result = false
+          end
+        end
+      end
+      if isvalid == false
+        annotation = [
+          {key: "Project name", value: project_label}
+        ]
+        if node_blank?(locus_tag_node, ".")
+          annotation.push({key: "LocusTagPrefix", value: ""})
+        else
+          annotation.push({key: "LocusTagPrefix", value: locus_tag_node.xpath("text()").text})
+        end
+        if node_blank?(locus_tag_node, "@biosample_id")
+          annotation.push({key: "biosample_id", value: ""})
+        else
+          annotation.push({key: "biosample_id", value: locus_tag_node.xpath("@biosample_id").text})
+        end
+        annotation.push({key: "Path", value: "['//ProjectDescr/LocusTagPrefix', '//ProjectDescr/LocusTagPrefix/@biosample_id']"})
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
+
+  #
+  # rule:22
+  # LocusTagPrefix要素のbiosample_id属性の記述がある場合biosample_idはDDBJのIDであるかチェック
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_biosample_accession (rule_code, project_label, project_node, line_num)
+    result = true
+    biosample_id_nodes = project_node.xpath("//ProjectDescr/LocusTagPrefix/@biosample_id")
+    biosample_id_nodes.each do |biosample_id_node|
+      isvalid = true
+      unless node_blank?(biosample_id_node, ".") #属性値がある
+        biosample_accession = biosample_id_node.text
+        p biosample_accession
+        if biosample_accession =~ /^SAMD\d{8}$/ || biosample_accession =~ /^SSUB\d{6}$/
+          p biosample_accession
+          #DBにIDがあるか検証する
+          unless @db_validator.is_valid_biosample_id?(biosample_accession)
+            isvalid = result = false
+          end
+        else
+          isvalid = result = false
+        end
+      end
+      if isvalid == false
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "biosample_id", value: biosample_accession},
+          {key: "Path", value: "//ProjectDescr/LocusTagPrefix/@biosample_id"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
+
+  #
   # 指定されたxPathのノードが存在しない、またはテキストが空白だった場合にtrueを返す
   # TODO commonに移してテストコードを書く
   def node_blank? (node_obj, xpath)

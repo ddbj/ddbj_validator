@@ -225,4 +225,118 @@ class DDBJDbValidator
     prefix_list
   end
 
+  #
+  # 指定されたBioSample Accession IDのlocus_tag_prefix属性の値を返す
+  # DBにない場合にはnilを返す
+  # TODO 複数返す可能性があるか質問する. Submission IDであれば複数のbiosample_idに紐付くため発生しそう
+  #
+  # ==== Args
+  # biosample_acceccion ex. "SSUB000020", "SAMD00000007"
+  # ==== Return
+  # BioSampleのIDとlocus_tag_prefix情報のハッシュ
+  # [
+  #   {
+  #     "accession_id" => "SAMD00000007",
+  #     "submission_id" => "SSUB000020",
+  #     "locus_tag_prefix" => "ATW"
+  #   }, ...
+  #
+  def get_biosample_locus_tag_prefix(biosample_accession)
+    return nil if biosample_accession.nil?
+    result = nil
+    begin
+      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+
+      if biosample_accession =~ /^SSUB\d{6}/
+        ssub_query_id = biosample_accession
+
+        q = "SELECT attr.attribute_value AS locus_tag_prefix, acc.accession_id, smp.submission_id
+             FROM mass.sample smp
+               LEFT OUTER JOIN mass.accession acc USING(smp_id)
+               JOIN mass.attribute attr USING(smp_id)
+             WHERE attr.attribute_name = 'locus_tag_prefix'
+               AND attr.attribute_value != ''
+               AND smp.submission_id = '#{ssub_query_id}'
+               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+      elsif biosample_accession =~ /^SAMD\d+/
+        samd_query_id = biosample_accession
+
+        q = "SELECT attr.attribute_value AS locus_tag_prefix, acc.accession_id, smp.submission_id
+             FROM mass.sample smp
+               LEFT OUTER JOIN mass.accession acc USING(smp_id)
+               JOIN mass.attribute attr USING(smp_id)
+             WHERE attr.attribute_name = 'locus_tag_prefix'
+               AND attr.attribute_value != ''
+               AND acc.accession_id = '#{samd_query_id}'
+               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+      else
+        return nil
+      end
+
+      res = connection.exec(q)
+      if 1 <= res.ntuples then
+        result = res
+      end
+      result
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+  end
+
+  #
+  # 指定されたBioSample AccessionがDBに登録されていればtrueを返す
+  #
+  # ==== Args
+  # biosample_acceccion ex. "SAMD00025188", "SSUB003675"
+  # ==== Return
+  # true/false
+  #
+  def is_valid_biosample_id?(biosample_accession)
+    return nil if biosample_accession.nil?
+    result = nil
+    begin
+      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+
+      if biosample_accession =~ /^SSUB\d{6}/
+        ssub_query_id = biosample_accession
+
+        q = "SELECT DISTINCT sub.submitter_id, acc.accession_id, sub.submission_id
+             FROM mass.sample smp
+               LEFT OUTER JOIN mass.accession acc USING(smp_id)
+               LEFT OUTER JOIN mass.submission sub USING(submission_id)
+             WHERE smp.submission_id = '#{ssub_query_id}'
+               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+      elsif biosample_accession =~ /^SAMD\d+/
+        samd_query_id = biosample_accession
+
+        q = "SELECT DISTINCT sub.submitter_id, acc.accession_id, sub.submission_id
+             FROM mass.sample smp
+               LEFT OUTER JOIN mass.accession acc USING(smp_id)
+               LEFT OUTER JOIN mass.submission sub USING(submission_id)
+             WHERE acc.accession_id = '#{samd_query_id}'
+               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+      else
+        return nil
+      end
+
+      res = connection.exec(q)
+      if 1 <= res.ntuples then
+        result = true
+      else
+        result = false
+      end
+      result
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+    result
+  end
 end

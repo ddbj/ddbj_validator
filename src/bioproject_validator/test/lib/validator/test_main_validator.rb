@@ -407,4 +407,83 @@ class TestMainValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:21
+  def test_invalid_locus_tag_prefix
+    #ok case
+    # exist valid locus_tag_prefix and biosample_id
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ok.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not exist LocusTagPrefix node(node exist both)
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ok2.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist mutiple LocusTagPrefix node
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ok3.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # exist locus_tag_prefix but not exist biosample_id
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ng1.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # exist biosample_id but not exist locus_tag_prefix
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ng2.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # exist LocusTagPrefix but not exist both biosample_id  locus_tag_prefix
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ng3.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # invalid biosample_id(check on ddbj db)
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ng4.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # not match locus_tag_prefix and biosample_id(check on ddbj db)
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ng5.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # exist multiple LocusTagPrefix node but both elements have error
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ng6.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size #2 errors
+  end
+
+  # rule:22
+  def test_invalid_biosample_accession
+    #ok case
+    # exist valid biosample_id
+    project_set = get_project_set_node("../../data/22_invalid_biosample_accession_ok.xml")
+    ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not exist LocusTagPrefix node
+    project_set = get_project_set_node("../../data/21_invalid_locus_tag_prefix_ok2.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # invalid biosample_id format
+    project_set = get_project_set_node("../../data/22_invalid_biosample_accession_ng1.xml")
+    ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # valid biosample_id format but not exist on ddbj db
+    project_set = get_project_set_node("../../data/22_invalid_biosample_accession_ng2.xml")
+    ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    p ret[:error_list]
+  end
 end
