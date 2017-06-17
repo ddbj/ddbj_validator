@@ -484,6 +484,245 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    p ret[:error_list]
+  end
+
+  def test_node_blank?
+    #element
+    ##has text element
+    project_set = get_project_set_node("../../data/node_blank_test.xml")
+    xpath = "//Project/Element/Description"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+    xpath = "//Project/Element/Description/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+
+    ## not exist element
+    xpath = "//Project/Element/NotExist"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = "//Project/Element/NotExist/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## blank text element
+    xpath = "//Project/Element/Blank"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = "//Project/Element/Blank/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## only space element
+    xpath = "//Project/Element/OnlySpace"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = "//Project/Element/OnlySpace/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## only child node has text
+    xpath = "//Project/Element/ChildHasText"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = "//Project/Element/ChildHasText/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+
+    #attribute
+    ## has text attribute
+    xpath = "//Project/Attribute/Description/@attr"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+
+    ## not exist attribute
+    xpath = "//Project/Attribute/NotExist/@attr"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## blank text element
+    xpath = "//Project/Attribute/Blank/@attr"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## only space element
+    xpath = "//Project/Attribute/OnlySpace/@attr"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+
+    #multi data
+    ##has text attribute
+    xpath = "//Project/MultiData/Description"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+    xpath = "//Project/MultiData/Description/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+
+    ## blank text element
+    xpath = "//Project/Element/Blank"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = "//Project/Element/Blank/text()"
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+
+    #check root node of xpath is blank?
+    ## has text element
+    desc_nodes = project_set.xpath("//Project/Element/Description")
+    ret = @validator.node_blank?(desc_nodes, ".")
+    assert_equal false, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal false, ret
+    desc_nodes = project_set.xpath("//Project/Element/Description/text()")
+    ret = @validator.node_blank?(desc_nodes, ".")
+    assert_equal false, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal false, ret
+    ## not exist element
+    desc_nodes = project_set.xpath("//Project/Element/NotExist")
+    ret = @validator.node_blank?(desc_nodes, ".")
+    assert_equal true, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal true, ret
+    desc_nodes = project_set.xpath("//Project/Element/NotExist/text()")
+    ret = @validator.node_blank?(desc_nodes, ".")
+    assert_equal true, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal true, ret
+    ## has text attribute
+    desc_nodes = project_set.xpath("//Project/Attribute/Description/@attr")
+    ret = @validator.node_blank?(desc_nodes, ".")
+    assert_equal false, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal false, ret
+    desc_nodes = project_set.xpath("//Project/Attribute/NotExist/@attr")
+    ret = @validator.node_blank?(desc_nodes, ".")
+    assert_equal true, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal true, ret
+  end
+
+  def test_get_node_text
+    #element
+    ##has text element
+    project_set = get_project_set_node("../../data/node_blank_test.xml")
+    xpath = "//Project/Element/Description"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "Description text", ret
+    xpath = "//Project/Element/Description/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "Description text", ret
+
+    ## not exist element
+    xpath = "//Project/Element/NotExist"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+    xpath = "//Project/Element/NotExist/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+
+    ## blank text element
+    xpath = "//Project/Element/Blank"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+    xpath = "//Project/Element/Blank/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+
+    ## only space element
+    xpath = "//Project/Element/OnlySpace"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "  ", ret
+    xpath = "//Project/Element/OnlySpace/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "  ", ret
+
+    ## only child node has text
+    xpath = "//Project/Element/ChildHasText"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+    xpath = "//Project/Element/ChildHasText/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+
+
+    #attribute
+    ## has text attribute
+    xpath = "//Project/Attribute/Description/@attr"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "attr text", ret
+
+    ## not exist attribute
+    xpath = "//Project/Attribute/NotExist/@attr"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+
+    ## blank text element
+    xpath = "//Project/Attribute/Blank/@attr"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+
+    ## only space element
+    xpath = "//Project/Attribute/OnlySpace/@attr"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "  ", ret
+
+
+    #multi data
+    ##has text attribute
+    xpath = "//Project/MultiData/Description"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "Description text", ret
+    xpath = "//Project/MultiData/Description/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "Description text", ret
+
+    ## blank text element
+    xpath = "//Project/Element/Blank"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+    xpath = "//Project/Element/Blank/text()"
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal "", ret
+
+
+    #check root node of xpath is blank?
+    ## has text element
+    desc_nodes = project_set.xpath("//Project/Element/Description")
+    ret = @validator.get_node_text(desc_nodes, ".")
+    assert_equal "Description text", ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal "Description text", ret
+    desc_nodes = project_set.xpath("//Project/Element/Description/text()")
+    ret = @validator.get_node_text(desc_nodes, ".")
+    assert_equal "Description text", ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal "Description text", ret
+    ## not exist element
+    desc_nodes = project_set.xpath("//Project/Element/NotExist")
+    ret = @validator.get_node_text(desc_nodes, ".")
+    assert_equal "", ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal "", ret
+    desc_nodes = project_set.xpath("//Project/Element/NotExist/text()")
+    ret = @validator.get_node_text(desc_nodes, ".")
+    assert_equal "", ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal "", ret
+    ## has text attribute
+    desc_nodes = project_set.xpath("//Project/Attribute/Description/@attr")
+    ret = @validator.get_node_text(desc_nodes, ".")
+    assert_equal "attr text", ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal "attr text", ret
+    desc_nodes = project_set.xpath("//Project/Attribute/NotExist/@attr")
+    ret = @validator.get_node_text(desc_nodes, ".")
+    assert_equal "", ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal "", ret
   end
 end

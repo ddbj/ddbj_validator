@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<PackageSet>
+  <Package>
+    <Project>
+      <Project>
+        <Element>
+          <Description>Description text</Description>
+          <Blank></Blank>
+          <OnlySpace>  </OnlySpace>
+          <ChildHasText><Child>Child text</Child></ChildHasText>
+        </Element>
+        <Attribute>
+          <Description attr="attr text"></Description>
+          <Blank attr=""></Blank>
+          <OnlySpace attr="  "></OnlySpace>
+        </Attribute>
+        <MultiData>
+          <Description></Description>
+          <Description>Description text</Description>
+        </MultiData>
+        </ProjectType>
+      </Project>
+    </Project>
+  </Package>
+</PackageSet>
