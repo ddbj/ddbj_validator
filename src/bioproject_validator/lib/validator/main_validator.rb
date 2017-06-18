@@ -231,16 +231,17 @@ class MainValidator
   #
   def identical_project_title_and_description (rule_code, project_label, project_node, line_num)
     result = true
-    title_path = "Project/ProjectDescr/Title"
-    desc_path = "Project/ProjectDescr/Description"
-    title_node = project_node.xpath(title_path)
-    desc_node = project_node.xpath(desc_path)
-    if !title_node.empty?  && !desc_node.empty?
-      if title_node.text.strip == desc_node.text.strip
+    title_path = "//Project/ProjectDescr/Title"
+    desc_path = "//Project/ProjectDescr/Description"
+    if !project_node.xpath(title_path).empty? && !project_node.xpath(desc_path).empty? #両方要素あり
+      title = get_node_text(project_node, title_path)
+      description = get_node_text(project_node, desc_path)
+      if title == description
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Title", value: title_node.text},
-          {key: "Description", value: desc_node.text},
+          {key: "Title", value: title},
+          {key: "Description", value: description},
+          {key: "Path", value: [title_path, desc_path]},
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -262,13 +263,14 @@ class MainValidator
   #
   def short_project_description (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectDescr/Description"
-    target_node = project_node.xpath(node_path)
-    if !target_node.empty?
-      if target_node.text.gsub(" ", "").size <= 100
+    desc_path = "//Project/ProjectDescr/Description"
+    if !project_node.xpath(desc_path).empty? #要素あり
+      description = get_node_text(project_node, desc_path)
+      if description.gsub(" ", "").size <= 100 #空白のぞいて100文字以下
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Description", value: description},
+          {key: "Path", value: desc_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -290,13 +292,12 @@ class MainValidator
   #
   def empty_description_for_other_relevance (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectDescr/Relevance/Other"
-    other_node = project_node.xpath(node_path)
-    if !other_node.empty?
-      if other_node.text.strip == ""
+    other_path = "//Project/ProjectDescr/Relevance/Other"
+    if !project_node.xpath(other_path).empty? #要素あり
+      if node_blank?(project_node, other_path) #テキストなし
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Path", value: other_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -318,14 +319,13 @@ class MainValidator
   #
   def empty_description_for_other_subtype (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectType/ProjectTypeTopAdmin"
-    condition_node = project_node.xpath(node_path)
-    if !condition_node.empty? && condition_node.attr("subtype").text.strip == "eOther"
-      target_node = condition_node.xpath("DescriptionSubtypeOther")
-      if target_node.empty? || target_node.text.strip == ""
+    other_path = "//Project/ProjectType/ProjectTypeTopAdmin[@subtype = 'eOther']"
+    desc_other_path = "//Project/ProjectType/ProjectTypeTopAdmin/DescriptionSubtypeOther"
+    if !project_node.xpath(other_path).empty? #eOther属性値を持つ要素あ
+      if node_blank?(project_node, desc_other_path) #DescriptionSubtypeOtherなしor空
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Path", value: desc_other_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -347,14 +347,13 @@ class MainValidator
   #
   def empty_target_description_for_other_sample_scope (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectType/ProjectTypeSubmission/Target"
-    condition_node = project_node.xpath(node_path)
-    if !condition_node.empty? && condition_node.attr("sample_scope").text.strip == "eOther"
-      target_node = condition_node.xpath("Description")
-      if target_node.empty? || target_node.text.strip == ""
+    target_path = "//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eOther']"
+    target_desc_path = "Project/ProjectType/ProjectTypeSubmission/Target/Description"
+    if !project_node.xpath(target_path).empty? #eOther属性値を持つ要素あり
+      if node_blank?(project_node, target_desc_path) #Descriptionなしor空
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Path", value: target_desc_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -364,7 +363,7 @@ class MainValidator
     result
   end
 
-  # TODO:sample_scopeとメソッド共通化した方が良いか
+  #
   # rule:10
   # Targetのmaterial属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
@@ -376,14 +375,13 @@ class MainValidator
   #
   def empty_target_description_for_other_material (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectType/ProjectTypeSubmission/Target"
-    condition_node = project_node.xpath(node_path)
-    if !condition_node.empty? && condition_node.attr("material").text.strip == "eOther"
-      target_node = condition_node.xpath("Description")
-      if target_node.empty? || target_node.text.strip == ""
+    target_path = "//Project/ProjectType/ProjectTypeSubmission/Target[@material='eOther']"
+    target_desc_path = "Project/ProjectType/ProjectTypeSubmission/Target/Description"
+    if !project_node.xpath(target_path).empty? #eOther属性値を持つ要素あり
+      if node_blank?(project_node, target_desc_path) #Descriptionなしor空
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Path", value: target_desc_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -393,7 +391,7 @@ class MainValidator
     result
   end
 
-  # TODO:sample_scopeとメソッド共通化した方が良いか
+  #
   # rule:11
   # Targetのcapture属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
@@ -405,14 +403,13 @@ class MainValidator
   #
   def empty_target_description_for_other_capture (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectType/ProjectTypeSubmission/Target"
-    condition_node = project_node.xpath(node_path)
-    if !condition_node.empty? && condition_node.attr("capture").text.strip == "eOther"
-      target_node = condition_node.xpath("Description")
-      if target_node.empty? || target_node.text.strip == ""
+    target_path = "//Project/ProjectType/ProjectTypeSubmission/Target[@capture='eOther']"
+    target_desc_path = "Project/ProjectType/ProjectTypeSubmission/Target/Description"
+    if !project_node.xpath(target_path).empty? #eOther属性値を持つ要素あり
+      if node_blank?(project_node, target_desc_path) #Descriptionなしor空
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Path", value: target_desc_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -434,14 +431,12 @@ class MainValidator
   #
   def empty_method_description_for_other_method_type (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectType/ProjectTypeSubmission/Method"
-    condition_node = project_node.xpath(node_path)
-    if !condition_node.empty? && condition_node.attr("method_type").text.strip == "eOther"
-      target_node = condition_node
-      if target_node.empty? || target_node.text.strip == ""
+    method_path = "//Project/ProjectType/ProjectTypeSubmission/Method[@method_type='eOther']"
+    if !project_node.xpath(method_path).empty? #eOther属性値を持つ要素あり
+      if node_blank?(project_node, method_path) #Methodなしor空
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
+          {key: "Path", value: method_path}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -463,18 +458,18 @@ class MainValidator
   #
   def empty_data_description_for_other_data_type (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectType/ProjectTypeSubmission/Objectives/Data"
-    condition_node = project_node.xpath(node_path)
-    if !condition_node.empty? && condition_node.attr("data_type").text.strip == "eOther"
-      target_node = condition_node
-      if target_node.empty? || target_node.text.strip == ""
-        annotation = [
-          {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-        result = false
+    data_path = "//Project/ProjectType/ProjectTypeSubmission/Objectives/Data"
+    project_node.xpath(data_path).each_with_index do |data_node, idx| #複数出現の可能性あり
+      if !data_node.xpath("//Data[@data_type='eOther']").empty? #eOther属性値を持つ要素あり
+        if node_blank?(data_node, ".") #Dataなしor空
+          annotation = [
+            {key: "Project name", value: project_label},
+            {key: "Path", value: "#{data_path}[#{idx + 1}]"} #順番を表示
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
       end
     end
     result
@@ -492,18 +487,18 @@ class MainValidator
   #
   def empty_publication_reference (rule_code, project_label, project_node, line_num)
     result = true
-    node_path = "Project/ProjectDescr/Publication"
-    condition_node = project_node.xpath(node_path + "/DbType")
-    if !condition_node.empty? && condition_node.text.strip == "eNotAvailable"
-      target_node = project_node.xpath(node_path + "/Reference")
-      if target_node.empty? || target_node.text.strip == ""
-        annotation = [
-          {key: "Project name", value: project_label},
-          {key: "Path", value: node_path}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-        result = false
+    pub_path = "//Project/ProjectDescr/Publication"
+    project_node.xpath(pub_path).each_with_index do |pub_node, idx| #複数出現の可能性あり
+      if !pub_node.xpath("DbType[text()='eNotAvailable']").empty? #eNotAvailable属性値を持つ要素あり
+        if node_blank?(pub_node, "Reference") #Referenceなしor空 "//Reference"とは書かないこと
+          annotation = [
+            {key: "Project name", value: project_label},
+            {key: "Path", value: "#{pub_path}[#{idx + 1}]/Reference"} #順番を表示
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
       end
     end
     result
@@ -521,18 +516,18 @@ class MainValidator
   #
   def invalid_umbrella_project (rule_code, link_label, link_node, line_num)
     result = true
-    accession_path = "//Link/Hierarchical/MemberID/@accession"
-    unless node_blank?(link_node, accession_path)
-      accession_node = link_node.xpath(accession_path)
-      accession_node.each do |accession_attr_node|
-        unless accession_attr_node.text.chomp.strip == ""
-          bioproject_accession = accession_attr_node.text.chomp.strip
+    hierar_path = "Link/Hierarchical[@type='TopAdmin']"
+    link_node.xpath(hierar_path).each_with_index do |hierar_node, idx_h|
+      member_path = "MemberID/@accession"
+      hierar_node.xpath(member_path).each_with_index do |acs_attr_node, idx_m|
+        unless node_blank?(acs_attr_node)
+          bioproject_accession = get_node_text(acs_attr_node)
           is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
           if !is_umbrella
             annotation = [
              {key: "Project name", value: "None"},
              {key: "BioProject accession", value: bioproject_accession},
-             {key: "Path", value: accession_path}
+             {key: "Path", value: "//Link/Hierarchical[#{idx_h + 1}]/#{member_path}[#{idx_m + 1}]"}
             ]
             error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
             @error_list.push(error_hash)
@@ -558,15 +553,15 @@ class MainValidator
     result = true
     sample_scope_attr = "//Target[@sample_scope='eMonoisolate']"
     monoisolate = project_node.xpath(sample_scope_attr)
-    if !monoisolate.empty? #eMonoisolateである場合にチェック
+    unless monoisolate.empty? #eMonoisolateである場合にチェック
       if ( node_blank?(project_node, "//Organism/Label") \
            && node_blank?(project_node, "//Organism/Strain") \
-           && node_blank?(project_node, "//Organism/Strain/IsolateName") \
-           && node_blank?(project_node, "//Organism/Strain/Breed") \
-           && node_blank?(project_node, "//Organism/Strain/Cultivar"))
+           && node_blank?(project_node, "//Organism/IsolateName") \
+           && node_blank?(project_node, "//Organism/Breed") \
+           && node_blank?(project_node, "//Organism/Cultivar"))
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: "//Organism/Label | //Organism/Strain | //Organism/Strain/IsolateName | //Organism/Strain/Breed | //Organism/Strain/Cultivar"}
+          {key: "Path", value: "//Organism/Label | //Organism/Strain | //Organism/IsolateName | //Organism/Breed | //Organism/Cultivar"}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -589,28 +584,29 @@ class MainValidator
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, project_label, project_node, line_num)
     result = true
-    #eMultispeciesでない場合にチェック. sample_scopeが他の値やsample_scope属性がない場合も含む
+    # tax_idが記述されていればtax_idを使用し、なければorganism_nameからtax_idを取得する
     tax_id = nil
-    unless node_blank?(project_node, "//Organism/@taxID")
-      tax_id = project_node.xpath("//Organism/@taxID").text.chomp.strip
+    taxid_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/@taxID"
+    if !node_blank?(project_node, taxid_path) && get_node_text(project_node, taxid_path).chomp.strip != "1" #tax_id=1(root)は未指定として扱う
+      tax_id = get_node_text(project_node, taxid_path).chomp.strip
     else
-      unless node_blank?(project_node, "//OrganismName")
-        organism_name = project_node.xpath("//OrganismName").text.chomp.strip
+     orgname_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/OrganismName"
+      unless node_blank?(project_node, orgname_path)
+        organism_name = get_node_text(project_node, orgname_path).chomp.strip
         ret = @org_validator.suggest_taxid_from_name(organism_name)
         if ret[:status] == "exist"
           tax_id = ret[:tax_id]
         end
       end
     end
-    unless tax_id.nil? #taxID,OrganismName共に記述がない場合はチェックしない
-      multispecies = project_node.xpath("//Target[@sample_scope='eMultispecies']")
+    unless tax_id.nil? #taxIDが確定できない場合はチェックしない
+      multispecies = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eMultispecies']")
       if multispecies.empty? #eMultispeciesではない場合にチェックする
-        # tax_idが記述されていればtax_idを記載し、なければorganism_nameからtax_idを取得する
         result = @org_validator.is_infraspecific_rank(tax_id)
         if result == false
           annotation = [
             {key: "Project name", value: project_label},
-            {key: "Path", value: "//Organism/@taxID | //OrganismName"}
+            {key: "Path", value: [taxid_path, orgname_path]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
@@ -662,29 +658,31 @@ class MainValidator
   #
   def metagenome_or_environmental (rule_code, project_label, project_node, line_num)
     result = true
-    # tax_idが記述されていればtax_idを記載し、なければorganism_nameからtax_idを取得する
+    # tax_idが記述されていればtax_idを使用し、なければorganism_nameからtax_idを取得する
     # TODO rule18と同じコードまとめたい
     tax_id = nil
-    unless node_blank?(project_node, "//Organism/@taxID")
-      tax_id = project_node.xpath("//Organism/@taxID").text.chomp.strip
+    taxid_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/@taxID"
+    if !node_blank?(project_node, taxid_path) && get_node_text(project_node, taxid_path).chomp.strip != "1" #tax_id=1(root)は未指定として扱う
+      tax_id = get_node_text(project_node, taxid_path).chomp.strip
     else
-      unless node_blank?(project_node, "//OrganismName")
-        organism_name = project_node.xpath("//OrganismName").text.chomp.strip
+     orgname_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/OrganismName"
+      unless node_blank?(project_node, orgname_path)
+        organism_name = get_node_text(project_node, orgname_path).chomp.strip
         ret = @org_validator.suggest_taxid_from_name(organism_name)
         if ret[:status] == "exist"
           tax_id = ret[:tax_id]
         end
       end
     end
-    unless tax_id.nil? #taxID,OrganismName共に記述がない場合はチェックしない
-      environment = project_node.xpath("//Target[@sample_scope='eEnvironment']")
+    unless tax_id.nil? #taxIDが確定できない場合はチェックしない
+      environment = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eEnvironment']")
       unless environment.empty? #eEnvironmentである場合にチェック
-        #TODO tax_id がmetagenome配下かどうか
+        #tax_id がmetagenome配下かどうか
         linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
         unless @org_validator.has_linage(tax_id, linages) &&  @org_validator.get_organism_name(tax_id).end_with?("metagenome")
           annotation = [
             {key: "Project name", value: project_label},
-            {key: "Path", value: "//Organism/@taxID | //OrganismName"}
+            {key: "Path", value: [taxid_path, orgname_path]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
@@ -707,22 +705,22 @@ class MainValidator
   #
   def invalid_locus_tag_prefix (rule_code, project_label, project_node, line_num)
     result = true
-    locus_tag_nodes = project_node.xpath("//ProjectDescr/LocusTagPrefix")
-    locus_tag_nodes.each do |locus_tag_node| #XSD定義では複数記述可能
+    locus_tag_path = "//Project/ProjectDescr/LocusTagPrefix"
+    project_node.xpath(locus_tag_path).each_with_index do |locus_tag_node, idx| #XSD定義では複数記述可能
       isvalid = true
       # locus_tagとbiosampleのどちらか指定が欠けているればエラー
       if (node_blank?(locus_tag_node, ".") || node_blank?(locus_tag_node, "@biosample_id"))
         isvalid = result = false #複数ノードの一つでもエラーがあればresultをfalseとする
       else
         # biosample_idからDB検索してlocus_tag_prefixが取得できない、値が異なる場合にエラー
-        biosample_accession = locus_tag_node.xpath("@biosample_id").text
-        locus_tag_prefix = locus_tag_node.xpath("text()").text
+        biosample_accession = get_node_text(locus_tag_node, "@biosample_id")
+        locus_tag_prefix = get_node_text(locus_tag_node)
         bp_locus_tag_prefix =  @db_validator.get_biosample_locus_tag_prefix(biosample_accession)
         if bp_locus_tag_prefix.nil?
           isvalid = result = false
         else
           # get_biosample_locus_tag_prefixはハッシュの配列で返ってくる.findで検索して一つも合致しなければエラー
-          if bp_locus_tag_prefix.find{|row| row["locus_tag_prefix"] == locus_tag_node.xpath("text()").text}.nil?
+          if bp_locus_tag_prefix.find{|row| row["locus_tag_prefix"] == locus_tag_prefix}.nil?
             isvalid = result = false
           end
         end
@@ -741,7 +739,7 @@ class MainValidator
         else
           annotation.push({key: "biosample_id", value: locus_tag_node.xpath("@biosample_id").text})
         end
-        annotation.push({key: "Path", value: "['//ProjectDescr/LocusTagPrefix', '//ProjectDescr/LocusTagPrefix/@biosample_id']"})
+        annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]", "#{locus_tag_path}[#{idx + 1}]/@biosample_id"]})
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
       end
@@ -761,8 +759,8 @@ class MainValidator
   #
   def invalid_biosample_accession (rule_code, project_label, project_node, line_num)
     result = true
-    biosample_id_nodes = project_node.xpath("//ProjectDescr/LocusTagPrefix/@biosample_id")
-    biosample_id_nodes.each do |biosample_id_node|
+    biosample_id_path = "//Project/ProjectDescr/LocusTagPrefix/@biosample_id"
+    project_node.xpath(biosample_id_path).each_with_index do |biosample_id_node, idx| #XSD定義では複数記述可能
       isvalid = true
       unless node_blank?(biosample_id_node, ".") #属性値がある
         biosample_accession = biosample_id_node.text
@@ -771,7 +769,7 @@ class MainValidator
           unless @db_validator.is_valid_biosample_id?(biosample_accession)
             isvalid = result = false
           end
-        else
+        else #formatエラー
           isvalid = result = false
         end
       end
@@ -779,7 +777,7 @@ class MainValidator
         annotation = [
           {key: "Project name", value: project_label},
           {key: "biosample_id", value: biosample_accession},
-          {key: "Path", value: "//ProjectDescr/LocusTagPrefix/@biosample_id"}
+          {key: "Path", value: "#{biosample_id_path}[#{idx + 1}]"}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)

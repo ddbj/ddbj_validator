@@ -4,9 +4,9 @@
     <ProjectLinks>
       <Link>
         <ProjectIDRef accession="" archive="DDBJ" />
-        <Hierarchical type="TopSingle">
-          <MemberID accession="PRJDB3490" archive="DDBJ" />
+        <Hierarchical type="TopAdmin">
           <MemberID accession="" archive="DDBJ" />
+          <MemberID accession="PRJDB3490" archive="DDBJ" />
         </Hierarchical>
       </Link>
     </ProjectLinks>

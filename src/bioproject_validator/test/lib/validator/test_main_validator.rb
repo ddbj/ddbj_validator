@@ -68,6 +68,7 @@ class TestMainValidator < Minitest::Test
   end
 
 #### 各validationメソッドのユニットテスト ####
+
   # rule:5
   def test_identical_project_title_and_description
     #ok case
@@ -242,6 +243,16 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## multiple Data node,  one of these has error
+    project_set = get_project_set_node("../../data/13_empty_data_description_for_other_data_type_ng2.xml")
+    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple Data node,  two of these have error
+    project_set = get_project_set_node("../../data/13_empty_data_description_for_other_data_type_ng3.xml")
+    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size #twice
   end
 
   # rule:15
@@ -261,6 +272,16 @@ class TestMainValidator < Minitest::Test
     ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## multiple Publication node,  one of these has error
+    project_set = get_project_set_node("../../data/15_empty_publication_reference_ng2.xml")
+    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple Data node,  two of these have error
+    project_set = get_project_set_node("../../data/15_empty_publication_reference_ng3.xml")
+    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size #twice
   end
 
   # rule:16
@@ -725,4 +746,5 @@ class TestMainValidator < Minitest::Test
     ret = @validator.get_node_text(desc_nodes)
     assert_equal "", ret
   end
+
 end

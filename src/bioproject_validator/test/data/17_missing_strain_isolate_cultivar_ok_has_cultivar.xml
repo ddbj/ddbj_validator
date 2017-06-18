@@ -15,9 +15,8 @@
             <Target sample_scope="eMonoisolate" material="ePartialGenome" capture="eTargetedLocusLoci">
               <Organism taxID="1314752">
                 <OrganismName>Bacillus drentensis NBRC 102427</OrganismName>
-                <Strain>
-                  <Cultivar>Cultivar text</Cultivar>
-                </Strain>
+                <Strain></Strain>
+                <Cultivar>Cultivar text</Cultivar>
               </Organism>
             </Target>
             <Method method_type="eSequencing" />
