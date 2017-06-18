@@ -255,6 +255,46 @@ class TestMainValidator < Minitest::Test
     assert_equal 2, ret[:error_list].size #twice
   end
 
+  # rule:14
+  def test_invalid_publication_identifier
+    #ok case
+    ## valid PubMed id
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ok.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## valid PMC id
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ok2.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## nod ePMC ePubmed
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ok2.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    #ng case
+    # PubMed id is blank
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ng1.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # invalid PubMed
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ng2.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple Publication node,  one of these has error
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ng3.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple Publication node,  two of these have error
+    project_set = get_project_set_node("../../data/14_invalid_publication_identifier_ng4.xml")
+    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size #twice
+  end
+
   # rule:15
   def test_empty_publication_reference
     #ok case
@@ -503,6 +543,62 @@ class TestMainValidator < Minitest::Test
     # valid biosample_id format but not exist on ddbj db
     project_set = get_project_set_node("../../data/22_invalid_biosample_accession_ng2.xml")
     ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:36
+  def test_missing_project_name
+    #ok case
+    # exist bioproject_name
+    project_set = get_project_set_node("../../data/36_missing_project_name_ok.xml")
+    ret = exec_validator("missing_project_name", "36", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # blank bioproject_name
+    project_set = get_project_set_node("../../data/36_missing_project_name_ng.xml")
+    ret = exec_validator("missing_project_name", "36", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # not exist bioproject_name
+    project_set = get_project_set_node("../../data/36_missing_project_name_ng2.xml")
+    ret = exec_validator("missing_project_name", "36", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:37
+  def test_multiple_projects
+    #ok case
+    # 1 bioproject
+    project_set = get_project_set_node("../../data/37_multiple_projects_ok.xml")
+    ret = exec_validator("multiple_projects", "37", project_set)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # 2 bioproject
+    project_set = get_project_set_node("../../data/37_multiple_projects_ng.xml")
+    ret = exec_validator("multiple_projects", "37", project_set)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:40
+  def test_invalid_project_type
+    #ok case
+    # not exist ProjectTypeTopSingleOrganism
+    project_set = get_project_set_node("../../data/40_invalid_project_type_ok.xml")
+    ret = exec_validator("invalid_project_type", "40", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # exist ProjectTypeTopSingleOrganism
+    project_set = get_project_set_node("../../data/40_invalid_project_type_ng.xml")
+    ret = exec_validator("invalid_project_type", "40", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

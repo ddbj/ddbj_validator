@@ -112,7 +112,24 @@ class TestCommonUtils < Minitest::Test
 
     #nil
     ret = @common.exist_pubmed_id?(nil)
-    assert_equal nil, ret
+    assert_nil ret
+  end
+
+  def test_exist_pmc?
+    #ok
+    ret = @common.exist_pmc_id?("5343844")
+    assert_equal true, ret
+
+    #ng
+    ret = @common.exist_pmc_id?("99999999")
+    assert_equal false, ret
+
+    ret = @common.exist_pmc_id?("aiueo")
+    assert_equal false, ret
+
+    #nil
+    ret = @common.exist_pmc_id?(nil)
+    assert_nil ret
   end
 
   def test_ddbj_date_format?
@@ -152,6 +169,6 @@ class TestCommonUtils < Minitest::Test
     assert_equal false, ret
     # nil
     ret = @common.ddbj_date_format?(nil)
-    assert_equal nil, ret
+    assert_nil ret
   end
 end

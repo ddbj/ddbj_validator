@@ -307,11 +307,12 @@ class CommonUtils
   # 引数のPubMedIDが実在するか否かを返す
   #
   # ==== Args
-  # pubmed_id: PubMedID
+  # db_name: "pubmed","pmc"
+  # id: entry ID
   # ==== Return
   # returns true/false
   #
-  # EutilsAPI returns below scheme when pubmed_id is not exist.
+  # EutilsAPI returns below scheme when id is not exist.
   #
   # {
   #   "header": {
@@ -329,9 +330,9 @@ class CommonUtils
   #   }
   # }
   #
-  def exist_pubmed_id? (pubmed_id)
-    return nil if pubmed_id.nil?
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=#{pubmed_id}&retmode=json"
+  def eutils_summary(db_name, id)
+    return nil if db_name.nil? || id.nil?
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=#{db_name}&id=#{id}&retmode=json"
     begin
       res = http_get_response(url)
       if res.code =~ /^5/ # server error
@@ -340,9 +341,9 @@ class CommonUtils
         raise "'NCBI eutils' returns a error. Please check the url. url: #{url}\n"
       else
         begin
-          pubmed_info = JSON.parse(res.body)
+          entry_info = JSON.parse(res.body)
           # responseデータにerrorキーがなければOK
-          if !pubmed_info["result"].nil? && !pubmed_info["result"][pubmed_id].nil? && pubmed_info["result"][pubmed_id]["error"].nil?
+          if !entry_info["result"].nil? && !entry_info["result"][id].nil? && entry_info["result"][id]["error"].nil?
             return true
           else
             return false
@@ -355,6 +356,32 @@ class CommonUtils
       message = "Connection to 'NCBI eutils' server failed. Please check the url or your internet connection. url: #{url}\n"
       raise StandardError, message, ex.backtrace
     end
+  end
+
+  #
+  # 引数のPubMedIDが実在するか否かを返す
+  #
+  # ==== Args
+  # pubmed_id: PubMedID
+  # ==== Return
+  # returns true/false
+  #
+  def exist_pubmed_id? (pubmed_id)
+    return nil if pubmed_id.nil?
+    eutils_summary("pubmed", pubmed_id)
+  end
+
+  #
+  # 引数のPubMedIDが実在するか否かを返す
+  #
+  # ==== Args
+  # pmc_id: PMC ID
+  # ==== Return
+  # returns true/false
+  #
+  def exist_pmc_id? (pmc_id)
+    return nil if pmc_id.nil?
+    eutils_summary("pmc", pmc_id)
   end
 
   #

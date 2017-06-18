@@ -72,6 +72,8 @@ class MainValidator
       doc = Nokogiri::XML(File.read(data_xml))
       project_set = doc.xpath("//PackageSet/Package/Project")
 
+      multiple_projects("37", project_set)
+
       #各プロジェクト毎の検証
       project_set.each_with_index do |project_node, idx|
         #TODO 各プロジェクトでxpathに複数ヒットする可能性のあるものは全てをチェックするようにeachで回す事
@@ -86,11 +88,17 @@ class MainValidator
         empty_target_description_for_other_capture("11", project_name, project_node, idx)
         empty_method_description_for_other_method_type("12", project_name, project_node, idx)
         empty_data_description_for_other_data_type("13", project_name, project_node, idx)
+        invalid_publication_identifier("14", project_name, project_node, idx)
         empty_publication_reference("15", project_name, project_node, idx)
         missing_strain_isolate_cultivar("17", project_name, project_node, idx)
         taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
         empty_organism_description_for_multi_species("19", project_name, project_node, idx)
         metagenome_or_environmental("20", project_name, project_node, idx)
+        invalid_locus_tag_prefix("21", project_name, project_node, idx)
+        invalid_biosample_accession("22", project_name, project_node, idx)
+        missing_project_name("36", project_name, project_node, idx)
+        multiple_projects("37", project_name, project_node, idx)
+        invalid_project_type("40", project_name, project_node, idx)
       end
 
       link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
@@ -476,6 +484,48 @@ class MainValidator
   end
 
   #
+  # rule:14
+  # DbTypeがePubmed/ePMCの場合に実在するidかどうか、eDOIはチェックしない
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_publication_identifier (rule_code, project_label, project_node, line_num)
+    result = true
+    pub_path = "//Project/ProjectDescr/Publication"
+    project_node.xpath(pub_path).each_with_index do |pub_node, idx| #複数出現の可能性あり
+      valid = true
+      db_type = ""
+      id =  get_node_text(pub_node,"@id")
+      common = CommonUtils.new
+      if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !common.exist_pubmed_id?(id)
+        result = valid = false
+        db_type = "ePubmed"
+      elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
+        # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
+      elsif !pub_node.xpath("DbType[text()='ePMC']").empty?  && !common.exist_pmc_id?(id)
+        result = valid = false
+        db_type = "ePMC"
+      end
+      if (!valid)
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "DbType", value: db_type},
+          {key: "ID", value: id},
+          {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"} #順番を表示
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
   # rule:15
   # DbTypeがeNotAvailableのときReference要素で説明が提供されていない場合エラー
   #
@@ -782,6 +832,78 @@ class MainValidator
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
       end
+    end
+    result
+  end
+
+  #
+  # rule:36
+  # 参照ラベルとしての project name 必須
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def missing_project_name (rule_code, project_label, project_node, line_num)
+    result = true
+    project_name_path = "//Project/ProjectDescr/Name"
+    if node_blank?(project_node, project_name_path)
+      annotation = [
+        {key: "Project name", value: project_label},
+        {key: "Path", value: "#{project_name_path}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:37
+  # 1 BioProject XML - 1 BioProject であるか
+  #
+  # ==== Args
+  # project_set_node: a bioproject set node object
+  # ==== Return
+  # true/false
+  #
+  def multiple_projects (rule_code, project_set_node)
+    result = true
+    if project_set_node.size > 1
+      annotation = [
+        {key: "Number of <Project>", value: "#{project_set_node.size}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:40
+  # ProjectTypeTopSingleOrganismではないか
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_project_type (rule_code, project_label, project_node, line_num)
+    result = true
+    project_type_path = "//Project/ProjectType/ProjectTypeTopSingleOrganism"
+    if !project_node.xpath(project_type_path).empty?
+      annotation = [
+        {key: "Project name", value: project_label},
+        {key: "Path", value: "#{project_type_path}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end

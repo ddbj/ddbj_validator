@@ -225,7 +225,7 @@
     "level": "error",
     "name": "Invalid locus tag prefix",
     "method": "invalid_locus_tag_prefix",
-    "message": "Locus tag prefix format is invalid. Locus tag must consist of at least three alpha-numeric characters (the first character can not be a number).",
+    "message": "Locus tag prefix and DDBJ BioSample accession pair is invalid.",
     "reference": [
       "http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html"
     ]
@@ -236,95 +236,62 @@
     "level": "error",
     "name": "Invalid BioSample accession",
     "method": "invalid_biosample_accession",
-    "message": "Invalid BioSample accession. Please provide a valid BioSample accession with format SAM(D|E|N)[A-Z]?\\d+",
+    "message": "Invalid BioSample accession. Please provide a valid BioSample accession with format SAMD\\d+",
     "reference": [
 
     ]
   },
-  "rule28": {
+  "rule36": {
     "rule_class": "BioProject",
-    "code": "28",
+    "code": "36",
     "level": "error",
-    "name": "Invalid value for controlled terms: Relevance",
-    "method": "invalid_value_for_controlled_terms:_relevance",
-    "message": "Invalid value for controlled terms: Relevance",
+    "name": "Missing project name",
+    "method": "missing_project_name",
+    "message": "Project name is required.",
     "reference": [
 
     ]
   },
-  "rule29": {
+  "rule37": {
     "rule_class": "BioProject",
-    "code": "29",
+    "code": "37",
     "level": "error",
-    "name": "Invalid value for controlled terms: subtype",
-    "method": "invalid_value_for_controlled_terms:_subtype",
-    "message": "Invalid value for controlled terms: subtype",
+    "name": "Multiple projects",
+    "method": "multiple_projects",
+    "message": "Only one project is allowed in BioProject XML",
     "reference": [
 
     ]
   },
-  "rule30": {
+  "rule38": {
     "rule_class": "BioProject",
-    "code": "30",
+    "code": "38",
     "level": "error",
-    "name": "Invalid value for controlled terms: sample_scope",
-    "method": "invalid_value_for_controlled_terms:_sample_scope",
-    "message": "Invalid value for controlled terms: sample_scope",
+    "name": "Taxonomy name and id not match",
+    "method": "taxonomy_name_and_id_not_match",
+    "message": "Organism and taxonomy id do not match.",
     "reference": [
 
     ]
   },
-  "rule31": {
+  "rule39": {
     "rule_class": "BioProject",
-    "code": "31",
-    "level": "error",
-    "name": "Invalid value for controlled terms: material",
-    "method": "invalid_value_for_controlled_terms:_material",
-    "message": "Invalid value for controlled terms: material",
+    "code": "39",
+    "level": "warning",
+    "name": "Taxonomy error warning",
+    "method": "taxonomy_error_warning",
+    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
     "reference": [
 
     ]
   },
-  "rule32": {
+  "rule40": {
     "rule_class": "BioProject",
-    "code": "32",
+    "code": "40",
     "level": "error",
-    "name": "Invalid value for controlled terms: capture",
-    "method": "invalid_value_for_controlled_terms:_capture",
-    "message": "Invalid value for controlled terms: capture",
-    "reference": [
-
-    ]
-  },
-  "rule33": {
-    "rule_class": "BioProject",
-    "code": "33",
-    "level": "error",
-    "name": "Invalid value for controlled terms: method_type",
-    "method": "invalid_value_for_controlled_terms:_method_type",
-    "message": "Invalid value for controlled terms: method_type",
-    "reference": [
-
-    ]
-  },
-  "rule34": {
-    "rule_class": "BioProject",
-    "code": "34",
-    "level": "error",
-    "name": "Invalid value for controlled terms: data_type",
-    "method": "invalid_value_for_controlled_terms:_data_type",
-    "message": "Invalid value for controlled terms: data_type",
-    "reference": [
-
-    ]
-  },
-  "rule35": {
-    "rule_class": "BioProject",
-    "code": "35",
-    "level": "error",
-    "name": "Invalid value for controlled terms: DbType for Publication",
-    "method": "invalid_value_for_controlled_terms:_dbtype_for_publication",
-    "message": "Invalid value for controlled terms: DbType for Publication",
+    "name": "Invalid project type",
+    "method": "invalid_project_type",
+    "message": "ProjectTypeTopSingleOrganism is invalid project type",
     "reference": [
 
     ]
