@@ -76,7 +76,6 @@ class MainValidator
 
       #各プロジェクト毎の検証
       project_set.each_with_index do |project_node, idx|
-        #TODO 各プロジェクトでxpathに複数ヒットする可能性のあるものは全てをチェックするようにeachで回す事
         idx += 1
         project_name = get_bioporject_name(project_node, idx)
         identical_project_title_and_description("5", project_name, project_node, idx)
@@ -91,13 +90,15 @@ class MainValidator
         invalid_publication_identifier("14", project_name, project_node, idx)
         empty_publication_reference("15", project_name, project_node, idx)
         missing_strain_isolate_cultivar("17", project_name, project_node, idx)
+        ###TODO organismの検証とtaxonomy_idの確定
+        ## rule39, rule38
         taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
         empty_organism_description_for_multi_species("19", project_name, project_node, idx)
         metagenome_or_environmental("20", project_name, project_node, idx)
         invalid_locus_tag_prefix("21", project_name, project_node, idx)
         invalid_biosample_accession("22", project_name, project_node, idx)
         missing_project_name("36", project_name, project_node, idx)
-        multiple_projects("37", project_name, project_node, idx)
+        taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
         invalid_project_type("40", project_name, project_node, idx)
       end
 
@@ -640,7 +641,7 @@ class MainValidator
     if !node_blank?(project_node, taxid_path) && get_node_text(project_node, taxid_path).chomp.strip != "1" #tax_id=1(root)は未指定として扱う
       tax_id = get_node_text(project_node, taxid_path).chomp.strip
     else
-     orgname_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/OrganismName"
+      orgname_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/OrganismName"
       unless node_blank?(project_node, orgname_path)
         organism_name = get_node_text(project_node, orgname_path).chomp.strip
         ret = @org_validator.suggest_taxid_from_name(organism_name)
@@ -881,6 +882,50 @@ class MainValidator
       result = false
     end
     result
+  end
+
+  #
+  # rule:39
+  # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
+  #
+  # ==== Args
+  # project_set_node: a bioproject set node object
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_error_warning (rule_code, project_label, project_node, line_num)
+    taxid_path = "//Organism/@taxID"
+    orgname_path = "//Organism/OrganismName"
+    unless node_blank?(project_node, orgname_path)
+      organism_name = get_node_text(project_node, orgname_path)
+      #TODO rule 18とコードが重複
+      ret = @org_validator.suggest_taxid_from_name(organism_name)
+
+      annotation = [
+        {key: "Project name", value: project_label},
+        {key: "Path", value: [taxid_path, orgname_path]},
+        {key: "organism", value: organism_name}
+      ]
+      if ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+        scientific_name = ret[:scientific_name]
+        #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+        if scientific_name != organism_name
+          annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "organism", orgname_path, true)); #TODO 絶対パスを返す
+        end
+        annotation.push({key: "taxonomy_id", value: ""})
+        annotation.push(CommonUtils::create_suggested_annotation([ret[:tax_id]], "taxonomy_id", taxid_path, true)); #TODO 絶対パスを返す
+      else ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+        msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
+        annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
+      end #該当するtaxonomy_idが無かった場合は単なるエラー
+      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else #auto-annotation無
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      end
+      @error_list.push(error_hash)
+      false
+    end
   end
 
   #

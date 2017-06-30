@@ -586,6 +586,53 @@ class TestMainValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:39
+  def test_taxonomy_error_warning
+    #このメソッドではokになるケースはない
+    #ng case
+    ## exist
+    project_set = get_project_set_node("../../data/39_taxonomy_error_warning_ng1.xml")
+    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    expect_taxid_annotation = "103690"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+
+    ##exist but not correct as scientific name ("Anabaena sp. PCC 7120"=>"Nostoc sp. PCC 7120")
+    project_set = get_project_set_node("../../data/39_taxonomy_error_warning_ng2.xml")
+    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    expect_taxid_annotation = "103690"
+    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
+    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    ## exist but not correct caracter case ("nostoc sp. pcc 7120" => "Nostoc sp. PCC 7120")
+    project_set = get_project_set_node("../../data/39_taxonomy_error_warning_ng3.xml")
+    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    expect_taxid_annotation = "103690"
+    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
+    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    ## multiple exist
+    project_set = get_project_set_node("../../data/39_taxonomy_error_warning_ng4.xml")
+    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist
+    project_set = get_project_set_node("../../data/39_taxonomy_error_warning_ng5.xml")
+    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   # rule:40
   def test_invalid_project_type
     #ok case
