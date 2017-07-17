@@ -1,0 +1,34 @@
+<div class="container result-summary">
+    <% if(status == "success"){ %>
+        <h2>No errors or warnings to show</h2>
+    <% } else if(status == "error"){%>
+        <h2>Error found in while checking this document</h2>
+    <% } %>
+
+    <table class="result">
+        <tbody>
+        <tr>
+            <th>Result:</th>
+            <td>
+                <span class="error_info">
+                    <% if(status == "success"){ %>
+                    No Errors Found
+                    <% } else if(status == "error"){%>
+                        <%= exception %>
+                    <% } else if(exception){%>
+                        <%= exception.cmd %>
+                    <% } %>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <th>File:</th>
+            <td><%= original_file %></td>
+        </tr>
+        <tr>
+            <th>Validation Method:</th>
+            <td><%= method %></td>
+        </tr>
+        </tbody>
+    </table>
+</div>

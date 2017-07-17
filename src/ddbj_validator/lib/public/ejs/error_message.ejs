@@ -1,0 +1,73 @@
+<div class="container result-summary">
+    <h2>Error found in while checking this document</h2>
+    <table class="result">
+        <tbody>
+        <tr>
+            <th>Result:</th>
+            <td>
+                <span class="error_info">
+                    <% if(error_size != 0){ %>
+                    <%= error_size %> Errors
+                    <% } else if(exception){%>
+                    <%= exception %>
+                    <% } else { %>
+                    No Errors Found
+                    <% } %>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <th>File:</th>
+            <td><%= original_file %></td>
+        </tr>
+        <tr>
+            <th>Validation Method:</th>
+            <td><%= method %></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="container result-group">
+    <h2>Validation Output</h2>
+
+    <% for(var i=0; i< errors.length; i++){ %>
+    <div class="error-item">
+        <h3>
+            <% if(errors[i].level == "error"){ %>
+            <span class="label label-danger error_level error">
+                <%= errors[i].level %>
+            </span>
+            <% } else if(errors[i].level == "warning"){ %>
+            <span class="label label-danger error_level warning">
+                <%= errors[i].level %>
+            </span>
+            <% } %>
+
+            <%= errors[i].annotation[0].key %> : <%= errors[i].annotation[0].value %> ,
+            <%= errors[i].message %>
+        </h3>
+        <ul>
+            <% for(var j = 1; j < errors[i].annotation.length; j++) { %>
+                <% if(errors[i].annotation[j].is_auto_annotation) { %>
+                <li data-auto-annotation="true">
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                </li>
+                <% }else{%>
+                <li>
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                </li>
+                <% } %>
+            <% } %>
+        </ul>
+    </div>
+    <% } %>
+</div>
+
+<div class="container user-reaction">
+    <div class="input-group">
+        <button id="dl_xml" type="button" class="btn btn-default btn-sm">down load file</button>
+    </div>
+</div>
+
+

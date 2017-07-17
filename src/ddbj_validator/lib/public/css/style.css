@@ -1,0 +1,74 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.file_selecter {
+  width: 150px;
+  text-align: left;
+}
+.login > a {
+  float: right;
+  color: #FFFFFF;
+}
+
+.ret_error {
+  color: #FF0000;
+}
+
+.ret_success {
+  color: #5cb85c;
+}
+
+.ret-summary {
+    margin-top: 37px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.ret-summary h2 {
+    font-size: 2rem;
+    padding: 6px;
+    margin: 0;
+    background-color: #d9534f;
+    color: white;
+}
+
+.ret-summary table.result {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+    padding: 0;
+}
+
+.ret-summary table.result th {
+    padding: 6px;
+    width: 25%;
+    background-color: #eee;
+    border: 1px solid #444;
+    font-size: 1.5rem;
+}
+.ret-summary table.result td {
+    padding: 6px;
+    border: 1px solid #444;
+    font-size: 1.5rem;
+}
+.ret-summary table.result td .error_info {
+    color: #b00;
+    font-weight: bold;
+}
+
+.result-summary.result-success h2 {
+    background-color: #5cb85c;
+}
+
+.ret-summary {
+  visibility: hidden;
+}
+.results {
+  visibility: hidden;
+}
