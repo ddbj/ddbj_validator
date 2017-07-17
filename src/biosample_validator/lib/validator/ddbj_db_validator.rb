@@ -29,7 +29,7 @@ class DDBJDbValidator
     return nil if bioproject_accession.nil?
     result = nil
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
 
       if bioproject_accession =~ /^PSUB\d{6}/
         psub_query_id = bioproject_accession
@@ -78,7 +78,7 @@ class DDBJDbValidator
   def umbrella_project? (bioproject_accession)
     result = false
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
 
       if bioproject_accession =~ /^PSUB\d{6}/
         psub_query_id = bioproject_accession
@@ -128,7 +128,7 @@ class DDBJDbValidator
   def get_sample_names (submission_id)
     sample_name_list = []
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
 
       q = "SELECT smp.sample_name
             FROM mass.sample smp
@@ -164,7 +164,7 @@ class DDBJDbValidator
   def get_bioproject_accession(psub_id)
     result = nil
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
       q = "SELECT p.project_id_counter prj_id, p.project_id_prefix prefix
            FROM mass.project p
            WHERE p.submission_id = '#{psub_id}'
@@ -198,7 +198,7 @@ class DDBJDbValidator
   def get_all_locus_tag_prefix
     prefix_list = []
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
 
       q = "SELECT attr.attribute_value
            FROM mass.attribute attr
@@ -245,7 +245,7 @@ class DDBJDbValidator
     return nil if biosample_accession.nil?
     result = nil
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
 
       if biosample_accession =~ /^SSUB\d{6}/
         ssub_query_id = biosample_accession
@@ -299,7 +299,7 @@ class DDBJDbValidator
     return nil if biosample_accession.nil?
     result = nil
     begin
-      connection = PGconn.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
 
       if biosample_accession =~ /^SSUB\d{6}/
         ssub_query_id = biosample_accession
