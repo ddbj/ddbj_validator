@@ -1,0 +1,9 @@
+.DS_Store
+.idea
+.idea/*
+memo/*
+memo/
+node_modules
+tmp
+*.iml
+*_test_.*
