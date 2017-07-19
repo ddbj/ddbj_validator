@@ -2,6 +2,7 @@ require 'sinatra/base'
 require 'sinatra/json'
 require "securerandom"
 require 'sinatra/reloader'
+require File.expand_path('../validator/validator.rb', __FILE__)
 
 #require_relative "../../ddbj_validator/src/biosample_validator/biosample_validator.rb"
 #require_relative  "/" + File.dirname(__FILE__) + "../../../ddbj_validator/src/biosample_validator/biosample_validator.rb" #.rb" # + "../../../src/biosample_validator/biosample_validator.rb"
@@ -41,6 +42,11 @@ module DDBJValidator
           end
           start_time = Time.now
           output_file_path = "#{@@data_dir}/#{uuid}/result.json"
+
+#         call validator library
+          validation_params = {biosample: save_path, output: output_file_path }
+          Validator.new().execute(validation_params)
+
           Dir.chdir("./lib/validator/biosample_validator") {
             system("ruby biosample_validator.rb #{save_path} xml #{output_file_path} private")
           }
