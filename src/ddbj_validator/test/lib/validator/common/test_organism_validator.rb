@@ -1,10 +1,11 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../lib/validator/organism_validator.rb'
+require '../../../../lib/validator/common/organism_validator.rb'
 
 class TestOrganismValidator < Minitest::Test
   def setup
-    conf = JSON.parse(File.read("../../../conf/sparql_config.json"))
+    conf_dir = File.expand_path('../../../../../conf', __FILE__)
+    conf = JSON.parse(File.read("#{conf_dir}/sparql_config.json"))
     @validator = OrganismValidator.new(conf["endpoint"])
   end
 

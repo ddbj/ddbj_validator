@@ -1,19 +1,20 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../lib/validator/biosample_xml_convertor.rb'
+require '../../../../lib/validator/common/xml_convertor.rb'
 
-class TestBioSampleXmlConvertor < Minitest::Test
+class TestXmlConvertor < Minitest::Test
   def setup
-    @convertor = BioSampleXmlConvertor.new
+    @convertor = XmlConvertor.new
+    @test_file_dir = File.expand_path('../../../../data/biosample', __FILE__)
   end
 
   def test_xml2obj
     # one sample
-    xml_doc = File.read("../../data/xml2obj_SSUB000019.xml")
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
     biosample_list = @convertor.xml2obj(xml_doc)
     assert_equal 1, biosample_list.size
-    assert_equal nil, biosample_list[0]["submission_id"]
-    assert_equal nil, biosample_list[0]["submitter_id"]
+    assert_nil biosample_list[0]["submission_id"]
+    assert_nil biosample_list[0]["submitter_id"]
     assert_equal "SAMD00000328", biosample_list[0]["biosample_accession"]
     assert_equal "MIGS.ba.microbial", biosample_list[0]["package"]
     attr = biosample_list[0]["attributes"]
@@ -22,17 +23,17 @@ class TestBioSampleXmlConvertor < Minitest::Test
     assert_equal "Streptococcus pyogenes", attr["organism"]
     assert_equal "1314", attr["taxonomy_id"]
     assert_equal "urban biome", attr["env_biome"]
-    assert_equal nil, biosample_list[0]["attributes"]["description"]
+    assert_nil biosample_list[0]["attributes"]["description"]
     assert_equal 18, biosample_list[0]["attribute_list"].size
 
     # with submit info
-    xml_doc = File.read("../../data/xml2obj_SSUB000019_with_sub.xml")
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019_with_sub.xml")
     biosample_list = @convertor.xml2obj(xml_doc)
     assert_equal "SSUBXXXXX", biosample_list[0]["submission_id"]
     assert_equal "12345", biosample_list[0]["submitter_id"]
 
     # multiple samples
-    xml_doc = File.read("../../data/xml2obj_SSUB002415.xml")
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB002415.xml")
     biosample_list = @convertor.xml2obj(xml_doc)
     assert_equal 2, biosample_list.size
     # discription check

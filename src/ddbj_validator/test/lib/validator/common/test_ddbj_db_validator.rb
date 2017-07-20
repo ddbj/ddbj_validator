@@ -1,12 +1,13 @@
 require 'json'
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../lib/validator/ddbj_db_validator.rb'
+require '../../../../lib/validator/common/ddbj_db_validator.rb'
 
 class TestDDBJDbValidator < Minitest::Test
 
   def setup
-    db_config = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/ddbj_db_config.json"))
+    conf_dir = File.expand_path('../../../../../conf', __FILE__)
+    db_config = JSON.parse(File.read("#{conf_dir}/ddbj_db_config.json"))
     @db_validator = DDBJDbValidator.new(db_config)
   end
 

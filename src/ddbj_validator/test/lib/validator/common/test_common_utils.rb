@@ -1,15 +1,16 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../lib/common_utils.rb'
+require '../../../../lib/validator/common/common_utils.rb'
 
 class TestCommonUtils < Minitest::Test
   def setup
+    conf_dir = File.expand_path('../../../../../conf', __FILE__)
     @common = CommonUtils.new
     config_obj = {}
-    config_obj[:null_accepted] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/null_accepted.json"))
-    config_obj[:exchange_country_list] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/exchange_country_list.json"))
-    config_obj[:convert_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/convert_date_format.json"))
-    config_obj[:ddbj_date_format] = JSON.parse(File.read(File.dirname(__FILE__) + "/../../conf/ddbj_date_format.json"))
+    config_obj[:null_accepted] = JSON.parse(File.read("#{conf_dir}/null_accepted.json"))
+    config_obj[:exchange_country_list] = JSON.parse(File.read("#{conf_dir}/exchange_country_list.json"))
+    config_obj[:convert_date_format] = JSON.parse(File.read("#{conf_dir}/convert_date_format.json"))
+    config_obj[:ddbj_date_format] = JSON.parse(File.read("#{conf_dir}/ddbj_date_format.json"))
     CommonUtils::set_config (config_obj)
   end
 

@@ -1,6 +1,6 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../lib/validator/sparql_base.rb'
+require '../../../../lib/validator/common/sparql_base.rb'
 
 class TestSPARQLBase < Minitest::Test
   def setup
