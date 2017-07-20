@@ -5,16 +5,16 @@ require 'ostruct'
 require 'geocoder'
 require 'date'
 require 'net/http'
-require File.dirname(__FILE__) + "/biosample_xml_convertor.rb"
-require File.dirname(__FILE__) + "/organism_validator.rb"
-require File.dirname(__FILE__) + "/sparql_base.rb"
-require File.dirname(__FILE__) + "/validator_cache.rb"
-require File.dirname(__FILE__) + "/../common_utils.rb"
+require File.dirname(__FILE__) + "/common/xml_convertor.rb"
+require File.dirname(__FILE__) + "/common/organism_validator.rb"
+require File.dirname(__FILE__) + "/common/validator_cache.rb"
+require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/sparql_base.rb"
 
 #
 # A class for BioSample validation 
 #
-class MainValidator
+class BioSampleValidator
 
   #
   # Initializer
@@ -26,14 +26,14 @@ class MainValidator
   def initialize (mode)
     @mode = mode
     if mode == "private"
-      require File.dirname(__FILE__) + "/ddbj_db_validator.rb"
+      require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
     end
     @conf = read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
     CommonUtils::set_config(@conf)
 
     @validation_config = @conf[:validation_config] #need?
     @error_list = []
-    @xml_convertor = BioSampleXmlConvertor.new
+    @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
     if mode == "private"
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])

@@ -1,4 +1,6 @@
 require 'optparse'
+require File.expand_path('../biosample_validator.rb', __FILE__)
+require File.expand_path('../bioproject_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
@@ -27,15 +29,62 @@ class Validator
         case k.to_s
         when 'biosample', 'bioproject', 'experiment', 'run', 'analysis', 'output'
           params[k] = File.expand_path(v)
+          #TODO check file exist and permission, need write permission to output file
         end
       end
       p params
-      #TODO validate
 
-    rescue => e
-      abort "Error: #{e.message}"
+      # if exist user/password
+      unless params[:user].nil? and params[:password].nil?
+        if params[:user] == 'admin' and params[:password] == 'admin'
+          #TODO get xml with submission?
+        else
+          puts "Unauthorized" #return error
+          return
+        end
+      end
+
+      # validate
+      begin
+        ret = {}
+        error_list = []
+        error_list.concat(validate("biosample", params)) if !params[:biosample].nil?
+        error_list.concat(validate("bioproject", params))if !params[:bioproject].nil?
+        #TODO dra validator
+
+        if error_list.size == 0
+          ret = {status: "success", format: ARGV[1]}
+        else
+          ret = {status: "fail", format: ARGV[1], failed_list: error_list}
+        end
+      rescue => ex
+        message = "#{ex.message}"
+        message += ex.backtrace.map {|row| row}.join("\n")
+        ret = {status: "error", format: ARGV[1], message: message}
+      end
+
+      File.open(params[:output], "w") do |file|
+        file.puts(JSON.generate(ret))
+      end
     end
 
+    def validate(object_type, params)
+        begin
+          case object_type
+          when "biosample"
+            validator = BioSampleValidator.new ('private')
+            data = params[:biosample]
+          when "bioproject"
+            validator = BioProjectValidator.new
+            data = params[:bioproject]
+          end
+          validator.validate(data);
+          validator.get_error_list()
+
+        rescue => ex
+          raise StandardError, ex.message, ex.backtrace
+        end
+    end
 
 #### Parse the arguments
 

@@ -6,14 +6,14 @@ require 'geocoder'
 require 'date'
 require 'net/http'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/../../../biosample_validator/lib/validator/organism_validator.rb"
-require File.dirname(__FILE__) + "/../../../biosample_validator/lib/validator/ddbj_db_validator.rb"
-require File.dirname(__FILE__) + "/../../../biosample_validator/lib/common_utils.rb"
+require File.dirname(__FILE__) + "/common/organism_validator.rb"
+require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
+require File.dirname(__FILE__) + "/common/common_utils.rb"
 
 #
 # A class for BioProject validation
 #
-class MainValidator
+class BioProjectValidator
 
   #
   # Initializer
@@ -44,7 +44,7 @@ class MainValidator
     config = {}
     begin
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_bioproject.json")) #TODO auto update when genereted
-      config[:xsd_path] = File.absolute_path(File.read(config_file_dir + "/xsd/Package.xsd"))
+      config[:xsd_path] = File.absolute_path(config_file_dir + "/xsd/Package.xsd")
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))#TODO common setting
       config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))#TODO common setting
       config
@@ -77,7 +77,7 @@ class MainValidator
       #各プロジェクト毎の検証
       project_set.each_with_index do |project_node, idx|
         idx += 1
-        project_name = get_bioporject_name(project_node, idx)
+        project_name = get_bioporject_label(project_node, idx)
         identical_project_title_and_description("5", project_name, project_node, idx)
         short_project_description("6", project_name, project_node, idx)
         empty_description_for_other_relevance("7", project_name, project_node, idx)
@@ -98,7 +98,7 @@ class MainValidator
         invalid_locus_tag_prefix("21", project_name, project_node, idx)
         invalid_biosample_accession("22", project_name, project_node, idx)
         missing_project_name("36", project_name, project_node, idx)
-        taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
+        #taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
         invalid_project_type("40", project_name, project_node, idx)
       end
 
@@ -209,6 +209,7 @@ class MainValidator
   #
   def xml_data_schema (rule_code, xml_file, xsd_path)
     result = true
+    
     xsddoc = Nokogiri::XML(File.read(xsd_path), xsd_path)
     schema = Nokogiri::XML::Schema.from_document(xsddoc)
     document = Nokogiri::XML(File.read(xml_file))

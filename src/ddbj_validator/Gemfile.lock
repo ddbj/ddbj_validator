@@ -7,9 +7,12 @@ GEM
     haml (5.0.1)
       temple (>= 0.8.0)
       tilt
+    mini_portile2 (2.1.0)
     minitest (5.10.2)
     multi_json (1.12.1)
     mustermann (1.0.0)
+    nokogiri (1.6.8.1)
+      mini_portile2 (~> 2.1.0)
     pg (0.21.0)
     rack (2.0.3)
     rack-protection (2.0.0)
@@ -39,6 +42,7 @@ DEPENDENCIES
   geocoder
   haml
   minitest
+  nokogiri
   pg
   rack
   sinatra

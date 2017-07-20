@@ -1,7 +1,7 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../lib/validator/main_validator.rb'
-require '../../../lib/validator/biosample_xml_convertor.rb'
+require '../../../lib/validator/biosample_validator.rb'
+require '../../../lib/validator/xml_convertor.rb'
 
 class TestMainValidator < Minitest::Test
   def setup

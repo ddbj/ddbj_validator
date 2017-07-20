@@ -5,18 +5,15 @@ require 'ostruct'
 require 'geocoder'
 require 'date'
 require 'rexml/document'
-require File.dirname(__FILE__) + "/organism_validator.rb"
-require File.dirname(__FILE__) + "/sparql_base.rb"
-require File.dirname(__FILE__) + "/../common_utils.rb"
 
 #
-# BioSampleのXMLの変換処理を行うクラス
+# XMLの変換処理を行うクラス
 #
 # XMLスキーマは以下にのXSDを基本として処理する
 # ftp://ftp.ddbj.nig.ac.jp/ddbj_database/biosample/schema/biosample_exchange.xsd
 # ftp://ftp.ddbj.nig.ac.jp/ddbj_database/biosample/schema/biosample_exchange.1.1.xsd
 #
-class BioSampleXmlConvertor
+class XmlConvertor
 
   #
   # 引数のXMLデータをRubyオブジェクトにして返す

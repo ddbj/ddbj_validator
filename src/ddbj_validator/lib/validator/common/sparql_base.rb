@@ -2,7 +2,7 @@ require 'json'
 require 'rubygems'
 require 'json'
 require 'erb'
-require File.dirname(__FILE__) + "/../sparql.rb"
+require File.dirname(__FILE__) + "/sparql.rb"
 
 
 # A class for execute sparql query

@@ -47,9 +47,6 @@ module DDBJValidator
           validation_params = {biosample: save_path, output: output_file_path }
           Validator.new().execute(validation_params)
 
-          Dir.chdir("./lib/validator/biosample_validator") {
-            system("ruby biosample_validator.rb #{save_path} xml #{output_file_path} private")
-          }
           p "time: #{Time.now - start_time}s"
           result_json = File.open(output_file_path).read
           json result_json         

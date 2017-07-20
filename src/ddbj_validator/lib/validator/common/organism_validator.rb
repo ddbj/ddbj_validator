@@ -2,7 +2,7 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require File.dirname(__FILE__) + "/sparql_base.rb"
-require File.dirname(__FILE__) + "/../common_utils.rb"
+require File.dirname(__FILE__) + "/common_utils.rb"
 
 #
 # A class for BioSample validation that is relevant organism
@@ -31,7 +31,7 @@ class OrganismValidator < SPARQLBase
   #
   def initialize (endpoint)
     super(endpoint)
-    @template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
+    @template_dir = File.absolute_path(File.dirname(__FILE__) + "/../sparql")
   end
 
   #
