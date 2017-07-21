@@ -51,24 +51,26 @@ class BioSampleValidator
   def read_config (config_file_dir)
     config = {}
     begin
+      #common conf
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_biosample.json")) #TODO auto update when genereted
-      config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
-      config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
-      config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
-      config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
-      config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
-      config[:int_attr] = JSON.parse(File.read(config_file_dir + "/integer_attributes.json"))
-      config[:special_chars] = JSON.parse(File.read(config_file_dir + "/special_characters.json"))
-      config[:country_list] = JSON.parse(File.read(config_file_dir + "/country_list.json"))
-      config[:historical_country_list] = JSON.parse(File.read(config_file_dir + "/historical_country_list.json"))
-      config[:valid_country_list] = config[:country_list] - config[:historical_country_list]
-      config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))
-      config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
-      config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
-      if @mode == "private"
-        config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))
-      end
+      config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))
+
+      #biosample conf
+      bs_config_file_dir = config_file_dir + "/biosample"
+      config[:null_accepted] = JSON.parse(File.read(bs_config_file_dir + "/null_accepted.json"))
+      config[:null_not_recommended] = JSON.parse(File.read(bs_config_file_dir + "/null_not_recommended.json"))
+      config[:cv_attr] = JSON.parse(File.read(bs_config_file_dir + "/controlled_terms.json"))
+      config[:ref_attr] = JSON.parse(File.read(bs_config_file_dir + "/reference_attributes.json"))
+      config[:ts_attr] = JSON.parse(File.read(bs_config_file_dir + "/timestamp_attributes.json"))
+      config[:int_attr] = JSON.parse(File.read(bs_config_file_dir + "/integer_attributes.json"))
+      config[:special_chars] = JSON.parse(File.read(bs_config_file_dir + "/special_characters.json"))
+      config[:country_list] = JSON.parse(File.read(bs_config_file_dir + "/country_list.json"))
+      config[:historical_country_list] = JSON.parse(File.read(bs_config_file_dir + "/historical_country_list.json"))
+      config[:valid_country_list] = config[:country_list] - config[:historical_country_list]
+      config[:exchange_country_list] = JSON.parse(File.read(bs_config_file_dir + "/exchange_country_list.json"))
+      config[:convert_date_format] = JSON.parse(File.read(bs_config_file_dir + "/convert_date_format.json"))
+      config[:ddbj_date_format] = JSON.parse(File.read(bs_config_file_dir + "/ddbj_date_format.json"))
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
