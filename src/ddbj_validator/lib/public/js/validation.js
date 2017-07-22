@@ -41,17 +41,15 @@
         $.get("./ejs/error_message.ejs"),
         $.get("./ejs/error_message_group.ejs"),
         $.get("./ejs/annotated_sequence.ejs"),
-        $.get("./ejs/data_info.ejs"),
-        $.get("./ejs/success.ejs")
-    ).done(function(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_info, tmpl_ok){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_info, tmpl_ok)});
+        $.get("./ejs/result_summary.ejs")
+    ).done(function(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_summary){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_summary)});
 
-    function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_as, tmpl_info, tmpl_ok){
+    function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_as, tmpl_summary){
 
         var error_tmpl = tmpl_bs[0];
         var group_tmpl = tmpl_bs_group[0];
         var anottated_sequence_tmpl = tmpl_as[0];
-        var info_tmpl = tmpl_info[0];
-        var success_tmpl = tmpl_ok[0];
+        var summary_tmpl = tmpl_summary[0];
 
         var list_option = $("input[name=list-option]:checked").val();
         $("input[name=list-option]").change(function(){
@@ -102,6 +100,7 @@
                     result["file_list"] = file_list;
                     var tmpl = "";
                     if (result["status"] == "fail" ) {
+                      result["title_message"] = "Error found in while checking this document"
                       result["all_error_size"] = result.failed_list.length;
                       /*
                       filter by object
@@ -128,12 +127,11 @@
                           tmpl = error_tmpl;
                       }
                     } else if (result["status"] == "success" ) {
-                       result["error_size"] = 0;
-                       tmpl = success_tmpl;
+                      result["title_message"] = "No errors or warnings to show"
+                      tmpl = summary_tmpl;
                     } else if (result["status"] == "error" ) {
-                       tmpl = info_tmpl;
-                    } else {
-                       tmpl = info_tmpl;
+                      result["title_message"] = "Error found in while checking this document"
+                      tmpl = summary_tmpl;
                     }
                     var ErrorView = Backbone.View.extend({
                         initialize: function () {

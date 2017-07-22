@@ -1,23 +1,26 @@
-<div class="container result-summary">
-    <h2>Error found in while checking this document</h2>
+<div class="container result-summary <%= status %>">
+    <h2><%= title_message %></h2>
+
     <table class="result">
         <tbody>
         <tr>
-            <th>Result:</th>
+            <th>Result</th>
             <td>
-                <span class="error_info">
-                    <% if(all_error_size != 0){ %>
-                    <%= all_error_size %> Errors
+                <span class="error_info <%= status %>">
+                    <% if(status == "success"){ %>
+                        No Errors Found
+                    <% } else if (status == "fail"){ %>
+                        <%= all_error_size %> Errors
+                    <% } else if(status == "error"){%>
+                        <%= exception %>
                     <% } else if(exception){%>
-                    <%= exception %>
-                    <% } else { %>
-                    No Errors Found
+                        <%= exception.cmd %>
                     <% } %>
                 </span>
             </td>
         </tr>
         <tr>
-            <th>Files:</th>
+            <th>Files</th>
             <td>
                 <% for(key in file_list) { %>
                   <%= key %>: <%= file_list[key] %><br/>
