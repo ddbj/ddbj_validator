@@ -24,15 +24,31 @@ class Validator
     # @return [void]
     def execute(params)
 
-      #get absolute file path
+      #get absolute file path and check permission
+      permission_error_list = []
       params.each do |k,v|
         case k.to_s
         when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'output'
           params[k] = File.expand_path(v)
           #TODO check file exist and permission, need write permission to output file
+          if k.to_s == 'output'
+            dir_path = File.dirname(params[k])
+            unless File.writable? dir_path
+              permission_error_list.push(dir_path)
+            end
+          else
+            unless File.readable? params[k]
+              permission_error_list.push(params[k])
+            end
+          end
         end
       end
       p params
+      if permission_error_list.size > 0
+        ret = {status: "error", format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
+        JSON.generate(ret)
+        return
+      end
 
       # if exist user/password
       unless params[:user].nil? and params[:password].nil?
@@ -66,6 +82,7 @@ class Validator
       File.open(params[:output], "w") do |file|
         file.puts(JSON.generate(ret))
       end
+      JSON.generate(ret)
     end
 
     def validate(object_type, params)
