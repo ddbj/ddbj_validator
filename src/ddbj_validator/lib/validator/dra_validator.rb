@@ -6,13 +6,16 @@ require 'geocoder'
 require 'date'
 require 'net/http'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/../../../biosample_validator/lib/validator/ddbj_db_validator.rb"
-require File.dirname(__FILE__) + "/../../../biosample_validator/lib/common_utils.rb"
+require File.dirname(__FILE__) + "/base.rb"
+require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
+
 
 #
 # A class for DRA validation 
 #
-class MainValidator
+class DraValidator < ValidatorBase
+  attr_reader :error_list
 
   #
   # Initializer
@@ -22,11 +25,13 @@ class MainValidator
   # "public": 内部DBを使用した検証をスキップ
   #
   def initialize
-    @conf = read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
+    super
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/dra")))
     CommonUtils::set_config(@conf)
 
+    @error_list = error_list = []
+
     @validation_config = @conf[:validation_config] #need?
-    @error_list = []
     @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 
@@ -119,14 +124,6 @@ class MainValidator
     end
 
     #組合せチェック
-  end
-
-  #
-  # Returns error/warning list as the validation result
-  #
-  #
-  def get_error_list ()
-    @error_list
   end
 
 ### validate method ###

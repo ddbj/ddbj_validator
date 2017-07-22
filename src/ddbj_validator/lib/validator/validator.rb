@@ -79,7 +79,7 @@ class Validator
             data = params[:bioproject]
           end
           validator.validate(data);
-          validator.get_error_list()
+          validator.error_list
 
         rescue => ex
           raise StandardError, ex.message, ex.backtrace

@@ -6,14 +6,16 @@ require 'geocoder'
 require 'date'
 require 'net/http'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/common/organism_validator.rb"
-require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
+require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
+require File.dirname(__FILE__) + "/common/organism_validator.rb"
 
 #
 # A class for BioProject validation
 #
-class BioProjectValidator
+class BioProjectValidator < ValidatorBase
+  attr_reader :error_list
 
   #
   # Initializer
@@ -23,12 +25,14 @@ class BioProjectValidator
   # "public": 内部DBを使用した検証をスキップ
   #
   def initialize
-    @conf = read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
+    super
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/bioproject")))
     CommonUtils::set_config(@conf)
+
+    @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
-    @error_list = []
     @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 
@@ -45,8 +49,6 @@ class BioProjectValidator
     begin
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_bioproject.json")) #TODO auto update when genereted
       config[:xsd_path] = File.absolute_path(config_file_dir + "/xsd/Package.xsd")
-      config[:sparql_config] = JSON.parse(File.read(config_file_dir + "/sparql_config.json"))#TODO common setting
-      config[:ddbj_db_config] = JSON.parse(File.read(config_file_dir + "/ddbj_db_config.json"))#TODO common setting
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -109,15 +111,6 @@ class BioProjectValidator
       end
     end
   end
-
-  #
-  # Returns error/warning list as the validation result
-  #
-  #
-  def get_error_list ()
-    @error_list
-  end
-
 
   #
   # Projectを一意識別するためのlabelを返す
