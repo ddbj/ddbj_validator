@@ -72,7 +72,8 @@ class CommonUtils
              message: message,
              #reference: rule["reference"],
              level: rule["level"],
-             method: "biosample validator",
+             method: rule["rule_class"],
+             object: rule["object"],
              source: file_path,
              annotation: annotation
            }

@@ -6,6 +6,9 @@
     "name": "Not well-formed XML",
     "method": "not_well_formed_xml",
     "message": "XML document is not well-formed.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
       "http://www.w3schools.com/xml/xml_validator.asp"
     ]
@@ -17,6 +20,9 @@
     "name": "Invalid XML against schema",
     "method": "invalid_xml_against_schema",
     "message": "XML document is invalid against the schema.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
       "https://github.com/ddbj/docs/tree/master/bioproject/xsd"
     ]
@@ -28,6 +34,9 @@
     "name": "Duplicated project name",
     "method": "duplicated_project_name",
     "message": "The following project name was used in the submitted projects more than one time. Please provide unique project name.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -39,6 +48,9 @@
     "name": "Duplicated project title and description",
     "method": "duplicated_project_title_and_description",
     "message": "Both project title and description are duplicated with the submitted projects. Duplicated project should not be submitted.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -50,6 +62,9 @@
     "name": "Identical project title and description",
     "method": "identical_project_title_and_description",
     "message": "Project title and description are identical. Please provide more detailed description.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -61,6 +76,9 @@
     "name": "Short project description",
     "method": "short_project_description",
     "message": "Project description is too short. Description text must be more than 100 characters.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -72,6 +90,9 @@
     "name": "Empty description for other relevance",
     "method": "empty_description_for_other_relevance",
     "message": "Text description for the Relevance 'Other' is not provided. Please provide description of the Relevance 'Other'.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -83,6 +104,9 @@
     "name": "Empty description for other subtype",
     "method": "empty_description_for_other_subtype",
     "message": "Text description for the subtype 'Other' is not provided. Please provide DescriptionSubtypeOther.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -94,6 +118,9 @@
     "name": "Empty target description for other sample_scope",
     "method": "empty_target_description_for_other_sample_scope",
     "message": "Text description for the sample_scope 'Other' is not provided. Please provide description of target.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -105,6 +132,9 @@
     "name": "Empty target description for other material",
     "method": "empty_target_description_for_other_material",
     "message": "Text description for the material 'Other' is not provided. Please provide description of target.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -116,6 +146,9 @@
     "name": "Empty target description for other capture",
     "method": "empty_target_description_for_other_capture",
     "message": "Text description for the capture 'Other' is not provided. Please provide description of target.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -127,6 +160,9 @@
     "name": "Empty method description for other method_type",
     "method": "empty_method_description_for_other_method_type",
     "message": "Text description for the method_type 'Other' is not provided. Please provide description of method.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -138,6 +174,9 @@
     "name": "Empty data description for other data_type",
     "method": "empty_data_description_for_other_data_type",
     "message": "Text description for the data_type 'Other' is not provided. Please provide description of data.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -149,6 +188,9 @@
     "name": "Invalid publication identifier",
     "method": "invalid_publication_identifier",
     "message": "Invalid publication identifier, enter valid pubmed id, pmc id or DOI.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -160,6 +202,9 @@
     "name": "Empty publication reference",
     "method": "empty_publication_reference",
     "message": "Publication reference is not provided. Please provide reference in free-text when id is not available.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -171,6 +216,9 @@
     "name": "Invalid umbrella project",
     "method": "invalid_umbrella_project",
     "message": "Invalid project is selected as an umbrella project. Please select a valid umbrella project.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -182,6 +230,9 @@
     "name": "Missing strain/isolate/cultivar",
     "method": "missing_strain_isolate_cultivar",
     "message": "At least one of strain/isolate/cultivar is required for monoisolate organism.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -193,6 +244,9 @@
     "name": "Taxonomy at species or infraspecific rank",
     "method": "taxonomy_at_species_or_infraspecific_rank",
     "message": "Taxonomy should be species or infraspecific level.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -204,6 +258,9 @@
     "name": "Empty organism description for multi-species",
     "method": "empty_organism_description_for_multi_species",
     "message": "Organism description is required when sample scope is multi-species.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -215,6 +272,9 @@
     "name": "Metagenome or environmental",
     "method": "metagenome_or_environmental",
     "message": "When sample_scope is \"Environment\", taxonomy must be a metagenome where lineage starts with unclassified sequences and scientific name ends with 'metagenome'.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -226,6 +286,9 @@
     "name": "Invalid locus tag prefix",
     "method": "invalid_locus_tag_prefix",
     "message": "Locus tag prefix and DDBJ BioSample accession pair is invalid.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
       "http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html"
     ]
@@ -237,6 +300,9 @@
     "name": "Invalid BioSample accession",
     "method": "invalid_biosample_accession",
     "message": "Invalid BioSample accession. Please provide a valid BioSample accession with format SAMD\\d+",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -248,6 +314,9 @@
     "name": "Missing project name",
     "method": "missing_project_name",
     "message": "Project name is required.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -259,6 +328,9 @@
     "name": "Multiple projects",
     "method": "multiple_projects",
     "message": "Only one project is allowed in BioProject XML",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -270,6 +342,9 @@
     "name": "Taxonomy name and id not match",
     "method": "taxonomy_name_and_id_not_match",
     "message": "Organism and taxonomy id do not match.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -281,6 +356,9 @@
     "name": "Taxonomy error warning",
     "method": "taxonomy_error_warning",
     "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]
@@ -292,6 +370,9 @@
     "name": "Invalid project type",
     "method": "invalid_project_type",
     "message": "ProjectTypeTopSingleOrganism is invalid project type",
+    "object": [
+      "BioProject"
+    ],
     "reference": [
 
     ]

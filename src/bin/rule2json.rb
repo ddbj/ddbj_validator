@@ -1,7 +1,7 @@
 # rule2json.rb
 # 
 # Converts the rule configuration from google spreadsheet to json file.
-# output file is :  ../conf/rule_config_(validator_name).json
+# output file is :  ./rule_config_(validator_name).json
 #
 
 require 'csv'
@@ -47,6 +47,8 @@ class CreateRuleJson
         hash[:name] = row["name"]
         hash[:method] = row["name"].gsub(" ", "_").gsub(">", "_").gsub("-", "_").gsub("/", "_").downcase
         hash[:message] = row["message"]
+        #hash[:object] = "BioSample, BioProject and Submission AND Run".split(/and|,/i).map {|obj| obj.chomp.strip }
+        hash[:object] = row["object"].split(/and|,/i).map {|obj| obj.chomp.strip }
         if row["reference"].nil? || row["reference"].strip == ""
           hash[:reference] = []
         else
@@ -56,7 +58,7 @@ class CreateRuleJson
       end
 
       #output
-      output_dir = File.absolute_path(File.dirname(__FILE__) + "/../conf")
+      output_dir = File.absolute_path(File.dirname(__FILE__))
 
       # separate the rule config file to each validator
       rule_classes = rule_config.group_by {|rule| rule[:rule_class]}

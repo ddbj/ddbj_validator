@@ -12,8 +12,12 @@
             </td>
         </tr>
         <tr>
-            <th>File:</th>
-            <td><%= original_file %></td>
+            <th>Files:</th>
+            <td>
+                <% for(key in file_list) { %>
+                  <%= key %>: <%= file_list[key] %><br/>
+                <% } %>
+            </td>
         </tr>
         <tr>
             <th>Validation Method:</th>

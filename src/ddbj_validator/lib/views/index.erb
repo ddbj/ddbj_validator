@@ -32,13 +32,22 @@
             <div id="myTabContent" class="tab-content">
                 <form action="./upload" id="submit_data" method="post" enctype="multipart/form-data">
                     <div class="input-group">
-                        <input id="biosample" name="biosample" type="file" style="display: none">
+                        <input id="biosample" class="selected_file" name="biosample" type="file" style="display: none">
                         <span class="input-group-btn">
-                            <button id="select_file" class="btn btn-default" type="button">
+                            <button id="biosample_file_select" class="btn btn-default file_select" type="button">
                             <span>BioSample file(.xml)</span>
                             <i class="glyphicon glyphicon-folder-open"></i></button>
                         </span>
-                        <input id="file_name" type="text" class="form-control" placeholder="select file ..." disabled>
+                        <input id="biosample_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
+                    </div>
+                    <div class="input-group">
+                        <input id="bioproject" class="selected_file" name="bioproject" type="file" style="display: none">
+                        <span class="input-group-btn">
+                            <button id="bioproject_file_select" class="btn btn-default file_select" type="button">
+                            <span>BioProject file(.xml)</span>
+                            <i class="glyphicon glyphicon-folder-open"></i></button>
+                        </span>
+                        <input id="bioproject_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
                     </div>
         
                     <div class="sbmt">

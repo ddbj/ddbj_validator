@@ -32,25 +32,26 @@ module DDBJValidator
       #組み合わせが成功したものだけ保存しチェック
       if valid_file_combination? 
 
-        if params[:biosample]
-          uuid = SecureRandom.uuid
-          save_dir = "#{@@data_dir}/#{uuid}/biosample"
-          FileUtils.mkdir_p(save_dir)
-          save_path = save_dir + "/" + params[:biosample][:filename]
-          File.open(save_path, 'wb') do |f|
-            f.write params[:biosample][:tempfile].read
+        uuid = SecureRandom.uuid
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        validation_params = {}
+        input_file_list = %w(biosample bioproject submission experiment run analysis)
+        input_file_list.each do |file_category|
+          if params[file_category.to_sym]
+            save_path = save_file(save_dir, file_category, params)
+            validation_params[file_category.to_sym] = save_path
           end
-          start_time = Time.now
-          output_file_path = "#{@@data_dir}/#{uuid}/result.json"
-
-#         call validator library
-          validation_params = {biosample: save_path, output: output_file_path }
-          Validator.new().execute(validation_params)
-
-          p "time: #{Time.now - start_time}s"
-          result_json = File.open(output_file_path).read
-          json result_json         
         end
+        output_file_path = "#{save_dir}/result.json"
+        validation_params[:output] = output_file_path
+
+#       call validator library
+        start_time = Time.now
+        Validator.new().execute(validation_params)
+        p "time: #{Time.now - start_time}s"
+
+        result_json = File.open(output_file_path).read
+        json result_json
       else #file 組み合わせエラー
         status 400
         #400
@@ -80,7 +81,7 @@ module DDBJValidator
     end
 
     helpers do
-    # file数と組み合わせをチェック
+      # file数と組み合わせをチェック
       def valid_file_combination?
         # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する
         file_combination = true
@@ -98,6 +99,17 @@ module DDBJValidator
           end
         end
         file_combination
+      end
+
+      #file保存を保存し、ファイルパスを返す
+      def save_file (output_dir, validator_type, params)
+        save_dir = "#{output_dir}/#{validator_type}"
+        FileUtils.mkdir_p(save_dir)
+        save_path = save_dir + "/" + params[validator_type.to_sym][:filename]
+        File.open(save_path, 'wb') do |f|
+          f.write params[validator_type.to_sym][:tempfile].read
+        end
+        save_path
       end
     end
   end

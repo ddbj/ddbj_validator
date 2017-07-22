@@ -27,7 +27,7 @@ class Validator
       #get absolute file path
       params.each do |k,v|
         case k.to_s
-        when 'biosample', 'bioproject', 'experiment', 'run', 'analysis', 'output'
+        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'output'
           params[k] = File.expand_path(v)
           #TODO check file exist and permission, need write permission to output file
         end

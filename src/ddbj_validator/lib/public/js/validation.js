@@ -17,13 +17,23 @@
     var api_version = "0.9.0";
 
     var output_f = "";
-    $('#select_file').click(function(){
-        $('input[id=biosample]').click();
+    $('.btn.file_select').click(function(){
+        var clicked = $(this).attr("id");
+        if (clicked === 'biosample_file_select') {
+            $('input[id=biosample]').click();
+        } else if (clicked === 'bioproject_file_select') {
+            $('input[id=bioproject]').click();
+        }
     });
-    $('#biosample').change(function () {
-        if ($('#biosample')[0].files.length > 0) {
-            output_f = $('#biosample')[0].files[0].name;
-            $('#file_name').val(output_f);
+    $('.selected_file').change(function () {
+        if ($(this)[0].files.length > 0) {
+            output_f = $(this)[0].files[0].name;
+            var changed = $(this).attr("id");
+            if (changed === 'biosample') {
+                $('#biosample_file_name').val(output_f);
+            } else if (changed === 'bioproject') {
+                $('#bioproject_file_name').val(output_f);
+            }
         }
     });
 
@@ -54,10 +64,16 @@
         });
 
         $("#check_data").click(function () {
-            if (output_f == "") {
+            var file_list = {};
+            $('.selected_file').each(function() {
+              if ($(this)[0].files.length > 0) {
+                file_list[$(this).attr("id")] = $(this)[0].files[0].name;
+              }
+            });
+            if (Object.keys(file_list).length == 0) {
                 alert("Please select a file");
             } else {
-                $("#result").empty();
+                $("#result").empty(); //clear
                 showLoading();
                 var form = $("#submit_data").get()[0];
                 var formData = new FormData(form);
@@ -83,18 +99,22 @@
                         */
 
                     var result = JSON.parse(response);
-                    //TODO add this info to api response?
-                    result["original_file"] = $('#file_name').val();
-                    result["method"] = "biosample validator"; 
+                    result["file_list"] = file_list;
                     var tmpl = "";
                     if (result["status"] == "fail" ) {
+                      result["all_error_size"] = result.failed_list.length;
+                      /*
+                      filter by object
+                      result.failed_list = result.failed_list.filter(function(failed_list, index, array) {
+                        return (failed_list.object.includes("BioSample"));
+                      });
+                      */
                       result["error_size"] = result.failed_list.length;
                       if(list_option == "option-grouped") {
                         // create nested data
                         var grouped_message = d3.nest().key(function (d) {
-                                return d.id
-                            })
-                            .entries(result.failed_list);
+                                return d.method + "_" + d.id
+                            }).entries(result.failed_list);
                         //add message and attributions each grouped messages
                         $.each(grouped_message, function (i, v) {
                             v["message"] = v.values[0]["message"];
