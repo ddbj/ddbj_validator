@@ -1,0 +1,202 @@
+require 'rubygems'
+require 'json'
+require 'erb'
+require 'date'
+require 'nokogiri'
+require File.dirname(__FILE__) + "/base.rb"
+require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
+
+#
+# A class for DRA submission validation
+#
+class SubmissionValidator < ValidatorBase
+  attr_reader :error_list
+
+  #
+  # Initializer
+  # ==== Args
+  # mode: DDBJの内部DBにアクセスできない環境かの識別用。
+  # "private": 内部DBを使用した検証を実行
+  # "public": 内部DBを使用した検証をスキップ
+  #
+  def initialize
+    super
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/dra")))
+    CommonUtils::set_config(@conf)
+
+    @error_list = error_list = []
+
+    @validation_config = @conf[:validation_config] #need?
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+  end
+
+  #
+  # 各種設定ファイルの読み込み
+  #
+  # ==== Args
+  # config_file_dir: 設定ファイル設置ディレクトリ
+  #
+  #
+  def read_config (config_file_dir)
+    config = {}
+    begin
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_dra.json")) #TODO auto update when genereted
+      config[:xsd_path] = File.absolute_path(config_file_dir + "/xsd/SRA.submission.xsd")
+      config
+    rescue => ex
+      message = "Failed to parse the setting file. Please check the config file below.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+  end
+
+  #
+  # Validate the all rules for the dra data.
+  # Error/warning list is stored to @error_list
+  #
+  # ==== Args
+  # data_xml: xml file path
+  #
+  #
+  def validate (data_xml)
+    @data_file = File::basename(data_xml)
+    valid_xml = not_well_format_xml("1", data_xml)
+    # xml検証が通った場合のみ実行
+    if valid_xml
+      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+      doc = Nokogiri::XML(File.read(data_xml))
+      submission_set = doc.xpath("//SUBMISSION")
+      #各サブミッション毎の検証
+      submission_set.each_with_index do |submission_node, idx|
+        idx += 1
+        submission_name = get_submission_label(submission_node, idx)
+        invalid_hold_date("6", submission_name, submission_node, idx)
+      end
+    end
+  end
+
+  #
+  # Submissionを一意識別するためのlabelを返す
+  # Submission title, ccession IDの順に採用される
+  # いずれもない場合には何番目のsubmissionかを示すためラベルを返す(例:"1st submission")
+  #
+  # ==== Args
+  # submission_node: 1submissionのxml nodeset オプジェクト
+  # line_num
+  #
+  def get_submission_label (submission_node, line_num)
+    submission_name = "No:" + line_num
+    #Submission Title
+    title_node = submission_node.xpath("SUBMISSION/TITLE")
+    if !title_node.empty? && get_node_text(title_node) != ""
+      submission_name += ", TITLE:" + get_node_text(title_node)
+    elsif
+      #Accession ID
+      archive_node = submission_node.xpath("SUBMISSION[@accession]")
+      if !archive_node.empty? && get_node_text(archive_node) != ""
+        submission_name += ", AccessionID:" +  get_node_text(archive_node)
+      end
+    end
+    submission_name
+  end
+
+### validate method ###
+
+  #
+  # rule:4
+  # center name はアカウント情報と一致しているかどうか
+  #
+  # ==== Args
+  # submission_label: submission label for error displaying
+  # submission_node: a submission node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_center_name (rule_code, submission_label, submission_node, line_num)
+    result = true
+  end
+
+  #
+  # rule:5
+  # submission lab name はアカウント情報と一致しているかどうか
+  #
+  # ==== Args
+  # submission_label: submission label for error displaying
+  # submission_node: a submission node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_laboratory_name (rule_code, submission_label, submission_node, line_num)
+    result = true
+  end
+
+  #
+  # rule:6
+  # 公開予定日は今日から二年後の範囲に入ってるかどうか
+  #
+  # ==== Args
+  # submission_label: submission label for error displaying
+  # submission_node: a submission node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_hold_date (rule_code, submission_label, submission_node, line_num)
+    result = true
+    data_path = "//SUBMISSION/ACTIONS/ACTION/HOLD/@HoldUntilDate"
+    submission_node.xpath(data_path).each_with_index do |data_node, idx| #複数出現の可能性あり
+      unless node_blank?(data_node)
+        date_text = get_node_text(data_node)
+        begin
+          hold_until_date = DateTime.parse(date_text)
+          two_years_later = DateTime.now >> 24 #24months
+          if (hold_until_date > two_years_later)
+            result = false
+          end
+        rescue ArgumentError #日付に変換できない形式
+          result = false
+        end
+        # parseで処理しきれない場合
+        unless result
+          annotation = [
+            {key: "Submission name", value: submission_label},
+            {key: "HoldUntilDate", value: date_text},
+            {key: "Path", value: "#{data_path}[#{idx + 1}]"} #順番を表示
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:7
+  # name はアカウント情報と一致しているかどうか
+  #
+  # ==== Args
+  # submission_label: submission label for error displaying
+  # submission_node: a submission node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_submitter_name (rule_code, submission_label, submission_node, line_num)
+    result = true
+  end
+
+  #
+  # rule:8
+  # CONTACTS のメールアドレス（１つ以上）にアカウント情報に登録されているものが含まれているかどうか
+  #
+  # ==== Args
+  # submission_label: submission label for error displaying
+  # submission_node: a submission node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_submitter_email_address (rule_code, submission_label, submission_node, line_num)
+    result = true
+  end
+
+end
