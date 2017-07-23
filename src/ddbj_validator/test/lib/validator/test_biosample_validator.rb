@@ -330,7 +330,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_attribute_value_for_controlled_terms
-    cv_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/controlled_terms.json"))
+    cv_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/controlled_terms.json"))
     #ok case
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", "aerobe", cv_attr, 1)
     assert_equal true, ret[:result]
@@ -360,7 +360,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_publication_identifier
-    ref_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/reference_attributes.json"))
+    ref_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/reference_attributes.json"))
     #ok case
     ##pubmed id
     ret = exec_validator("invalid_publication_identifier", "11", "SampleA", "ref_biomaterial", "27148491", ref_attr, 1)
@@ -415,8 +415,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_country
-    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/country_list.json"))
-    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/historical_country_list.json"))
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/historical_country_list.json"))
     country_list = country_list - historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "8", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
@@ -768,8 +768,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_attribute_value_for_null
-    null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_accepted.json"))
-    null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/null_not_recommended.json"))
+    null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_accepted.json"))
+    null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
     # ok case
     ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted, null_not_recommended, 1)
     assert_equal true, ret[:result]
@@ -796,7 +796,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_date_format
-    ts_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/timestamp_attributes.json"))
+    ts_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/timestamp_attributes.json"))
     # ok case
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "2016-01-01", ts_attr,  1)
     assert_equal true, ret[:result]
@@ -868,7 +868,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_special_character_included
-    special_chars = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/special_characters.json"))
+    special_chars = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/special_characters.json"))
     ### attribute name
     # ok case
     ret = exec_validator("special_character_included", "12", "SampleA", "temperature", "value", special_chars, "attr_name", 1)
@@ -1027,7 +1027,7 @@ jkl\"  "
   end
 
   def test_attribute_value_is_not_integer
-    int_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/integer_attributes.json"))
+    int_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/integer_attributes.json"))
     #ok case
     ret = exec_validator("attribute_value_is_not_integer", "93", "sampleA", "host_taxid", "9606", int_attr, 1)
     assert_equal true, ret[:result]

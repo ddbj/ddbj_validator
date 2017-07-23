@@ -759,40 +759,52 @@ class BioSampleValidator < ValidatorBase
         result = false
       end
 
-      # check exist ref
-      if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
-        #あればキャッシュを使用
-        if @cache.nil? || @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref).nil?
-          exist_pubchem = common.exist_pubmed_id?(ref)
-          @cache.save(ValidatorCache::EXIST_PUBCHEM_ID, ref, exist_pubchem) unless @cache.nil?
-        else
-          puts "use cache in invalid_publication_identifier(pubchem)" if $DEBUG
-          exist_pubchem = @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref)
+      begin
+        # check exist ref
+        if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
+          #あればキャッシュを使用
+          if @cache.nil? || @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref).nil?
+            exist_pubchem = common.exist_pubmed_id?(ref)
+            @cache.save(ValidatorCache::EXIST_PUBCHEM_ID, ref, exist_pubchem) unless @cache.nil?
+         else
+            puts "use cache in invalid_publication_identifier(pubchem)" if $DEBUG
+            exist_pubchem = @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref)
+          end
+          result = exist_pubchem && result
+        elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ #DOI
+          # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
+        else #ref !~ /^https?/ #URL
+          begin
+            url = URI.parse(ref)
+          rescue URI::InvalidURIError
+            result = false
+          end
         end
-        result = exist_pubchem && result
-      elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ #DOI
-        # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
-      else #ref !~ /^https?/ #URL
-        begin
-          url = URI.parse(ref)
-        rescue URI::InvalidURIError
+
+        if result == false
+          annotation = [
+            {key: "Sample name", value: sample_name},
+            {key: "Attribute", value: attr_name},
+            {key: "Attribute value", value: attr_val}
+          ]
+          if attr_val != ref #置換候補があればAuto annotationをつける
+            location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+            annotation.push(CommonUtils::create_suggested_annotation([ref], "Attribute value", location, true));
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+          else #置換候補がないエラー
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+          end
+          @error_list.push(error_hash)
           result = false
         end
-      end
-
-      if result == false
+      rescue => ex #NCBI checkが取らない場合にはerrorではなくwargningにする
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        if attr_val != ref #置換候補があればAuto annotationをつける
-          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-          annotation.push(CommonUtils::create_suggested_annotation([ref], "Attribute value", location, true));
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-        else #置換候補がないエラー
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
-        end
+        override = {level: "wargning", message: "Validation processing failed because connection to NCBI service failed"}
+        error_hash = CommonUtils::error_obj_override(@validation_config["rule" + rule_code], @data_file, annotation, override)
         @error_list.push(error_hash)
         result = false
       end
@@ -1110,23 +1122,35 @@ class BioSampleValidator < ValidatorBase
       latlon_country_name = @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon)
     end
 
-    if !latlon_country_name.nil? && country_name == common.country_name_google2insdc(latlon_country_name)
-      true
-    else
-      if latlon_country_name.nil?
-        message = "Geographic location is not retrieved by geocoding '#{lat_lon}'."
+    begin
+      if !latlon_country_name.nil? && country_name == common.country_name_google2insdc(latlon_country_name)
+        true
       else
-        message = "Lat_lon '#{lat_lon}' maps to '#{common.country_name_google2insdc(latlon_country_name)}' instead of '#{country_name}'"
+        if latlon_country_name.nil?
+          message = "Geographic location is not retrieved by geocoding '#{lat_lon}'."
+        else
+          message = "Lat_lon '#{lat_lon}' maps to '#{common.country_name_google2insdc(latlon_country_name)}' instead of '#{country_name}'"
+        end
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "geo_loc_name", value: geo_loc_name},
+          {key: "lat_lon", value: lat_lon},
+          {key: "Message", value: message}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        false
       end
+    rescue
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "geo_loc_name", value: geo_loc_name},
         {key: "lat_lon", value: lat_lon},
         {key: "Message", value: message}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      override = {level: "wargning", message: "Validation processing failed because connection to Geocoder service failed"}
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, override)
       @error_list.push(error_hash)
-      false
     end
   end
 

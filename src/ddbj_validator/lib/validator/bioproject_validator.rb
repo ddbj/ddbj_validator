@@ -496,23 +496,37 @@ class BioProjectValidator < ValidatorBase
       db_type = ""
       id =  get_node_text(pub_node,"@id")
       common = CommonUtils.new
-      if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !common.exist_pubmed_id?(id)
-        result = valid = false
-        db_type = "ePubmed"
-      elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
-        # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
-      elsif !pub_node.xpath("DbType[text()='ePMC']").empty?  && !common.exist_pmc_id?(id)
-        result = valid = false
-        db_type = "ePMC"
-      end
-      if (!valid)
+      begin
+        if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !common.exist_pubmed_id?(id)
+          result = valid = false
+          db_type = "ePubmed"
+        elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
+          # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
+        elsif !pub_node.xpath("DbType[text()='ePMC']").empty?  && !common.exist_pmc_id?(id)
+          result = valid = false
+          db_type = "ePMC"
+        end
+
+        if (!valid)
+          annotation = [
+            {key: "Project name", value: project_label},
+            {key: "DbType", value: db_type},
+            {key: "ID", value: id},
+            {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"} #順番を表示
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
+      rescue => ex #NCBI checkが取らない場合にはerrorではなくwargningにする
         annotation = [
           {key: "Project name", value: project_label},
           {key: "DbType", value: db_type},
           {key: "ID", value: id},
           {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"} #順番を表示
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        override = {level: "wargning", message: "Validation processing failed because connection to NCBI service failed"}
+        error_hash = CommonUtils::error_obj_override(@validation_config["rule" + rule_code], @data_file, annotation, override)
         @error_list.push(error_hash)
         result = false
       end
