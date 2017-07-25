@@ -2,7 +2,7 @@ require 'sinatra/base'
 require 'sinatra/json'
 require "securerandom"
 require 'sinatra/reloader'
-require File.expand_path('../validator/validator.rb', __FILE__)
+require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 
 #require_relative "../../ddbj_validator/src/biosample_validator/biosample_validator.rb"
 #require_relative  "/" + File.dirname(__FILE__) + "../../../ddbj_validator/src/biosample_validator/biosample_validator.rb" #.rb" # + "../../../src/biosample_validator/biosample_validator.rb"
@@ -13,7 +13,7 @@ module DDBJValidator
     @@data_dir = File.dirname(__FILE__) +"/../logs" #TODO conf
 
     configure do
-      set :public_folder  , File.expand_path('../public', __FILE__)
+      set :public_folder  , File.expand_path('../../public', __FILE__)
       set :views          , File.expand_path('../views', __FILE__)
       set :root           , File.dirname(__FILE__)
       set :show_exceptions, development?

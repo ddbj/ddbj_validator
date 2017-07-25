@@ -1,4 +1,4 @@
 require 'rack'
-require './lib/application.rb'
+require './app/application.rb'
 
 run DDBJValidator::Application
