@@ -72,6 +72,10 @@ class ExperimentValidator < ValidatorBase
         idx += 1
         experiment_name = get_experiment_label(experiment_node, idx)
         missing_experiment_title("10", experiment_name, experiment_node, idx)
+        missing_experiment_description("13", experiment_name, experiment_node, idx)
+        missing_library_name("18", experiment_name, experiment_node, idx)
+        missing_insert_size_for_paired_library("19", experiment_name, experiment_node, idx)
+        insert_size_too_large("20", experiment_name, experiment_node, idx)
       end
     end
   end
@@ -141,6 +145,114 @@ class ExperimentValidator < ValidatorBase
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+  #
+  # rule:13
+  # EXPERIMENTのDESIGN_DESCRIPTION要素が存在し空白ではないか
+  #
+  # ==== Args
+  # experiment_label: experiment label for error displaying
+  # experiment_node: a experiment node object
+  # ==== Return
+  # true/false
+  #
+  def missing_experiment_description (rule_code, experiment_label, experiment_node, line_num)
+    result = true
+    desc_path = "//EXPERIMENT/DESIGN/DESIGN_DESCRIPTION"
+    if node_blank?(experiment_node, desc_path)
+      annotation = [
+        {key: "Experimentt name", value: experiment_label},
+        {key: "Path", value: "#{desc_path}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:18
+  # EXPERIMENTのLIBRARY_NAME要素が存在し空白ではないか
+  #
+  # ==== Args
+  # experiment_label: experiment label for error displaying
+  # experiment_node: a experiment node object
+  # ==== Return
+  # true/false
+  #
+  def missing_library_name (rule_code, experiment_label, experiment_node, line_num)
+    result = true
+    lib_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_NAME"
+    if node_blank?(experiment_node, lib_path)
+      annotation = [
+        {key: "Experimentt name", value: experiment_label},
+        {key: "Path", value: "#{lib_path}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:19
+  # EXPERIMENTのpairedの場合にnominal lengthが記述されているか
+  #
+  # ==== Args
+  # experiment_label: experiment label for error displaying
+  # experiment_node: a experiment node object
+  # ==== Return
+  # true/false
+  #
+  def missing_insert_size_for_paired_library (rule_code, experiment_label, experiment_node, line_num)
+    result = true
+    paired_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED"
+    unless experiment_node.xpath(paired_path).empty?
+      length_path = paired_path + "/@NOMINAL_LENGTH"
+      if node_blank?(experiment_node, length_path)
+        annotation = [
+          {key: "Experimentt name", value: experiment_label},
+          {key: "Path", value: "#{length_path}"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
+  # rule:20
+  # EXPERIMENTのnominal lengthが上限(10000000)超えていないか
+  #
+  # ==== Args
+  # experiment_label: experiment label for error displaying
+  # experiment_node: a experiment node object
+  # ==== Return
+  # true/false
+  #
+  def insert_size_too_large (rule_code, experiment_label, experiment_node, line_num)
+    result = true
+    length_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED/@NOMINAL_LENGTH"
+    unless node_blank?(experiment_node, length_path)
+      length = get_node_text(experiment_node, length_path)
+      #TODO 型チェック
+      if length.to_i > 10000000
+        annotation = [
+          {key: "Experimentt name", value: experiment_label},
+          {key: "Nominal length", value: "#{length}"},
+          {key: "Path", value: "#{length_path}"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
     end
     result
   end
