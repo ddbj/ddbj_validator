@@ -97,6 +97,7 @@
                         */
 
                     var result = JSON.parse(response);
+console.log(result)
                     result["file_list"] = file_list;
                     var tmpl = "";
                     if (result["status"] == "fail" ) {
