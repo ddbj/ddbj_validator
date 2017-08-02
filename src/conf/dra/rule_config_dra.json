@@ -1,0 +1,475 @@
+{
+  "rule1": {
+    "rule_class": "DRA",
+    "code": "1",
+    "level": "error",
+    "name": "Not well-formed XML",
+    "method": "not_well_formed_xml",
+    "message": "XML document is not well-formed.",
+    "object": [
+      "Submission",
+      "Experiment",
+      "Run",
+      "Analysis"
+    ],
+    "reference": [
+      "http://www.w3schools.com/xml/xml_validator.asp"
+    ]
+  },
+  "rule2": {
+    "rule_class": "DRA",
+    "code": "2",
+    "level": "error",
+    "name": "Invalid XML against schema",
+    "method": "invalid_xml_against_schema",
+    "message": "XML document is invalid against the schema.",
+    "object": [
+      "Submission",
+      "Experiment",
+      "Run",
+      "Analysis"
+    ],
+    "reference": [
+      "https://github.com/ddbj/docs/tree/master/bioproject/xsd"
+    ]
+  },
+  "rule3": {
+    "rule_class": "DRA",
+    "code": "3",
+    "level": "error",
+    "name": "Multiple BioProjects in a submission",
+    "method": "multiple_bioprojects_in_a_submission",
+    "message": "Multiple BioProjects are referenced. Objects must reference single BioProject in a submission.",
+    "object": [
+      "Experiment",
+      "Analysis",
+      "Submission"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule4": {
+    "rule_class": "DRA",
+    "code": "4",
+    "level": "error",
+    "name": "Invalid center name",
+    "method": "invalid_center_name",
+    "message": "Submission center name is not registered in the account.",
+    "object": [
+      "Submission",
+      "Experiment",
+      "Run",
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule5": {
+    "rule_class": "DRA",
+    "code": "5",
+    "level": "error",
+    "name": "Invalid laboratory name",
+    "method": "invalid_laboratory_name",
+    "message": "Submission laboratory name is not registered in the account.",
+    "object": [
+      "Submission"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule6": {
+    "rule_class": "DRA",
+    "code": "6",
+    "level": "error",
+    "name": "Invalid hold date",
+    "method": "invalid_hold_date",
+    "message": "Hold date must be within two years.",
+    "object": [
+      "Submission"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule7": {
+    "rule_class": "DRA",
+    "code": "7",
+    "level": "error",
+    "name": "Invalid submitter name",
+    "method": "invalid_submitter_name",
+    "message": "Submitter name is not registered in the account.",
+    "object": [
+      "Submission"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule8": {
+    "rule_class": "DRA",
+    "code": "8",
+    "level": "error",
+    "name": "Invalid submitter e-mail address",
+    "method": "invalid_submitter_e_mail_address",
+    "message": "Submitter e-mail address is not registered in the account.",
+    "object": [
+      "Submission"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule9": {
+    "rule_class": "DRA",
+    "code": "9",
+    "level": "error",
+    "name": "Duplicate object names",
+    "method": "duplicate_object_names",
+    "message": "Object name is already used in the account.",
+    "object": [
+      "Submission",
+      "Experiment",
+      "Run",
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule10": {
+    "rule_class": "DRA",
+    "code": "10",
+    "level": "error",
+    "name": "Missing Experiment title",
+    "method": "missing_experiment_title",
+    "message": "Experiment Title is required.",
+    "object": [
+      "Experiment"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule11": {
+    "rule_class": "DRA",
+    "code": "11",
+    "level": "error",
+    "name": "Missing Run title",
+    "method": "missing_run_title",
+    "message": "Run Title is required.",
+    "object": [
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule12": {
+    "rule_class": "DRA",
+    "code": "12",
+    "level": "error",
+    "name": "Missing Analysis title",
+    "method": "missing_analysis_title",
+    "message": "Analysis Title is required.",
+    "object": [
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule13": {
+    "rule_class": "DRA",
+    "code": "13",
+    "level": "error",
+    "name": "Missing Experiment description",
+    "method": "missing_experiment_description",
+    "message": "Experiment description is required.",
+    "object": [
+      "Experiment"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule14": {
+    "rule_class": "DRA",
+    "code": "14",
+    "level": "error",
+    "name": "Missing Analysis description",
+    "method": "missing_analysis_description",
+    "message": "Analysis description is required.",
+    "object": [
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule15": {
+    "rule_class": "DRA",
+    "code": "15",
+    "level": "error",
+    "name": "BioProject not found",
+    "method": "bioproject_not_found",
+    "message": "Referenced BioProject is not found in the account.",
+    "object": [
+      "BioProject",
+      "Experiment",
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule16": {
+    "rule_class": "DRA",
+    "code": "16",
+    "level": "error",
+    "name": "BioSample not found",
+    "method": "biosample_not_found",
+    "message": "Referenced BioSample is not found in the account.",
+    "object": [
+      "BioProject",
+      "Experiment",
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule17": {
+    "rule_class": "DRA",
+    "code": "17",
+    "level": "error",
+    "name": "Experiment not found",
+    "method": "experiment_not_found",
+    "message": "Referenced Experiment is not found in the submitted objects.",
+    "object": [
+      "Experiment",
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule18": {
+    "rule_class": "DRA",
+    "code": "18",
+    "level": "error",
+    "name": "Missing Library name",
+    "method": "missing_library_name",
+    "message": "Library name is missing.",
+    "object": [
+      "Experiment"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule19": {
+    "rule_class": "DRA",
+    "code": "19",
+    "level": "error",
+    "name": "Missing Insert size for paired library",
+    "method": "missing_insert_size_for_paired_library",
+    "message": "Insert size (nominal length) is required for paired library.",
+    "object": [
+      "Experiment"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule20": {
+    "rule_class": "DRA",
+    "code": "20",
+    "level": "error",
+    "name": "Insert size too large",
+    "method": "insert_size_too_large",
+    "message": "Insert size (nominal length) must be less than 10000000",
+    "object": [
+      "Experiment"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule21": {
+    "rule_class": "DRA",
+    "code": "21",
+    "level": "error",
+    "name": "Missing Run filename",
+    "method": "missing_run_filename",
+    "message": "Run filename is required",
+    "object": [
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule22": {
+    "rule_class": "DRA",
+    "code": "22",
+    "level": "error",
+    "name": "Missing Analysis filename",
+    "method": "missing_analysis_filename",
+    "message": "Analysis filename is required",
+    "object": [
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule23": {
+    "rule_class": "DRA",
+    "code": "23",
+    "level": "error",
+    "name": "Invalid Run filename",
+    "method": "invalid_run_filename",
+    "message": "Invalid Run filename. Filenames must be constructed only from alphanumerals, hyphens, underscores and dots.",
+    "object": [
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule24": {
+    "rule_class": "DRA",
+    "code": "24",
+    "level": "error",
+    "name": "Invalid Analysis filename",
+    "method": "invalid_analysis_filename",
+    "message": "Invalid Analysis filename. Filenames must be constructed only from alphanumerals, hyphens, underscores and dots.",
+    "object": [
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule25": {
+    "rule_class": "DRA",
+    "code": "25",
+    "level": "error",
+    "name": "Invalid Run file md5 checksum",
+    "method": "invalid_run_file_md5_checksum",
+    "message": "Run file md5 checksum is invalid. Checksum must be 32 alphanumeric characters.",
+    "object": [
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule26": {
+    "rule_class": "DRA",
+    "code": "26",
+    "level": "error",
+    "name": "Invalid Analysis file md5 checksum",
+    "method": "invalid_analysis_file_md5_checksum",
+    "message": "Analysis file md5 checksum is invalid. Checksum must be 32 alphanumeric characters.",
+    "object": [
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule27": {
+    "rule_class": "DRA",
+    "code": "27",
+    "level": "error",
+    "name": "One fastq file for paired library",
+    "method": "one_fastq_file_for_paired_library",
+    "message": "In most cases, more than two fastq files per Run need to be registered for paired sequencing Experiment.",
+    "object": [
+      "Experiment",
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule28": {
+    "rule_class": "DRA",
+    "code": "28",
+    "level": "error",
+    "name": "Invalid PacBio RS II hdf file series",
+    "method": "invalid_pacbio_rs_ii_hdf_file_series",
+    "message": "A series of PacBio RS II hdf files, one bas and three bax files, must be registered per Run.",
+    "object": [
+      "Experiment",
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule29": {
+    "rule_class": "DRA",
+    "code": "29",
+    "level": "error",
+    "name": "Invalid bam alignment file series",
+    "method": "invalid_bam_alignment_file_series",
+    "message": "A series of bam alignment files, one bam | one reference mapping table | one reference fasta, must be registered per Run.",
+    "object": [
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule30": {
+    "rule_class": "DRA",
+    "code": "30",
+    "level": "error",
+    "name": "Invalid filetype",
+    "method": "invalid_filetype",
+    "message": "Filetype is not accepted or combination of sequencing platform and filetype is invalid.",
+    "object": [
+      "Experiment",
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule31": {
+    "rule_class": "DRA",
+    "code": "31",
+    "level": "error",
+    "name": "Mixed filetype",
+    "method": "mixed_filetype",
+    "message": "Different filetypes are mixed in a Run.",
+    "object": [
+      "Run"
+    ],
+    "reference": [
+
+    ]
+  },
+  "rule32": {
+    "rule_class": "DRA",
+    "code": "32",
+    "level": "error",
+    "name": "Missing submission",
+    "method": "missing_submission",
+    "message": "Submission XML is required for submitting Experiment, Run and Analysis",
+    "object": [
+      "Submission",
+      "Experiment",
+      "Run",
+      "Analysis"
+    ],
+    "reference": [
+
+    ]
+  }
+}

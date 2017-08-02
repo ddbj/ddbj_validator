@@ -1,0 +1,76 @@
+<div class="container result-summary <%= status %>">
+    <h2><%= title_message %></h2>
+
+    <table class="result">
+        <tbody>
+        <tr>
+            <th>Result</th>
+            <td>
+                <span class="error_info <%= status %>">
+                    <% if(status == "success"){ %>
+                        No Errors Found
+                    <% } else if (status == "fail"){ %>
+                        <%= all_error_size %> Errors
+                    <% } else if(status == "error"){%>
+                        <%= exception %>
+                    <% } else if(exception){%>
+                        <%= exception.cmd %>
+                    <% } %>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <th>Files</th>
+            <td>
+                <% for(key in file_list) { %>
+                  <%= key %>: <%= file_list[key] %><br/>
+                <% } %>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="container result-group">
+    <h2>Validation Output</h2>
+
+    <% for(var i=0; i< errors.length; i++){ %>
+    <div class="error-item">
+        <h3>
+            <% if(errors[i].level == "error"){ %>
+            <span class="label label-danger error_level error">
+                <%= errors[i].level %>
+            </span>
+            <% } else if(errors[i].level == "warning"){ %>
+            <span class="label label-danger error_level warning">
+                <%= errors[i].level %>
+            </span>
+            <% } %>
+
+            <%= errors[i].annotation[0].key %> : <%= errors[i].annotation[0].value %> ,
+            <%= errors[i].message %>
+        </h3>
+        <ul>
+            <% for(var j = 1; j < errors[i].annotation.length; j++) { %>
+                <% if(errors[i].annotation[j].is_auto_annotation) { %>
+                <li data-auto-annotation="true">
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                </li>
+                <% }else{%>
+                <li>
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                </li>
+                <% } %>
+            <% } %>
+        </ul>
+    </div>
+    <% } %>
+</div>
+
+<div class="container user-reaction">
+    <div class="input-group">
+        <button id="dl_xml" type="button" class="btn btn-default btn-sm">down load file</button>
+    </div>
+</div>
+
+

@@ -1,0 +1,104 @@
+<div class="container result-summary <%= status %>">
+    <h2><%= title_message %></h2>
+
+    <table class="result">
+        <tbody>
+        <tr>
+            <th>Result</th>
+            <td>
+                <span class="error_info <%= status %>">
+                    <% if(status == "success"){ %>
+                        No Errors Found
+                    <% } else if (status == "fail"){ %>
+                        <%= all_error_size %> Errors
+                    <% } else if(status == "error"){%>
+                        <%= exception %>
+                    <% } else if(exception){%>
+                        <%= exception.cmd %>
+                    <% } %>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <th>Files</th>
+            <td>
+                <% for(key in file_list) { %>
+                  <%= key %>: <%= file_list[key] %><br/>
+                <% } %>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="container result-group">
+    <h2>Error Message</h2>
+
+    <% for(var i=0; i< errors.length; i++){ %>
+
+        <% if(errors[i].level == "error"){ %>
+        <h3>
+            <span class="label label-danger error_level error"><%= errors[i].level %></span>
+            <%= errors[i].message %>
+        </h3>
+        <div class="tbl_error">
+
+        <% }else if(errors[i].level == "warning"){ %>
+        <h3>
+            <span class="label label-danger error_level warning"><%= errors[i].level %></span>
+            <%= errors[i].message %>
+        </h3>
+        <div class="tbl_warning">
+        <% } %>
+
+            <table class="grouped">
+                <thead>
+                <tr>
+                    <% for (var j = 0; j < errors[i].values[0].annotation.length; j++) { %>
+                    <th><%= errors[i].values[0].annotation[j].key %></th>
+                    <% } %>
+                </tr>
+                </thead>
+                <tbody>
+                <% for(var h = 0; h < errors[i].values.length; h++) { %>
+                <tr>
+                <% for(var j = 0; j < errors[i].values[h].annotation.length; j++) { %>
+                    <% if(errors[i].values[h].annotation[j].is_auto_annotation) { %>
+                    <td data-auto-annotation='true' data-location='<%= errors[i].values[h].annotation[j].location %>'><%= errors[i].values[h].annotation[j].value %></td>
+                    <% }else{ %>
+                    <td><%= errors[i].values[h].annotation[j].value %></td>
+                    <% } %>
+                <% } %>
+                </tr>
+                <% } %>
+                </tbody>
+
+            </table>
+
+        </div>
+    <% } %>
+
+</div>
+
+<div class="container user-reaction">
+    <div class="input-group">
+        <button id="dl_xml" type="button" class="btn btn-default btn-sm">down load file</button>
+    </div>
+</div>
+<script>
+    $(function(){
+        if($("#edit-option").is(":checked")){
+            $(".result-group input[type=text]").prop("disabled", false);
+            $(".result-group input[type=text]").css("border", "solid 1px #cccccc");
+            /*
+            $(".result-group input[type=text]").change(function(){
+
+            })
+            */
+        }
+        $(".grouped").DataTable({
+             "searching": false
+        });
+    })
+</script>
+

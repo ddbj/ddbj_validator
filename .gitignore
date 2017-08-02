@@ -5,11 +5,13 @@ memo/*
 memo/
 db_conf/*
 db_conf
-.gitignore
 tmp/*
 memo
 node_modules/*
-.*
 *_test_.*
 .DS_Store
 *_back_*
+vendor
+logs
+.bundle
+*.swp

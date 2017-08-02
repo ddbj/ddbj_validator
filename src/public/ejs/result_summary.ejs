@@ -1,0 +1,32 @@
+<div class="container result-summary <%= status %>">
+    <h2><%= title_message %></h2>
+
+    <table class="result">
+        <tbody>
+        <tr>
+            <th>Result</th>
+            <td>
+                <span class="error_info <%= status %>">
+                    <% if(status == "success"){ %>
+                        No Errors Found
+                    <% } else if (status == "fail"){ %>
+                        < %= all_error_size %> Errors
+                    <% } else if(status == "error"){%>
+                        <%= exception %> 
+                    <% } else if(exception){%>
+                        <%= exception.cmd %>
+                    <% } %>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <th>Files</th>
+            <td>
+                <% for(key in file_list) { %>
+                  <%= key %>: <%= file_list[key] %><br/>
+                <% } %>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>

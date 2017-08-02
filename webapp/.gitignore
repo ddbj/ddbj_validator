@@ -5,6 +5,5 @@ memo/*
 memo/
 node_modules
 tmp
-.gitignore
 *.iml
 *_test_.*
