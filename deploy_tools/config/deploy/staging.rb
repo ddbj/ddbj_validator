@@ -1,3 +1,32 @@
+require 'net/ssh/proxy/command'
+
+set :deploy_to, "/home/w3sw/ddbj/DDBJValidator/deploy/staging"
+
+# rbenv setting see: https://github.com/capistrano/rbenv/
+set :rbenv_type, :user # :system or :user
+set :rbenv_ruby, '2.2.6'
+set :rbenv_path, '/home/w3sw/.anyenv/envs/rbenv'
+set :rbenv_prefix, "#{fetch(:rbenv_path)}/bin/rbenv exec"
+set :rbenv_map_bins, %w(rake gem bundle ruby rails)
+set :rbenv_roles, :all # default value
+
+set :unicorn_config_path, "/home/w3sw/ddbj/DDBJValidator/deploy/conf/unicorn.rb"
+set :unicorn_rack_env, 'staging'
+
+set :ssh_options, {
+  forward_agent: true
+}
+
+server "172.19.16.14", #t014
+  user: "w3sw",
+  roles: %w{web app},
+  ssh_options: {
+    user: "w3sw",
+    forward_agent: true,
+    auth_methods: %w(publickey),
+    proxy: Net::SSH::Proxy::Command::new('ssh ddbj -W %h:%p')
+  }
+
 # server-based syntax
 # ======================
 # Defines a single server with a list of roles and multiple properties.

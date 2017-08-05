@@ -1,15 +1,16 @@
 # config valid only for current version of Capistrano
 lock "3.9.0"
 
-set :application, "my_app_name"
-set :repo_url, "git@example.com:me/my_repo.git"
+set :application, "ddbj_validator"
+set :repo_url, "git@github.com:ddbj/ddbj_validator.git"
+set :repo_tree, 'src'
 
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
+set :branch, ENV['BRANCH'] || 'master'
 
 # Default deploy_to directory is /var/www/my_app_name
 # set :deploy_to, "/var/www/my_app_name"
-
 # Default value for :format is :airbrussh.
 # set :format, :airbrussh
 
@@ -25,6 +26,7 @@ set :repo_url, "git@example.com:me/my_repo.git"
 
 # Default value for linked_dirs is []
 # append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system"
+set :linked_dirs, fetch(:linked_dirs, []).push('bin', 'log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'public/system')
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -34,3 +36,16 @@ set :repo_url, "git@example.com:me/my_repo.git"
 
 # Default value for keep_releases is 5
 # set :keep_releases, 5
+
+set :unicorn_roles, :all
+
+namespace :deploy do
+  desc 'Update config files to environment'
+  task :conf_copy do
+    on roles :all do
+      execute "cp #{shared_path}/config/ddbj_db_config.json #{release_path}/conf/"
+      execute "cp #{shared_path}/config/sparql_config.json #{release_path}/conf/"
+    end
+  end
+  after 'deploy:updated', 'deploy:conf_copy'
+end

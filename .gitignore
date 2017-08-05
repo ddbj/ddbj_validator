@@ -13,5 +13,6 @@ node_modules/*
 *_back_*
 vendor
 logs
+log
 .bundle
 *.swp
