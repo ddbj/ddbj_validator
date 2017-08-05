@@ -51,6 +51,7 @@ DEPENDENCIES
   pg
   rack
   sinatra
+  sinatra-contrib
   sinatra-reloader
   unicorn
 
