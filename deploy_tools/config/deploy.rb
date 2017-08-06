@@ -43,8 +43,7 @@ namespace :deploy do
   desc 'Update config files to environment'
   task :conf_copy do
     on roles :all do
-      execute "cp #{shared_path}/config/ddbj_db_config.json #{release_path}/conf/"
-      execute "cp #{shared_path}/config/sparql_config.json #{release_path}/conf/"
+      execute "cp #{shared_path}/config/validator.yml #{release_path}/conf/"
     end
   end
   after 'deploy:updated', 'deploy:conf_copy'
