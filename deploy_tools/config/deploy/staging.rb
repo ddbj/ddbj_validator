@@ -10,7 +10,7 @@ set :rbenv_prefix, "#{fetch(:rbenv_path)}/bin/rbenv exec"
 set :rbenv_map_bins, %w(rake gem bundle ruby rails)
 set :rbenv_roles, :all # default value
 
-set :unicorn_config_path, "/home/w3sw/ddbj/DDBJValidator/deploy/conf/unicorn.rb"
+set :unicorn_config_path, "#{shared_path}/config/unicorn.rb"
 set :unicorn_rack_env, 'staging'
 
 set :ssh_options, {
@@ -24,7 +24,7 @@ server "172.19.16.14", #t014
     user: "w3sw",
     forward_agent: true,
     auth_methods: %w(publickey),
-    proxy: Net::SSH::Proxy::Command::new('ssh ddbj -W %h:%p')
+    proxy: Net::SSH::Proxy::Command::new('ssh ddbj_gw -W %h:%p')
   }
 
 # server-based syntax
