@@ -1,3 +1,4 @@
+require 'yaml'
 require 'sinatra/base'
 require 'sinatra/json'
 require "securerandom"
@@ -10,7 +11,8 @@ require File.expand_path('../../lib/validator/validator.rb', __FILE__)
  
 module DDBJValidator
   class Application < Sinatra::Base
-    @@data_dir = File.dirname(__FILE__) +"/../logs" #TODO conf
+    setting = YAML.load(File.read(File.dirname(__FILE__) + "/../conf/validator.yml"))
+    @@data_dir = setting["api_log"]["path"]
 
     configure do
       set :public_folder  , File.expand_path('../../public', __FILE__)

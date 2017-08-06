@@ -1,3 +1,4 @@
+require 'yaml'
 require 'bundler/setup'
 require 'minitest/autorun'
 require '../../../../lib/validator/common/organism_validator.rb'
@@ -5,7 +6,8 @@ require '../../../../lib/validator/common/organism_validator.rb'
 class TestOrganismValidator < Minitest::Test
   def setup
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
-    conf = JSON.parse(File.read("#{conf_dir}/sparql_config.json"))
+    setting = YAML.load(File.read(conf_dir + "/validator.yml"))
+    conf = setting["sparql_endpoint"]
     @validator = OrganismValidator.new(conf["endpoint"])
   end
 

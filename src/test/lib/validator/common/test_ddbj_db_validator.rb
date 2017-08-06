@@ -1,4 +1,5 @@
 require 'json'
+require 'yaml'
 require 'bundler/setup'
 require 'minitest/autorun'
 require '../../../../lib/validator/common/ddbj_db_validator.rb'
@@ -7,7 +8,8 @@ class TestDDBJDbValidator < Minitest::Test
 
   def setup
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
-    db_config = JSON.parse(File.read("#{conf_dir}/ddbj_db_config.json"))
+    setting = YAML.load(File.read(conf_dir + "/validator.yml"))
+    db_config = setting["ddbj_rdb"]
     @db_validator = DDBJDbValidator.new(db_config)
   end
 

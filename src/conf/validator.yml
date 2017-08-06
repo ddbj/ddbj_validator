@@ -1,0 +1,12 @@
+ddbj_rdb:
+  pg_host: localhost
+  pg_port: 5432
+  pg_user:  const
+  pg_pass:  const
+
+sparql_endpoint:
+  endpoint: http://staging-genome.annotation.jp/sparql
+  slave_endpoint: http://staging-genome.annotation.jp/sparql
+
+api_log:
+  path: /Users/yoko/DDBJ/logs/
