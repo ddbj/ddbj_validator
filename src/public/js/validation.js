@@ -40,15 +40,13 @@
     $.when(
         $.get("./ejs/error_message.ejs"),
         $.get("./ejs/error_message_group.ejs"),
-        $.get("./ejs/annotated_sequence.ejs"),
         $.get("./ejs/result_summary.ejs")
-    ).done(function(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_summary){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_as, tmpl_summary)});
+    ).done(function(tmpl_bs, tmpl_bs_group, tmpl_summary){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_summary)});
 
-    function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_as, tmpl_summary){
+    function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_summary){
 
         var error_tmpl = tmpl_bs[0];
         var group_tmpl = tmpl_bs_group[0];
-        var anottated_sequence_tmpl = tmpl_as[0];
         var summary_tmpl = tmpl_summary[0];
 
         var list_option = $("input[name=list-option]:checked").val();
@@ -97,7 +95,6 @@
                         */
 
                     var result = JSON.parse(response);
-console.log(result)
                     result["file_list"] = file_list;
                     var tmpl = "";
                     if (result["status"] == "fail" ) {
@@ -128,10 +125,11 @@ console.log(result)
                           tmpl = error_tmpl;
                       }
                     } else if (result["status"] == "success" ) {
-                      result["title_message"] = "No errors or warnings to show"
+                      result["title_message"] = "No errors or warnings to show";
                       tmpl = summary_tmpl;
                     } else if (result["status"] == "error" ) {
-                      result["title_message"] = "Error found in while checking this document"
+                      result["title_message"] = "An error occurred during the validation process!";
+                      result["error_message"] = "An error occurred during the validation process. Please try again later";
                       tmpl = summary_tmpl;
                     }
                     var ErrorView = Backbone.View.extend({

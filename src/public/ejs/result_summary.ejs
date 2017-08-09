@@ -10,11 +10,9 @@
                     <% if(status == "success"){ %>
                         No Errors Found
                     <% } else if (status == "fail"){ %>
-                        < %= all_error_size %> Errors
+                        <%= all_error_size %> Errors
                     <% } else if(status == "error"){%>
-                        <%= exception %> 
-                    <% } else if(exception){%>
-                        <%= exception.cmd %>
+                        <%= error_message %>
                     <% } %>
                 </span>
             </td>

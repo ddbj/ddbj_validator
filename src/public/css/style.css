@@ -125,12 +125,18 @@ li .warning {
   font-size: 2rem;
   padding: 6px;
   margin: 0;
-  background-color: #d9534f;
   color: white;
 }
 .result-summary.success h2 {
   background-color: #5cb85c;
 }
+.result-summary.fail h2 {
+  background-color: #d9534f;
+}
+.result-summary.error h2 {
+  background-color: #000000;
+}
+
 .result-summary table.result {
   width: 100%;
   border-collapse: collapse;
@@ -150,8 +156,10 @@ li .warning {
   font-size: 1.5rem;
 }
 .result-summary table.result td .error_info {
-  color: #bb0000;
   font-weight: bold;
+}
+span.error_info.error{
+  color: #d9534f;
 }
 .result-group {
   border: solid 1px #ccc;
@@ -296,10 +304,6 @@ ol {
   color: #444;
 }
 
-span.error{
-  background-color: #d9534f;
-}
 span.warning{
   background-color: #444444;
 }
-

@@ -7,15 +7,7 @@
             <th>Result</th>
             <td>
                 <span class="error_info <%= status %>">
-                    <% if(status == "success"){ %>
-                        No Errors Found
-                    <% } else if (status == "fail"){ %>
-                        <%= all_error_size %> Errors
-                    <% } else if(status == "error"){%>
-                        <%= exception %>
-                    <% } else if(exception){%>
-                        <%= exception.cmd %>
-                    <% } %>
+                    <%= all_error_size %> Errors
                 </span>
             </td>
         </tr>
