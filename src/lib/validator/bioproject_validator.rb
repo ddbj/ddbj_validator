@@ -32,7 +32,7 @@ class BioProjectValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
     @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 

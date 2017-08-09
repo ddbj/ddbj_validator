@@ -36,7 +36,7 @@ class BioSampleValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["endpoint"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
     @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
     @cache = ValidatorCache.new
   end
@@ -269,7 +269,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
@@ -308,7 +308,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
@@ -470,7 +470,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
@@ -1468,6 +1468,7 @@ class BioSampleValidator < ValidatorBase
             end
              attr_val = formated_date.strftime(format["output_format"])
           rescue ArgumentError
+            #invalid format
           end
         end
         ## range date format
@@ -1493,6 +1494,7 @@ class BioSampleValidator < ValidatorBase
             end
             attr_val = range_date_list.join("/")
           rescue ArgumentError
+            #invalid format
           end
         end
       end

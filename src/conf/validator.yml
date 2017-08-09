@@ -5,8 +5,8 @@ ddbj_rdb:
   pg_pass:  const
 
 sparql_endpoint:
-  endpoint: http://staging-genome.annotation.jp/sparql
-  slave_endpoint: http://staging-genome.annotation.jp/sparql
+  master_endpoint: http://staging-genome.annotation.jp/sparql
+  slave_endpoint: http://localhost:8890/sparql
 
 api_log:
   path: /Users/yoko/DDBJ/logs/

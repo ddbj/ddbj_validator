@@ -8,7 +8,7 @@ class TestOrganismValidator < Minitest::Test
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
     setting = YAML.load(File.read(conf_dir + "/validator.yml"))
     conf = setting["sparql_endpoint"]
-    @validator = OrganismValidator.new(conf["endpoint"])
+    @validator = OrganismValidator.new(conf["master_endpoint"])
   end
 
   def test_get_organism_name
