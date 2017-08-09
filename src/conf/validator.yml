@@ -1,8 +1,8 @@
 ddbj_rdb:
   pg_host: localhost
   pg_port: 5432
-  pg_user:  const
-  pg_pass:  const
+  pg_user: const
+  pg_pass: const
 
 sparql_endpoint:
   master_endpoint: http://staging-genome.annotation.jp/sparql
@@ -10,3 +10,10 @@ sparql_endpoint:
 
 api_log:
   path: /Users/yoko/DDBJ/logs/
+
+notification_mail:
+  smtp_host: localhost
+  smtp_port: 25
+  to:
+    - yoko.okabeppu@okbp.jp
+  from: validator_notification@ddbj.jp

@@ -1,4 +1,8 @@
 require 'optparse'
+require 'logger'
+require 'yaml'
+require 'mail'
+
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
 
@@ -15,7 +19,10 @@ class Validator
 
     # constructor
     def initialize()
-      #TODO read setting
+      config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
+      @setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
+      @log_file = @setting["api_log"]["path"] + "validator.log"
+      @log = Logger.new(@log_file)
     end
 
     # Executes validation
@@ -23,6 +30,7 @@ class Validator
     # @param [Hash] params {biosample:"XXXX.xml", bioproject:"YYYY.xml", .., output:"ZZZZ.json"}
     # @return [void]
     def execute(params)
+      @log.info('execute validation:' + params.to_s)
 
       #get absolute file path and check permission
       permission_error_list = []
@@ -43,7 +51,6 @@ class Validator
           end
         end
       end
-      p params
       if permission_error_list.size > 0
         ret = {status: "error", format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
         JSON.generate(ret)
@@ -70,13 +77,24 @@ class Validator
 
         if error_list.size == 0
           ret = {status: "success", format: ARGV[1]}
+          @log.info('validation result: ' + "success")
         else
           ret = {status: "fail", format: ARGV[1], failed_list: error_list}
+          @log.info('validation result: ' + "fail")
         end
       rescue => ex
-        message = "#{ex.message}"
-        message += ex.backtrace.map {|row| row}.join("\n")
-        ret = {status: "error", format: ARGV[1], message: message}
+        @log.info('validation result: ' + "error")
+        @log.error(ex.message)
+        trace = ex.backtrace.map {|row| row}.join("\n")
+        @log.error(trace)
+        ex.message
+
+        #エラー時のメール送信設定があれば送る
+        unless @setting["notification_mail"].nil?
+          send_notification_mail(@setting["notification_mail"], ex.message)
+        end
+
+        ret = {status: "error", format: ARGV[1], message: ex.message}
       end
 
       File.open(params[:output], "w") do |file|
@@ -148,6 +166,33 @@ class Validator
         opt.on('--user=VAL',                  'user name')               {|v| options[:output] = v}
         opt.on('--password=VAL',              'password')               {|v| options[:output] = v}
       end
+    end
+
+#### Error mail
+    def send_notification_mail (setting, message)
+      smtp_host  = setting["smtp_host"]
+      smtp_port  = setting["smtp_port"]
+      to  = setting["to"]
+      from  = setting["from"]
+
+      options = {
+        :address  => smtp_host,
+        :port   => smtp_port
+      }
+      Mail.defaults do
+        delivery_method :smtp, options
+      end
+
+      body_text = "An error occurred during the validation process. Please check the following message and log file: #{@log_file}\n\n"
+      body_text += message
+
+      mail = Mail.new do
+        from     "#{from}"
+        to       "#{to.join(", ")}"
+        subject  "DDBJ validator API error notification"
+        body     "#{body_text}"
+      end
+      mail.deliver!
     end
 
     private_class_method :create_command_parser
