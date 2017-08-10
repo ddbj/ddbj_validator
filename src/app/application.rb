@@ -13,6 +13,7 @@ module DDBJValidator
   class Application < Sinatra::Base
     setting = YAML.load(File.read(File.dirname(__FILE__) + "/../conf/validator.yml"))
     @@data_dir = setting["api_log"]["path"]
+    @@latest_version = setting["version"]["ver"]
 
     configure do
       set :public_folder  , File.expand_path('../../public', __FILE__)
@@ -25,57 +26,95 @@ module DDBJValidator
       register Sinatra::Reloader
     end
 
-    get '/validation' do
+    get '/api/client/index' do
       erb :index
     end
 
-    post '/api/:version/validation' do
+    #バージョン指定なしの場合、最新バージョンを加えてルーティングを振り分ける
+    post '/api/validation' do
+      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
+      pass
+    end
 
-      #組み合わせが成功したものだけ保存しチェック
-      if valid_file_combination? 
+    get '/api/validation/:uuid' do |uuid|
+      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
+      pass
+    end
 
-        uuid = SecureRandom.uuid
-        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        validation_params = {}
-        input_file_list = %w(biosample bioproject submission experiment run analysis)
-        input_file_list.each do |file_category|
-          if params[file_category.to_sym]
-            save_path = save_file(save_dir, file_category, params)
-            validation_params[file_category.to_sym] = save_path
-          end
-        end
-        output_file_path = "#{save_dir}/result.json"
-        validation_params[:output] = output_file_path
+    get '/api/validation/:uuid/:filetype' do |uuid, filetype|
+      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
+      pass
+    end
 
-#       call validator library
-        start_time = Time.now
-        Validator.new().execute(validation_params)
-        p "time: #{Time.now - start_time}s"
+    get '/api/validation/:uuid/:filetype/autocorrect' do |uuid, filetype|
+      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
+      pass
+    end
 
-        result_json = File.open(output_file_path).read
-        json result_json
-      else #file 組み合わせエラー
+    #バージョン指定ありの場合
+    post '/api/:version/validation' do |version|
+      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
         status 400
-        #400
+      else
+        #組み合わせが成功したものだけ保存しチェック
+        if valid_file_combination?
+
+          uuid = SecureRandom.uuid
+          save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+          validation_params = {}
+          input_file_list = %w(biosample bioproject submission experiment run analysis)
+          input_file_list.each do |file_category|
+            if params[file_category.to_sym]
+              save_path = save_file(save_dir, file_category, params)
+              validation_params[file_category.to_sym] = save_path
+            end
+          end
+          output_file_path = "#{save_dir}/result.json"
+          validation_params[:output] = output_file_path
+
+          #call validator library
+          start_time = Time.now
+          Validator.new().execute(validation_params)
+          p "time: #{Time.now - start_time}s"
+          result_json = File.open(output_file_path).read
+          json result_json
+
+        else #file 組み合わせエラー
+          status 400
+        end
       end
     end
 
     get '/api/:version/validation/:uuid' do |version, uuid|
-      'Requested validation result id:' + uuid
+      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
+        status 400
+      else
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        output_file_path = "#{save_dir}/result.json"
+        #ファイルがなければ400番?
+        result_json = File.open(output_file_path).read
+        json result_json
+      end
     end
 
     get '/api/:version/validation/:uuid/:filetype' do |version, uuid, filetype|
-      'Requested validation file id:' + uuid + ", filetype:" + filetype
+      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
+        status 400
+      else
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        output_file_path = "#{save_dir}/#{filetype}"
+        #TODO retreave a file and output stream
+      end
     end
 
     get '/api/:version/validation/:uuid/:filetype/autocorrect' do |version, uuid, filetype|
-      'Requested validation autocorrect id:' + uuid + ", filetype:" + filetype
-    end
-
-    get '/api/ubmission' do
-      status 400
-      headers 'Content-Type' => 'text/plain'
-      body 'Bad resuest'
+      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
+        status 400
+      else
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        output_file_path = "#{save_dir}/result.json"
+        #TODO filter autocorrect data
+      end
     end
 
     not_found do

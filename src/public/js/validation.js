@@ -38,9 +38,9 @@
     });
 
     $.when(
-        $.get("./ejs/error_message.ejs"),
-        $.get("./ejs/error_message_group.ejs"),
-        $.get("./ejs/result_summary.ejs")
+        $.get("/ejs/error_message.ejs"),
+        $.get("/ejs/error_message_group.ejs"),
+        $.get("/ejs/result_summary.ejs")
     ).done(function(tmpl_bs, tmpl_bs_group, tmpl_summary){renderMessage(tmpl_bs, tmpl_bs_group, tmpl_summary)});
 
     function renderMessage(tmpl_bs,tmpl_bs_group, tmpl_summary){
@@ -76,7 +76,7 @@
                 var ajax_obj = {};
 
                 ajax_obj = {
-                    url: "./api/" + api_version + "/validation",
+                    url: "/api/" + api_version + "/validation",
                     method: "post",
                     dataType: "json",
                     data: formData,

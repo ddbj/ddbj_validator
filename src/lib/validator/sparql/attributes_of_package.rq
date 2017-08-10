@@ -3,7 +3,7 @@ PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
 SELECT DISTINCT
  (REPLACE(?attr_name, " attribute", "") AS ?attribute) ?require
-FROM <http://ddbj.nig.ac.jp/ontologies/biosample>
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
   ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;

@@ -272,6 +272,7 @@ class BioSampleValidator < ValidatorBase
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
+      params[:version] = @conf[:version]["biosample_graph"]
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
       result = sparql.query(sparql_query)
       attr_list = []
@@ -311,6 +312,7 @@ class BioSampleValidator < ValidatorBase
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
+      params[:version] = @conf[:version]["biosample_graph"]
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
       result = sparql.query(sparql_query)
       attr_group_list = []
@@ -472,6 +474,7 @@ class BioSampleValidator < ValidatorBase
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
       params = {package_name: package_name}
+      params[:version] = @conf[:version]["biosample_graph"]
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
       result = sparql.query(sparql_query)

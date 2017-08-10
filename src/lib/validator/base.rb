@@ -19,6 +19,7 @@ class ValidatorBase
       setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
       config[:sparql_config] = setting["sparql_endpoint"]
       config[:ddbj_db_config] = setting["ddbj_rdb"]
+      config[:version] = setting["version"]
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"

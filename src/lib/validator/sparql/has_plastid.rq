@@ -2,7 +2,7 @@ PREFIX id-tax: <http://identifiers.org/taxonomy/>
 PREFIX tax: <http://ddbj.nig.ac.jp/ontologies/taxonomy/>
 
 SELECT ?tax_id
-FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy>
+FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy-private>
 WHERE
 {
   VALUES ?tax_id { id-tax:<%= tax_id %> }
