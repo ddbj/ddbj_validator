@@ -41,6 +41,11 @@ module DDBJValidator
       pass
     end
 
+    get '/api/validation/:uuid/status' do |uuid|
+      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
+      pass
+    end
+
     get '/api/validation/:uuid/:filetype' do |uuid, filetype|
       request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
       pass
@@ -72,13 +77,24 @@ module DDBJValidator
           output_file_path = "#{save_dir}/result.json"
           validation_params[:output] = output_file_path
 
-          #call validator library
+          status_file_path = "#{save_dir}/status.json"
           start_time = Time.now
-          Validator.new().execute(validation_params)
-          p "time: #{Time.now - start_time}s"
-          result_json = File.open(output_file_path).read
-          json result_json
+          status = { uuid: uuid, status: "running", "start-time": start_time}
+          File.open(status_file_path, "w") do |file|
+            file.puts(JSON.generate(status))
+          end
 
+          #call validator library
+          Thread.new{
+            Validator.new().execute(validation_params)
+            status = { uuid: uuid, status: "finished", "start-time": start_time, "end-time": Time.now}
+            File.open(status_file_path, "w") do |file|
+              file.puts(JSON.generate(status))
+            end
+          }
+
+          content_type :json
+          { uuid: uuid }.to_json
         else #file 組み合わせエラー
           status 400
         end
@@ -92,8 +108,22 @@ module DDBJValidator
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         output_file_path = "#{save_dir}/result.json"
         #ファイルがなければ400番?
-        result_json = File.open(output_file_path).read
-        json result_json
+        result_json = JSON.parse(File.open(output_file_path).read)
+        content_type :json
+        result_json.to_json
+      end
+    end
+
+    get '/api/:version/validation/:uuid/status' do |version, uuid|
+      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
+        status 400
+      else
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        status_file_path = "#{save_dir}/status.json"
+        #ファイルがなければ400番?
+        status_json = JSON.parse(File.open(status_file_path).read)
+        content_type :json
+        status_json.to_json
       end
     end
 
@@ -103,7 +133,14 @@ module DDBJValidator
       else
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         output_file_path = "#{save_dir}/#{filetype}"
-        #TODO retreave a file and output stream
+        file_list = Dir.glob("#{output_file_path}/*")
+        if file_list.size == 1 && File.exist?(file_list.first)
+          file_name = File.basename(file_list.first)
+          file_path = file_list.first
+          send_file file_path, :filename => file_name, :type => 'application/xml'
+        else
+          status 400
+        end
       end
     end
 
