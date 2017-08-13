@@ -1,5 +1,5 @@
 require 'pg'
-require 'rexml/document'
+require 'nokogiri'
 require 'yaml'
 
 class BioSampleXml
@@ -58,27 +58,36 @@ class BioSampleXml
           )
       SQL
       res = connection.exec(get_xml_query)
-      if res.ntuples > 0
-        biosample_set = REXML::Document.new('<BioSampleSet></BioSampleSet>')
-        biosample_set.add(REXML::XMLDecl.new(version="1.0", encoding="UTF-8"))
-        submitter_id = "" 
-        res.each do |row|
-          biosample_xml = REXML::Document.new(row["content"])
-          submitter_id = row['submitter_id']
-          biosample_set.root.add(biosample_xml.root)
-        end
-        biosample_set.root.add_attributes({"submitter_id" => submitter_id})
-
-        File.open(output, 'w') do |file|
-          biosample_set.write(file, indent=2)
-        end
-      end
     rescue => ex
       message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
       message += "#{ex.message} (#{ex.class})"
       raise StandardError, message, ex.backtrace
     ensure
       connection.close if connection
+    end
+    begin
+      if res.ntuples > 0
+
+        doc = Nokogiri::XML("<BioSampleSet>")
+        doc.encoding = "utf-8"
+        biosample_set = doc.root
+        submitter_id = ""
+        res.each do |row|
+          biosample_node = Nokogiri::XML::Document.parse row["content"]
+          submitter_id = row['submitter_id']
+          biosample_set << biosample_node.root
+        end
+        #sumbitter_idをBioSampleSet要素の属性に追加
+        biosample_set['submitter_id'] = submitter_id
+
+        File.open(output, 'w') do |file|
+          file.puts Nokogiri::XML(doc.to_xml, nil, 'utf-8').to_xml
+        end
+      end
+    rescue => ex
+      message = "Failed to convert xml file"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
     end
   end
 end

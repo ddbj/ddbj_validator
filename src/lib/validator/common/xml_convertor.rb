@@ -4,7 +4,8 @@ require 'erb'
 require 'ostruct'
 require 'geocoder'
 require 'date'
-require 'rexml/document'
+require 'nokogiri'
+require File.dirname(__FILE__) + "/../base.rb"
 
 #
 # XMLの変換処理を行うクラス
@@ -13,7 +14,7 @@ require 'rexml/document'
 # ftp://ftp.ddbj.nig.ac.jp/ddbj_database/biosample/schema/biosample_exchange.xsd
 # ftp://ftp.ddbj.nig.ac.jp/ddbj_database/biosample/schema/biosample_exchange.1.1.xsd
 #
-class XmlConvertor
+class XmlConvertor < ValidatorBase
 
   #
   # 引数のXMLデータをRubyオブジェクトにして返す
@@ -50,7 +51,7 @@ class XmlConvertor
   #
   def xml2obj(xml_document)
     begin
-      doc = REXML::Document.new(xml_document)
+      doc = Nokogiri::XML(xml_document)
     rescue => ex
       message = "Failed to parse the biosample xml file. Please check the xml format.\n"
       message += "#{ex.message} (#{ex.class})"
@@ -58,12 +59,13 @@ class XmlConvertor
     end
     sample_list = []
     if doc.root.name == "BioSampleSet"
-      biosample_list = REXML::XPath.each(doc.root, "BioSample")
+      biosample_list = doc.xpath("BioSample")
       biosample_list.each do |biosample|
         sample_list.push(parseBioSample(biosample))
       end
     elsif doc.root.name == "BioSample"
-      sample_list.push(parseBioSample(doc.root))
+      biosample_list = doc.xpath("BioSample")
+      sample_list.push(parseBioSample(biosample_list.first))
     else # is not BioSample XML
       raise "Failed to parse the biosample xml file. Excpected root tag are <BioSampleSet> or <BioSample>. Please check the format.\n"
     end
@@ -73,53 +75,46 @@ class XmlConvertor
   def parseBioSample(biosample_element)
     sample_obj = {}
     #submission_id
-    if !biosample_element.attributes["submission_id"].nil?
-      sample_obj["submission_id"] = biosample_element.attributes["submission_id"]
-    end
-    #submitter_id
-    if !biosample_element.attributes["submitter_id"].nil?
-      sample_obj["submitter_id"] = biosample_element.attributes["submitter_id"]
-    end
+   # if !biosample_element.attributes["submission_id"].nil?
+   #   sample_obj["submission_id"] = biosample_element.attributes["submission_id"]
+   # end
+   # #submitter_id
+   # if !biosample_element.attributes["submitter_id"].nil?
+   #   sample_obj["submitter_id"] = biosample_element.attributes["submitter_id"]
+   # end
 
     #biosample_accession
-    id_biosample = REXML::XPath.first(biosample_element, "Ids/Id[@namespace=\"BioSample\"]")
-    if !id_biosample.nil?
-      sample_obj["biosample_accession"] = id_biosample.text
+    unless node_blank?(biosample_element, "Ids/Id[@namespace=\"BioSample\"]")
+      sample_obj["biosample_accession"] = get_node_text(biosample_element, "Ids/Id[@namespace=\"BioSample\"]")
     end
     #package
-    model = REXML::XPath.first(biosample_element, "Models/Model")
-    if !model.nil?
-      sample_obj["package"] = model.text
+    unless node_blank?(biosample_element, "Models/Model")
+      sample_obj["package"] = get_node_text(biosample_element, "Models/Model")
     end
     #attributes
     attributes = {}
     attribute_list = []
     
-    sample_title = REXML::XPath.first(biosample_element, "Description/Title")
-    if !sample_title.nil?
-      attributes["sample_title"] = sample_title.text
-      attribute_list.push({"sample_title" => sample_title.text});
+    unless node_blank?(biosample_element, "Description/Title")
+      attributes["sample_title"] = get_node_text(biosample_element, "Description/Title")
+      attribute_list.push({"sample_title" => attributes["sample_title"]});
     end
-    description = REXML::XPath.first(biosample_element, "Description/Comment/Paragraph")
-    if !description.nil?
-      attributes["description"] = description.text
-      attribute_list.push({"description" => description.text});
+    unless node_blank?(biosample_element, "Description/Comment/Paragraph")
+      attributes["description"] = get_node_text(biosample_element, "Description/Comment/Paragraph")
+      attribute_list.push({"description" => attributes["description"]});
     end
-    organism_name = REXML::XPath.first(biosample_element, "Description/Organism/OrganismName")
-    if !organism_name.nil?
-      attributes["organism"] = organism_name.text
-      attribute_list.push({"organism" => organism_name.text});
+    unless node_blank?(biosample_element, "Description/Organism/OrganismName")
+      attributes["organism"] = get_node_text(biosample_element, "Description/Organism/OrganismName")
+      attribute_list.push({"organism" => attributes["organism"]});
     end
-    organism = REXML::XPath.first(biosample_element, "Description/Organism[@taxonomy_id]")
-    if !organism.nil?
-      attributes["taxonomy_id"] = organism.attributes["taxonomy_id"]
-
-      attribute_list.push({"taxonomy_id" => organism.attributes["taxonomy_id"]});
+    unless node_blank?(biosample_element, "Description/Organism/@taxonomy_id")
+      attributes["taxonomy_id"] = get_node_text(biosample_element, "Description/Organism/@taxonomy_id")
+      attribute_list.push({"taxonomy_id" => attributes["taxonomy_id"]});
     end
-    attributes_list = REXML::XPath.each(biosample_element, "Attributes/Attribute")
+    attributes_list = biosample_element.xpath("Attributes/Attribute")
     attributes_list.each do |attr|
-      attr_name = attr.attributes["attribute_name"]
-      attr_value = attr.text
+      attr_name = attr.attribute("attribute_name").text
+      attr_value = get_node_text(attr)
       attributes[attr_name] = attr_value
       attribute_list.push({attr_name => attr_value});
     end
