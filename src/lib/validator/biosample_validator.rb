@@ -21,18 +21,13 @@ class BioSampleValidator < ValidatorBase
 
   #
   # Initializer
-  # ==== Args
-  # mode: DDBJの内部DBにアクセスできない環境かの識別用。
-  # "private": 内部DBを使用した検証を実行
-  # "public": 内部DBを使用した検証をスキップ
   #
-  def initialize (mode)
+  def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")))
     CommonUtils::set_config(@conf)
 
     @error_list = error_list = []
-    @mode = mode
 
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
@@ -832,11 +827,9 @@ class BioSampleValidator < ValidatorBase
     result = true
     if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
       #DDBJ管理の場合にはDBにIDがあるか検証する
-      if @mode == "private"
-        if bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-          if @db_validator.get_bioproject_submitter_id(bioproject_accession).nil?
-            result = false
-          end
+      if bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
+        if @db_validator.get_bioproject_submitter_id(bioproject_accession).nil?
+          result = false
         end
       end
     else
@@ -1784,25 +1777,23 @@ class BioSampleValidator < ValidatorBase
     return nil if submitter_id.nil?
 
     result = true
-    if @mode == "private"
-      if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession) == false #cache値がnilの可能性があるためhas_keyでチェック
-        ret = @db_validator.get_bioproject_submitter_id(bioproject_accession)
-        @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession, ret)
-      else
-        ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
-      end
+    if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession) == false #cache値がnilの可能性があるためhas_keyでチェック
+      ret = @db_validator.get_bioproject_submitter_id(bioproject_accession)
+      @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession, ret)
+    else
+      ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
+    end
 
-      #SubmitterIDが一致しない場合はNG
-      result = false if !ret.nil? && ret["submitter_id"] != submitter_id
-      if result == false
-        annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Submitter ID", value: submitter_id},
-          {key: "bioproject_acession", value: bioproject_accession}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-      end
+    #SubmitterIDが一致しない場合はNG
+    result = false if !ret.nil? && ret["submitter_id"] != submitter_id
+    if result == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Submitter ID", value: submitter_id},
+        {key: "bioproject_acession", value: bioproject_accession}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
     end
     result
   end
@@ -1891,23 +1882,21 @@ class BioSampleValidator < ValidatorBase
   def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
     return nil if CommonUtils::null_value?(bioproject_accession)
     result  = true
-    if @mode == "private"
-      if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession).nil?
-        is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
-        @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession, is_umbrella)
-      else
-        is_umbrella = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession)
-      end
+    if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession).nil?
+      is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
+      @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession, is_umbrella)
+    else
+      is_umbrella = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession)
+    end
 
-      if is_umbrella == true #NG
-        annotation = [
-            {key: "Sample name", value: sample_name},
-            {key: "bioproject_accession", value: bioproject_accession}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-        result = false
-      end
+    if is_umbrella == true #NG
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "bioproject_accession", value: bioproject_accession}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end
@@ -1971,7 +1960,7 @@ class BioSampleValidator < ValidatorBase
     result = false if duplicated.length > 1 #自身以外に同一のsample_nameをもつサンプルがある
 
     # DB内の同一submissionで重複チェック
-    if result == true && !submission_id.nil? && @mode == "private"
+    if result == true && !submission_id.nil?
       if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
         sample_name_list = @db_validator.get_sample_names(submission_id)
         @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, sample_name_list)
@@ -2069,20 +2058,18 @@ class BioSampleValidator < ValidatorBase
     result = false if duplicated.length > 1 #自身以外に同一のlocus_tag_prefixをもつサンプルがある
 
     # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
-    if @mode == "private"
-      if @cache.nil? || @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all").nil?
-        # biosample DBから全locus_tag_prefixのリストを取得
-        all_prefix_list = @db_validator.get_all_locus_tag_prefix()
-        @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, "all", all_prefix_list)
-      else
-        all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all")
-      end
-
-      # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じprefixがあるとNG
-      result = false if submission_id.nil? && all_prefix_list.count(locus_tag) >= 1
-      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-      result = false if !submission_id.nil? && all_prefix_list.count(locus_tag) >= 2
+    if @cache.nil? || @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all").nil?
+      # biosample DBから全locus_tag_prefixのリストを取得
+      all_prefix_list = @db_validator.get_all_locus_tag_prefix()
+      @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, "all", all_prefix_list)
+    else
+      all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all")
     end
+
+    # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じprefixがあるとNG
+    result = false if submission_id.nil? && all_prefix_list.count(locus_tag) >= 1
+    # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+    result = false if !submission_id.nil? && all_prefix_list.count(locus_tag) >= 2
 
     if result == false
       annotation = [
@@ -2113,7 +2100,7 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(psub_id)
     result = true
 
-    if /^PSUB/ =~ psub_id && @mode == "private"
+    if /^PSUB/ =~ psub_id
       if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id) == false #cache値がnilの可能性があるためhas_keyでチェック
         biosample_accession = @db_validator.get_bioproject_accession(psub_id)
         @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id, biosample_accession)

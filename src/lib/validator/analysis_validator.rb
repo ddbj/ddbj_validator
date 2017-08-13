@@ -15,10 +15,6 @@ class AnalysisValidator < ValidatorBase
 
   #
   # Initializer
-  # ==== Args
-  # mode: DDBJの内部DBにアクセスできない環境かの識別用。
-  # "private": 内部DBを使用した検証を実行
-  # "public": 内部DBを使用した検証をスキップ
   #
   def initialize
     super

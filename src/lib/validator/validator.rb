@@ -107,7 +107,7 @@ class Validator
         begin
           case object_type
           when "biosample"
-            validator = BioSampleValidator.new ('private')
+            validator = BioSampleValidator.new
             data = params[:biosample]
           when "bioproject"
             validator = BioProjectValidator.new

@@ -6,7 +6,7 @@ require '../../../../lib/validator/common/validator_cache.rb'
 class TestValidatorCache < Minitest::Test
 
   def setup
-    @validator = BioSampleValidator.new("public")
+    @validator = BioSampleValidator.new
   end
 
   def test_cache_invalid_host_organism_name

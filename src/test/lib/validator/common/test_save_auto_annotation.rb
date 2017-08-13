@@ -9,7 +9,7 @@ require '../../../../lib/validator/common/xml_convertor.rb'
 class TestSaveAutoAnnotation < Minitest::Test
 
   def setup
-    @validator = BioSampleValidator.new("public")
+    @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../../data/biosample', __FILE__)
   end
