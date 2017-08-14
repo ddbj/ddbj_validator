@@ -76,11 +76,18 @@ class BioSampleValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml)
+  def validate (data_xml, submitter_id=nil)
     #convert to object for validator
     @data_file = File::basename(data_xml)
     xml_document = File.read(data_xml)
     @biosample_list = @xml_convertor.xml2obj(xml_document)
+
+    if submitter_id.nil?
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document)
+    else
+      @submitter_id = submitter_id
+    end
+    #TODO @submitter_id が取得できない場合はエラーにする?
 
     ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 12, 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -215,7 +222,7 @@ class BioSampleValidator < ValidatorBase
 
       ### 特定の属性値に対する検証
       invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
-      bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_accession"], biosample_data["submitter_id"], line_num)
+      bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_accession"], @submitter_id, line_num)
       invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
       duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, biosample_data["submission_id"], line_num)
       ret = format_of_geo_loc_name_is_invalid("94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
@@ -1783,7 +1790,6 @@ class BioSampleValidator < ValidatorBase
     else
       ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
     end
-
     #SubmitterIDが一致しない場合はNG
     result = false if !ret.nil? && ret["submitter_id"] != submitter_id
     if result == false

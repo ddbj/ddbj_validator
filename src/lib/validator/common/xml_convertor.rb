@@ -59,12 +59,12 @@ class XmlConvertor < ValidatorBase
     end
     sample_list = []
     if doc.root.name == "BioSampleSet"
-      biosample_list = doc.xpath("BioSample")
+      biosample_list = doc.xpath("//BioSample")
       biosample_list.each do |biosample|
         sample_list.push(parseBioSample(biosample))
       end
     elsif doc.root.name == "BioSample"
-      biosample_list = doc.xpath("BioSample")
+      biosample_list = doc.xpath("//BioSample")
       sample_list.push(parseBioSample(biosample_list.first))
     else # is not BioSample XML
       raise "Failed to parse the biosample xml file. Excpected root tag are <BioSampleSet> or <BioSample>. Please check the format.\n"
@@ -74,14 +74,6 @@ class XmlConvertor < ValidatorBase
 
   def parseBioSample(biosample_element)
     sample_obj = {}
-    #submission_id
-   # if !biosample_element.attributes["submission_id"].nil?
-   #   sample_obj["submission_id"] = biosample_element.attributes["submission_id"]
-   # end
-   # #submitter_id
-   # if !biosample_element.attributes["submitter_id"].nil?
-   #   sample_obj["submitter_id"] = biosample_element.attributes["submitter_id"]
-   # end
 
     #biosample_accession
     unless node_blank?(biosample_element, "Ids/Id[@namespace=\"BioSample\"]")
@@ -121,6 +113,23 @@ class XmlConvertor < ValidatorBase
     sample_obj["attributes"] = attributes
     sample_obj["attribute_list"] = attribute_list
     return sample_obj
+  end
+
+  def get_submitter_id(xml_document)
+    submitter_id = nil
+    begin
+      doc = Nokogiri::XML(xml_document)
+      if doc.root.name == "BioSampleSet"
+        unless node_blank?(doc, "//BioSampleSet/@submitter_id")
+          submitter_id = get_node_text(doc, "//BioSampleSet/@submitter_id")
+        end
+      end
+    rescue => ex
+      message = "Failed to parse the biosample xml file. Please check the xml format.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+    submitter_id
   end
 
   #
