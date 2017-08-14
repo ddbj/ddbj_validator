@@ -93,6 +93,7 @@ module DDBJValidator
             end
           }
 
+          response.headers["Access-Control-Allow-Origin"] = "*"
           content_type :json
           { uuid: uuid }.to_json
         else #file 組み合わせエラー
@@ -109,6 +110,7 @@ module DDBJValidator
         output_file_path = "#{save_dir}/result.json"
         #ファイルがなければ400番?
         result_json = JSON.parse(File.open(output_file_path).read)
+        response.headers["Access-Control-Allow-Origin"] = "*"
         content_type :json
         result_json.to_json
       end
@@ -122,6 +124,7 @@ module DDBJValidator
         status_file_path = "#{save_dir}/status.json"
         #ファイルがなければ400番?
         status_json = JSON.parse(File.open(status_file_path).read)
+        response.headers["Access-Control-Allow-Origin"] = "*"
         content_type :json
         status_json.to_json
       end
@@ -137,6 +140,7 @@ module DDBJValidator
         if file_list.size == 1 && File.exist?(file_list.first)
           file_name = File.basename(file_list.first)
           file_path = file_list.first
+          response.headers["Access-Control-Allow-Origin"] = "*"
           send_file file_path, :filename => file_name, :type => 'application/xml'
         else
           status 400
@@ -150,6 +154,7 @@ module DDBJValidator
       else
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         output_file_path = "#{save_dir}/result.json"
+        response.headers["Access-Control-Allow-Origin"] = "*"
         #TODO filter autocorrect data
       end
     end
