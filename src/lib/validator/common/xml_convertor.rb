@@ -132,6 +132,23 @@ class XmlConvertor < ValidatorBase
     submitter_id
   end
 
+  def get_submission_id(xml_document)
+    submitter_id = nil
+    begin
+      doc = Nokogiri::XML(xml_document)
+      if doc.root.name == "BioSampleSet"
+        unless node_blank?(doc, "//BioSampleSet/@submission_id")
+          submitter_id = get_node_text(doc, "//BioSampleSet/@submission_id")
+        end
+      end
+    rescue => ex
+      message = "Failed to parse the biosample xml file. Please check the xml format.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+    submitter_id
+  end
+
   #
   # 属性名からXPathを返す
   # sample_nameのようにXMLの複数箇所に記述される属性があるため配列で返す

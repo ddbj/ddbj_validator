@@ -89,6 +89,9 @@ class BioSampleValidator < ValidatorBase
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
 
+    #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
+    @submission_id = @xml_convertor.get_submission_id(xml_document)
+
     ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 12, 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
@@ -152,7 +155,7 @@ class BioSampleValidator < ValidatorBase
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
       duplicated_sample_title_in_this_submission("3", sample_name, sample_title, @biosample_list, line_num)
-      duplicate_sample_names("28", sample_name, sample_title, @biosample_list, biosample_data["submission_id"], line_num)
+      duplicate_sample_names("28", sample_name, sample_title, @biosample_list, line_num)
     end
 
     ### それ以外
@@ -224,7 +227,7 @@ class BioSampleValidator < ValidatorBase
       invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
       bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_accession"], @submitter_id, line_num)
       invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
-      duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, biosample_data["submission_id"], line_num)
+      duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
       ret = format_of_geo_loc_name_is_invalid("94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
@@ -1955,29 +1958,15 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def duplicate_sample_names(rule_code, sample_name, sample_title, biosample_list, submission_id, line_num)
+  def duplicate_sample_names(rule_code, sample_name, sample_title, biosample_list, line_num)
     return nil if CommonUtils::blank?(sample_name)
     result = true
 
-    # 同一ファイル内での重複チェック
+    # 同一ファイル内での重複チェック. 同じsubmissionは1ファイル内に列挙されていることを前提とする
     duplicated = biosample_list.select do |biosample_data|
       sample_name == biosample_data["attributes"]["sample_name"]
     end
     result = false if duplicated.length > 1 #自身以外に同一のsample_nameをもつサンプルがある
-
-    # DB内の同一submissionで重複チェック
-    if result == true && !submission_id.nil?
-      if @cache.nil? || @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id).nil?
-        sample_name_list = @db_validator.get_sample_names(submission_id)
-        @cache.save(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id, sample_name_list)
-      else
-        sample_name_list = @cache.check(ValidatorCache::SUBMISSIONS_SAMPLE_NAME, submission_id)
-      end
-
-      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-      result = false if sample_name_list.count(sample_name) >= 2
-    end
-
     if result == false
       annotation = [
         {key: "Sample name", value: sample_name},

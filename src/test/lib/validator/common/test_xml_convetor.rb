@@ -13,8 +13,6 @@ class TestXmlConvertor < Minitest::Test
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
     biosample_list = @convertor.xml2obj(xml_doc)
     assert_equal 1, biosample_list.size
-    assert_nil biosample_list[0]["submission_id"]
-    assert_nil biosample_list[0]["submitter_id"]
     assert_equal "SAMD00000328", biosample_list[0]["biosample_accession"]
     assert_equal "MIGS.ba.microbial", biosample_list[0]["package"]
     attr = biosample_list[0]["attributes"]
@@ -25,12 +23,6 @@ class TestXmlConvertor < Minitest::Test
     assert_equal "urban biome", attr["env_biome"]
     assert_nil biosample_list[0]["attributes"]["description"]
     assert_equal 18, biosample_list[0]["attribute_list"].size
-
-    # with submit info
-    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019_with_sub.xml")
-    biosample_list = @convertor.xml2obj(xml_doc)
-    assert_equal "SSUBXXXXX", biosample_list[0]["submission_id"]
-    assert_equal "12345", biosample_list[0]["submitter_id"]
 
     # multiple samples
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB002415.xml")
@@ -44,6 +36,30 @@ class TestXmlConvertor < Minitest::Test
 
     # not biosample xml
     # TODO
+  end
+
+  def test_get_submitter_id
+    # no submit info
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
+    submitter_id = @convertor.get_submitter_id(xml_doc)
+    assert_nil submitter_id
+
+    # with submit info
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019_with_sub.xml")
+    submitter_id = @convertor.get_submitter_id(xml_doc)
+    assert_equal "12345", submitter_id
+  end
+
+  def test_get_submission_id
+    # no submit info
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
+    submission_id = @convertor.get_submission_id(xml_doc)
+    assert_nil submission_id
+
+    # with submit info
+    xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019_with_sub.xml")
+    submission_id = @convertor.get_submission_id(xml_doc)
+    assert_equal "SSUBXXXXX", submission_id
   end
 
   def test_xpath_from_attrname

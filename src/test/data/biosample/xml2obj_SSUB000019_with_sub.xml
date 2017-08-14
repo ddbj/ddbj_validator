@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<BioSample access="public" publication_date="2015-02-25T09:59:23+09:00" last_update="2015-02-25T09:59:23+09:00" submitter_id="12345" submission_id="SSUBXXXXX">
+<BioSampleSet submitter_id="12345" submission_id="SSUBXXXXX">
+<BioSample access="public" publication_date="2015-02-25T09:59:23+09:00" last_update="2015-02-25T09:59:23+09:00">
     <Ids>
         <Id is_primary="1" namespace="BioSample">SAMD00000328</Id>
     </Ids>
@@ -42,3 +43,4 @@
         <Attribute attribute_name="bioproject_accession">PRJDB1654</Attribute>
     </Attributes>
 </BioSample>
+</BioSampleSet>

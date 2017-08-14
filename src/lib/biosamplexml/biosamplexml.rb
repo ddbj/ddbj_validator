@@ -79,6 +79,7 @@ class BioSampleXml
         end
         #sumbitter_idをBioSampleSet要素の属性に追加
         biosample_set['submitter_id'] = submitter_id
+        biosample_set['submission_id'] = submission_id
 
         File.open(output, 'w') do |file|
           file.puts Nokogiri::XML(doc.to_xml, nil, 'utf-8').to_xml

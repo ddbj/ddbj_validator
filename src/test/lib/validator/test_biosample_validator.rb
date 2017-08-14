@@ -1084,18 +1084,18 @@ jkl\"  "
     xml_data = File.read("#{@test_file_dir}/28_duplicate_sample_names_SSUB005454_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
     ## xmlファイル内に同一のsample_nameがない(submissionがなくDBは検索しない)
-    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, nil, 1)
+    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## xmlファイル内に同一のsample_nameがない。DB内でも重複がない
-    ret = exec_validator("duplicate_sample_names", "28", "sample 1", "sample_title_1", biosample_data, "SSUB003677", 1)
+    ret = exec_validator("duplicate_sample_names", "28", "sample 1", "sample_title_1", biosample_data, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case (Same sample names in local data)
     xml_data = File.read("#{@test_file_dir}/28_duplicate_sample_names_SSUB005454_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
-    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, nil, 1)
+    ret = exec_validator("duplicate_sample_names", "28", "NBRC 100056", "sample_title_1", biosample_data, 1)
     assert_equal false , ret[:result]
     assert_equal 1, ret[:error_list].size
     ## xmlファイル内に同一のsample_nameがないがDB内で重複している #このテストはDBに重複データを登録しないと通らない
@@ -1106,7 +1106,7 @@ jkl\"  "
     #assert_equal 1, ret[:error_list].size
 
     #params are nil pattern
-    ret = exec_validator("duplicate_sample_names", "28", "", "title", biosample_data, nil, 1)
+    ret = exec_validator("duplicate_sample_names", "28", "", "title", biosample_data, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
