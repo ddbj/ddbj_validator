@@ -9,7 +9,7 @@ sparql_endpoint:
   slave_endpoint: http://localhost:8890/sparql
 
 api_log:
-  path: /Users/yoko/DDBJ/logs/
+  path: /Users/yoko/DDBJ/logs
 
 notification_mail:
   smtp_host: localhost

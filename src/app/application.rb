@@ -99,6 +99,7 @@ module DDBJValidator
           { uuid: uuid }.to_json
         else #file 組み合わせエラー
           status 400
+          body "Invalid file combination"
         end
       end
     end
@@ -195,6 +196,7 @@ module DDBJValidator
         req_params = Rack::Utils.parse_query(form_vars)
         param_names = req_params["name"]
         if param_names.instance_of?(Array) #引数1の場合は配列ではなく文字列
+          #同じfiletypeで複数ファイルが送られて来た場合はエラー
           if param_names.select{|name| name == "\"biosample\"" }.size > 1 \
             || param_names.select{|name| name == "\"bioproject\"" }.size > 1 \
             || param_names.select{|name| name == "\"submission\"" }.size > 1 \
@@ -202,6 +204,17 @@ module DDBJValidator
             || param_names.select{|name| name == "\"run\"" }.size > 1 \
             || param_names.select{|name| name == "\"analysis\"" }.size > 1
             file_combination = false
+          end
+
+          #DRAファイルが送信された場合、"submission", "experiment", "run"のセットは必須。"analysis"は任意
+          sent_filetype = params.keys #実際にファイル選択されて送られてきたfiletype
+          dra_filetype_list = ["submission", "experiment", "run", "analysis"]
+          if dra_filetype_list.any? {|dra_filetype| sent_filetype.include?(dra_filetype)}
+            unless (sent_filetype.include?("submission") \
+               && sent_filetype.include?("experiment") \
+               && sent_filetype.include?("run"))
+               file_combination = false
+            end
           end
         end
         file_combination

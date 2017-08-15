@@ -71,7 +71,12 @@
                     //成功すると受付UUIDが返されるので、validation処理完了までポーリングする
                     polling(response.uuid);
                 }).fail(function (data) {
-                    alert('error!!!');
+                    $("#result").empty(); //clear
+                    if (data.responseText !== "") {
+                      alert(data.responseText);
+                    } else {
+                      alert('error!!!');
+                    }
                 });
             }
         });
