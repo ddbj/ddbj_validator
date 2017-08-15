@@ -4,6 +4,7 @@ require 'sinatra/json'
 require "securerandom"
 require 'sinatra/reloader'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
+require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 
 #require_relative "../../ddbj_validator/src/biosample_validator/biosample_validator.rb"
 #require_relative  "/" + File.dirname(__FILE__) + "../../../ddbj_validator/src/biosample_validator/biosample_validator.rb" #.rb" # + "../../../src/biosample_validator/biosample_validator.rb"
@@ -135,15 +136,14 @@ module DDBJValidator
         status 400
       else
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        output_file_path = "#{save_dir}/#{filetype}"
-        file_list = Dir.glob("#{output_file_path}/*")
-        if file_list.size == 1 && File.exist?(file_list.first)
+        file_list = Dir.glob("#{save_dir}/#{filetype}/*")
+        if file_list.size == 1
           file_name = File.basename(file_list.first)
           file_path = file_list.first
           response.headers["Access-Control-Allow-Origin"] = "*"
           send_file file_path, :filename => file_name, :type => 'application/xml'
         else
-          status 400
+          status 404
         end
       end
     end
@@ -153,9 +153,23 @@ module DDBJValidator
         status 400
       else
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        output_file_path = "#{save_dir}/result.json"
-        response.headers["Access-Control-Allow-Origin"] = "*"
-        #TODO filter autocorrect data
+        result_file = "#{save_dir}/result.json"
+        org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
+        if File.exist?(result_file) && org_file_list.size == 1
+          org_file = org_file_list.first
+          annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)
+          annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
+          FileUtils.mkdir_p(annotated_file_dir)
+          annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
+          AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype)
+        end
+        if File.exist?(annotated_file_path)
+          response.headers["Access-Control-Allow-Origin"] = "*"
+          send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
+        else
+          response.headers["Access-Control-Allow-Origin"] = "*"
+          status 404
+        end
       end
     end
 
