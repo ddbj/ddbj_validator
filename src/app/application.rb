@@ -110,7 +110,7 @@ module DDBJValidator
       else
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         output_file_path = "#{save_dir}/result.json"
-        if File.exist?(status_file_path)
+        if File.exist?(output_file_path)
           result_json = JSON.parse(File.open(output_file_path).read)
           content_type :json
           result_json.to_json
