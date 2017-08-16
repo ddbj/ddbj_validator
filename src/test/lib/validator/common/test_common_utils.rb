@@ -4,7 +4,7 @@ require '../../../../lib/validator/common/common_utils.rb'
 
 class TestCommonUtils < Minitest::Test
   def setup
-    conf_dir = File.expand_path('../../../../../conf', __FILE__)
+    conf_dir = File.expand_path('../../../../../conf/biosample', __FILE__)
     @common = CommonUtils.new
     config_obj = {}
     config_obj[:null_accepted] = JSON.parse(File.read("#{conf_dir}/null_accepted.json"))

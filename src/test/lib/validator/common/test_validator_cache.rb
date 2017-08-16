@@ -69,7 +69,7 @@ class TestValidatorCache < Minitest::Test
   end
 
   def test_cache_invalid_publication_identifier
-    ref_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../../conf/reference_attributes.json"))
+    ref_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../../conf/biosample/reference_attributes.json"))
     pubchem_id = "27148491"
     ret1 = @validator.send("invalid_publication_identifier", "11", "SampleA", "ref_biomaterial", pubchem_id, ref_attr, 1)
     cache = @validator.instance_variable_get (:@cache)
