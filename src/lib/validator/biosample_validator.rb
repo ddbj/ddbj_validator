@@ -174,10 +174,8 @@ class BioSampleValidator < ValidatorBase
       ### 属性名や必須項目に関する検証
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
-      attr_group_list = get_attribute_groups_of_package(biosample_data["package"])
       not_predefined_attribute_name("14", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_mandatory_attribute("27", sample_name, biosample_data["attributes"], attr_list , line_num)
-      missing_group_of_at_least_one_required_attributes("36", sample_name, biosample_data["attributes"], attr_group_list, line_num)
       missing_required_attribute_name("92", sample_name, biosample_data["attributes"], attr_list , line_num)
 
       ### 全属性値を対象とした検証
@@ -193,9 +191,9 @@ class BioSampleValidator < ValidatorBase
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         attribute_value_is_not_integer("93", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
-        ret = bioproject_submission_id_replacement("95", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+        ret = bioproject_submission_id_replacement("95", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"]["bioproject_accession"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+          biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
       end
 
@@ -224,9 +222,9 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 特定の属性値に対する検証
-      invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
-      bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_accession"], @submitter_id, line_num)
-      invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_accession"], line_num)
+      invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
+      invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
       duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
       ret = format_of_geo_loc_name_is_invalid("94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
@@ -291,49 +289,6 @@ class BioSampleValidator < ValidatorBase
       puts "use cache in get_attributes_of_package" if $DEBUG
       attr_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
       attr_list
-    end
-  end
-
-  #
-  # 指定されたpackageの属性グループのリストを取得して返す
-  # 属性グループがないpackageの場合には空のリストを返す
-  #
-  # ==== Args
-  # package name ex."Microbe"
-  #
-  # ==== Return
-  # An hash of the attributes.
-  # [
-  #   {
-  #     :group_name => "Source group attribute in Microbe",
-  #     :attribute_set => ["host", "isolation_source"]
-  #   },
-  #   {...}, ...
-  # ]
-  def get_attribute_groups_of_package (package_name)
-
-    #あればキャッシュを使用
-    if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
-      params = {package_name: package_name}
-      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      params[:version] = @conf[:version]["biosample_graph"]
-      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
-      result = sparql.query(sparql_query)
-      attr_group_list = []
-      result.group_by {|row| row[:group_name] }.each do |group, item|
-        attribute_set = []
-        item.each do |row|
-          attribute_set.push(row[:attribute_name])
-        end
-        attr_group_list.push({group_name: group, attribute_set: attribute_set})
-      end
-      @cache.save(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name, attr_group_list) unless @cache.nil?
-      attr_group_list
-    else
-      puts "use cache in get_attributes_of_package" if $DEBUG
-      attr_group_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name)
-      attr_group_list
     end
   end
 
@@ -626,45 +581,6 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # 複数のうちいずれかの入力が必須である属性の記載がないものを検証
-  #
-  # ==== Args
-  # rule_code
-  # sample_attr ユーザ入力の属性リスト
-  # package_attr_group_list パッケージに対する属性グループリスト
-  # line_num
-  # ==== Return
-  # true/false
-  #
-  def missing_group_of_at_least_one_required_attributes (rule_code, sample_name, sample_attr, package_attr_group_list , line_num)
-    return nil if sample_attr.nil? || package_attr_group_list.nil?
-
-    ng_group_list = []
-    package_attr_group_list.each do |attr_group|
-      count = 0
-      attr_group[:attribute_set].each do |require_attribute|
-        if !sample_attr[require_attribute].nil? && !CommonUtils::blank?(sample_attr[require_attribute])
-          count = count + 1
-        end
-      end
-      if count == 0 # グループの属性のうち一つも値がない
-        ng_group_list.push("[ #{attr_group[:attribute_set].join(", ")} ]") #配列風の文字列を生成 "[ attr1, attr2 ]"
-      end
-    end
-
-    if ng_group_list.size <= 0
-      true
-    else #ルールに反した属性グループがひとつでもあればNG
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute groups", value: ng_group_list.join(", ")}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      false
-    end
-  end
-  #
   # 必須属性名の記載がないものを検証
   #
   # ==== Args
@@ -849,7 +765,7 @@ class BioSampleValidator < ValidatorBase
     if result == false
       annotation = [
           {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_accession"},
+          {key: "Attribute", value: "bioproject_id"},
           {key: "Attribute value", value: bioproject_accession}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
@@ -1799,7 +1715,7 @@ class BioSampleValidator < ValidatorBase
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Submitter ID", value: submitter_id},
-        {key: "bioproject_acession", value: bioproject_accession}
+        {key: "bioproject_id", value: bioproject_accession}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
@@ -1808,7 +1724,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject accession, description 以外で
+  # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject id, description 以外で
   # ユニークな属性を持っている他のサンプルがないかの検証
   # 全サンプルを対象に検証し、同値であるサンプルには同じグループIDを降り、どのサンプルのセットが重複しているかを示す
   #
@@ -1824,7 +1740,7 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     # 同値比較しない基本属性
-    keys_excluding = ["sample_name", "sample_title", "bioproject_accession", "description"]
+    keys_excluding = ["sample_name", "sample_title", "bioproject_id", "description"]
 
     duplicate_sample_error_list = [] #エラー出力用データ
     duplicate_groups = {} #同値データのグループ情報
@@ -1901,7 +1817,7 @@ class BioSampleValidator < ValidatorBase
     if is_umbrella == true #NG
       annotation = [
           {key: "Sample name", value: sample_name},
-          {key: "bioproject_accession", value: bioproject_accession}
+          {key: "bioproject_id", value: bioproject_accession}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
@@ -1993,7 +1909,7 @@ class BioSampleValidator < ValidatorBase
     result = true
     bioproject_accession_list = []
     biosample_list.each do |biosample_data|
-      bioproject_accession_list.push(biosample_data["attributes"]["bioproject_accession"])
+      bioproject_accession_list.push(biosample_data["attributes"]["bioproject_id"])
     end
     compact_list = bioproject_accession_list.compact
     if bioproject_accession_list.size != compact_list.size #nilが含まれていた場合には連続値ではないものとする
@@ -2017,7 +1933,7 @@ class BioSampleValidator < ValidatorBase
         biosample_list.each do |biosample_data|
           annotation = [
             {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
-            {key: "Attribute", value: biosample_data["attributes"]["bioproject_accession"]}
+            {key: "Attribute", value: biosample_data["attributes"]["bioproject_id"]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
@@ -2105,13 +2021,13 @@ class BioSampleValidator < ValidatorBase
 
       annotation = [
           {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_accession"},
+          {key: "Attribute", value: "bioproject_id"},
           {key: "Attribute value", value: psub_id}
       ]
 
       # biosample_accessionにAuto-annotationできる
       if !biosample_accession.nil?
-        location = @xml_convertor.xpath_from_attrname("bioproject_accession", line_num)
+        location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
         annotation.push(CommonUtils::create_suggested_annotation([biosample_accession], "Attribute value", location, true))
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
         @error_list.push(error_hash)

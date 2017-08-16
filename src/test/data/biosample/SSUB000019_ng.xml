@@ -39,7 +39,7 @@
         <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
         <Attribute attribute_name="elev">88.8m</Attribute>
         <Attribute attribute_name="depth">0m</Attribute>
-        <Attribute attribute_name="bioproject_accession">PDAAAAA1654</Attribute>
+        <Attribute attribute_name="bioproject_id">PDAAAAA1654</Attribute>
         <Attribute attribute_name="rel_to_oxygen">aaaa</Attribute>
         <Attribute attribute_name="oxy_stat_samp">bbbb</Attribute>
     </Attributes>

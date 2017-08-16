@@ -39,6 +39,6 @@
         <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
         <Attribute attribute_name="elev">88.8m</Attribute>
         <Attribute attribute_name="depth">0m</Attribute>
-        <Attribute attribute_name="bioproject_accession">PRJDB1654</Attribute>
+        <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
     </Attributes>
 </MyBioSample>

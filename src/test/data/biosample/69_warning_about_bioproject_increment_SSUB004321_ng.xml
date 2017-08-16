@@ -39,7 +39,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">coffee-1</Attribute>
-      <Attribute attribute_name="bioproject_accession">PRJDB3929</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
       <Attribute attribute_name="env_biome">village biome</Attribute>
       <Attribute attribute_name="env_feature">farm</Attribute>
@@ -90,7 +90,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">coffee-2</Attribute>
-      <Attribute attribute_name="bioproject_accession">PRJDB3930</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3930</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
       <Attribute attribute_name="env_biome">village biome</Attribute>
       <Attribute attribute_name="env_feature">farm</Attribute>
@@ -141,7 +141,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">coffee-3</Attribute>
-      <Attribute attribute_name="bioproject_accession">PRJDB3931</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3931</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
       <Attribute attribute_name="env_biome">village biome</Attribute>
       <Attribute attribute_name="env_feature">farm</Attribute>
@@ -192,7 +192,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">coffee-4</Attribute>
-      <Attribute attribute_name="bioproject_accession">PRJDB3932</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3932</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
       <Attribute attribute_name="env_biome">village biome</Attribute>
       <Attribute attribute_name="env_feature">farm</Attribute>
@@ -243,7 +243,7 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">goma-1</Attribute>
-      <Attribute attribute_name="bioproject_accession">PRJDB3933</Attribute>
+      <Attribute attribute_name="bioproject_id">PRJDB3933</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
       <Attribute attribute_name="env_biome">village biome</Attribute>
       <Attribute attribute_name="env_feature">farm</Attribute>

@@ -80,7 +80,7 @@ class TestXmlConvertor < Minitest::Test
     xpath_taxonomy_id = @convertor.xpath_from_attrname("taxonomy_id" , 2)
     assert_equal ["//BioSample[2]/Description/Organism/@taxonomy_id"], xpath_taxonomy_id
 
-    xpath_bioproject_accession = @convertor.xpath_from_attrname("bioproject_accession" , 2)
-    assert_equal ["//BioSample[2]/Attributes/Attribute[@attribute_name=\"bioproject_accession\"]"], xpath_bioproject_accession
+    xpath_bioproject_accession = @convertor.xpath_from_attrname("bioproject_id" , 2)
+    assert_equal ["//BioSample[2]/Attributes/Attribute[@attribute_name=\"bioproject_id\"]"], xpath_bioproject_accession
   end
 end
