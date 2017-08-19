@@ -65,4 +65,115 @@ class TestRunValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:21
+  def test_missing_run_filename
+    #ok case
+    run_set = get_run_set_node("#{@test_file_dir}/21_missing_run_filename_ok.xml")
+    ret = exec_validator("missing_run_filename", "21", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    run_set = get_run_set_node("#{@test_file_dir}/21_missing_run_filename_ok2.xml")
+    ret = exec_validator("missing_run_filename", "21", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #blank filename
+    run_set = get_run_set_node("#{@test_file_dir}/21_missing_run_filename_ng1.xml")
+    ret = exec_validator("missing_run_filename", "21", "run name" , run_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+  end
+
+  # rule:23
+  def test_invalid_run_filename
+    #ok case
+    run_set = get_run_set_node("#{@test_file_dir}/23_invalid_run_filename_ok.xml")
+    ret = exec_validator("invalid_run_filename", "23", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    run_set = get_run_set_node("#{@test_file_dir}/23_invalid_run_filename_ok2.xml")
+    ret = exec_validator("invalid_run_filename", "21", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #invalid filename
+    run_set = get_run_set_node("#{@test_file_dir}/23_invalid_run_filename_ng1.xml")
+    ret = exec_validator("invalid_run_filename", "23", "run name" , run_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:25
+  def test_invalid_run_file_md5_checksum
+    #ok case
+    run_set = get_run_set_node("#{@test_file_dir}/25_invalid_run_file_md5_checksum_ok.xml")
+    ret = exec_validator("invalid_run_file_md5_checksum", "25", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    run_set = get_run_set_node("#{@test_file_dir}/25_invalid_run_file_md5_checksum_ok2.xml")
+    ret = exec_validator("invalid_run_file_md5_checksum", "25", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #invalid checksum
+    run_set = get_run_set_node("#{@test_file_dir}/25_invalid_run_file_md5_checksum_ng1.xml")
+    ret = exec_validator("invalid_run_file_md5_checksum", "25", "run name" , run_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+  end
+
+  # rule:29
+  def test_invalid_bam_alignment_file_series
+    #ok case
+    run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ok.xml")
+    ret = exec_validator("invalid_bam_alignment_file_series", "29", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ok2.xml")
+    ret = exec_validator("invalid_bam_alignment_file_series", "29", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    # 2 reference_fasta
+    run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ng1.xml")
+    ret = exec_validator("invalid_bam_alignment_file_series", "29", "run name" , run_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # 1 reference_fasta and 1 bam
+    run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ng2.xml")
+    ret = exec_validator("invalid_bam_alignment_file_series", "29", "run name" , run_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:31
+  def test_invalid_bam_alignment_file_series
+    #ok case
+    ## 2 fastq
+    run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ok.xml")
+    ret = exec_validator("mixed_filetype", "31", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## 1 bam & 1 SOLiD_native_csfasta
+    run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ok2.xml")
+    ret = exec_validator("mixed_filetype", "31", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ok3.xml")
+    ret = exec_validator("mixed_filetype", "31", "run name" , run_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    # 1 fastq % 1 sff
+    run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ng1.xml")
+    ret = exec_validator("mixed_filetype", "31", "run name" , run_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
 end

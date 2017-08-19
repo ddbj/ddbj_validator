@@ -141,4 +141,169 @@ class RunValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:21
+  # Run filename が存在し空白文字ではないか
+  #
+  # ==== Args
+  # run_label: run label for error displaying
+  # run_node: a run node object
+  # ==== Return
+  # true/false
+  #
+  def missing_run_filename (rule_code, run_label, run_node, line_num)
+    result = true
+    data_block_path = "//DATA_BLOCK"
+    run_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
+      file_path = "FILES/FILE"
+      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
+        if node_blank?(file_node, "@filename")
+          annotation = [
+            {key: "Run name", value: run_label},
+            {key: "filename", value: ""},
+            {key: "Path", value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:23
+  # filename は [A-Za-z0-9-_.] のみで構成されている必要がある
+  #
+  # ==== Args
+  # run_label: run label for error displaying
+  # run_node: a run node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_run_filename (rule_code, run_label, run_node, line_num)
+    result = true
+    data_block_path = "//DATA_BLOCK"
+    run_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
+      file_path = "FILES/FILE"
+      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
+        unless node_blank?(file_node, "@filename")
+          filename = get_node_text(file_node, "@filename")
+          unless filename =~ /^[A-Za-z0-9_.-]+$/
+            annotation = [
+              {key: "Run name", value: run_label},
+              {key: "filename", value: filename},
+              {key: "Path", value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
+            ]
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+            @error_list.push(error_hash)
+            result = false
+          end
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:25
+  # Run file の md5sum が 32桁の英数字であるかどうか
+  #
+  # ==== Args
+  # run_label: run label for error displaying
+  # run_node: a run node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_run_file_md5_checksum (rule_code, run_label, run_node, line_num)
+    result = true
+    data_block_path = "//DATA_BLOCK"
+    run_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
+      file_path = "FILES/FILE"
+      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
+        unless node_blank?(file_node, "@checksum")
+          checksum = get_node_text(file_node, "@checksum")
+          unless checksum =~ /^[A-Za-z0-9]{32}$/
+            annotation = [
+              {key: "Run name", value: run_label},
+              {key: "checksum", value: checksum},
+              {key: "Path", value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
+            ]
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+            @error_list.push(error_hash)
+            result = false
+          end
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:29
+  # Run filetype = bam AND/OR tab AND/OR reference_fasta 各 1 のみ
+  #
+  # ==== Args
+  # run_label: run label for error displaying
+  # run_node: a run node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_bam_alignment_file_series (rule_code, run_label, run_node, line_num)
+    result = true
+    filetype_path = "//DATA_BLOCK/FILES/FILE/@filetype"
+    filetype_list = []
+    run_node.xpath(filetype_path).each_with_index do |filetype_node, f_idx|
+      filetype_list.push(get_node_text(filetype_node))
+    end
+    filetype_list.select! {|filetype| filetype == 'bam' || filetype == 'tab' || filetype == 'reference_fasta'}
+    if filetype_list.size >= 2
+      annotation = [
+        {key: "Run name", value: run_label},
+        {key: "filetypes", value: filetype_list.to_s},
+        {key: "Path", value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:31
+  # filetypeの組み合わせチェック
+  # (filetype = bam AND/OR tab AND/OR reference_fasta 各 1) (SOLiD_native_csfasta, SOLiD_native_qual) は混在 OK だが、
+  # 他の generic_fastq, fastq, sff, hdf5 は Run で揃っている必要がある
+  # (file1 sff, file2 sff は OK だが、file1 sff file2 fastq は NG)
+  #
+  # ==== Args
+  # run_label: run label for error displaying
+  # run_node: a run node object
+  # ==== Return
+  # true/false
+  #
+  def mixed_filetype (rule_code, run_label, run_node, line_num)
+    result = true
+    filetype_path = "//DATA_BLOCK/FILES/FILE/@filetype"
+    filetype_list = []
+    run_node.xpath(filetype_path).each_with_index do |filetype_node, f_idx|
+      filetype_list.push(get_node_text(filetype_node))
+    end
+    org_filetype_list = filetype_list.dup
+    filetype_list.delete_if {|filetype| filetype == 'bam' || filetype == 'tab' || filetype == 'reference_fasta' || filetype == 'SOLiD_native_csfasta' || filetype == 'SOLiD_native_qual'}
+    if filetype_list.uniq.size >= 2
+      annotation = [
+        {key: "Run name", value: run_label},
+        {key: "filetypes", value: org_filetype_list.to_s},
+        {key: "Path", value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
 end
