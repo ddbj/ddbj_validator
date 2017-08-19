@@ -7,7 +7,7 @@ FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
   ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
-    dc:identifier "<%= package_name %>" .
+    rdfs:label "<%= package_name %> package"@en .
   ?source owl:domain ?package .
 
   ?axiom owl:annotatedSource ?source .
