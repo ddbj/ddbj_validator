@@ -73,6 +73,7 @@ class Validator
         error_list = []
         error_list.concat(validate("biosample", params)) if !params[:biosample].nil?
         error_list.concat(validate("bioproject", params))if !params[:bioproject].nil?
+        error_list.concat(validate("combination", params))
         #TODO dra validator
 
         if error_list.size == 0
@@ -112,6 +113,9 @@ class Validator
           when "bioproject"
             validator = BioProjectValidator.new
             data = params[:bioproject]
+          when "combination"
+            validator = CombinationValidator.new
+            data = params
           end
           validator.validate(data);
           validator.error_list
