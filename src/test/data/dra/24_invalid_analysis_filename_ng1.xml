@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ANALYSIS_SET>
+    <ANALYSIS>
+        <TITLE>Title text</TITLE>
+        <STUDY_REF>
+            <IDENTIFIERS>
+            </IDENTIFIERS>
+        </STUDY_REF>
+        <DESCRIPTION>Description text</DESCRIPTION>
+        <ANALYSIS_TYPE>
+            <SEQUENCE_ANNOTATION>
+                <PROCESSING>
+                    <PIPELINE>
+                        <PIPE_SECTION>
+                            <STEP_INDEX>1</STEP_INDEX>
+                            <PREV_STEP_INDEX>NIL</PREV_STEP_INDEX>
+                            <PROGRAM></PROGRAM>
+                            <VERSION></VERSION>
+                        </PIPE_SECTION>
+                    </PIPELINE>
+                </PROCESSING>
+            </SEQUENCE_ANNOTATION>
+        </ANALYSIS_TYPE>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="test.txt" filetype="fasta" checksum_method="MD5" checksum="8EB6DED7FFE88938026281DF32044527"/>
+            </FILES>
+        </DATA_BLOCK>
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="test(2)ng.txt" filetype="fasta" checksum_method="MD5" checksum="8EB6DED7FFE88938026281DF32044527"/>
+                <FILE filename="test3.txt" filetype="fasta" checksum_method="MD5" checksum="8EB6DED7FFE88938026281DF32044527"/>
+            </FILES>
+        </DATA_BLOCK>
+    </ANALYSIS>
+</ANALYSIS_SET>

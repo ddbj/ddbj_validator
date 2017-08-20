@@ -131,12 +131,137 @@ class AnalysisValidator < ValidatorBase
     title_path = "//ANALYSIS/TITLE"
     if node_blank?(analysis_node, title_path)
       annotation = [
-        {key: "Analysist name", value: analysis_label},
+        {key: "Analysis name", value: analysis_label},
         {key: "Path", value: "#{title_path}"}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+  #
+  # rule:14
+  # ANALYSISのDESCRIPTION要素が空白ではないか
+  #
+  # ==== Args
+  # analysis_label: analysis label for error displaying
+  # analysis_node: a analysis node object
+  # ==== Return
+  # true/false
+  #
+  def missing_analysis_description (rule_code, analysis_label, analysis_node, line_num)
+    result = true
+    desc_path = "//DESCRIPTION"
+    if node_blank?(analysis_node, desc_path)
+      annotation = [
+        {key: "Analysis name", value: analysis_label},
+        {key: "DESCRIPTION", value: ""},
+        {key: "Path", value: "//ANALYSIS[#{line_num}]/#{desc_path.gsub('//','')}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:22
+  # ANALYSISのfilename属性が空白ではないか
+  #
+  # ==== Args
+  # analysis_label: analysis label for error displaying
+  # analysis_node: a analysis node object
+  # ==== Return
+  # true/false
+  #
+  def missing_analysis_filename (rule_code, analysis_label, analysis_node, line_num)
+    result = true
+    data_block_path = "//DATA_BLOCK"
+    analysis_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
+      file_path = "FILES/FILE"
+      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
+        if node_blank?(file_node, "@filename")
+          annotation = [
+            {key: "Analysis name", value: analysis_label},
+            {key: "filename", value: ""},
+            {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:24
+  # filename は [A-Za-z0-9-_.] のみで構成されている必要がある
+  #
+  # ==== Args
+  # analysis_label: analysis label for error displaying
+  # analysis_node: a analysis node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_analysis_filename (rule_code, analysis_label, analysis_node, line_num)
+    result = true
+    data_block_path = "//DATA_BLOCK"
+    analysis_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
+      file_path = "FILES/FILE"
+      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
+        unless node_blank?(file_node, "@filename")
+          filename = get_node_text(file_node, "@filename")
+          unless filename =~ /^[A-Za-z0-9_.-]+$/
+            annotation = [
+              {key: "Analysis name", value: analysis_label},
+              {key: "filename", value: filename},
+              {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
+            ]
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+            @error_list.push(error_hash)
+            result = false
+          end
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:26
+  # FILEのmd5sum属性が32桁の英数字であるかどうか
+  #
+  # ==== Args
+  # analysis_label: analysis label for error displaying
+  # analysis_node: a analysis node object
+  # ==== Return
+  # true/false
+  #
+  def invalid_analysis_file_md5_checksum (rule_code, analysis_label, analysis_node, line_num)
+    result = true
+    data_block_path = "//DATA_BLOCK"
+    analysis_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
+      file_path = "FILES/FILE"
+      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
+        unless node_blank?(file_node, "@checksum")
+          checksum = get_node_text(file_node, "@checksum")
+          unless checksum =~ /^[A-Za-z0-9]{32}$/
+            annotation = [
+              {key: "Analysis name", value: analysis_label},
+              {key: "checksum", value: checksum},
+              {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
+            ]
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+            @error_list.push(error_hash)
+            result = false
+          end
+        end
+      end
     end
     result
   end

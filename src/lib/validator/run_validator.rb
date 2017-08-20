@@ -118,7 +118,7 @@ class RunValidator < ValidatorBase
 
   #
   # rule:11
-  # RUNのTITLE要素が存在し空白ではないか
+  # RUNのTITLE要素が空白ではないか
   #
   # ==== Args
   # run_label: run label for error displaying
@@ -143,7 +143,7 @@ class RunValidator < ValidatorBase
 
   #
   # rule:21
-  # Run filename が存在し空白文字ではないか
+  # Run filename属性が空白文字ではないか
   #
   # ==== Args
   # run_label: run label for error displaying
@@ -208,7 +208,7 @@ class RunValidator < ValidatorBase
 
   #
   # rule:25
-  # Run file の md5sum が 32桁の英数字であるかどうか
+  # FILEのmd5sum属性が32桁の英数字であるかどうか
   #
   # ==== Args
   # run_label: run label for error displaying

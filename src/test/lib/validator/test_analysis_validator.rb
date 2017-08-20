@@ -65,4 +65,84 @@ class TestAnalysisValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:14
+  def test_missing_analysis_description
+    #ok case
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/14_missing_analysis_description_ok.xml")
+    ret = exec_validator("missing_analysis_description", "14", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/14_missing_analysis_description_ok2.xml")
+    ret = exec_validator("missing_analysis_description", "14", "analysis name" , analysis_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #ng case
+    #blank
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/14_missing_analysis_description_ng1.xml")
+    ret = exec_validator("missing_analysis_description", "14", "analysis name" , analysis_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:22
+  def test_missing_analysis_filename
+    #ok case
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/22_missing_analysis_filename_ok.xml")
+    ret = exec_validator("missing_analysis_filename", "22", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/22_missing_analysis_filename_ok2.xml")
+    ret = exec_validator("missing_analysis_filename", "22", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #blank filename
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/22_missing_analysis_filename_ng1.xml")
+    ret = exec_validator("missing_analysis_filename", "22", "analysis name" , analysis_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+  end
+
+  # rule:24
+  def test_invalid_analysis_filename
+    #ok case
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/24_invalid_analysis_filename_ok.xml")
+    ret = exec_validator("invalid_analysis_filename", "24", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/24_invalid_analysis_filename_ok2.xml")
+    ret = exec_validator("invalid_analysis_filename", "24", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #invalid filename
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/24_invalid_analysis_filename_ng1.xml")
+    ret = exec_validator("invalid_analysis_filename", "24", "analysis name" , analysis_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:26
+  def test_invalid_analysis_file_md5_checksum
+    #ok case
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/26_invalid_analysis_file_md5_checksum_ok.xml")
+    ret = exec_validator("invalid_analysis_file_md5_checksum", "26", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # no element
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/26_invalid_analysis_file_md5_checksum_ok2.xml")
+    ret = exec_validator("invalid_analysis_file_md5_checksum", "26", "analysis name" , analysis_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    #invalid checksum
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/26_invalid_analysis_file_md5_checksum_ng1.xml")
+    ret = exec_validator("invalid_analysis_file_md5_checksum", "26", "analysis name" , analysis_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+  end
+
 end
