@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN>
+        <EXPERIMENT_REF refname="test_Experiment_0001" />
+    </RUN>
+    <RUN>
+        <EXPERIMENT_REF refname="test_Experiment_0002" />
+    </RUN>
+</RUN_SET>

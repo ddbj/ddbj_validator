@@ -80,7 +80,7 @@ class CombinationValidator < ValidatorBase
       @analysis_doc = Nokogiri::XML(File.read(data[:analysis]))
     end
     if !(data[:experiment].nil? || data[:run].nil?)
-      missing_run_title("17", )
+      experiment_not_found("17", @experiment_doc, @run_doc)
     end
   end
 
@@ -99,23 +99,24 @@ class CombinationValidator < ValidatorBase
   def experiment_not_found (rule_code, experiment_set, run_set)
     result = true
     experiment_alias_list = []
-    experiment_set =  @run_doc.xpath("//EXPERIMENT")
+    experiment_set =  experiment_set.xpath("//EXPERIMENT")
     experiment_set.each_with_index do |experiment_node, idx|
       unless node_blank?(experiment_node, "@alias")
         experiment_alias_list.push(get_node_text(experiment_node, "@alias"))
       end
     end
-    run_set =  @run_doc.xpath("//RUN")
+    run_set =  run_set.xpath("//RUN")
     run_set.each_with_index do |run_node, idx|
       idx += 1
-      run_name = get_run_label(run_node, idx) #RunValidator
-      refname_path = "//EXPERIMENT_REF/@refname"
+      run_label = "run name" #TODO get_run_label(run_node, idx) #RunValidator
+      refname_path = "EXPERIMENT_REF/@refname"
       unless node_blank?(run_node, refname_path)
         refname = get_node_text(run_node, refname_path)
         if experiment_alias_list.find {|ex_alias| ex_alias == refname }.nil?
           annotation = [
             {key: "Run name", value: run_label},
-            {key: "Path", value: "//RUN[#{idx}]/#{refname_path.gsub('//','')}"}
+            {key: "refname", value: refname},
+            {key: "Path", value: "//RUN[#{idx}]/#{refname_path}"}
           ]
           error_hash = CommonUtils::error_obj(@dra_validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
