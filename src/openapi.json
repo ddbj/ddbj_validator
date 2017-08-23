@@ -286,11 +286,15 @@
         },
         "status": {
           "type": "string",
-          "description": "validation status. \"success\", \"fail\", \"error\""
+          "description": "validation status.<br/> \"success\" Passed the all validation rules<br/> \"fail\" Failed with some validation rules<br/> \"error\" An error occurred while executing the validation process"
         },
         "failed_list": {
           "type": "array",
-          "description": "validation error list. List of error contents when status of validation is fail."
+          "description": "validation error list. List of error contents when status of validation is \"fail\"."
+        },
+        "message": {
+          "type": "string",
+          "description": "when status of validation is \"error\""
         }
       },
       "example": {
@@ -324,13 +328,15 @@
           "type": "string"
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "description": "\"runnning\" or \"finished\""
         },
         "start-time": {
           "type": "string"
         },
         "end-time": {
-          "type": "string"
+          "type": "string",
+          "description": "only when status is \"finished\""
         }
       },
       "example": {
