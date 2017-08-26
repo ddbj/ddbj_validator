@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN>
+        <EXPERIMENT_REF refname="test_Experiment_0001" />
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="100121.s_4_1_sequence.txt.bz2" filetype="fastq" quality_scoring_system="phred" quality_encoding="ascii" ascii_offset="@" checksum_method="MD5" checksum="049ffd0c1b0afc4a50c76bcad0537a4b"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN>
+        <EXPERIMENT_REF refname="test_Experiment_0002" />
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="100121.s_4_2_sequence.txt.bz2" filetype="fastq" quality_scoring_system="phred" quality_encoding="ascii" ascii_offset="@" checksum_method="MD5" checksum="79e81bb64d4b90d01339356455ec1c86"/>
+                <FILE filename="100121.s_4_3_sequence.txt.bz2" filetype="fastq" quality_scoring_system="phred" quality_encoding="ascii" ascii_offset="@" checksum_method="MD5" checksum="79e81bb64d4b90d01339356455ec1c86"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+</RUN_SET>

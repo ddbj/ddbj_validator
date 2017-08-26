@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<RUN_SET>
+    <RUN>
+        <EXPERIMENT_REF refname="test_Experiment_0001" />
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="68a5d94cb81c047837ada8c8ffc16b91"/>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="616079f473841320c732a1518b4fbec4"/>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="103d6077ec4108349d8f4138c32b9db1"/>
+                <FILE filename="m131120_080752_42192_c100585382550000001823104004281400_s1_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="d705a769e6fadf621a3b95cfdfa63e0f"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+    <RUN>
+        <EXPERIMENT_REF refname="test_Experiment_0002" />
+        <DATA_BLOCK>
+            <FILES>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s2_p0.1.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="1e4a7aa7abf539a88c660d232496460c"/>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s2_p0.2.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="ee7660d219157edb62c5ae2329e0d3b0"/>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s2_p0.3.bax.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="5d150c5ddf683160f4a336ceef177db0"/>
+                <FILE filename="m131120_102706_42192_c100585382550000001823104004281401_s2_p0.bas.h5" filetype="PacBio_HDF5" checksum_method="MD5" checksum="bbf29a0b3e2a9c9216cdec55177b47b9"/>
+            </FILES>
+        </DATA_BLOCK>
+    </RUN>
+</RUN_SET>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<EXPERIMENT_SET>
+    <EXPERIMENT alias="test_Experiment_0001">
+        <STUDY_REF>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR></SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <PAIRED NOMINAL_LENGTH="300"/>
+                </LIBRARY_LAYOUT>
+            </LIBRARY_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <PACBIO_SMRT>
+                <INSTRUMENT_MODEL>PacBio RS II</INSTRUMENT_MODEL>
+            </PACBIO_SMRT>
+        </PLATFORM>
+    </EXPERIMENT>
+    <EXPERIMENT alias="test_Experiment_0002">
+        <STUDY_REF>
+        </STUDY_REF>
+        <DESIGN>
+            <DESIGN_DESCRIPTION></DESIGN_DESCRIPTION>
+            <SAMPLE_DESCRIPTOR></SAMPLE_DESCRIPTOR>
+            <LIBRARY_DESCRIPTOR>
+                <LIBRARY_STRATEGY>WGS</LIBRARY_STRATEGY>
+                <LIBRARY_SOURCE>GENOMIC</LIBRARY_SOURCE>
+                <LIBRARY_SELECTION>RANDOM</LIBRARY_SELECTION>
+                <LIBRARY_LAYOUT>
+                    <PAIRED NOMINAL_LENGTH="300"/>
+                </LIBRARY_LAYOUT>
+            </LIBRARY_DESCRIPTOR>
+        </DESIGN>
+        <PLATFORM>
+            <PACBIO_SMRT>
+                <INSTRUMENT_MODEL>PacBio RS II</INSTRUMENT_MODEL>
+            </PACBIO_SMRT>
+        </PLATFORM>
+    </EXPERIMENT>
+</EXPERIMENT_SET>

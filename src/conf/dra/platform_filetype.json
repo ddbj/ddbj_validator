@@ -1,0 +1,38 @@
+[
+  {
+    "platform": "LS454",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta", "sff" ]
+  },
+  {
+    "platform": "ILLUMINA",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta" ]
+  },
+  {
+    "platform": "HELICOS",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta" ]
+  },
+  {
+    "platform": "ABI_SOLID",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta" ]
+  },
+  {
+    "platform": "OXFORD_NANOPORE",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta" ]
+  },
+  {
+    "platform": "PACBIO_SMRT",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta", "PacBio_HDF5" ]
+  },
+  {
+    "platform": "ION_TORRENT",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta", "sff"]
+  },
+  {
+    "platform": "CAPILLARY",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta" ]
+  },
+  {
+    "platform": "COMPLETE_GENOMICS",
+    "filetype": [ "generic_fastq", "fastq", "bam", "tab", "reference_fasta" ]
+  }
+]
