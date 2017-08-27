@@ -4,6 +4,7 @@ require 'yaml'
 class DDBJDbValidator
   BIOPROJCT_DB_NAME = "bioproject"
   BIOSAMPLE_DB_NAME = "biosample"
+  SUBMITTER_DB_NAME = "submitterdb"
 
   def initialize (config)
     @pg_host = config["pg_host"]
@@ -339,4 +340,82 @@ class DDBJDbValidator
     end
     result
   end
+
+  #
+  # 指定されたsubmitter_idのOrganizationの情報を返す。submitter_idが存在しなければnilを返す
+  #
+  # ==== Args
+  # submitter_id ex. "test01"
+  # ==== Return
+  # submitterのorganization情報のハッシュ
+  # {
+  #   "submitter_id" => "test01",
+  #   "center_name" => "National Institute of Genetics",
+  #   "organization" => "DNA Data Bank of Japan",
+  #   "department" => "Database Division",
+  #   "affiliation" => "affiliation name",
+  #   "unit" => "unit name"
+  # }
+  #
+  def get_submitter_organization(submitter_id)
+    return nil if submitter_id.nil?
+    result = nil
+    begin
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
+
+      q = "SELECT submitter_id, center_name, organization, department, affiliation, unit FROM mass.organization WHERE submitter_id = '#{submitter_id}'"
+
+      res = connection.exec(q)
+      if 1 == res.ntuples then
+        result = res[0]
+      end
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{SUBMITTER_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+    result
+  end
+
+  #
+  # 指定されたsubmitter_idのContact情報のリストを返す。submitter_idが存在しなければnilを返す
+  #
+  # ==== Args
+  # submitter_id ex. "test01"
+  # ==== Return
+  # submitterのContact情報のリスト
+  # [
+  #   {
+  #     "submitter_id" => "test01",
+  #     "email" => "test@mail.com",
+  #     "first_name" => "Taro",
+  #     "middle_name" => "Genome",
+  #     "last_name" => "Mishima"
+  #   }, ..
+  # ]
+  #
+  def get_submitter_contact_list(submitter_id)
+    return nil if submitter_id.nil?
+    result = nil
+    begin
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
+
+      q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = '#{submitter_id}' and is_contact = true"
+
+      res = connection.exec(q)
+      if res.ntuples > 0 then
+        result = res
+      end
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{SUBMITTER_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+    result
+  end
+
 end

@@ -132,4 +132,34 @@ class TestDDBJDbValidator < Minitest::Test
   def test_get_all_locus_tag_prefix
     ret = @db_validator.get_all_locus_tag_prefix()
   end
+
+  def test_get_submitter_organization
+    # exist id
+    ret = @db_validator.get_submitter_organization("test01")
+    assert_equal "test01", ret["submitter_id"]
+    assert_equal "National Institute of Genetics", ret["center_name"]
+    assert_equal "DNA Data Bank of Japan", ret["organization"]
+    assert_equal "Database Division", ret["department"]
+    assert_equal "affiliation name", ret["affiliation"]
+    assert_equal "unit name", ret["unit"]
+
+    # not exist id
+    assert_nil @db_validator.get_submitter_organization("not id")
+
+  end
+
+  def test_get_submitter_contact_list
+    # exist id
+    ret = @db_validator.get_submitter_contact_list("test01")
+    ret = ret[0]
+    assert_equal "test01", ret["submitter_id"]
+    assert_equal "test@mail.com", ret["email"]
+    assert_equal "Taro", ret["first_name"]
+    assert_equal "Genome", ret["middle_name"]
+    assert_equal "Mishima", ret["last_name"]
+
+    # not exist id
+    assert_nil @db_validator.get_submitter_contact_list("not id")
+  end
+
 end

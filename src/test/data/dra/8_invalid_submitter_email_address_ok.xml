@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SUBMISSION>
+    <CONTACTS>
+        <CONTACT inform_on_error="test@mail.com" inform_on_status="test@mail.com" name="Taro Mishima" />
+        <CONTACT inform_on_error="test2@mail.com" inform_on_status="test2@mail.com" name="Hanako Mishima" />
+    </CONTACTS>
+</SUBMISSION>
