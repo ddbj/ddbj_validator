@@ -27,6 +27,10 @@ module DDBJValidator
       response.headers["Access-Control-Allow-Origin"] = "*"
     end
 
+    get '/api/apispec/' do
+      send_file File.join(settings.public_folder, 'apispec/index.html')
+    end
+
     get '/api/client/index' do
       erb :index
     end
