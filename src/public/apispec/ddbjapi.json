@@ -19,8 +19,8 @@
         "tags": [
           "Validation"
         ],
-        "summary": "DDBJ validation main API",
-        "description": "DDBJ validation main API",
+        "summary": "execute validation",
+        "description": "Create a new validation job",
         "operationId": "validation",
         "produces": [
           "application/json"
@@ -60,6 +60,11 @@
             "description": "Bad Request. Invalid input file supplied.",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "invalid file combination": {
+                "message": "Invalid combination of files"
+              }
             }
           }
         }
@@ -91,9 +96,17 @@
             }
           },
           "400": {
-            "description": "Bad Request. Invalid input file supplied.",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "not exist UUID": {
+                "message": "Invalid UUID"
+              },
+              "unfinished UUID": {
+                "message": "This validation job has not completed yet"
+              }
             }
           }
         }
@@ -122,12 +135,30 @@
             "description": "Successful Operation",
             "schema": {
               "$ref": "#/definitions/Status"
+            },
+            "examples": {
+              "unfinished status": {
+                "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
+                "status": "runnning",
+                "start-time": "2017-08-29 21:15:53 +0900"
+              },
+              "finished status": {
+                "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
+                "status": "finished",
+                "start-time": "2017-08-29 21:15:53 +0900",
+                "end-time": "2017-08-29 21:16:03 +0900"
+              }
             }
           },
           "400": {
-            "description": "Bad Request. Invalid input file supplied.",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "not exist UUID": {
+                "message": "Invalid UUID"
+              }
             }
           }
         }
@@ -162,9 +193,17 @@
             }
           },
           "400": {
-            "description": "Bad Request. Invalid input file supplied.",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "not exist UUID": {
+                "message": "Invalid UUID"
+              },
+              "invalid filetype": {
+                "message": "Invalid or not exist filetype."
+              }
             }
           }
         }
@@ -199,9 +238,20 @@
             }
           },
           "400": {
-            "description": "Bad Request. Invalid input file supplied.",
+            "description": "Bad Request",
             "schema": {
               "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "not exist UUID": {
+                "message": "Invalid UUID"
+              },
+              "invalid filetype": {
+                "message": "Invalid or not exist filetype."
+              },
+              "no autocorrect fields": {
+                "message": "not exist autocorrect fields on this validation."
+              }
             }
           }
         }
@@ -338,23 +388,12 @@
           "type": "string",
           "description": "only when status is \"finished\""
         }
-      },
-      "example": {
-        "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
-        "status": "runnning"
       }
     },
     "Error": {
       "type": "object",
       "properties": {
-        "code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
-        },
-        "fields": {
+        "error_message": {
           "type": "string"
         }
       }
