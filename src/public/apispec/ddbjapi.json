@@ -93,6 +93,38 @@
             "description": "Successful Operation",
             "schema": {
               "$ref": "#/definitions/ValidationResult"
+            },
+            "examples": {
+              "succeed (Passed the all validation rules)": {
+                "status": "success"
+              },
+              "failed (Failed with some validation rule)": {
+                "status": "fail",
+                "failed_list": {
+                  "id": "14",
+                  "message": "Not predefined attribute name.",
+                  "level": "warning",
+                  "method": "BioSample",
+                  "object": [
+                    "BioSample"
+                  ],
+                  "source": "SSUB000019_ng.xml",
+                  "annotation": [
+                    {
+                      "key": "Sample name",
+                      "value": "MTB313"
+                    },
+                    {
+                      "key": "Attribute names",
+                      "value": "sample_title"
+                    }
+                  ]
+                }
+              },
+              "error (An error occurred while executing the validation process)": {
+                "status": "error",
+                "message": "Failed the sparql query."
+              }
             }
           },
           "400": {
@@ -345,29 +377,6 @@
         "message": {
           "type": "string",
           "description": "when status of validation is \"error\""
-        }
-      },
-      "example": {
-        "status": "fail",
-        "failed_list": {
-          "id": "14",
-          "message": "Not predefined attribute name.",
-          "level": "warning",
-          "method": "BioSample",
-          "object": [
-            "BioSample"
-          ],
-          "source": "SSUB000019_ng.xml",
-          "annotation": [
-            {
-              "key": "Sample name",
-              "value": "MTB313"
-            },
-            {
-              "key": "Attribute names",
-              "value": "sample_title"
-            }
-          ]
         }
       }
     },
