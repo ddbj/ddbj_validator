@@ -105,24 +105,19 @@ class Validator
     end
 
     def validate(object_type, params)
-        begin
-          case object_type
-          when "biosample"
-            validator = BioSampleValidator.new
-            data = params[:biosample]
-          when "bioproject"
-            validator = BioProjectValidator.new
-            data = params[:bioproject]
-          when "combination"
-            validator = CombinationValidator.new
-            data = params
-          end
-          validator.validate(data);
-          validator.error_list
-
-        rescue => ex
-          raise StandardError, ex.message, ex.backtrace
-        end
+      case object_type
+      when "biosample"
+        validator = BioSampleValidator.new
+        data = params[:biosample]
+      when "bioproject"
+        validator = BioProjectValidator.new
+        data = params[:bioproject]
+      when "combination"
+        validator = CombinationValidator.new
+        data = params
+      end
+      validator.validate(data);
+      validator.error_list
     end
 
 #### Parse the arguments

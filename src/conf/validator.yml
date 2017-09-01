@@ -11,13 +11,6 @@ sparql_endpoint:
 api_log:
   path: /Users/yoko/DDBJ/logs
 
-notification_mail:
-  smtp_host: localhost
-  smtp_port: 25
-  to:
-    - yoko.okabeppu@okbp.jp
-  from: validator_notification@ddbj.jp
-
 version:
   ver: 0.9.0
   biosample_graph: 0.9.0
