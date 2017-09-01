@@ -53,7 +53,14 @@
           "200": {
             "description": "Successful Operation",
             "schema": {
-              "$ref": "#/definitions/Accept"
+              "$ref": "#/definitions/Status"
+            },
+            "examples": {
+              "ok": {
+                "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
+                "status": "accepted",
+                "start_time": "2017-08-29 21:15:53 +0900"
+              }
             }
           },
           "400": {
@@ -63,81 +70,8 @@
             },
             "examples": {
               "invalid file combination": {
-                "message": "Invalid combination of files"
-              }
-            }
-          }
-        }
-      }
-    },
-    "/validation/{uuid}": {
-      "get": {
-        "tags": [
-          "Validation"
-        ],
-        "summary": "validation result",
-        "description": "Get specific validation result",
-        "produces": [
-          "application/json"
-        ],
-        "consumes": [
-          "text/plain"
-        ],
-        "parameters": [
-          {
-            "$ref": "#/parameters/uuid"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Successful Operation",
-            "schema": {
-              "$ref": "#/definitions/ValidationResult"
-            },
-            "examples": {
-              "succeed (Passed the all validation rules)": {
-                "status": "success"
-              },
-              "failed (Failed with some validation rule)": {
-                "status": "fail",
-                "failed_list": {
-                  "id": "14",
-                  "message": "Not predefined attribute name.",
-                  "level": "warning",
-                  "method": "BioSample",
-                  "object": [
-                    "BioSample"
-                  ],
-                  "source": "SSUB000019_ng.xml",
-                  "annotation": [
-                    {
-                      "key": "Sample name",
-                      "value": "MTB313"
-                    },
-                    {
-                      "key": "Attribute names",
-                      "value": "sample_title"
-                    }
-                  ]
-                }
-              },
-              "error (An error occurred while executing the validation process)": {
                 "status": "error",
-                "message": "Failed the sparql query."
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "examples": {
-              "not exist UUID": {
-                "message": "Invalid UUID"
-              },
-              "unfinished UUID": {
-                "message": "This validation job has not completed yet"
+                "message": "Invalid combination of files"
               }
             }
           }
@@ -169,12 +103,7 @@
               "$ref": "#/definitions/Status"
             },
             "examples": {
-              "unfinished status": {
-                "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
-                "status": "runnning",
-                "start-time": "2017-08-29 21:15:53 +0900"
-              },
-              "finished status": {
+              "finished": {
                 "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
                 "status": "finished",
                 "start-time": "2017-08-29 21:15:53 +0900",
@@ -189,7 +118,56 @@
             },
             "examples": {
               "not exist UUID": {
+                "status": "error",
                 "message": "Invalid UUID"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/validation/{uuid}": {
+      "get": {
+        "tags": [
+          "Validation"
+        ],
+        "summary": "validation result",
+        "description": "Get specific validation result",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/uuid"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/Status"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "error occurred while executing the validation process": {
+                "status": "error",
+                "message": "Failed the sparql query"
+              },
+              "not exist UUID": {
+                "status": "error",
+                "message": "Invalid UUID"
+              },
+              "unfinished UUID": {
+                "status": "error",
+                "message": "This validation job has not completed yet"
               }
             }
           }
@@ -231,9 +209,11 @@
             },
             "examples": {
               "not exist UUID": {
+                "status": "error",
                 "message": "Invalid UUID"
               },
               "invalid filetype": {
+                "status": "error",
                 "message": "Invalid or not exist filetype."
               }
             }
@@ -276,17 +256,72 @@
             },
             "examples": {
               "not exist UUID": {
+                "status": "error",
                 "message": "Invalid UUID"
               },
               "invalid filetype": {
+                "status": "error",
                 "message": "Invalid or not exist filetype."
               },
               "no autocorrect fields": {
+                "status": "error",
                 "message": "not exist autocorrect fields on this validation."
               }
             }
           }
         }
+      }
+    },
+    "/submission/{filetype}/{submission_id}": {
+      "get": {
+        "tags": [
+          "Validation"
+        ],
+        "summary": "download a submision XML file",
+        "description": "Get the xml file of specific submission_id. This api for administrator",
+        "produces": [
+          "application/xml"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/filetype"
+          },
+          {
+            "$ref": "#/parameters/submission_id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "An xml file of specified submission_id",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "examples": {
+              "not exist UUID": {
+                "status": "error",
+                "message": "Invalid submission_id"
+              },
+              "invalid filetype": {
+                "status": "error",
+                "message": "Invalid or not exist filetype."
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "api_key": []
+          }
+        ]
       }
     }
   },
@@ -346,40 +381,16 @@
       "description": "filetype e.g., submission, biosample, bioproject, run,",
       "required": true,
       "type": "string"
+    },
+    "submission_id": {
+      "name": "submission_id",
+      "in": "path",
+      "description": "Unique identifier of Submission. Starts with 'SSUB', 'PSUB'",
+      "required": true,
+      "type": "string"
     }
   },
   "definitions": {
-    "Accept": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        }
-      },
-      "example": {
-        "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f"
-      }
-    },
-    "ValidationResult": {
-      "type": "object",
-      "properties": {
-        "uuid": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "description": "validation status.<br/> \"success\" Passed the all validation rules<br/> \"fail\" Failed with some validation rules<br/> \"error\" An error occurred while executing the validation process"
-        },
-        "failed_list": {
-          "type": "array",
-          "description": "validation error list. List of error contents when status of validation is \"fail\"."
-        },
-        "message": {
-          "type": "string",
-          "description": "when status of validation is \"error\""
-        }
-      }
-    },
     "Status": {
       "type": "object",
       "properties": {
@@ -388,7 +399,7 @@
         },
         "status": {
           "type": "string",
-          "description": "\"runnning\" or \"finished\""
+          "description": "\"accepted\" or \"runnning\" or \"finished\" or \"error\""
         },
         "start-time": {
           "type": "string"
@@ -396,16 +407,159 @@
         "end-time": {
           "type": "string",
           "description": "only when status is \"finished\""
+        },
+        "result": {
+          "$ref": "#/definitions/ValidationResult"
+        }
+      }
+    },
+    "ValidationResult": {
+      "type": "object",
+      "description": "only when status is \"finished\"",
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "api version"
+        },
+        "validity": {
+          "type": "boolean",
+          "description": "true: passed the all validation rules<br/> false: unpassed the validation<br/> if only warning will return true"
+        },
+        "stats": {
+          "type": "object",
+          "description": "statistics of validation result",
+          "properties": {
+            "error_count": {
+              "type": "integer"
+            },
+            "warning_count": {
+              "type": "integer"
+            },
+            "autocorrect": {
+              "type": "object",
+              "description": "true is autocorrect file is exist"
+            }
+          }
+        },
+        "messages": {
+          "$ref": "#/definitions/ValidationMessages"
+        }
+      },
+      "example": {
+        "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
+        "status": "finished",
+        "start-time": "2017-08-29 21:15:53 +0900",
+        "end-time": "2017-08-29 21:16:03 +0900",
+        "result": {
+          "version": "0.9.0",
+          "validity": false,
+          "stats": {
+            "error_count": 2,
+            "warning_count": 3,
+            "autocorrect": {
+              "biosample": true,
+              "bioproject": false
+            }
+          },
+          "messages": [
+            {
+              "id": "14",
+              "message": "Not predefined attribute name.",
+              "level": "warning",
+              "method": "BioSample",
+              "object": [
+                "BioSample"
+              ],
+              "source": "SSUB000019_ng.xml",
+              "annotation": [
+                {
+                  "key": "Sample name",
+                  "value": "MTB313"
+                },
+                {
+                  "key": "Attribute names",
+                  "value": "sample_title"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "ValidationMessages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "method": {
+            "type": "string",
+            "description": "rule method"
+          },
+          "id": {
+            "type": "integer",
+            "description": "rule id"
+          },
+          "message": {
+            "type": "string",
+            "description": "error message"
+          },
+          "level": {
+            "type": "string",
+            "description": "\"warning\" or \"error\""
+          },
+          "object": {
+            "type": "array",
+            "description": "related object"
+          },
+          "source": {
+            "type": "string",
+            "description": "filename"
+          },
+          "annotation": {
+            "type": "array",
+            "items": {
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "value": {
+                  "type": "string"
+                },
+                "is_auto_annotation": {
+                  "type": "boolean",
+                  "description": "if has auto_annotation"
+                },
+                "target_key": {
+                  "type": "string",
+                  "description": "if has auto_annotation"
+                },
+                "location": {
+                  "type": "array",
+                  "description": "if has auto_annotation"
+                }
+              }
+            }
+          }
         }
       }
     },
     "Error": {
       "type": "object",
       "properties": {
+        "status": {
+          "type": "string"
+        },
         "error_message": {
           "type": "string"
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "in": "header",
+      "name": "api_key"
     }
   }
 }
