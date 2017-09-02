@@ -10,7 +10,6 @@ module DDBJValidator
   class Application < Sinatra::Base
     setting = YAML.load(File.read(File.dirname(__FILE__) + "/../conf/validator.yml"))
     @@data_dir = setting["api_log"]["path"]
-    @@latest_version = setting["version"]["ver"]
 
     configure do
       set :public_folder  , File.expand_path('../../public', __FILE__)
@@ -36,6 +35,7 @@ module DDBJValidator
     end
 
     post '/api/validation' do
+      content_type :json
       #組み合わせが成功したものだけ保存しチェック
       if valid_file_combination?
 
@@ -62,43 +62,63 @@ module DDBJValidator
         #call validator library
         Thread.new{
           Validator.new().execute(validation_params)
-          status = { uuid: uuid, status: "finished", "start-time": start_time, "end-time": Time.now}
+          result_json = JSON.parse(File.open(output_file_path).read)
+          if !result_json["status"].nil? && result_json["status"] == "error"
+            status = { uuid: uuid, status: "error", "start-time": start_time, "end-time": Time.now}
+          else
+            status = { uuid: uuid, status: "finished", "start-time": start_time, "end-time": Time.now}
+          end
           File.open(status_file_path, "w") do |file|
             file.puts(JSON.generate(status))
           end
         }
 
-        content_type :json
-        { uuid: uuid }.to_json
+        { uuid: uuid, status: "accepted", "start-time": start_time}.to_json
       else #file 組み合わせエラー
         status 400
-        body "Invalid file combination"
+        message = "Invalid file combination"
+        { status: "error", "message": message}.to_json
       end
     end
 
     get '/api/validation/:uuid' do |uuid|
+      content_type :json
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+      status_file_path = "#{save_dir}/status.json"
       output_file_path = "#{save_dir}/result.json"
-      if File.exist?(output_file_path)
+      if File.exist?(output_file_path) && File.exist?(status_file_path)
         result_json = JSON.parse(File.open(output_file_path).read)
-        content_type :json
-        result_json.to_json
+        if !result_json["status"].nil? && result_json["status"] == "error"
+          status 500
+          message = "An error occurred during validation processing."
+          { status: "error", "message": message}.to_json
+        else
+          status_json = JSON.parse(File.open(status_file_path).read)
+          status_json["result"] = result_json
+          status_json.to_json
+        end
       else
+        if File.exist?(status_file_path) && JSON.parse(File.open(status_file_path).read)["status"] == "running"
+          message = "Validation process has not finished yet"
+        else
+          message = "Invalid uuid"
+        end
         status 400
-        body "Invalid uuid"
+        { status: "error", "message": message}.to_json
       end
     end
 
     get '/api/validation/:uuid/status' do |uuid|
+      content_type :json
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
       status_file_path = "#{save_dir}/status.json"
       if File.exist?(status_file_path)
         status_json = JSON.parse(File.open(status_file_path).read)
-        content_type :json
         status_json.to_json
       else
         status 400
-        body "Invalid uuid"
+        message = "Invalid uuid"
+        { status: "error", "message": message}.to_json
       end
     end
 
@@ -111,7 +131,9 @@ module DDBJValidator
         send_file file_path, :filename => file_name, :type => 'application/xml'
       else
         status 400
-        body "Invalid uuid or filetype"
+        content_type :json
+        message = "Invalid uuid or filetype"
+        { status: "error", "message": message}.to_json
       end
     end
 
@@ -131,7 +153,9 @@ module DDBJValidator
         send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
       else
         status 400
-        body "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
+        content_type :json
+        message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
+        { status: "error", "message": message}.to_json
       end
     end
 
@@ -182,6 +206,7 @@ module DDBJValidator
         end
         save_path
       end
+
     end
   end
 end

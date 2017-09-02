@@ -8,6 +8,7 @@ require File.expand_path('../bioproject_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
+    @@filetype = %w(biosample bioproject submission experiment run analysis)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -21,6 +22,7 @@ class Validator
     def initialize()
       config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
       @setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
+      @latest_version = @setting["version"]["ver"]
       @log_file = @setting["api_log"]["path"] + "validator.log"
       @log = Logger.new(@log_file)
     end
@@ -77,10 +79,17 @@ class Validator
         #TODO dra validator
 
         if error_list.size == 0
-          ret = {status: "success", format: ARGV[1]}
+          ret = {version: @latest_version, validity: true}
+          ret["stats"] = {error_count: 0, warning_count:0, autocorrect: {biosample: false, bioproject: false}}
+          ret["messages"] = []
           @log.info('validation result: ' + "success")
         else
-          ret = {status: "fail", format: ARGV[1], failed_list: error_list}
+          ret = {version: @latest_version, validity: true}
+
+          stats = get_result_stats(error_list)
+          ret["validity"] = false if stats[:error_count] > 0
+          ret["stats"] = stats
+          ret["messages"] = error_list
           @log.info('validation result: ' + "fail")
         end
       rescue => ex
@@ -95,7 +104,7 @@ class Validator
           send_notification_mail(@setting["notification_mail"], ex.message)
         end
 
-        ret = {status: "error", format: ARGV[1], message: ex.message}
+        ret = {status: "error", message: ex.message}
       end
 
       File.open(params[:output], "w") do |file|
@@ -165,6 +174,29 @@ class Validator
         opt.on('--user=VAL',                  'user name')               {|v| options[:output] = v}
         opt.on('--password=VAL',              'password')               {|v| options[:output] = v}
       end
+    end
+
+#### Parse the validation result
+
+    #error_listから統計情報を計算して返す
+    def get_result_stats (error_list)
+      #failed_listの内容をパースして統計情報(stats)を計算
+      error_count = error_list.select{|item| item[:level] == "error" }.size
+      warning_count = error_list.select{|item| item[:level] == "warning" }.size
+      autocorrect = {}
+      #autocorrectできるfileかどうかをのフラグを立てる
+      @@filetype.each do |filetype|
+        autocorrect_item = error_list.select{|item|
+          item[:method].casecmp(filetype) == 0 \
+           && item[:annotation].select{|anno| anno[:is_auto_annotation] == true }.size > 0
+        }
+        if autocorrect_item.size > 0
+          autocorrect[filetype] = true
+        else
+          autocorrect[filetype] = false
+        end
+      end
+      {error_count: error_count, warning_count: warning_count, autocorrect: autocorrect}
     end
 
 #### Error mail
