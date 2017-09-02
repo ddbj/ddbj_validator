@@ -1,6 +1,5 @@
 (function(){
-    //使用するAPIのバージョン
-    var api_version = "0.9.0";
+    var api_url = "/api";
 
     //ファイル選択ボタン押下時に選択ウィンドウを表示
     var output_f = "";
@@ -62,7 +61,7 @@
                 showLoading(); //クルクル表示
                 $.ajax({
                     //validationAPIにファイル(formData)を送信
-                    url: "/api/" + api_version + "/validation",
+                    url: api_url + "/validation",
                     method: "post",
                     data: new FormData($("#submit_data").get()[0]),
                     processData: false,
@@ -85,13 +84,13 @@
         //finishedに変わったらvalidationの結果を取得するAPIを叩く
         function polling(uuid) {
             $.ajax({
-                url: "/api/" + api_version + "/validation/" + uuid + "/status"
+                url: api_url + "/validation/" + uuid + "/status"
             }).done(function(data) {
                 if (data.status === "running") { //まだ実行中なので一定時間待って再びstatusを問い合わせる
                     setTimeout(function() {polling(uuid)},2000);
                 } else if (data.status === "finished") { //validation終了したので結果をAPIに問い合わせる
                     $.ajax({
-                        url: "/api/" + api_version + "/validation/" + uuid
+                        url: api_url + "/validation/" + uuid
                     }).done(function(data) {
                         render(data);
                     }).fail(function(data) {

@@ -35,155 +35,103 @@ module DDBJValidator
       erb :index
     end
 
-    #バージョン指定なしの場合、最新バージョンを加えてルーティングを振り分ける
     post '/api/validation' do
-      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
-      pass
-    end
+      #組み合わせが成功したものだけ保存しチェック
+      if valid_file_combination?
 
-    get '/api/validation/:uuid' do |uuid|
-      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
-      pass
-    end
-
-    get '/api/validation/:uuid/status' do |uuid|
-      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
-      pass
-    end
-
-    get '/api/validation/:uuid/:filetype' do |uuid, filetype|
-      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
-      pass
-    end
-
-    get '/api/validation/:uuid/:filetype/autocorrect' do |uuid, filetype|
-      request.path_info.gsub!("/api/validation", "/api/" + @@latest_version + "/validation")
-      pass
-    end
-
-    #バージョン指定ありの場合
-    post '/api/:version/validation' do |version|
-      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
-        status 400
-        body "invalid version. latest version is '#{@@latest_version}'"
-      else
-        #組み合わせが成功したものだけ保存しチェック
-        if valid_file_combination?
-
-          uuid = SecureRandom.uuid
-          save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-          validation_params = {}
-          input_file_list = %w(biosample bioproject submission experiment run analysis)
-          input_file_list.each do |file_category|
-            if params[file_category.to_sym]
-              save_path = save_file(save_dir, file_category, params)
-              validation_params[file_category.to_sym] = save_path
-            end
+        uuid = SecureRandom.uuid
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        validation_params = {}
+        input_file_list = %w(biosample bioproject submission experiment run analysis)
+        input_file_list.each do |file_category|
+          if params[file_category.to_sym]
+            save_path = save_file(save_dir, file_category, params)
+            validation_params[file_category.to_sym] = save_path
           end
-          output_file_path = "#{save_dir}/result.json"
-          validation_params[:output] = output_file_path
+        end
+        output_file_path = "#{save_dir}/result.json"
+        validation_params[:output] = output_file_path
 
-          status_file_path = "#{save_dir}/status.json"
-          start_time = Time.now
-          status = { uuid: uuid, status: "running", "start-time": start_time}
+        status_file_path = "#{save_dir}/status.json"
+        start_time = Time.now
+        status = { uuid: uuid, status: "running", "start-time": start_time}
+        File.open(status_file_path, "w") do |file|
+          file.puts(JSON.generate(status))
+        end
+
+        #call validator library
+        Thread.new{
+          Validator.new().execute(validation_params)
+          status = { uuid: uuid, status: "finished", "start-time": start_time, "end-time": Time.now}
           File.open(status_file_path, "w") do |file|
             file.puts(JSON.generate(status))
           end
+        }
 
-          #call validator library
-          Thread.new{
-            Validator.new().execute(validation_params)
-            status = { uuid: uuid, status: "finished", "start-time": start_time, "end-time": Time.now}
-            File.open(status_file_path, "w") do |file|
-              file.puts(JSON.generate(status))
-            end
-          }
-
-          content_type :json
-          { uuid: uuid }.to_json
-        else #file 組み合わせエラー
-          status 400
-          body "Invalid file combination"
-        end
+        content_type :json
+        { uuid: uuid }.to_json
+      else #file 組み合わせエラー
+        status 400
+        body "Invalid file combination"
       end
     end
 
-    get '/api/:version/validation/:uuid' do |version, uuid|
-      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
-        status 400
-        body "invalid version. latest version is '#{@@latest_version}'"
+    get '/api/validation/:uuid' do |uuid|
+      save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+      output_file_path = "#{save_dir}/result.json"
+      if File.exist?(output_file_path)
+        result_json = JSON.parse(File.open(output_file_path).read)
+        content_type :json
+        result_json.to_json
       else
-        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        output_file_path = "#{save_dir}/result.json"
-        if File.exist?(output_file_path)
-          result_json = JSON.parse(File.open(output_file_path).read)
-          content_type :json
-          result_json.to_json
-        else
-          status 400
-          body "Invalid uuid"
-        end
+        status 400
+        body "Invalid uuid"
       end
     end
 
-    get '/api/:version/validation/:uuid/status' do |version, uuid|
-      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
-        status 400
-        body "invalid version. latest version is '#{@@latest_version}'"
+    get '/api/validation/:uuid/status' do |uuid|
+      save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+      status_file_path = "#{save_dir}/status.json"
+      if File.exist?(status_file_path)
+        status_json = JSON.parse(File.open(status_file_path).read)
+        content_type :json
+        status_json.to_json
       else
-        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        status_file_path = "#{save_dir}/status.json"
-        if File.exist?(status_file_path)
-          status_json = JSON.parse(File.open(status_file_path).read)
-          content_type :json
-          status_json.to_json
-        else
-          status 400
-          body "Invalid uuid"
-        end
+        status 400
+        body "Invalid uuid"
       end
     end
 
-    get '/api/:version/validation/:uuid/:filetype' do |version, uuid, filetype|
-      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
-        status 400
-        body "invalid version. latest version is '#{@@latest_version}'"
+    get '/api/validation/:uuid/:filetype' do |uuid, filetype|
+      save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+      file_list = Dir.glob("#{save_dir}/#{filetype}/*")
+      if file_list.size == 1
+        file_name = File.basename(file_list.first)
+        file_path = file_list.first
+        send_file file_path, :filename => file_name, :type => 'application/xml'
       else
-        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        file_list = Dir.glob("#{save_dir}/#{filetype}/*")
-        if file_list.size == 1
-          file_name = File.basename(file_list.first)
-          file_path = file_list.first
-          send_file file_path, :filename => file_name, :type => 'application/xml'
-        else
-          status 400
-          body "Invalid uuid or filetype"
-        end
+        status 400
+        body "Invalid uuid or filetype"
       end
     end
 
-    get '/api/:version/validation/:uuid/:filetype/autocorrect' do |version, uuid, filetype|
-      unless version == @@latest_version #バージョンが最新でなければ400　本当は転送したい
-        status 400
-        body "invalid version. latest version is '#{@@latest_version}'"
+    get '/api/validation/:uuid/:filetype/autocorrect' do |uuid, filetype|
+      save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+      result_file = "#{save_dir}/result.json"
+      org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
+      if File.exist?(result_file) && org_file_list.size == 1
+        org_file = org_file_list.first
+        annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)
+        annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
+        FileUtils.mkdir_p(annotated_file_dir)
+        annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
+        AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype)
+      end
+      if File.exist?(annotated_file_path)
+        send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
       else
-        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        result_file = "#{save_dir}/result.json"
-        org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
-        if File.exist?(result_file) && org_file_list.size == 1
-          org_file = org_file_list.first
-          annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)
-          annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
-          FileUtils.mkdir_p(annotated_file_dir)
-          annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
-          AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype)
-        end
-        if File.exist?(annotated_file_path)
-          send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
-        else
-          status 400
-          body "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
-        end
+        status 400
+        body "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
       end
     end
 
