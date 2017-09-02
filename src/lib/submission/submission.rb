@@ -2,7 +2,7 @@ require 'pg'
 require 'nokogiri'
 require 'yaml'
 
-class BioSampleXml
+class Submission
   BIOSAMPLE_DB_NAME = "biosample"
 
   def initialize
@@ -16,28 +16,10 @@ class BioSampleXml
     @pg_pass = config["pg_pass"]
   end
 
-  def get_submitter_id(accession_id)
-    submission_id = ""
-    begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
-      get_submission_id_query = <<-"SQL"
-        SELECT DISTINCT s.submission_id
-        FROM mass.sample s
-        INNER JOIN mass.accession a USING(smp_id)
-        WHERE a.accession_id = '#{accession_id}';
-      SQL
-      res = connection.exec(get_submission_id_query) 
-      if res.ntuples == 1
-         submission_id = res.first["submission_id"]
-      end
-      submission_id
-    rescue => ex
-      message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    ensure
-      connection.close if connection
-    end
+  def submission_xml(file_type, submission_id, output_dir)
+    file_path = output_dir + "/#{submission_id}.xml"
+    output_xml_file(submission_id, file_path)
+    file_path
   end
 
   def output_xml_file(submission_id, output)
@@ -67,7 +49,6 @@ class BioSampleXml
     end
     begin
       if res.ntuples > 0
-
         doc = Nokogiri::XML("<BioSampleSet>")
         doc.encoding = "utf-8"
         biosample_set = doc.root
@@ -92,21 +73,3 @@ class BioSampleXml
     end
   end
 end
-
-#TODO create method
-id = ARGV[0]
-output = ARGV[1]
-bsxml = BioSampleXml.new
-submission_id = id 
-if id.start_with?("SAMD")
-  submission_id = bsxml.get_submitter_id(id) 
-end
-if submission_id.start_with?("SSUB")
-  bsxml.output_xml_file(submission_id, output)  
-  #TODO if output file is not exist, return "invalid id"
-else
-  puts "invalid id"
-end
-#example id
-#SAMD00008487
-#SSUB000831

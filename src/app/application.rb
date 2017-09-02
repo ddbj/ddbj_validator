@@ -5,6 +5,7 @@ require "securerandom"
 require 'sinatra/reloader'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
+require File.expand_path('../../lib/submission/submission.rb', __FILE__)
 
 module DDBJValidator
   class Application < Sinatra::Base
@@ -156,6 +157,31 @@ module DDBJValidator
         content_type :json
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
         { status: "error", "message": message}.to_json
+      end
+    end
+
+    get '/api/submission/:filetype/:submittion_id' do |filetype, submission_id|
+      headers = request.env.select do |key, val|
+        key.start_with?("HTTP_")
+      end
+      if headers["HTTP_API_KEY"].nil? || headers["HTTP_API_KEY"] != "admin"
+        status 401
+        content_type :json
+        message = "Unauthorized. Please input authorication information"
+        { status: "error", "message": message}.to_json
+      else
+        uuid = SecureRandom.uuid
+        save_dir = "#{@@data_dir}/submission_xml/#{uuid[0..1]}/#{uuid}"
+        FileUtils.mkdir_p(save_dir)
+        xml_file_path = Submission.new().submission_xml(filetype, submission_id, save_dir)
+        if File.exist?(xml_file_path)
+          send_file xml_file_path, :filename => File.basename(xml_file_path), :type => 'application/xml'
+        else
+          status 400
+          content_type :json
+          message = "Invalid filetype or submission_id"
+          { status: "error", "message": message}.to_json
+        end
       end
     end
 
