@@ -5,7 +5,7 @@ require "securerandom"
 require 'sinatra/reloader'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
-require File.expand_path('../../lib/submission/submission.rb', __FILE__)
+require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
 
 module DDBJValidator
   class Application < Sinatra::Base
@@ -173,13 +173,18 @@ module DDBJValidator
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/submission_xml/#{uuid[0..1]}/#{uuid}"
         FileUtils.mkdir_p(save_dir)
-        xml_file_path = Submission.new().submission_xml(filetype, submission_id, save_dir)
-        if File.exist?(xml_file_path)
-          send_file xml_file_path, :filename => File.basename(xml_file_path), :type => 'application/xml'
-        else
+        ret = Submitter.new().submission_xml(filetype, submission_id, save_dir)
+        if ret[:status] == "success"
+          send_file ret[:file_path], :filename => File.basename(ret[:file_path]), :type => 'application/xml'
+        elsif ret[:status] == "fail"
           status 400
           content_type :json
           message = "Invalid filetype or submission_id"
+          { status: "error", "message": message}.to_json
+        elsif ret[:status] == "error"
+          status 500
+          content_type :json
+          message = "An error occurred during processing."
           { status: "error", "message": message}.to_json
         end
       end
