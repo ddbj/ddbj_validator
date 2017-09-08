@@ -385,7 +385,7 @@
     "submission_id": {
       "name": "submission_id",
       "in": "path",
-      "description": "Unique identifier of Submission. Starts with 'SSUB', 'PSUB'",
+      "description": "Unique identifier of Submission. Starts with 'SSUBXXXXXX', 'PSUBXXXXXX' or 'submitter_id + serial'",
       "required": true,
       "type": "string"
     }

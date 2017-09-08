@@ -7,8 +7,23 @@ class DraSubmitter < SubmitterBase
 
   def output_xml_file(object_type, submission_id, output)
     begin
+      #parse submission_id(submitter_id, serial)
+      submission_id_text = submission_id.split("-")
+      valid_format = true
+      valid_format = false if submission_id_text.size != 2
+      begin
+        Integer(submission_id_text[1])
+      rescue
+        valid_format = false
+      end
+      if valid_format == false #invalid submission_id format
+        return nil
+      end
+      submitter_id = submission_id_text[0]
+      serial = submission_id_text[1].to_i
+
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', DRA_DB_NAME, @pg_user,  @pg_pass)
-      res = connection.exec(xml_sql(object_type, submission_id))
+      res = connection.exec(xml_sql(object_type, submitter_id, serial))
       if res.ntuples > 0
         if object_type == "submission" #submissionについてはSet要素不要
           row = res.first
@@ -54,7 +69,7 @@ class DraSubmitter < SubmitterBase
     end
   end
 
-  def xml_sql(object_type, submission_id)
+  def xml_sql(object_type, submitter_id, serial)
     query = <<-"SQL"
       SELECT DISTINCT acc_id, acc_no, content, meta_version, sub_id, submitter_id, serial
       FROM mass.meta_entity
@@ -71,7 +86,7 @@ class DraSubmitter < SubmitterBase
          LEFT OUTER JOIN mass.submission_group grp USING(sub_id)
          LEFT OUTER JOIN mass.accession_relation rel USING(grp_id)
          LEFT OUTER JOIN mass.accession_entity ent USING(acc_id)
-         WHERE sub_id = #{submission_id}
+         WHERE submitter_id = '#{submitter_id}' AND serial = #{serial}
         )
         GROUP BY acc_id
        )

@@ -164,7 +164,7 @@ module DDBJValidator
       headers = request.env.select do |key, val|
         key.start_with?("HTTP_")
       end
-      if headers["HTTP_API_KEY"].nil? || headers["HTTP_API_KEY"] != "admin"
+      if headers["HTTP_API_KEY"].nil? || headers["HTTP_API_KEY"] != "curator" #TODO change
         status 401
         content_type :json
         message = "Unauthorized. Please input authorication information"
