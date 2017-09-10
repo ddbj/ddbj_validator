@@ -1,13 +1,16 @@
 <div class="container result-summary <%= status %>">
-    <h2><%= title_message %></h2>
-
     <table class="result">
         <tbody>
+        <tr>
+            <td class="result-title <%= status %>" colspan="2">
+                <%= title_message %>
+            </td>
+        </tr>
         <tr>
             <th>Result</th>
             <td>
                 <span class="error_info <%= status %>">
-                    <%= all_error_size %> Errors
+                    <%= result_message %>
                 </span>
             </td>
         </tr>
@@ -37,7 +40,7 @@
 
         <% }else if(errors[i].level == "warning"){ %>
         <h3>
-            <span class="label label-danger error_level warning"><%= errors[i].level %></span>
+            <span class="label label-warning error_level warning"><%= errors[i].level %></span>
             <%= errors[i].message %>
         </h3>
         <div class="tbl_warning">

@@ -71,10 +71,10 @@
                     polling(response.uuid);
                 }).fail(function (data) {
                     $("#result").empty(); //clear
-                    if (data.responseText !== "") {
-                      alert(data.responseText);
+                    if (Math.floor(data.status / 100) == 4) {
+                        render_user_error(data);
                     } else {
-                      alert('error!!!');
+                        render_system_error();
                     }
                 });
             }
@@ -86,44 +86,67 @@
             $.ajax({
                 url: api_url + "/validation/" + uuid + "/status"
             }).done(function(data) {
-                if (data.status === "running") { //まだ実行中なので一定時間待って再びstatusを問い合わせる
+                if (data.status === "accepted" || data.status === "running") { //まだ実行中なので一定時間待って再びstatusを問い合わせる
                     setTimeout(function() {polling(uuid)},2000);
-                } else if (data.status === "finished") { //validation終了したので結果をAPIに問い合わせる
+                } else { //validation終了したので結果をAPIに問い合わせる
                     $.ajax({
                         url: api_url + "/validation/" + uuid
                     }).done(function(data) {
                         render(data);
                     }).fail(function(data) {
-                        alert('error!!!');
+                        if (Math.floor(data.status / 100) == 4) {
+                            render_user_error(data);
+                        } else {
+                            render_system_error();
+                        }
                     });
-                } else {
-                    alert('error!!!');
                 }
             }).fail(function(data) {
-                alert('error!!!');
+                if (Math.floor(data.status / 100) == 4) {
+                    render_user_error(data);
+                } else {
+                    render_system_error();
+                }
             });
         }
-
-        //validationの結果を画面表示する
-        function render(result) {
-            //ユーザが選択したファイル名をformから取得 //TODO apiで返すようにする?
+        //ユーザが選択したファイル名をformから取得する
+        function selected_file_list() {
             var file_list = {};
             $('.selected_file').each(function() {
                 if ($(this)[0].files.length > 0) {
                     file_list[$(this).attr("id")] = $(this)[0].files[0].name;
                 }
             });
-            result["file_list"] = file_list;
-
+            return file_list;
+        }
+        //validationの結果を画面表示する
+        function render(response) {
+            var result = {};
+            result = response["result"];//validationの結果を代入
+            result["file_list"] = selected_file_list();
+            result["error_count"] = result["stats"]["error_count"];
+            result["warning_count"] = result["stats"]["warning_count"];
             var tmpl = ""; //表示用テンプレート
-            if (result["status"] == "fail" ) { //validationでerror/wawrningがある場合
-                result["title_message"] = "Error found in while checking this document"
-                result["all_error_size"] = result.failed_list.length;
+            var message_count = result["error_count"] + result["warning_count"];
+            if (message_count > 0) { //validationでerror/wawrningがある場合
+                if (result["error_count"] == 0) { //warningのみの場合
+                    result["title_message"] = "This document was successfully checked as DDBJ XML";
+                    result["result_message"] = "Passed, " + result["warning_count"] + " warning(s)";
+                    result["status"] = "warning";
+                } else { // validationでerrorがある場合
+                    result["title_message"] = "Errors found while checking this document as DDBJ XML";
+                    result["result_message"] = result["error_count"] + " errors(s)"
+                    result["status"] = "unpassed";
+                    if (result["warning_count"] > 0) {
+                        result["result_message"] += ", " + result["warning_count"] + " warning(s)";
+                    }
+                }
+                result["all_error_size"] = result.messages.length;
                 if(list_option == "option-grouped") { //グルーピング表示が選択されている場合
                     // create nested data
                     var grouped_message = d3.nest().key(function (d) {
-                          return d.method + "_" + d.id
-                    }).entries(result.failed_list);
+                        return d.method + "_" + d.id
+                    }).entries(result.messages);
                     //add message and attributions each grouped messages
                     $.each(grouped_message, function (i, v) {
                         v["message"] = v.values[0]["message"];
@@ -133,17 +156,59 @@
                     result["errors"] = grouped_message;
                     tmpl = group_tmpl; //表示テンプレートを指定
                 } else if (list_option == "option-sequential") { //シーケンシャル表示が選択されている場合
-                    result["errors"] = result.failed_list;
+                    result["errors"] = result.messages;
                     tmpl = error_tmpl;  //表示テンプレートを指定
                 }
-            } else if (result["status"] == "success" ) { //validationが全て通った場合
-                result["title_message"] = "No errors or warnings to show";
-                tmpl = summary_tmpl; //表示テンプレートを指定
-            } else if (result["status"] == "error" ) { //システムエラーでvalidationが終わらなかった場合
-                result["title_message"] = "An error occurred during the validation process!";
-                result["error_message"] = "An error occurred during the validation process. Please try again later";
+            } else { //validationが全て通った場合
+                result["title_message"] = "This document was successfully checked as DDBJ XML";
+                result["result_message"] = "Passed";
+                result["status"] = "passed";
                 tmpl = summary_tmpl; //表示テンプレートを指定
             }
+            //指定された表示テンプレートを使用して描画
+            var ErrorView = Backbone.View.extend({
+                initialize: function () {
+                    _.bindAll(this, "render");
+                    this.render();
+                },
+                template: _.template(tmpl),
+                render: function () {
+                    this.$el.html(this.template(result))
+                }
+            });
+            var error_view = new ErrorView({el: $("#result")});
+        }
+
+        //ユーザのパラメータが不正だった場合にメッセージを画面表示する
+        function render_user_error(response) {
+            var result = {};
+            result["file_list"] = selected_file_list();
+            result["title_message"] = "An error occurred during the validation process!";
+            result["result_message"] = JSON.parse(response.responseText).message;
+            result["status"] = "error";
+            tmpl = summary_tmpl; //表示テンプレートを指定
+            //指定された表示テンプレートを使用して描画
+            var ErrorView = Backbone.View.extend({
+                initialize: function () {
+                    _.bindAll(this, "render");
+                    this.render();
+                },
+                template: _.template(tmpl),
+                render: function () {
+                    this.$el.html(this.template(result))
+                }
+            });
+            var error_view = new ErrorView({el: $("#result")});
+        }
+
+        //システムエラーが発生した場合にメッセージを画面表示する
+        function render_system_error() {
+            var result = {};
+            result["file_list"] = selected_file_list();
+            result["title_message"] = "An error occurred during the validation process!";
+            result["result_message"] = "An error occurred during the validation process. Please try again later";
+            result["status"] = "error";
+            tmpl = summary_tmpl; //表示テンプレートを指定
             //指定された表示テンプレートを使用して描画
             var ErrorView = Backbone.View.extend({
                 initialize: function () {

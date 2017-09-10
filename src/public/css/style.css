@@ -116,31 +116,10 @@ li .warning {
   padding: .3em .6em .3em;
   margin-right: 0.75rem;
 }
-.result-summary {
-  margin-top: 37px;
-  padding-left: 0;
-  padding-right: 0;
-}
-.result-summary h2 {
-  font-size: 2rem;
-  padding: 6px;
-  margin: 0;
-  color: white;
-}
-.result-summary.success h2 {
-  background-color: #5cb85c;
-}
-.result-summary.fail h2 {
-  background-color: #d9534f;
-}
-.result-summary.error h2 {
-  background-color: #000000;
-}
-
 .result-summary table.result {
   width: 100%;
   border-collapse: collapse;
-  margin: 0;
+  margin: 20px;
   padding: 0;
 }
 .result-summary table.result th {
@@ -155,10 +134,34 @@ li .warning {
   border: 1px solid #444;
   font-size: 1.5rem;
 }
-.result-summary table.result td .error_info {
-  font-weight: bold;
+.result-title {
+  margin-top: 37px;
+  padding-left: 0;
+  padding-right: 0;
+  font-size: 2rem;
+  padding: 6px;
+  margin: 0;
+  color: white;
 }
-span.error_info.error{
+.result-title.passed {
+  background-color: #5cb85c;
+}
+.result-title.warning {
+  background-color: #5cb85c;
+}
+.result-title.unpassed {
+  background-color: #d9534f;
+}
+.result-title.error {
+  background-color: #000000;
+}
+span.error_info.warning {
+  color: #ffa500;
+}
+span.error_info.unpassed {
+  color: #d9534f;
+}
+span.error_info.error {
   color: #d9534f;
 }
 .result-group {
@@ -302,8 +305,4 @@ ol {
   border-collapse: collapse;
   border: solid 1px #ccc;
   color: #444;
-}
-
-span.warning{
-  background-color: #444444;
 }
