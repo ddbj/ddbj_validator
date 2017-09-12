@@ -137,9 +137,15 @@ class SubmissionValidator < ValidatorBase
   def invalid_laboratory_name (rule_code, submission_label, submission_node, submitter_id, line_num)
     result = true
     submitter_org = @db_validator.get_submitter_organization(submitter_id)
+    unless submitter_org != nil
+      db_lab_name = ""
+    else
+      db_lab_name = [submitter_org["unit"], submitter_org["affiliation"], submitter_org["department"], submitter_org["organization"]]
+      db_lab_name = db_lab_name.compact.join(", ")
+    end
     lab_node = submission_node.xpath("@lab_name").each do |lab_node|
       lab_name = get_node_text(lab_node, ".")
-      if submitter_org.nil? || lab_name != submitter_org["department"]
+      if submitter_org.nil? || lab_name != db_lab_name
         annotation = [
           {key: "Submission name", value: submission_label},
           {key: "lab name", value: lab_name},

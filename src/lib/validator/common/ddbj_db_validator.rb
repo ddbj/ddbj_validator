@@ -402,7 +402,7 @@ class DDBJDbValidator
     begin
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
 
-      q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = '#{submitter_id}' and is_contact = true"
+      q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = '#{submitter_id}' and is_pi = true"
 
       res = connection.exec(q)
       if res.ntuples > 0 then
