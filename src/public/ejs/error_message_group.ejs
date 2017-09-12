@@ -75,11 +75,15 @@
 
 </div>
 
-<div class="container user-reaction">
-    <div class="input-group">
-        <button id="dl_xml" type="button" class="btn btn-default btn-sm">down load file</button>
+<% if(annotated_filetypes.length > 0){ %>
+    <div class="container user-reaction">
+        <div class="input-group">
+        <% for(var i=0; i< annotated_filetypes.length; i++){ %>
+            <a href="<%= annotated_file_baseurl %>/<%= annotated_filetypes[i] %>/autocorrect" target="_blank">auto-corrected file (<%= annotated_filetypes[i] %>)</a><br/>
+        <% } %>
+        </div>
     </div>
-</div>
+<% } %>
 <script>
     $(function(){
         if($("#edit-option").is(":checked")){

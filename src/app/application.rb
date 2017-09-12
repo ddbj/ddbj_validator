@@ -142,6 +142,7 @@ module DDBJValidator
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
       result_file = "#{save_dir}/result.json"
       org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
+      annotated_file_path = ""
       if File.exist?(result_file) && org_file_list.size == 1
         org_file = org_file_list.first
         annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)

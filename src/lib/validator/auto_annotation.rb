@@ -77,8 +77,8 @@ class AutoAnnotation
   def get_annotated_list (validate_result_file, filetype)
     auto_annotation_list = []
     result_json = JSON.parse(File.read(validate_result_file))
-    unless result_json["failed_list"].nil?
-      error_list = result_json["failed_list"].select {|error| error["method"].casecmp(filetype) }
+    unless result_json["messages"].nil?
+      error_list = result_json["messages"].select {|error| error["method"].casecmp(filetype) }
       error_list.each do |error|
         an = error["annotation"].select do |annotation|
           !annotation["is_auto_annotation"].nil? && annotation["is_auto_annotation"] == true

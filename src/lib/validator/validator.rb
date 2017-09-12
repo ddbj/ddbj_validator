@@ -180,7 +180,7 @@ class Validator
 
     #error_listから統計情報を計算して返す
     def get_result_stats (error_list)
-      #failed_listの内容をパースして統計情報(stats)を計算
+      #message(failed_list)の内容をパースして統計情報(stats)を計算
       error_count = error_list.select{|item| item[:level] == "error" }.size
       warning_count = error_list.select{|item| item[:level] == "warning" }.size
       autocorrect = {}

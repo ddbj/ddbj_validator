@@ -125,7 +125,14 @@
             result = response["result"];//validationの結果を代入
             result["file_list"] = selected_file_list();
             result["error_count"] = result["stats"]["error_count"];
+            result["uuid"] = response["uuid"];
             result["warning_count"] = result["stats"]["warning_count"];
+            var filetypes = Object.keys(result["stats"]["autocorrect"]);
+            result["annotated_filetypes"] = filetypes.filter(function(filetype, idx, array) {
+                return result["stats"]["autocorrect"][filetype] == true;
+            });
+            result["annotated_file_baseurl"] = api_url + "/validation/" + result["uuid"];
+
             var tmpl = ""; //表示用テンプレート
             var message_count = result["error_count"] + result["warning_count"];
             if (message_count > 0) { //validationでerror/wawrningがある場合
@@ -228,4 +235,5 @@
             $("#result").append("<div id='loading'><div class='loader'></div></div>");
         }
     }
+
 }());
