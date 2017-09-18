@@ -1178,4 +1178,37 @@ jkl\"  "
 
   end
 
+  def test_invalid_locus_tag_prefix_format
+    # ok case
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", "LOCus1234", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## short length
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", "L4", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## long length
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", "LONGPREFIX123", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not alpha numeric
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", "LOCUS_TAG_123", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## start numeric
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", "123LOCUS", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", nil, 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_locus_tag_prefix_format", "99", "Sample A", "", 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+  end
 end

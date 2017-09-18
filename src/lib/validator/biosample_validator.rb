@@ -231,6 +231,7 @@ class BioSampleValidator < ValidatorBase
       invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
       bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
       invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      invalid_locus_tag_prefix_format("99", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
       duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
       ret = format_of_geo_loc_name_is_invalid("94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
@@ -2110,4 +2111,31 @@ class BioSampleValidator < ValidatorBase
     result
   end
 
+  #
+  # locus_tag_prefixのフォーマットチェック
+  # 3-12文字の英数字で、数字では始まらない
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # locus_tag locus_tag
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_locus_tag_prefix_format (rule_code, sample_name, locus_tag, line_num)
+    return nil if CommonUtils::null_value?(locus_tag)
+    result = true
+    if locus_tag.size < 3 || locus_tag.size > 12 || !locus_tag =~ /^[0-9a-zA-Z]+$/ || locus_tag =~ /^[0-9]+/
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: "locus_tag_prefix"},
+          {key: "Attribute value", value: locus_tag}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
 end
