@@ -77,9 +77,15 @@ class BioSampleValidator < ValidatorBase
   #
   #
   def validate (data_xml, submitter_id=nil)
+    valid_xml = not_well_format_xml("97", data_xml)
+    return unless valid_xml
     #convert to object for validator
     @data_file = File::basename(data_xml)
     xml_document = File.read(data_xml)
+    valid_xml = xml_data_schema("98", xml_document)
+    return unless valid_xml
+
+    # xml検証が通った場合のみ実行
     @biosample_list = @xml_convertor.xml2obj(xml_document)
 
     if submitter_id.nil?
@@ -2063,4 +2069,45 @@ class BioSampleValidator < ValidatorBase
     end
     result
   end
+
+  #
+  # XMLがxsdに対して妥当ではない
+  # 但し、BioSampleの場合はxsd検証を使用せず<BioSampleSet>要素がルートであり子要素が<BioSample>であるかのみを検証
+  #
+  # ==== Args
+  # rule_code
+  # xml_file
+  # ==== Return
+  # true/false
+  #
+  def xml_data_schema (rule_code, xml_document)
+    result = true
+    doc = Nokogiri::XML(xml_document)
+    annotation = []
+    if doc.root.name == "BioSampleSet"
+      doc.root.children.each do |child_node|
+        #rootのchild nodeがBioSampleではない
+        if child_node.class == Nokogiri::XML::Element && child_node.name != "BioSample"
+          annotation = [
+            {key: "second node name", value: child_node.name},
+            {key: "message", value: "Expected second node is BioSample"}
+          ]
+          result = false
+          break
+        end
+      end
+    else #root nodeがBioSampleSetではない
+      annotation = [
+        {key: "root node name", value: doc.root.name},
+        {key: "message", value: "Expected root node is BioSampleSet"}
+      ]
+      result = false
+    end
+    if result == false
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
 end

@@ -69,6 +69,34 @@ class TestBioProjectValidator < Minitest::Test
   end
 
 #### 各validationメソッドのユニットテスト ####
+  # rule:1
+  def test_not_well_format_xml
+    #ok case
+    xml_file = "#{@test_file_dir}/1_not_well_format_xml_ok.xml"
+    ret = exec_validator("not_well_format_xml", "1", xml_file)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_file = "#{@test_file_dir}/1_not_well_format_xml_ng.xml"
+    ret = exec_validator("not_well_format_xml", "1", xml_file)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:2
+  def test_xml_data_schema
+    xsd_file_path = File.dirname(__FILE__) + "/../../../conf/bioproject/xsd/Package.xsd"
+    #ok case
+    xml_file = "#{@test_file_dir}/2_xml_data_schema_ok.xml"
+    ret = exec_validator("xml_data_schema", "2", xml_file, xsd_file_path)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_file = "#{@test_file_dir}/2_xml_data_schema_ng.xml"
+    ret = exec_validator("xml_data_schema", "2", xml_file, xsd_file_path)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
 
   # rule:5
   def test_identical_project_title_and_description

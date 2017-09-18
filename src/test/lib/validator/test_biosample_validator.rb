@@ -110,6 +110,36 @@ class TestBioSampleValidator < Minitest::Test
 
 #### 各validationメソッドのユニットテスト ####
 
+  def test_not_well_format_xml
+    #ok case
+    xml_file = "#{@test_file_dir}/97_not_well_format_xml_SSUB000019_ok.xml"
+    ret = exec_validator("not_well_format_xml", "97", xml_file)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_file = "#{@test_file_dir}/97_not_well_format_xml_SSUB000019_ng.xml"
+    ret = exec_validator("not_well_format_xml", "97", xml_file)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_xml_data_schema
+    #ok case
+    xml_data = File.read("#{@test_file_dir}/98_xml_data_schema_ok.xml")
+    ret = exec_validator("xml_data_schema", "98", xml_data)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_data = File.read("#{@test_file_dir}/98_xml_data_schema_ng1.xml")
+    ret = exec_validator("xml_data_schema", "98", xml_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    xml_data = File.read("#{@test_file_dir}/98_xml_data_schema_ng2.xml")
+    ret = exec_validator("xml_data_schema", "98", xml_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   def test_non_ascii_header_line
     #ok case
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
@@ -1147,4 +1177,5 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
 
   end
+
 end

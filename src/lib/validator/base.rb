@@ -37,7 +37,7 @@ class ValidatorBase
   # ==== Return
   # true/false
   #
-  def not_well_format_xml (rule_code, xml_file) #TODO add object
+  def not_well_format_xml (rule_code, xml_file)
     result = true
     document = Nokogiri::XML(File.read(xml_file))
     if !document.errors.empty?

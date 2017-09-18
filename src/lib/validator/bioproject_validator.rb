@@ -62,49 +62,48 @@ class BioProjectValidator < ValidatorBase
   #
   #
   def validate (data_xml)
-    @data_file = File::basename(data_xml)
     valid_xml = not_well_format_xml("1", data_xml)
+    return unless valid_xml
     # xml検証が通った場合のみ実行
-    if valid_xml
-      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
-      doc = Nokogiri::XML(File.read(data_xml))
-      project_set = doc.xpath("//PackageSet/Package/Project")
+    @data_file = File::basename(data_xml)
+    valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+    doc = Nokogiri::XML(File.read(data_xml))
+    project_set = doc.xpath("//PackageSet/Package/Project")
 
-      multiple_projects("37", project_set)
+    multiple_projects("37", project_set)
 
-      #各プロジェクト毎の検証
-      project_set.each_with_index do |project_node, idx|
-        idx += 1
-        project_name = get_bioporject_label(project_node, idx)
-        identical_project_title_and_description("5", project_name, project_node, idx)
-        short_project_description("6", project_name, project_node, idx)
-        empty_description_for_other_relevance("7", project_name, project_node, idx)
-        empty_description_for_other_subtype("8", project_name, project_node, idx)
-        empty_target_description_for_other_sample_scope("9", project_name, project_node, idx)
-        empty_target_description_for_other_material("10", project_name, project_node, idx)
-        empty_target_description_for_other_capture("11", project_name, project_node, idx)
-        empty_method_description_for_other_method_type("12", project_name, project_node, idx)
-        empty_data_description_for_other_data_type("13", project_name, project_node, idx)
-        invalid_publication_identifier("14", project_name, project_node, idx)
-        empty_publication_reference("15", project_name, project_node, idx)
-        missing_strain_isolate_cultivar("17", project_name, project_node, idx)
-        ###TODO organismの検証とtaxonomy_idの確定
-        ## rule39, rule38
-        taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
-        empty_organism_description_for_multi_species("19", project_name, project_node, idx)
-        metagenome_or_environmental("20", project_name, project_node, idx)
-        invalid_locus_tag_prefix("21", project_name, project_node, idx)
-        invalid_biosample_accession("22", project_name, project_node, idx)
-        missing_project_name("36", project_name, project_node, idx)
-        #taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
-        invalid_project_type("40", project_name, project_node, idx)
-      end
+    #各プロジェクト毎の検証
+    project_set.each_with_index do |project_node, idx|
+      idx += 1
+      project_name = get_bioporject_label(project_node, idx)
+      identical_project_title_and_description("5", project_name, project_node, idx)
+      short_project_description("6", project_name, project_node, idx)
+      empty_description_for_other_relevance("7", project_name, project_node, idx)
+      empty_description_for_other_subtype("8", project_name, project_node, idx)
+      empty_target_description_for_other_sample_scope("9", project_name, project_node, idx)
+      empty_target_description_for_other_material("10", project_name, project_node, idx)
+      empty_target_description_for_other_capture("11", project_name, project_node, idx)
+      empty_method_description_for_other_method_type("12", project_name, project_node, idx)
+      empty_data_description_for_other_data_type("13", project_name, project_node, idx)
+      invalid_publication_identifier("14", project_name, project_node, idx)
+      empty_publication_reference("15", project_name, project_node, idx)
+      missing_strain_isolate_cultivar("17", project_name, project_node, idx)
+      ###TODO organismの検証とtaxonomy_idの確定
+      ## rule39, rule38
+      taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
+      empty_organism_description_for_multi_species("19", project_name, project_node, idx)
+      metagenome_or_environmental("20", project_name, project_node, idx)
+      invalid_locus_tag_prefix("21", project_name, project_node, idx)
+      invalid_biosample_accession("22", project_name, project_node, idx)
+      missing_project_name("36", project_name, project_node, idx)
+      #taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
+      invalid_project_type("40", project_name, project_node, idx)
+    end
 
-      link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
-      #各リンク毎の検証
-      link_set.each_with_index do |link_node, idx|
-        invalid_umbrella_project("16", "Link", link_node, idx)
-      end
+    link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
+    #各リンク毎の検証
+    link_set.each_with_index do |link_node, idx|
+      invalid_umbrella_project("16", "Link", link_node, idx)
     end
   end
 
@@ -156,67 +155,6 @@ class BioProjectValidator < ValidatorBase
   end
 
 ### validate method ###
-
-  #
-  # 正しいXML文書であるかの検証
-  #
-  # ==== Args
-  # xml_file: xml file path
-  # ==== Return
-  # true/false
-  #
-  def not_well_format_xml (rule_code, xml_file)
-    result = true
-    document = Nokogiri::XML(File.read(xml_file))
-    if !document.errors.empty?
-      result = false
-      xml_error_msg = document.errors.map {|err|
-        err.to_s
-      }.join("\n")
-    end
-    if result
-      result
-    else
-      annotation = [
-        {key: "XML file", value: @data_file},
-        {key: "XML error message", value: xml_error_msg}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      false
-    end
-  end
-
-  #
-  # XSDで規定されたXMLに違反していないかの検証
-  #
-  # ==== Args
-  # xml_file: xml file path
-  # xsd_path: xsd file path
-  # ==== Return
-  # true/false
-  #
-  def xml_data_schema (rule_code, xml_file, xsd_path)
-    result = true
-    
-    xsddoc = Nokogiri::XML(File.read(xsd_path), xsd_path)
-    schema = Nokogiri::XML::Schema.from_document(xsddoc)
-    document = Nokogiri::XML(File.read(xml_file))
-    validatan_ret = schema.validate(document)
-    if validatan_ret.size <= 0
-      result
-    else
-      schema.validate(document).each do |error|
-        annotation = [
-          {key: "XML file", value: @data_file},
-          {key: "XSD error message", value: error.message}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-      end
-      false
-    end
-  end
 
   #
   # rule:5

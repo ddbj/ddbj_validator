@@ -785,5 +785,47 @@
     "reference": [
       "http://www.ddbj.nig.ac.jp/sub/ref8-j.html"
     ]
+  },
+  "rule97": {
+    "rule_class": "BioSample",
+    "code": "97",
+    "level": "error",
+    "name": "Not well-formed XML",
+    "method": "not_well_formed_xml",
+    "message": "XML document is not well-formed.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": [
+      "http://www.w3schools.com/xml/xml_validator.asp"
+    ]
+  },
+  "rule98": {
+    "rule_class": "BioSample",
+    "code": "98",
+    "level": "error",
+    "name": "Invalid XML against schema",
+    "method": "invalid_xml_against_schema",
+    "message": "XML document is invalid against the schema.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": [
+      "https://github.com/ddbj/docs/tree/master/bioproject/xsd"
+    ]
+  },
+  "rule99": {
+    "rule_class": "BioSample",
+    "code": "99",
+    "level": "error",
+    "name": "Invalid locus tag prefix format",
+    "method": "invalid_locus_tag_prefix_format",
+    "message": "Locus tag prefix must be 3-12 alphanumeric characters and the first character may not be a digit.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": [
+      "http://trace.ddbj.nig.ac.jp/glossary/ja/Locus_tag_prefix"
+    ]
   }
 }
