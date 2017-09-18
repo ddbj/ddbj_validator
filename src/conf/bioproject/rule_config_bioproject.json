@@ -376,5 +376,19 @@
     "reference": [
 
     ]
+  },
+  "rule41": {
+    "rule_class": "BioProject",
+    "code": "41",
+    "level": "error",
+    "name": "Invalid locus tag prefix format",
+    "method": "invalid_locus_tag_prefix_format",
+    "message": "Locus tag prefix must be 3-12 alphanumeric characters and the first character may not be a digit.",
+    "object": [
+      "BioProject"
+    ],
+    "reference": [
+      "http://trace.ddbj.nig.ac.jp/glossary/ja/Locus_tag_prefix"
+    ]
   }
 }

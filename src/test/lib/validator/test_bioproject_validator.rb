@@ -679,6 +679,21 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:41
+  def test_invalid_locus_tag_prefix_format
+    #ok case
+    project_set = get_project_set_node("#{@test_file_dir}/41_invalid_locus_tag_prefix_format_ok.xml")
+    ret = exec_validator("invalid_locus_tag_prefix_format", "41", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    project_set = get_project_set_node("#{@test_file_dir}/41_invalid_locus_tag_prefix_format_ng.xml")
+    ret = exec_validator("invalid_locus_tag_prefix_format", "41", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   def test_node_blank?
     #element
     ##has text element

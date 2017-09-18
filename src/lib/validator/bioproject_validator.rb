@@ -896,6 +896,43 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
+  # locus_tag_prefixのフォーマットチェック
+  # 3-12文字の英数字で、数字では始まらない
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # locus_tag locus_tag
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_locus_tag_prefix_format (rule_code, project_label, project_node, line_num)
+    result = true
+    locus_tag_path = "//Project/ProjectDescr/LocusTagPrefix"
+    project_node.xpath(locus_tag_path).each_with_index do |locus_tag_node, idx| #XSD定義では複数記述可能
+      isvalid = true
+      # locus_tagが記述されて入れば
+      unless node_blank?(locus_tag_node, ".")
+        locus_tag = get_node_text(locus_tag_node)
+        if locus_tag.size < 3 || locus_tag.size > 12 || !locus_tag =~ /^[0-9a-zA-Z]+$/ || locus_tag =~ /^[0-9]+/
+          isvalid = result = false #複数ノードの一つでもエラーがあればresultをfalseとする
+        end
+        if isvalid == false
+          annotation = [
+            {key: "Project name", value: project_label},
+            {key: "LocusTagPrefix", value: locus_tag},
+            {key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]"]}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
   # node_objで指定された対象ノードに対してxpathで検索し、ノードが存在しないまたはテキストが空（空白のみを含む）だった場合にtrueを返す
   # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
   # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
