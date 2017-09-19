@@ -115,7 +115,7 @@ class XmlConvertor < ValidatorBase
     return sample_obj
   end
 
-  def get_submitter_id(xml_document)
+  def get_biosample_submitter_id(xml_document)
     submitter_id = nil
     begin
       doc = Nokogiri::XML(xml_document)
@@ -132,7 +132,24 @@ class XmlConvertor < ValidatorBase
     submitter_id
   end
 
-  def get_submission_id(xml_document)
+  def get_bioproject_submitter_id(xml_document)
+    submitter_id = nil
+    begin
+      doc = Nokogiri::XML(xml_document)
+      if doc.root.name == "PackageSet"
+        unless node_blank?(doc, "//PackageSet/@submitter_id")
+          submitter_id = get_node_text(doc, "//PackageSet/@submitter_id")
+        end
+      end
+    rescue => ex
+      message = "Failed to parse the bioproject xml file. Please check the xml format.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+    submitter_id
+  end
+
+  def get_biosample_submission_id(xml_document)
     submitter_id = nil
     begin
       doc = Nokogiri::XML(xml_document)
@@ -143,6 +160,23 @@ class XmlConvertor < ValidatorBase
       end
     rescue => ex
       message = "Failed to parse the biosample xml file. Please check the xml format.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+    submitter_id
+  end
+
+  def get_bioproject_submission_id(xml_document)
+    submitter_id = nil
+    begin
+      doc = Nokogiri::XML(xml_document)
+      if doc.root.name == "PackageSet"
+        unless node_blank?(doc, "//PackageSet/@submission_id")
+          submitter_id = get_node_text(doc, "//PackageSet/@submission_id")
+        end
+      end
+    rescue => ex
+      message = "Failed to parse the bioproject xml file. Please check the xml format.\n"
       message += "#{ex.message} (#{ex.class})"
       raise StandardError, message, ex.backtrace
     end

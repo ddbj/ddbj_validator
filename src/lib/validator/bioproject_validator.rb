@@ -61,7 +61,7 @@ class BioProjectValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml)
+  def validate (data_xml, submitter_id=nil)
     valid_xml = not_well_format_xml("1", data_xml)
     return unless valid_xml
     # xml検証が通った場合のみ実行
@@ -70,12 +70,24 @@ class BioProjectValidator < ValidatorBase
     doc = Nokogiri::XML(File.read(data_xml))
     project_set = doc.xpath("//PackageSet/Package/Project")
 
-    multiple_projects("37", project_set)
+    if submitter_id.nil?
+      @submitter_id = @xml_convertor.get_bioproject_submitter_id(xml_document)
+    else
+      @submitter_id = submitter_id
+    end
+    #TODO @submitter_id が取得できない場合はエラーにする?
 
+    #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
+    @submission_id = @xml_convertor.get_bioproject_submission_id(xml_document)
+
+    multiple_projects("37", project_set)
+    project_name_list = @db_validator.get_bioproject_names(@submitter_id)
+    project_title_desc_list = @db_validator.get_bioproject_title_descs(@submitter_id)
     #各プロジェクト毎の検証
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
+      duplicated_project_name("3", project_name, project_node, project_name_list, @submission_id, idx)
       identical_project_title_and_description("5", project_name, project_node, idx)
       short_project_description("6", project_name, project_node, idx)
       empty_description_for_other_relevance("7", project_name, project_node, idx)
@@ -155,6 +167,84 @@ class BioProjectValidator < ValidatorBase
   end
 
 ### validate method ###
+
+  #
+  # rule:3
+  # project name がアカウント単位でユニークではない
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # project_name_list: submitter_idに紐付くプロジェクトのproject_nameの一覧
+  # ==== Return
+  # true/false
+  #
+  def duplicated_project_name (rule_code, project_label, project_node, project_name_list, submission_id, line_num)
+    result = true
+    name_path = "//Project/ProjectDescr/Name"
+
+    if !project_node.xpath(name_path).empty? #要素あり
+      project_name = get_node_text(project_node, name_path)
+      # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じproject nameがあるとNG
+      result = false if submission_id.nil? && project_name_list.count(project_name) >= 1
+      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+      result = false if !submission_id.nil? && project_name_list.count(project_name) >= 2
+
+      if result == false
+        annotation = [
+            {key: "Project name", value: project_label},
+            {key: "Project name", value: project_name},
+            {key: "Path", value: [name_path]},
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
+
+  #
+  # rule:4
+  # project title & description がアカウント単位でユニークではない
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # project_title_desc_list: submitter_idに紐付くプロジェクトのtitle,descriptionの一覧
+  # ==== Return
+  # true/false
+  #
+  def duplicated_project_title_and_description (rule_code, project_label, project_node, project_title_desc_list, submission_id, line_num)
+    result = true
+    title_path = "//Project/ProjectDescr/Title"
+    desc_path = "//Project/ProjectDescr/Description"
+
+    title = description = ""
+    if !project_node.xpath(title_path).empty? #要素あり
+      title = get_node_text(project_node, title_path)
+    end
+    if !project_node.xpath(desc_path).empty? #要素あり
+      description = get_node_text(project_node, desc_path)
+    end
+    combination_text = [title, description].join(",")
+p combination_text
+    # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じtitle&descがあるとNG
+    result = false if submission_id.nil? && project_title_desc_list.count(combination_text) >= 1
+    # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
+    result = false if !submission_id.nil? && project_title_desc_list.count(combination_text) >= 2
+
+    if result == false
+      annotation = [
+        {key: "Project name", value: project_label},
+        {key: "Title", value: title},
+        {key: "Description", value: description},
+        {key: "Path", value: [title_path, desc_path]},
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
 
   #
   # rule:5

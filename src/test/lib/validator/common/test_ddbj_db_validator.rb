@@ -60,6 +60,26 @@ class TestDDBJDbValidator < Minitest::Test
 
   end
 
+  def test_get_bioproject_names
+    # exist case
+    ret = @db_validator.get_bioproject_names("ddbj_ffpri")
+    assert_equal 1, ret.size
+    # not exist case
+    ret = @db_validator.get_bioproject_names("not_exist_submitter")
+    assert_equal 0, ret.size
+  end
+
+  def test_get_bioproject_title_descs
+    # exist case
+    ret = @db_validator.get_bioproject_title_descs("ddbj_ffpri")
+    assert_equal 1, ret.size
+    expected_text = "Diurnal transcriptome dynamics of Japanese cedar (Cryptomeria japonica) in summer and winter,We constracted cDNA library form the RNA mixture which were isolated from Japanese cedar shoots sampled throughout the day and year, and analyzed by Roche 454 GS FLX.  The sequence data was used to design microarray probes. The seasonal and diurnal transcriptome dynamics were investigated by this new designed microarray."
+    assert_equal expected_text, ret.first
+    # not exist case
+    ret = @db_validator.get_bioproject_title_descs("not_exist_submitter")
+    assert_equal 0, ret.size
+  end
+
   def test_get_sample_names
     # exist data
     ret = @db_validator.get_sample_names("SSUB003677")

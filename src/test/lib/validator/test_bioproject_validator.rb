@@ -98,6 +98,62 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:3
+  def test_duplicated_project_name
+    #ok case
+    project_name_list = ["project name 1", "project name 2"]
+    ## without submission_id ("project name 0" is new name)
+    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ok1.xml")
+    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## with submission_id  ("project name 1" has 1 entity in DB, but allows with submission_id)
+    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ok2.xml")
+    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, "psub", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ## without submission_id ("project name 1" has 1 entity in DB, not allow without submission_id)
+    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ng1.xml")
+    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, nil, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## with submission_id ("project name 1" already duplicate in DB)
+    project_name_list = ["project name 1", "project name 1", "project name 2"]
+    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ng2.xml")
+    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, "psub", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:4
+  def test_duplicated_project_title_and_description
+    #ok case
+    project_title_desc_list = ["Title text 1,Description text 1", "Title text 2,Description text 2"]
+    ## without submission_id (is new text)
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok1.xml")
+    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## with submission_id  (has 1 entity in DB, but allows with submission_id)
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok2.xml")
+    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, "psub", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ## without submission_id (has 1 entity in DB, not allow without submission_id)
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng1.xml")
+    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, nil, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## with submission_id (already duplicate in DB)
+    project_title_desc_list = ["Title text 1,Description text 1", "Title text 2,Description text 2", "Title text 2,Description text 2"]
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng2.xml")
+    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, "psub", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   # rule:5
   def test_identical_project_title_and_description
     #ok case

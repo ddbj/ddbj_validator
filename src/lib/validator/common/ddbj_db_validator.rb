@@ -118,6 +118,86 @@ class DDBJDbValidator
   end
 
   #
+  # 指定されたsubmitter_idに紐付くプロジェクトのproject_name名をリストで返す
+  #
+  # ==== Args
+  # submitter_id
+  # ==== Return
+  # project_nameのリスト。一つもない場合にも空のリストを返す
+  # [ "project name 1", "project name 2", ...]
+  #
+  def get_bioproject_names (submitter_id)
+    bioproject_name_list = []
+    begin
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      q = "SELECT submitter_id, submission_id, data_value AS bioproject_name
+           FROM mass.submission_data
+           LEFT OUTER JOIN mass.submission USING(submission_id)
+           WHERE data_name = 'project_name'
+            AND submitter_id = '#{submitter_id}'
+            AND (status_id IS NULL OR status_id NOT IN (5600, 5700))"
+
+      res = connection.exec(q)
+
+      res.each do |item|
+        unless item["bioproject_name"].empty?
+          bioproject_name_list.push(item["bioproject_name"])
+        end
+      end
+
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+
+    bioproject_name_list
+  end
+
+  #
+  # 指定されたsubmitter_idに紐付くプロジェクトのtitleとdescriptionをカンマ連結した文字列をリストで返す
+  #
+  # ==== Args
+  # submitter_id
+  # ==== Return
+  # project_nameのリスト。一つもない場合にも空のリストを返す
+  # [ "project name 1", "project name 2", ...]
+  #
+  def get_bioproject_title_descs  (submitter_id)
+    bioproject_title_desc_list = []
+    begin
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      q = "SELECT submitter_id, submission_id, data_name, data_value
+           FROM mass.submission_data
+           LEFT OUTER JOIN mass.submission USING(submission_id)
+           WHERE (data_name = 'project_title' OR data_name = 'public_description')
+            AND submitter_id = '#{submitter_id}'
+            AND (status_id IS NULL OR status_id NOT IN (5600, 5700))"
+
+      res = connection.exec(q)
+
+      #属性(title, description)毎に行が出力されるので、submission_id単位でグルーピングし、
+      #それぞれの属性の値を取得した後、カンマで連結してリストに格納する
+      res.group_by {|item| item["submission_id"]}.each do |submission, data_list|
+        title = data_list.select {|data| data["data_name"] == "project_title"}.first["data_value"]
+        desc = data_list.select {|data| data["data_name"] == "public_description"}.first["data_value"]
+        bioproject_title_desc_list.push([title, desc].join(","))
+      end
+
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+
+    bioproject_title_desc_list
+  end
+
+  #
   # 指定されたsubmission_idのサンプルのサンプル名をリストで返す
   #
   # ==== Args

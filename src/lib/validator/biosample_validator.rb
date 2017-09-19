@@ -89,14 +89,14 @@ class BioSampleValidator < ValidatorBase
     @biosample_list = @xml_convertor.xml2obj(xml_document)
 
     if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_submitter_id(xml_document)
+      @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
     else
       @submitter_id = submitter_id
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
 
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
-    @submission_id = @xml_convertor.get_submission_id(xml_document)
+    @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
 
     ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 12, 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
