@@ -301,9 +301,8 @@ class BioSampleValidator < ValidatorBase
 
 ### validate method ###
 
-### validate method ###
-
   #
+  # rule:30
   # 属性名に非ASCII文字が含まれていないかの検証
   #
   # ==== Args
@@ -335,6 +334,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:34
   # 属性値はあるが属性名がないものの検証(csvでヘッダーを削除されたデータを想定)
   #
   # ==== Args
@@ -367,6 +367,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:61
   # 複数出現する属性名がないかの検証
   #
   # ==== Args
@@ -403,6 +404,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:25
   # packageの情報が欠落していないかの検証
   #
   # ==== Args
@@ -427,6 +429,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:26
   # packageがDDBJで定義されているpackage名かどうかの検証
   #
   # ==== Args
@@ -464,6 +467,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:18
   # sample_nameの値があるかどうかの検証
   # "missing"などのNull相当の値は許容しない
   #
@@ -493,6 +497,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:20
   # organismの値があるかどうかの検証
   # "missing"などのNull相当の値は許容しない
   #
@@ -521,6 +526,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:14
   # DDBJ BioSampleで規定されていない(ユーザ定義)属性が含まれているかの検証
   #
   # ==== Args
@@ -550,6 +556,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:27
   # 必須属性名の値の記載がないものを検証
   #
   # ==== Args
@@ -588,6 +595,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:92
   # 必須属性名の記載がないものを検証
   #
   # ==== Args
@@ -619,6 +627,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:2
   # CV(controlled vocabulary)を使用するべき属性値の検証する
   #
   # ==== Args
@@ -668,6 +677,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:11
   # リファレンス型(PMID|DOI|URL)であるべき属性値の検証する
   #
   # ==== Args
@@ -744,6 +754,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:5
   # bioproject_accession のID体系が正しいかの検証
   # DDBJ管理(PDBJD orf PSUB)の場合にはDBにIDがあるか検証する
   #
@@ -782,6 +793,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:94
   # geo_loc_name属性のフォーマットの空白除去等の補正
   #
   # ==== Args
@@ -815,6 +827,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:8
   # geo_loc_name属性に記載された国名が妥当であるかの検証
   #
   # ==== Args
@@ -843,6 +856,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:9
   # 緯度経度のフォーマットの検証
   #
   # ==== Args
@@ -879,6 +893,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:15
   # host属性に記載された生物種名がTaxonomy ontologyにScientific nameとして存在するかの検証
   # 
   # ==== Args
@@ -925,6 +940,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:45
   # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
   #
   # ==== Args
@@ -974,6 +990,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:4
   # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
   # Taxonomy ontologyのScientific nameとの比較を行う
   # 一致しなかった場合にはtaxonomy_idを元にorganismの自動補正情報をエラーリストに出力する
@@ -1019,6 +1036,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:41
   # 緯度経度と国名が一致しているかの検証
   # Google geocooder APIを使用して検証を行う
   #
@@ -1084,6 +1102,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:48(74-89)
   # パッケージに対して生物種(TaxonomyID)が適切であるかの検証
   #
   # ==== Args
@@ -1127,6 +1146,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:59
   # 生物種とsex属性の整合性を検証
   # bacteria, viruses, fungiの系統においてsex属性が入力されている場合はエラー
   #
@@ -1188,6 +1208,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:62
   # 同じ institution code をもつ値が複数の voucher attributes (specimen voucher, culture collection) に入力されていないかの検証
   #
   # ==== Args
@@ -1232,6 +1253,7 @@ class BioSampleValidator < ValidatorBase
 
 
   #
+  # rule:40
   # sample collection date が未来の日付になっていないかの検証
   # 有効な日付のフォーマットでなければnilを返す
   # 受け付けるフォーマットは以下を参照
@@ -1291,6 +1313,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:1
   # "not applicable"のようなNULL値相当の値の表記ゆれ(大文字小文字)を補正
   # "N.A."のような非推奨値を規定の値(missing)に補正
   #
@@ -1345,6 +1368,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:7
   # 日付(time stamp)型の属性のフォーマットの検証と補正
   #
   # http://www.ddbj.nig.ac.jp/sub/ref6-j.html#collection_date
@@ -1468,6 +1492,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:12
   # 特殊文字が含まれているかの検証と補正
   #
   # ===Args
@@ -1536,6 +1561,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:73
   # organism, host, isolation_source のうちいずれかで同じ値を持つものがないかの検証
   # 空白及び大文字/小文字は区別せず比較する
   #
@@ -1577,6 +1603,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:13
   # 不要な空白文字などの除去
   #
   # ==== Args
@@ -1635,6 +1662,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:58
   # 属性値にNon-ascii文字列が含まれていないかの検証
   #
   # ==== Args
@@ -1663,6 +1691,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:3
   # submission内でsample_titleが重複していないかの検証
   #
   # ==== Args
@@ -1694,6 +1723,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:6
   # 指定されたbioproject_accessionのsubmitterが引数のsubmitter_idと一致するかの検証
   #
   # ==== Args
@@ -1731,6 +1761,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:24
   # Submisison に含まれる複数の BioSample 間で sample name, title, bioproject id, description 以外で
   # ユニークな属性を持っている他のサンプルがないかの検証
   # 全サンプルを対象に検証し、同値であるサンプルには同じグループIDを降り、どのサンプルのセットが重複しているかを示す
@@ -1800,6 +1831,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:70
   # 指定されたbioproject_accessionがUmbrellaプロジェクトでないかの検証
   # Umbrellaプロジェクトであればfalseを返す
   #
@@ -1834,6 +1866,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:93
   # 整数であるべき属性値の検証
   #
   # ==== Args
@@ -1869,6 +1902,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:28
   # submission単位でsample_nameが重複していないか検証
   #
   # ==== Args
@@ -1902,6 +1936,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:69
   # BioProjectIDが連続値になっていないか検証(Excelのオートインクリメント使用の可能性)
   #
   # ==== Args
@@ -1953,6 +1988,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:91
   # locus_tag_prefixが一意であるかの検証
   #
   # ==== Args
@@ -2002,6 +2038,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:95
   # psub_idの値がSubmissionID(PSUB)であれば、BioSample Accession(PRJDXXX)形式に補正する
   # 補正の必要がない(PSUBではない)、またはDB検索した結果補正値がない(AccessionIDが振られていない)場合はtrueを返す
   # AccessionIDがあればAuto-annotationの値を取得しfalseを返す
@@ -2045,6 +2082,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:96
   # taxonomy_idがSpeciesランクまたはそれ以下のランクであるかの検証
   #
   # ==== Args
@@ -2072,6 +2110,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:98
   # XMLがxsdに対して妥当ではない
   # 但し、BioSampleの場合はxsd検証を使用せず<BioSampleSet>要素がルートであり子要素が<BioSample>であるかのみを検証
   #
@@ -2112,6 +2151,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:99
   # locus_tag_prefixのフォーマットチェック
   # 3-12文字の英数字で、数字では始まらない
   #
