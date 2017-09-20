@@ -55,7 +55,13 @@ class AnalysisValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml)
+  def validate (data_xml, submitter_id=nil)
+    if submitter_id.nil?
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
+    else
+      @submitter_id = submitter_id
+    end
+    #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)
     valid_xml = not_well_format_xml("1", data_xml)
     # xml検証が通った場合のみ実行
@@ -67,7 +73,12 @@ class AnalysisValidator < ValidatorBase
       analysis_set.each_with_index do |analysis_node, idx|
         idx += 1
         analysis_name = get_analysis_label(analysis_node, idx)
+        invalid_center_name("4", analysis_name, analysis_node, idx)
         missing_analysis_title("12", analysis_name, analysis_node, idx)
+        missing_analysis_description("14", analysis_name, analysis_node, idx)
+        missing_analysis_filename("22", analysis_name, analysis_node, idx)
+        invalid_analysis_filename("24", analysis_name, analysis_node, idx)
+        invalid_analysis_file_md5_checksum("26", analysis_name, analysis_node, idx)
       end
     end
   end
@@ -112,8 +123,23 @@ class AnalysisValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_center_name (rule_code, analysis_label, analysis_node, line_num)
+  def invalid_center_name (rule_code, analysis_label, analysis_node, submitter_id, line_num)
     result = true
+    acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
+    analysis_node.xpath("@center_name").each do |center_node|
+      center_name = get_node_text(center_node, ".")
+      if acc_center_name != center_name
+        annotation = [
+          {key: "Analysis name", value: analysis_label},
+          {key: "center name", value: center_name},
+          {key: "Path", value: "//ANALYSIS/@center_name"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
   end
 
   #

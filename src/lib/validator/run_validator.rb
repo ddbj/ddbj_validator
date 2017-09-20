@@ -55,7 +55,13 @@ class RunValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml)
+  def validate (data_xml, submitter_id=nil)
+    if submitter_id.nil?
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
+    else
+      @submitter_id = submitter_id
+    end
+    #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)
     valid_xml = not_well_format_xml("1", data_xml)
     # xml検証が通った場合のみ実行
@@ -67,7 +73,13 @@ class RunValidator < ValidatorBase
       run_set.each_with_index do |run_node, idx|
         idx += 1
         run_name = get_run_label(run_node, idx)
+        invalid_center_name("4", run_name, run_node, @submitter_id, idx)
         missing_run_title("11", run_name, run_node, idx)
+        missing_run_filename("21", run_name, run_node, idx)
+        invalid_run_filename("23", run_name, run_node, idx)
+        invalid_run_file_md5_checksum("25", run_name, run_node, idx)
+        invalid_bam_alignment_file_series("29", run_name, run_node, idx)
+        mixed_filetype("31", run_name, run_node, idx)
       end
     end
   end
@@ -101,7 +113,6 @@ class RunValidator < ValidatorBase
   end
 
 ### validate method ###
-
   #
   # rule:4
   # center name はアカウント情報と一致しているかどうか
@@ -112,8 +123,23 @@ class RunValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_center_name (rule_code, run_label, run_node, line_num)
+  def invalid_center_name (rule_code, run_label, run_node, submitter_id, line_num)
     result = true
+    acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
+    run_node.xpath("@center_name").each do |center_node|
+      center_name = get_node_text(center_node, ".")
+      if acc_center_name != center_name
+        annotation = [
+          {key: "run name", value: run_label},
+          {key: "center name", value: center_name},
+          {key: "Path", value: "//RUN/@center_name"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
   end
 
   #

@@ -460,6 +460,23 @@ class DDBJDbValidator
   end
 
   #
+  # 指定されたsubmitter_idのcenter_nameを返す。submitter_idまたはcenter_nameが存在しなければnilを返す
+  #
+  # ==== Args
+  # submitter_id ex. "test01"
+  # ==== Return
+  # submitterのcenter_name: e.g. "National Institute of Genetics"
+  #
+  def get_submitter_center_name(submitter_id)
+    center_name = nil
+    org_info = get_submitter_organization(submitter_id)
+    if !org_info.nil?
+      center_name = org_info["center_name"]
+    end
+    center_name
+  end
+
+  #
   # 指定されたsubmitter_idのContact情報のリストを返す。submitter_idが存在しなければnilを返す
   #
   # ==== Args

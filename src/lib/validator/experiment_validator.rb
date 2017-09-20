@@ -55,7 +55,13 @@ class ExperimentValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml)
+  def validate (data_xml, submitter_id=nil)
+    if submitter_id.nil?
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
+    else
+      @submitter_id = submitter_id
+    end
+    #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)
     valid_xml = not_well_format_xml("1", data_xml)
     # xml検証が通った場合のみ実行
@@ -67,6 +73,7 @@ class ExperimentValidator < ValidatorBase
       experiment_set.each_with_index do |experiment_node, idx|
         idx += 1
         experiment_name = get_experiment_label(experiment_node, idx)
+        invalid_center_name("4", submission_name, submission_node, acc_center_name, idx)
         missing_experiment_title("10", experiment_name, experiment_node, idx)
         missing_experiment_description("13", experiment_name, experiment_node, idx)
         missing_library_name("18", experiment_name, experiment_node, idx)
@@ -116,8 +123,23 @@ class ExperimentValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_center_name (rule_code, experiment_label, experiment_node, line_num)
+  def invalid_center_name (rule_code, experiment_label, experiment_node, submitter_id, line_num)
     result = true
+    acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
+    experiment_node.xpath("@center_name").each do |center_node|
+      center_name = get_node_text(center_node, ".")
+      if acc_center_name != center_name
+        annotation = [
+          {key: "Experiment name", value: experiment_label},
+          {key: "center name", value: center_name},
+          {key: "Path", value: "//EXPERIMENT/@center_name"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
   end
 
   #

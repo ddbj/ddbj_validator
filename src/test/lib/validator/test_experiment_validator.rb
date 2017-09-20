@@ -45,6 +45,36 @@ class TestExperimentValidator < Minitest::Test
 
 #### 各validationメソッドのユニットテスト ####
 
+  # rule:4
+  def test_invalid_center_name
+    #ok case
+    experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok.xml")
+    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## no center_name
+    experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok2.xml")
+    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##invalid center name
+    experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ng1.xml")
+    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## center name empty
+    experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ng2.xml")
+    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist submitter_id
+    experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok.xml")
+    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "not_exist_submitter", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   # rule:10
   def test_missing_experiment_title
     #ok case

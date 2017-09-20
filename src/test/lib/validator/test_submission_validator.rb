@@ -45,6 +45,36 @@ class TestSubmissionValidator < Minitest::Test
 
 #### 各validationメソッドのユニットテスト ####
 
+  # rule:4
+  def test_invalid_center_name
+    #ok case
+    submission_set = get_submission_set_node("#{@test_file_dir}/4_invalid_center_name_submission_ok.xml")
+    ret = exec_validator("invalid_center_name", "4", "submission name" , submission_set.first, "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## no center_name
+    submission_set = get_submission_set_node("#{@test_file_dir}/4_invalid_center_name_submission_ok2.xml")
+    ret = exec_validator("invalid_center_name", "4", "submission name" , submission_set.first, "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##invalid center name
+    submission_set = get_submission_set_node("#{@test_file_dir}/4_invalid_center_name_submission_ng1.xml")
+    ret = exec_validator("invalid_center_name", "4", "submission name" , submission_set.first, "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## center name empty
+    submission_set = get_submission_set_node("#{@test_file_dir}/4_invalid_center_name_submission_ng2.xml")
+    ret = exec_validator("invalid_center_name", "4", "submission name" , submission_set.first, "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist submitter_id
+    submission_set = get_submission_set_node("#{@test_file_dir}/4_invalid_center_name_submission_ok.xml")
+    ret = exec_validator("invalid_center_name", "4", "submission name" , submission_set.first, "not_exist_submitter", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   # rule:5
   def test_invalid_laboratory_name
     #ok case

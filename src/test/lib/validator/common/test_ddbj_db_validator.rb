@@ -168,6 +168,19 @@ class TestDDBJDbValidator < Minitest::Test
 
   end
 
+  def test_get_submitter_center_name
+    # exist id
+    ret = @db_validator.get_submitter_center_name("test01")
+    assert_equal "National Institute of Genetics", ret
+    # exist id but not has center_name
+    ret = @db_validator.get_submitter_center_name("test02")
+    assert_nil ret
+
+    # not exist id
+    assert_nil @db_validator.get_submitter_center_name("not id")
+
+  end
+
   def test_get_submitter_contact_list
     # exist id
     ret = @db_validator.get_submitter_contact_list("test01")

@@ -74,6 +74,7 @@ class SubmissionValidator < ValidatorBase
       submission_set.each_with_index do |submission_node, idx|
         idx += 1
         submission_name = get_submission_label(submission_node, idx)
+        invalid_center_name("4", submission_name, submission_node, @submitter_id, idx)
         invalid_laboratory_name("5", submission_name, submission_node, @submitter_id, idx)
         invalid_hold_date("6", submission_name, submission_node, idx)
         invalid_submitter_name("7", submission_name, submission_node, @submitter_id, idx)
@@ -119,8 +120,23 @@ class SubmissionValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_center_name (rule_code, submission_label, submission_node, line_num)
+  def invalid_center_name (rule_code, submission_label, submission_node, submitter_id, line_num)
     result = true
+    acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
+    submission_node.xpath("@center_name").each do |center_node|
+      center_name = get_node_text(center_node, ".")
+      if acc_center_name != center_name
+        annotation = [
+          {key: "Submission name", value: submission_label},
+          {key: "center name", value: center_name},
+          {key: "Path", value: "//SUBMISSION/@center_name"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
   end
 
   #

@@ -45,6 +45,36 @@ class TestAnalysisValidator < Minitest::Test
 
 #### 各validationメソッドのユニットテスト ####
 
+  # rule:4
+  def test_invalid_center_name
+    #ok case
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/4_invalid_center_name_analysis_ok.xml")
+    ret = exec_validator("invalid_center_name", "4", "analysis name" , analysis_set.first, "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## no center_name
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/4_invalid_center_name_analysis_ok2.xml")
+    ret = exec_validator("invalid_center_name", "4", "analysis name" , analysis_set.first, "test01", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##invalid center name
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/4_invalid_center_name_analysis_ng1.xml")
+    ret = exec_validator("invalid_center_name", "4", "analysis name" , analysis_set.first, "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## center name empty
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/4_invalid_center_name_analysis_ng2.xml")
+    ret = exec_validator("invalid_center_name", "4", "analysis name" , analysis_set.first, "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist submitter_id
+    analysis_set = get_analysis_set_node("#{@test_file_dir}/4_invalid_center_name_analysis_ok.xml")
+    ret = exec_validator("invalid_center_name", "4", "analysis name" , analysis_set.first, "not_exist_submitter", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   # rule:12
   def test_missing_analysis_title
     #ok case
