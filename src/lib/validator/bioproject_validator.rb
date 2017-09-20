@@ -100,15 +100,14 @@ class BioProjectValidator < ValidatorBase
       invalid_publication_identifier("14", project_name, project_node, idx)
       empty_publication_reference("15", project_name, project_node, idx)
       missing_strain_isolate_cultivar("17", project_name, project_node, idx)
-      ###TODO organismの検証とtaxonomy_idの確定
-      ## rule39, rule38
       taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
       empty_organism_description_for_multi_species("19", project_name, project_node, idx)
       metagenome_or_environmental("20", project_name, project_node, idx)
       invalid_locus_tag_prefix("21", project_name, project_node, idx)
       invalid_biosample_accession("22", project_name, project_node, idx)
       missing_project_name("36", project_name, project_node, idx)
-      #taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
+      taxonomy_error_warning("38", project_name, project_node, idx)
+      taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
       invalid_project_type("40", project_name, project_node, idx)
     end
 
@@ -227,7 +226,6 @@ class BioProjectValidator < ValidatorBase
       description = get_node_text(project_node, desc_path)
     end
     combination_text = [title, description].join(",")
-p combination_text
     # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じtitle&descがあるとNG
     result = false if submission_id.nil? && project_title_desc_list.count(combination_text) >= 1
     # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
@@ -917,47 +915,101 @@ p combination_text
   end
 
   #
+  # rule:38
+  # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
+  # Taxonomy ontologyのScientific nameとの比較を行う
+  # 一致しなかった場合にはtaxonomy_idを元にorganismの自動補正情報をエラーリストに出力する
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_name_and_id_not_match (rule_code, project_label, project_node, line_num)
+    result = true
+    taxid_path = "//Organism/@taxID"
+    orgname_path = "//Organism/OrganismName"
+    if !project_node.xpath(orgname_path).empty? && !node_blank?(project_node, taxid_path) #両方要素あり
+      organism_name = get_node_text(project_node, orgname_path)
+      taxonomy_id = get_node_text(project_node, taxid_path)
+      scientific_name = @org_validator.get_organism_name(taxonomy_id)
+      #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
+      if !scientific_name.nil? && scientific_name == organism_name && taxonomy_id != OrganismValidator::TAX_ROOT
+        retuls = true
+      else
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: [taxid_path, orgname_path]},
+          {key: "OrganismName", value: organism_name},
+          {key: "taxID", value: taxonomy_id}
+        ]
+        if scientific_name.nil? || taxonomy_id == OrganismValidator::TAX_ROOT
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        else #taxonomy_idのscientific_nameで自動補正する
+          annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", orgname_path, true));
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+        end
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+  #
   # rule:39
   # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
   #
   # ==== Args
+  # project_label: project label for error displaying
   # project_set_node: a bioproject set node object
   # ==== Return
   # true/false
   #
   def taxonomy_error_warning (rule_code, project_label, project_node, line_num)
+    result = false
     taxid_path = "//Organism/@taxID"
     orgname_path = "//Organism/OrganismName"
-    unless node_blank?(project_node, orgname_path)
+    unless project_node.xpath(orgname_path).empty?
       organism_name = get_node_text(project_node, orgname_path)
-      #TODO rule 18とコードが重複
       ret = @org_validator.suggest_taxid_from_name(organism_name)
 
       annotation = [
         {key: "Project name", value: project_label},
         {key: "Path", value: [taxid_path, orgname_path]},
-        {key: "organism", value: organism_name}
+        {key: "OrganismName", value: organism_name}
       ]
       if ret[:status] == "exist" #該当するtaxonomy_idがあった場合
         scientific_name = ret[:scientific_name]
-        #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
-        if scientific_name != organism_name
-          annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "organism", orgname_path, true)); #TODO 絶対パスを返す
+        user_edit_taxid = "" #ユーザ入力のtaxid
+        user_edit_taxid = get_node_text(project_node, taxid_path) unless node_blank?(project_node, taxid_path)
+        if scientific_name == organism_name && user_edit_taxid == ret[:tax_id]
+          result = true #ユーザ入力のorganism_nameとtax_idの組み合わせが正しい場合のみtrue
+        else
+          #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+          if scientific_name != organism_name
+            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", orgname_path, true));
+          end
+          if user_edit_taxid != ret[:tax_id]
+            annotation.push({key: "taxID", value: user_edit_taxid})
+            annotation.push(CommonUtils::create_suggested_annotation([ret[:tax_id]], "taxID", taxid_path, true));
+          end
         end
-        annotation.push({key: "taxonomy_id", value: ""})
-        annotation.push(CommonUtils::create_suggested_annotation([ret[:tax_id]], "taxonomy_id", taxid_path, true)); #TODO 絶対パスを返す
       else ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
         msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
         annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
       end #該当するtaxonomy_idが無かった場合は単なるエラー
-      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else #auto-annotation無
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      if result == false
+        unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+        else #auto-annotation無
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        end
+        @error_list.push(error_hash)
       end
-      @error_list.push(error_hash)
-      false
     end
+    result
   end
 
   #
@@ -986,6 +1038,7 @@ p combination_text
   end
 
   #
+  # rule:41
   # locus_tag_prefixのフォーマットチェック
   # 3-12文字の英数字で、数字では始まらない
   #

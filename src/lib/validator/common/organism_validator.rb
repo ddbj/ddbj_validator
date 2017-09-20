@@ -140,7 +140,7 @@ class OrganismValidator < SPARQLBase
   # organism_name ex. "escherichia coli"
   # ==== Return
   # 該当するtax_idがない場合
-  # {status: "no exist", tax_id: "-1"}
+  # {status: "no exist", tax_id: "1"}
   # 該当するtax_idが一つある場合
   # {status: "exist", tax_id: "562", scientific_name: "Escherichia coli"}
   # 該当するtax_idが複数ある場合(複数のtax_idはカンマで連結)
