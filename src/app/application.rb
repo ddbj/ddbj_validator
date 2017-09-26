@@ -201,6 +201,7 @@ module DDBJValidator
         # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する
         file_combination = true
         form_vars = @env["rack.request.form_input"].read
+        form_vars = Rack::Utils.escape(form_vars)
         req_params = Rack::Utils.parse_query(form_vars)
         param_names = req_params["name"]
         if param_names.instance_of?(Array) #引数1の場合は配列ではなく文字列
