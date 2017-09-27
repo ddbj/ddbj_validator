@@ -760,7 +760,8 @@ class BioProjectValidator < ValidatorBase
       unless environment.empty? #eEnvironmentである場合にチェック
         #tax_id がmetagenome配下かどうか
         linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
-        unless @org_validator.has_linage(tax_id, linages) &&  @org_validator.get_organism_name(tax_id).end_with?("metagenome")
+        db_org_name = @org_validator.get_organism_name(tax_id)
+        unless @org_validator.has_linage(tax_id, linages) && !db_org_name.nil? && db_org_name.end_with?("metagenome")
           annotation = [
             {key: "Project name", value: project_label},
             {key: "Path", value: [taxid_path, orgname_path]}

@@ -272,7 +272,8 @@ class OrganismValidator < SPARQLBase
       rule_id = "78"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
-      unless get_organism_name(tax_id).end_with?("metagenome")
+      organism_name = get_organism_name(tax_id)
+      if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
       end
     elsif package_name == "Human" #rule 80
@@ -296,7 +297,8 @@ class OrganismValidator < SPARQLBase
       rule_id = "83"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
-      unless get_organism_name(tax_id).end_with?("metagenome")
+      organism_name = get_organism_name(tax_id)
+      if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
       end 
     elsif package_name.start_with?("MIGS.ba") #rule 84
@@ -317,7 +319,8 @@ class OrganismValidator < SPARQLBase
       rule_id = "88"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
-      unless get_organism_name(tax_id).end_with?("metagenome")
+      organism_name = get_organism_name(tax_id)
+      if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
       end 
     elsif package_name == "Beta-lactamase" #rule 89
