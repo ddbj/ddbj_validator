@@ -1459,10 +1459,14 @@ class BioSampleValidator < ValidatorBase
         if attr_val =~ regex
           range_start =  Regexp.last_match[:start]
           range_end =  Regexp.last_match[:end]
-          if DateTime.strptime(range_start, parse_format) <= DateTime.strptime(range_end, parse_format)
-            attr_val = Regexp.last_match[:start] + "/" +  Regexp.last_match[:end]
-          else
-            attr_val = Regexp.last_match[:end] + "/" +  Regexp.last_match[:start]
+          begin
+            if DateTime.strptime(range_start, parse_format) <= DateTime.strptime(range_end, parse_format)
+              attr_val = Regexp.last_match[:start] + "/" +  Regexp.last_match[:end]
+            else
+              attr_val = Regexp.last_match[:end] + "/" +  Regexp.last_match[:start]
+            end
+          rescue
+            # can't parse date format ex)2017-14-32
           end
         end
       end
@@ -1471,7 +1475,27 @@ class BioSampleValidator < ValidatorBase
       common = CommonUtils.new
       is_ddbj_format = common.ddbj_date_format?(attr_val)
 
-      if !is_ddbj_format || attr_val_org != attr_val
+      # 日付としてパースできるか14月や32日など不正でないか
+      parsable_date = true
+      @conf[:ddbj_date_format].each do |format|
+        regex_simple = Regexp.new(format["regex"]) #範囲ではない
+        regex_range = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #範囲での記述
+        parse_format = format["parse_format"]
+        begin
+          if attr_val =~ regex_simple
+            DateTime.strptime(attr_val, parse_format)
+          elsif attr_val =~ regex_range
+            range_start =  Regexp.last_match[:start]
+            range_end =  Regexp.last_match[:end]
+            DateTime.strptime(range_start, parse_format)
+            DateTime.strptime(range_end, parse_format)
+          end
+        rescue
+          parsable_date = false
+        end
+      end
+
+      if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},

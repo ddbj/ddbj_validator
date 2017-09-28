@@ -818,6 +818,10 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ### 不正な日付 32日
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     ### 範囲
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952/10/21/1952/11/20", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -833,6 +837,10 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21T23:44:30Z/1952-10-22T23:10:02Z", get_auto_annotation(ret[:error_list])
+    ### 範囲で不正な日付 14月
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "1952-10-22T23:10:02Z / 1952-14-21T23:44:30Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     ### 西暦の2桁入力
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "21-11", ts_attr,  1)
     assert_equal false, ret[:result]
