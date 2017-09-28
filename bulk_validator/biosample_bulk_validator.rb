@@ -13,6 +13,8 @@ class BioSampleBulkValidator
     FileUtils.mkdir_p(@output_dir) unless FileTest.exist?(@output_dir)
     @xml_output_dir = "#{@output_dir}/xml"
     @uuid_output_dir = "#{@output_dir}/uuid"
+    @result_output_dir = "#{@output_dir}/result"
+    @result_detail_output_dir = "#{@output_dir}/result_by_id"
     @submission_id_list = []
     @summary = {}
   end
@@ -52,6 +54,86 @@ class BioSampleBulkValidator
       system(command)
     end
   end
+
+  def get_result_json
+    FileUtils.mkdir_p(@result_output_dir) unless FileTest.exist?(@result_output_dir)
+    @submission_id_list.each do |submission_id|
+      next unless submission_id == "SSUB000019"
+      status = JSON.parse(File.read("#{@uuid_output_dir}/#{submission_id}.json"))
+      uuid = status["uuid"]
+      command = %Q(curl -o #{@result_output_dir}/#{submission_id}.json -X GET "#{@api_host}/api/validation/#{uuid}" -H "accept: application/json")
+      system(command)
+    end
+  end
+
+  def output_stats
+    error_count = 0
+    warning_count = 0
+    rule_stats = {}
+    Dir.chdir("#{@result_output_dir}") do
+      Dir.glob("*") do |file|
+        submission_id = file.split(".").first
+        begin
+          result = JSON.parse(File.read(file))
+          unless result["stats"].nil?
+            error_count += result["stats"]["error_count"]
+            warning_count += result["stats"]["warning_count"]
+          end
+          unless result["result"].nil? && result["result"]["messages"].nil?
+            result["result"]["messages"].each do |msg|
+              rule_id = msg["id"]
+              if rule_stats[rule_id].nil?
+                rule_stats[rule_id] = 1
+              else
+                rule_stats[rule_id] += 1
+              end
+            end
+          end
+        rescue
+          # TODO output id to error log file
+        end
+      end
+    end
+    rule_conf = JSON.parse(File.read("/Users/yoko/DDBJ/ddbj_validator/src/conf/biosample/rule_config_biosample.json"))
+    rule_stats_list = []
+    rule_stats.each do |k, v|
+      conf = rule_conf.select{|rk, rv| rv["code"] == k.to_s }
+      hash = {}
+      hash[:id] = k.to_s
+      hash[:level] = conf["rule#{k}"]["level"]
+      hash[:name] = conf["rule#{k}"]["name"]
+      hash[:count] = v
+      rule_stats_list.push(hash)
+    end
+    @summary[:error_count] = error_count
+    @summary[:warning_count] = warning_count
+    @summary[:rule_stats_list] = rule_stats_list
+  end
+
+  def split_message_by_rule_id
+    FileUtils.mkdir_p(@result_detail_output_dir) unless FileTest.exist?(@result_detail_output_dir)
+    @summary[:rule_stats_list].each do |rule|
+      rule_id = rule[:id]
+      result_list = []
+      Dir.chdir("#{@result_output_dir}") do
+        Dir.glob("*") do |file|
+          submission_id = file.split(".").first
+          begin
+            result = JSON.parse(File.read(file))
+            unless result["result"]["messages"].nil?
+              result_list.concat(result["result"]["messages"].select {|msg| msg["id"] == rule_id})
+            end
+          rescue
+            # nothing to do
+          end
+        end
+      end
+      file = File.open("#{@result_detail_output_dir}/#{rule_id}.json","w")
+      file.puts JSON.pretty_generate(result_list)
+      file.flush
+      file.close
+    end
+  end
     
   def output_summary
     file = File.open("#{@output_dir}/summary.json", "w")
@@ -67,4 +149,7 @@ validator = BioSampleBulkValidator.new(config, output_dir)
 validator.get_target_biosample_submission_id
 validator.download_xml
 validator.exec_validation
+validator.get_result_json
+validator.output_stats
+validator.split_message_by_rule_id
 validator.output_summary
