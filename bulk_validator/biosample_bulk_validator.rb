@@ -1,14 +1,17 @@
 require 'pg'
 require 'fileutils'
+require 'csv'
+require 'yaml'
 
 class BioSampleBulkValidator
   @@biosample_submission_list = "biosample_submission_list.json"
   def initialize (config, output_dir)
-    @pg_host = config[:pg_host]
-    @pg_port = config[:pg_port]
-    @pg_user = config[:pg_user]
-    @pg_pass = config[:pg_pass]
-    @api_host = config[:api_host]
+    @pg_host = config["pg_host"]
+    @pg_port = config["pg_port"]
+    @pg_user = config["pg_user"]
+    @pg_pass = config["pg_pass"]
+    @api_host = config["api_host"]
+    @rule_json_path = config["rule_json_path"]
     @output_dir = File.expand_path(output_dir, File.dirname(__FILE__))
     FileUtils.mkdir_p(@output_dir) unless FileTest.exist?(@output_dir)
     @xml_output_dir = "#{@output_dir}/xml"
@@ -58,7 +61,7 @@ class BioSampleBulkValidator
   def get_result_json
     FileUtils.mkdir_p(@result_output_dir) unless FileTest.exist?(@result_output_dir)
     @submission_id_list.each do |submission_id|
-      next unless submission_id == "SSUB000019"
+      #next unless submission_id == "SSUB000019"
       status = JSON.parse(File.read("#{@uuid_output_dir}/#{submission_id}.json"))
       uuid = status["uuid"]
       command = %Q(curl -o #{@result_output_dir}/#{submission_id}.json -X GET "#{@api_host}/api/validation/#{uuid}" -H "accept: application/json")
@@ -75,9 +78,9 @@ class BioSampleBulkValidator
         submission_id = file.split(".").first
         begin
           result = JSON.parse(File.read(file))
-          unless result["stats"].nil?
-            error_count += result["stats"]["error_count"]
-            warning_count += result["stats"]["warning_count"]
+          unless result["result"]["stats"].nil?
+            error_count += result["result"]["stats"]["error_count"]
+            warning_count += result["result"]["stats"]["warning_count"]
           end
           unless result["result"].nil? && result["result"]["messages"].nil?
             result["result"]["messages"].each do |msg|
@@ -90,11 +93,13 @@ class BioSampleBulkValidator
             end
           end
         rescue
+          p "can't get result: #{submission_id}"
           # TODO output id to error log file
         end
       end
     end
-    rule_conf = JSON.parse(File.read("/Users/yoko/DDBJ/ddbj_validator/src/conf/biosample/rule_config_biosample.json"))
+    # TODO error handling
+    rule_conf = JSON.parse(File.read(@rule_json_path))
     rule_stats_list = []
     rule_stats.each do |k, v|
       conf = rule_conf.select{|rk, rv| rv["code"] == k.to_s }
@@ -107,7 +112,7 @@ class BioSampleBulkValidator
     end
     @summary[:error_count] = error_count
     @summary[:warning_count] = warning_count
-    @summary[:rule_stats_list] = rule_stats_list
+    @summary[:rule_stats_list] = rule_stats_list.sort_by { |rule| [rule[:level], rule[:id].to_i]}
   end
 
   def split_message_by_rule_id
@@ -134,22 +139,115 @@ class BioSampleBulkValidator
       file.close
     end
   end
-    
+
+  def output_tsv_by_rule_id
+    FileUtils.mkdir_p(@result_detail_output_dir) unless FileTest.exist?(@result_detail_output_dir)
+    @summary[:rule_stats_list].each do |rule_hash|
+      rule_id = rule_hash[:id]
+      rule_data = JSON.parse(File.read("#{@result_detail_output_dir}/#{rule_id}.json"))
+      CSV.open("#{@result_detail_output_dir}/#{rule_id}.tsv", "w", :col_sep => "\t") do |file|
+        #header
+        header_list = ["Submission ID"]
+        rule_data.each do |item|
+          item["annotation"].each do |anno|
+            unless header_list.include?(anno["key"])
+              header_list.push(anno["key"])
+            end
+          end
+        end
+        if rule_hash[:auto_annotation_count] > 0
+          header_list.push("Auto Annotation")
+        end
+        file.puts(header_list)
+        #details
+        rule_data.each do |item|
+          row = []
+          row.push(item["source"].split(".").first)
+          header_list[1..-2].each do |key|
+            next if key == "Submission ID"
+            column = item["annotation"].select{|anno| anno["key"] == key}
+            #p column
+            if column.size == 0
+              row.push("")
+            else
+              if column.first["key"] == "Suggested value" && column.first["value"].size ==1
+                #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
+                row.push(column.first["value"].first)
+              else
+                row.push(column.first["value"])
+              end
+            end
+          end
+          #autoannotaionができるなら"true",それ以外(auto-annotationなし、複数候補あり等)だと"false"
+          auto_annotatable = false
+          item["annotation"].each do |anno|
+            if !anno["key"].nil? && anno["key"] == "Suggested value" && anno["value"].size ==1 && !anno["is_auto_annotation"].nil?
+              auto_annotatable = true
+            end
+          end
+          if rule_hash[:auto_annotation_count] > 0
+            row.push(auto_annotatable.to_s)
+          end
+          file.puts(row)
+        end
+      end
+    end
+  end
+
+
+  def output_stats_by_rule_id
+    @summary[:rule_stats_list].each do |rule_hash|
+      rule_id = rule_hash[:id]
+      rule_data = JSON.parse(File.read("#{@result_detail_output_dir}/#{rule_id}.json"))
+      ssub_id_list = []
+      auto_annotation_count = 0
+      rule_data.each do |item|
+        ssub_id_list.push(item["source"])
+        auto_annotatable = false
+        item["annotation"].each do |anno|
+          if !anno["key"].nil? && anno["key"] == "Suggested value" && anno["value"].size ==1 && !anno["is_auto_annotation"].nil?
+            auto_annotatable = true
+          end
+        end
+        auto_annotation_count += 1 if auto_annotatable
+      end
+      rule_hash[:auto_annotation_count] = auto_annotation_count
+      rule_hash[:submission_count] = ssub_id_list.uniq.size
+    end
+  end
+
   def output_summary
+    #json
     file = File.open("#{@output_dir}/summary.json", "w")
     file.puts JSON.pretty_generate(@summary)
     file.flush
     file.close
+    #tsv
+    file = File.open("#{@output_dir}/summary.tsv", "w")
+    file.puts "Rule ID\tLevel\tRule Name\tNumber\t# of Auto-annotation\t# of submission"
+    @summary[:rule_stats_list].each do |rule_hash|
+      file.puts "#{rule_hash[:id]}\t#{rule_hash[:level]}\t#{rule_hash[:name]}\t#{rule_hash[:count]}\t#{rule_hash[:auto_annotation_count]}\t#{rule_hash[:submission_count]}"
+    end
+    file.flush
+    file.close
   end
 end
-conf_file =  ARGV[0]
-#TODO parse conf file
-output_dir =  ARGV[1]
-validator = BioSampleBulkValidator.new(config, output_dir)
+
+if ARGV.size < 2
+  puts "usage: ruby biosample_bulk_validator.rb <setting_file> <output_dir>"
+  exit(1)
+end
+param_conf_file = ARGV[0]
+param_output_dir = ARGV[1]
+conf_file = File.expand_path(param_conf_file, File.dirname(__FILE__))
+config = YAML.load(File.read(conf_file))
+validator = BioSampleBulkValidator.new(config, param_output_dir)
 validator.get_target_biosample_submission_id
 validator.download_xml
 validator.exec_validation
 validator.get_result_json
 validator.output_stats
 validator.split_message_by_rule_id
+validator.output_stats_by_rule_id
+validator.output_tsv_by_rule_id
 validator.output_summary
