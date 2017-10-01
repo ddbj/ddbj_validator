@@ -1545,11 +1545,11 @@ class BioSampleValidator < ValidatorBase
       pos = 0
       while pos < replaced.length
         #再起的に置換してしまうためgsubは使用できない。
-        #"microm" => "micrometer"と置換する場合、ユーザ入力値が"micrometer"だった場合には"microm"にマッチするため"micrometereter"になってしまう
+        #"degree C" => "degree Celsius"と置換する場合、ユーザ入力値が"degree Celsius"だった場合には"degree C"にマッチするため"degree Celsiuselsius"になってしまう
         hit_pos = replaced.index(target_val, pos)
         break if hit_pos.nil?
         target_str = replaced.slice(hit_pos, replace_val.length)
-        if target_str == replace_val # "microm"はその後に"micrometer"と続くか。続くなら置換不要(再起置換の防止)
+        if target_str == replace_val # "degree C"はその後に"degree Celsiuselsius"と続くか。続くなら置換不要(再起置換の防止)
           pos = hit_pos + target_val.length
         else
           #置換(delete & insert)

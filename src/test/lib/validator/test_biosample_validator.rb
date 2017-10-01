@@ -883,7 +883,7 @@ class TestBioSampleValidator < Minitest::Test
 
     ### attribute value
     # ok case
-    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 micrometer", special_chars, "attr_value", 1)
+    ret = exec_validator("special_character_included", "12", "SampleA", "title", "1st: 39 degree Celsius", special_chars, "attr_value", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
@@ -892,6 +892,10 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal "1.0 micrometer", get_auto_annotation(ret[:error_list])
     ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, "attr_value", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1st: 39 degree Celsius, 2nd: 38 degree Celsius, 3rd: 37 degree Celsius", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degrees Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1st: 39 degree Celsius, 2nd: 38 degree Celsius, 3rd: 37 degree Celsius", get_auto_annotation(ret[:error_list])
