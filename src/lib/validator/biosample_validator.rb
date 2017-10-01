@@ -806,7 +806,7 @@ class BioSampleValidator < ValidatorBase
   def format_of_geo_loc_name_is_invalid (rule_code, sample_name, geo_loc_name, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name)
 
-    annotated_name = geo_loc_name.sub(/\s+:\s+/, ":")
+    annotated_name = geo_loc_name.sub(/\s*:\s*/, ":")
     annotated_name = annotated_name.gsub(/,\s+/, ', ')
     annotated_name = annotated_name.gsub(/,(?![ ])/, ', ')
     if geo_loc_name == annotated_name

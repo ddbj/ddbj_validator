@@ -389,6 +389,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    ret = exec_validator("format_of_geo_loc_name_is_invalid", "94", "SampleA", "Japan: Kanagaw,Hakone,  Lake Ashi", 1)
+    expect_annotation = "Japan:Kanagaw, Hakone, Lake Ashi"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("format_of_geo_loc_name_is_invalid", "94", "SampleA", nil, 1)
     assert_nil ret[:result]
