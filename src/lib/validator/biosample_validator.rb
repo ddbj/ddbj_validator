@@ -695,7 +695,7 @@ class BioSampleValidator < ValidatorBase
     common = CommonUtils.new
     result =  true
     if ref_attr.include?(attr_name) # リファレンス型の属性か
-      ref = attr_val.sub(/[ :]*P?M?ID[ :]*|[ :]*DOI[ :]*/i, "")
+      ref = attr_val.gsub(/[ :]*P?M?ID[ :]+|[ :]*DOI[ :]+/i, "")
       if attr_val != ref #auto-annotation
         result = false
       end
