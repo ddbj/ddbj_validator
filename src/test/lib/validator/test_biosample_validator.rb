@@ -755,6 +755,9 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "MTB313", null_accepted, null_not_recommended, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "NIAS", null_accepted, null_not_recommended, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     # ng case
     ## uppercase
     ret = exec_validator("invalid_attribute_value_for_null", "1", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, 1)
