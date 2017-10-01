@@ -29,7 +29,7 @@ class ValidatorCache
   # キャッシュされたキーがあればtrue,なければfalseを返す
   #
   def has_key (cache_name, key)
-    if @cache_data[cache_name].nil? || @cache_data[cache_name][key].nil?
+    if @cache_data[cache_name].nil? || !@cache_data[cache_name].has_key?(key)
       false
     else
       true
@@ -53,11 +53,7 @@ class ValidatorCache
   #
   def save (cache_name, key, value)
     @cache_data[cache_name] = {} if @cache_data[cache_name].nil?
-    if value.nil?
-      @cache_data[cache_name][key] = ""
-    else
-      @cache_data[cache_name][key] = value
-    end
+    @cache_data[cache_name][key] = value
   end
 
   #
