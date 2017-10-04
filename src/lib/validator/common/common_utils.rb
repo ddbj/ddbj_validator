@@ -215,10 +215,10 @@ class CommonUtils
       insdc_latlon = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
     elsif dec_insdc_latlon_reg.match(lat_lon) #期待するformatであり変更は無し
       d = dec_insdc_latlon_reg.match(lat_lon)
-      insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
+      insdc_latlon = "#{d['lat_dec']} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
     elsif dec_insdc_reversed_latlon_reg.match(lat_lon)
       d = dec_insdc_reversed_latlon_reg.match(lat_lon)
-      insdc_latlon = "#{d['lat_dec'].to_f} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
+      insdc_latlon = "#{d['lat_dec']} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
     elsif dec_latlon_reg.match(lat_lon)
       d = dec_latlon_reg.match(lat_lon)
       lat = d['lat_dec']

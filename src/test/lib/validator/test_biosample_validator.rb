@@ -466,7 +466,7 @@ class TestBioSampleValidator < Minitest::Test
 
     #auto annotation
     ret = exec_validator("bioproject_submission_id_replacement", "95", "", "PSUB004142", 1)
-    expect_annotation = "PRJDB3490"
+    expect_annotation = "PRJDB3849"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])

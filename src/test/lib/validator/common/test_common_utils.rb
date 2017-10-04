@@ -40,6 +40,12 @@ class TestCommonUtils < Minitest::Test
     ret = @common.format_insdc_latlon("37.4435 N 6.254 W")
     assert_equal "37.4435 N 6.254 W", ret
 
+    ret = @common.format_insdc_latlon("37.4000 N 6.25400 W")
+    assert_equal "37.4000 N 6.25400 W", ret
+
+    ret = @common.format_insdc_latlon("33 N 119 E")
+    assert_equal "33 N 119 E", ret
+
     #correction case
     ret = @common.format_insdc_latlon("37°26′36.42″N 06°15′14.28″W")
     assert_equal "37.4435 N 6.254 W", ret
