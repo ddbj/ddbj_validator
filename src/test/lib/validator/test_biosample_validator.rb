@@ -109,7 +109,6 @@ class TestBioSampleValidator < Minitest::Test
   end
 
 #### 各validationメソッドのユニットテスト ####
-
   def test_not_well_format_xml
     #ok case
     xml_file = "#{@test_file_dir}/97_not_well_format_xml_SSUB000019_ok.xml"
@@ -858,6 +857,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "2021-11", get_auto_annotation(ret[:error_list])
+    ### Zの追加
+    ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "2015-04-16T12:00:00", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2015-04-16T12:00:00Z", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_date_format", "7", "SampleA", "collection_date", "", ts_attr,  1)
     assert_nil ret[:result]

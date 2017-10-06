@@ -1394,24 +1394,38 @@ class BioSampleValidator < ValidatorBase
       rep_table_month = {
         "January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12",
         "january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12",
+        "JAN" => "01", "FEB" => "02", "MAR" => "03", "APR" => "04", "MAY" => "05", "JUN" => "06", "JUL" => "07", "AUG" => "08", "SEP" => "09", "OCT" => "10", "NOV" => "11", "DEC" => "12",
         "Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12",
         "jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"
       }
-      if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/i)
-        attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/i,rep_table_month)
+      if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/)
+        attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/, rep_table_month)
       end
-      if attr_val.match(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/i)
-        attr_val = attr_val.sub(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/i,rep_table_month)
+      if attr_val.match(/january|february|march|april|may|june|july|august|september|october|november|december/)
+        attr_val = attr_val.sub(/january|february|march|april|may|june|july|august|september|october|november|december/, rep_table_month)
       end
-
+      if attr_val.match(/JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC/)
+        attr_val = attr_val.sub(/JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC/ , rep_table_month)
+      end
+      if attr_val.match(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/)
+        attr_val = attr_val.sub(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/, rep_table_month)
+      end
+      if attr_val.match(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/)
+        attr_val = attr_val.sub(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/, rep_table_month)
+      end
       #区切り文字の表記を揃える
       @conf[:convert_date_format].each do |format|
         regex = Regexp.new(format["regex"])
         ## single date format
         if attr_val =~ regex
           begin
-            if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"  #この書式場合、前半が12より大きければ西暦の下2桁とみなす
-              if $1.to_i > 12
+            if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"
+              # 月の文字列表現を変換している場合は、どちらが月を表すのか自明なので、そのフォーマットで変換する
+              if rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').first.downcase)
+                formated_date = DateTime.strptime(attr_val, "%m-%y")
+              elsif rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').last.downcase)
+                formated_date = DateTime.strptime(attr_val, "%y-%m")
+              elsif $1.to_i > 12 #この書式場合、前半が12より大きければ西暦の下2桁とみなす
                 formated_date = DateTime.strptime(attr_val, "%y-%m")
               else
                 formated_date = DateTime.strptime(attr_val, "%m-%y")
@@ -1433,8 +1447,13 @@ class BioSampleValidator < ValidatorBase
           begin
             range_date_list = range_date_list.map do |range_date|  #範囲のstart/endのformatを補正
               range_date = range_date.strip
-              if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$" #この書式場合、前半が12より大きければ西暦の下2桁とみなす
-                if $1.to_i > 12
+              if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"
+                # 月の文字列表現を変換している場合は、どちらが月を表すのか自明なので、そのフォーマットで変換する
+                if rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').first.downcase)
+                  formated_date = DateTime.strptime(attr_val, "%m-%y")
+                elsif rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').last.downcase)
+                  formated_date = DateTime.strptime(attr_val, "%y-%m")
+                elsif $1.to_i > 12 #この書式場合、前半が12より大きければ西暦の下2桁とみなす
                   formated_date = DateTime.strptime(range_date, "%y-%m")
                 else
                   formated_date = DateTime.strptime(range_date, "%m-%y")
