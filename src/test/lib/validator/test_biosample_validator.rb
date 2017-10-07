@@ -1235,4 +1235,25 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
 
   end
+
+  def test_null_values_provided_for_optional_attributes
+    null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_accepted.json"))
+    null_not_recommended = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
+    #ok case
+    xml_data = File.read("#{@test_file_dir}/100_null_values_provided_for_optional_attributes_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("null_values_provided_for_optional_attributes", "100", "SampleA", biosample_data[0]["attributes"], null_accepted, null_not_recommended, attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_data = File.read("#{@test_file_dir}/100_null_values_provided_for_optional_attributes_SSUB000019_ng.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("null_values_provided_for_optional_attributes", "100", "SampleA", biosample_data[0]["attributes"], null_accepted, null_not_recommended, attr_list, 1)
+    assert_equal false, ret[:result]
+    p ret[:error_list]
+    assert_equal 2, ret[:error_list].size
+  end
+
 end

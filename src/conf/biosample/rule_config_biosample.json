@@ -371,7 +371,7 @@
     "level": "warning",
     "name": "Taxonomy error warning",
     "method": "taxonomy_error_warning",
-    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
+    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism. When the organism(s) is novel, please enter proposed name(s) and submit the BioSamples.",
     "object": [
       "BioSample"
     ],
@@ -733,7 +733,7 @@
   "rule93": {
     "rule_class": "BioSample",
     "code": "93",
-    "level": "warning",
+    "level": "error",
     "name": "Attribute value is not integer",
     "method": "attribute_value_is_not_integer",
     "message": "Attribute value must be integer.",
@@ -826,6 +826,20 @@
     ],
     "reference": [
       "http://trace.ddbj.nig.ac.jp/glossary/ja/Locus_tag_prefix"
+    ]
+  },
+  "rule100": {
+    "rule_class": "BioSample",
+    "code": "100",
+    "level": "warning",
+    "name": "Null values provided for optional attributes",
+    "method": "null_values_provided_for_optional_attributes",
+    "message": "Null values are not neccesary for optional attributes. Leave values empty when there is no information.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": [
+
     ]
   }
 }

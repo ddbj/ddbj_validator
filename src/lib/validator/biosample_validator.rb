@@ -183,6 +183,7 @@ class BioSampleValidator < ValidatorBase
       not_predefined_attribute_name("14", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_mandatory_attribute("27", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_required_attribute_name("92", sample_name, biosample_data["attributes"], attr_list , line_num)
+      null_values_provided_for_optional_attributes("100", sample_name, biosample_data["attributes"], attr_list , line_num)
 
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
@@ -2221,4 +2222,48 @@ class BioSampleValidator < ValidatorBase
     end
     result
   end
+
+  #
+  # rule:100
+  # 任意属性で提供情報が無い場合、missing 等の null value が記載されるケースではauto-correct で削除する
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # attr_val 属性値
+  # null_accepted_list NULL値として推奨される値(正規表現)のリスト
+  # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
+  # package_attr_list パッケージに紐づく属性リスト
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_values_provided_for_optional_attributes (rule_code, sample_name, sample_attr, null_accepted_list, null_not_recommended_list, package_attr_list , line_num)
+    return nil if sample_attr.nil? || package_attr_list.nil?
+    result = true
+    mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
+      attr[:attribute_name] if attr[:require] == "mandatory"
+    }.compact
+    optional_attr_list = sample_attr.keys - mandatory_attr_list #差分から必須ではない属性名だけを抽出
+    #一つずつoptionalな属性の値を検証
+    optional_attr_list.each do |optional_attr|
+      # null_acceptedかnull_not_recommendedの正規表現リストにマッチすればNG
+      null_accepted_size = null_accepted_list.select{|refexp| sample_attr[optional_attr] =~ /#{refexp}/i }.size
+      null_not_recomm_size = null_not_recommended_list.select {|refexp| sample_attr[optional_attr] =~ /^(#{refexp})$/i }.size
+      if (null_accepted_size + null_not_recomm_size) > 0
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute name", value: optional_attr},
+          {key: "Attribute value", value: sample_attr[optional_attr]},
+        ]
+        location = @xml_convertor.xpath_from_attrname(optional_attr, line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([""], "Attribute value", location, true))
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
 end
