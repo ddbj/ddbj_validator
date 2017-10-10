@@ -163,18 +163,19 @@ class BioSampleBulkValidator
         rule_data.each do |item|
           row = []
           row.push(item["source"].split(".").first)
-          header_list[1..-2].each do |key|
+          header_list[1..-1].each do |key|
             next if key == "Submission ID"
             column = item["annotation"].select{|anno| anno["key"] == key}
-            #p column
-            if column.size == 0
-              row.push("")
-            else
-              if column.first["key"] == "Suggested value" && column.first["value"].size ==1
-                #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
-                row.push(column.first["value"].first)
+            unless key == "Auto Annotation"
+              if column.size > 0
+                if column.first["key"] == "Suggested value" && column.first["value"].size == 1
+                  #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
+                  row.push(column.first["value"].first)
+                else
+                  row.push(column.first["value"])
+                end
               else
-                row.push(column.first["value"])
+                row.push("")
               end
             end
           end
