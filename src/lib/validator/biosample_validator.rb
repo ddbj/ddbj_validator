@@ -183,7 +183,7 @@ class BioSampleValidator < ValidatorBase
       not_predefined_attribute_name("14", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_mandatory_attribute("27", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_required_attribute_name("92", sample_name, biosample_data["attributes"], attr_list , line_num)
-      null_values_provided_for_optional_attributes("100", sample_name, biosample_data["attributes"], attr_list , line_num)
+      null_values_provided_for_optional_attributes("100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list , line_num)
 
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
