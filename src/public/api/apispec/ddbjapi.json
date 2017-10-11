@@ -5,9 +5,9 @@
     "description": "DDBJ Data Validation API",
     "version": "0.9.0"
   },
-  "host": "localhost:9292",
+  "host": "ddbj.nig.ac.jp",
   "schemes": [
-    "http"
+    "https"
   ],
   "basePath": "/api",
   "produces": [
