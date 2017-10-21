@@ -148,7 +148,7 @@
           "200": {
             "description": "Successful Operation",
             "schema": {
-              "$ref": "#/definitions/Status"
+              "$ref": "#/definitions/ValidationResult"
             }
           },
           "400": {
@@ -407,42 +407,60 @@
         "end-time": {
           "type": "string",
           "description": "only when status is \"finished\""
-        },
-        "result": {
-          "$ref": "#/definitions/ValidationResult"
         }
       }
     },
     "ValidationResult": {
       "type": "object",
-      "description": "only when status is \"finished\"",
+      "description": "validation result file",
       "properties": {
-        "version": {
+        "uuid": {
+          "type": "string"
+        },
+        "status": {
           "type": "string",
-          "description": "api version"
+          "description": "only \"finished\""
         },
-        "validity": {
-          "type": "boolean",
-          "description": "true: passed the all validation rules<br/> false: unpassed the validation<br/> if only warning will return true"
+        "start-time": {
+          "type": "string"
         },
-        "stats": {
+        "end-time": {
+          "type": "string"
+        },
+        "result": {
           "type": "object",
-          "description": "statistics of validation result",
           "properties": {
-            "error_count": {
-              "type": "integer"
+            "version": {
+              "type": "string",
+              "description": "api version"
             },
-            "warning_count": {
-              "type": "integer"
+            "validity": {
+              "type": "boolean",
+              "description": "true: passed the all validation rules<br/> false: unpassed the validation<br/> if only warning will return true"
             },
-            "autocorrect": {
+            "stats": {
               "type": "object",
-              "description": "true is autocorrect file is exist"
+              "description": "statistics of validation result",
+              "properties": {
+                "error_count": {
+                  "type": "integer"
+                },
+                "warning_count": {
+                  "type": "integer"
+                },
+                "autocorrect": {
+                  "type": "object",
+                  "description": "true is autocorrect file is exist"
+                }
+              }
+            },
+            "messages": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/ValidationMessages"
+              }
             }
           }
-        },
-        "messages": {
-          "$ref": "#/definitions/ValidationMessages"
         }
       },
       "example": {
@@ -452,10 +470,10 @@
         "end-time": "2017-08-29 21:16:03 +0900",
         "result": {
           "version": "0.9.0",
-          "validity": false,
+          "validity": true,
           "stats": {
-            "error_count": 2,
-            "warning_count": 3,
+            "error_count": 0,
+            "warning_count": 2,
             "autocorrect": {
               "biosample": true,
               "bioproject": false
@@ -470,15 +488,48 @@
               "object": [
                 "BioSample"
               ],
-              "source": "SSUB000019_ng.xml",
+              "source": "SSUB001664.xml",
               "annotation": [
                 {
                   "key": "Sample name",
-                  "value": "MTB313"
+                  "value": "DRS000302"
                 },
                 {
                   "key": "Attribute names",
-                  "value": "sample_title"
+                  "value": "sample comment"
+                }
+              ]
+            },
+            {
+              "id": "7",
+              "message": "Invalid date format. An automatically-generated correction will be applied.",
+              "level": "warning",
+              "method": "BioSample",
+              "object": [
+                "BioSample"
+              ],
+              "source": "SSUB001664.xml",
+              "annotation": [
+                {
+                  "key": "Sample name",
+                  "value": "DRS000302"
+                },
+                {
+                  "key": "Attribute",
+                  "value": "collection_date"
+                },
+                {
+                  "key": "Attribute value",
+                  "value": "22-APR-2004"
+                },
+                {
+                  "key": "Suggested value",
+                  "value": "2004-04-22",
+                  "target_key": "Attribute value",
+                  "location": [
+                    "//BioSample[1]/Attributes/Attribute[@attribute_name=\"collection_date\"]"
+                  ],
+                  "is_auto_annotation": true
                 }
               ]
             }
@@ -509,11 +560,14 @@
           },
           "object": {
             "type": "array",
+            "items": {
+              "type": "string"
+            },
             "description": "related object"
           },
           "source": {
             "type": "string",
-            "description": "filename"
+            "description": "validated filename"
           },
           "annotation": {
             "type": "array",
@@ -531,11 +585,14 @@
                 },
                 "target_key": {
                   "type": "string",
-                  "description": "if has auto_annotation"
+                  "description": "if has auto_annotation. points other 'key' name"
                 },
                 "location": {
                   "type": "array",
-                  "description": "if has auto_annotation"
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "if has auto_annotation. list of xpath"
                 }
               }
             }
