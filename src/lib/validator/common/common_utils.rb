@@ -70,7 +70,7 @@ class CommonUtils
     hash = {
              id: rule["code"],
              message: message,
-             #reference: rule["reference"],
+             reference: rule["reference"],
              level: rule["level"],
              method: rule["rule_class"],
              object: rule["object"],
