@@ -16,31 +16,33 @@ class TestDDBJDbValidator < Minitest::Test
   def test_get_bioproject_submitter_id
     # exist data
     ##PSUB
-    ret = @db_validator.get_bioproject_submitter_id("PSUB004142")
+    ret = @db_validator.get_bioproject_submitter_id("PSUB004141")
     assert_equal "PRJDB3490", ret["bioproject_accession"]
-    assert_equal "PSUB004142", ret["submission_id"]
-    assert_equal "test01", ret["submitter_id"]
+    assert_equal "PSUB004141", ret["submission_id"]
+    #assert_equal "test01", ret["submitter_id"]
     ##PRJDB
     ret = @db_validator.get_bioproject_submitter_id("PRJDB3490")
     assert_equal "PRJDB3490", ret["bioproject_accession"]
-    assert_equal "PSUB004142", ret["submission_id"]
-    assert_equal "test01", ret["submitter_id"]
+    assert_equal "PSUB004141", ret["submission_id"]
+    #assert_equal "test01", ret["submitter_id"]
 
     # not exist data
     ##invalid ID
     assert_nil @db_validator.get_bioproject_submitter_id("not id")
     ## not exist id
     assert_nil @db_validator.get_bioproject_submitter_id("PRJDB00000")
+    ## sql injection
+    assert_nil @db_validator.get_bioproject_submitter_id("PSUB004141' OR '1' = '1")
 
   end
 
   def test_umbrella_project?
     # true case
     ##PSUB
-    ret = @db_validator.umbrella_project?("PSUB990036")
+    ret = @db_validator.umbrella_project?("PSUB001851")
     assert_equal true, ret
     ##PRJDB
-    ret = @db_validator.umbrella_project?("PRJDB3549")
+    ret = @db_validator.umbrella_project?("PRJDB1554")
     assert_equal true, ret
     # false case
     ##PSUB
@@ -82,7 +84,7 @@ class TestDDBJDbValidator < Minitest::Test
 
   def test_get_sample_names
     # exist data
-    ret = @db_validator.get_sample_names("SSUB003677")
+    ret = @db_validator.get_sample_names("SSUB001848")
     assert_equal 4, ret.size
 
     # not exist
@@ -92,7 +94,7 @@ class TestDDBJDbValidator < Minitest::Test
 
   def test_get_bioproject_accession
     # exist data
-    ret = @db_validator.get_bioproject_accession("PSUB004142")
+    ret = @db_validator.get_bioproject_accession("PSUB004141")
     assert_equal "PRJDB3490", ret
 
     # not exist

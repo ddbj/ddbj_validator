@@ -38,21 +38,24 @@ class DDBJDbValidator
         q = "SELECT p.project_id_prefix || p.project_id_counter bioproject_accession, sub.submission_id, sub.submitter_id 
              FROM mass.submission sub 
               LEFT OUTER JOIN mass.project p USING(submission_id)
-             WHERE sub.submission_id = '#{psub_query_id}'
+             WHERE sub.submission_id = $1
                AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
+        prj_query_id = "#{psub_query_id}"
       elsif bioproject_accession =~ /^PRJDB\d+/
         prjd_query_id = bioproject_accession.gsub("PRJDB", "").to_i
 
         q = "SELECT p.project_id_prefix || p.project_id_counter bioproject_accession, sub.submission_id, sub.submitter_id 
              FROM mass.submission sub 
               LEFT OUTER JOIN mass.project p USING(submission_id)
-             WHERE p.project_id_counter = #{prjd_query_id} 
+             WHERE p.project_id_counter = $1
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
+        prj_query_id = "#{prjd_query_id}"
       else
         return nil
       end
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [prj_query_id])
       if 1 == res.ntuples then
         result = res[0]
       end
@@ -86,22 +89,25 @@ class DDBJDbValidator
 
         q = "SELECT COUNT(*)
              FROM mass.project p 
-             WHERE p.submission_id = '#{psub_query_id}'
+             WHERE p.submission_id = $1
               AND p.project_type = 'umbrella'
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
+        prj_query_id = "#{psub_query_id}"
       elsif bioproject_accession =~ /^PRJDB\d+/
         prjd_query_id = bioproject_accession.gsub("PRJDB", "").to_i
 
         q = "SELECT COUNT(*)
              FROM mass.project p 
-             WHERE p.project_id_counter = #{prjd_query_id} 
+             WHERE p.project_id_counter = $1
               AND p.project_type = 'umbrella'
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
+        prj_query_id = "#{prjd_query_id}"
       else
         return false
       end
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [prj_query_id])
       # if "count" >= 1 this bioproject_accession is  umbrella id
       if res[0]["count"].to_i > 0
         result = true
@@ -134,10 +140,11 @@ class DDBJDbValidator
            FROM mass.submission_data
            LEFT OUTER JOIN mass.submission USING(submission_id)
            WHERE data_name = 'project_name'
-            AND submitter_id = '#{submitter_id}'
+            AND submitter_id = $1
             AND (status_id IS NULL OR status_id NOT IN (5600, 5700))"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [submitter_id])
 
       res.each do |item|
         unless item["bioproject_name"].empty?
@@ -173,10 +180,11 @@ class DDBJDbValidator
            FROM mass.submission_data
            LEFT OUTER JOIN mass.submission USING(submission_id)
            WHERE (data_name = 'project_title' OR data_name = 'public_description')
-            AND submitter_id = '#{submitter_id}'
+            AND submitter_id = $1
             AND (status_id IS NULL OR status_id NOT IN (5600, 5700))"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [submitter_id])
 
       #属性(title, description)毎に行が出力されるので、submission_id単位でグルーピングし、
       #それぞれの属性の値を取得した後、カンマで連結してリストに格納する
@@ -213,10 +221,11 @@ class DDBJDbValidator
 
       q = "SELECT smp.sample_name
             FROM mass.sample smp
-            WHERE smp.submission_id = '#{submission_id}'
+            WHERE smp.submission_id = $1
               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [submission_id])
       res.each do |item|
         unless item["sample_name"].empty?
           sample_name_list.push(item["sample_name"])
@@ -248,12 +257,13 @@ class DDBJDbValidator
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
       q = "SELECT p.project_id_counter prj_id, p.project_id_prefix prefix
            FROM mass.project p
-           WHERE p.submission_id = '#{psub_id}'
+           WHERE p.submission_id = $1
             AND p.project_id_counter IS NOT NULL
             AND p.project_id_prefix IS NOT NULL
             AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [psub_id])
       if 1 == res.ntuples then ## 2つ以上返ってきてもエラー扱い
         result = res[0]["prefix"] + res[0]["prj_id"]
       end
@@ -287,7 +297,8 @@ class DDBJDbValidator
            WHERE attribute_name = 'locus_tag_prefix' AND attribute_value <> ''
             AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query")
 
       res.each do |item|
         unless item["attribute_value"].empty?
@@ -337,8 +348,9 @@ class DDBJDbValidator
                JOIN mass.attribute attr USING(smp_id)
              WHERE attr.attribute_name = 'locus_tag_prefix'
                AND attr.attribute_value != ''
-               AND smp.submission_id = '#{ssub_query_id}'
+               AND smp.submission_id = $1
                AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        smp_query_id = ssub_query_id
       elsif biosample_accession =~ /^SAMD\d+/
         samd_query_id = biosample_accession
 
@@ -348,13 +360,15 @@ class DDBJDbValidator
                JOIN mass.attribute attr USING(smp_id)
              WHERE attr.attribute_name = 'locus_tag_prefix'
                AND attr.attribute_value != ''
-               AND acc.accession_id = '#{samd_query_id}'
+               AND acc.accession_id = $1
                AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        smp_query_id = samd_query_id
       else
         return nil
       end
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [smp_query_id])
       if 1 <= res.ntuples then
         result = res
       end
@@ -389,8 +403,9 @@ class DDBJDbValidator
              FROM mass.sample smp
                LEFT OUTER JOIN mass.accession acc USING(smp_id)
                LEFT OUTER JOIN mass.submission sub USING(submission_id)
-             WHERE smp.submission_id = '#{ssub_query_id}'
+             WHERE smp.submission_id = $1
                AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        smp_query_id = ssub_query_id
       elsif biosample_accession =~ /^SAMD\d+/
         samd_query_id = biosample_accession
 
@@ -398,13 +413,15 @@ class DDBJDbValidator
              FROM mass.sample smp
                LEFT OUTER JOIN mass.accession acc USING(smp_id)
                LEFT OUTER JOIN mass.submission sub USING(submission_id)
-             WHERE acc.accession_id = '#{samd_query_id}'
+             WHERE acc.accession_id = $1
                AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        smp_query_id = samd_query_id
       else
         return nil
       end
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [smp_query_id])
       if 1 <= res.ntuples then
         result = true
       else
@@ -443,9 +460,10 @@ class DDBJDbValidator
     begin
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
 
-      q = "SELECT submitter_id, center_name, organization, department, affiliation, unit FROM mass.organization WHERE submitter_id = '#{submitter_id}'"
+      q = "SELECT submitter_id, center_name, organization, department, affiliation, unit FROM mass.organization WHERE submitter_id = $1"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [submitter_id])
       if 1 == res.ntuples then
         result = res[0]
       end
@@ -499,9 +517,10 @@ class DDBJDbValidator
     begin
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
 
-      q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = '#{submitter_id}' and is_pi = true"
+      q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = $1 and is_pi = true"
 
-      res = connection.exec(q)
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [submitter_id])
       if res.ntuples > 0 then
         result = res
       end
