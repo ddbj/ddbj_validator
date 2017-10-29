@@ -16,3 +16,4 @@ gem "erubis"
 gem "nokogiri"
 gem "unicorn"
 gem "mail"
+gem 'unicorn-worker-killer'
