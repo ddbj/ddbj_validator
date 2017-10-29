@@ -11,6 +11,7 @@ set :rbenv_map_bins, %w(rake gem bundle ruby rails)
 set :rbenv_roles, :all # default value
 
 set :unicorn_config_path, "#{shared_path}/config/unicorn.rb"
+set :unicorn_pid, "#{shared_path}/tmp/pids/unicorn.pid"
 set :unicorn_rack_env, 'development'
 
 set :ssh_options, {

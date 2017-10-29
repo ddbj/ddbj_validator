@@ -39,6 +39,7 @@ set :linked_dirs, fetch(:linked_dirs, []).push('bin', 'log', 'tmp/pids', 'tmp/ca
 
 set :unicorn_roles, :all
 
+after 'deploy:publishing', 'deploy:restart'
 namespace :deploy do
   desc 'Update config files to environment'
   task :conf_copy do
@@ -47,4 +48,9 @@ namespace :deploy do
     end
   end
   after 'deploy:updated', 'deploy:conf_copy'
+
+  desc 'restart Unicorn process'
+  task :restart do
+    invoke 'unicorn:restart'
+  end
 end
