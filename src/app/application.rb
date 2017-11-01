@@ -27,6 +27,10 @@ module DDBJValidator
       response.headers["Access-Control-Allow-Origin"] = "*"
     end
 
+    head "/" do
+      "HEAD"
+    end
+
     get '/api/' do
       send_file File.join(settings.public_folder, 'api/index.html')
     end
