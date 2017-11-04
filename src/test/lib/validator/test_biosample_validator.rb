@@ -609,7 +609,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## exchange google country to insdc country case
-    ret = exec_validator("latlon_versus_country", "41", "SampleA", "Svalbard", "78.92267 N 11.98147 E", 1)
+    ret = exec_validator("latlon_versus_country", "41", "SampleA", "Svalbard", "78.92268 N 11.98147 E", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not valid latlon format
+    ret = exec_validator("latlon_versus_country", "41", "SampleA", "Japan", "not description", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case

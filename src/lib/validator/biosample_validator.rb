@@ -1044,8 +1044,8 @@ class BioSampleValidator < ValidatorBase
     if @cache.nil? || @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon) == false #cache値がnilの可能性があるためhas_keyでチェック
       insdc_latlon = common.format_insdc_latlon(lat_lon)
       iso_latlon = common.convert_latlon_insdc2iso(insdc_latlon)
-      if iso_latlon.nil?
-        latlon_for_google = lat_lon
+      if iso_latlon.nil? #if value is not insdc format, not check country
+        return true
       else
         latlon_for_google = "#{iso_latlon[:latitude].to_s}, #{iso_latlon[:longitude].to_s}"
       end
