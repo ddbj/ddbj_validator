@@ -98,7 +98,7 @@ class BioSampleValidator < ValidatorBase
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
     @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
 
-    ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 12, 13は先頭で実行
+    ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
@@ -108,15 +108,6 @@ class BioSampleValidator < ValidatorBase
 
         #attr name
         ret = special_character_included("12", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
-          #attrbutes(hash)の置換
-          biosample_data["attributes"][replaced_attr_name] = biosample_data["attributes"][attr_name]
-          biosample_data["attributes"].delete(attr_name)
-          #attrbute_list(array)の置換
-          biosample_data["attribute_list"][attr_idx] = {replaced_attr_name => value}
-          attr_name = replaced_attr_name
-        end
         ret = invalid_data_format("13", sample_name, attr_name, value, "attr_name", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
@@ -130,9 +121,6 @@ class BioSampleValidator < ValidatorBase
 
         #attr value
         ret = special_character_included("12", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
-        end
         ret = invalid_data_format("13", sample_name, attr_name, value, "attr_value", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
@@ -1579,24 +1567,24 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
-    if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
+    if target == "attr_name" && replaced != attr_name
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute name", value: attr_name}
       ]
       location = @xml_convertor.xpath_of_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, true))
+      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, false))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
-    elsif target == "attr_value" && replaced != attr_val #属性値のAuto-annotationが必要
+    elsif target == "attr_value" && replaced != attr_val
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
       location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
+      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, false))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false

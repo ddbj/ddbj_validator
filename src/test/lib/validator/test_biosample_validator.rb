@@ -879,7 +879,7 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("special_character_included", "12", "SampleA", "temperature(°C)", "value", special_chars, "attr_name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "temperature(degree Celsius)", get_auto_annotation(ret[:error_list])
+    assert_nil get_auto_annotation(ret[:error_list]) #not auto annotation
     # nil case
     ret = exec_validator("special_character_included", "12", "SampleA", "", "value", special_chars, "attr_name", 1)
     assert_nil ret[:result]
@@ -894,15 +894,15 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("special_character_included", "12", "SampleA", "title", "1.0 μm", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1.0 micrometer", get_auto_annotation(ret[:error_list])
+    assert_nil get_auto_annotation(ret[:error_list]) #not auto annotation
     ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degree Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1st: 39 degree Celsius, 2nd: 38 degree Celsius, 3rd: 37 degree Celsius", get_auto_annotation(ret[:error_list])
+    assert_nil get_auto_annotation(ret[:error_list]) #not auto annotation
     ret = exec_validator("special_character_included", "12", "SampleA", "host_body_temp", "1st: 39 degrees Celsius, 2nd: 38 degree C, 3rd: 37 ℃", special_chars, "attr_value", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1st: 39 degree Celsius, 2nd: 38 degree Celsius, 3rd: 37 degree Celsius", get_auto_annotation(ret[:error_list])
+    assert_nil get_auto_annotation(ret[:error_list]) #not auto annotation
     # params are nil pattern
     ret = exec_validator("special_character_included", "12", "SampleA", "title", "", special_chars, "attr_value", 1)
     assert_nil ret[:result]
@@ -1252,7 +1252,6 @@ jkl\"  "
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("null_values_provided_for_optional_attributes", "100", "SampleA", biosample_data[0]["attributes"], null_accepted, null_not_recommended, attr_list, 1)
     assert_equal false, ret[:result]
-    p ret[:error_list]
     assert_equal 2, ret[:error_list].size
   end
 
