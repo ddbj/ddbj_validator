@@ -209,7 +209,7 @@ class BioSampleValidator < ValidatorBase
         ret = taxonomy_name_and_id_not_match("4", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["organism"] = CommonUtils::get_auto_annotation(@error_list.last)
-        else ret == false #auto annotationできないエラーであればtax_idが不正な可能性がある
+        elsif ret == false #auto annotationできないエラーであればtax_idが不正な可能性がある
           taxonomy_id = OrganismValidator::TAX_ROOT
         end
       end
