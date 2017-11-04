@@ -168,7 +168,6 @@ class BioSampleValidator < ValidatorBase
       ### 属性名や必須項目に関する検証
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
-      not_predefined_attribute_name("14", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_mandatory_attribute("27", sample_name, biosample_data["attributes"], attr_list , line_num)
       missing_required_attribute_name("92", sample_name, biosample_data["attributes"], attr_list , line_num)
       null_values_provided_for_optional_attributes("100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list , line_num)
@@ -515,7 +514,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # rule:14
+  # rule:14 (suppressed)
   # DDBJ BioSampleで規定されていない(ユーザ定義)属性が含まれているかの検証
   #
   # ==== Args

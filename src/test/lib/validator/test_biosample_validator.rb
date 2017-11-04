@@ -254,6 +254,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+=begin (suppressed)
   def test_not_predefined_attribute_name
     #ok case
     xml_data = File.read("#{@test_file_dir}/14_not_predefined_attribute_name_SSUB000019_ok.xml")
@@ -272,6 +273,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
   end
+=end
 
   def test_missing_required_attribute_name
     #ok case
