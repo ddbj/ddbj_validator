@@ -4,6 +4,7 @@ require 'yaml'
 class DDBJDbValidator
   BIOPROJCT_DB_NAME = "bioproject"
   BIOSAMPLE_DB_NAME = "biosample"
+  DRA_DB_NAME = "drmdb"
   SUBMITTER_DB_NAME = "submitterdb"
 
   def initialize (config)
@@ -14,28 +15,24 @@ class DDBJDbValidator
   end
 
   #
-  # 指定されたBioSample Accession IDのsubmitter_idを返す
-  # DBにない場合にはnilを返す
+  # 指定されたBioSample Accession IDが有効なIDであるかを返す
+  # DBにない場合や、statusが5600,5700の場合にはfalseを返す
   #
   # ==== Args
   # bioproject_acceccion ex. "PSUB004142", "PRJDB3490"
   # ==== Return
-  # BioProjectのIDとsubmitter情報のハッシュ
-  # {
-  #   "bioproject_accession" => "PRJDB3490",
-  #   "submission_id" => "PSUB004142",
-  #   "submitter_id" => "test01"
-  # }
-  def get_bioproject_submitter_id(bioproject_accession)
+  # true/false
+  #
+  def valid_bioproject_id?(bioproject_accession)
     return nil if bioproject_accession.nil?
-    result = nil
+    result = false
     begin
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
 
       if bioproject_accession =~ /^PSUB\d{6}/
         psub_query_id = bioproject_accession
 
-        q = "SELECT p.project_id_prefix || p.project_id_counter bioproject_accession, sub.submission_id, sub.submitter_id 
+        q = "SELECT *
              FROM mass.submission sub 
               LEFT OUTER JOIN mass.project p USING(submission_id)
              WHERE sub.submission_id = $1
@@ -44,20 +41,69 @@ class DDBJDbValidator
       elsif bioproject_accession =~ /^PRJDB\d+/
         prjd_query_id = bioproject_accession.gsub("PRJDB", "").to_i
 
-        q = "SELECT p.project_id_prefix || p.project_id_counter bioproject_accession, sub.submission_id, sub.submitter_id 
+        q = "SELECT *
              FROM mass.submission sub 
               LEFT OUTER JOIN mass.project p USING(submission_id)
              WHERE p.project_id_counter = $1
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
         prj_query_id = "#{prjd_query_id}"
       else
-        return nil
+        return false
       end
-
       connection.prepare("pre_query", q)
       res = connection.exec_prepared("pre_query", [prj_query_id])
       if 1 == res.ntuples then
-        result = res[0]
+        result = true
+      end
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+    result
+  end
+
+  #
+  # 指定されたBioSample Accession IDを参照許可submitter_idの配列返す
+  # DBにない場合や、statusが5600,5700の場合には空の配列を返す
+  #
+  # ==== Args
+  # bioproject_acceccion ex. "PSUB004142", "PRJDB3490"
+  # ==== Return
+  # submitter_idの配列
+  # [ "test01", "test02" ]
+  #
+  def get_bioproject_referenceable_submitter_ids(bioproject_accession)
+    return nil if bioproject_accession.nil?
+    result = []
+
+    #無効なbioproject_idが指定された場合には空の配列を返す
+    unless valid_bioproject_id?(bioproject_accession)
+      return []
+    end
+    begin
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', DRA_DB_NAME, @pg_user,  @pg_pass)
+
+      if bioproject_accession =~ /^PSUB\d{6}/
+        prj_query_id = bioproject_accession
+      elsif bioproject_accession =~ /^PRJDB\d+/
+        prj_query_id = get_bioproject_submission(bioproject_accession)
+      else
+        return []
+      end
+
+      q = "SELECT submitter_id
+           FROM mass.ext_entity
+             JOIN mass.ext_permit USING(ext_id)
+           WHERE status = 100
+             AND ref_name = $1"
+
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [prj_query_id])
+      res.each do |item|
+        result.push(item["submitter_id"])
       end
     rescue => ex
       message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
@@ -266,6 +312,45 @@ class DDBJDbValidator
       res = connection.exec_prepared("pre_query", [psub_id])
       if 1 == res.ntuples then ## 2つ以上返ってきてもエラー扱い
         result = res[0]["prefix"] + res[0]["prj_id"]
+      end
+
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+    result
+  end
+
+  #
+  # BioProject ID(Accession ID)に対応するPSUB IDがあれば返す
+  # なければnilを返す
+  #
+  # ==== Args
+  # bioproject_accession PRJDBから始まるID ex."PRJDB3490"
+  # ==== Return
+  #
+  #
+  def get_bioproject_submission(bioproject_accession)
+    result = nil
+
+    unless bioproject_accession =~ /^PRJDB\d+/
+      return nil
+    end
+    begin
+      project_id_counter = bioproject_accession.gsub("PRJDB", "").to_i
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      q = "SELECT p.submission_id
+           FROM mass.project p
+           WHERE p.project_id_counter = $1
+            AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
+
+      connection.prepare("pre_query", q)
+      res = connection.exec_prepared("pre_query", [project_id_counter])
+      if 1 == res.ntuples then ## 2つ以上返ってきてもエラー扱い
+        result = res[0]["submission_id"]
       end
 
     rescue => ex

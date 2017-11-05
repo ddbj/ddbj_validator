@@ -759,7 +759,7 @@ class BioSampleValidator < ValidatorBase
     if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
       #DDBJ管理の場合にはDBにIDがあるか検証する
       if bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-        if @db_validator.get_bioproject_submitter_id(bioproject_accession).nil?
+        unless @db_validator.valid_bioproject_id?(bioproject_accession)
           result = false
         end
       end
@@ -1755,6 +1755,7 @@ class BioSampleValidator < ValidatorBase
   #
   # rule:6
   # 指定されたbioproject_accessionのsubmitterが引数のsubmitter_idと一致するかの検証
+  # submitterでなくとも、bioprojectの参照権限のあるsubmitter_idも可とする
   #
   # ==== Args
   # rule_code
@@ -1771,13 +1772,13 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession) == false #cache値がnilの可能性があるためhas_keyでチェック
-      ret = @db_validator.get_bioproject_submitter_id(bioproject_accession)
+      ret = @db_validator.get_bioproject_referenceable_submitter_ids(bioproject_accession)
       @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession, ret)
     else
       ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
     end
     #SubmitterIDが一致しない場合はNG
-    result = false if !ret.nil? && ret["submitter_id"] != submitter_id
+    result = false if !ret.nil? && !ret.include?(submitter_id)
     if result == false
       annotation = [
         {key: "Sample name", value: sample_name},

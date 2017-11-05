@@ -13,27 +13,44 @@ class TestDDBJDbValidator < Minitest::Test
     @db_validator = DDBJDbValidator.new(db_config)
   end
 
-  def test_get_bioproject_submitter_id
+  def test_valid_bioproject_id?
     # exist data
     ##PSUB
-    ret = @db_validator.get_bioproject_submitter_id("PSUB004141")
-    assert_equal "PRJDB3490", ret["bioproject_accession"]
-    assert_equal "PSUB004141", ret["submission_id"]
-    #assert_equal "test01", ret["submitter_id"]
+    ret = @db_validator.valid_bioproject_id?("PSUB004141")
+    assert_equal true, ret
     ##PRJDB
-    ret = @db_validator.get_bioproject_submitter_id("PRJDB3490")
-    assert_equal "PRJDB3490", ret["bioproject_accession"]
-    assert_equal "PSUB004141", ret["submission_id"]
-    #assert_equal "test01", ret["submitter_id"]
+    ret = @db_validator.valid_bioproject_id?("PRJDB3490")
+    assert_equal true, ret
 
     # not exist data
     ##invalid ID
-    assert_nil @db_validator.get_bioproject_submitter_id("not id")
+    ret = @db_validator.valid_bioproject_id?("not id")
+    assert_equal false, ret
     ## not exist id
-    assert_nil @db_validator.get_bioproject_submitter_id("PRJDB00000")
+    ret = @db_validator.valid_bioproject_id?("PRJDB00000")
+    assert_equal false, ret
     ## sql injection
-    assert_nil @db_validator.get_bioproject_submitter_id("PSUB004141' OR '1' = '1")
+    ret = @db_validator.valid_bioproject_id?("PSUB004141' OR '1' = '1")
+    assert_equal false, ret
 
+  end
+
+  def test_get_bioproject_referenceable_submitter_ids
+    # exist data
+    ##PSUB
+    ret = @db_validator.get_bioproject_referenceable_submitter_ids("PSUB004388")
+    assert_equal 2, ret.size
+    ##PRJDB
+    ret = @db_validator.get_bioproject_referenceable_submitter_ids("PRJDB3595")
+    assert_equal 2, ret.size
+
+    # not exist data
+    ##invalid ID
+    assert_equal [], @db_validator.get_bioproject_referenceable_submitter_ids("not id")
+    ## not exist id
+    assert_equal [], @db_validator.get_bioproject_referenceable_submitter_ids("PRJDB00000")
+    ## sql injection
+    assert_equal [], @db_validator.get_bioproject_referenceable_submitter_ids("PSUB004141' OR '1' = '1")
   end
 
   def test_umbrella_project?
@@ -106,6 +123,23 @@ class TestDDBJDbValidator < Minitest::Test
 
     ## status 5700(deleted?)
     assert_nil @db_validator.get_bioproject_accession("PSUB000078")
+  end
+
+  def test_get_bioproject_submission
+    # exist data
+    ret = @db_validator.get_bioproject_submission("PRJDB3490")
+    assert_equal "PSUB004141", ret
+
+    # not exist
+    ## not exist accession id
+    assert_nil @db_validator.get_bioproject_accession("PRJDB00")
+
+    ## project accession is not valid format
+    assert_nil @db_validator.get_bioproject_accession("PRJE3490")
+
+
+    ## status 5700(deleted?)
+    assert_nil @db_validator.get_bioproject_accession("PRJDB51")
   end
 
   def test_get_all_locus_tag_prefix

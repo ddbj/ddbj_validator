@@ -989,20 +989,20 @@ jkl\"  "
   def test_bioproject_not_found
     # ok case (given submitter_id matches DB response submitter_id)
     ## valid data
-    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB990080", "test04", 1)
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PSUB004388", "hirakawa", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## not ddbj bioproject
-    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJNA90080", "test04", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## not exist bioproject id
-    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJDB0000", "test04", 1)
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJDB3595", "hirakawa", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     ## mismatch submitter id
-    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB990080", "test01", 1)
+    ret = exec_validator("bioproject_not_found","6", "Sample A", "PSUB004388", "test01", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist bioproject id
+    ret = exec_validator("bioproject_not_found", "6", "Sample A", "PRJDB0000", "test04", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # params are nil pattern
@@ -1077,11 +1077,11 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
     #ng case
     #PSUB
-    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB990036", 1)
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PSUB001851", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #PRJDB
-    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PRJDB3549", 1)
+    ret = exec_validator("invalid_bioproject_type", "70", "Sample A", "PRJDB1554", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
