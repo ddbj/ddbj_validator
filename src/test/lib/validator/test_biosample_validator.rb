@@ -317,6 +317,7 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", "aerobe", cv_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+
     #ng case
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
     assert_equal false, ret[:result]
@@ -327,6 +328,13 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    ##sex attribute xattr replace
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "sex", "f", cv_attr, 1)
+    expect_annotation = "female"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+
     #params are nil pattern
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "2", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
     assert_nil ret[:result]

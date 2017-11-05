@@ -633,16 +633,24 @@ class BioSampleValidator < ValidatorBase
     if !cv_attr[attr_name].nil? # CVを使用する属性か
       is_cv_term = false
       replace_value = ""
-      cv_attr[attr_name].each do |term|
-        if term.casecmp(attr_val) == 0 #大文字小文字を区別せず一致
-          is_cv_term = true
-          if term != attr_val #大文字小文字で異なる
-            replace_value = term #置換が必要
-            is_cv_term = false
+      if attr_name == 'sex' && (attr_val.casecmp("M") == 0 || attr_val.casecmp("F") == 0)
+        #sex属性の場合の特殊な置換
+        if attr_val.casecmp("M") == 0
+          replace_value = "male"
+        elsif attr_val.casecmp("F") == 0
+          replace_value = "female"
+        end
+      else
+        cv_attr[attr_name].each do |term|
+          if term.casecmp(attr_val) == 0 #大文字小文字を区別せず一致
+            is_cv_term = true
+            if term != attr_val #大文字小文字で異なる
+              replace_value = term #置換が必要
+              is_cv_term = false
+            end
           end
         end
       end
-
       if !is_cv_term # CVリストに値がない
         annotation = [
           {key: "Sample name", value: sample_name},
