@@ -230,7 +230,7 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
-      invalid_host_organism_name("15", sample_name, biosample_data["attributes"]["host"], line_num)
+      invalid_host_organism_name("15", sample_name,  biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
       future_collection_date("40", sample_name, biosample_data["attributes"]["collection_date"], line_num)
 
       ### 複数属性の組合せの検証
@@ -890,48 +890,87 @@ class BioSampleValidator < ValidatorBase
   #
   # rule:15
   # host属性に記載された生物種名がTaxonomy ontologyにScientific nameとして存在するかの検証
+  # host_taxidは記述がなくてもよく、あった場合にはhost_nameとの整合性をチェックする
   # 
   # ==== Args
   # rule_code
   # sample_name
+  # host_taxid ex."9606"
   # host_name ex."Homo sapiens"
   # line_num 
   # ==== Return
   # true/false
   #
-  def invalid_host_organism_name (rule_code, sample_name, host_name, line_num)
+  def invalid_host_organism_name (rule_code, sample_name, host_taxid, host_name, line_num)
     return nil if CommonUtils::null_value?(host_name)
+    ret = true
 
-    replace_value = ""
+    annotation = [
+      {key: "Sample name", value: sample_name},
+      {key: "host", value: host_name}
+    ]
+    location = @xml_convertor.xpath_from_attrname("host", line_num)
+
     if host_name.casecmp("human") == 0
       ret = false
-      replace_value = "Homo sapiens"
-    elsif @cache.nil? || @cache.check(ValidatorCache::EXIST_HOST_NAME, host_name).nil? #あればキャッシュを使用
-      ret = @org_validator.exist_organism_name?(host_name)
-      @cache.save(ValidatorCache::EXIST_HOST_NAME, host_name, ret) unless @cache.nil?
+      #"human"は"Homo sapiens"にauto-annotation
+      annotation.push(CommonUtils::create_suggested_annotation(["Homo sapiens"], "host", location, true));
     else
-      puts "use cache in invalid_host_organism_name" if $DEBUG
-      ret = @cache.check(ValidatorCache::EXIST_HOST_NAME, host_name)
+      if host_taxid.nil? || host_taxid.strip == "" #host_id記述なし
+        #あればキャッシュを使用
+        if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name).nil?
+          org_ret = @org_validator.suggest_taxid_from_name(host_name)
+          @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, host_name, ret) unless @cache.nil?
+        else
+          puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
+          org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name)
+        end
+        if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+          scientific_name = org_ret[:scientific_name]
+          #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+          if scientific_name != host_name
+            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true));
+            ret = false
+          end
+        elsif org_ret[:status] == "no exist"
+          ret = false
+        elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+          msg = "Multiple taxonomies detected with the same host name. Please provide the host_taxid to distinguish the duplicated names."
+          annotation.push({key: "Message", value: msg + " host_taxid:[#{org_ret[:tax_id]}]"})
+          ret = false
+        end #該当するtaxonomy_idが無かった場合は単なるエラー
+      else #host_taxid記述あり
+        annotation.push({key: "host_taxid", value: host_taxid})
+        #あればキャッシュを使用
+        if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid) == false #cache値がnilの可能性があるためhas_keyでチェック
+          scientific_name = @org_validator.get_organism_name(host_taxid)
+          @cache.save(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid, scientific_name) unless @cache.nil?
+        else
+          puts "use cache in taxonomy_name_from_id" if $DEBG
+          scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid)
+        end
+        #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
+        if !scientific_name.nil? && scientific_name == host_name && host_taxid != OrganismValidator::TAX_ROOT
+          ret = true
+        else
+          # tax_id=1ではなくtax_idからscientifin_nameが拾えればauto-annotation
+          if !scientific_name.nil? && host_taxid != OrganismValidator::TAX_ROOT
+            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true))
+          end
+          ret = false
+        end
+      end
     end
 
-    if ret
-      true
-    else
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "host"},
-        {key: "Attribute value", value: host_name}
-      ]
-      if replace_value != "" #置換候補があればAuto annotationをつける
-        location = @xml_convertor.xpath_from_attrname("host", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-      else #置換候補がないエラー
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+    unless ret
+      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else #auto-annotation無
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       end
       @error_list.push(error_hash)
-      false
-    end 
+    end
+    ret
   end
 
   #

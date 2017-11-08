@@ -109,6 +109,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
 #### 各validationメソッドのユニットテスト ####
+
   def test_not_well_format_xml
     #ok case
     xml_file = "#{@test_file_dir}/97_not_well_format_xml_SSUB000019_ok.xml"
@@ -517,27 +518,55 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_bioproject_accession", "5","", "missing", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    end
+  end
 
   def test_invalid_host_organism_name
     #ok case
-    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Homo sapiens", 1)
+    ## with host_taxid
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "9606", "Homo sapiens", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## without host_taxid
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "", "Homo sapiens", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Not exist taxonomy name", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    #auto annotation
-    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "Human", 1)
+    ## not match host and host_taxid
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "9606", "Not exist taxonomy name", 1)
     expect_annotation = "Homo sapiens"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
-    #params are nil pattern
-    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", nil, 1)
+    ## not match host and host_taxid(case)
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "9606", "Homo Sapiens", 1)
+    expect_annotation = "Homo sapiens"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    ## not exist host name
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "", "Not exist taxonomy name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple exist host name
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "", "Mouse", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not match host and host_taxid
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "1", "Not exist taxonomy name", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list])
+    ## human
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "9606", "Human", 1)
+    expect_annotation = "Homo sapiens"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+
+    #host name is nil pattern
+    ## only and host_taxid
+    ret = exec_validator("invalid_host_organism_name", "15", "sampleA", "9606", nil, 1)
     assert_nil ret[:result]
-    assert_equal 0, ret[:error_list].size
   end
 
   def test_taxonomy_error_warning
