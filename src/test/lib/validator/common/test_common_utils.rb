@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'minitest/autorun'
+require 'yaml'
 require '../../../../lib/validator/common/common_utils.rb'
 
 class TestCommonUtils < Minitest::Test
@@ -11,6 +12,8 @@ class TestCommonUtils < Minitest::Test
     config_obj[:exchange_country_list] = JSON.parse(File.read("#{conf_dir}/exchange_country_list.json"))
     config_obj[:convert_date_format] = JSON.parse(File.read("#{conf_dir}/convert_date_format.json"))
     config_obj[:ddbj_date_format] = JSON.parse(File.read("#{conf_dir}/ddbj_date_format.json"))
+    setting = YAML.load(File.read("#{conf_dir}/../validator.yml"))
+    config_obj[:google_api_key] = setting["google_api_key"]
     CommonUtils::set_config (config_obj)
   end
 
@@ -86,7 +89,7 @@ class TestCommonUtils < Minitest::Test
   def test_geocode_country_from_latlon 
     #ok case
     ret = @common.geocode_country_from_latlon("35.2095, 139.0034")
-    assert_equal "Japan", ret
+    assert_equal ["Japan"], ret
 
     #no hit case 
     ret = @common.geocode_country_from_latlon("not valid latlon format")

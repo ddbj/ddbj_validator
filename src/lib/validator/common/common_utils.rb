@@ -13,6 +13,7 @@ class CommonUtils
     @@exchange_country_list = config_obj[:exchange_country_list]
     @@convert_date_format = config_obj[:convert_date_format]
     @@ddbj_date_format = config_obj[:ddbj_date_format]
+    @@google_api_key = config_obj[:google_api_key]
   end
 
   #
@@ -263,49 +264,44 @@ class CommonUtils
   end
 
   #
-  # Returns a address of the specified latlon value as geocoding result.
-  #
-  # ==== Args
-  # iso_latlon: ISO lat_lon format ex. "35.2095, 139.0034"
-  # ==== Return
-  # returns first result of geocodeing
-  # returns nil if the geocoding hasn't hit.
-  #
-  def geocode_address_from_latlon (iso_latlon)
-    return nil if iso_latlon.nil?
-    address = Geocoder.search(iso_latlon)
-    if address.size > 0
-      address.first
-    else
-      nil
-    end
-  end
-
-  #
   # Returns a country name of the specified latlon value as geocoding result.
   #
   # ==== Args
   # iso_latlon: ISO lat_lon format ex. "35.2095, 139.0034"
   # ==== Return
-  # returns country name ex. "Japan"
-  # returns nil if the geocoding hasn't hit.
+  # returns list of country name ex. ["Japan"]
+  # returns nil if the geocoding hasn't hit(include not valid latlon format case).
   #
   def geocode_country_from_latlon (iso_latlon)
     return nil if iso_latlon.nil?
-
     # 200 ms 間隔を空ける
     # free API の制約が 5 requests per second のため
     # https://developers.google.com/maps/documentation/geocoding/intro?hl=ja#Limits
     sleep(0.2)
+    url = "https://maps.googleapis.com/maps/api/geocode/json?language=en&result_type=country"
+    url += "&key=#{@@google_api_key['key']}"
+    url += "&latlng=#{iso_latlon}"
     begin
-      geocode = geocode_address_from_latlon(iso_latlon)
-      if geocode.nil? || geocode.country.nil?
+      res = http_get_response(url)
+      if res.code =~ /^5/ # server error
+        raise "'Google Maps Geocoding API' returns a server error. Please retry later.\n"
+      elsif res.code =~ /^4/ # client error, not valid latlon format
+        country_names = nil
+      else
+        geo_info = JSON.parse(res.body)
+        begin
+          country_names = geo_info["results"].first["address_components"].map{|entry| entry["long_name"]}
+        rescue # googleがgeocode 出来なかった場合
+          country_names = nil
+        end
+      end
+      if country_names.nil?
         nil
       else
-        geocode.country
+        country_names
       end
     rescue => ex
-      message = "Failed to geocode with Google Geocoder API. Please check the latlon value or your internet connection. latlon: #{iso_latlon}\n"
+      message = "Failed to geocode with Google Maps Geocoding API. Please retry later. latlon: #{iso_latlon}\n"
       raise StandardError, message, ex.backtrace
     end
   end

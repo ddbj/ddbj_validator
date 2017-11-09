@@ -19,6 +19,7 @@ class ValidatorBase
       setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
       config[:sparql_config] = setting["sparql_endpoint"]
       config[:ddbj_db_config] = setting["ddbj_rdb"]
+      config[:google_api_key] = setting["google_api_key"]
       config[:version] = setting["version"]
       config
     rescue => ex
