@@ -917,30 +917,13 @@ class BioSampleValidator < ValidatorBase
       #"human"は"Homo sapiens"にauto-annotation
       annotation.push(CommonUtils::create_suggested_annotation(["Homo sapiens"], "host", location, true));
     else
-      if host_taxid.nil? || host_taxid.strip == "" #host_id記述なし
-        #あればキャッシュを使用
-        if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name).nil?
-          org_ret = @org_validator.suggest_taxid_from_name(host_name)
-          @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, host_name, ret) unless @cache.nil?
-        else
-          puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
-          org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name)
-        end
-        if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
-          scientific_name = org_ret[:scientific_name]
-          #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
-          if scientific_name != host_name
-            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true));
-            ret = false
-          end
-        elsif org_ret[:status] == "no exist"
-          ret = false
-        elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
-          msg = "Multiple taxonomies detected with the same host name. Please provide the host_taxid to distinguish the duplicated names."
-          annotation.push({key: "Message", value: msg + " host_taxid:[#{org_ret[:tax_id]}]"})
-          ret = false
-        end #該当するtaxonomy_idが無かった場合は単なるエラー
-      else #host_taxid記述あり
+      host_tax_id_not_integer = false
+      begin
+        Integer(host_taxid) unless host_taxid.nil?
+      rescue ArgumentError
+        host_tax_id_not_integer = true
+      end
+      if !(host_taxid.nil? || host_taxid.strip == "" || host_tax_id_not_integer) #host_taxid記述あり #host_id記述なしまたは不正
         annotation.push({key: "host_taxid", value: host_taxid})
         #あればキャッシュを使用
         if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid) == false #cache値がnilの可能性があるためhas_keyでチェック
@@ -960,6 +943,29 @@ class BioSampleValidator < ValidatorBase
           end
           ret = false
         end
+      else #host_id記述なしまたは不正
+        #あればキャッシュを使用
+        if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name).nil?
+          org_ret = @org_validator.suggest_taxid_from_name(host_name)
+          @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, host_name, org_ret) unless @cache.nil?
+        else
+          puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
+          org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name)
+        end
+        if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+          scientific_name = org_ret[:scientific_name]
+          #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+          if scientific_name != host_name
+            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true));
+            ret = false
+          end
+        elsif org_ret[:status] == "no exist"
+          ret = false
+        elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+          msg = "Multiple taxonomies detected with the same host name. Please provide the host_taxid to distinguish the duplicated names."
+          annotation.push({key: "Message", value: msg + " host_taxid:[#{org_ret[:tax_id]}]"})
+          ret = false
+        end #該当するtaxonomy_idが無かった場合は単なるエラー
       end
     end
 
