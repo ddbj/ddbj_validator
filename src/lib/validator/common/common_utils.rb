@@ -278,7 +278,7 @@ class CommonUtils
     # free API の制約が 5 requests per second のため
     # https://developers.google.com/maps/documentation/geocoding/intro?hl=ja#Limits
     sleep(0.2)
-    url = "https://maps.googleapis.com/maps/api/geocode/json?language=en&result_type=country"
+    url = "https://maps.googleapis.com/maps/api/geocode/json?language=en"
     url += "&key=#{@@google_api_key['key']}"
     url += "&latlng=#{iso_latlon}"
     begin
@@ -290,7 +290,17 @@ class CommonUtils
       else
         geo_info = JSON.parse(res.body)
         begin
-          country_names = geo_info["results"].first["address_components"].map{|entry| entry["long_name"]}
+          country_names = geo_info["results"].map do |entry|
+             country = nil
+             unless entry["address_components"].nil?
+               entry["address_components"].find do |address|
+                 if address["types"].include?("country")
+                   country = address["long_name"]
+                 end
+               end
+             end
+             country
+          end
         rescue # googleがgeocode 出来なかった場合
           country_names = nil
         end
@@ -298,7 +308,7 @@ class CommonUtils
       if country_names.nil?
         nil
       else
-        country_names
+        country_names.uniq!
       end
     rescue => ex
       message = "Failed to geocode with Google Maps Geocoding API. Please retry later. latlon: #{iso_latlon}\n"
