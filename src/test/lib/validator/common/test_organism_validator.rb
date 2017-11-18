@@ -93,13 +93,25 @@ class TestOrganismValidator < Minitest::Test
     expect_value = {status: "exist", tax_id: "562", scientific_name: "Escherichia coli"}
     ret = @validator.suggest_taxid_from_name("escherichia coli")
     assert_equal expect_value, ret
-    #exist one tax(unpublished tax)
-    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
-    ret = @validator.suggest_taxid_from_name("Actinomyces polynesiensis")
-    assert_equal expect_value, ret
     #multiple
     expect_value = {status: "multiple exist", tax_id: "10088, 10090"}
     ret = @validator.suggest_taxid_from_name("mouse")
+    assert_equal expect_value, ret
+
+    #特殊なID
+    #exist one tax(32644"Unidentified" tax) #scientificNameであればOK
+    expect_value = {status: "exist", tax_id: "32644", scientific_name: "unidentified"}
+    ret = @validator.suggest_taxid_from_name("Unidentified")
+    assert_equal expect_value, ret
+    #no exist (32644"Unidentified" tax) #Synonymは無効とする"none","other","unknown"などがある
+    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
+    ret = @validator.suggest_taxid_from_name("none")
+    assert_equal expect_value, ret
+
+    #dummy taxon
+    #exist one tax(unpublished tax)
+    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
+    ret = @validator.suggest_taxid_from_name("Alkalobacillus saladarense")
     assert_equal expect_value, ret
   end
 =begin
@@ -109,7 +121,7 @@ PREFIX id-tax: <http://identifiers.org/taxonomy/>
 PREFIX tax: <http://ddbj.nig.ac.jp/ontologies/taxonomy/>
 
 SELECT DISTINCT ?name
-FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy>
+FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy-private>
 WHERE
 {
   VALUES ?name_prop { tax:scientificName  tax:synonym tax:genbankSynonym tax:equivalentName
@@ -117,7 +129,7 @@ WHERE
                       tax:genbankAnamorph tax:teleomorph tax:unpublishedName}
     id-tax:1274375 tax:unpublishedName ?name .
     MINUS {?tax_id tax:unpublishedName ?name FILTER (! ?tax_id = id-tax:1274375)}
-} ORDER BY ?namein
+} ORDER BY ?name
 =end
 
   def test_organism_name_of_synonym

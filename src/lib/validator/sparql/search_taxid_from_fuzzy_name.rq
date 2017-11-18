@@ -17,4 +17,5 @@ WHERE
   BIND (REPLACE(STR(?tax_id), "http://identifiers.org/taxonomy/", "") AS ?tax_no)
   ?tax_id a tax:Taxon ;
     tax:scientificName ?scientific_name .
+  FILTER (!(?tax_id  = id-tax:32644 && ?name_prop !=  tax:scientificName))
 }
