@@ -310,6 +310,7 @@ class CommonUtils
       else
         country_names.uniq!
       end
+      country_names
     rescue => ex
       message = "Failed to geocode with Google Maps Geocoding API. Please retry later. latlon: #{iso_latlon}\n"
       raise StandardError, message, ex.backtrace
