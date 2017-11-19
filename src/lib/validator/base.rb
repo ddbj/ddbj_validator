@@ -20,6 +20,7 @@ class ValidatorBase
       config[:sparql_config] = setting["sparql_endpoint"]
       config[:ddbj_db_config] = setting["ddbj_rdb"]
       config[:google_api_key] = setting["google_api_key"]
+      config[:eutils_api_key] = setting["eutils_api_key"]
       config[:version] = setting["version"]
       config
     rescue => ex

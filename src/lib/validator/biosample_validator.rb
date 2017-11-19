@@ -61,6 +61,7 @@ class BioSampleValidator < ValidatorBase
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
       config[:google_api_key] = @conf[:google_api_key]
+      config[:eutils_api_key] = @conf[:eutils_api_key]
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -923,7 +924,7 @@ class BioSampleValidator < ValidatorBase
       rescue ArgumentError
         host_tax_id_not_integer = true
       end
-      if !(host_taxid.nil? || host_taxid.strip == "" || host_tax_id_not_integer) #host_taxid記述あり #host_id記述なしまたは不正
+      if !(host_taxid.nil? || host_taxid.strip == "" || host_tax_id_not_integer) #host_taxid記述あり
         annotation.push({key: "host_taxid", value: host_taxid})
         #あればキャッシュを使用
         if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid) == false #cache値がnilの可能性があるためhas_keyでチェック

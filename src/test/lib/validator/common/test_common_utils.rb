@@ -14,6 +14,7 @@ class TestCommonUtils < Minitest::Test
     config_obj[:ddbj_date_format] = JSON.parse(File.read("#{conf_dir}/ddbj_date_format.json"))
     setting = YAML.load(File.read("#{conf_dir}/../validator.yml"))
     config_obj[:google_api_key] = setting["google_api_key"]
+    config_obj[:eutils_api_key] = setting["eutils_api_key"]
     CommonUtils::set_config (config_obj)
   end
 

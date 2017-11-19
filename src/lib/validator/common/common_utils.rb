@@ -14,6 +14,7 @@ class CommonUtils
     @@convert_date_format = config_obj[:convert_date_format]
     @@ddbj_date_format = config_obj[:ddbj_date_format]
     @@google_api_key = config_obj[:google_api_key]
+    @@eutils_api_key = config_obj[:eutils_api_key]
   end
 
   #
@@ -274,8 +275,8 @@ class CommonUtils
   #
   def geocode_country_from_latlon (iso_latlon)
     return nil if iso_latlon.nil?
-    # 200 ms 間隔を空ける
-    # free API の制約が 5 requests per second のため
+    # 200ms 間隔を空ける
+    # APIのper second制約がある為. 50/sだが早過ぎるとエラーになるという報告がみられる
     # https://developers.google.com/maps/documentation/geocoding/intro?hl=ja#Limits
     sleep(0.2)
     url = "https://maps.googleapis.com/maps/api/geocode/json?language=en"
@@ -363,7 +364,11 @@ class CommonUtils
   #
   def eutils_summary(db_name, id)
     return nil if db_name.nil? || id.nil?
-    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=#{db_name}&id=#{id}&retmode=json"
+    # 400ms 間隔を空ける
+    # APIのper second制約がある為. 10/s. 4workerだと2.5/s
+    # https://support.ncbi.nlm.nih.gov/link/portal/28045/28049/Article/2039/Why-and-how-should-I-get-an-API-key-to-use-the-E-utilities
+    sleep(0.4)
+    url = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=#{db_name}&id=#{id}&retmode=json&api_key=#{@@eutils_api_key['key']}"
     begin
       res = http_get_response(url)
       if res.code =~ /^5/ # server error
