@@ -80,8 +80,10 @@ class DDBJDbValidator
     result = []
 
     #無効なbioproject_idが指定された場合には空の配列を返す
-    unless valid_bioproject_id?(bioproject_accession)
-      return []
+    if (bioproject_accession =~ /^PSUB\d{6}/ || bioproject_accession =~ /^PRJDB\d+/)
+      if !valid_bioproject_id?(bioproject_accession)
+        return []
+      end
     end
     begin
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', DRA_DB_NAME, @pg_user,  @pg_pass)
@@ -90,8 +92,8 @@ class DDBJDbValidator
         prj_query_id = bioproject_accession
       elsif bioproject_accession =~ /^PRJDB\d+/
         prj_query_id = get_bioproject_submission(bioproject_accession)
-      else
-        return []
+      else #外部ID(PRJNA,PRJDA等)
+        prj_query_id = bioproject_accession
       end
 
       q = "SELECT submitter_id

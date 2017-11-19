@@ -43,6 +43,9 @@ class TestDDBJDbValidator < Minitest::Test
     ##PRJDB
     ret = @db_validator.get_bioproject_referenceable_submitter_ids("PRJDB3595")
     assert_equal 2, ret.size
+    ##PRJNA71719
+    ret = @db_validator.get_bioproject_referenceable_submitter_ids("PRJNA71719")
+    assert_equal 1, ret.size
 
     # not exist data
     ##invalid ID
