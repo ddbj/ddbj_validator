@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#exit code
+OK=0
+WARNING=1
+CRITICAL=2
+UNKNOWN=3
+
 API_PATH="" #change it
 BASE_DIR="" #change it
 MONITORING_DATA_DIR="${BASE_DIR}/data"
