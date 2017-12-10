@@ -3,6 +3,8 @@ require 'sinatra/base'
 require 'sinatra/json'
 require "securerandom"
 require 'sinatra/reloader'
+require 'net/http'
+require 'net/https'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
@@ -199,6 +201,63 @@ module DDBJValidator
       end
     end
 
+    get '/api/monitoring' do
+      ret_message = ""
+      submission_id = "SSUB000019"
+      begin
+        # api url path
+        port_str = ""
+        unless request.port == "80"
+          port_str = ":" + request.port.to_s
+        end
+        api_url = request.scheme + "://" + request.host + port_str + "/api/"
+
+        # get xml file
+        file_get_api = api_url + "submission/biosample/" + submission_id
+        res = http_get_response(file_get_api, {"API_KEY" => "curator"})
+        unless res.body.start_with?("<?xml")
+          raise "Can't get submission xml file. Please check the validation service."
+        end
+        tmp_xml_file = Tempfile.open("test_biosample") do |f|
+          f.puts(res.body)
+          f
+        end
+        # exec validation
+        validate_exec_api = api_url + "validation"
+        data = [
+          [ "biosample", tmp_xml_file.open, { filename: submission_id + ".xml" } ]
+        ]
+        res = http_post_response(validate_exec_api, data , {})
+        uuid = JSON.parse(res.body)["uuid"]
+        # wait validator has finished
+        status_api = api_url + "validation/" + uuid + "/status"
+        status = ""
+        count = 0
+        while !(status == "finished" || status == "error") do
+          count += 1
+          res = http_get_response(status_api, {})
+          status = JSON.parse(res.body)["status"]
+          if count > 50 #timeout
+            raise "Validation processing timed out."
+          end
+          sleep(2)
+        end
+        # get validation result
+        result_api = api_url + "validation/" + uuid
+        res = http_get_response(result_api, {})
+        status = JSON.parse(res.body)["status"]
+
+        if status == "finished"
+          ret_message = '{"status": "OK", "message": "Validation processing has finished successfully."}'
+        else
+          ret_message =  '{"status": "NG", "message": "Validation processing finished with error. Please check the validation service."}'
+        end
+      rescue => e
+        ret_message = '{"status": "NG", "message": "Error has occurred during monitoring processing. Please check the validation service. ' + e.message + '"}'
+      end
+      ret_message
+    end
+
     not_found do
       erb :not_found
     end
@@ -249,6 +308,36 @@ module DDBJValidator
         save_path
       end
 
+      def http_get_response (uri, options)
+        url = URI.parse(uri)
+        req = Net::HTTP::Get.new(url)
+        options.each do |k, v|
+          req[k] = v
+        end
+        ssl_flag = false
+        ssl_flag = true if uri.start_with?("https")
+        res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag) {|http|
+          http.request(req)
+        }
+        res
+      end
+
+      def http_post_response (uri, data, options)
+        url = URI.parse(uri)
+        req = Net::HTTP::Post.new(url)
+        req.set_form(data, "multipart/form-data")
+        options.each do |k, v|
+          req[k] = v
+        end
+        ssl_flag = false
+        ssl_flag = true if uri.start_with?("https")
+        res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag) {|http|
+          http.request(req)
+        }
+        res
+      end
+
     end
+
   end
 end
