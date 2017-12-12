@@ -206,12 +206,10 @@ module DDBJValidator
       submission_id = "SSUB000019"
       begin
         # api url path
-        port_str = ""
-        unless request.port == "80"
-          port_str = ":" + request.port.to_s
-        end
-        api_url = request.scheme + "://" + request.host + port_str + "/api/"
-
+p request.env
+p request
+        api_url = "http://" + request.env["HTTP_HOST"] + "/api/"
+puts api_url
         # get xml file
         file_get_api = api_url + "submission/biosample/" + submission_id
         res = http_get_response(file_get_api, {"API_KEY" => "curator"})
