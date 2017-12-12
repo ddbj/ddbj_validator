@@ -206,10 +206,7 @@ module DDBJValidator
       submission_id = "SSUB000019"
       begin
         # api url path
-p request.env
-p request
         api_url = "http://" + request.env["HTTP_HOST"] + "/api/"
-puts api_url
         # get xml file
         file_get_api = api_url + "submission/biosample/" + submission_id
         res = http_get_response(file_get_api, {"API_KEY" => "curator"})
