@@ -44,6 +44,11 @@ class CreateRuleJson
         hash[:rule_class] = row["rule_class"]
         hash[:code] = row["rule_id"]
         hash[:level] = row["level"]
+        if row["internal_ignore"].nil? || row["internal_ignore"].strip == ""
+          hash[:internal_ignore] = false
+        else
+          hash[:internal_ignore] = true
+        end
         hash[:name] = row["name"]
         hash[:method] = row["name"].gsub(" ", "_").gsub(">", "_").gsub("-", "_").gsub("/", "_").downcase
         hash[:message] = row["message"]

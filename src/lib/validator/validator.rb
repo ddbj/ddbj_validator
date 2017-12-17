@@ -183,6 +183,13 @@ class Validator
       #message(failed_list)の内容をパースして統計情報(stats)を計算
       error_count = error_list.select{|item| item[:level] == "error" }.size
       warning_count = error_list.select{|item| item[:level] == "warning" }.size
+
+      external_error_count = error_list.select{|item| item[:level] == "error" && item[:external] == true }.size
+      external_warning_count = error_list.select{|item| item[:level] == "warning" && item[:external] == true }.size
+      common_error_count = error_count - external_error_count
+      common_warning_count = warning_count - external_warning_count
+      error_type_count = {common_error: common_error_count, common_warning: common_warning_count, external_error: external_error_count, external_warning: external_warning_count}
+
       autocorrect = {}
       #autocorrectできるfileかどうかをのフラグを立てる
       @@filetype.each do |filetype|
@@ -196,7 +203,7 @@ class Validator
           autocorrect[filetype] = false
         end
       end
-      {error_count: error_count, warning_count: warning_count, autocorrect: autocorrect}
+      {error_count: error_count, warning_count: warning_count, error_type_count: error_type_count, autocorrect: autocorrect}
     end
 
 #### Error mail

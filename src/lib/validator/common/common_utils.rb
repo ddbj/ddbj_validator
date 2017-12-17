@@ -74,6 +74,7 @@ class CommonUtils
              message: message,
              reference: rule["reference"],
              level: rule["level"],
+             external: !rule["internal_ignore"],
              method: rule["rule_class"],
              object: rule["object"],
              source: file_path,
