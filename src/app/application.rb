@@ -65,7 +65,7 @@ module DDBJValidator
 
         status_file_path = "#{save_dir}/status.json"
         start_time = Time.now
-        status = { uuid: uuid, status: "running", "start-time": start_time}
+        status = { uuid: uuid, status: "running", "start_time": start_time}
         File.open(status_file_path, "w") do |file|
           file.puts(JSON.generate(status))
         end
@@ -75,16 +75,16 @@ module DDBJValidator
           Validator.new().execute(validation_params)
           result_json = JSON.parse(File.open(output_file_path).read)
           if !result_json["status"].nil? && result_json["status"] == "error"
-            status = { uuid: uuid, status: "error", "start-time": start_time, "end-time": Time.now}
+            status = { uuid: uuid, status: "error", "start_time": start_time, "end_time": Time.now}
           else
-            status = { uuid: uuid, status: "finished", "start-time": start_time, "end-time": Time.now}
+            status = { uuid: uuid, status: "finished", "start_time": start_time, "end_time": Time.now}
           end
           File.open(status_file_path, "w") do |file|
             file.puts(JSON.generate(status))
           end
         }
 
-        { uuid: uuid, status: "accepted", "start-time": start_time}.to_json
+        { uuid: uuid, status: "accepted", "start_time": start_time}.to_json
       else #file 組み合わせエラー
         status 400
         message = "Invalid file combination"

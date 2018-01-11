@@ -106,8 +106,8 @@
               "finished": {
                 "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
                 "status": "finished",
-                "start-time": "2017-08-29 21:15:53 +0900",
-                "end-time": "2017-08-29 21:16:03 +0900"
+                "start_time": "2017-08-29 21:15:53 +0900",
+                "end_time": "2017-08-29 21:16:03 +0900"
               }
             }
           },
@@ -401,10 +401,10 @@
           "type": "string",
           "description": "\"accepted\" or \"running\" or \"finished\" or \"error\""
         },
-        "start-time": {
+        "start_time": {
           "type": "string"
         },
-        "end-time": {
+        "end_time": {
           "type": "string",
           "description": "only when status is \"finished\""
         }
@@ -421,10 +421,10 @@
           "type": "string",
           "description": "only \"finished\""
         },
-        "start-time": {
+        "start_time": {
           "type": "string"
         },
-        "end-time": {
+        "end_time": {
           "type": "string"
         },
         "result": {
@@ -466,8 +466,8 @@
       "example": {
         "uuid": "27ca0fbf-88a9-49c5-96f6-f3dfd257888f",
         "status": "finished",
-        "start-time": "2017-08-29 21:15:53 +0900",
-        "end-time": "2017-08-29 21:16:03 +0900",
+        "start_time": "2017-08-29 21:15:53 +0900",
+        "end_time": "2017-08-29 21:16:03 +0900",
         "result": {
           "version": "0.9.0",
           "validity": true,
