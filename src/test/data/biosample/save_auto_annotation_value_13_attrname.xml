@@ -16,7 +16,7 @@
       <Model>Generic</Model>
     </Models>
     <Attributes>
-      <Attribute attribute_name="sample_name">DRS012892</Attribute>
+      <Attribute attribute_name=" sample_name">DRS012892with_space</Attribute>
       <Attribute attribute_name="sample   comment">to many space</Attribute>
     </Attributes>
   </BioSample>

@@ -15,38 +15,14 @@ class TestSaveAutoAnnotation < Minitest::Test
   end
 
   #
-  # 12(special_character_included)の属性のauto annotationの保存が効いているかの検証
-  # auto-annotated "temperature(°C)" => "temperature(degree Celsius)"
-  #
-  def test_save_annotation_12_attrname
-    biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_12_attrname.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "14"} #not_predefined_attribute_nameのwarningに引っかかるのでそのエラー時の値を参照
-    attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute names"}
-    assert_equal "temperature(degree Celsius)", attr_value[:value]
-  end
-  #
-  # 12(special_character_included)のauto annotationの保存が効いているかの検証
-  # auto-annotated "12 hours at 20°C. テスト用：utf8ではない文字" => "12 hours at 20degree Celsius. テスト用：utf8ではない文字"
-  #
-  def test_save_annotation_12
-    biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_12.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "58"}
-    attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute value"}
-    assert_equal "12 hours at 20degree Celsius. テスト用：utf8ではない文字", attr_value[:value]
-  end
-
-  #
   # 13(invalid_data_format)の属性のauto annotationの保存が効いているかの検証
-  # auto-annotated "sample    comment" => "sample comment"
+  # auto-annotated " sample_name" => "sample_name"(先頭の空白が削除されて、rule18:missing sample name がなければOK)
   #
   def test_save_annotation_13_attrname
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_13_attrname.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "14"}
-    attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute names"}
-    assert_equal "sample comment", attr_value[:value]
+    error =  error_list.find {|error| error[:id] == "18"}
+    assert_nil error
   end
 
   #
@@ -91,7 +67,7 @@ class TestSaveAutoAnnotation < Minitest::Test
     error_list = @validator.instance_variable_get (:@error_list)
     error =  error_list.find {|error| error[:id] == "41"}
     attr_value = error[:annotation].find {|anno| anno[:key] == "geo_loc_name"}
-    assert_equal "Jaaaapan: Hikone-shi", attr_value[:value]
+    assert_equal "Jaaaapan:Hikone-shi", attr_value[:value]
   end
 
   #

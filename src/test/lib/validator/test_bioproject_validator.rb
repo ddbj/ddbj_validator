@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require '../../../lib/validator/bioproject_validator.rb'
+require '../../../lib/validator/common/common_utils.rb'
 
 class TestBioProjectValidator < Minitest::Test
   def setup
@@ -689,17 +690,17 @@ class TestBioProjectValidator < Minitest::Test
     ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "OrganismName" }
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
     expect_organism_annotation = "Nostoc sp. PCC 7120"
-    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    assert_equal expect_organism_annotation, suggest_value
     #organism name blank
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng2.xml")
     ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "OrganismName" }
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
     expect_organism_annotation = "Nostoc sp. PCC 7120"
-    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    assert_equal expect_organism_annotation, suggest_value
     #not exist taxid
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng3.xml")
     ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
@@ -721,8 +722,8 @@ class TestBioProjectValidator < Minitest::Test
     expect_taxid_annotation = "103690"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxID" }
-    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
+    assert_equal expect_taxid_annotation, suggest_value
 
     ##exist but not correct as scientific name ("Anabaena sp. PCC 7120"=>"Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng2.xml")
@@ -731,10 +732,10 @@ class TestBioProjectValidator < Minitest::Test
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxID" }
-    assert_equal expect_taxid_annotation, suggest_value[:value][0]
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "OrganismName" }
-    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
+    assert_equal expect_taxid_annotation, suggest_value
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
+    assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case ("nostoc sp. pcc 7120" => "Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng3.xml")
     ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
@@ -742,10 +743,10 @@ class TestBioProjectValidator < Minitest::Test
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxID" }
-    assert_equal expect_taxid_annotation, suggest_value[:value][0]
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "OrganismName" }
-    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
+    assert_equal expect_taxid_annotation, suggest_value
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
+    assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng4.xml")
     ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)

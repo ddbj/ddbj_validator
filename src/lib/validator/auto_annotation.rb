@@ -38,11 +38,11 @@ class AutoAnnotation
               #Elementの場合、子nodeのうち直下のText nodeの値を置き換える
               node.children.each do |child|
                 if child.text?
-                  child.content = annotation["value"].first
+                  child.content = annotation["suggested_value"].first
                 end
               end
             elsif node.class == Nokogiri::XML::Attr #Attributeの場合は値を置き換える
-              node.content = annotation["value"].first
+              node.content = annotation["suggested_value"].first
             end
           end
         end
@@ -66,7 +66,7 @@ class AutoAnnotation
   # ex.
   # [
   #  {"key"=>"Suggested value",
-  #   "value"=>["missing"],
+  #   "suggested_value"=>["missing"],
   #   "target_key"=>"Attribute value",
   #   "location"=>["//BioSample[1]/Description/Organism/OrganismName"],
   #   "is_auto_annotation"=>true

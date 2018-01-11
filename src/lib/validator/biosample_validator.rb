@@ -197,13 +197,13 @@ class BioSampleValidator < ValidatorBase
       if biosample_data["attributes"]["taxonomy_id"].nil? || biosample_data["attributes"]["taxonomy_id"].strip == "" #taxonomy_id記述なし
         ret = taxonomy_error_warning("45", sample_name, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
-          taxid_annotation = @error_list.last[:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
+          taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
           unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
-            taxonomy_id = taxid_annotation[:value][0]
+            taxonomy_id = taxid_annotation
           end
-          organism_annotation = @error_list.last[:annotation].find{|anno| anno[:target_key] == "organism" }
+          organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "organism")
           unless organism_annotation.nil? #organismの補正があれば値を置き換える
-            biosample_data["attributes"]["organism"] = organism_annotation[:value][0]
+            biosample_data["attributes"]["organism"] = organism_annotation
           end
         end
       else #taxonomy_id記述あり

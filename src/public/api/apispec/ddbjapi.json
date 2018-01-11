@@ -399,7 +399,7 @@
         },
         "status": {
           "type": "string",
-          "description": "\"accepted\" or \"runnning\" or \"finished\" or \"error\""
+          "description": "\"accepted\" or \"running\" or \"finished\" or \"error\""
         },
         "start-time": {
           "type": "string"
@@ -524,7 +524,7 @@
                 },
                 {
                   "key": "Suggested value",
-                  "value": "2004-04-22",
+                  "suggested_value": "2004-04-22",
                   "target_key": "Attribute value",
                   "location": [
                     "//BioSample[1]/Attributes/Attribute[@attribute_name=\"collection_date\"]"
@@ -576,7 +576,7 @@
                 "key": {
                   "type": "string"
                 },
-                "value": {
+                "suggested_value": {
                   "type": "string"
                 },
                 "is_auto_annotation": {

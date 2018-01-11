@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require '../../../lib/validator/biosample_validator.rb'
+require '../../../lib/validator/common/common_utils.rb'
 require '../../../lib/validator/common/xml_convertor.rb'
 
 class TestBioSampleValidator < Minitest::Test
@@ -89,7 +90,7 @@ class TestBioSampleValidator < Minitest::Test
       ret = nil
       error_list[0][:annotation].each do |annotation|
        if annotation[:is_auto_annotation] == true
-         ret = annotation[:value].first
+         ret = annotation[:suggested_value].first
        end
       end
       ret
@@ -577,28 +578,28 @@ class TestBioSampleValidator < Minitest::Test
     expect_taxid_annotation = "9606"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
-    assert_equal expect_taxid_annotation, suggest_value[:value][0]
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
+    assert_equal expect_taxid_annotation, suggest_value
     ## exist but not correct as scientific name
     ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "Anabaena sp. PCC 7120", 1)
     expect_taxid_annotation = "103690"
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
-    assert_equal expect_taxid_annotation, suggest_value[:value][0]
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
-    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
+    assert_equal expect_taxid_annotation, suggest_value
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "organism")
+    assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case
     ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "nostoc sp. pcc 7120", 1)
     expect_taxid_annotation = "103690"
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "taxonomy_id" }
-    assert_equal expect_taxid_annotation, suggest_value[:value][0]
-    suggest_value = ret[:error_list][0][:annotation].find{|anno| anno[:target_key] == "organism" }
-    assert_equal expect_organism_annotation, suggest_value[:value][0]
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
+    assert_equal expect_taxid_annotation, suggest_value
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "organism")
+    assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     ret = exec_validator("taxonomy_error_warning", "45", "sampleA", "mouse", 1)
     assert_equal false, ret[:result]

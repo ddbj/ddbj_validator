@@ -119,7 +119,7 @@ class CommonUtils
   # Suggest用Hashオブジェクト
   # {
   #   key: "Suggested value",
-  #   value: sugget_value_list,
+  #   suggested_value: suggest_value_list,
   #   is_auto_annotation: true, //or is_suggest: true
   #   target_key: target_key,
   #   location: location
@@ -128,7 +128,7 @@ class CommonUtils
   def self.create_suggested_annotation (suggest_value_list, target_key, location, is_auto_annotation)
     hash = {
              key: "Suggested value",
-             value: suggest_value_list,
+             suggested_value: suggest_value_list,
              target_key: target_key,
              location: location
            }
@@ -153,7 +153,25 @@ class CommonUtils
     if annotation.nil?
       return nil
     else
-      annotation[:value].first
+      annotation[:suggested_value].first
+    end
+  end
+
+  #
+  # エラーオブジェクトにauto-annotationの値があり、かつ指定された修正先であればその値を返す。なければnilを返す
+  # ==== Args
+  # error_ojb: 1件のエラーオブジェクト
+  # target_key_value: 修正先(target_key)の値 "taxonomy_id", "organism"
+  # ==== Return
+  # auto-annotationの値
+  #
+  def self.get_auto_annotation_with_target_key (error_obj, target_key_value)
+    return nil if error_obj.nil? || error_obj[:annotation].nil?
+    annotation = error_obj[:annotation].find {|anno| anno[:is_auto_annotation] == true && anno[:target_key] == target_key_value }
+    if annotation.nil?
+      return nil
+    else
+      annotation[:suggested_value].first
     end
   end
 
