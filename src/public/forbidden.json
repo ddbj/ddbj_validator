@@ -1,0 +1,5 @@
+{
+  "status": "error",
+  "code": "403",
+  "message": "Forbidden. Your account is not authorized to access the requested resource."
+}

@@ -26,6 +26,7 @@ module DDBJValidator
     end
 
     before do
+      content_type 'application/json; charset=utf-8'
       response.headers["Access-Control-Allow-Origin"] = "*"
     end
 
@@ -34,19 +35,21 @@ module DDBJValidator
     end
 
     get '/api/' do
+      content_type 'text/html; charset=utf-8'
       send_file File.join(settings.public_folder, 'api/index.html')
     end
 
     get '/api/apispec/' do
+      content_type 'text/html; charset=utf-8'
       send_file File.join(settings.public_folder, 'apispec/index.html')
     end
 
     get '/api/client/index' do
+      content_type 'text/html; charset=utf-8'
       erb :index
     end
 
     post '/api/validation' do
-      content_type :json
       #組み合わせが成功したものだけ保存しチェック
       if valid_file_combination?
 
@@ -93,7 +96,6 @@ module DDBJValidator
     end
 
     get '/api/validation/:uuid' do |uuid|
-      content_type :json
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
       status_file_path = "#{save_dir}/status.json"
       output_file_path = "#{save_dir}/result.json"
@@ -101,8 +103,6 @@ module DDBJValidator
         result_json = JSON.parse(File.open(output_file_path).read)
         if !result_json["status"].nil? && result_json["status"] == "error"
           status 500
-          message = "An error occurred during validation processing."
-          { status: "error", "message": message}.to_json
         else
           status_json = JSON.parse(File.open(status_file_path).read)
           status_json["result"] = result_json
@@ -120,7 +120,6 @@ module DDBJValidator
     end
 
     get '/api/validation/:uuid/status' do |uuid|
-      content_type :json
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
       status_file_path = "#{save_dir}/status.json"
       if File.exist?(status_file_path)
@@ -142,7 +141,6 @@ module DDBJValidator
         send_file file_path, :filename => file_name, :type => 'application/xml'
       else
         status 400
-        content_type :json
         message = "Invalid uuid or filetype"
         { status: "error", "message": message}.to_json
       end
@@ -165,7 +163,6 @@ module DDBJValidator
         send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
       else
         status 400
-        content_type :json
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
         { status: "error", "message": message}.to_json
       end
@@ -177,9 +174,6 @@ module DDBJValidator
       end
       if headers["HTTP_API_KEY"].nil? || headers["HTTP_API_KEY"] != "curator" #TODO change
         status 401
-        content_type :json
-        message = "Unauthorized. Please input authorication information"
-        { status: "error", "message": message}.to_json
       else
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/submission_xml/#{uuid[0..1]}/#{uuid}"
@@ -189,14 +183,10 @@ module DDBJValidator
           send_file ret[:file_path], :filename => File.basename(ret[:file_path]), :type => 'application/xml'
         elsif ret[:status] == "fail"
           status 400
-          content_type :json
           message = "Invalid filetype or submission_id"
           { status: "error", "message": message}.to_json
         elsif ret[:status] == "error"
           status 500
-          content_type :json
-          message = "An error occurred during processing."
-          { status: "error", "message": message}.to_json
         end
       end
     end
@@ -253,9 +243,34 @@ module DDBJValidator
       ret_message
     end
 
-    not_found do
-      erb :not_found
+    #error response
+    error 400..599 do
+      if status == 400 #400番の場合は詳細メッセージを表示するために、設定されたresponseをそのまま返す
+        response
+      elsif status == 401
+        send_file(File.join(settings.public_folder, 'unauthorized.json'), {status: 401})
+      elsif status == 403
+        send_file(File.join(settings.public_folder, 'forbidden.json'), {status: 403})
+      elsif status == 404
+        send_file(File.join(settings.public_folder, 'not_found.json'), {status: 404})
+      elsif status == 500
+        send_file(File.join(settings.public_folder, 'internal_server_error.json'), {status: 500})
+      else #other error with rack default message
+        { status: "error", "message": Rack::Utils::HTTP_STATUS_CODES[status] }.to_json
+      end
     end
+
+    # error content for statis url
+    get '/api/unauthorized.json' do
+      401
+    end
+    get '/api/forbidden.json' do
+      403
+    end
+    get '/api/not_found.json' do
+      404
+    end
+
 
     helpers do
       # file数と組み合わせをチェック

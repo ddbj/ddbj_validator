@@ -606,7 +606,7 @@
         "status": {
           "type": "string"
         },
-        "error_message": {
+        "message": {
           "type": "string"
         }
       }
