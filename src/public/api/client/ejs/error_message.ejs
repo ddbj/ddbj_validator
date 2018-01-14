@@ -49,8 +49,10 @@
             <% for(var j = 1; j < errors[i].annotation.length; j++) { %>
                 <% if(errors[i].annotation[j].is_auto_annotation) { %>
                 <li data-auto-annotation="true">
-                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].suggested_value[0] %>
                 </li>
+                <% } else if(errors[i].annotation[j].is_suggest) { %>
+                    <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].suggested_value %>
                 <% }else{%>
                 <li>
                     <%= errors[i].annotation[j].key %> : <%= errors[i].annotation[j].value %>
