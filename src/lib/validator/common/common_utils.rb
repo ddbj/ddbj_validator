@@ -55,9 +55,8 @@ class CommonUtils
   # フォーマット(JSON)は以下を参照
   # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
   # ==== Args
-  # config: ルール記載オブジェクト { "code": "4", "level": "error", "name": "...", "method": "...",  "message": "...", "reference": "..."}
-  # reference: 参照
-  # level: error/warning 
+  # rule: ルールのオブジェクト
+  # file_path: 検証対象のファイルパス
   # annotation: annotation list for correcting the value 
   # auto_annotation: true/false Auto annotationかどうか
   # ==== Return
@@ -89,9 +88,8 @@ class CommonUtils
   # フォーマット(JSON)は以下を参照
   # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
   # ==== Args
-  # config: ルール記載オブジェクト { "code": "4", "level": "error", "name": "...", "method": "...",  "message": "...", "reference": "..."}
-  # reference: 参照
-  # level: error/warning
+  # rule: ルールのオブジェクト
+  # file_path: 検証対象のファイルパス
   # annotation: annotation list for correcting the value
   # override: 上書きしたいrule情報
   # auto_annotation: true/false Auto annotationかどうか

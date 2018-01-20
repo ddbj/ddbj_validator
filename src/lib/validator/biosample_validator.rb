@@ -741,7 +741,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        override = {level: "wargning", message: "Validation processing failed because connection to NCBI service failed"}
+        override = {level: "warning", message: "Validation processing failed because connection to NCBI service failed"}
         error_hash = CommonUtils::error_obj_override(@validation_config["rule" + rule_code], @data_file, annotation, override)
         @error_list.push(error_hash)
         result = false
