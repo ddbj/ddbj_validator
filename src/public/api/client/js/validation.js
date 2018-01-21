@@ -151,14 +151,7 @@
                 result["all_error_size"] = result.messages.length;
                 if(list_option == "option-grouped") { //グルーピング表示が選択されている場合
                     // create nested data
-                    var grouped_message = d3.nest().key(function (d) {
-                        return d.method + "_" + d.id
-                    }).entries(result.messages);
-                    //add message and attributions each grouped messages
-                    $.each(grouped_message, function (i, v) {
-                        v["message"] = v.values[0]["message"];
-                        v["level"] = v.values[0]["level"];
-                    });
+                    var grouped_message = group_by_rule(result.messages);
                     // "errors" is object grouped by validation rule type
                     result["errors"] = grouped_message;
                     tmpl = group_tmpl; //表示テンプレートを指定
@@ -228,6 +221,49 @@
                 }
             });
             var error_view = new ErrorView({el: $("#result")});
+        }
+        /*
+           rule毎にグルーピングした配列を返す
+           [
+              {
+                key: "BioSample_9",
+                level: "warning",
+                message: "Invalid lat_lon format.",
+                header: ["Sample name", "Attribute", "Attribute value"], //ルールに出現するannotationの全キー
+                values: [( each error message )]
+              },
+              {} ...
+           ]
+        */
+        function group_by_rule(error_message) {
+          ret = [];
+          error_message.forEach(function(d) {
+            var group_key = d.method + "_" + d.id;
+            var group_data = ret.find(function(d){
+              return (d.key == group_key);
+            });
+            var annotation_key_list = d.annotation.map(function(d){return d.key});
+            if (group_data == undefined) {
+              ret.push({
+                 key: group_key,
+                 level: d.level,
+                 message: d.message,
+                 header: annotation_key_list,
+                 values: [d]
+              });
+            } else {
+              //ルール内でもannotaionの個数に違いはあるため、出現する最大のannotationのkey(カラム名)リストを取得する
+              var current_header = group_data["header"];
+              annotation_key_list.forEach(function(d) {
+                if (!current_header.includes(d)) {
+                  current_header.push(d);
+                }
+              });
+              group_data["header"] = current_header;
+              group_data["values"].push(d);
+            }
+          });
+          return ret;
         }
 
         // 問い合わせ中を示すアニメーション描画

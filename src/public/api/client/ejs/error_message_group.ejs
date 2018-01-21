@@ -49,22 +49,28 @@
             <table class="grouped">
                 <thead>
                 <tr>
-                    <% for (var j = 0; j < errors[i].values[0].annotation.length; j++) { %>
-                    <th><%= errors[i].values[0].annotation[j].key %></th>
-                    <% } %>
+                <% for (var j = 0; j < errors[i].header.length; j++) { %>
+                    <th><%= errors[i].header[j] %></th>
+                <% } %>
                 </tr>
                 </thead>
                 <tbody>
                 <% for(var h = 0; h < errors[i].values.length; h++) { %>
                 <tr>
-                <% for(var j = 0; j < errors[i].values[h].annotation.length; j++) { %>
-                    <% if(errors[i].values[h].annotation[j].is_auto_annotation) { %>
-                    <td data-auto-annotation='true' data-location='<%= errors[i].values[h].annotation[j].location %>'><%= errors[i].values[h].annotation[j].suggested_value[0] %></td>
-                    <% } else if(errors[i].values[h].annotation[j].is_suggest) { %>
-                    <td data-suggest='true' data-location='<%= errors[i].values[h].annotation[j].location %>'><%= errors[i].values[h].annotation[j].suggested_value %></td>
-                    <% }else{ %>
-                    <td><%= errors[i].values[h].annotation[j].value %></td>
-                    <% } %>
+                <% for (var j = 0; j < errors[i].header.length; j++) {
+                     var annotation = errors[i].values[h].annotation.find(function(d){
+                       return (d.key === errors[i].header[j])
+                     });
+                   %>
+                   <% if(annotation == undefined) { %>
+                     <td></td>
+                   <% } else if(annotation.is_auto_annotation) { %>
+                     <td data-auto-annotation='true' data-location='<%= annotation.location %>'><%= annotation.suggested_value[0] %></td>
+                   <% } else if(annotation.is_suggest) { %>
+                     <td data-suggest='true' data-location='<%= annotation.location %>'><%= annotation.suggested_value %></td>
+                   <% }else{ %>
+                     <td><%= annotation.value %></td>
+                   <% } %>
                 <% } %>
                 </tr>
                 <% } %>
