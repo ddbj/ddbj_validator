@@ -80,7 +80,7 @@ class Validator
 
         if error_list.size == 0
           ret = {version: @latest_version, validity: true}
-          ret["stats"] = {error_count: 0, warning_count:0, autocorrect: {biosample: false, bioproject: false}}
+          ret["stats"]  = get_result_stats(error_list)
           ret["messages"] = []
           @log.info('validation result: ' + "success")
         else
