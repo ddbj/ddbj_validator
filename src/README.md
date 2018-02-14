@@ -19,6 +19,17 @@ Bundler version 1.13.1
   $ bundle install (--path vendor/bundle)
 ```
 
+## Setup Configuration
+ * PostgreSQL
+ * SPARQL endpoint
+ * google_api_key
+ * eutils_api_key
+ * api_log
+
+```
+vi src/conf/validator.yml 
+```
+
 ## Start API server
 ``` sh
 $ bundle exec rackup

@@ -5,10 +5,11 @@ require 'mail'
 
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
+require File.expand_path('../sequence_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
-    @@filetype = %w(biosample bioproject submission experiment run analysis)
+    @@filetype = %w(biosample bioproject submission experiment run analysis sequnece)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -38,7 +39,7 @@ class Validator
       permission_error_list = []
       params.each do |k,v|
         case k.to_s
-        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'output'
+        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'output', 'sequence'
           params[k] = File.expand_path(v)
           #TODO check file exist and permission, need write permission to output file
           if k.to_s == 'output'
@@ -75,6 +76,7 @@ class Validator
         error_list = []
         error_list.concat(validate("biosample", params)) if !params[:biosample].nil?
         error_list.concat(validate("bioproject", params))if !params[:bioproject].nil?
+        error_list.concat(validate("sequence", params))if !params[:sequence].nil?
         #error_list.concat(validate("combination", params))
         #TODO dra validator
 
@@ -121,6 +123,9 @@ class Validator
       when "bioproject"
         validator = BioProjectValidator.new
         data = params[:bioproject]
+      when "sequence"
+        validator = AnnotatedSequenceValidator.new
+        data = params[:sequence]
       when "combination"
         validator = CombinationValidator.new
         data = params
@@ -171,6 +176,7 @@ class Validator
         opt.on('-r VAL', '--run=file',        'run xml file path')              {|v| options[:run] = v}
         opt.on('-a VAL', '--analysis=file',   'analysis xml file path')         {|v| options[:analysis] = v}
         opt.on('-o VAL', '--output=file',     'output file path')               {|v| options[:output] = v}
+        opt.on('-o VAL', '--sequnece=file',   'annotated sequence file path')   {|v| options[:sequence] = v}
         opt.on('--user=VAL',                  'user name')               {|v| options[:output] = v}
         opt.on('--password=VAL',              'password')               {|v| options[:output] = v}
       end
