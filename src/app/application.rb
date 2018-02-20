@@ -248,26 +248,26 @@ module DDBJValidator
       if status == 400 #400番の場合は詳細メッセージを表示するために、設定されたresponseをそのまま返す
         response
       elsif status == 401
-        send_file(File.join(settings.public_folder, 'unauthorized.json'), {status: 401})
+        send_file(File.join(settings.public_folder, 'error_unauthorized.json'), {status: 401})
       elsif status == 403
-        send_file(File.join(settings.public_folder, 'forbidden.json'), {status: 403})
+        send_file(File.join(settings.public_folder, 'error_forbidden.json'), {status: 403})
       elsif status == 404
-        send_file(File.join(settings.public_folder, 'not_found.json'), {status: 404})
+        send_file(File.join(settings.public_folder, 'error_not_found.json'), {status: 404})
       elsif status == 500
-        send_file(File.join(settings.public_folder, 'internal_server_error.json'), {status: 500})
+        send_file(File.join(settings.public_folder, 'error_internal_server_error.json'), {status: 500})
       else #other error with rack default message
         { status: "error", "message": Rack::Utils::HTTP_STATUS_CODES[status] }.to_json
       end
     end
 
     # error content for statis url
-    get '/api/unauthorized.json' do
+    get '/api/error_unauthorized.json' do
       401
     end
-    get '/api/forbidden.json' do
+    get '/api/error_forbidden.json' do
       403
     end
-    get '/api/not_found.json' do
+    get '/api/error_not_found.json' do
       404
     end
 
