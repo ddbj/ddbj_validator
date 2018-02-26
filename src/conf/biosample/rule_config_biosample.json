@@ -1,7 +1,7 @@
 {
-  "rule1": {
+  "ruleBS_R0001": {
     "rule_class": "BioSample",
-    "code": "1",
+    "code": "BS_R0001",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid Attribute value for null",
@@ -10,13 +10,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "https://www.ebi.ac.uk/ena/about/missing-values-reporting"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0001"
   },
-  "rule2": {
+  "ruleBS_R0002": {
     "rule_class": "BioSample",
-    "code": "2",
+    "code": "BS_R0002",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid Attribute value for controlled terms",
@@ -25,13 +23,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0002"
   },
-  "rule3": {
+  "ruleBS_R0003": {
     "rule_class": "BioSample",
-    "code": "3",
+    "code": "BS_R0003",
     "level": "error",
     "internal_ignore": true,
     "name": "Duplicated sample title in this submission",
@@ -40,13 +36,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#sample_title"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0003"
   },
-  "rule4": {
+  "ruleBS_R0004": {
     "rule_class": "BioSample",
-    "code": "4",
+    "code": "BS_R0004",
     "level": "error",
     "internal_ignore": false,
     "name": "Taxonomy name and id not match",
@@ -55,14 +49,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#organism",
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#taxonomy_id"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0004"
   },
-  "rule5": {
+  "ruleBS_R0005": {
     "rule_class": "BioSample",
-    "code": "5",
+    "code": "BS_R0005",
     "level": "error",
     "internal_ignore": false,
     "name": "Invalid BioProject accession",
@@ -71,13 +62,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#bioproject_id"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0005"
   },
-  "rule6": {
+  "ruleBS_R0006": {
     "rule_class": "BioSample",
-    "code": "6",
+    "code": "BS_R0006",
     "level": "warning",
     "internal_ignore": false,
     "name": "BioProject not found",
@@ -86,13 +75,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#bioproject_id"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0006"
   },
-  "rule7": {
+  "ruleBS_R0007": {
     "rule_class": "BioSample",
-    "code": "7",
+    "code": "BS_R0007",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid date format",
@@ -101,13 +88,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "https://www.ddbj.nig.ac.jp/FT/full_index.html#collection_date"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0007"
   },
-  "rule8": {
+  "ruleBS_R0008": {
     "rule_class": "BioSample",
-    "code": "8",
+    "code": "BS_R0008",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid country",
@@ -116,13 +101,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "https://www.ddbj.nig.ac.jp/sub/ref6-j.html#country"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0008"
   },
-  "rule9": {
+  "ruleBS_R0009": {
     "rule_class": "BioSample",
-    "code": "9",
+    "code": "BS_R0009",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid lat_lon format",
@@ -131,13 +114,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "https://www.ddbj.nig.ac.jp/sub/ref6-j.html#lat_lon"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0009"
   },
-  "rule11": {
+  "ruleBS_R0011": {
     "rule_class": "BioSample",
-    "code": "11",
+    "code": "BS_R0011",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid publication identifier",
@@ -146,14 +127,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#ref_biomaterial",
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#isol_growth_condt"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0011"
   },
-  "rule12": {
+  "ruleBS_R0012": {
     "rule_class": "BioSample",
-    "code": "12",
+    "code": "BS_R0012",
     "level": "warning",
     "internal_ignore": false,
     "name": "Special character included",
@@ -162,13 +140,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0012"
   },
-  "rule13": {
+  "ruleBS_R0013": {
     "rule_class": "BioSample",
-    "code": "13",
+    "code": "BS_R0013",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid data format",
@@ -177,13 +153,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/submission.html#Area_core-package"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013"
   },
-  "rule15": {
+  "ruleBS_R0015": {
     "rule_class": "BioSample",
-    "code": "15",
+    "code": "BS_R0015",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid host organism name",
@@ -192,13 +166,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#host"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0015"
   },
-  "rule18": {
+  "ruleBS_R0018": {
     "rule_class": "BioSample",
-    "code": "18",
+    "code": "BS_R0018",
     "level": "error",
     "internal_ignore": false,
     "name": "Missing Sample name",
@@ -207,13 +179,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#sample_name"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0018"
   },
-  "rule20": {
+  "ruleBS_R0020": {
     "rule_class": "BioSample",
-    "code": "20",
+    "code": "BS_R0020",
     "level": "error",
     "internal_ignore": false,
     "name": "Missing organism",
@@ -222,13 +192,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#organism"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0020"
   },
-  "rule24": {
+  "ruleBS_R0024": {
     "rule_class": "BioSample",
-    "code": "24",
+    "code": "BS_R0024",
     "level": "warning",
     "internal_ignore": false,
     "name": "Identical Attributes",
@@ -237,13 +205,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0024"
   },
-  "rule25": {
+  "ruleBS_R0025": {
     "rule_class": "BioSample",
-    "code": "25",
+    "code": "BS_R0025",
     "level": "error",
     "internal_ignore": false,
     "name": "Missing Package information",
@@ -252,13 +218,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/submission.html#Area_core-package"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0025"
   },
-  "rule26": {
+  "ruleBS_R0026": {
     "rule_class": "BioSample",
-    "code": "26",
+    "code": "BS_R0026",
     "level": "error",
     "internal_ignore": false,
     "name": "Unknown Package",
@@ -267,13 +231,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/submission.html#Area_core-package"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0026"
   },
-  "rule27": {
+  "ruleBS_R0027": {
     "rule_class": "BioSample",
-    "code": "27",
+    "code": "BS_R0027",
     "level": "error",
     "internal_ignore": true,
     "name": "Missing mandatory attribute",
@@ -282,13 +244,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0027"
   },
-  "rule28": {
+  "ruleBS_R0028": {
     "rule_class": "BioSample",
-    "code": "28",
+    "code": "BS_R0028",
     "level": "error",
     "internal_ignore": true,
     "name": "Duplicate Sample names",
@@ -297,13 +257,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#sample_name"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0028"
   },
-  "rule30": {
+  "ruleBS_R0030": {
     "rule_class": "BioSample",
-    "code": "30",
+    "code": "BS_R0030",
     "level": "error",
     "internal_ignore": false,
     "name": "Non-ASCII header line",
@@ -312,13 +270,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0030"
   },
-  "rule34": {
+  "ruleBS_R0034": {
     "rule_class": "BioSample",
-    "code": "34",
+    "code": "BS_R0034",
     "level": "error",
     "internal_ignore": false,
     "name": "Missing Attribute name",
@@ -327,13 +283,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0034"
   },
-  "rule36": {
+  "ruleBS_R0036": {
     "rule_class": "BioSample",
-    "code": "36",
+    "code": "BS_R0036",
     "level": "error",
     "internal_ignore": true,
     "name": "Missing group of at least one required Attributes",
@@ -342,13 +296,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0036"
   },
-  "rule40": {
+  "ruleBS_R0040": {
     "rule_class": "BioSample",
-    "code": "40",
+    "code": "BS_R0040",
     "level": "error",
     "internal_ignore": true,
     "name": "Future collection date",
@@ -357,13 +309,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0040"
   },
-  "rule41": {
+  "ruleBS_R0041": {
     "rule_class": "BioSample",
-    "code": "41",
+    "code": "BS_R0041",
     "level": "warning",
     "internal_ignore": false,
     "name": "Latlon versus country",
@@ -372,13 +322,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0041"
   },
-  "rule45": {
+  "ruleBS_R0045": {
     "rule_class": "BioSample",
-    "code": "45",
+    "code": "BS_R0045",
     "level": "warning",
     "internal_ignore": false,
     "name": "Taxonomy error warning",
@@ -387,13 +335,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0045"
   },
-  "rule48": {
+  "ruleBS_R0048": {
     "rule_class": "BioSample",
-    "code": "48",
+    "code": "BS_R0048",
     "level": "error",
     "internal_ignore": true,
     "name": "Package versus Organism",
@@ -402,13 +348,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/packages/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0048"
   },
-  "rule58": {
+  "ruleBS_R0058": {
     "rule_class": "BioSample",
-    "code": "58",
+    "code": "BS_R0058",
     "level": "error",
     "internal_ignore": false,
     "name": "Non-ASCII Attribute value",
@@ -417,13 +361,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0058"
   },
-  "rule59": {
+  "ruleBS_R0059": {
     "rule_class": "BioSample",
-    "code": "59",
+    "code": "BS_R0059",
     "level": "warning",
     "internal_ignore": false,
     "name": "Sex for bacteria",
@@ -432,13 +374,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0059"
   },
-  "rule61": {
+  "ruleBS_R0061": {
     "rule_class": "BioSample",
-    "code": "61",
+    "code": "BS_R0061",
     "level": "error",
     "internal_ignore": false,
     "name": "Multiple Attribute values",
@@ -447,13 +387,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0061"
   },
-  "rule62": {
+  "ruleBS_R0062": {
     "rule_class": "BioSample",
-    "code": "62",
+    "code": "BS_R0062",
     "level": "warning",
     "internal_ignore": false,
     "name": "Multiple vouchers",
@@ -462,14 +400,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ddbj.nig.ac.jp/sub/ref6-j.html#culture_collection",
-      "http://www.ddbj.nig.ac.jp/sub/ref6-j.html#specimen_voucher"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0062"
   },
-  "rule69": {
+  "ruleBS_R0069": {
     "rule_class": "BioSample",
-    "code": "69",
+    "code": "BS_R0069",
     "level": "warning",
     "internal_ignore": false,
     "name": "Warning about BioProject increment",
@@ -478,13 +413,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#bioproject_id"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0069"
   },
-  "rule70": {
+  "ruleBS_R0070": {
     "rule_class": "BioSample",
-    "code": "70",
+    "code": "BS_R0070",
     "level": "error",
     "internal_ignore": false,
     "name": "Invalid BioProject type",
@@ -493,13 +426,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute.html?all=all#bioproject_id"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0070"
   },
-  "rule73": {
+  "ruleBS_R0073": {
     "rule_class": "BioSample",
-    "code": "73",
+    "code": "BS_R0073",
     "level": "warning",
     "internal_ignore": false,
     "name": "Redundant taxonomy attributes",
@@ -508,13 +439,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0073"
   },
-  "rule74": {
+  "ruleBS_R0074": {
     "rule_class": "BioSample",
-    "code": "74",
+    "code": "BS_R0074",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Pathogen: clinical or host-associated",
@@ -523,13 +452,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0074"
   },
-  "rule75": {
+  "ruleBS_R0075": {
     "rule_class": "BioSample",
-    "code": "75",
+    "code": "BS_R0075",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Pathogen: environmental/food/other",
@@ -538,13 +465,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0075"
   },
-  "rule76": {
+  "ruleBS_R0076": {
     "rule_class": "BioSample",
-    "code": "76",
+    "code": "BS_R0076",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Microbe",
@@ -553,13 +478,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0076"
   },
-  "rule77": {
+  "ruleBS_R0077": {
     "rule_class": "BioSample",
-    "code": "77",
+    "code": "BS_R0077",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Model organism or animal",
@@ -568,13 +491,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0077"
   },
-  "rule78": {
+  "ruleBS_R0078": {
     "rule_class": "BioSample",
-    "code": "78",
+    "code": "BS_R0078",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Metagenome or environmental",
@@ -583,13 +504,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0078"
   },
-  "rule80": {
+  "ruleBS_R0080": {
     "rule_class": "BioSample",
-    "code": "80",
+    "code": "BS_R0080",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Human",
@@ -598,13 +517,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0080"
   },
-  "rule81": {
+  "ruleBS_R0081": {
     "rule_class": "BioSample",
-    "code": "81",
+    "code": "BS_R0081",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Plant",
@@ -613,13 +530,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0081"
   },
-  "rule82": {
+  "ruleBS_R0082": {
     "rule_class": "BioSample",
-    "code": "82",
+    "code": "BS_R0082",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Virus",
@@ -628,13 +543,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0082"
   },
-  "rule83": {
+  "ruleBS_R0083": {
     "rule_class": "BioSample",
-    "code": "83",
+    "code": "BS_R0083",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > MIMS Environmental/Metagenome",
@@ -643,13 +556,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0083"
   },
-  "rule84": {
+  "ruleBS_R0084": {
     "rule_class": "BioSample",
-    "code": "84",
+    "code": "BS_R0084",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > MIGS Cultured Bacterial/Archaeal",
@@ -658,13 +569,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0084"
   },
-  "rule85": {
+  "ruleBS_R0085": {
     "rule_class": "BioSample",
-    "code": "85",
+    "code": "BS_R0085",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > MIGS Eukaryotic",
@@ -673,13 +582,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0085"
   },
-  "rule86": {
+  "ruleBS_R0086": {
     "rule_class": "BioSample",
-    "code": "86",
+    "code": "BS_R0086",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > MIGS Viral",
@@ -688,13 +595,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0086"
   },
-  "rule88": {
+  "ruleBS_R0088": {
     "rule_class": "BioSample",
-    "code": "88",
+    "code": "BS_R0088",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > MIMARKS Survey related",
@@ -703,13 +608,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0088"
   },
-  "rule89": {
+  "ruleBS_R0089": {
     "rule_class": "BioSample",
-    "code": "89",
+    "code": "BS_R0089",
     "level": "error",
     "internal_ignore": true,
     "name": "package_vs_organism > Beta-lactamase",
@@ -718,13 +621,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/submission/validation/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0089"
   },
-  "rule90": {
+  "ruleBS_R0090": {
     "rule_class": "BioSample",
-    "code": "90",
+    "code": "BS_R0090",
     "level": "warning",
     "internal_ignore": false,
     "name": "Invalid Attribute value format",
@@ -733,13 +634,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ncbi.nlm.nih.gov/biosample/docs/attributes/"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0090"
   },
-  "rule91": {
+  "ruleBS_R0091": {
     "rule_class": "BioSample",
-    "code": "91",
+    "code": "BS_R0091",
     "level": "error",
     "internal_ignore": false,
     "name": "Duplicated locus tag prefix",
@@ -748,13 +647,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0091"
   },
-  "rule92": {
+  "ruleBS_R0092": {
     "rule_class": "BioSample",
-    "code": "92",
+    "code": "BS_R0092",
     "level": "error",
     "internal_ignore": true,
     "name": "Missing required attribute name",
@@ -763,13 +660,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0092"
   },
-  "rule93": {
+  "ruleBS_R0093": {
     "rule_class": "BioSample",
-    "code": "93",
+    "code": "BS_R0093",
     "level": "error",
     "internal_ignore": true,
     "name": "Attribute value is not integer",
@@ -778,13 +673,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0093"
   },
-  "rule94": {
+  "ruleBS_R0094": {
     "rule_class": "BioSample",
-    "code": "94",
+    "code": "BS_R0094",
     "level": "warning",
     "internal_ignore": false,
     "name": "Format of geo_loc_name is invalid",
@@ -793,13 +686,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ddbj.nig.ac.jp/sub/country-e.html"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0094"
   },
-  "rule95": {
+  "ruleBS_R0095": {
     "rule_class": "BioSample",
-    "code": "95",
+    "code": "BS_R0095",
     "level": "warning",
     "internal_ignore": false,
     "name": "BioProject submission id replacement",
@@ -808,13 +699,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/biosample/attribute_e.html?all=all#bioproject_id"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0095"
   },
-  "rule96": {
+  "ruleBS_R0096": {
     "rule_class": "BioSample",
-    "code": "96",
+    "code": "BS_R0096",
     "level": "error",
     "internal_ignore": true,
     "name": "Taxonomy at species or infraspecific rank",
@@ -823,13 +712,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.ddbj.nig.ac.jp/sub/ref8-j.html"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0096"
   },
-  "rule97": {
+  "ruleBS_R0097": {
     "rule_class": "BioSample",
-    "code": "97",
+    "code": "BS_R0097",
     "level": "error",
     "internal_ignore": false,
     "name": "Not well-formed XML",
@@ -838,13 +725,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://www.w3schools.com/xml/xml_validator.asp"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0097"
   },
-  "rule98": {
+  "ruleBS_R0098": {
     "rule_class": "BioSample",
-    "code": "98",
+    "code": "BS_R0098",
     "level": "error",
     "internal_ignore": false,
     "name": "Invalid XML against schema",
@@ -853,13 +738,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "https://github.com/ddbj/docs/tree/master/bioproject/xsd"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0098"
   },
-  "rule99": {
+  "ruleBS_R0099": {
     "rule_class": "BioSample",
-    "code": "99",
+    "code": "BS_R0099",
     "level": "error",
     "internal_ignore": false,
     "name": "Invalid locus tag prefix format",
@@ -868,13 +751,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/glossary/ja/Locus_tag_prefix"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0099"
   },
-  "rule100": {
+  "ruleBS_R0100": {
     "rule_class": "BioSample",
-    "code": "100",
+    "code": "BS_R0100",
     "level": "warning",
     "internal_ignore": false,
     "name": "Null values provided for optional attributes",
@@ -883,13 +764,11 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0100"
   },
-  "rule101": {
+  "ruleBS_R0101": {
     "rule_class": "BioSample",
-    "code": "101",
+    "code": "BS_R0101",
     "level": "error",
     "internal_ignore": true,
     "name": "Invalid Sample Name format.",
@@ -898,8 +777,6 @@
     "object": [
       "BioSample"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0101"
   }
 }

@@ -16,12 +16,12 @@ class TestSaveAutoAnnotation < Minitest::Test
 
   #
   # 13(invalid_data_format)の属性のauto annotationの保存が効いているかの検証
-  # auto-annotated " sample_name" => "sample_name"(先頭の空白が削除されて、rule18:missing sample name がなければOK)
+  # auto-annotated " sample_name" => "sample_name"(先頭の空白が削除されて、rule BS_R0018:missing sample name がなければOK)
   #
   def test_save_annotation_13_attrname
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_13_attrname.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "18"}
+    error =  error_list.find {|error| error[:id] == "BS_R0018"}
     assert_nil error
   end
 
@@ -32,7 +32,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_13
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_13.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "58"}
+    error =  error_list.find {|error| error[:id] == "BS_R0058"}
     attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute value"}
     assert_equal "12 hours テスト用：utf8ではない文字", attr_value[:value]
   end
@@ -43,7 +43,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_1
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_1.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "20"}
+    error =  error_list.find {|error| error[:id] == "BS_R0020"}
     attr_value = error[:annotation].find {|anno| anno[:key] == "organism"}
     assert_equal "missing", attr_value[:value]
   end
@@ -54,7 +54,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_7
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_7.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "40"}
+    error =  error_list.find {|error| error[:id] == "BS_R0040"}
     attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute value"}
     assert_equal "2050-01-01", attr_value[:value]
   end
@@ -65,7 +65,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_94
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_94.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "41"}
+    error =  error_list.find {|error| error[:id] == "BS_R0041"}
     attr_value = error[:annotation].find {|anno| anno[:key] == "geo_loc_name"}
     assert_equal "Jaaaapan:Hikone-shi", attr_value[:value]
   end
@@ -76,7 +76,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_9
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_9.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "41"}
+    error =  error_list.find {|error| error[:id] == "BS_R0041"}
     annotation = error[:annotation].find {|anno| anno[:key] == "lat_lon" }
     assert_equal "37.4435 N 6.254 W", annotation[:value]
   end
@@ -88,7 +88,7 @@ class TestSaveAutoAnnotation < Minitest::Test
     #"escherichia"からtaxonomy_idの値が"561"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_45.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "96"}
+    error =  error_list.find {|error| error[:id] == "BS_R0096"}
     annotation = error[:annotation].find {|anno| anno[:key] == "taxonomy_id" }
     assert_equal "561", annotation[:value] #taxonomy_idが追加されている
     annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
@@ -102,7 +102,7 @@ class TestSaveAutoAnnotation < Minitest::Test
     #tax_id:561によって"eschericha coli"=>"Escherichia"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_4.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "96"}
+    error =  error_list.find {|error| error[:id] == "BS_R0096"}
     annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
     assert_equal "Escherichia", annotation[:value] #organism name が"escherichia coli" => "Escherichia"に補正されている
   end

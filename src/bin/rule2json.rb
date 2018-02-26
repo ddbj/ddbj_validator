@@ -54,10 +54,8 @@ class CreateRuleJson
         hash[:message] = row["message"]
         #hash[:object] = "BioSample, BioProject and Submission AND Run".split(/and|,/i).map {|obj| obj.chomp.strip }
         hash[:object] = row["object"].split(/and|,/i).map {|obj| obj.chomp.strip }
-        if row["reference"].nil? || row["reference"].strip == ""
-          hash[:reference] = []
-        else
-          hash[:reference] = row["reference"].split("\n") 
+        unless row["reference"].nil? || row["reference"].strip == ""
+          hash[:reference] = row["reference"]
         end
         rule_config.push(hash)
       end

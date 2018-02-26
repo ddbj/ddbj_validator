@@ -35,8 +35,6 @@ class TestOrganismValidator < Minitest::Test
     assert_equal true, ret.size > 0
     ret = @validator.search_tax_from_name_ignore_case("sicyoeae schrad., 1838")
     assert_equal true, ret.size > 0
-    ret = @validator.search_tax_from_name_ignore_case("atcc 6260 [[Candida guilliermondii]]")
-    assert_equal true, ret.size > 0
     ret = @validator.search_tax_from_name_ignore_case("Verticillium lateritium (Ehrenb.) Rabenh.")
     assert_equal true, ret.size > 0
     ret = @validator.search_tax_from_name_ignore_case("drechslera tritici-repentis")
@@ -71,11 +69,7 @@ class TestOrganismValidator < Minitest::Test
     assert_equal true, ret.size > 0
     ret = @validator.search_tax_from_name_ignore_case("transposon vector EPICENTRE EZ-Tn5 <oriV/KAN-2>")
     assert_equal true, ret.size > 0
-    ret = @validator.search_tax_from_name_ignore_case("Mimetes cucullatus (L.) R.Br. << mimetes cucullata")
-    assert_equal true, ret.size > 0
     ret = @validator.search_tax_from_name_ignore_case("Blue fox parvovirus isolate tai`an")
-    assert_equal true, ret.size > 0
-    ret = @validator.search_tax_from_name_ignore_case("kalmanozyma brasiliensis (J.V.C. Oliveira, T.A. Borges, R.A.C. Santos, L.F.D. Freitas, C.A. Rosa, G.H. Goldman & D.M. Ria~no- Pach on) Q.M. Wang, F.Y. Bai, Begerow & Boekhout, 2015")
     assert_equal true, ret.size > 0
     ret = @validator.search_tax_from_name_ignore_case('Heros "common"')
     assert_equal true, ret.size > 0

@@ -39,7 +39,7 @@ class CommonUtils
   #
   # ==== Args
   # rule_obj: object that is described the rule
-  # rule_code: rule_no ex."48"
+  # rule_code: rule_no ex."BS_R0048"
   # params: a hash object for binding the variable to template ex."{attribute_name: attr_name}"
   # ==== Return
   # returns error message as string

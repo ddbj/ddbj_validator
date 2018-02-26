@@ -241,16 +241,16 @@ class OrganismValidator < SPARQLBase
   def org_vs_package_validate (tax_id, package_name)
     result = true
     rule_id = ""
-    if package_name == "Pathogen.cl" #rule 74
-      rule_id = "74"
+    if package_name == "Pathogen.cl" #rule BS_R0074
+      rule_id = "BS_R0074"
       linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
       result = has_linage(tax_id, linages)
-    elsif package_name == "Pathogen.env" #rule 75
-      rule_id = "75"
+    elsif package_name == "Pathogen.env" #rule BS_R0075
+      rule_id = "BS_R0075"
       linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
       result = has_linage(tax_id, linages)
-    elsif package_name == "Microbe" #rule 76
-      rule_id = "76"
+    elsif package_name == "Microbe" #rule BS_R0076
+      rule_id = "BS_R0076"
       prokaryota_linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_VIROIDS]
       is_prokaryota = has_linage(tax_id, prokaryota_linages)
       #eukaryotesでありMETAZOAとEMBRYOPHYTA以外であればtrue
@@ -261,70 +261,70 @@ class OrganismValidator < SPARQLBase
       unless (is_prokaryota || is_unicellular_eukaryotes)
         result = false
       end
-    elsif package_name == "Model.organism.animal" #rule 77
-      rule_id = "77"
+    elsif package_name == "Model.organism.animal" #rule BS_R0077
+      rule_id = "BS_R0077"
       linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_FUNGI, TAX_VIROIDS, TAX_UNCLASSIFIED_SEQUENCES, TAX_OTHER_SEQUENCES]
       has_linage = has_linage(tax_id, linages)
       if (tax_id == "9606" || has_linage)
         result = false
       end
-    elsif package_name == "Metagenome.environmental" #rule 78
-      rule_id = "78"
+    elsif package_name == "Metagenome.environmental" #rule BS_R0078
+      rule_id = "BS_R0078"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       organism_name = get_organism_name(tax_id)
       if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
       end
-    elsif package_name == "Human" #rule 80
-      rule_id = "80"
+    elsif package_name == "Human" #rule BS_R0080
+      rule_id = "BS_R0080"
       unless tax_id == "9606"
         result = false
       end
-    elsif package_name == "Plant" #rule 81
-      rule_id = "81"
+    elsif package_name == "Plant" #rule BS_R0081
+      rule_id = "BS_R0081"
       linages = [TAX_VIRIDIPLANTAE]
       has_plastids = has_plastids(tax_id)
       unless (linages && has_plastids)
         result = false
       end
       result = has_linage(tax_id, linages)
-    elsif package_name == "Virus" #rule 82
-      rule_id = "82"
+    elsif package_name == "Virus" #rule BS_R0082
+      rule_id = "BS_R0082"
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIMS.me") #rule 83
-      rule_id = "83"
+    elsif package_name.start_with?("MIMS.me") #rule BS_R0083
+      rule_id = "BS_R0083"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       organism_name = get_organism_name(tax_id)
       if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
       end 
-    elsif package_name.start_with?("MIGS.ba") #rule 84
-      rule_id = "84"
+    elsif package_name.start_with?("MIGS.ba") #rule BS_R0084
+      rule_id = "BS_R0084"
       linages = [TAX_BACTERIA, TAX_ARCHAEA]
       result = has_linage(tax_id, linages) 
-    elsif package_name.start_with?("MIGS.eu") #rule 85
-      rule_id = "85"
+    elsif package_name.start_with?("MIGS.eu") #rule BS_R0085
+      rule_id = "BS_R0085"
       linages = [TAX_EUKARYOTA]
       result = has_linage(tax_id, linages) 
-    elsif package_name.start_with?("MIGS.vi") #rule 86
-      rule_id = "86"
+    elsif package_name.start_with?("MIGS.vi") #rule BS_R0086
+      rule_id = "BS_R0086"
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages) 
-    elsif package_name.start_with?("MIMARKS.specimen") #rule 87
+    elsif package_name.start_with?("MIMARKS.specimen") #rule BS_R0087
       #no check
-    elsif package_name.start_with?("MIMARKS.survey") #rule 88
-      rule_id = "88"
+    elsif package_name.start_with?("MIMARKS.survey") #rule BS_R0088
+      rule_id = "BS_R0088"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       organism_name = get_organism_name(tax_id)
       if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
       end 
-    elsif package_name == "Beta-lactamase" #rule 89
-      rule_id = "89"
+    elsif package_name == "Beta-lactamase" #rule BS_R0089
+      rule_id = "BS_R0089"
       linages = [TAX_BACTERIA]
       result = has_linage(tax_id, linages)
     end

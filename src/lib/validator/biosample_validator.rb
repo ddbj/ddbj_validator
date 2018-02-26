@@ -79,12 +79,12 @@ class BioSampleValidator < ValidatorBase
   #
   #
   def validate (data_xml, submitter_id=nil)
-    valid_xml = not_well_format_xml("97", data_xml)
+    valid_xml = not_well_format_xml("BS_R0097", data_xml)
     return unless valid_xml
     #convert to object for validator
     @data_file = File::basename(data_xml)
     xml_document = File.read(data_xml)
-    valid_xml = xml_data_schema("98", xml_document)
+    valid_xml = xml_data_schema("BS_R0098", xml_document)
     return unless valid_xml
 
     # xml検証が通った場合のみ実行
@@ -109,8 +109,8 @@ class BioSampleValidator < ValidatorBase
         value = attr[attr_name]
 
         #attr name
-        ret = special_character_included("12", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
-        ret = invalid_data_format("13", sample_name, attr_name, value, "attr_name", line_num)
+        ret = special_character_included("BS_R0012", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
+        ret = invalid_data_format("BS_R0013", sample_name, attr_name, value, "attr_name", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
           #attrbutes(hash)の置換
@@ -122,12 +122,12 @@ class BioSampleValidator < ValidatorBase
         end
 
         #attr value
-        ret = special_character_included("12", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
-        ret = invalid_data_format("13", sample_name, attr_name, value, "attr_value", line_num)
+        ret = special_character_included("BS_R0012", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
+        ret = invalid_data_format("BS_R0013", sample_name, attr_name, value, "attr_value", line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = invalid_attribute_value_for_null("1", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
+        ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
@@ -138,20 +138,20 @@ class BioSampleValidator < ValidatorBase
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
-      non_ascii_header_line("30", sample_name, biosample_data["attribute_list"], line_num)
-      missing_attribute_name("34", sample_name, biosample_data["attribute_list"], line_num)
-      multiple_attribute_values("61", sample_name, biosample_data["attribute_list"], line_num)
+      non_ascii_header_line("BS_R0030", sample_name, biosample_data["attribute_list"], line_num)
+      missing_attribute_name("BS_R0034", sample_name, biosample_data["attribute_list"], line_num)
+      multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], line_num)
     end
 
     ### 複数のサンプル間の関係(一意性など)の検証
-    identical_attributes("24", @biosample_list)
-    warning_about_bioproject_increment("69", @biosample_list)
+    identical_attributes("BS_R0024", @biosample_list)
+    warning_about_bioproject_increment("BS_R0069", @biosample_list)
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
       sample_name = biosample_data["attributes"]["sample_name"]
       sample_title = biosample_data["attributes"]["sample_title"]
-      duplicated_sample_title_in_this_submission("3", sample_name, sample_title, @biosample_list, line_num)
-      duplicate_sample_names("28", sample_name, sample_title, @biosample_list, line_num)
+      duplicated_sample_title_in_this_submission("BS_R0003", sample_name, sample_title, @biosample_list, line_num)
+      duplicate_sample_names("BS_R0028", sample_name, sample_title, @biosample_list, line_num)
     end
 
     ### それ以外
@@ -160,33 +160,33 @@ class BioSampleValidator < ValidatorBase
       sample_name = biosample_data["attributes"]["sample_name"]
 
       ### パッケージの関する検証
-      missing_package_information("25", sample_name, biosample_data, line_num)
-      unknown_package("26", sample_name, biosample_data["package"], line_num)
+      missing_package_information("BS_R0025", sample_name, biosample_data, line_num)
+      unknown_package("BS_R0026", sample_name, biosample_data["package"], line_num)
 
       ### 重要属性の欠損検証
-      missing_sample_name("18", sample_name, biosample_data, line_num)
-      missing_organism("20", sample_name, biosample_data, line_num)
+      missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
+      missing_organism("BS_R0020", sample_name, biosample_data, line_num)
 
       ### 属性名や必須項目に関する検証
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
-      missing_mandatory_attribute("27", sample_name, biosample_data["attributes"], attr_list , line_num)
-      missing_required_attribute_name("92", sample_name, biosample_data["attributes"], attr_list , line_num)
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
+      missing_required_attribute_name("BS_R0092", sample_name, biosample_data["attributes"], attr_list , line_num)
 
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
-        non_ascii_attribute_value("58", sample_name, attr_name, value, line_num)
-        invalid_attribute_value_for_controlled_terms("2", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
-        ret = invalid_publication_identifier("11", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
+        non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
+        invalid_attribute_value_for_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        ret = invalid_publication_identifier("BS_R0011", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = invalid_date_format("7", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        ret = invalid_date_format("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        attribute_value_is_not_integer("93", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
-        ret = bioproject_submission_id_replacement("95", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+        attribute_value_is_not_integer("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
+        ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
@@ -195,7 +195,7 @@ class BioSampleValidator < ValidatorBase
       ### organismの検証とtaxonomy_idの確定
       taxonomy_id = OrganismValidator::TAX_ROOT
       if biosample_data["attributes"]["taxonomy_id"].nil? || biosample_data["attributes"]["taxonomy_id"].strip == "" #taxonomy_id記述なし
-        ret = taxonomy_error_warning("45", sample_name, biosample_data["attributes"]["organism"], line_num)
+        ret = taxonomy_error_warning("BS_R0045", sample_name, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
           taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
           unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
@@ -208,7 +208,7 @@ class BioSampleValidator < ValidatorBase
         end
       else #taxonomy_id記述あり
         taxonomy_id = biosample_data["attributes"]["taxonomy_id"]
-        ret = taxonomy_name_and_id_not_match("4", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+        ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"]["organism"] = CommonUtils::get_auto_annotation(@error_list.last)
         elsif ret == false #auto annotationできないエラーであればtax_idが不正な可能性がある
@@ -217,34 +217,34 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 特定の属性値に対する検証
-      invalid_bioproject_accession("5", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      bioproject_not_found("6", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
-      invalid_bioproject_type("70", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      invalid_locus_tag_prefix_format("99", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
-      duplicated_locus_tag_prefix("91", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
-      ret = format_of_geo_loc_name_is_invalid("94", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
+      invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      bioproject_not_found("BS_R0006", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
+      invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
+      duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
+      ret = format_of_geo_loc_name_is_invalid("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
 
-      invalid_country("8", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      ret = invalid_lat_lon_format("9", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
+      invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
+      ret = invalid_lat_lon_format("BS_R0009", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
-      invalid_host_organism_name("15", sample_name,  biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
-      future_collection_date("40", sample_name, biosample_data["attributes"]["collection_date"], line_num)
+      invalid_host_organism_name("BS_R0015", sample_name,  biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
+      future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
 
       ### 複数属性の組合せの検証
-      latlon_versus_country("41", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
-      multiple_vouchers("62", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
-      redundant_taxonomy_attributes("73", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
+      latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
+      multiple_vouchers("BS_R0062", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
+      redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### taxonomy_idの値を使う検証
       if taxonomy_id != OrganismValidator::TAX_ROOT #無効なtax_idでなければ実行
-        package_versus_organism("48", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
-        sex_for_bacteria("59", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
-        taxonomy_at_species_or_infraspecific_rank("96", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+        package_versus_organism("BS_R0048", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
+        sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
+        taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
       end
     end
   end

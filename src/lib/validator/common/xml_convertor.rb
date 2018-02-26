@@ -216,7 +216,7 @@ class XmlConvertor < ValidatorBase
 
   #
   # 属性名のXPathを返す
-  # rule12(special_character_included),13(invalid_data_format)において属性名のAuto-annotationが発生する場合に使用する
+  # rule BS_R0012(special_character_included),BS_R0013(invalid_data_format)において属性名のAuto-annotationが発生する場合に使用する
   # ユーザの自由書式であるAttributesタグでしかAuto-annotationが発生しないため、Attributesタグしか参照しない
   #
   # ==== Args
