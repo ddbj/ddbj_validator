@@ -1301,4 +1301,31 @@ jkl\"  "
   end
 =end
 
+  def test_invalid_sample_name_format
+    # ok case
+    ret = exec_validator("invalid_sample_name_format", "BS_R0101", "ok sample name", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_sample_name_format", "BS_R0101", "{s}a.(m)[]p_l+e Na[m-e.  12[[ ", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## too long
+    ret = exec_validator("invalid_sample_name_format", "BS_R0101", "sample name is too long. sample name is too long. sample name is too long. sample name is too long. s", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## disallowed character
+    ret = exec_validator("invalid_sample_name_format", "BS_R0101", "sample/name", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ret = exec_validator("invalid_sample_name_format", "BS_R0101", nil, 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_sample_name_format", "BS_R0101", "", 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
 end

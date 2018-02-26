@@ -234,6 +234,7 @@ class BioSampleValidator < ValidatorBase
       end
       invalid_host_organism_name("BS_R0015", sample_name,  biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
       future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
+      invalid_sample_name_format("BS_R0101", sample_name, line_num)
 
       ### 複数属性の組合せの検証
       latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
@@ -2308,6 +2309,20 @@ class BioSampleValidator < ValidatorBase
         @error_list.push(error_hash)
         result = false
       end
+    end
+    result
+  end
+
+  def invalid_sample_name_format (rule_code, sample_name, line_num)
+    return nil if CommonUtils::null_value?(sample_name)
+    result = true
+    if sample_name.size > 100 || sample_name !~ /^[0-9a-zA-Z\s\(\)\{\}\[\]\+\-_.]+$/  #最大100文字で英数字、空白、記号 (){}[]+-_. から構成されること
+      annotation = [
+        {key: "Sample name", value: sample_name}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end
