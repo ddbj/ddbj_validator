@@ -63,22 +63,22 @@ class AnalysisValidator < ValidatorBase
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("1", data_xml)
+    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
       analysis_set = doc.xpath("//ANALYSIS")
       #各ラン毎の検証
       analysis_set.each_with_index do |analysis_node, idx|
         idx += 1
         analysis_name = get_analysis_label(analysis_node, idx)
-        invalid_center_name("4", analysis_name, analysis_node, idx)
-        missing_analysis_title("12", analysis_name, analysis_node, idx)
-        missing_analysis_description("14", analysis_name, analysis_node, idx)
-        missing_analysis_filename("22", analysis_name, analysis_node, idx)
-        invalid_analysis_filename("24", analysis_name, analysis_node, idx)
-        invalid_analysis_file_md5_checksum("26", analysis_name, analysis_node, idx)
+        invalid_center_name("DRA_R0004", analysis_name, analysis_node, idx)
+        missing_analysis_title("DRA_R0012", analysis_name, analysis_node, idx)
+        missing_analysis_description("DRA_R0014", analysis_name, analysis_node, idx)
+        missing_analysis_filename("DRA_R0022", analysis_name, analysis_node, idx)
+        invalid_analysis_filename("DRA_R0024", analysis_name, analysis_node, idx)
+        invalid_analysis_file_md5_checksum("DRA_R0026", analysis_name, analysis_node, idx)
       end
     end
   end
@@ -114,7 +114,7 @@ class AnalysisValidator < ValidatorBase
 ### validate method ###
 
   #
-  # rule:4
+  # rule:DRA_R0004
   # center name はアカウント情報と一致しているかどうか
   #
   # ==== Args
@@ -143,7 +143,7 @@ class AnalysisValidator < ValidatorBase
   end
 
   #
-  # rule:12
+  # rule:DRA_R0012
   # ANALYSISのTITLE要素が存在し空白ではないか
   #
   # ==== Args
@@ -168,7 +168,7 @@ class AnalysisValidator < ValidatorBase
   end
 
   #
-  # rule:14
+  # rule:DRA_R0014
   # ANALYSISのDESCRIPTION要素が空白ではないか
   #
   # ==== Args
@@ -194,7 +194,7 @@ class AnalysisValidator < ValidatorBase
   end
 
   #
-  # rule:22
+  # rule:DRA_R0022
   # ANALYSISのfilename属性が空白ではないか
   #
   # ==== Args
@@ -225,7 +225,7 @@ class AnalysisValidator < ValidatorBase
   end
 
   #
-  # rule:24
+  # rule:DRA_R0024
   # filename は [A-Za-z0-9-_.] のみで構成されている必要がある
   #
   # ==== Args
@@ -259,7 +259,7 @@ class AnalysisValidator < ValidatorBase
   end
 
   #
-  # rule:26
+  # rule:DRA_R0026
   # FILEのmd5sum属性が32桁の英数字であるかどうか
   #
   # ==== Args

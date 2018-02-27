@@ -63,23 +63,23 @@ class RunValidator < ValidatorBase
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("1", data_xml)
+    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
       run_set = doc.xpath("//RUN")
       #各ラン毎の検証
       run_set.each_with_index do |run_node, idx|
         idx += 1
         run_name = get_run_label(run_node, idx)
-        invalid_center_name("4", run_name, run_node, @submitter_id, idx)
-        missing_run_title("11", run_name, run_node, idx)
-        missing_run_filename("21", run_name, run_node, idx)
-        invalid_run_filename("23", run_name, run_node, idx)
-        invalid_run_file_md5_checksum("25", run_name, run_node, idx)
-        invalid_bam_alignment_file_series("29", run_name, run_node, idx)
-        mixed_filetype("31", run_name, run_node, idx)
+        invalid_center_name("DRA_R0004", run_name, run_node, @submitter_id, idx)
+        missing_run_title("DRA_R0011", run_name, run_node, idx)
+        missing_run_filename("DRA_R0021", run_name, run_node, idx)
+        invalid_run_filename("DRA_R0023", run_name, run_node, idx)
+        invalid_run_file_md5_checksum("DRA_R0025", run_name, run_node, idx)
+        invalid_bam_alignment_file_series("DRA_R0029", run_name, run_node, idx)
+        mixed_filetype("DRA_R0031", run_name, run_node, idx)
       end
     end
   end
@@ -114,7 +114,7 @@ class RunValidator < ValidatorBase
 
 ### validate method ###
   #
-  # rule:4
+  # rule:DRA_R0004
   # center name はアカウント情報と一致しているかどうか
   #
   # ==== Args
@@ -143,7 +143,7 @@ class RunValidator < ValidatorBase
   end
 
   #
-  # rule:11
+  # rule:DRA_R0011
   # RUNのTITLE要素が空白ではないか
   #
   # ==== Args
@@ -168,7 +168,7 @@ class RunValidator < ValidatorBase
   end
 
   #
-  # rule:21
+  # rule:DRA_R0021
   # Run filename属性が空白文字ではないか
   #
   # ==== Args
@@ -199,7 +199,7 @@ class RunValidator < ValidatorBase
   end
 
   #
-  # rule:23
+  # rule:DRA_R0023
   # filename は [A-Za-z0-9-_.] のみで構成されている必要がある
   #
   # ==== Args
@@ -233,7 +233,7 @@ class RunValidator < ValidatorBase
   end
 
   #
-  # rule:25
+  # rule:DRA_R0025
   # FILEのmd5sum属性が32桁の英数字であるかどうか
   #
   # ==== Args
@@ -267,7 +267,7 @@ class RunValidator < ValidatorBase
   end
 
   #
-  # rule:29
+  # rule:DRA_R0029
   # Run filetype = bam AND/OR tab AND/OR reference_fasta 各 1 のみ
   #
   # ==== Args
@@ -298,7 +298,7 @@ class RunValidator < ValidatorBase
   end
 
   #
-  # rule:31
+  # rule:DRA_R0031
   # filetypeの組み合わせチェック
   # (filetype = bam AND/OR tab AND/OR reference_fasta 各 1) (SOLiD_native_csfasta, SOLiD_native_qual) は混在 OK だが、
   # 他の generic_fastq, fastq, sff, hdf5 は Run で揃っている必要がある

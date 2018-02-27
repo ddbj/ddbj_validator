@@ -80,12 +80,12 @@ class CombinationValidator < ValidatorBase
       @analysis_data_file = File::basename(data[:analysis])
       @analysis_doc = Nokogiri::XML(File.read(data[:analysis]))
     end
-    multiple_bioprojects_in_a_submission("3", @experiment_doc, @analysis_doc)
+    multiple_bioprojects_in_a_submission("DRA_R0003", @experiment_doc, @analysis_doc)
     if !(data[:experiment].nil? || data[:run].nil?)
-      experiment_not_found("17", @experiment_doc, @run_doc)
-      one_fastq_file_for_paired_library("27", @experiment_doc, @run_doc)
-      invalid_PacBio_RS_II_hdf_file_series("28", @experiment_doc, @run_doc)
-      invalid_filetype("30", @experiment_doc, @run_doc)
+      experiment_not_found("DRA_R0017", @experiment_doc, @run_doc)
+      one_fastq_file_for_paired_library("DRA_R0027", @experiment_doc, @run_doc)
+      invalid_PacBio_RS_II_hdf_file_series("DRA_R0028", @experiment_doc, @run_doc)
+      invalid_filetype("DRA_R0030", @experiment_doc, @run_doc)
     end
   end
 
@@ -94,7 +94,7 @@ class CombinationValidator < ValidatorBase
 ### validate method ###
 
   #
-  # rule: dra 3
+  # rule: DRA_R0003
   # 1 submission 中の Experiment と Analysis から参照されている BioProject が一つではない場合エラー
   #
   # ==== Args
@@ -139,7 +139,7 @@ class CombinationValidator < ValidatorBase
   end
 
   #
-  # rule: dra 17
+  # rule: DRA_R0017
   # Run からの Experiment 参照が同一 submission 内に存在しているか
   #
   # ==== Args
@@ -179,7 +179,7 @@ class CombinationValidator < ValidatorBase
   end
 
   #
-  # rule: dra 27
+  # rule: DRA_R0027
   # run が参照している experiment の library layout が paired の場合、
   # 当該 run 中の filetype="fastq" もしくは generic_fastq であるファイルの数が 1 の場合ワーニング
   #
@@ -221,7 +221,7 @@ class CombinationValidator < ValidatorBase
   end
 
   #
-  # rule: dra 28
+  # rule: DRA_R0028
   # Instrument が PacBio RS II で filetype="hdf5" がある場合、1 Run あたり 1 bas、3 bax で同一シリーズ由来か
   #
   # ==== Args
@@ -263,7 +263,7 @@ class CombinationValidator < ValidatorBase
   end
 
   #
-  # rule: dra 30
+  # rule: DRA_R0030
   # Platform名とfiletypeの組み合わせが正しいか
   #
   # ==== Args

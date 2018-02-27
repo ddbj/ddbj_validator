@@ -63,22 +63,22 @@ class ExperimentValidator < ValidatorBase
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("1", data_xml)
+    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
       experiment_set = doc.xpath("//EXPERIMENT")
       #各エクスペリメント毎の検証
       experiment_set.each_with_index do |experiment_node, idx|
         idx += 1
         experiment_name = get_experiment_label(experiment_node, idx)
-        invalid_center_name("4", submission_name, submission_node, acc_center_name, idx)
-        missing_experiment_title("10", experiment_name, experiment_node, idx)
-        missing_experiment_description("13", experiment_name, experiment_node, idx)
-        missing_library_name("18", experiment_name, experiment_node, idx)
-        missing_insert_size_for_paired_library("19", experiment_name, experiment_node, idx)
-        insert_size_too_large("20", experiment_name, experiment_node, idx)
+        invalid_center_name("DRA_R0004", submission_name, submission_node, acc_center_name, idx)
+        missing_experiment_title("DRA_R0010", experiment_name, experiment_node, idx)
+        missing_experiment_description("DRA_R0013", experiment_name, experiment_node, idx)
+        missing_library_name("DRA_R0018", experiment_name, experiment_node, idx)
+        missing_insert_size_for_paired_library("DRA_R0019", experiment_name, experiment_node, idx)
+        insert_size_too_large("DRA_R0020", experiment_name, experiment_node, idx)
       end
     end
   end
@@ -114,7 +114,7 @@ class ExperimentValidator < ValidatorBase
 ### validate method ###
 
   #
-  # rule:4
+  # rule:DRA_R0004
   # center name はアカウント情報と一致しているかどうか
   #
   # ==== Args
@@ -143,7 +143,7 @@ class ExperimentValidator < ValidatorBase
   end
 
   #
-  # rule:10
+  # rule:DRA_R0010
   # EXPERIMENTのTITLE要素が存在し空白ではないか
   #
   # ==== Args
@@ -168,7 +168,7 @@ class ExperimentValidator < ValidatorBase
   end
 
   #
-  # rule:13
+  # rule:DRA_R0013
   # EXPERIMENTのDESIGN_DESCRIPTION要素が存在し空白ではないか
   #
   # ==== Args
@@ -193,7 +193,7 @@ class ExperimentValidator < ValidatorBase
   end
 
   #
-  # rule:18
+  # rule:DRA_R0018
   # EXPERIMENTのLIBRARY_NAME要素が存在し空白ではないか
   #
   # ==== Args
@@ -218,7 +218,7 @@ class ExperimentValidator < ValidatorBase
   end
 
   #
-  # rule:19
+  # rule:DRA_R0019
   # EXPERIMENTのpairedの場合にnominal lengthが記述されているか
   #
   # ==== Args
@@ -246,7 +246,7 @@ class ExperimentValidator < ValidatorBase
   end
 
   #
-  # rule:20
+  # rule:DRA_R0020
   # EXPERIMENTのnominal lengthが上限(10000000)超えていないか
   #
   # ==== Args

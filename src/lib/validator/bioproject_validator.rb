@@ -62,11 +62,11 @@ class BioProjectValidator < ValidatorBase
   #
   #
   def validate (data_xml, submitter_id=nil)
-    valid_xml = not_well_format_xml("1", data_xml)
+    valid_xml = not_well_format_xml("BP_R0001", data_xml)
     return unless valid_xml
     # xml検証が通った場合のみ実行
     @data_file = File::basename(data_xml)
-    valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+    valid_schema = xml_data_schema("BP_R0002", data_xml, @conf[:xsd_path])
     doc = Nokogiri::XML(File.read(data_xml))
     project_set = doc.xpath("//PackageSet/Package/Project")
 
@@ -80,41 +80,41 @@ class BioProjectValidator < ValidatorBase
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
     @submission_id = @xml_convertor.get_bioproject_submission_id(xml_document)
 
-    multiple_projects("37", project_set)
+    multiple_projects("BP_R0037", project_set)
     project_name_list = @db_validator.get_bioproject_names(@submitter_id)
     project_title_desc_list = @db_validator.get_bioproject_title_descs(@submitter_id)
     #各プロジェクト毎の検証
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
-      duplicated_project_name("3", project_name, project_node, project_name_list, @submission_id, idx)
-      identical_project_title_and_description("5", project_name, project_node, idx)
-      short_project_description("6", project_name, project_node, idx)
-      empty_description_for_other_relevance("7", project_name, project_node, idx)
-      empty_description_for_other_subtype("8", project_name, project_node, idx)
-      empty_target_description_for_other_sample_scope("9", project_name, project_node, idx)
-      empty_target_description_for_other_material("10", project_name, project_node, idx)
-      empty_target_description_for_other_capture("11", project_name, project_node, idx)
-      empty_method_description_for_other_method_type("12", project_name, project_node, idx)
-      empty_data_description_for_other_data_type("13", project_name, project_node, idx)
-      invalid_publication_identifier("14", project_name, project_node, idx)
-      empty_publication_reference("15", project_name, project_node, idx)
-      missing_strain_isolate_cultivar("17", project_name, project_node, idx)
-      taxonomy_at_species_or_infraspecific_rank("18", project_name, project_node, idx)
-      empty_organism_description_for_multi_species("19", project_name, project_node, idx)
-      metagenome_or_environmental("20", project_name, project_node, idx)
-      invalid_locus_tag_prefix("21", project_name, project_node, idx)
-      invalid_biosample_accession("22", project_name, project_node, idx)
-      missing_project_name("36", project_name, project_node, idx)
-      taxonomy_error_warning("38", project_name, project_node, idx)
-      taxonomy_name_and_id_not_match("39", project_name, project_node, idx)
-      invalid_project_type("40", project_name, project_node, idx)
+      duplicated_project_name("BP_R0003", project_name, project_node, project_name_list, @submission_id, idx)
+      identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
+      short_project_description("BP_R0006", project_name, project_node, idx)
+      empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
+      empty_description_for_other_subtype("BP_R0008", project_name, project_node, idx)
+      empty_target_description_for_other_sample_scope("BP_R0009", project_name, project_node, idx)
+      empty_target_description_for_other_material("BP_R0010", project_name, project_node, idx)
+      empty_target_description_for_other_capture("BP_R0011", project_name, project_node, idx)
+      empty_method_description_for_other_method_type("BP_R0012", project_name, project_node, idx)
+      empty_data_description_for_other_data_type("BP_R0013", project_name, project_node, idx)
+      invalid_publication_identifier("BP_R0014", project_name, project_node, idx)
+      empty_publication_reference("BP_R0015", project_name, project_node, idx)
+      missing_strain_isolate_cultivar("BP_R0017", project_name, project_node, idx)
+      taxonomy_at_species_or_infraspecific_rank("BP_R0018", project_name, project_node, idx)
+      empty_organism_description_for_multi_species("BP_R0019", project_name, project_node, idx)
+      metagenome_or_environmental("BP_R0020", project_name, project_node, idx)
+      invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx)
+      invalid_biosample_accession("BP_R0022", project_name, project_node, idx)
+      missing_project_name("BP_R0036", project_name, project_node, idx)
+      taxonomy_error_warning("BP_R0038", project_name, project_node, idx)
+      taxonomy_name_and_id_not_match("BP_R0039", project_name, project_node, idx)
+      invalid_project_type("BP_R0040", project_name, project_node, idx)
     end
 
     link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
     #各リンク毎の検証
     link_set.each_with_index do |link_node, idx|
-      invalid_umbrella_project("16", "Link", link_node, idx)
+      invalid_umbrella_project("BP_R0016", "Link", link_node, idx)
     end
   end
 
@@ -168,7 +168,7 @@ class BioProjectValidator < ValidatorBase
 ### validate method ###
 
   #
-  # rule:3
+  # rule:BP_R0003
   # project name がアカウント単位でユニークではない
   #
   # ==== Args
@@ -203,7 +203,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:4
+  # rule:BP_R0004
   # project title & description がアカウント単位でユニークではない
   #
   # ==== Args
@@ -245,7 +245,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:5
+  # rule:BP_R0005
   # プロジェクトの description と title が完全一致でエラー
   #
   # ==== Args
@@ -277,7 +277,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:6
+  # rule:BP_R0006
   # description が空白文字を除いて 100 文字以下でエラー
   #
   # ==== Args
@@ -306,7 +306,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:7
+  # rule:BP_R0007
   # Relevance が Other のとき要素テキストとして説明が提供されていない
   #
   # ==== Args
@@ -333,7 +333,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:8
+  # rule:BP_R0008
   # ProjectTypeTopAdminのsubtype属性がeOtherのとき要素テキストとして説明が提供されているか
   #
   # ==== Args
@@ -361,7 +361,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:9
+  # rule:BP_R0009
   # Targetのsample_scope属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
@@ -389,7 +389,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:10
+  # rule:BP_R0010
   # Targetのmaterial属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
@@ -417,7 +417,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:11
+  # rule:BP_R0011
   # Targetのcapture属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
@@ -445,7 +445,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:12
+  # rule:BP_R0012
   # Methodのmethod_type属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
@@ -472,7 +472,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:13
+  # rule:BP_R0013
   # Objectives/Dataのdata_type属性がeOther のとき要素テキストとして説明が提供されていない場合エラー
   #
   # ==== Args
@@ -501,7 +501,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:14
+  # rule:BP_R0014
   # DbTypeがePubmed/ePMCの場合に実在するidかどうか、eDOIはチェックしない
   #
   # ==== Args
@@ -557,7 +557,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:15
+  # rule:BP_R0015
   # DbTypeがeNotAvailableのときReference要素で説明が提供されていない場合エラー
   #
   # ==== Args
@@ -586,7 +586,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:16
+  # rule:BP_R0016
   # 選択された Umbrella BioProject が実在しない、指定されている Umbrella が DDBJ DB に存在すれば OK
   #
   # ==== Args
@@ -621,7 +621,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:17
+  # rule:BP_R0017
   # organism: sample scope = "mono-isolate" の場合は strain or breed or cultivar or isolate or label 必須
   #
   # ==== Args
@@ -653,7 +653,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:18
+  # rule:BP_R0018
   # organism: sample scope = "multi-species" 以外の場合、species レベル以下の taxonomy が必須 (multi-species の場合、任意で species レベル以上を許容)
   # biosample rule:4,45,96と関連
   #
@@ -699,7 +699,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:19
+  # rule:BP_R0019
   # organism: sample scope = "multi-species" の場合 Target > Description が必須、要素があり、内容が空の場合にエラー
   #
   # ==== Args
@@ -728,7 +728,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:20
+  # rule:BP_R0020
   # organism: sample scope = "environment" の場合は biosample と同様にmetagenome などのチェック
   #
   # ==== Args
@@ -776,7 +776,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:21
+  # rule:BP_R0021
   # LocusTagPrefix要素の記述がある場合にbiosample_id属性とLocusTagPrefixのテキストが正しい組合せで記述されているかチェック
   #
   # ==== Args
@@ -830,7 +830,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:22
+  # rule:BP_R0022
   # LocusTagPrefix要素のbiosample_id属性の記述がある場合biosample_idはDDBJのIDであるかチェック
   #
   # ==== Args
@@ -869,7 +869,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:36
+  # rule:BP_R0036
   # 参照ラベルとしての project name 必須
   #
   # ==== Args
@@ -894,7 +894,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:37
+  # rule:BP_R0037
   # 1 BioProject XML - 1 BioProject であるか
   #
   # ==== Args
@@ -916,7 +916,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:38
+  # rule:BP_R0038
   # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
   # Taxonomy ontologyのScientific nameとの比較を行う
   # 一致しなかった場合にはtaxonomy_idを元にorganismの自動補正情報をエラーリストに出力する
@@ -959,7 +959,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:39
+  # rule:BP_R0039
   # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
   #
   # ==== Args
@@ -1014,7 +1014,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:40
+  # rule:BP_R0040
   # ProjectTypeTopSingleOrganismではないか
   #
   # ==== Args
@@ -1039,7 +1039,7 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:41
+  # rule:BP_R0041
   # locus_tag_prefixのフォーマットチェック
   # 3-12文字の英数字で、数字では始まらない
   #

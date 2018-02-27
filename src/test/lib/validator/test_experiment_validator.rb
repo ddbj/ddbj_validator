@@ -45,137 +45,137 @@ class TestExperimentValidator < Minitest::Test
 
 #### 各validationメソッドのユニットテスト ####
 
-  # rule:4
+  # rule:DRA_R0004
   def test_invalid_center_name
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok.xml")
-    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    ret = exec_validator("invalid_center_name", "DRA_R0004", "experiment name" , experiment_set.first, "test01", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## no center_name
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok2.xml")
-    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    ret = exec_validator("invalid_center_name", "DRA_R0004", "experiment name" , experiment_set.first, "test01", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ##invalid center name
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ng1.xml")
-    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    ret = exec_validator("invalid_center_name", "DRA_R0004", "experiment name" , experiment_set.first, "test01", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## center name empty
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ng2.xml")
-    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "test01", 1)
+    ret = exec_validator("invalid_center_name", "DRA_R0004", "experiment name" , experiment_set.first, "test01", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not exist submitter_id
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok.xml")
-    ret = exec_validator("invalid_center_name", "4", "experiment name" , experiment_set.first, "not_exist_submitter", 1)
+    ret = exec_validator("invalid_center_name", "DRA_R0004", "experiment name" , experiment_set.first, "not_exist_submitter", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:10
+  # rule:DRA_R0010
   def test_missing_experiment_title
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/10_missing_experiment_title_ok.xml")
-    ret = exec_validator("missing_experiment_title", "10", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_experiment_title", "DRA_R0010", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     # no element
     experiment_set = get_experiment_set_node("#{@test_file_dir}/10_missing_experiment_title_ng1.xml")
-    ret = exec_validator("missing_experiment_title", "10", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_experiment_title", "DRA_R0010", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #blank
     experiment_set = get_experiment_set_node("#{@test_file_dir}/10_missing_experiment_title_ng2.xml")
-    ret = exec_validator("missing_experiment_title", "10", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_experiment_title", "DRA_R0010", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:13
+  # rule:DRA_R0013
   def test_missing_experiment_description
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/13_missing_experiment_description_ok.xml")
-    ret = exec_validator("missing_experiment_description", "13", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_experiment_description", "DRA_R0013", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     # no element
     experiment_set = get_experiment_set_node("#{@test_file_dir}/13_missing_experiment_description_ng1.xml")
-    ret = exec_validator("missing_experiment_description", "13", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_experiment_description", "DRA_R0013", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #blank
     experiment_set = get_experiment_set_node("#{@test_file_dir}/13_missing_experiment_description_ng2.xml")
-    ret = exec_validator("missing_experiment_description", "13", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_experiment_description", "DRA_R0013", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:18
+  # rule:DRA_R0018
   def test_missing_library_name
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/18_missing_library_name_ok.xml")
-    ret = exec_validator("missing_library_name", "18", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_library_name", "DRA_R0018", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     # no element
     experiment_set = get_experiment_set_node("#{@test_file_dir}/18_missing_library_name_ng1.xml")
-    ret = exec_validator("missing_library_name", "18", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_library_name", "DRA_R0018", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #blank
     experiment_set = get_experiment_set_node("#{@test_file_dir}/18_missing_library_name_ng2.xml")
-    ret = exec_validator("missing_library_name", "18", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_library_name", "DRA_R0018", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:19
+  # rule:DRA_R0019
   def test_missing_insert_size_for_paired_library
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/19_missing_insert_size_for_paired_library_ok.xml")
-    ret = exec_validator("missing_insert_size_for_paired_library", "19", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_insert_size_for_paired_library", "DRA_R0019", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no paired
     experiment_set = get_experiment_set_node("#{@test_file_dir}/19_missing_insert_size_for_paired_library_ok2.xml")
-    ret = exec_validator("missing_insert_size_for_paired_library", "19", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_insert_size_for_paired_library", "DRA_R0019", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     # no NOMINAL_LENGTH attribute
     experiment_set = get_experiment_set_node("#{@test_file_dir}/19_missing_insert_size_for_paired_library_ng1.xml")
-    ret = exec_validator("missing_insert_size_for_paired_library", "19", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_insert_size_for_paired_library", "DRA_R0019", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #blank
     experiment_set = get_experiment_set_node("#{@test_file_dir}/19_missing_insert_size_for_paired_library_ng2.xml")
-    ret = exec_validator("missing_insert_size_for_paired_library", "19", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("missing_insert_size_for_paired_library", "DRA_R0019", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:20
+  # rule:DRA_R0020
   def test_insert_size_too_large
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/20_insert_size_too_large_ok.xml")
-    ret = exec_validator("insert_size_too_large", "20", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("insert_size_too_large", "DRA_R0020", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no paired
     experiment_set = get_experiment_set_node("#{@test_file_dir}/20_insert_size_too_large_ok2.xml")
-    ret = exec_validator("insert_size_too_large", "20", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("insert_size_too_large", "DRA_R0020", "experiment name" , experiment_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     # too_large
     experiment_set = get_experiment_set_node("#{@test_file_dir}/20_insert_size_too_large_ng1.xml")
-    ret = exec_validator("insert_size_too_large", "20", "experiment name" , experiment_set.first, 1)
+    ret = exec_validator("insert_size_too_large", "DRA_R0020", "experiment name" , experiment_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

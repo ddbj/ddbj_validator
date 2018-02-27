@@ -64,21 +64,21 @@ class SubmissionValidator < ValidatorBase
     #TODO @submitter_id が取得できない場合はエラーにする?
 
     @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("1", data_xml)
+    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("2", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
       submission_set = doc.xpath("//SUBMISSION")
       #各サブミッション毎の検証
       submission_set.each_with_index do |submission_node, idx|
         idx += 1
         submission_name = get_submission_label(submission_node, idx)
-        invalid_center_name("4", submission_name, submission_node, @submitter_id, idx)
-        invalid_laboratory_name("5", submission_name, submission_node, @submitter_id, idx)
-        invalid_hold_date("6", submission_name, submission_node, idx)
-        invalid_submitter_name("7", submission_name, submission_node, @submitter_id, idx)
-        invalid_submitter_email_address("8", submission_name, submission_node, @submitter_id, idx)
+        invalid_center_name("DRA_R0004", submission_name, submission_node, @submitter_id, idx)
+        invalid_laboratory_name("DRA_R0005", submission_name, submission_node, @submitter_id, idx)
+        invalid_hold_date("DRA_R0006", submission_name, submission_node, idx)
+        invalid_submitter_name("DRA_R0007", submission_name, submission_node, @submitter_id, idx)
+        invalid_submitter_email_address("DRA_R0008", submission_name, submission_node, @submitter_id, idx)
       end
     end
   end
@@ -111,7 +111,7 @@ class SubmissionValidator < ValidatorBase
 ### validate method ###
 
   #
-  # rule:4
+  # rule:DRA_R0004
   # center name はアカウント情報と一致しているかどうか
   #
   # ==== Args
@@ -140,7 +140,7 @@ class SubmissionValidator < ValidatorBase
   end
 
   #
-  # rule:5
+  # rule:DRA_R0005
   # submission lab name はアカウント情報と一致しているかどうか
   #
   # ==== Args
@@ -176,7 +176,7 @@ class SubmissionValidator < ValidatorBase
   end
 
   #
-  # rule:6
+  # rule:DRA_R0006
   # 公開予定日は今日から二年後の範囲に入ってるかどうか
   #
   # ==== Args
@@ -216,7 +216,7 @@ class SubmissionValidator < ValidatorBase
   end
 
   #
-  # rule:7
+  # rule:DRA_R0007
   # submitterのNameがContactsに含まれているかをチェックする
   #
   # ==== Args
@@ -263,7 +263,7 @@ class SubmissionValidator < ValidatorBase
   end
 
   #
-  # rule:8
+  # rule:DRA_R0008
   # submitterのメールアドレスがContactsに含まれているかをチェックする
   #
   # ==== Args

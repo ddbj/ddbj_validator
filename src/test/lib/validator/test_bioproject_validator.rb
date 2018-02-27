@@ -70,624 +70,624 @@ class TestBioProjectValidator < Minitest::Test
   end
 
 #### 各validationメソッドのユニットテスト ####
-  # rule:1
+  # rule:BP_R0001
   def test_not_well_format_xml
     #ok case
     xml_file = "#{@test_file_dir}/1_not_well_format_xml_ok.xml"
-    ret = exec_validator("not_well_format_xml", "1", xml_file)
+    ret = exec_validator("not_well_format_xml", "BP_R0001", xml_file)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     xml_file = "#{@test_file_dir}/1_not_well_format_xml_ng.xml"
-    ret = exec_validator("not_well_format_xml", "1", xml_file)
+    ret = exec_validator("not_well_format_xml", "BP_R0001", xml_file)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:2
+  # rule:BP_R0002
   def test_xml_data_schema
     xsd_file_path = File.dirname(__FILE__) + "/../../../conf/bioproject/xsd/Package.xsd"
     #ok case
     xml_file = "#{@test_file_dir}/2_xml_data_schema_ok.xml"
-    ret = exec_validator("xml_data_schema", "2", xml_file, xsd_file_path)
+    ret = exec_validator("xml_data_schema", "BP_R0002", xml_file, xsd_file_path)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     xml_file = "#{@test_file_dir}/2_xml_data_schema_ng.xml"
-    ret = exec_validator("xml_data_schema", "2", xml_file, xsd_file_path)
+    ret = exec_validator("xml_data_schema", "BP_R0002", xml_file, xsd_file_path)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:3
+  # rule:BP_R0003
   def test_duplicated_project_name
     #ok case
     project_name_list = ["project name 1", "project name 2"]
     ## without submission_id ("project name 0" is new name)
     project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ok1.xml")
-    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, nil, 1)
+    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## with submission_id  ("project name 1" has 1 entity in DB, but allows with submission_id)
     project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ok2.xml")
-    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, "psub", 1)
+    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, "psub", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ## without submission_id ("project name 1" has 1 entity in DB, not allow without submission_id)
     project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ng1.xml")
-    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, nil, 1)
+    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, nil, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## with submission_id ("project name 1" already duplicate in DB)
     project_name_list = ["project name 1", "project name 1", "project name 2"]
     project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ng2.xml")
-    ret = exec_validator("duplicated_project_name", "3", "project name" , project_set.first, project_name_list, "psub", 1)
+    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, "psub", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:4
+  # rule:BP_R0004
   def test_duplicated_project_title_and_description
     #ok case
     project_title_desc_list = ["Title text 1,Description text 1", "Title text 2,Description text 2"]
     ## without submission_id (is new text)
     project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok1.xml")
-    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, nil, 1)
+    ret = exec_validator("duplicated_project_title_and_description", "BP_R0004", "project name" , project_set.first, project_title_desc_list, nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## with submission_id  (has 1 entity in DB, but allows with submission_id)
     project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok2.xml")
-    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, "psub", 1)
+    ret = exec_validator("duplicated_project_title_and_description", "BP_R0004", "project name" , project_set.first, project_title_desc_list, "psub", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ## without submission_id (has 1 entity in DB, not allow without submission_id)
     project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng1.xml")
-    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, nil, 1)
+    ret = exec_validator("duplicated_project_title_and_description", "BP_R0004", "project name" , project_set.first, project_title_desc_list, nil, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## with submission_id (already duplicate in DB)
     project_title_desc_list = ["Title text 1,Description text 1", "Title text 2,Description text 2", "Title text 2,Description text 2"]
     project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng2.xml")
-    ret = exec_validator("duplicated_project_title_and_description", "4", "project name" , project_set.first, project_title_desc_list, "psub", 1)
+    ret = exec_validator("duplicated_project_title_and_description", "BP_R0004", "project name" , project_set.first, project_title_desc_list, "psub", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:5
+  # rule:BP_R0005
   def test_identical_project_title_and_description
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/5_identical_project_title_and_description_ok.xml")
-    ret = exec_validator("identical_project_title_and_description", "5", "project name" , project_set.first, 1)
+    ret = exec_validator("identical_project_title_and_description", "BP_R0005", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not use Description element
     project_set = get_project_set_node("#{@test_file_dir}/5_identical_project_title_and_description_ok2.xml")
-    ret = exec_validator("identical_project_title_and_description", "5", "project name" , project_set.first, 1)
+    ret = exec_validator("identical_project_title_and_description", "BP_R0005", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/5_identical_project_title_and_description_ng.xml")
-    ret = exec_validator("identical_project_title_and_description", "5", "project name" , project_set.first, 1)
+    ret = exec_validator("identical_project_title_and_description", "BP_R0005", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:6
+  # rule:BP_R0006
   def test_short_project_description
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/6_short_project_description_ok.xml")
-    ret = exec_validator("short_project_description", "6", "project name" , project_set.first, 1)
+    ret = exec_validator("short_project_description", "BP_R0006", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not use Description element
     project_set = get_project_set_node("#{@test_file_dir}/6_short_project_description_ok2.xml")
-    ret = exec_validator("short_project_description", "6", "project name" , project_set.first, 1)
+    ret = exec_validator("short_project_description", "BP_R0006", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/6_short_project_description_ng.xml")
-    ret = exec_validator("short_project_description", "6", "project name" , project_set.first, 1)
+    ret = exec_validator("short_project_description", "BP_R0006", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:7
+  # rule:BP_R0007
   def test_empty_description_for_other_relevance
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/7_empty_description_for_other_relevance_ok.xml")
-    ret = exec_validator("empty_description_for_other_relevance", "7", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_relevance", "BP_R0007", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not use Other element
     project_set = get_project_set_node("#{@test_file_dir}/7_empty_description_for_other_relevance_ok2.xml")
-    ret = exec_validator("empty_description_for_other_relevance", "7", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_relevance", "BP_R0007", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/7_empty_description_for_other_relevance_ng.xml")
-    ret = exec_validator("empty_description_for_other_relevance", "7", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_relevance", "BP_R0007", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:8
+  # rule:BP_R0008
   def test_empty_description_for_other_subtype
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/8_empty_description_for_other_subtype_ok.xml")
-    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_subtype", "BP_R0008", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/8_empty_description_for_other_subtype_ok2.xml")
-    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_subtype", "BP_R0008", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not use ProjectTypeTopAdmin element
     project_set = get_project_set_node("#{@test_file_dir}/8_empty_description_for_other_subtype_ok3.xml")
-    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_subtype", "BP_R0008", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/8_empty_description_for_other_subtype_ng.xml")
-    ret = exec_validator("empty_description_for_other_subtype", "8", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_description_for_other_subtype", "BP_R0008", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:9
+  # rule:BP_R0009
   def test_empty_target_description_for_other_sample_scope
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/9_empty_target_description_for_other_sample_scope_ok.xml")
-    ret = exec_validator("empty_target_description_for_other_sample_scope", "9", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_sample_scope", "BP_R0009", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/9_empty_target_description_for_other_sample_scope_ok2.xml")
-    ret = exec_validator("empty_target_description_for_other_sample_scope", "9", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_sample_scope", "BP_R0009", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/9_empty_target_description_for_other_sample_scope_ng.xml")
-    ret = exec_validator("empty_target_description_for_other_sample_scope", "9", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_sample_scope", "BP_R0009", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:10
+  # rule:BP_R0010
   def test_empty_target_description_for_other_material
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/10_empty_target_description_for_other_material_ok.xml")
-    ret = exec_validator("empty_target_description_for_other_material", "10", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_material", "BP_R0010", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/10_empty_target_description_for_other_material_ok2.xml")
-    ret = exec_validator("empty_target_description_for_other_material", "10", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_material", "BP_R0010", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/10_empty_target_description_for_other_material_ng.xml")
-    ret = exec_validator("empty_target_description_for_other_material", "10", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_material", "BP_R0010", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:11
+  # rule:BP_R0011
   def test_empty_target_description_for_other_capture
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/11_empty_target_description_for_other_capture_ok.xml")
-    ret = exec_validator("empty_target_description_for_other_capture", "11", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_capture", "BP_R0011", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/11_empty_target_description_for_other_capture_ok2.xml")
-    ret = exec_validator("empty_target_description_for_other_capture", "11", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_capture", "BP_R0011", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/11_empty_target_description_for_other_capture_ng.xml")
-    ret = exec_validator("empty_target_description_for_other_capture", "11", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_target_description_for_other_capture", "BP_R0011", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:12
+  # rule:BP_R0012
   def test_empty_method_description_for_other_method_type
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/12_empty_method_description_for_other_method_type_ok.xml")
-    ret = exec_validator("empty_method_description_for_other_method_type", "12", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_method_description_for_other_method_type", "BP_R0012", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/12_empty_method_description_for_other_method_type_ok2.xml")
-    ret = exec_validator("empty_method_description_for_other_method_type", "12", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_method_description_for_other_method_type", "BP_R0012", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/12_empty_method_description_for_other_method_type_ng.xml")
-    ret = exec_validator("empty_method_description_for_other_method_type", "12", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_method_description_for_other_method_type", "BP_R0012", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:13
+  # rule:BP_R0013
   def test_empty_data_description_for_other_data_type
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/13_empty_data_description_for_other_data_type_ok.xml")
-    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_data_description_for_other_data_type", "BP_R0013", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/13_empty_data_description_for_other_data_type_ok2.xml")
-    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_data_description_for_other_data_type", "BP_R0013", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/13_empty_data_description_for_other_data_type_ng.xml")
-    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_data_description_for_other_data_type", "BP_R0013", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## multiple Data node,  one of these has error
     project_set = get_project_set_node("#{@test_file_dir}/13_empty_data_description_for_other_data_type_ng2.xml")
-    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_data_description_for_other_data_type", "BP_R0013", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## multiple Data node,  two of these have error
     project_set = get_project_set_node("#{@test_file_dir}/13_empty_data_description_for_other_data_type_ng3.xml")
-    ret = exec_validator("empty_data_description_for_other_data_type", "13", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_data_description_for_other_data_type", "BP_R0013", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size #twice
   end
 
-  # rule:14
+  # rule:BP_R0014
   def test_invalid_publication_identifier
     #ok case
     ## valid PubMed id
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## valid PMC id
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok2.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## nod ePMC ePubmed
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok2.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     #ng case
     # PubMed id is blank
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng1.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # invalid PubMed
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng2.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## multiple Publication node,  one of these has error
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng3.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## multiple Publication node,  two of these have error
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng4.xml")
-    ret = exec_validator("invalid_publication_identifier", "14", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_publication_identifier", "BP_R0014", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size #twice
   end
 
-  # rule:15
+  # rule:BP_R0015
   def test_empty_publication_reference
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/15_empty_publication_reference_ok.xml")
-    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_publication_reference", "BP_R0015", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eOther attribute
     project_set = get_project_set_node("#{@test_file_dir}/15_empty_publication_reference_ok2.xml")
-    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_publication_reference", "BP_R0015", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/15_empty_publication_reference_ng.xml")
-    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_publication_reference", "BP_R0015", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## multiple Publication node,  one of these has error
     project_set = get_project_set_node("#{@test_file_dir}/15_empty_publication_reference_ng2.xml")
-    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_publication_reference", "BP_R0015", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## multiple Data node,  two of these have error
     project_set = get_project_set_node("#{@test_file_dir}/15_empty_publication_reference_ng3.xml")
-    ret = exec_validator("empty_publication_reference", "15", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_publication_reference", "BP_R0015", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size #twice
   end
 
-  # rule:16
+  # rule:BP_R0016
   def test_invalid_umbrella_project
     #ok case
     link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok.xml")
-    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    ret = exec_validator("invalid_umbrella_project", "BP_R0016", "Link" , link_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not exist node
     link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok2.xml")
-    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    ret = exec_validator("invalid_umbrella_project", "BP_R0016", "Link" , link_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # attribute blank
     link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok3.xml")
-    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    ret = exec_validator("invalid_umbrella_project", "BP_R0016", "Link" , link_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case(not umbrella id)
     link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ng.xml")
-    ret = exec_validator("invalid_umbrella_project", "16", "Link" , link_set.first, 1)
+    ret = exec_validator("invalid_umbrella_project", "BP_R0016", "Link" , link_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:17
+  # rule:BP_R0017
   def test_missing_strain_isolate_cultivar
     #ok case
     # exist Label text
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_label.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist Strain text
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_strain.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist isolateName text
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_isolatename.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist Breed text
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_breed.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist Cultivar text
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_cultivar.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eMonoisolate attribute
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok2.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ng.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "17", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:18
+  # rule:BP_R0018
   def test_taxonomy_at_species_or_infraspecific_rank
     #ok case
     # exist tax_id
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist only organism name
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok2.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok3.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # not infraspecific_rank, but sample_scope = eMultispecies. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok4.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ng.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "18", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:19
+  # rule:BP_R0019
   def test_empty_organism_description_for_multi_species
     #ok case
     # exist Label text
     project_set = get_project_set_node("#{@test_file_dir}/19_empty_organism_description_for_multi_species_ok.xml")
-    ret = exec_validator("empty_organism_description_for_multi_species", "19", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_organism_description_for_multi_species", "BP_R0019", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #not eMultispecies attribute
     project_set = get_project_set_node("#{@test_file_dir}/19_empty_organism_description_for_multi_species_ok2.xml")
-    ret = exec_validator("empty_organism_description_for_multi_species", "19", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_organism_description_for_multi_species", "BP_R0019", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/19_empty_organism_description_for_multi_species_ng.xml")
-    ret = exec_validator("empty_organism_description_for_multi_species", "19", "project name" , project_set.first, 1)
+    ret = exec_validator("empty_organism_description_for_multi_species", "BP_R0019", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:20
+  # rule:BP_R0020
   def test_metagenome_or_environmental
     #ok case
     # exist tax_id
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok.xml")
-    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist only organism name
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok2.xml")
-    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok3.xml")
-    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # not metagenome tax_id, but sample_scope is not eEnvironment. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok4.xml")
-    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ng.xml")
-    ret = exec_validator("metagenome_or_environmental", "20", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:21
+  # rule:BP_R0021
   def test_invalid_locus_tag_prefix
     #ok case
     # exist valid locus_tag_prefix and biosample_id
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ok.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # not exist LocusTagPrefix node(node exist both)
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ok2.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist mutiple LocusTagPrefix node
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ok3.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     # exist locus_tag_prefix but not exist biosample_id
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng1.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # exist biosample_id but not exist locus_tag_prefix
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng2.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # exist LocusTagPrefix but not exist both biosample_id  locus_tag_prefix
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng3.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # invalid biosample_id(check on ddbj db)
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng4.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # not match locus_tag_prefix and biosample_id(check on ddbj db)
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng5.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # exist multiple LocusTagPrefix node but both elements have error
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng6.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size #2 errors
   end
 
-  # rule:22
+  # rule:BP_R0022
   def test_invalid_biosample_accession
     #ok case
     # exist valid biosample_id
     project_set = get_project_set_node("#{@test_file_dir}/22_invalid_biosample_accession_ok.xml")
-    ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_biosample_accession", "BP_R0022", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # not exist LocusTagPrefix node
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ok2.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "21", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     # invalid biosample_id format
     project_set = get_project_set_node("#{@test_file_dir}/22_invalid_biosample_accession_ng1.xml")
-    ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_biosample_accession", "BP_R0022", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # valid biosample_id format but not exist on ddbj db
     project_set = get_project_set_node("#{@test_file_dir}/22_invalid_biosample_accession_ng2.xml")
-    ret = exec_validator("invalid_biosample_accession", "22", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_biosample_accession", "BP_R0022", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:36
+  # rule:BP_R0036
   def test_missing_project_name
     #ok case
     # exist bioproject_name
     project_set = get_project_set_node("#{@test_file_dir}/36_missing_project_name_ok.xml")
-    ret = exec_validator("missing_project_name", "36", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_project_name", "BP_R0036", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     # blank bioproject_name
     project_set = get_project_set_node("#{@test_file_dir}/36_missing_project_name_ng.xml")
-    ret = exec_validator("missing_project_name", "36", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_project_name", "BP_R0036", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # not exist bioproject_name
     project_set = get_project_set_node("#{@test_file_dir}/36_missing_project_name_ng2.xml")
-    ret = exec_validator("missing_project_name", "36", "project name" , project_set.first, 1)
+    ret = exec_validator("missing_project_name", "BP_R0036", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:37
+  # rule:BP_R0037
   def test_multiple_projects
     #ok case
     # 1 bioproject
     project_set = get_project_set_node("#{@test_file_dir}/37_multiple_projects_ok.xml")
-    ret = exec_validator("multiple_projects", "37", project_set)
+    ret = exec_validator("multiple_projects", "BP_R0037", project_set)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     # 2 bioproject
     project_set = get_project_set_node("#{@test_file_dir}/37_multiple_projects_ng.xml")
-    ret = exec_validator("multiple_projects", "37", project_set)
+    ret = exec_validator("multiple_projects", "BP_R0037", project_set)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:38
+  # rule:BP_R0038
   def test_taxonomy_name_and_id_not_match
     #ok case
     #exact match
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ok.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #taxid blank
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ok2.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng1.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
@@ -695,7 +695,7 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal expect_organism_annotation, suggest_value
     #organism name blank
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng2.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
@@ -703,22 +703,22 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal expect_organism_annotation, suggest_value
     #not exist taxid
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng3.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "38", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:39
+  # rule:BP_R0039
   def test_taxonomy_error_warning
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ok.xml")
-    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     ## exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng1.xml")
-    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
     expect_taxid_annotation = "103690"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -727,7 +727,7 @@ class TestBioProjectValidator < Minitest::Test
 
     ##exist but not correct as scientific name ("Anabaena sp. PCC 7120"=>"Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng2.xml")
-    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
     expect_taxid_annotation = "103690"
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
@@ -738,7 +738,7 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case ("nostoc sp. pcc 7120" => "Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng3.xml")
-    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
     expect_taxid_annotation = "103690"
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
@@ -749,44 +749,44 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng4.xml")
-    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng5.xml")
-    ret = exec_validator("taxonomy_error_warning", "39", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:40
+  # rule:BP_R0040
   def test_invalid_project_type
     #ok case
     # not exist ProjectTypeTopSingleOrganism
     project_set = get_project_set_node("#{@test_file_dir}/40_invalid_project_type_ok.xml")
-    ret = exec_validator("invalid_project_type", "40", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_project_type", "BP_R0040", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     # exist ProjectTypeTopSingleOrganism
     project_set = get_project_set_node("#{@test_file_dir}/40_invalid_project_type_ng.xml")
-    ret = exec_validator("invalid_project_type", "40", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_project_type", "BP_R0040", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:41
+  # rule:BP_R0041
   def test_invalid_locus_tag_prefix_format
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/41_invalid_locus_tag_prefix_format_ok.xml")
-    ret = exec_validator("invalid_locus_tag_prefix_format", "41", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix_format", "BP_R0041", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/41_invalid_locus_tag_prefix_format_ng.xml")
-    ret = exec_validator("invalid_locus_tag_prefix_format", "41", "project name" , project_set.first, 1)
+    ret = exec_validator("invalid_locus_tag_prefix_format", "BP_R0041", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

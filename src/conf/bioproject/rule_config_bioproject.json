@@ -1,394 +1,366 @@
 {
-  "rule1": {
+  "ruleBP_R0001": {
     "rule_class": "BioProject",
-    "code": "1",
+    "code": "BP_R0001",
     "level": "error",
+    "internal_ignore": false,
     "name": "Not well-formed XML",
     "method": "not_well_formed_xml",
     "message": "XML document is not well-formed.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-      "http://www.w3schools.com/xml/xml_validator.asp"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0001"
   },
-  "rule2": {
+  "ruleBP_R0002": {
     "rule_class": "BioProject",
-    "code": "2",
+    "code": "BP_R0002",
     "level": "error",
+    "internal_ignore": false,
     "name": "Invalid XML against schema",
     "method": "invalid_xml_against_schema",
     "message": "XML document is invalid against the schema.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-      "https://github.com/ddbj/docs/tree/master/bioproject/xsd"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0002"
   },
-  "rule3": {
+  "ruleBP_R0003": {
     "rule_class": "BioProject",
-    "code": "3",
+    "code": "BP_R0003",
     "level": "error",
+    "internal_ignore": false,
     "name": "Duplicated project name",
     "method": "duplicated_project_name",
     "message": "The following project name was used in the submitted projects more than one time. Please provide unique project name.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0003"
   },
-  "rule4": {
+  "ruleBP_R0004": {
     "rule_class": "BioProject",
-    "code": "4",
+    "code": "BP_R0004",
     "level": "warning",
+    "internal_ignore": false,
     "name": "Duplicated project title and description",
     "method": "duplicated_project_title_and_description",
     "message": "Both project title and description are duplicated with the submitted projects. Duplicated project should not be submitted.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0004"
   },
-  "rule5": {
+  "ruleBP_R0005": {
     "rule_class": "BioProject",
-    "code": "5",
+    "code": "BP_R0005",
     "level": "error",
+    "internal_ignore": true,
     "name": "Identical project title and description",
     "method": "identical_project_title_and_description",
     "message": "Project title and description are identical. Please provide more detailed description.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0005"
   },
-  "rule6": {
+  "ruleBP_R0006": {
     "rule_class": "BioProject",
-    "code": "6",
+    "code": "BP_R0006",
     "level": "error",
+    "internal_ignore": true,
     "name": "Short project description",
     "method": "short_project_description",
     "message": "Project description is too short. Description text must be more than 100 characters.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0006"
   },
-  "rule7": {
+  "ruleBP_R0007": {
     "rule_class": "BioProject",
-    "code": "7",
+    "code": "BP_R0007",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty description for other relevance",
     "method": "empty_description_for_other_relevance",
     "message": "Text description for the Relevance 'Other' is not provided. Please provide description of the Relevance 'Other'.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0007"
   },
-  "rule8": {
+  "ruleBP_R0008": {
     "rule_class": "BioProject",
-    "code": "8",
+    "code": "BP_R0008",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty description for other subtype",
     "method": "empty_description_for_other_subtype",
     "message": "Text description for the subtype 'Other' is not provided. Please provide DescriptionSubtypeOther.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0008"
   },
-  "rule9": {
+  "ruleBP_R0009": {
     "rule_class": "BioProject",
-    "code": "9",
+    "code": "BP_R0009",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty target description for other sample_scope",
     "method": "empty_target_description_for_other_sample_scope",
     "message": "Text description for the sample_scope 'Other' is not provided. Please provide description of target.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0009"
   },
-  "rule10": {
+  "ruleBP_R0010": {
     "rule_class": "BioProject",
-    "code": "10",
+    "code": "BP_R0010",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty target description for other material",
     "method": "empty_target_description_for_other_material",
     "message": "Text description for the material 'Other' is not provided. Please provide description of target.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0010"
   },
-  "rule11": {
+  "ruleBP_R0011": {
     "rule_class": "BioProject",
-    "code": "11",
+    "code": "BP_R0011",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty target description for other capture",
     "method": "empty_target_description_for_other_capture",
     "message": "Text description for the capture 'Other' is not provided. Please provide description of target.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0011"
   },
-  "rule12": {
+  "ruleBP_R0012": {
     "rule_class": "BioProject",
-    "code": "12",
+    "code": "BP_R0012",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty method description for other method_type",
     "method": "empty_method_description_for_other_method_type",
     "message": "Text description for the method_type 'Other' is not provided. Please provide description of method.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0012"
   },
-  "rule13": {
+  "ruleBP_R0013": {
     "rule_class": "BioProject",
-    "code": "13",
+    "code": "BP_R0013",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty data description for other data_type",
     "method": "empty_data_description_for_other_data_type",
     "message": "Text description for the data_type 'Other' is not provided. Please provide description of data.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0013"
   },
-  "rule14": {
+  "ruleBP_R0014": {
     "rule_class": "BioProject",
-    "code": "14",
+    "code": "BP_R0014",
     "level": "warning",
+    "internal_ignore": false,
     "name": "Invalid publication identifier",
     "method": "invalid_publication_identifier",
     "message": "Invalid publication identifier, enter valid pubmed id, pmc id or DOI.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0014"
   },
-  "rule15": {
+  "ruleBP_R0015": {
     "rule_class": "BioProject",
-    "code": "15",
+    "code": "BP_R0015",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty publication reference",
     "method": "empty_publication_reference",
     "message": "Publication reference is not provided. Please provide reference in free-text when id is not available.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0015"
   },
-  "rule16": {
+  "ruleBP_R0016": {
     "rule_class": "BioProject",
-    "code": "16",
+    "code": "BP_R0016",
     "level": "error",
+    "internal_ignore": false,
     "name": "Invalid umbrella project",
     "method": "invalid_umbrella_project",
     "message": "Invalid project is selected as an umbrella project. Please select a valid umbrella project.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0016"
   },
-  "rule17": {
+  "ruleBP_R0017": {
     "rule_class": "BioProject",
-    "code": "17",
+    "code": "BP_R0017",
     "level": "error",
+    "internal_ignore": true,
     "name": "Missing strain/isolate/cultivar",
     "method": "missing_strain_isolate_cultivar",
     "message": "At least one of strain/isolate/cultivar is required for monoisolate organism.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0017"
   },
-  "rule18": {
+  "ruleBP_R0018": {
     "rule_class": "BioProject",
-    "code": "18",
+    "code": "BP_R0018",
     "level": "error",
+    "internal_ignore": true,
     "name": "Taxonomy at species or infraspecific rank",
     "method": "taxonomy_at_species_or_infraspecific_rank",
     "message": "Taxonomy should be species or infraspecific level.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0018"
   },
-  "rule19": {
+  "ruleBP_R0019": {
     "rule_class": "BioProject",
-    "code": "19",
+    "code": "BP_R0019",
     "level": "error",
+    "internal_ignore": true,
     "name": "Empty organism description for multi-species",
     "method": "empty_organism_description_for_multi_species",
     "message": "Organism description is required when sample scope is multi-species.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0019"
   },
-  "rule20": {
+  "ruleBP_R0020": {
     "rule_class": "BioProject",
-    "code": "20",
+    "code": "BP_R0020",
     "level": "error",
+    "internal_ignore": true,
     "name": "Metagenome or environmental",
     "method": "metagenome_or_environmental",
     "message": "When sample_scope is \"Environment\", taxonomy must be a metagenome where lineage starts with unclassified sequences and scientific name ends with 'metagenome'.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0020"
   },
-  "rule21": {
+  "ruleBP_R0021": {
     "rule_class": "BioProject",
-    "code": "21",
+    "code": "BP_R0021",
     "level": "error",
+    "internal_ignore": true,
     "name": "Invalid locus tag prefix",
     "method": "invalid_locus_tag_prefix",
     "message": "Locus tag prefix and DDBJ BioSample accession pair is invalid.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-      "http://www.ddbj.nig.ac.jp/sub/locus_tag-j.html"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0021"
   },
-  "rule22": {
+  "ruleBP_R0022": {
     "rule_class": "BioProject",
-    "code": "22",
+    "code": "BP_R0022",
     "level": "error",
+    "internal_ignore": false,
     "name": "Invalid BioSample accession",
     "method": "invalid_biosample_accession",
     "message": "Invalid BioSample accession. Please provide a valid BioSample accession with format SAMD\\d+",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0022"
   },
-  "rule36": {
+  "ruleBP_R0036": {
     "rule_class": "BioProject",
-    "code": "36",
+    "code": "BP_R0036",
     "level": "error",
+    "internal_ignore": false,
     "name": "Missing project name",
     "method": "missing_project_name",
     "message": "Project name is required.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0036"
   },
-  "rule37": {
+  "ruleBP_R0037": {
     "rule_class": "BioProject",
-    "code": "37",
+    "code": "BP_R0037",
     "level": "error",
+    "internal_ignore": false,
     "name": "Multiple projects",
     "method": "multiple_projects",
     "message": "Only one project is allowed in BioProject XML",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0037"
   },
-  "rule38": {
+  "ruleBP_R0038": {
     "rule_class": "BioProject",
-    "code": "38",
+    "code": "BP_R0038",
     "level": "error",
+    "internal_ignore": false,
     "name": "Taxonomy name and id not match",
     "method": "taxonomy_name_and_id_not_match",
     "message": "Organism and taxonomy id do not match.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0038"
   },
-  "rule39": {
+  "ruleBP_R0039": {
     "rule_class": "BioProject",
-    "code": "39",
+    "code": "BP_R0039",
     "level": "warning",
+    "internal_ignore": false,
     "name": "Taxonomy error warning",
     "method": "taxonomy_error_warning",
     "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0039"
   },
-  "rule40": {
+  "ruleBP_R0040": {
     "rule_class": "BioProject",
-    "code": "40",
+    "code": "BP_R0040",
     "level": "error",
+    "internal_ignore": false,
     "name": "Invalid project type",
     "method": "invalid_project_type",
     "message": "ProjectTypeTopSingleOrganism is invalid project type",
     "object": [
       "BioProject"
     ],
-    "reference": [
-
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0040"
   },
-  "rule41": {
+  "ruleBP_R0041": {
     "rule_class": "BioProject",
-    "code": "41",
+    "code": "BP_R0041",
     "level": "error",
+    "internal_ignore": false,
     "name": "Invalid locus tag prefix format",
     "method": "invalid_locus_tag_prefix_format",
     "message": "Locus tag prefix must be 3-12 alphanumeric characters and the first character may not be a digit.",
     "object": [
       "BioProject"
     ],
-    "reference": [
-      "http://trace.ddbj.nig.ac.jp/glossary/ja/Locus_tag_prefix"
-    ]
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0041"
   }
 }
