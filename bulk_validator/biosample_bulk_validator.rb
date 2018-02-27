@@ -170,11 +170,15 @@ class BioSampleBulkValidator
             column = item["annotation"].select{|anno| anno["key"] == key}
             unless key == "Auto Annotation"
               if column.size > 0
-                if column.first["key"] == "Suggested value" && column.first["suggested_value"].size == 1
-                  #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
-                  row.push(column.first["suggested_value"].first)
+                if column.first["key"] == "Suggested value"
+                  if  column.first["suggested_value"].size == 1
+                    #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
+                    row.push(column.first["suggested_value"].first)
+                  else
+                    row.push(column.first["suggested_value"])
+                  end
                 else
-                  row.push(column.first["suggested_value"])
+                  row.push(column.first["value"])
                 end
               else
                 row.push("")
