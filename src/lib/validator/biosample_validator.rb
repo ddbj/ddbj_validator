@@ -167,12 +167,6 @@ class BioSampleValidator < ValidatorBase
       missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
       missing_organism("BS_R0020", sample_name, biosample_data, line_num)
 
-      ### 属性名や必須項目に関する検証
-      # パッケージから属性情報(必須項目やグループ)を取得
-      attr_list = get_attributes_of_package(biosample_data["package"])
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
-      missing_required_attribute_name("BS_R0092", sample_name, biosample_data["attributes"], attr_list , line_num)
-
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
         non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
@@ -199,7 +193,7 @@ class BioSampleValidator < ValidatorBase
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
           taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
           unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
-            taxonomy_id = taxid_annotation
+            taxonomy_id = biosample_data["attributes"]["taxonomy_id"] =  taxid_annotation
           end
           organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "organism")
           unless organism_annotation.nil? #organismの補正があれば値を置き換える
@@ -247,6 +241,13 @@ class BioSampleValidator < ValidatorBase
         sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
         taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
       end
+
+      ### 属性名や必須項目に関する検証
+      # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
+      # パッケージから属性情報(必須項目やグループ)を取得
+      attr_list = get_attributes_of_package(biosample_data["package"])
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
+
     end
   end
 
@@ -563,7 +564,8 @@ class BioSampleValidator < ValidatorBase
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
-    missing_attr_names = []
+    missing_attr_names = mandatory_attr_list - sample_attr.keys #必須項目が
+
     sample_attr.each do |attr_name, attr_value|
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
@@ -596,6 +598,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
+=begin
   def missing_required_attribute_name (rule_code, sample_name, sample_attr, package_attr_list , line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
@@ -615,6 +618,7 @@ class BioSampleValidator < ValidatorBase
       false
     end
   end
+=end
 
   #
   # rule:2

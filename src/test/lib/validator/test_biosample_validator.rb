@@ -277,6 +277,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 =end
 
+=begin (suppressed)
   def test_missing_required_attribute_name
     #ok case
     xml_data = File.read("#{@test_file_dir}/92_missing_required_attribute_name_SSUB000019_ok.xml")
@@ -295,6 +296,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
   end
+=end
 
   def test_missing_mandatory_attribute
     #ok case
@@ -305,7 +307,15 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error.xml")
+    ## not exist required attr name
+    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error1.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## brank required attr
+    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)

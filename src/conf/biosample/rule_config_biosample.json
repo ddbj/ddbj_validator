@@ -649,19 +649,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0091"
   },
-  "ruleBS_R0092": {
-    "rule_class": "BioSample",
-    "code": "BS_R0092",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Missing required attribute name",
-    "method": "missing_required_attribute_name",
-    "message": "Required field is missing from the header line of the file.",
-    "object": [
-      "BioSample"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0092"
-  },
   "ruleBS_R0093": {
     "rule_class": "BioSample",
     "code": "BS_R0093",
