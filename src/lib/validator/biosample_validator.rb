@@ -1438,27 +1438,22 @@ class BioSampleValidator < ValidatorBase
     if ts_attr.include?(attr_name) #日付型の属性であれば
       #TODO auto-annotationの部分のコードを分離
       #月の表現を揃える
-      rep_table_month = {
-        "January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12",
-        "january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12",
-        "JAN" => "01", "FEB" => "02", "MAR" => "03", "APR" => "04", "MAY" => "05", "JUN" => "06", "JUL" => "07", "AUG" => "08", "SEP" => "09", "OCT" => "10", "NOV" => "11", "DEC" => "12",
-        "Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12",
-        "jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"
-      }
-      if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/)
-        attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/, rep_table_month)
-      end
-      if attr_val.match(/january|february|march|april|may|june|july|august|september|october|november|december/)
-        attr_val = attr_val.sub(/january|february|march|april|may|june|july|august|september|october|november|december/, rep_table_month)
-      end
-      if attr_val.match(/JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC/)
-        attr_val = attr_val.sub(/JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC/ , rep_table_month)
-      end
-      if attr_val.match(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/)
-        attr_val = attr_val.sub(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/, rep_table_month)
-      end
-      if attr_val.match(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/)
-        attr_val = attr_val.sub(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/, rep_table_month)
+      month_long_capitalize  = {"January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12"}
+      month_long_downcase    = {"january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12"}
+      month_short_upcase     = {"JAN" => "01", "FEB" => "02", "MAR" => "03", "APR" => "04", "MAY" => "05", "JUN" => "06", "JUL" => "07", "AUG" => "08", "SEP" => "09", "OCT" => "10", "NOV" => "11", "DEC" => "12"}
+      month_short_capitalize  = {"Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12"}
+      month_short_downcase   = {"jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"}
+      #全置換設定
+      rep_table_month = month_long_capitalize.update(month_long_downcase).update(month_short_upcase).update(month_short_capitalize).update(month_short_downcase) #hash
+      rep_table_month_array = [month_long_capitalize, month_long_downcase, month_short_upcase, month_short_capitalize, month_short_downcase] #array
+
+      #置換処理
+      rep_table_month_array.each do |replace_month_hash|
+        replace_month_hash.keys.each do |month_name|
+          if attr_val.match(/[^a-zA-Z0-9]#{month_name}[^a-zA-Z0-9]/) #単語そのものであるか(#46 のようなスペルミスを防ぐ)
+            attr_val = attr_val.sub(/#{month_name}/, replace_month_hash)
+          end
+        end
       end
       #区切り文字の表記を揃える
       @conf[:convert_date_format].each do |format|
