@@ -1630,9 +1630,8 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute name", value: attr_name}
       ]
-      location = @xml_convertor.xpath_of_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, false))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      annotation.push({key:"Suggestion",value: replaced})
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
     elsif target == "attr_value" && replaced != attr_val
@@ -1641,9 +1640,8 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
-      location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, false))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      annotation.push({key:"Suggestion",value: replaced})
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
     end
