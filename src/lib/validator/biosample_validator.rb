@@ -1450,11 +1450,12 @@ class BioSampleValidator < ValidatorBase
       #置換処理
       rep_table_month_array.each do |replace_month_hash|
         replace_month_hash.keys.each do |month_name|
-          if attr_val.match(/[^a-zA-Z0-9]#{month_name}[^a-zA-Z0-9]/) #単語そのものであるか(#46 のようなスペルミスを防ぐ)
+          if attr_val.match(/[^a-zA-Z0-9]*#{month_name}([^a-zA-Z0-9]+|$)/) #単語そのものであるか(#46 のようなスペルミスを防ぐ)
             attr_val = attr_val.sub(/#{month_name}/, replace_month_hash)
           end
         end
       end
+
       #区切り文字の表記を揃える
       @conf[:convert_date_format].each do |format|
         regex = Regexp.new(format["regex"])

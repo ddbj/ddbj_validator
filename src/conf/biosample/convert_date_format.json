@@ -72,15 +72,33 @@
     "output_format": "%Y-%m-%dT%HZ"
   },
   {
+    "_example": "2016/7/10T11 => 2016-07-10T11Z",
+    "regex": "^\\d{4}\\/\\d{1,2}\\/\\d{1,2}T\\d{1,2}$",
+    "parse_format": "%Y/%m/%dT%H",
+    "output_format": "%Y-%m-%dT%HZ"
+  },
+  {
     "_example": "2016/7/10T11:43Z => 2016-07-10T11:43Z",
     "regex": "^\\d{4}\\/\\d{1,2}\\/\\d{1,2}T\\d{1,2}:\\d{1,2}Z$",
     "parse_format": "%Y/%m/%dT%H:%MZ",
     "output_format": "%Y-%m-%dT%H:%MZ"
   },
   {
+    "_example": "2016/7/10T11:43 => 2016-07-10T11:43Z",
+    "regex": "^\\d{4}\\/\\d{1,2}\\/\\d{1,2}T\\d{1,2}:\\d{1,2}$",
+    "parse_format": "%Y/%m/%dT%H:%M",
+    "output_format": "%Y-%m-%dT%H:%MZ"
+  },
+  {
     "_example": "2016/7/10T11:43:30Z => 2016-07-10T11:43:30Z",
     "regex": "^\\d{4}\\/\\d{1,2}\\/\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z$",
     "parse_format": "%Y/%m/%dT%H:%M:%SZ",
+    "output_format": "%Y-%m-%dT%H:%M:%SZ"
+  },
+  {
+    "_example": "2016/7/10T11:43:30 => 2016-07-10T11:43:30Z",
+    "regex": "^\\d{4}\\/\\d{1,2}\\/\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}$",
+    "parse_format": "%Y/%m/%dT%H:%M:%S",
     "output_format": "%Y-%m-%dT%H:%M:%SZ"
   },
   {
@@ -147,5 +165,59 @@
     "_example": "10-16 => 2016-10 #depend on value (see code)",
     "regex": "^(\\d{1,2})-(\\d{1,2})$",
     "output_format": "%Y-%m"
+  },
+  {
+    "_example": "2016 7 => 2016-07",
+    "regex": "^\\d{4} \\d{1,2}$",
+    "parse_format": "%Y %m",
+    "output_format": "%Y-%m"
+  },
+  {
+    "_example": "2016 7 10 => 2016-07-10",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}$",
+    "parse_format": "%Y %m %d",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "_example": "2016 7 10T11Z => 2016-07-10T11Z",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}T\\d{1,2}Z$",
+    "parse_format": "%Y %m %dT%HZ",
+    "output_format": "%Y-%m-%dT%HZ"
+  },
+  {
+    "_example": "2016 7 10T11 => 2016-07-10T11Z",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}T\\d{1,2}$",
+    "parse_format": "%Y %m %dT%H",
+    "output_format": "%Y-%m-%dT%HZ"
+  },
+  {
+    "_example": "2016 7 10T11:43Z => 2016-07-10T11:43Z",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}T\\d{1,2}:\\d{1,2}Z$",
+    "parse_format": "%Y %m %dT%H:%MZ",
+    "output_format": "%Y-%m-%dT%H:%MZ"
+  },
+  {
+    "_example": "2016 7 10T11:43 => 2016-07-10T11:43Z",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}T\\d{1,2}:\\d{1,2}$",
+    "parse_format": "%Y %m %dT%H:%M",
+    "output_format": "%Y-%m-%dT%H:%MZ"
+  },
+  {
+    "_example": "2016 7 10T11:43:30Z => 2016-07-10T11:43:30Z",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z$",
+    "parse_format": "%Y %m %dT%H:%M:%SZ",
+    "output_format": "%Y-%m-%dT%H:%M:%SZ"
+  },
+  {
+    "_example": "2016 7 10T11:43:30 => 2016-07-10T11:43:30Z",
+    "regex": "^\\d{4} \\d{1,2} \\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}$",
+    "parse_format": "%Y %m %dT%H:%M:%S",
+    "output_format": "%Y-%m-%dT%H:%M:%SZ"
+  },
+  {
+    "_example": "10 7 2016 => 2016-07-10",
+    "regex": "^\\d{1,2} \\d{1,2} \\d{4}$",
+    "parse_format": "%d %m %Y",
+    "output_format": "%Y-%m-%d"
   }
 ]
