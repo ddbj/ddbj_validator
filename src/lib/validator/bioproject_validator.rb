@@ -540,15 +540,15 @@ class BioProjectValidator < ValidatorBase
           @error_list.push(error_hash)
           result = false
         end
-      rescue => ex #NCBI checkが取らない場合にはerrorではなくwargningにする
+      rescue => ex #NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
         annotation = [
           {key: "Project name", value: project_label},
           {key: "DbType", value: db_type},
           {key: "ID", value: id},
-          {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"} #順番を表示
+          {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"}, #順番を表示
+          {key: "Message", value: "Validation processing failed because connection to NCBI service failed." }
         ]
-        override = {level: "wargning", message: "Validation processing failed because connection to NCBI service failed"}
-        error_hash = CommonUtils::error_obj_override(@validation_config["rule" + rule_code], @data_file, annotation, override)
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
         @error_list.push(error_hash)
         result = false
       end

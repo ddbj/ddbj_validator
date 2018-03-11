@@ -736,14 +736,14 @@ class BioSampleValidator < ValidatorBase
           @error_list.push(error_hash)
           result = false
         end
-      rescue => ex #NCBI checkが取らない場合にはerrorではなくwargningにする
+      rescue => ex #NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_val}
+          {key: "Attribute value", value: attr_val},
+          {key: "Message", value: "Validation processing failed because connection to NCBI service failed." }
         ]
-        override = {level: "warning", message: "Validation processing failed because connection to NCBI service failed"}
-        error_hash = CommonUtils::error_obj_override(@validation_config["rule" + rule_code], @data_file, annotation, override)
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
         @error_list.push(error_hash)
         result = false
       end
