@@ -1018,12 +1018,12 @@ class BioSampleValidator < ValidatorBase
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_name
         location = @xml_convertor.xpath_from_attrname("organism", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "organism", location, true));
+        annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
       end
       annotation.push({key: "taxonomy_id", value: ""})
       location = @xml_convertor.xpath_from_attrname("taxonomy_id", line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([ret[:tax_id]], "taxonomy_id", location, true));
-    else ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
+    elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
     end #該当するtaxonomy_idが無かった場合は単なるエラー

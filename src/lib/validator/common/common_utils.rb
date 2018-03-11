@@ -105,6 +105,43 @@ class CommonUtils
   end
 
   #
+  # Suggest形式のannotation情報のhashを組み立てて返す.
+  # デフォルトのkey名("Suggested value")を使用したくない場合に指定できる(複数のSuggested項目がある場合に識別するケース等)
+  # フォーマット(JSON)は以下を参照
+  # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
+  # ==== Args
+  # suggest_key_name: "Suggested value(デフォルト値)"以外の項目名を指定
+  # suggest_value_list: 候補値のリスト(配列)
+  # target_key: 適用する(表示用の)列名 ex. "Attribute value"
+  # location: 値を置き換える為のファイル内の位置情報(配列)
+  # is_auto_annotation: auto_annotationであればtrue
+  # ==== Return
+  # Suggest用Hashオブジェクト
+  # {
+  #   key: suggest_key_name,
+  #   suggested_value: suggest_value_list,
+  #   is_auto_annotation: true, //or is_suggest: true
+  #   target_key: target_key,
+  #   location: location
+  # }
+  #
+  def self.create_suggested_annotation_with_key (suggest_key_name, suggest_value_list, target_key, location, is_auto_annotation)
+    suggest_key_name == "Suggested value" if suggest_key_name.nil? || suggest_key_name == ""
+    hash = {
+      key: suggest_key_name,
+      suggested_value: suggest_value_list,
+      target_key: target_key,
+      location: location
+    }
+    if is_auto_annotation == true
+      hash[:is_auto_annotation] = true
+    else
+      hash[:is_suggestion] = true
+    end
+    hash
+  end
+
+  #
   # Suggest形式のannotation情報のhashを組み立てて返す
   # フォーマット(JSON)は以下を参照
   # https://github.com/ddbj/ddbj_validator/wiki/Validator-API#%E3%82%A8%E3%83%A9%E3%83%BC%E3%83%A1%E3%83%83%E3%82%BB%E3%83%BC%E3%82%B8%E4%BB%95%E6%A7%98json%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
@@ -124,18 +161,7 @@ class CommonUtils
   # }
   #
   def self.create_suggested_annotation (suggest_value_list, target_key, location, is_auto_annotation)
-    hash = {
-             key: "Suggested value",
-             suggested_value: suggest_value_list,
-             target_key: target_key,
-             location: location
-           }
-    if is_auto_annotation == true
-      hash[:is_auto_annotation] = true
-    else
-      hash[:is_suggestion] = true
-    end
-    hash
+    self.create_suggested_annotation_with_key("Suggested value", suggest_value_list, target_key, location, is_auto_annotation)
   end
 
   #
