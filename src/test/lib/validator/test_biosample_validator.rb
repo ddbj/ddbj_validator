@@ -566,7 +566,7 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_host_organism_name", "BS_R0015", "sampleA", "1", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list])
+    assert_equal "root", get_auto_annotation(ret[:error_list])
     ## human
     ret = exec_validator("invalid_host_organism_name", "BS_R0015", "sampleA", "9606", "Human", 1)
     expect_annotation = "Homo sapiens"
@@ -629,19 +629,18 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "103690", "Nostoc sp. PCC 7120", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ##tax_id=1
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "1", "root", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     #ng case
     ##exist tax_id
     ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "103690", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "Nostoc sp. PCC 7120",  get_auto_annotation(ret[:error_list])
+    assert_nil  get_auto_annotation(ret[:error_list])
     ##not exist tax_id
     ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "-1", "Not exist taxonomy name", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil  get_auto_annotation(ret[:error_list])
-    ##tax_id=1(new organism)
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "1", "root", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_nil  get_auto_annotation(ret[:error_list])
@@ -1245,11 +1244,11 @@ jkl\"  "
     ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "561", "Escherichia", 1 )
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "1", "not exist taxon", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
 
     # nil case
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "1", "not exist taxon", 1 )
-    assert_nil ret[:result]
-    assert_equal 0, ret[:error_list].size
     ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "", "Escherichia coli", 1 )
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
