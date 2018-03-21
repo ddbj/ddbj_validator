@@ -857,6 +857,14 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-09-07T03:08:02Z", get_auto_annotation(ret[:error_list])
     ### 月の略称を補正
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "Jun-12", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2012-06", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2011 June", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2011-06", get_auto_annotation(ret[:error_list])
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "21-Oct-1952", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -878,6 +886,14 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "24 February 2018", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2018-02-24", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2015 02", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2015-02", get_auto_annotation(ret[:error_list])
     ### 不正な日付 32日
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -915,6 +931,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "2015-04-16T12:00:00Z", get_auto_annotation(ret[:error_list])
+    #月名のスペルミス
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list]) #auto-annotation無し
     # params are nil pattern
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "", ts_attr,  1)
     assert_nil ret[:result]
