@@ -1029,11 +1029,7 @@ class BioSampleValidator < ValidatorBase
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
     end #該当するtaxonomy_idが無かった場合は単なるエラー
-    unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-    else #auto-annotation無
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-    end
+    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
     @error_list.push(error_hash)
     false
   end
@@ -1072,12 +1068,10 @@ class BioSampleValidator < ValidatorBase
         {key: "organism", value: organism_name},
         {key: "taxonomy_id", value: taxonomy_id}
       ]
-      if scientific_name.nil?
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      else #taxonomy_idのscientific_nameで自動補正する
+      unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameで自動補正する
         annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       false
     end

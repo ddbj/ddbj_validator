@@ -331,7 +331,7 @@
     "internal_ignore": false,
     "name": "Taxonomy error warning",
     "method": "taxonomy_error_warning",
-    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism. When the organism(s) is novel, please enter proposed name(s) and submit the BioSamples.",
+    "message": "If applicable, the taxonomy id will be automatically filled and the organism will be corrected to the scientific name. When the organism(s) is novel, please enter proposed name(s) in the organism, leave the taxonomy id empty and submit the BioSample.",
     "object": [
       "BioSample"
     ],
