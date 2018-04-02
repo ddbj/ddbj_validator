@@ -331,7 +331,7 @@
     "internal_ignore": false,
     "name": "Taxonomy error warning",
     "method": "taxonomy_error_warning",
-    "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism. When the organism(s) is novel, please enter proposed name(s) and submit the BioSamples.",
+    "message": "If applicable, the taxonomy id will be automatically filled and the organism will be corrected to the scientific name. When the organism(s) is novel, please enter proposed name(s) in the organism, leave the taxonomy id empty and submit the BioSample.",
     "object": [
       "BioSample"
     ],
@@ -648,19 +648,6 @@
       "BioSample"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0091"
-  },
-  "ruleBS_R0092": {
-    "rule_class": "BioSample",
-    "code": "BS_R0092",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Missing required attribute name",
-    "method": "missing_required_attribute_name",
-    "message": "Required field is missing from the header line of the file.",
-    "object": [
-      "BioSample"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0092"
   },
   "ruleBS_R0093": {
     "rule_class": "BioSample",

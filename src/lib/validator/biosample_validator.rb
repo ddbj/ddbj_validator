@@ -163,16 +163,6 @@ class BioSampleValidator < ValidatorBase
       missing_package_information("BS_R0025", sample_name, biosample_data, line_num)
       unknown_package("BS_R0026", sample_name, biosample_data["package"], line_num)
 
-      ### 重要属性の欠損検証
-      missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
-      missing_organism("BS_R0020", sample_name, biosample_data, line_num)
-
-      ### 属性名や必須項目に関する検証
-      # パッケージから属性情報(必須項目やグループ)を取得
-      attr_list = get_attributes_of_package(biosample_data["package"])
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
-      missing_required_attribute_name("BS_R0092", sample_name, biosample_data["attributes"], attr_list , line_num)
-
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
         non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
@@ -193,26 +183,28 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### organismの検証とtaxonomy_idの確定
-      taxonomy_id = OrganismValidator::TAX_ROOT
-      if biosample_data["attributes"]["taxonomy_id"].nil? || biosample_data["attributes"]["taxonomy_id"].strip == "" #taxonomy_id記述なし
-        ret = taxonomy_error_warning("BS_R0045", sample_name, biosample_data["attributes"]["organism"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
-          taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
-          unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
-            taxonomy_id = taxid_annotation
+      input_taxid = biosample_data["attributes"]["taxonomy_id"]
+      if input_taxid.nil? || CommonUtils::null_value?(input_taxid) #taxonomy_idの記述がない("missing"も未記入とみなす)
+        taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
+      else
+        taxonomy_id = input_taxid
+      end
+      input_organism = biosample_data["attributes"]["organism"]
+      if !(input_organism.nil? && CommonUtils::null_value?(input_organism)) #organismの記述がある("missing"は未記入とみなす)
+        if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
+          ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, input_organism, line_num)
+        else
+          ret = taxonomy_error_warning("BS_R0045", sample_name, biosample_data["attributes"]["organism"], line_num)
+          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
+            taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
+            unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
+              taxonomy_id = biosample_data["attributes"]["taxonomy_id"] =  taxid_annotation
+            end
+            organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "organism")
+            unless organism_annotation.nil? #organismの補正があれば値を置き換える
+              biosample_data["attributes"]["organism"] = organism_annotation
+            end
           end
-          organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "organism")
-          unless organism_annotation.nil? #organismの補正があれば値を置き換える
-            biosample_data["attributes"]["organism"] = organism_annotation
-          end
-        end
-      else #taxonomy_id記述あり
-        taxonomy_id = biosample_data["attributes"]["taxonomy_id"]
-        ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"]["organism"] = CommonUtils::get_auto_annotation(@error_list.last)
-        elsif ret == false #auto annotationできないエラーであればtax_idが不正な可能性がある
-          taxonomy_id = OrganismValidator::TAX_ROOT
         end
       end
 
@@ -242,11 +234,22 @@ class BioSampleValidator < ValidatorBase
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### taxonomy_idの値を使う検証
-      if taxonomy_id != OrganismValidator::TAX_ROOT #無効なtax_idでなければ実行
+      if taxonomy_id != OrganismValidator::TAX_INVALID #無効なtax_idでなければ実行
         package_versus_organism("BS_R0048", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
         sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
         taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
       end
+
+      ### 重要属性の欠損検証
+      missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
+      missing_organism("BS_R0020", sample_name, biosample_data, line_num)
+
+      ### 属性名や必須項目に関する検証
+      # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
+      # パッケージから属性情報(必須項目やグループ)を取得
+      attr_list = get_attributes_of_package(biosample_data["package"])
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
+
     end
   end
 
@@ -563,7 +566,8 @@ class BioSampleValidator < ValidatorBase
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
-    missing_attr_names = []
+    missing_attr_names = mandatory_attr_list - sample_attr.keys #必須項目が
+
     sample_attr.each do |attr_name, attr_value|
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
@@ -596,6 +600,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
+=begin
   def missing_required_attribute_name (rule_code, sample_name, sample_attr, package_attr_list , line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
@@ -615,6 +620,7 @@ class BioSampleValidator < ValidatorBase
       false
     end
   end
+=end
 
   #
   # rule:2
@@ -736,14 +742,14 @@ class BioSampleValidator < ValidatorBase
           @error_list.push(error_hash)
           result = false
         end
-      rescue => ex #NCBI checkが取らない場合にはerrorではなくwargningにする
+      rescue => ex #NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_val}
+          {key: "Attribute value", value: attr_val},
+          {key: "Message", value: "Validation processing failed because connection to NCBI service failed." }
         ]
-        override = {level: "warning", message: "Validation processing failed because connection to NCBI service failed"}
-        error_hash = CommonUtils::error_obj_override(@validation_config["rule" + rule_code], @data_file, annotation, override)
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
         @error_list.push(error_hash)
         result = false
       end
@@ -935,12 +941,12 @@ class BioSampleValidator < ValidatorBase
           puts "use cache in taxonomy_name_from_id" if $DEBG
           scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid)
         end
-        #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
-        if !scientific_name.nil? && scientific_name == host_name && host_taxid != OrganismValidator::TAX_ROOT
+        #scientific_nameがあり、ユーザの入力値と一致する
+        if !scientific_name.nil? && scientific_name == host_name
           ret = true
         else
-          # tax_id=1ではなくtax_idからscientifin_nameが拾えればauto-annotation
-          if !scientific_name.nil? && host_taxid != OrganismValidator::TAX_ROOT
+          # tax_idからscientifin_nameが拾えればauto-annotation
+          if !scientific_name.nil?
             annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true))
           end
           ret = false
@@ -1014,20 +1020,16 @@ class BioSampleValidator < ValidatorBase
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_name
         location = @xml_convertor.xpath_from_attrname("organism", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "organism", location, true));
+        annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
       end
       annotation.push({key: "taxonomy_id", value: ""})
       location = @xml_convertor.xpath_from_attrname("taxonomy_id", line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([ret[:tax_id]], "taxonomy_id", location, true));
-    else ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
+    elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
     end #該当するtaxonomy_idが無かった場合は単なるエラー
-    unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-    else #auto-annotation無
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-    end
+    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
     @error_list.push(error_hash)
     false
   end
@@ -1058,7 +1060,7 @@ class BioSampleValidator < ValidatorBase
       scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id)
     end
     #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
-    if !scientific_name.nil? && scientific_name == organism_name && taxonomy_id != OrganismValidator::TAX_ROOT
+    if !scientific_name.nil? && scientific_name == organism_name
       true
     else
       annotation = [
@@ -1066,13 +1068,10 @@ class BioSampleValidator < ValidatorBase
         {key: "organism", value: organism_name},
         {key: "taxonomy_id", value: taxonomy_id}
       ]
-      if scientific_name.nil? || taxonomy_id == OrganismValidator::TAX_ROOT
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      else #taxonomy_idのscientific_nameで自動補正する
-        location = @xml_convertor.xpath_from_attrname("organism", line_num)
-        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "organism", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameで自動補正する
+        annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       false
     end
@@ -1162,7 +1161,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   # 
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
-    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_ROOT
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
     #あればキャッシュを使用
     cache_key = ValidatorCache::create_key(taxonomy_id, package_name)
@@ -1206,7 +1205,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def sex_for_bacteria (rule_code, sample_name, taxonomy_id, sex, organism, line_num)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_ROOT || CommonUtils::null_value?(sex)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID || CommonUtils::null_value?(sex)
 
     ret = true
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
@@ -1438,28 +1437,24 @@ class BioSampleValidator < ValidatorBase
     if ts_attr.include?(attr_name) #日付型の属性であれば
       #TODO auto-annotationの部分のコードを分離
       #月の表現を揃える
-      rep_table_month = {
-        "January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12",
-        "january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12",
-        "JAN" => "01", "FEB" => "02", "MAR" => "03", "APR" => "04", "MAY" => "05", "JUN" => "06", "JUL" => "07", "AUG" => "08", "SEP" => "09", "OCT" => "10", "NOV" => "11", "DEC" => "12",
-        "Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12",
-        "jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"
-      }
-      if attr_val.match(/January|February|March|April|May|June|July|August|September|October|November|December/)
-        attr_val = attr_val.sub(/January|February|March|April|May|June|July|August|September|October|November|December/, rep_table_month)
+      month_long_capitalize  = {"January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12"}
+      month_long_downcase    = {"january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12"}
+      month_short_upcase     = {"JAN" => "01", "FEB" => "02", "MAR" => "03", "APR" => "04", "MAY" => "05", "JUN" => "06", "JUL" => "07", "AUG" => "08", "SEP" => "09", "OCT" => "10", "NOV" => "11", "DEC" => "12"}
+      month_short_capitalize  = {"Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12"}
+      month_short_downcase   = {"jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"}
+      #全置換設定
+      rep_table_month = month_long_capitalize.update(month_long_downcase).update(month_short_upcase).update(month_short_capitalize).update(month_short_downcase) #hash
+      rep_table_month_array = [month_long_capitalize, month_long_downcase, month_short_upcase, month_short_capitalize, month_short_downcase] #array
+
+      #置換処理
+      rep_table_month_array.each do |replace_month_hash|
+        replace_month_hash.keys.each do |month_name|
+          if attr_val.match(/[^a-zA-Z0-9]*#{month_name}([^a-zA-Z0-9]+|$)/) #単語そのものであるか(#46 のようなスペルミスを防ぐ)
+            attr_val = attr_val.sub(/#{month_name}/, replace_month_hash)
+          end
+        end
       end
-      if attr_val.match(/january|february|march|april|may|june|july|august|september|october|november|december/)
-        attr_val = attr_val.sub(/january|february|march|april|may|june|july|august|september|october|november|december/, rep_table_month)
-      end
-      if attr_val.match(/JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC/)
-        attr_val = attr_val.sub(/JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC/ , rep_table_month)
-      end
-      if attr_val.match(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/)
-        attr_val = attr_val.sub(/Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec/, rep_table_month)
-      end
-      if attr_val.match(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/)
-        attr_val = attr_val.sub(/jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec/, rep_table_month)
-      end
+
       #区切り文字の表記を揃える
       @conf[:convert_date_format].each do |format|
         regex = Regexp.new(format["regex"])
@@ -1630,9 +1625,8 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute name", value: attr_name}
       ]
-      location = @xml_convertor.xpath_of_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, false))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      annotation.push({key:"Suggestion",value: replaced})
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
     elsif target == "attr_value" && replaced != attr_val
@@ -1641,9 +1635,8 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
-      location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, false))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      annotation.push({key:"Suggestion",value: replaced})
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
     end
@@ -2186,7 +2179,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, sample_name, taxonomy_id, organism, line_num)
-    return nil if CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_ROOT
+    return nil if CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
     result = @org_validator.is_infraspecific_rank(taxonomy_id)
     if result == false
       annotation = [

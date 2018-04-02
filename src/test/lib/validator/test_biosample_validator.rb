@@ -277,6 +277,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 =end
 
+=begin (suppressed)
   def test_missing_required_attribute_name
     #ok case
     xml_data = File.read("#{@test_file_dir}/92_missing_required_attribute_name_SSUB000019_ok.xml")
@@ -295,6 +296,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
   end
+=end
 
   def test_missing_mandatory_attribute
     #ok case
@@ -305,7 +307,15 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error.xml")
+    ## not exist required attr name
+    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error1.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data)
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## brank required attr
+    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
@@ -556,7 +566,7 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_host_organism_name", "BS_R0015", "sampleA", "1", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list])
+    assert_equal "root", get_auto_annotation(ret[:error_list])
     ## human
     ret = exec_validator("invalid_host_organism_name", "BS_R0015", "sampleA", "9606", "Human", 1)
     expect_annotation = "Homo sapiens"
@@ -619,19 +629,18 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "103690", "Nostoc sp. PCC 7120", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ##tax_id=1
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "1", "root", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     #ng case
     ##exist tax_id
     ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "103690", "Not exist taxonomy name", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "Nostoc sp. PCC 7120",  get_auto_annotation(ret[:error_list])
+    assert_nil  get_auto_annotation(ret[:error_list])
     ##not exist tax_id
     ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "-1", "Not exist taxonomy name", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil  get_auto_annotation(ret[:error_list])
-    ##tax_id=1(new organism)
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "1", "root", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_nil  get_auto_annotation(ret[:error_list])
@@ -848,6 +857,14 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-09-07T03:08:02Z", get_auto_annotation(ret[:error_list])
     ### 月の略称を補正
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "Jun-12", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2012-06", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2011 June", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2011-06", get_auto_annotation(ret[:error_list])
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "21-Oct-1952", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -869,6 +886,14 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "24 February 2018", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2018-02-24", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2015 02", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2015-02", get_auto_annotation(ret[:error_list])
     ### 不正な日付 32日
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -906,6 +931,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "2015-04-16T12:00:00Z", get_auto_annotation(ret[:error_list])
+    #月名のスペルミス
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list]) #auto-annotation無し
     # params are nil pattern
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "", ts_attr,  1)
     assert_nil ret[:result]
@@ -1235,11 +1265,11 @@ jkl\"  "
     ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "561", "Escherichia", 1 )
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "1", "not exist taxon", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
 
     # nil case
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "1", "not exist taxon", 1 )
-    assert_nil ret[:result]
-    assert_equal 0, ret[:error_list].size
     ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BS_R0096", "Sample A", "", "Escherichia coli", 1 )
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size

@@ -9,6 +9,7 @@ require File.dirname(__FILE__) + "/common_utils.rb"
 #
 class OrganismValidator < SPARQLBase 
 
+  TAX_INVALID = "-1" #invalid id
   TAX_ROOT = "1" #root
   TAX_BACTERIA = "2" #bacteria
   TAX_VIRUSES = "10239" #viruses

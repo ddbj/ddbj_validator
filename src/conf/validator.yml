@@ -18,5 +18,5 @@ api_log:
   path: /Users/yoko/DDBJ/logs
 
 version:
-  ver: 0.9.0
-  biosample_graph: 0.9.0
+  ver: 1.0.1
+  biosample_graph: 1.1.0
