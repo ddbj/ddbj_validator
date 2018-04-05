@@ -2,6 +2,7 @@ require 'optparse'
 require 'logger'
 require 'yaml'
 require 'mail'
+require 'fileutils'
 
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
@@ -24,6 +25,8 @@ class Validator
       @setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
       @latest_version = @setting["version"]["ver"]
       @log_file = @setting["api_log"]["path"] + "/validator.log"
+      @running_dir = @setting["api_log"]["path"] + "/running/"
+      FileUtils.mkdir_p(@running_dir)
       @log = Logger.new(@log_file)
     end
 
@@ -33,6 +36,8 @@ class Validator
     # @return [void]
     def execute(params)
       @log.info('execute validation:' + params.to_s)
+      running_file = @running_dir + "/" + Time.now.strftime("%Y%m%d%H%M%S%L.tmp")
+      FileUtils.touch(running_file)
 
       #get absolute file path and check permission
       permission_error_list = []
@@ -110,6 +115,7 @@ class Validator
       File.open(params[:output], "w") do |file|
         file.puts(JSON.generate(ret))
       end
+      FileUtils.rm(running_file)
       JSON.generate(ret)
     end
 
