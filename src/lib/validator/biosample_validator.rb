@@ -280,7 +280,13 @@ class BioSampleValidator < ValidatorBase
       result = sparql.query(sparql_query)
       attr_list = []
       result.each do |row|
-        attr = {attribute_name: row[:attribute], require: row[:require]}
+        attr_require = "other"
+        if row[:require] == "has_mandatory_attribute"
+          attr_require = "mandatory"
+        elsif row[:require] == "has_optional_attribute"
+          attr_require = "optional"
+        end
+        attr = {attribute_name: row[:attribute], require: attr_require}
         attr_list.push(attr)
       end
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
