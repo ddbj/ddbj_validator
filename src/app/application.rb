@@ -5,6 +5,7 @@ require "securerandom"
 require 'sinatra/reloader'
 require 'net/http'
 require 'net/https'
+require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
@@ -237,6 +238,8 @@ module DDBJValidator
         else
           ret_message =  '{"status": "NG", "message": "Validation processing finished with error. Please check the validation service."}'
         end
+        save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
+        FileUtils.rm_r(save_dir)
       rescue => e
         ret_message = '{"status": "NG", "message": "Error has occurred during monitoring processing. Please check the validation service. ' + e.message + '"}'
       end
