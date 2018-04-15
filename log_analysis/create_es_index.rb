@@ -2,6 +2,7 @@
 require "date"
 require "fileutils"
 require "json"
+require "net/http"
 
 class CreateEsIndex
   LOG_DIR = File.expand_path('../production', __FILE__)
@@ -20,8 +21,6 @@ class CreateEsIndex
       @target_date = target_date
     end
     puts "target date: #{@target_date}"
-    puts ES_DIR
-    puts LOG_DIR
     @index_message_file = "#{ES_DIR}/#{@target_date}_message.ndjson"
     FileUtils.rm(@index_message_file) if FileTest.exist?(@index_message_file)
   end
@@ -84,6 +83,33 @@ class CreateEsIndex
       end
     end
   end
+
+  def load_index
+    bulkload_index("http://localhost:9200/validation_message/type/_bulk?pretty", @index_message_file)
+  end
+
+  def bulkload_index(url, load_file)
+    if FileTest.exist?(load_file)
+      puts "Load index file: #{load_file}"
+      begin
+        uri = URI.parse(url)
+        file = load_file
+        http = Net::HTTP.new(uri.host, uri.port)
+        request = Net::HTTP::Put.new("#{uri.request_uri}")
+        request.body_stream = File.open(file)
+        request["Content-Type"] = "application/x-ndjson"
+        request.add_field('Content-Length', File.size(file))
+        response = http.request(request)
+        unless response.code.to_s.start_with?("2")
+          puts "some error has occurred while loading index #{load_file}"
+          puts response.body
+        end
+      rescue => e
+        puts "some error has occurred while loading index #{load_file}"
+        puts e
+      end
+    end
+  end
 end
 
 if ARGV.size > 0
@@ -93,4 +119,10 @@ else
   # 引数無しの場合には昨日のログを出力
   creator = CreateEsIndex.new()
 end
+puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} Start create index"
 creator.create_index
+puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} End create index"
+
+puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} Start load index"
+creator.load_index
+puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} End load index"
