@@ -49,14 +49,13 @@
               { "name": "uuid", "title": "UUID", "visible": true },
               { "name": "ssub", "title": "SSUB ID", "visible": true },
               { "name": "end_time", "title": "Date", "visible": true },
-              { "name": "id", "title": "Rule ID", "visible": true },
-              { "name": "level", "title": "Level", "visible": true },
-              { "name": "external", "title": "External", "visible": false },
-              { "name": "message", "title": "Message", "visible": false },
-              { "name": "reference", "title": "Reference", "visible": false },
-              { "name": "object", "title": "Object", "visible": false },
-              { "name": "method", "title": "Method", "visible": false },
-              { "name": "source", "title": "Source", "visible": false }
+              { "name": "error_count", "title": "Error count", "visible": true },
+              { "name": "warning_count", "title": "Warning count", "visible": true },
+              { "name": "common_error", "title": "Common error", "visible": true },
+              { "name": "common_warning", "title": "Common warning", "visible": true },
+              { "name": "external_error", "title": "External error", "visible": true },
+              { "name": "external_warning", "title": "External warning", "visible": true },
+              { "name": "autocorrect_biosample", "title": "Autocorrect(biosample)", "visible": false },
             ];
 
             // データエラー時に表示するデフォルトのテーブルカラム
@@ -88,41 +87,11 @@
             var head_html = "<tr>";
             column_settings.forEach(function(column) {
               if (src_keys.includes(column.name)) {
-                if (column.name == "id") { //rule idの場合にはルール説明ページへリンクを貼る
-                  columns.push({data: column.name,
-                    "fnCreatedCell": function (td, s_data, o_data, row, col) {
-                      if (o_data.id.startsWith("BS_")) {
-                        $(td).html("<a href='https://www.ddbj.nig.ac.jp/biosample/validation.html#" + o_data.id + "' target='_blank'>" + o_data.id + "</a>");
-                      } else {
-                        $(td).html(o_data.id);
-                      }
-                    }
-                  });
-                } else {
-                  columns.push({data: column.name});
-                }
+                columns.push({data: column.name});
                 head_html += "<th>" + column.title + "</th>";
               }
             });
 
-            // annotationの配列の最大値を求める
-            var anno_length = Math.max.apply(null, data.hits.hits.map(function( value ) {
-               var src = value._source;
-               if (src.annotation != null) {
-                 return src.annotation.length;
-               } else {  //"_source":を指定された場合はannotationがない場合もありうる
-                 return 0;
-               }
-            }));
-
-             //複数ルールを混在して表示するのでAnnotationのカラム名は統一できない
-             //Annotaion1(key),Annotaion1(value),Annotaion2(key),..
-            for (var i = 1; i <= anno_length; i++) {
-              columns.push({data: 'annotation' + i + '_key'});
-              columns.push({data: 'annotation' + i + '_value'});
-              head_html += "<th>Annotation" + i + "(key)</th>";
-              head_html += "<th>Annotation" + i + "(value)</th>";
-            }
             head_html += "</tr>";
             $("thead").html(head_html);
 
@@ -160,21 +129,6 @@
                    row[column.name] = src[column.name]
                  }
                });
-               //annotationのデータを表示用にカラムにセット
-               for (var i = 0; i < anno_length; i++) {
-                 if (i < src.annotation.length) { //annnotationの値がある場合はkey,valueをセットする
-                   row["annotation" + (i + 1) + "_key"] = src.annotation[i].key;
-                   if (src.annotation[i].value) { //TODO もう少しちゃんと条件書く
-                     row["annotation" + (i + 1) + "_value"] = src.annotation[i].value;
-                   } else {
-                     //TODO 配列だったりを処理する
-                     row["annotation" + (i + 1) + "_value"] = src.annotation[i].suggested_value[0];
-                   }
-                 } else { //nullのままではdatatablesでwarningが出るため空白で埋める
-                   row["annotation" + (i + 1) + "_key"] = "";
-                   row["annotation" + (i + 1) + "_value"] = "";
-                 }
-               }
                table_data.push(row);
             });
 
@@ -203,7 +157,7 @@
     <form class="navbar-form" role="search">
       <div class="form-group">
         <label>URL : </label>
-        <input id="endpoint" type="text" class="form-control" size="70" value="http://localhost:9200/validation_message/type/_search">
+        <input id="endpoint" type="text" class="form-control" size="70" value="http://localhost:9200/validation_status/type/_search">
       </div>
       <button id="exec_query" type="button" class="btn btn-default">Query</button>
     </form>
@@ -227,11 +181,9 @@
         <h5>Examples</h5>
         <!-- List group -->
         <ul>
-          <li>特定のルールIDのエラーリストを取得<button class="sample_query" id="sample1">show</button></li>
-          <li>特定のSSUB IDのエラーリストを取得<button class="sample_query" id="sample2">show</button></li>
-          <li>指定日付以降のエラーリストを取得<button class="sample_query" id="sample3">show</button></li>
-          <li>1ヶ月間のエラーリストを取得<button class="sample_query" id="sample4">show</button></li>
-          <li>1ヶ月間の特定のルールIDのエラーリストを取得(複合条件)<button class="sample_query" id="sample5">show</button></li>
+          <li>1ヶ月間のリストを取得<button class="sample_query" id="sample1">show</button></li>
+          <li>指定日付以降のリストを取得<button class="sample_query" id="sample2">show</button></li>
+          <li>特定のSSUB IDのリストを取得<button class="sample_query" id="sample3">show</button></li>
         </ul>
       </div>
     </div>
@@ -248,7 +200,7 @@
   "query": {
     "bool": {
       "must": [
-        { "term" : { "id.keyword": "BS_R0024"}}
+        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900", "lt": "2018-04-01 00:00:00 +0900" }}}
       ]
     }
   }
@@ -260,7 +212,7 @@
   "query": {
     "bool": {
       "must": [
-        { "term" : {"ssub.keyword": "SSUB000000"}}
+        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900" }}}
       ]
     }
   }
@@ -272,32 +224,7 @@
   "query": {
     "bool": {
       "must": [
-        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900" }}}
-      ]
-    }
-  }
-}
-    </textarea>
-    <textarea id="query_sample4" style="display:none">
-{
-  "size": 10000,
-  "query": {
-    "bool": {
-      "must": [
-        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900", "lt": "2018-04-01 00:00:00 +0900" }}}
-      ]
-    }
-  }
-}
-    </textarea>
-    <textarea id="query_sample5" style="display:none">
-{
-  "size": 10000,
-  "query": {
-    "bool": {
-      "must": [
-        { "term":  {"id.keyword": "BS_R0024"}},
-        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900", "lt": "2018-04-01 00:00:00 +0900" }}}
+        { "term" : {"ssub.keyword": "SSUB000000"}}
       ]
     }
   }

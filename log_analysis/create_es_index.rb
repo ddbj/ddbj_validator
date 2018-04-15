@@ -23,6 +23,8 @@ class CreateEsIndex
     puts "target date: #{@target_date}"
     @index_message_file = "#{ES_DIR}/#{@target_date}_message.ndjson"
     FileUtils.rm(@index_message_file) if FileTest.exist?(@index_message_file)
+    @index_status_file = "#{ES_DIR}/#{@target_date}_status.ndjson"
+    FileUtils.rm(@index_status_file) if FileTest.exist?(@index_status_file)
   end
 
   def create_index
@@ -75,6 +77,21 @@ class CreateEsIndex
     ret = JSON.parse(File.read(output_file))
     status = JSON.parse(File.read(status_file))
 
+    File.open(@index_status_file, "a") do |f|
+      # statsをフラットなhashにする
+      result_stats = {}
+      result_stats["error_count"] = ret["stats"]["error_count"]
+      result_stats["warning_count"] = ret["stats"]["warning_count"]
+      result_stats.merge!(ret["stats"]["error_type_count"])
+      ret["stats"]["autocorrect"].keys.each do |key|
+        result_stats["autocorrect_#{key}"]= ret["stats"]["autocorrect"][key]
+      end
+
+      status["ssub"] = ssub
+      f.puts '{ "index" : {} }'
+      f.puts JSON.generate(status.merge(result_stats))
+    end
+
     File.open(@index_message_file, "a") do |f|
       status["ssub"] = ssub
       ret["messages"].each do |err|
@@ -86,6 +103,7 @@ class CreateEsIndex
 
   def load_index
     bulkload_index("http://localhost:9200/validation_message/type/_bulk?pretty", @index_message_file)
+    bulkload_index("http://localhost:9200/validation_status/type/_bulk?pretty", @index_status_file)
   end
 
   def bulkload_index(url, load_file)
