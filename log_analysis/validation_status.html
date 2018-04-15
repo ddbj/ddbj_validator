@@ -36,6 +36,7 @@
           }
           $("thead").empty(); //テーブルのカラムをクリア
           $("#count_alert").empty(); //アラートもクリア
+          $("#query_error").empty(); //アラートもクリア
 
           $.ajax({ //Elasticsearchにクエリを投げる
             url: url,
@@ -146,8 +147,13 @@
               ]
             });
           }).fail(function(data) {
-            //TODO エラー内容表示
-            alert('error!!!');
+            var error_message = "クエリに失敗しました<br/>"
+            if (data.responseText != null) {
+              error_message += data.responseText;
+            } else {
+              error_message += "Elasticsearchの接続情報が正しいか確認して下さい";
+            }
+            $("#query_error").html(error_message);
           });
         });
       });
@@ -157,7 +163,7 @@
     <form class="navbar-form" role="search">
       <div class="form-group">
         <label>URL : </label>
-        <input id="endpoint" type="text" class="form-control" size="70" value="http://localhost:9200/validation_status/type/_search">
+        <input id="endpoint" type="text" class="form-control" size="70" value="http://localhost:9214/validation_status/type/_search">
       </div>
       <button id="exec_query" type="button" class="btn btn-default">Query</button>
     </form>
@@ -188,6 +194,7 @@
       </div>
     </div>
     <div id="count_alert" style="color: red"></div>
+    <div id="query_error" style="color: red"></div>
     <div style="padding: 10px 15px;">
       <table id="result_table" class="table table-striped table-bordered" width="100%">
         <thead>
