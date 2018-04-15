@@ -1,0 +1,313 @@
+<html>
+  <head>
+    <title>Validation API log</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.5.1/css/buttons.dataTables.min.css">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>
+    <script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script language="JavaScript"><!--
+      $(function(){
+        var table;
+
+        // sampleのクエリをテキストボックスにコピーする
+        $('.sample_query').on('click',function() {
+          var query_text = $('#query_' + this.id).val();
+          $('#query_text').val(query_text);
+          return false;
+        });
+
+        //Queryのボタン押下時
+        $('#exec_query').on('click',function(){
+          var url = $('#endpoint').val(); //Elasticserachの検索URL
+          var query_text = $('#query_text').val();
+
+          //既にdatatablesのオブジェクトがあれば削除
+          if (table != null) {
+            table.clear().draw();
+            table.destroy();
+          }
+          $("thead").empty(); //テーブルのカラムをクリア
+          $("#count_alert").empty(); //アラートもクリア
+          $("#query_error").empty(); //アラートもクリア
+
+          $.ajax({ //Elasticsearchにクエリを投げる
+            url: url,
+            type:'POST',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: query_text
+          }).done(function(data) {
+            //カラム一覧
+            var column_settings = [
+              { "name": "uuid", "title": "UUID", "visible": true },
+              { "name": "ssub", "title": "SSUB ID", "visible": true },
+              { "name": "end_time", "title": "Date", "visible": true },
+              { "name": "id", "title": "Rule ID", "visible": true },
+              { "name": "level", "title": "Level", "visible": true },
+              { "name": "external", "title": "External", "visible": false },
+              { "name": "message", "title": "Message", "visible": false },
+              { "name": "reference", "title": "Reference", "visible": false },
+              { "name": "object", "title": "Object", "visible": false },
+              { "name": "method", "title": "Method", "visible": false },
+              { "name": "source", "title": "Source", "visible": false }
+            ];
+
+            // データエラー時に表示するデフォルトのテーブルカラム
+            var default_head_html = "<tr>";
+            column_settings.forEach(function(column){
+              if (column["visible"]) {
+                default_head_html += "<th>" + column["title"] + "</th>";
+              }
+            });
+            default_head_html += "</tr>";
+
+            //検索結果の形式が不正、または検索結果が一件もない場合
+            if ( data.hits == null ||  data.hits.hits == null || data.hits.hits.length  == 0 ) {
+              // 空のdatatablesを描画して終了
+              $("thead").html(default_head_html);
+              table = $('#result_table').DataTable();
+              return false;
+            }
+
+            //検索ヒット数が多くてElasticsearchから全件返されていない場合に警告を表示
+            if ( data.hits.total > data.hits.hits.length) {
+              $("#count_alert").text("ヒット数が上限値を超えています。検索条件を絞るかsizeの指定を上げて下さい");
+            }
+
+            //カラム設定ここから
+            //Elasticsearchクエリ側で出力カラムを制限するケースもあり、表示カラムは動的に設定する
+            var src_keys = Object.keys(data.hits.hits[0]._source);//1件目を取得してElasticsearchの出力カラムを取得する
+            var columns = [];
+            var head_html = "<tr>";
+            column_settings.forEach(function(column) {
+              if (src_keys.includes(column.name)) {
+                if (column.name == "id") { //rule idの場合にはルール説明ページへリンクを貼る
+                  columns.push({data: column.name,
+                    "fnCreatedCell": function (td, s_data, o_data, row, col) {
+                      if (o_data.id.startsWith("BS_")) {
+                        $(td).html("<a href='https://www.ddbj.nig.ac.jp/biosample/validation.html#" + o_data.id + "' target='_blank'>" + o_data.id + "</a>");
+                      } else {
+                        $(td).html(o_data.id);
+                      }
+                    }
+                  });
+                } else {
+                  columns.push({data: column.name});
+                }
+                head_html += "<th>" + column.title + "</th>";
+              }
+            });
+
+            // annotationの配列の最大値を求める
+            var anno_length = Math.max.apply(null, data.hits.hits.map(function( value ) {
+               var src = value._source;
+               if (src.annotation != null) {
+                 return src.annotation.length;
+               } else {  //"_source":を指定された場合はannotationがない場合もありうる
+                 return 0;
+               }
+            }));
+
+             //複数ルールを混在して表示するのでAnnotationのカラム名は統一できない
+             //Annotaion1(key),Annotaion1(value),Annotaion2(key),..
+            for (var i = 1; i <= anno_length; i++) {
+              columns.push({data: 'annotation' + i + '_key'});
+              columns.push({data: 'annotation' + i + '_value'});
+              head_html += "<th>Annotation" + i + "(key)</th>";
+              head_html += "<th>Annotation" + i + "(value)</th>";
+            }
+            head_html += "</tr>";
+            $("thead").html(head_html);
+
+            //デフォルトでは日付昇順でソートする
+            var default_order_column = columns.findIndex(function(column){
+              return column["data"] == "end_time";
+            });
+            var default_order = [];
+            if (default_order_column != -1) {
+              default_order = [[default_order_column, 'asc']];
+            }
+
+            //非表示カラムの設定
+            var invisible_settings = []
+            var invisible_columns = column_settings.filter(function(column){
+              return !column["visible"];
+            });
+            invisible_columns.forEach(function(invisible_column) {
+              var column_index = columns.findIndex(function(column){
+               return invisible_column["name"] == column["data"];
+              });
+              if (column_index != -1) {
+                invisible_settings.push({"targets": [ column_index ],"visible": false});
+              }
+            });
+            //カラム設定ここまで
+
+            //表示用にデータセットを加工
+            var table_data = [];
+            data.hits.hits.forEach(function(value) {
+               var src = value._source;
+               var row = {};
+               column_settings.forEach(function(column) {
+                 if (src[column.name] != null) {
+                   row[column.name] = src[column.name]
+                 }
+               });
+               //annotationのデータを表示用にカラムにセット
+               for (var i = 0; i < anno_length; i++) {
+                 if (i < src.annotation.length) { //annnotationの値がある場合はkey,valueをセットする
+                   row["annotation" + (i + 1) + "_key"] = src.annotation[i].key;
+                   if (src.annotation[i].suggested_value) {
+                     row["annotation" + (i + 1) + "_value"] = src.annotation[i].suggested_value.join(', ');
+                   } else {
+                     row["annotation" + (i + 1) + "_value"] = src.annotation[i].value;
+                   }
+                 } else { //nullのままではdatatablesでwarningが出るため空白で埋める
+                   row["annotation" + (i + 1) + "_key"] = "";
+                   row["annotation" + (i + 1) + "_value"] = "";
+                 }
+               }
+               table_data.push(row);
+            });
+
+            // datatablesを作成してテーブル描画
+            table = $('#result_table').DataTable( {
+              "destroy": true,
+              "data": table_data,
+              "pageLength": 10000,
+              "columns": columns,
+              "columnDefs": invisible_settings,
+              "order": default_order,
+              "dom": 'Bfrtip',
+              "buttons": [
+                'csv', 'excel'
+              ]
+            });
+          }).fail(function(data) {
+            var error_message = "クエリに失敗しました<br/>"
+            if (data.responseText != null) {
+              error_message += data.responseText;
+            } else {
+              error_message += "Elasticsearchの接続情報が正しいか確認して下さい";
+            }
+            $("#query_error").html(error_message);
+          });
+        });
+      });
+    //--></script>
+  </head>
+  <body>
+    <form class="navbar-form" role="search">
+      <div class="form-group">
+        <label>URL : </label>
+        <input id="endpoint" type="text" class="form-control" size="70" value="http://localhost:9214/validation_message/type/_search">
+      </div>
+      <button id="exec_query" type="button" class="btn btn-default">Query</button>
+    </form>
+    <div style="padding: 10px 15px;">
+      <label>Query : </label>
+      <br/>
+      <div class="row">
+        <textarea id="query_text" class="col-md-8" rows="10" cols="100">
+{
+  "size": 10000,
+  "query": {
+    "bool": {
+      "must": [
+        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900", "lt": "2018-04-01 00:00:00 +0900" }}}
+      ]
+    }
+  }
+}
+      </textarea>
+      <div class="col-md-4" style="background-color: #ECDCCE;">
+        <h5>Examples</h5>
+        <!-- List group -->
+        <ul>
+          <li>特定のルールIDのエラーリストを取得<button class="sample_query" id="sample1">show</button></li>
+          <li>特定のSSUB IDのエラーリストを取得<button class="sample_query" id="sample2">show</button></li>
+          <li>指定日付以降のエラーリストを取得<button class="sample_query" id="sample3">show</button></li>
+          <li>1ヶ月間のエラーリストを取得<button class="sample_query" id="sample4">show</button></li>
+          <li>1ヶ月間の特定のルールIDのエラーリストを取得(複合条件)<button class="sample_query" id="sample5">show</button></li>
+        </ul>
+      </div>
+    </div>
+    <div id="count_alert" style="color: red"></div>
+    <div id="query_error" style="color: red"></div>
+    <div style="padding: 10px 15px;">
+      <table id="result_table" class="table table-striped table-bordered" width="100%">
+        <thead>
+        </thead>
+      </table>
+    </div>
+    <textarea id="query_sample1" style="display:none">
+{
+  "size": 10000,
+  "query": {
+    "bool": {
+      "must": [
+        { "term" : { "id.keyword": "BS_R0024"}}
+      ]
+    }
+  }
+}
+    </textarea>
+    <textarea id="query_sample2" style="display:none">
+{
+  "size": 10000,
+  "query": {
+    "bool": {
+      "must": [
+        { "term" : {"ssub.keyword": "SSUB000000"}}
+      ]
+    }
+  }
+}
+    </textarea>
+    <textarea id="query_sample3" style="display:none">
+{
+  "size": 10000,
+  "query": {
+    "bool": {
+      "must": [
+        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900" }}}
+      ]
+    }
+  }
+}
+    </textarea>
+    <textarea id="query_sample4" style="display:none">
+{
+  "size": 10000,
+  "query": {
+    "bool": {
+      "must": [
+        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900", "lt": "2018-04-01 00:00:00 +0900" }}}
+      ]
+    }
+  }
+}
+    </textarea>
+    <textarea id="query_sample5" style="display:none">
+{
+  "size": 10000,
+  "query": {
+    "bool": {
+      "must": [
+        { "term":  {"id.keyword": "BS_R0024"}},
+        { "range": { "end_time": { "gte": "2018-03-01 00:00:00 +0900", "lt": "2018-04-01 00:00:00 +0900" }}}
+      ]
+    }
+  }
+}
+    </textarea>
+  </body>
+</html>
