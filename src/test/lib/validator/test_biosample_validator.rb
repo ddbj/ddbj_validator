@@ -826,6 +826,14 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", ".", null_accepted, null_not_recommended, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "-", null_accepted, null_not_recommended, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
     # params are nil pattern
     ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "", null_accepted, null_not_recommended, 1)
     assert_nil ret[:result]
