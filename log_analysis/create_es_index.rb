@@ -5,8 +5,8 @@ require "json"
 require "net/http"
 
 class CreateEsIndex
-  LOG_DIR = File.expand_path('../production', __FILE__)
-  ES_DIR = File.expand_path('../elasticsearch', __FILE__)
+  LOG_DIR = File.expand_path('../../deploy/logs/production', __FILE__)
+  ES_DIR = File.expand_path('../../deploy/logs/elasticsearch', __FILE__)
   @target_date = ""
   def initialize(target_date = nil)
     if target_date.nil?
@@ -107,7 +107,7 @@ class CreateEsIndex
   end
 
   def bulkload_index(url, load_file)
-    if FileTest.exist?(load_file)
+    if FileTest.exist?(load_file) && File.size(load_file) > 0
       puts "Load index file: #{load_file}"
       begin
         uri = URI.parse(url)
