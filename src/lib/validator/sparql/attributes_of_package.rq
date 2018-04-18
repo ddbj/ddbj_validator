@@ -8,27 +8,10 @@ WHERE
 {
   ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
     rdfs:label "<%= package_name %> package"@en .
-  {
-    ?package dbs:has_mandatory_attribute ?attr .
-     ?attr dc:identifier ?attr_name .
-     BIND ("mandatory" AS ?require)
-  }
-  UNION
-  {
-    ?package dbs:has_either_one_mandatory_attribute ?attr .
-     ?attr dc:identifier ?attr_name .
-     BIND ("either_one_mandatory" AS ?require)
-  }
-  UNION
-  {
-    ?package dbs:has_optional_attribute ?attr .
-     ?attr dc:identifier ?attr_name .
-     BIND ("optional" AS ?require)
-  }
-  UNION
-  {
-    ?package dbs:has_attribute ?attr .
-     ?attr dc:identifier ?attr_name .
-     BIND ("other" AS ?require)
-  }
-}
+  ?axiom owl:annotatedSource ?package ;
+    dc:identifier ?attr_pkg_id ;
+    owl:annotatedProperty  ?require_uri ;
+    owl:annotatedTarget ?attr .
+  ?attr rdfs:label ?attr_name .
+  BIND (REPLACE(STR(?require_uri), "http://ddbj.nig.ac.jp/ontologies/biosample/", "") AS ?require)
+} ORDER BY ?attr_pkg_id
