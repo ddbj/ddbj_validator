@@ -280,7 +280,13 @@ class BioSampleValidator < ValidatorBase
       result = sparql.query(sparql_query)
       attr_list = []
       result.each do |row|
-        attr = {attribute_name: row[:attribute], require: row[:require]}
+        attr_require = "other"
+        if row[:require] == "has_mandatory_attribute"
+          attr_require = "mandatory"
+        elsif row[:require] == "has_optional_attribute"
+          attr_require = "optional"
+        end
+        attr = {attribute_name: row[:attribute], require: attr_require}
         attr_list.push(attr)
       end
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
@@ -810,9 +816,17 @@ class BioSampleValidator < ValidatorBase
   def format_of_geo_loc_name_is_invalid (rule_code, sample_name, geo_loc_name, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name)
 
-    annotated_name = geo_loc_name.sub(/\s*:\s*/, ":")
+    annotated_name = geo_loc_name.sub(/\s*:\s*/, ":") #最初のコロンの前後の空白を詰める
+    # 2つ目以降の":"は", "に置換する
+    geo_loc_regex = %r{^(?<country>[\w\s\-\(\)]+):(?<other>.+)$}
+    if geo_loc_regex.match(annotated_name)
+      m = geo_loc_regex.match(annotated_name)
+      other = m['other'].gsub(":", ", ")
+      annotated_name = "#{m['country']}:#{other}"
+    end
     annotated_name = annotated_name.gsub(/,\s+/, ', ')
     annotated_name = annotated_name.gsub(/,(?![ ])/, ', ')
+
     if geo_loc_name == annotated_name
       true
     else

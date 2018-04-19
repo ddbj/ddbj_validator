@@ -415,6 +415,12 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    ## multi-colon
+    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "USA : Alaska : Fairbanks", 1)
+    expect_annotation = "USA:Alaska , Fairbanks"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     #params are nil pattern
     ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", nil, 1)
     assert_nil ret[:result]
@@ -823,6 +829,14 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal "not applicable", get_auto_annotation(ret[:error_list])
     ## not recommended
     ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "n. a.", null_accepted, null_not_recommended, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", ".", null_accepted, null_not_recommended, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "-", null_accepted, null_not_recommended, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
