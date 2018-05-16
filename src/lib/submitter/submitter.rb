@@ -10,7 +10,8 @@ class Submitter
   def initialize()
     config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
     @setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
-    @latest_version = @setting["version"]["ver"]
+    @version = YAML.load(File.read(config_file_dir + "/version.yml"))
+    @latest_version = @version["version"]["validator"]
     @log_file = @setting["api_log"]["path"] + "/validator.log"
     @log = Logger.new(@log_file)
     p @log_file

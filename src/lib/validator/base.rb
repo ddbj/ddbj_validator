@@ -21,7 +21,8 @@ class ValidatorBase
       config[:ddbj_db_config] = setting["ddbj_rdb"]
       config[:google_api_key] = setting["google_api_key"]
       config[:eutils_api_key] = setting["eutils_api_key"]
-      config[:version] = setting["version"]
+      version = YAML.load(File.read(config_file_dir + "/version.yml"))
+      config[:version] = version["version"]
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
