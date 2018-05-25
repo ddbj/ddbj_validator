@@ -3,10 +3,12 @@ require "date"
 require "fileutils"
 require "json"
 require "net/http"
+require File.expand_path('/home/w3sw/ddbj/DDBJValidator/deploy/staging/current/lib/validator/common/xml_convertor.rb', __FILE__)
 
 class CreateEsIndex
-  LOG_DIR = File.expand_path('../../deploy/logs/production', __FILE__)
-  ES_DIR = File.expand_path('../../deploy/logs/elasticsearch', __FILE__)
+  ACCESS_LOG_DIR = "/home/w3sw/ddbj/DDBJValidator/deploy/production/shared/log"
+  LOG_DIR = "/home/w3sw/ddbj/DDBJValidator/deploy/logs/production"
+  ES_DIR = "/home/w3sw/ddbj/DDBJValidator/deploy/logs/elasticsearch"
   @target_date = ""
   def initialize(target_date = nil)
     if target_date.nil?
@@ -30,12 +32,13 @@ class CreateEsIndex
   def create_index
     #日付単位でのログを取得(yyyy-MM-dd.log)
     system(%Q[grep #{@target_date} #{LOG_DIR}/validator.log > #{LOG_DIR}/#{@target_date}.log])
+    system(%Q[grep #{@target_date} #{LOG_DIR}/validator_staging20180309-0501.log >> #{LOG_DIR}/#{@target_date}.log])
     count = 0
     File.open("#{LOG_DIR}/#{@target_date}.log") do |file|
       file.each_line do |row|
         # I, [2018-04-10T17:24:29.396851 #38545]  INFO -- : execute validation:{:biosample=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/biosample/SSUB000061.xml", :output=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/result.json"}
         if row.include?("execute validation")
-          unless (row.include?("SSUB000061.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
+          unless (row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
             count += 1
             row = row.split("{").last.split("}").first
             log_reg = %r{^:biosample=>"(?<bs_file>.+)", :output=>"(?<op_file>.+)"$}
@@ -59,27 +62,42 @@ class CreateEsIndex
 
   # output_fileにbulkロード用のndjsonを出力する
   def output_index(input_file, output_file, status_file)
-    # input_fileから、あればSSUB IDを取得
-    ssub = ""
-    File.open(input_file) do |file|
-      count = 0
+    status = JSON.parse(File.read(status_file))
+    return nil if status["status"] == "error"
+    ret = JSON.parse(File.read(output_file))
+    uuid = status["uuid"]
+    # access IP addressをunicornログから取得
+    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/unicorn_err.log > #{ACCESS_LOG_DIR}/#{uuid}.log])
+    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/unicorn_err_staging20180309-0501.log >> #{ACCESS_LOG_DIR}/#{uuid}.log])
+    ip_list = []
+    File.open("#{ACCESS_LOG_DIR}/#{uuid}.log") do |file|
       file.each_line do |row|
-        if count == 1
-          begin
-            ssub = row.split("=").last.split('"')[1]
-          rescue
-          end
-        end
-        count += 1
+        ip_address = row.split(" ").first
+        ip_list.push(ip_address) if ip_address =~ /^[0-9.]+$/
       end
     end
+    FileUtils.rm("#{ACCESS_LOG_DIR}/#{uuid}.log") if FileTest.exist?("#{ACCESS_LOG_DIR}/#{uuid}.log")
 
-    ret = JSON.parse(File.read(output_file))
-    status = JSON.parse(File.read(status_file))
+    # xmlをパースして付加情報を取得
+    xml_document = File.read(input_file)
+    xml_convertor = XmlConvertor.new
+    submitter_id = xml_convertor.get_biosample_submitter_id(xml_document)
+    ssub_id = xml_convertor.get_biosample_submission_id(xml_document)
+    biosample_list = xml_convertor.xml2obj(xml_document)
+    packages = biosample_list.map {|biosample_data| biosample_data["package"]}.uniq
 
+    ip_address = ip_list.compact.first.nil? ? "" : ip_list.compact.first
+    submitter_id = submitter_id.nil? ? "" : submitter_id
+    ssub_id = ssub_id.nil??  "" : ssub_id
     File.open(@index_status_file, "a") do |f|
       # statsをフラットなhashにする
       result_stats = {}
+      result_stats["ip_address"] = ip_address
+      result_stats["submitter_id"] = submitter_id
+      result_stats["ssub"] = ssub_id
+      result_stats["num_of_samples"] = biosample_list.size
+      result_stats["package"] = packages.first #TODO to array
+      f.puts '{ "index" : {} }'
       result_stats["error_count"] = ret["stats"]["error_count"]
       result_stats["warning_count"] = ret["stats"]["warning_count"]
       result_stats.merge!(ret["stats"]["error_type_count"])
@@ -87,18 +105,19 @@ class CreateEsIndex
         result_stats["autocorrect_#{key}"]= ret["stats"]["autocorrect"][key]
       end
 
-      status["ssub"] = ssub
-      f.puts '{ "index" : {} }'
       f.puts JSON.generate(status.merge(result_stats))
     end
 
     File.open(@index_message_file, "a") do |f|
-      status["ssub"] = ssub
+      status["ip_address"] = ip_address
+      status["submitter_id"] = submitter_id
+      status["ssub"] = ssub_id
       ret["messages"].each do |err|
         f.puts '{ "index" : {} }'
         f.puts JSON.generate(status.merge(err))
       end
     end
+
   end
 
   def load_index

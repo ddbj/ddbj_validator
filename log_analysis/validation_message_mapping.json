@@ -68,6 +68,15 @@
         }
       }
     },
+     "ip_address" : {
+       "type" : "text",
+       "fields" : {
+         "keyword" : {
+           "type" : "keyword",
+           "ignore_above" : 256
+         }
+       }
+     },
     "level" : {
       "type" : "text",
       "fields" : {
@@ -136,6 +145,15 @@
       "format": "yyyy-MM-dd HH:mm:ss Z"
     },
     "status" : {
+      "type" : "text",
+      "fields" : {
+        "keyword" : {
+          "type" : "keyword",
+          "ignore_above" : 256
+        }
+      }
+    },
+    "submitter_id" : {
       "type" : "text",
       "fields" : {
         "keyword" : {
