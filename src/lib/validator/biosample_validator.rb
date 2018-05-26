@@ -2107,6 +2107,7 @@ class BioSampleValidator < ValidatorBase
     duplicated = biosample_list.select do |biosample_data|
       locus_tag == biosample_data["attributes"]["locus_tag_prefix"]
     end
+
     result = false if duplicated.length > 1 #自身以外に同一のlocus_tag_prefixをもつサンプルがある
 
     # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
@@ -2118,10 +2119,9 @@ class BioSampleValidator < ValidatorBase
       all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all")
     end
 
-    # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じprefixがあるとNG
-    result = false if submission_id.nil? && all_prefix_list.count(locus_tag) >= 1
-    # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-    result = false if !submission_id.nil? && all_prefix_list.count(locus_tag) >= 2
+    # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
+    duplicated_list = all_prefix_list.select {|row| row[:locus_tag_prefix] == locus_tag && row[:submission_id] != submission_id}
+    result = false if duplicated_list.size >= 1
 
     if result == false
       annotation = [
