@@ -1212,24 +1212,26 @@ jkl\"  "
     ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "NONEXISTPREFIX", biosample_data, nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ## DB内に同一のprefixがあるが、SubmissionIDがあるため(DBから取得したデータ)同一prefixが一つあってもOK
-    ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "AB1", biosample_data, "SSUB000001", 1)
+    ## DB内に同一のprefixがあるが、同じSubmissionIDのlocus_tagであるためOK
+    ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "PP14", biosample_data, "SSUB005454", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
+    ## SubmissionIDが記述されずにDB内に同一のprefixがある場合はNG
+    ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "PP14", biosample_data, nil, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## DB内に同一のprefixがあり、別のSubmissionIDのlocus_tagであるためNG("RR1"はSSUB005462で使用されているprefix)
+    ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "RR1", biosample_data, "SSUB005454", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
     ## xmlファイル内に同一のprefixがある
     xml_data = File.read("#{@test_file_dir}/91_duplicated_locus_tag_prefix_SSUB005454_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data)
     ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "WN1", biosample_data, nil, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    ## DB内に同一のprefixが2つ以上ある #このテストはDBに重複データを登録しないと通らない
-    #xml_data = File.read("#{@test_file_dir}/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
-    #biosample_data = @xml_convertor.xml2obj(xml_data)
-    #ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "Ato01", biosample_data, "SSUB000001", 1)
-    #assert_equal false, ret[:result]
-    #assert_equal 1, ret[:error_list].size
-    # parameters are nil case
+    ## nil相当
     ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "missing", biosample_data, nil, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
