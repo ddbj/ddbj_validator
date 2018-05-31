@@ -366,19 +366,22 @@ class DDBJDbValidator
   end
 
   #
-  # biosample databaseに存在するlocus_tag_prefixを取得してリストで返す
+  # biosample databaseに存在するlocus_tag_prefixとSSUBのセットを取得してリストで返す
   #
   # ==== Args
   # ==== Return
-  # locus_tag_prefixのリスト。一つもない場合にも空のリストを返す
-  # [ "XXC","XXA", ...]
+  # SSUBとlocus_tag_prefixのリスト。一つもない場合にも空のリストを返す
+  # [
+  #   {submission_id: "SSUBNNNNNN", locus_tag_prefix: "XXA" },
+  #   {submission_id: "SSUBNNNNNN", locus_tag_prefix: "XXB" }, ...
+  # ]
   #
   def get_all_locus_tag_prefix
     prefix_list = []
     begin
       connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
 
-      q = "SELECT attr.attribute_value
+      q = "SELECT smp.submission_id, attr.attribute_value
            FROM mass.attribute attr
             JOIN mass.sample smp USING (smp_id)
            WHERE attribute_name = 'locus_tag_prefix' AND attribute_value <> ''
@@ -389,7 +392,8 @@ class DDBJDbValidator
 
       res.each do |item|
         unless item["attribute_value"].empty?
-          prefix_list.push(item["attribute_value"])
+          hash = {submission_id: item["submission_id"], locus_tag_prefix: item["attribute_value"]}
+          prefix_list.push(hash)
         end
       end
 

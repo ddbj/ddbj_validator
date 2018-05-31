@@ -22,8 +22,9 @@ class Validator
     # constructor
     def initialize()
       config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
+      @version = YAML.load(File.read(config_file_dir + "/version.yml"))
+      @latest_version = @version["version"]["validator"]
       @setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
-      @latest_version = @setting["version"]["ver"]
       @log_file = @setting["api_log"]["path"] + "/validator.log"
       @running_dir = @setting["api_log"]["path"] + "/running/"
       FileUtils.mkdir_p(@running_dir)

@@ -194,7 +194,7 @@ module DDBJValidator
 
     get '/api/monitoring' do
       ret_message = ""
-      submission_id = "SSUB000061"
+      submission_id = "SSUB009526" # test data
       begin
         # api url path
         api_url = "http://" + request.env["HTTP_HOST"] + "/api/"
