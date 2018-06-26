@@ -194,8 +194,15 @@ module DDBJValidator
 
     get '/api/monitoring' do
       ret_message = ""
-      submission_id = "SSUB009526" # test data
+
       begin
+        # test data
+        unless setting["monitoring"]["ssub_id"].nil?
+          submission_id = setting["monitoring"]["ssub_id"]
+        else
+          submission_id = "SSUB009526"
+        end
+
         # api url path
         api_url = "http://" + request.env["HTTP_HOST"] + "/api/"
         # get xml file

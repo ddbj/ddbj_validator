@@ -16,3 +16,6 @@ eutils_api_key:
 
 api_log:
   path: /Users/yoko/DDBJ/logs
+
+monitoring:
+  ssub_id: SSUB009526
