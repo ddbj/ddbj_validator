@@ -135,7 +135,7 @@ class CreateEsIndex
     status_data["api_version"] = ret["version"]
     status_data["status"] = status["status"]
     status_data["start_time"] = status["start_time"]
-    status_data["end_time"] = status["start_time"]
+    status_data["end_time"] = status["end_time"]
     status_data["ip_address"] = ip_address
     status_data["submitter_id"] = submitter_id
     status_data["error_count"] = ret["stats"]["error_count"]
