@@ -439,6 +439,18 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Non exist country:Kanagawa, Hakone, Lake Ashi", country_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    # case no match (auto-annotation)
+    ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "JAPAN : Kanagawa, Hakone, Lake Ashi", country_list, 1)
+    expect_annotation = "Japan: Kanagawa, Hakone, Lake Ashi"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    # viet num(ignore space)
+    ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "vietnam:Hanoi", country_list, 1)
+    expect_annotation = "Viet Nam:Hanoi"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ##histrical country
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Korea", country_list, 1)
     assert_equal false, ret[:result]

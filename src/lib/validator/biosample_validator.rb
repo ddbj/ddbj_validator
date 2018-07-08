@@ -220,6 +220,9 @@ class BioSampleValidator < ValidatorBase
       end
 
       invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
       ret = invalid_lat_lon_format("BS_R0009", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
@@ -859,7 +862,14 @@ class BioSampleValidator < ValidatorBase
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name)
     country_name = geo_loc_name.split(":").first.strip
-    if country_list.include?(country_name)
+    matched_country = country_list.find do |define_country|
+      if define_country == "Viet Nam" #間違いが多いためadhocに対応
+        define_country.gsub(" ", "").downcase == country_name.gsub(" ", "").downcase
+      else
+        define_country =~ /^#{country_name}$/i # case-insensitive
+      end
+    end
+    if (!matched_country.nil?) && (matched_country == country_name)
       true
     else
       annotation = [
@@ -867,7 +877,14 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "geo_loc_name"},
         {key: "Attribute value", value: geo_loc_name}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      if !matched_country.nil? # auto-annotation
+        replaced_value = matched_country + ":" + geo_loc_name.split(":")[1..-1].join(":")
+        location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true));
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      end
       @error_list.push(error_hash)
       false
     end
