@@ -1026,6 +1026,13 @@ jkl\"  "
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
+    # 前後が引用符で囲われていてその中のテキストの前後に空白がある
+    ng_value = "'-69.23935, 39.76112 '"
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", ng_value, "attr_value", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "-69.23935, 39.76112", get_auto_annotation(ret[:error_list])
+
     # params are nil pattern
     ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "", "attr_value", 1)
     assert_nil ret[:result]

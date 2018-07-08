@@ -1733,6 +1733,7 @@ class BioSampleValidator < ValidatorBase
     if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
       replaced = replaced[1..-2]
     end
+    replaced.strip!  #引用符を除いた後にセル内の前後の空白文字をもう一度除去
     if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
       annotation = [
         {key: "Sample name", value: sample_name},
