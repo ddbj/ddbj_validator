@@ -1489,76 +1489,68 @@ class BioSampleValidator < ValidatorBase
       #区切り文字の表記を揃える
       @conf[:convert_date_format].each do |format|
         regex = Regexp.new(format["regex"])
-        ## single date format
-        if attr_val =~ regex
+        def_parse_format = format["parse_format"]
+        #March 02, 2014の形式の場合はパースする月の位置を変える "03 02, 2014" => "2014-02-03"という誤変換を防止
+        format_mmddyy = "^\\w+[\\W]+\\d{1,2}[\\W]+\\d{4}$"
+        range_format_mmddyy = "#{format_mmddyy[1..-2]}\s*/\s*#{format_mmddyy[1..-2]}" #範囲
+        if def_parse_format == "%d<delimit1>%m<delimit2>%Y" && (Regexp.new(format_mmddyy).match(attr_val_org) || Regexp.new(range_format_mmddyy).match(attr_val_org))
+          def_parse_format = "%m<delimit1>%d<delimit2>%Y"
+        end
+
+        ## single date format  e.g.) YYYY-MM-DD
+        if regex.match(attr_val)
           begin
-            if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"
-              # 月の文字列表現を変換している場合は、どちらが月を表すのか自明なので、そのフォーマットで変換する
-              if rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').first.downcase)
-                formated_date = DateTime.strptime(attr_val, "%m-%y")
-              elsif rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').last.downcase)
-                formated_date = DateTime.strptime(attr_val, "%y-%m")
-              elsif $1.to_i > 12 #この書式場合、前半が12より大きければ西暦の下2桁とみなす
-                formated_date = DateTime.strptime(attr_val, "%y-%m")
+            m = regex.match(attr_val)
+            #マッチ結果から区切り文字を得てパースする書式を確定する "%Y<delimit1>%m<delimit2>%d" => "%Y/%m/%d"
+            parse_format = ""
+            m.names.each do |match_name|
+              if  parse_format == ""
+                parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
               else
-                formated_date = DateTime.strptime(attr_val, "%m-%y")
+                parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
               end
-            else
-              formated_date = DateTime.strptime(attr_val, format["parse_format"])
             end
-             attr_val = formated_date.strftime(format["output_format"])
+            #記述書式で日付をパースしてDDBJformatに置換する
+            formated_date = DateTime.strptime(attr_val, parse_format)
+            attr_val = formated_date.strftime(format["output_format"])
+            break #置換したら抜ける
           rescue ArgumentError
             #invalid format
           end
         end
-        ## range date format
-        regex = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #行末行頭の^と$を除去して"/"で連結
-        if attr_val =~ regex
+        ## range date format  e.g.) YYYY-MM-DD / YYYY-MM-DD
+        range_format = format["regex"][1..-2] #行末行頭の^と$を除去
+        range_regex = Regexp.new("(?<start>#{range_format})\s*/\s*(?<end>#{range_format})") #"/"で連結
+        if attr_val =~ range_regex
           range_start =  Regexp.last_match[:start]
           range_end =  Regexp.last_match[:end]
           range_date_list = [range_start, range_end]
           begin
             range_date_list = range_date_list.map do |range_date|  #範囲のstart/endのformatを補正
-              range_date = range_date.strip
-              if format["regex"] == "^(\\d{1,2})-(\\d{1,2})$"
-                # 月の文字列表現を変換している場合は、どちらが月を表すのか自明なので、そのフォーマットで変換する
-                if rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').first.downcase)
-                  formated_date = DateTime.strptime(attr_val, "%m-%y")
-                elsif rep_table_month.keys.map{|key| key.downcase }.include?(attr_val_org.split('-').last.downcase)
-                  formated_date = DateTime.strptime(attr_val, "%y-%m")
-                elsif $1.to_i > 12 #この書式場合、前半が12より大きければ西暦の下2桁とみなす
-                  formated_date = DateTime.strptime(range_date, "%y-%m")
+              m = regex.match(range_date)
+              #マッチ結果から区切り文字を得てパースする書式を確定する "%Y<delimit1>%m<delimit2>%d" => "%Y/%m/%d"
+              parse_format = ""
+              m.names.each do |match_name|
+                if  parse_format == ""
+                  parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
                 else
-                  formated_date = DateTime.strptime(range_date, "%m-%y")
+                  parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
                 end
-              else
-                formated_date = DateTime.strptime(range_date, format["parse_format"])
               end
+              #記述書式で日付をパースしてDDBJformatに置換する
+              formated_date = DateTime.strptime(range_date, parse_format)
               range_date = formated_date.strftime(format["output_format"])
               range_date
             end
-            attr_val = range_date_list.join("/")
+            # 範囲の大小が逆であれば入れ替える
+            if DateTime.strptime(range_date_list[0], format["output_format"]) <= DateTime.strptime(range_date_list[1], format["output_format"])
+              attr_val = range_date_list[0] + "/" + range_date_list[1]
+            else
+              attr_val = range_date_list[1] + "/" + range_date_list[0]
+            end
+            break #置換したら抜ける
           rescue ArgumentError
             #invalid format
-          end
-        end
-      end
-
-      # 範囲の大小が逆であれば入れ替える
-      @conf[:ddbj_date_format].each do |format|
-        regex = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #行末行頭の^と$を除去して"/"で連結
-        parse_format = format["parse_format"]
-        if attr_val =~ regex
-          range_start =  Regexp.last_match[:start]
-          range_end =  Regexp.last_match[:end]
-          begin
-            if DateTime.strptime(range_start, parse_format) <= DateTime.strptime(range_end, parse_format)
-              attr_val = Regexp.last_match[:start] + "/" +  Regexp.last_match[:end]
-            else
-              attr_val = Regexp.last_match[:end] + "/" +  Regexp.last_match[:start]
-            end
-          rescue
-            # can't parse date format ex)2017-14-32
           end
         end
       end
@@ -1585,6 +1577,10 @@ class BioSampleValidator < ValidatorBase
         rescue
           parsable_date = false
         end
+      end
+
+      if !is_ddbj_format || !parsable_date #無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
+        attr_val = attr_val_org
       end
 
       if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
