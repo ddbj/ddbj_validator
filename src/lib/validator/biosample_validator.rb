@@ -1789,10 +1789,20 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     unless attr_val.ascii_only?
+      disp_attr_val = "" #属性値のどこにnon ascii文字があるか示すメッセージを作成
+      attr_val.chars.each_with_index do |ch, idx|
+        if ch.ascii_only?
+          disp_attr_val << ch.to_s
+        else
+          disp_attr_val << '[### Non-ASCII character ###]'
+        end
+      end
+
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val}
+        {key: "Attribute value", value: attr_val},
+        {key: "Position", value: disp_attr_val}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
