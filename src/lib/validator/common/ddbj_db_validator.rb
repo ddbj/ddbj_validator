@@ -12,8 +12,19 @@ class DDBJDbValidator
     @pg_port = config["pg_port"]
     @pg_user = config["pg_user"]
     @pg_pass = config["pg_pass"]
+    @pg_timeout = config["pg_timeout"]
   end
 
+  def get_connection(db_name)
+    begin
+      connection = PG::Connection.connect({host: @pg_host, port: @pg_port, dbname: db_name, user: @pg_user, password: @pg_pass, connect_timeout: @pg_timeout})
+      state_timeout = (@pg_timeout * 1000).to_s #millsec
+      connection.exec("SET SESSION statement_timeout = #{state_timeout}") ## 一定時間応答がなければエラーを発生させるように設定
+      connection
+    rescue => ex
+      raise ex
+    end
+  end
   #
   # 指定されたBioSample Accession IDが有効なIDであるかを返す
   # DBにない場合や、statusが5600,5700の場合にはfalseを返す
@@ -27,7 +38,7 @@ class DDBJDbValidator
     return nil if bioproject_accession.nil?
     result = false
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJCT_DB_NAME)
 
       if bioproject_accession =~ /^PSUB\d{6}/
         psub_query_id = bioproject_accession
@@ -86,7 +97,7 @@ class DDBJDbValidator
       end
     end
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', DRA_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(DRA_DB_NAME)
 
       if bioproject_accession =~ /^PSUB\d{6}/
         prj_query_id = bioproject_accession
@@ -130,7 +141,7 @@ class DDBJDbValidator
   def umbrella_project? (bioproject_accession)
     result = false
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJCT_DB_NAME)
 
       if bioproject_accession =~ /^PSUB\d{6}/
         psub_query_id = bioproject_accession
@@ -183,7 +194,7 @@ class DDBJDbValidator
   def get_bioproject_names (submitter_id)
     bioproject_name_list = []
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJCT_DB_NAME)
       q = "SELECT submitter_id, submission_id, data_value AS bioproject_name
            FROM mass.submission_data
            LEFT OUTER JOIN mass.submission USING(submission_id)
@@ -223,7 +234,7 @@ class DDBJDbValidator
   def get_bioproject_title_descs  (submitter_id)
     bioproject_title_desc_list = []
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJCT_DB_NAME)
       q = "SELECT submitter_id, submission_id, data_name, data_value
            FROM mass.submission_data
            LEFT OUTER JOIN mass.submission USING(submission_id)
@@ -265,7 +276,7 @@ class DDBJDbValidator
   def get_sample_names (submission_id)
     sample_name_list = []
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOSAMPLE_DB_NAME)
 
       q = "SELECT smp.sample_name
             FROM mass.sample smp
@@ -302,7 +313,7 @@ class DDBJDbValidator
   def get_bioproject_accession(psub_id)
     result = nil
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJCT_DB_NAME)
       q = "SELECT p.project_id_counter prj_id, p.project_id_prefix prefix
            FROM mass.project p
            WHERE p.submission_id = $1
@@ -343,7 +354,7 @@ class DDBJDbValidator
     end
     begin
       project_id_counter = bioproject_accession.gsub("PRJDB", "").to_i
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJCT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJCT_DB_NAME)
       q = "SELECT p.submission_id
            FROM mass.project p
            WHERE p.project_id_counter = $1
@@ -379,7 +390,7 @@ class DDBJDbValidator
   def get_all_locus_tag_prefix
     prefix_list = []
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOSAMPLE_DB_NAME)
 
       q = "SELECT smp.submission_id, attr.attribute_value
            FROM mass.attribute attr
@@ -428,7 +439,7 @@ class DDBJDbValidator
     return nil if biosample_accession.nil?
     result = nil
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOSAMPLE_DB_NAME)
 
       if biosample_accession =~ /^SSUB\d{6}/
         ssub_query_id = biosample_accession
@@ -485,7 +496,7 @@ class DDBJDbValidator
     return nil if biosample_accession.nil?
     result = nil
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOSAMPLE_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOSAMPLE_DB_NAME)
 
       if biosample_accession =~ /^SSUB\d{6}/
         ssub_query_id = biosample_accession
@@ -549,7 +560,7 @@ class DDBJDbValidator
     return nil if submitter_id.nil?
     result = nil
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(SUBMITTER_DB_NAME)
 
       q = "SELECT submitter_id, center_name, organization, department, affiliation, unit FROM mass.organization WHERE submitter_id = $1"
 
@@ -606,7 +617,7 @@ class DDBJDbValidator
     return nil if submitter_id.nil?
     result = nil
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', SUBMITTER_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(SUBMITTER_DB_NAME)
 
       q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = $1 and is_pi = true"
 
