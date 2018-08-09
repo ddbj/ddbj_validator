@@ -7,7 +7,7 @@ class BioProjectSubmitter < SubmitterBase
 
   def output_xml_file(submission_id, output)
     begin
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', BIOPROJECT_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(BIOPROJECT_DB_NAME)
       res = connection.exec(xml_sql(submission_id))
     rescue => ex
       message = "Failed to execute the query to DDBJ '#{BIOPROJECT_DB_NAME}'.\n"

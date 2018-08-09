@@ -22,7 +22,7 @@ class DraSubmitter < SubmitterBase
       submitter_id = submission_id_text[0]
       serial = submission_id_text[1].to_i
 
-      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', DRA_DB_NAME, @pg_user,  @pg_pass)
+      connection = get_connection(DRA_DB_NAME)
       res = connection.exec(xml_sql(object_type, submitter_id, serial))
       if res.ntuples > 0
         if object_type == "submission" #submissionについてはSet要素不要
