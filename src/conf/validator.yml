@@ -3,6 +3,7 @@ ddbj_rdb:
   pg_port: 5432
   pg_user: const
   pg_pass: const
+  pg_timeout: 30
 
 sparql_endpoint:
   master_endpoint: http://localhost:8890/sparql
