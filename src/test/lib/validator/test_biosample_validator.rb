@@ -868,7 +868,7 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-01-01", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952-10-21T23:10:02Z/2052-10-21T23:44:30Z", ts_attr,  1)
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952-10-21T23:10:02Z/2018-10-21T23:44:30Z", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
@@ -877,6 +877,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ##auto annotation
+    ### 年の順序替え
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2/1/2011", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2011-01-02", get_auto_annotation(ret[:error_list])
     ### 桁揃え
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952.9.7T3:8:2Z", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -911,11 +916,11 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "195210", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1952-10", get_auto_annotation(ret[:error_list])
+    assert_nil get_auto_annotation(ret[:error_list]) #1952-10の意味だと思うが解釈は難しい
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "180504", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1805-04", get_auto_annotation(ret[:error_list]) #20180504の意味だと思うが解釈は難しい
+    assert_nil get_auto_annotation(ret[:error_list]) #20180504の意味だと思うが解釈は難しい
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952.10", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -948,16 +953,33 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ### 過去すぎる、未来過ぎる日付
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "18880801", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2050/1/2", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
     ### 範囲
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952/10/21/1952/11/20", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21/1952-11-20", get_auto_annotation(ret[:error_list])
-    ### 範囲の区切りに空白がある　
-    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952.10.21T23:10:02Z /  2052.10.21T23:44:30Z", ts_attr,  1)
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2007/2008", ts_attr,  1)
+    assert_equal true, ret[:result]
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2007-10/2008-02", ts_attr,  1)
+    assert_equal true, ret[:result]
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "200710/200802", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "1952-10-21T23:10:02Z/2052-10-21T23:44:30Z", get_auto_annotation(ret[:error_list])
+    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
+    ### 範囲の区切りに空白がある　
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "1952.10.21T23:10:02Z /  2018.10.21T23:44:30Z", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "1952-10-21T23:10:02Z/2018-10-21T23:44:30Z", get_auto_annotation(ret[:error_list])
     ### 月名が先頭に来るパターン
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "March 30, 2014 / July, 12, 2014", ts_attr,  1)
     assert_equal false, ret[:result]

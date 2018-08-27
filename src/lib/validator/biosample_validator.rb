@@ -1491,7 +1491,7 @@ class BioSampleValidator < ValidatorBase
         regex = Regexp.new(format["regex"])
         def_parse_format = format["parse_format"]
         #March 02, 2014の形式の場合はパースする月の位置を変える "03 02, 2014" => "2014-02-03"という誤変換を防止
-        format_mmddyy = "^\\w+[\\W]+\\d{1,2}[\\W]+\\d{4}$"
+        format_mmddyy = "^[a-zA-Z]+[\\W]+\\d{1,2}[\\W]+\\d{4}$"
         range_format_mmddyy = "#{format_mmddyy[1..-2]}\s*/\s*#{format_mmddyy[1..-2]}" #範囲
         if def_parse_format == "%d<delimit1>%m<delimit2>%Y" && (Regexp.new(format_mmddyy).match(attr_val_org) || Regexp.new(range_format_mmddyy).match(attr_val_org))
           def_parse_format = "%m<delimit1>%d<delimit2>%Y"
@@ -1503,17 +1503,22 @@ class BioSampleValidator < ValidatorBase
             m = regex.match(attr_val)
             #マッチ結果から区切り文字を得てパースする書式を確定する "%Y<delimit1>%m<delimit2>%d" => "%Y/%m/%d"
             parse_format = ""
-            m.names.each do |match_name|
-              if  parse_format == ""
-                parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
-              else
-                parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
+            # 複数の区切り文字のうち片方の区切りが''(区切りなし)である場合に意図しない置換を避ける ex. 2007/2008 => 2008/07/20
+            # 数字だけ(区切り文字がない)だと年月日が分かりにくいので8文字未満だと除外
+            if !(m.names.size >= 2 && m.names.select{|match_name| m[match_name] == ""}.size == 1) \
+                 && !(attr_val =~ /^\d+$/ && attr_val.size < 8)
+              m.names.each do |match_name|
+                if  parse_format == ""
+                  parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
+                else
+                  parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
+                end
               end
+              #記述書式で日付をパースしてDDBJformatに置換する
+              formated_date = DateTime.strptime(attr_val, parse_format)
+              attr_val = formated_date.strftime(format["output_format"])
+              break #置換したら抜ける
             end
-            #記述書式で日付をパースしてDDBJformatに置換する
-            formated_date = DateTime.strptime(attr_val, parse_format)
-            attr_val = formated_date.strftime(format["output_format"])
-            break #置換したら抜ける
           rescue ArgumentError
             #invalid format
           end
@@ -1530,17 +1535,22 @@ class BioSampleValidator < ValidatorBase
               m = regex.match(range_date)
               #マッチ結果から区切り文字を得てパースする書式を確定する "%Y<delimit1>%m<delimit2>%d" => "%Y/%m/%d"
               parse_format = ""
-              m.names.each do |match_name|
-                if  parse_format == ""
-                  parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
-                else
-                  parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
+              # 複数の区切り文字のうち片方の区切りが''(区切りなし)である場合に意図しない置換を避ける ex. 2007/2008 => 2008/07/20
+              # 数字だけ(区切り文字がない)だと年月日が分かりにくいので8文字未満だと除外
+              if !(m.names.size >= 2 && m.names.select{|match_name| m[match_name] == ""}.size == 1) \
+                   && !(attr_val =~ /^\d+$/ && attr_val.size < 8)
+                m.names.each do |match_name|
+                  if parse_format == ""
+                    parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
+                  else
+                    parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
+                  end
                 end
+                #記述書式で日付をパースしてDDBJformatに置換する
+                formated_date = DateTime.strptime(range_date, parse_format)
+                range_date = formated_date.strftime(format["output_format"])
+                range_date
               end
-              #記述書式で日付をパースしてDDBJformatに置換する
-              formated_date = DateTime.strptime(range_date, parse_format)
-              range_date = formated_date.strftime(format["output_format"])
-              range_date
             end
             # 範囲の大小が逆であれば入れ替える
             if DateTime.strptime(range_date_list[0], format["output_format"]) <= DateTime.strptime(range_date_list[1], format["output_format"])
@@ -1558,7 +1568,6 @@ class BioSampleValidator < ValidatorBase
       # (補正後の)値がDDBJフォーマットであるか
       common = CommonUtils.new
       is_ddbj_format = common.ddbj_date_format?(attr_val)
-
       # 日付としてパースできるか14月や32日など不正でないか
       parsable_date = true
       @conf[:ddbj_date_format].each do |format|
@@ -1566,13 +1575,23 @@ class BioSampleValidator < ValidatorBase
         regex_range = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #範囲での記述
         parse_format = format["parse_format"]
         begin
+          # 明らかにおかしな年代に置換しないように、1900年から5年後の範囲でチェック
+          limit_lower = Date.new(1900, 1, 1);
+          limit_upper = Date.new(DateTime.now.year + 5, 1, 1);
+
           if attr_val =~ regex_simple
-            DateTime.strptime(attr_val, parse_format)
+            date = DateTime.strptime(attr_val, parse_format)
+            if !(date >= limit_lower && date < limit_upper)
+              parsable_date = false
+            end
           elsif attr_val =~ regex_range
             range_start =  Regexp.last_match[:start]
             range_end =  Regexp.last_match[:end]
-            DateTime.strptime(range_start, parse_format)
-            DateTime.strptime(range_end, parse_format)
+            start_date = DateTime.strptime(range_start, parse_format)
+            end_date = DateTime.strptime(range_end, parse_format)
+            if !(start_date >= limit_lower && end_date < limit_upper)
+              parsable_date = false
+            end
           end
         rescue
           parsable_date = false
