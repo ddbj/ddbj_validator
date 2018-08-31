@@ -1,4 +1,5 @@
 version:
   api: 0.9.0
-  validator: 1.0.7
+  rule: 1.1.1
+  validator: 1.0.8
   biosample_graph: 1.2.0

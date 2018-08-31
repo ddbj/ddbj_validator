@@ -358,6 +358,7 @@
     "name": "Non-ASCII Attribute value",
     "method": "non_ascii_attribute_value",
     "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
+    "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values around [### Non-ASCII character ###] and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
     "object": [
       "BioSample"
     ],
