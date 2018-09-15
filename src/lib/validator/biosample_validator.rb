@@ -22,8 +22,15 @@ class BioSampleValidator < ValidatorBase
   #
   # Initializer
   #
-  def initialize
+  def initialize(params)
     super()
+
+    # 外部(D-Way以外)の実行である場合にフラグを立てる
+    @external_exec = false
+    unless params[:executer].nil?
+      @external_exec = true
+    end
+
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")))
     CommonUtils::set_config(@conf)
 
@@ -32,7 +39,9 @@ class BioSampleValidator < ValidatorBase
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    unless @external_exec #外部実行者の場合DBへのアクセスはチェックしない
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    end
     @cache = ValidatorCache.new
   end
 
@@ -176,9 +185,11 @@ class BioSampleValidator < ValidatorBase
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         attribute_value_is_not_integer("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
-        ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        unless @external_exec
+          ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+            biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+          end
         end
       end
 
@@ -209,11 +220,15 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 特定の属性値に対する検証
-      invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      bioproject_not_found("BS_R0006", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
-      invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      unless @external_exec
+        invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+        bioproject_not_found("BS_R0006", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
+        invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      end
       invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
-      duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
+      unless @external_exec
+        duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
+      end
       ret = format_of_geo_loc_name_is_invalid("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
