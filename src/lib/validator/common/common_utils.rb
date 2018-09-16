@@ -503,4 +503,40 @@ class CommonUtils
     end
     result
   end
+
+  #
+  # TODO testコード追加
+  # テキストデータからフォーマットを判定して返す。判定できなければnilを返す
+  #
+  # ==== Args
+  # file_path: テキストデータ
+  # ==== Return
+  # "json", "xml", "tsv", "csv"のいずれか
+  #
+  def self.get_file_format(text_data)
+    format = nil
+    begin
+      JSON.parse(text_data)
+      format = "json"
+    rescue
+      begin
+        document = Nokogiri::XML(text_data)
+        if document.errors.empty?
+          format = "xml"
+        else
+          begin
+            tsv_headers = CSV.parse_line(text_data, col_sep: "\t")
+            csv_headers = CSV.parse_line(text_data)
+            if tsv_headers.size >= csv_headers.size
+              format = "tsv"
+            else
+              format = "csv"
+            end
+          end
+        end
+      end
+    end
+    format
+  end
+
 end

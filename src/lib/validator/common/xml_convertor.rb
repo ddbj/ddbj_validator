@@ -49,7 +49,7 @@ class XmlConvertor < ValidatorBase
   # attributesは属性名に重複がないハッシュ(重複時は最初に出現した属性値がセットされる)
   # attribute_listは属性名が重複している可能性があるリスト(属性名重複チェック(34.Multiple Attribute values)で仕様される)
   #
-  def xml2obj(xml_document)
+  def text2obj(xml_document)
     begin
       doc = Nokogiri::XML(xml_document)
     rescue => ex
@@ -194,7 +194,7 @@ class XmlConvertor < ValidatorBase
   # XPathの配列
   # ex. ["//BioSample[2]/Description/Organism/OrganismName"]
   #
-  def xpath_from_attrname (attr_name, item_no)
+  def location_from_attrname (attr_name, item_no)
     xpath = []
     case attr_name
     when "sample_name"
@@ -226,7 +226,7 @@ class XmlConvertor < ValidatorBase
   # XPathの配列
   # ex. ["//BioSample[2]/Attributes/Attribute[@attribute_name=\"sample   comment\"]/@attribute_name"]
   #
-  def xpath_of_attrname (attr_name, item_no)
+  def location_of_attrname (attr_name, item_no)
     xpath = []
     xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]/@attribute_name")
     xpath

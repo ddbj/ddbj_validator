@@ -1,0 +1,638 @@
+[
+  [
+	{
+		"attribute_name": "biosample_accession",
+		"attribute_value": "SAMD00017269"
+	},
+	{
+		"attribute_name": "sample_title",
+		"attribute_value": "Human Genomic DNA, Female"
+	},
+	{
+		"attribute_name": "taxonomy_id",
+		"attribute_value": "9606"
+	},
+	{
+		"attribute_name": "organism",
+		"attribute_value": "Homo sapiens"
+	},
+	{
+		"attribute_name": "package",
+		"attribute_value": "Generic"
+	},
+	{
+		"attribute_name": "description",
+		"attribute_value": "N. A."
+	},
+        {
+		"attribute_name": "sample_name",
+		"attribute_value": "Human Genomic DNA, Female"
+	},
+	{
+		"attribute_name": "strain",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "breed",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cultivar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "isolate",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "label",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "env_biome",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "collection_date",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "geo_loc_name",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "host",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subspecf_gen_lin",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "age",
+		"attribute_value": "Unknown"
+	},
+	{
+		"attribute_name": "host_body_site",
+		"attribute_value": "Blood"
+	},
+	{
+		"attribute_name": "genotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "phenotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "sex",
+		"attribute_value": "Female"
+	},
+	{
+		"attribute_name": "isolation_source",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "culture_collection",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "specimen_voucher",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subgroup",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subtype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "anamorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "authority",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_line",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "dev_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "disease",
+		"attribute_value": "Free"
+	},
+	{
+		"attribute_name": "disease_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "haplotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "health_state",
+		"attribute_value": "Good"
+	},
+	{
+		"attribute_name": "sample_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "teleomorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "tissue_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "pathovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "sample_name",
+		"attribute_value": "Human Genomic DNA, Female"
+	},
+	{
+		"attribute_name": "strain",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "breed",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cultivar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "isolate",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "label",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "env_biome",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "collection_date",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "geo_loc_name",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "host",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subspecf_gen_lin",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "age",
+		"attribute_value": "Unknown"
+	},
+	{
+		"attribute_name": "host_body_site",
+		"attribute_value": "Blood"
+	},
+	{
+		"attribute_name": "genotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "phenotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "sex",
+		"attribute_value": "Female"
+	},
+	{
+		"attribute_name": "isolation_source",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "culture_collection",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "specimen_voucher",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subgroup",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subtype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "anamorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "authority",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_line",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "dev_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "disease",
+		"attribute_value": "Free"
+	},
+	{
+		"attribute_name": "disease_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "haplotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "health_state",
+		"attribute_value": "Good"
+	},
+	{
+		"attribute_name": "sample_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "teleomorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "tissue_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "pathovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "bioproject_id",
+		"attribute_value": "PRJDB2884"
+	}
+  ],
+  [
+	{
+		"attribute_name": "biosample_accession",
+		"attribute_value": "SAMD00017270"
+	},
+	{
+		"attribute_name": "sample_title",
+		"attribute_value": "Genomic DNA isolated from IMR-90"
+	},
+	{
+		"attribute_name": "taxonomy_id",
+		"attribute_value": "9606"
+	},
+	{
+		"attribute_name": "organism",
+		"attribute_value": "Homo sapiens"
+	},
+	{
+		"attribute_name": "package",
+		"attribute_value": "Generic"
+	},
+	{
+		"attribute_name": "description",
+		"attribute_value": "N. A."
+	},
+        {
+		"attribute_name": "sample_name",
+		"attribute_value": "Human Genomic DNA, Female"
+	},
+	{
+		"attribute_name": "strain",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "breed",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cultivar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "isolate",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "label",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "env_biome",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "collection_date",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "geo_loc_name",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "host",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subspecf_gen_lin",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "age",
+		"attribute_value": "Unknown"
+	},
+	{
+		"attribute_name": "host_body_site",
+		"attribute_value": "Blood"
+	},
+	{
+		"attribute_name": "genotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "phenotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "sex",
+		"attribute_value": "Female"
+	},
+	{
+		"attribute_name": "isolation_source",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "culture_collection",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "specimen_voucher",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subgroup",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subtype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "anamorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "authority",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_line",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "dev_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "disease",
+		"attribute_value": "Free"
+	},
+	{
+		"attribute_name": "disease_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "haplotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "health_state",
+		"attribute_value": "Good"
+	},
+	{
+		"attribute_name": "sample_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "teleomorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "tissue_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "pathovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "sample_name",
+		"attribute_value": "Human Genomic DNA, Female"
+	},
+	{
+		"attribute_name": "strain",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "breed",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cultivar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "isolate",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "label",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "env_biome",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "collection_date",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "geo_loc_name",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "host",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subspecf_gen_lin",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "age",
+		"attribute_value": "Unknown"
+	},
+	{
+		"attribute_name": "host_body_site",
+		"attribute_value": "Blood"
+	},
+	{
+		"attribute_name": "genotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "phenotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "sex",
+		"attribute_value": "Female"
+	},
+	{
+		"attribute_name": "isolation_source",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "culture_collection",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "specimen_voucher",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "serovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subgroup",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "subtype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "anamorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "authority",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_line",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "cell_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "dev_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "disease",
+		"attribute_value": "Free"
+	},
+	{
+		"attribute_name": "disease_stage",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "haplotype",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "health_state",
+		"attribute_value": "Good"
+	},
+	{
+		"attribute_name": "sample_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "teleomorph",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "tissue_type",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "pathovar",
+		"attribute_value": "N. A."
+	},
+	{
+		"attribute_name": "bioproject_id",
+		"attribute_value": "PRJDB2884"
+	}
+]
+]

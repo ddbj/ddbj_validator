@@ -12,6 +12,7 @@ require File.dirname(__FILE__) + "/common/organism_validator.rb"
 require File.dirname(__FILE__) + "/common/sparql_base.rb"
 require File.dirname(__FILE__) + "/common/validator_cache.rb"
 require File.dirname(__FILE__) + "/common/xml_convertor.rb"
+require File.dirname(__FILE__) + "/common/json_convertor.rb"
 
 #
 # A class for BioSample validation 
@@ -37,7 +38,6 @@ class BioSampleValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
     unless @external_exec #外部実行者の場合DBへのアクセスはチェックしない
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
@@ -80,34 +80,61 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # Retrun convertor object.
+  #
+  # ==== Args
+  # data_format: parse format "xml", "json", "tsv", "csv"
+  #
+  def get_convertor_object(data_format)
+    if data_format == "xml"
+      convertor = XmlConvertor.new
+    elsif data_format == "json"
+      puts "json convertor!"
+      convertor = JsonConvertor.new
+    elsif data_format == "tsv"
+      #TODO convertor = TsvConvertor.new("\t")
+    else data_format == "csv"
+      #TODO convertor = TsvConvertor.new(",")
+    end
+    convertor
+  end
+
+  #
   # Validate the all rules for the bio sample data.
   # Error/warning list is stored to @error_list
   #
   # ==== Args
-  # data_xml: xml file path
+  # data_file: file path
   #
   #
-  def validate (data_xml, submitter_id=nil)
-    valid_xml = not_well_format_xml("BS_R0097", data_xml)
-    return unless valid_xml
-    #convert to object for validator
-    @data_file = File::basename(data_xml)
-    xml_document = File.read(data_xml)
-    valid_xml = xml_data_schema("BS_R0098", xml_document)
-    return unless valid_xml
+  def validate (data_file, submitter_id=nil)
+    file_data = File.read(data_file)
+    if @external_exec # D-Way以外からの実行の場合には、ファイルフォーマットを調査する。
+      data_format = CommonUtils::get_file_format(file_data)
+    else # D-Wayからの実行であれば常にXMLを期待する
+      valid_xml = not_well_format_xml("BS_R0097", file_data)
+      data_format = "xml"
+      return unless valid_xml
+    end
+    # ファイル形式に合わせた変換オブジェクトを生成
+    @convertor = get_convertor_object(data_format)
 
-    # xml検証が通った場合のみ実行
-    @biosample_list = @xml_convertor.xml2obj(xml_document)
+    @data_file = File::basename(data_file)
+    if data_format == "xml"
+      valid_xml = xml_data_schema("BS_R0098", file_data)
+      return unless valid_xml # xml検証が通った場合のみ実行
+    end
+    @biosample_list = @convertor.text2obj(file_data)
 
+    # submitter_id とsubmission_idを取得する
     if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
+      @submitter_id = @convertor.get_biosample_submitter_id(file_data)
     else
       @submitter_id = submitter_id
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
-
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
-    @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
+    @submission_id = @convertor.get_biosample_submission_id(file_data)
 
     ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -691,7 +718,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute value", value: attr_val}
         ]
         if replace_value != "" #置換候補があればAuto annotationをつける
-          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+          location = @convertor.location_from_attrname(attr_name, line_num)
           annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
         else #置換候補がないエラー
@@ -757,7 +784,7 @@ class BioSampleValidator < ValidatorBase
             {key: "Attribute value", value: attr_val}
           ]
           if attr_val != ref #置換候補があればAuto annotationをつける
-            location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+            location = @convertor.location_from_attrname(attr_name, line_num)
             annotation.push(CommonUtils::create_suggested_annotation([ref], "Attribute value", location, true));
             error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
           else #置換候補がないエラー
@@ -853,7 +880,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "geo_loc_name"},
         {key: "Attribute value", value: geo_loc_name}
       ]
-      location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
+      location = @convertor.location_from_attrname("geo_loc_name", line_num)
       annotation.push(CommonUtils::create_suggested_annotation([annotated_name], "Attribute value", location, true));
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
@@ -894,7 +921,7 @@ class BioSampleValidator < ValidatorBase
       ]
       if !matched_country.nil? # auto-annotation
         replaced_value = matched_country + ":" + geo_loc_name.split(":")[1..-1].join(":")
-        location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
+        location = @convertor.location_from_attrname("geo_loc_name", line_num)
         annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true));
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       else
@@ -931,7 +958,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute value", value: lat_lon}
       ]
       if !insdc_latlon.nil? #置換候補があればAuto annotationをつける
-        location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
+        location = @convertor.location_from_attrname("lat_lon", line_num)
         annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
       else #置換候補がないエラー
@@ -964,7 +991,7 @@ class BioSampleValidator < ValidatorBase
       {key: "Sample name", value: sample_name},
       {key: "host", value: host_name}
     ]
-    location = @xml_convertor.xpath_from_attrname("host", line_num)
+    location = @convertor.location_from_attrname("host", line_num)
 
     if host_name.casecmp("human") == 0
       ret = false
@@ -1065,11 +1092,11 @@ class BioSampleValidator < ValidatorBase
       scientific_name = ret[:scientific_name]
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_name
-        location = @xml_convertor.xpath_from_attrname("organism", line_num)
+        location = @convertor.location_from_attrname("organism", line_num)
         annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
       end
       annotation.push({key: "taxonomy_id", value: ""})
-      location = @xml_convertor.xpath_from_attrname("taxonomy_id", line_num)
+      location = @convertor.location_from_attrname("taxonomy_id", line_num)
       annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
@@ -1450,7 +1477,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
-      location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+      location = @convertor.location_from_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([attr_val_result], "Attribute value", location, true));
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
@@ -1624,7 +1651,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute value", value: attr_val_org}
         ]
         if attr_val_org != attr_val #replace_candidate
-          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+          location = @convertor.location_from_attrname(attr_name, line_num)
           annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
         else
@@ -1786,7 +1813,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute name", value: attr_name}
       ]
-      location = @xml_convertor.xpath_of_attrname(attr_name, line_num)
+      location = @convertor.location_of_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
@@ -1797,7 +1824,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
-      location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+      location = @convertor.location_from_attrname(attr_name, line_num)
       annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
@@ -2227,7 +2254,7 @@ class BioSampleValidator < ValidatorBase
 
       # biosample_accessionにAuto-annotationできる
       if !biosample_accession.nil?
-        location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
+        location = @convertor.location_from_attrname("bioproject_id", line_num)
         annotation.push(CommonUtils::create_suggested_annotation([biosample_accession], "Attribute value", location, true))
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
         @error_list.push(error_hash)
@@ -2368,7 +2395,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute name", value: optional_attr},
           {key: "Attribute value", value: sample_attr[optional_attr]},
         ]
-        location = @xml_convertor.xpath_from_attrname(optional_attr, line_num)
+        location = @convertor.location_from_attrname(optional_attr, line_num)
         annotation.push(CommonUtils::create_suggested_annotation([""], "Attribute value", location, true))
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)

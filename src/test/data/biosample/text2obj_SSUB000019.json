@@ -1,0 +1,84 @@
+[
+  [
+    { 
+      "attribute_name": "biosample_accession",
+      "attribute_value": "SAMD00000328"
+    },
+    { 
+      "attribute_name": "package",
+      "attribute_value": "MIGS.ba.microbial"
+    },
+    { 
+      "attribute_name": "sample_title",
+      "attribute_value": "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"
+    },
+    { 
+      "attribute_name": "taxonomy_id",
+      "attribute_value": "1314"
+    },
+    { 
+      "attribute_name": "organism",
+      "attribute_value": "Streptococcus pyogenes"
+    },
+    { 
+      "attribute_name": "sample_name",
+      "attribute_value": "MTB313"
+    },
+    { 
+      "attribute_name": "strain",
+      "attribute_value": "MTB313"
+    },
+    { 
+      "attribute_name": "env_biome",
+      "attribute_value": "urban biome"
+    },
+    { 
+      "attribute_name": "collection_date",
+      "attribute_value": "2011"
+    },
+    { 
+      "attribute_name": "env_feature",
+      "attribute_value": "town"
+    },
+    { 
+      "attribute_name": "geo_loc_name",
+      "attribute_value": "Japan: Hikone-shi"
+    },
+    { 
+      "attribute_name": "lat_lon",
+      "attribute_value": "136.225389 35.26224"
+    },
+    { 
+      "attribute_name": "env_material",
+      "attribute_value": "interstitial fluid"
+    },
+    { 
+      "attribute_name": "project_name",
+      "attribute_value": "Streptococcus pyogenes MTB313 genome sequencing"
+    },
+    { 
+      "attribute_name": "isol_growth_condt",
+      "attribute_value": "24464696"
+    },
+    { 
+      "attribute_name": "num_replicons",
+      "attribute_value": "1"
+    },
+    { 
+      "attribute_name": "ref_biomaterial",
+      "attribute_value": "16088826"
+    },
+    { 
+      "attribute_name": "elev",
+      "attribute_value": "88.8m"
+    },
+    { 
+      "attribute_name": "depth",
+      "attribute_value": "0m"
+    },
+    { 
+      "attribute_name": "bioproject_id",
+      "attribute_value": "PRJDB1654"
+    }
+  ]
+]

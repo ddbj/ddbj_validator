@@ -7,6 +7,7 @@ require 'net/http'
 require 'net/https'
 require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
+require File.expand_path('../../lib/validator/common/common_utils.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
 
@@ -164,10 +165,22 @@ module DDBJValidator
         annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
         FileUtils.mkdir_p(annotated_file_dir)
         annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
-        AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype)
+        file_format = CommonUtils::get_file_format(File.read(org_file))
+        AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype, file_format)
       end
       if File.exist?(annotated_file_path)
-        send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
+        if file_format == "xml"
+          file_type = 'application/xml'
+        elsif file_format == "json"
+          file_type = 'application/json'
+        elsif file_format == "tsv"
+          file_type = 'text/tab-separated-values'
+        elsif file_format == "csv"
+          file_type = 'text/comma-separated-values'
+        else
+          file_type = 'text/plain'
+        end
+        send_file annotated_file_path, :filename => annotated_file_name, :type => file_format
       else
         status 400
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"

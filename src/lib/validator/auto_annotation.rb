@@ -17,9 +17,21 @@ class AutoAnnotation
   # output_file: Auto-annotation済み結果ファイル(XML)を出力するパス
   # filetype: ファイルの種類 e.g. biosample, bioproject...
   #
-  def create_annotated_file (original_file, validate_result_file, output_file, filetype)
+  def create_annotated_file (original_file, validate_result_file, output_file, filetype, file_format)
     return nil unless File.exist?(original_file)
     return nil unless File.exist?(validate_result_file)
+    if file_format == "xml"
+      create_annotated_file_xml(original_file, validate_result_file, output_file, filetype)
+    elsif file_format == "json"
+      create_annotated_file_json(original_file, validate_result_file, output_file, filetype)
+    end
+    # TODO csv/tsv
+  end
+
+  #
+  # 元ファイルがXMLだった場合のAuto-annotationファイルを生成
+  #
+  def create_annotated_file_xml (original_file, validate_result_file, output_file, filetype)
 
     #auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
@@ -98,6 +110,39 @@ class AutoAnnotation
         #TODO include "@" but not start_with e.g.(Attribute[@attribute_name=\"sample_name\"])
       end
       parent_location += "/" + element
+    end
+  end
+
+  #
+  # 元ファイルがJSONだった場合のAuto-annotationファイルを生成
+  #
+  def create_annotated_file_json (original_file, validate_result_file, output_file, filetype)
+    #auto-annotation出来るエラーのみを抽出
+    annotation_list = get_annotated_list(validate_result_file, filetype)
+    if annotation_list.size > 0
+      begin
+        doc = JSON.parse(File.read(original_file))
+      rescue => ex
+        # 元ファイルのXMLがParseできない場合は中断する
+        return nil
+      end
+
+      annotation_list.each do |annotation|
+        annotation["location"].each do |location|
+          location_data = JSON.parse(location)
+          sample_idx = location_data["line_no"].to_i - 1 #index
+          biosample_object = doc[sample_idx]
+          #同一属性名の場合後方の値を優先するため、rindexで要素番号を特定する
+          last_index = biosample_object.rindex {|column| column["attribute_name"] == location_data["attr_name"] }
+          column_hash = biosample_object[last_index]
+          # targetには"attribute_name" or "attribute_value"のいずれかが入っている
+          column_hash[location_data["target"]] = annotation["suggested_value"].first
+        end
+      end
+
+      File.open(output_file, 'w') do |file|
+        file.puts JSON.pretty_generate(doc)
+      end
     end
   end
 
