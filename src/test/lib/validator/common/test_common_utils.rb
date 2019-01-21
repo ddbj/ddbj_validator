@@ -143,6 +143,111 @@ class TestCommonUtils < Minitest::Test
     assert_nil ret
   end
 
+  def test_format_month_name
+    # convert
+    ret = @common.format_month_name("2011 June")
+    assert_equal "2011 06", ret
+    ret = @common.format_month_name("21-Oct-1952")
+    assert_equal "21-10-1952", ret
+
+    # not convert
+    ret = @common.format_month_name("21-10-1952")
+    assert_equal "21-10-1952", ret
+    ret = @common.format_month_name("21-Feburuary-1952") #missspelling
+    assert_equal "21-Feburuary-1952", ret
+    ret = @common.format_month_name("Not date") #missspelling
+    assert_equal "Not date", ret
+
+    #nil
+    ret = @common.format_month_name(nil) #missspelling
+    assert_nil ret
+  end
+
+  def test_convert_date_format
+    # convert
+    regex = "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}$"
+    parse_format = "%Y<delimit1>%m<delimit2>%d"
+    output_format = "%Y-%m-%d"
+    ret = @common.convert_date_format("2016, 07/10", regex, parse_format, output_format)
+    assert_equal "2016-07-10", ret
+
+    regex = "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]+)\\d{1,2}$"
+    parse_format = "%Y<delimit1>%m"
+    output_format = "%Y-%m"
+    ret = @common.convert_date_format("2016/7", regex, parse_format, output_format)
+    assert_equal "2016-07", ret
+
+    # not convert
+    regex = "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]+)\\d{1,2}$"
+    parse_format = "%Y<delimit1>%m"
+    output_format = "%Y-%m"
+    ret = @common.convert_date_format("2016/Mar/3", regex, parse_format, output_format)
+    assert_equal "2016/Mar/3", ret
+
+    #nil
+    ret = @common.convert_date_format(nil, regex, parse_format, output_format)
+    assert_nil ret
+  end
+
+  def test_format_delimiter_single_date
+    # convert
+    ret = @common.format_delimiter_single_date("03 02, 2014", "03 02, 2014")
+    assert_equal "2014-02-03", ret
+    ret = @common.format_delimiter_single_date("03 02, 2014", "March 02, 2014")
+    assert_equal "2014-03-02", ret
+
+    # not convert
+    ret = @common.format_delimiter_single_date("03-02-2014", "03-02-2014") # collect format
+    assert_equal "2014-02-03", ret
+    ret = @common.format_delimiter_single_date("03 02, 2014 / 04 02, 2014", "03 02, 2014 / 04 02, 2014") #range
+    assert_equal "03 02, 2014 / 04 02, 2014", ret
+    ret = @common.format_delimiter_single_date("Not date", "Not date")
+    assert_equal "Not date", ret
+
+    #nil
+    ret = @common.format_delimiter_single_date(nil, nil)
+    assert_nil ret
+  end
+
+  def test_format_delimiter_range_date
+    # convert
+    ret = @common.format_delimiter_range_date("25 10, 2014 / 24 10, 2014", "25 10, 2014 / 24 10, 2014")
+    assert_equal "2014-10-24/2014-10-25", ret
+    ret = @common.format_delimiter_range_date("10 24, 2014 / 10 25, 2014", "Oct 24, 2014 / Oct 25, 2014")
+    assert_equal "2014-10-24/2014-10-25", ret
+
+    # not convert
+    ret = @common.format_delimiter_range_date("2014-10-24/2014-10-25", "2014-10-24/2014-10-25") # collect format
+    assert_equal "2014-10-24/2014-10-25", ret
+    ret = @common.format_delimiter_range_date("03 02, 2014", "03 02, 2014") #not range
+    assert_equal "03 02, 2014", ret
+    ret = @common.format_delimiter_range_date("Not date", "Not date")
+    assert_equal "Not date", ret
+
+    #nil
+    ret = @common.format_delimiter_range_date(nil, nil)
+    assert_nil ret
+  end
+
+  def test_parsable_date_format?
+    # ok
+    ret = @common.parsable_date_format?("2016")
+    assert_equal true, ret
+    ret = @common.parsable_date_format?("2016-10-11")
+    assert_equal true, ret
+
+    # ng
+    ret = @common.parsable_date_format?("2016-13-11")
+    assert_equal false, ret
+    ret = @common.parsable_date_format?("1852-09-10")
+    assert_equal false, ret
+    ret = @common.parsable_date_format?("2045-10-10")
+    assert_equal false, ret
+    # nil
+    ret = @common.parsable_date_format?(nil)
+    assert_equal false, ret
+  end
+
   def test_ddbj_date_format?
     #ok
     ret = @common.ddbj_date_format?("2016")
