@@ -710,4 +710,45 @@ class CommonUtils
     end
     result
   end
+
+  def format_time_and_zone (time_text)
+    if ["+", "-", "Z"].any? {|c| time_text.include?(c)} #timezoneの記載あり
+      if time_text.include?("Z") && ["+", "-"].any? {|c| time_text.include?(c)} #timezone識別が2つ以上あるのは誤り(T00Z+09:00 => T00+09:00)
+        time_text.gsub!("Z", "")
+      end
+      timezone_regex = Regexp.new("^*(?<timezone>[+-Z][\d:]*)$")
+      timezone_text = timezone_regex.match(date_text)["timezone"]
+      time = time_text.gsub(timezone_text, "")
+
+      format_timezone(timezone_text)
+      format_time(time)
+    else
+      return "" #timezoneの記載がなければ時刻表記は全て削除
+    end
+  end
+  def format_time (time_text)
+    if time =~ /^T\d{1,2}$/
+      formated_date = DateTime.strptime(time, "T%H")
+      time = formated_date.strftime("T%H")
+    elsif time =~ /^T\d{1,2}:\d{1,2}$/
+      formated_date = DateTime.strptime(time, "T%H:%M")
+      time = formated_date.strftime("T%H:%M")
+    elsif time =~ /^T\d{1,2}:\d{1,2}:\d{1,2}$/
+      formated_date = DateTime.strptime(time, "T%H:%M:%S")
+      time = formated_date.strftime("T%H:%M:%S")
+    end
+  end
+  def format_timezone(timezone_text)
+    Regexp.new("^(?<sign>[+-])(?<time>\\d{1,2})$")
+    if time =~ /^T\d{1,2}$/
+      formated_date = DateTime.strptime(time, "T%H")
+      time = formated_date.strftime("T%H")
+    elsif time =~ /^T\d{1,2}:\d{1,2}$/
+      formated_date = DateTime.strptime(time, "T%H:%M")
+      time = formated_date.strftime("T%H:%M")
+    elsif time =~ /^T\d{1,2}:\d{1,2}:\d{1,2}$/
+      formated_date = DateTime.strptime(time, "T%H:%M:%S")
+      time = formated_date.strftime("T%H:%M:%S")
+    end
+  end
 end

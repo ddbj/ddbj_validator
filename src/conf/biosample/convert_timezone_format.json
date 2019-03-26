@@ -1,0 +1,22 @@
+[
+  {
+    "_example": "+1 => +01",
+    "regex": "^(?<sign>[+-])(?<time>\\d{1,2})$",
+    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H",
+    "output_format": "%Y-%m-%dT%HZ"
+  },
+  {
+    "_example": "+1:0 => +01:00",
+    "regex": "^(?<sign>[+-])(?<time>\\d{1,2}):(?<minute>\\d{1,2})$",
+    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H:%MZ",
+    "output_format": "%Y-%m-%dT%H:%MZ"
+  },
+  {
+    "_example": "+100 => +0100",
+
+    "regex": "^(?<sign>[+-])(?<timeminute>\\d{3,4})$",
+    "regex": "^\\d{1,2}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{4}$",
+    "parse_format": "%d<delimit1>%m<delimit2>%Y",
+    "output_format": "%Y-%m-%d"
+  }
+]
