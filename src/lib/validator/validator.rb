@@ -93,7 +93,7 @@ class Validator
           ret = {version: @latest_version, validity: true}
 
           stats = get_result_stats(error_list)
-          ret["validity"] = false if stats[:error_count] > 0
+          ret[:validity] = false if stats[:error_count] > 0
           ret["stats"] = stats
           ret["messages"] = error_list
           @log.info('validation result: ' + "fail")
