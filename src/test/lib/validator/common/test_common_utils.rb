@@ -121,6 +121,12 @@ class TestCommonUtils < Minitest::Test
     ret = @common.exist_pubmed_id?("aiueo")
     assert_equal false, ret
 
+    ret = @common.exist_pubmed_id?("")
+    assert_equal false, ret
+
+    ret = @common.exist_pubmed_id?("2バイト文字")
+    assert_equal false, ret
+
     #nil
     ret = @common.exist_pubmed_id?(nil)
     assert_nil ret
