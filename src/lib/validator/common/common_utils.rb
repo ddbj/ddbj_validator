@@ -11,8 +11,6 @@ class CommonUtils
   def self.set_config (config_obj)
     @@null_accepted = config_obj[:null_accepted]
     @@exchange_country_list = config_obj[:exchange_country_list]
-    @@convert_date_format = config_obj[:convert_date_format]
-    @@ddbj_date_format = config_obj[:ddbj_date_format]
     @@google_api_key = config_obj[:google_api_key]
     @@eutils_api_key = config_obj[:eutils_api_key]
   end
@@ -379,7 +377,8 @@ class CommonUtils
   end
 
   #
-  # 引数のPubMedIDが実在するか否かを返す
+  # 引数のPubMedIDが実在するか否かを返す.
+  # [obsoleted] 実行環境によってはリクエスト制限を受けレスポンスが遅い場合がある.
   #
   # ==== Args
   # db_name: "pubmed","pmc"
@@ -438,6 +437,51 @@ class CommonUtils
   end
 
   #
+  # 引数のPubMedIDがDBCLS/medlineに存在するか否かを返す
+  #
+  # ==== Args
+  # pubmed_id: entry ID
+  # ==== Return
+  # returns true/false
+  #
+  # tm.dbcls.jp/medline returns blank data if the specified pubmed_id does not exist.
+  # e.g. http://tm.dbcls.jp/medline/9999999999.json
+  #
+  # {
+  #   "@encoding": "UTF-8",
+  #   "@version": "1.0",
+  #   "MedlineCitationSet": {}  //当該IDがある場合にはデータが記載される。
+  # }
+  #
+  def exist_in_medline?(pubmed_id)
+    return nil if pubmed_id.nil?
+    url = "http://tm.dbcls.jp/medline/#{pubmed_id}.json"
+    begin
+      res = http_get_response(url)
+      if res.code =~ /^5/ # server error
+        raise "'http://tm.dbcls.jp/medline' returns a server error. Please retry later. url: #{url}\n"
+      elsif res.code =~ /^4/ # client error
+        raise "'http://tm.dbcls.jp/medline' returns a error. Please check the url. url: #{url}\n"
+      else
+        begin
+          entry_info = JSON.parse(res.body)
+          # MedlineCitationSetの中身が空でなければOK
+          if !entry_info["MedlineCitationSet"].nil? && !(entry_info["MedlineCitationSet"].keys.size == 0)
+            return true
+          else
+            return false
+          end
+        rescue
+          raise "Parse error: 'http://tm.dbcls.jp/medline' might not return a JSON format. Please check the url. url: #{url}\n response body: #{res.body}\n"
+        end
+      end
+    rescue => ex
+      message = "Connection to 'http://tm.dbcls.jp/medline' server failed. Please check the url or your internet connection. url: #{url}\n"
+      raise StandardError, message, ex.backtrace
+    end
+  end
+
+  #
   # 引数のPubMedIDが実在するか否かを返す
   #
   # ==== Args
@@ -447,7 +491,8 @@ class CommonUtils
   #
   def exist_pubmed_id? (pubmed_id)
     return nil if pubmed_id.nil?
-    eutils_summary("pubmed", pubmed_id)
+    return false unless pubmed_id.strip.chomp =~ /^[0-9]+$/
+    exist_in_medline?(pubmed_id.strip.chomp )
   end
 
   #
@@ -481,26 +526,5 @@ class CommonUtils
       http.request(req)
     }
     res
-  end
-
-  def ddbj_date_format? (date_text)
-    return nil if date_text.nil?
-    result = false
-    @@ddbj_date_format.each do |format|
-      parse_format = format["parse_format"]
-
-      ## single date format
-      regex = Regexp.new(format["regex"])
-      if date_text =~ regex
-        result = true
-      end
-
-      ## range date format
-      regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
-      if date_text =~ regex
-        result = true
-      end
-    end
-    result
   end
 end

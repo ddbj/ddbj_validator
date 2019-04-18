@@ -7,6 +7,7 @@ require 'date'
 require 'net/http'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/date_format.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/common/organism_validator.rb"
 require File.dirname(__FILE__) + "/common/sparql_base.rb"
@@ -26,6 +27,7 @@ class BioSampleValidator < ValidatorBase
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")))
     CommonUtils::set_config(@conf)
+    DateFormat::set_config(@conf)
 
     @error_list = error_list = []
 
@@ -1347,7 +1349,7 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(collection_date)
     result = nil
     @conf[:ddbj_date_format].each do |format|
-      parse_format = format["parse_format"]
+      parse_format = format["parse_date_format"]
 
       ## single date format
       regex = Regexp.new(format["regex"])
@@ -1460,164 +1462,39 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
 
     attr_val_org = attr_val
     result = true
 
-    if ts_attr.include?(attr_name) #日付型の属性であれば
-      #TODO auto-annotationの部分のコードを分離
-      #月の表現を揃える
-      month_long_capitalize  = {"January" => "01", "February" => "02", "March" => "03", "April" => "04", "May" => "05", "June" => "06", "July" => "07", "August" => "08", "September" => "09", "October" => "10", "November" => "11", "December" => "12"}
-      month_long_downcase    = {"january" => "01", "february" => "02", "march" => "03", "april" => "04", "may" => "05", "june" => "06", "july" => "07", "august" => "08", "september" => "09", "october" => "10", "november" => "11", "december" => "12"}
-      month_short_upcase     = {"JAN" => "01", "FEB" => "02", "MAR" => "03", "APR" => "04", "MAY" => "05", "JUN" => "06", "JUL" => "07", "AUG" => "08", "SEP" => "09", "OCT" => "10", "NOV" => "11", "DEC" => "12"}
-      month_short_capitalize  = {"Jan" => "01", "Feb" => "02", "Mar" => "03", "Apr" => "04", "May" => "05", "Jun" => "06", "Jul" => "07", "Aug" => "08", "Sep" => "09", "Oct" => "10", "Nov" => "11", "Dec" => "12"}
-      month_short_downcase   = {"jan" => "01", "feb" => "02", "mar" => "03", "apr" => "04", "may" => "05", "jun" => "06", "jul" => "07", "aug" => "08", "sep" => "09", "oct" => "10", "nov" => "11", "dec" => "12"}
-      #全置換設定
-      rep_table_month = month_long_capitalize.update(month_long_downcase).update(month_short_upcase).update(month_short_capitalize).update(month_short_downcase) #hash
-      rep_table_month_array = [month_long_capitalize, month_long_downcase, month_short_upcase, month_short_capitalize, month_short_downcase] #array
+    # DDBJ 日付型へのフォーマットを試みる
+    df = DateFormat.new
+    attr_val = df.format_date2ddbj(attr_val)
 
-      #置換処理
-      rep_table_month_array.each do |replace_month_hash|
-        replace_month_hash.keys.each do |month_name|
-          if attr_val.match(/[^a-zA-Z0-9]*#{month_name}([^a-zA-Z0-9]+|$)/) #単語そのものであるか(#46 のようなスペルミスを防ぐ)
-            attr_val = attr_val.sub(/#{month_name}/, replace_month_hash)
-          end
-        end
+    # 補正後の値が妥当な日付、フォーマットであるかチェックする
+    is_ddbj_format = df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
+    parsable_date = df.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
+
+    if !is_ddbj_format || !parsable_date #無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
+      attr_val = attr_val_org
+    end
+
+    if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: attr_name},
+        {key: "Attribute value", value: attr_val_org}
+      ]
+      if attr_val_org != attr_val #replace_candidate
+        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
       end
-
-      #区切り文字の表記を揃える
-      @conf[:convert_date_format].each do |format|
-        regex = Regexp.new(format["regex"])
-        def_parse_format = format["parse_format"]
-        #March 02, 2014の形式の場合はパースする月の位置を変える "03 02, 2014" => "2014-02-03"という誤変換を防止
-        format_mmddyy = "^[a-zA-Z]+[\\W]+\\d{1,2}[\\W]+\\d{4}$"
-        range_format_mmddyy = "#{format_mmddyy[1..-2]}\s*/\s*#{format_mmddyy[1..-2]}" #範囲
-        if def_parse_format == "%d<delimit1>%m<delimit2>%Y" && (Regexp.new(format_mmddyy).match(attr_val_org) || Regexp.new(range_format_mmddyy).match(attr_val_org))
-          def_parse_format = "%m<delimit1>%d<delimit2>%Y"
-        end
-
-        ## single date format  e.g.) YYYY-MM-DD
-        if regex.match(attr_val)
-          begin
-            m = regex.match(attr_val)
-            #マッチ結果から区切り文字を得てパースする書式を確定する "%Y<delimit1>%m<delimit2>%d" => "%Y/%m/%d"
-            parse_format = ""
-            # 複数の区切り文字のうち片方の区切りが''(区切りなし)である場合に意図しない置換を避ける ex. 2007/2008 => 2008/07/20
-            # 数字だけ(区切り文字がない)だと年月日が分かりにくいので8文字未満だと除外
-            if !(m.names.size >= 2 && m.names.select{|match_name| m[match_name] == ""}.size == 1) \
-                 && !(attr_val =~ /^\d+$/ && attr_val.size < 8)
-              m.names.each do |match_name|
-                if  parse_format == ""
-                  parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
-                else
-                  parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
-                end
-              end
-              #記述書式で日付をパースしてDDBJformatに置換する
-              formated_date = DateTime.strptime(attr_val, parse_format)
-              attr_val = formated_date.strftime(format["output_format"])
-              break #置換したら抜ける
-            end
-          rescue ArgumentError
-            #invalid format
-          end
-        end
-        ## range date format  e.g.) YYYY-MM-DD / YYYY-MM-DD
-        range_format = format["regex"][1..-2] #行末行頭の^と$を除去
-        range_regex = Regexp.new("(?<start>#{range_format})\s*/\s*(?<end>#{range_format})") #"/"で連結
-        if attr_val =~ range_regex
-          range_start =  Regexp.last_match[:start]
-          range_end =  Regexp.last_match[:end]
-          range_date_list = [range_start, range_end]
-          begin
-            range_date_list = range_date_list.map do |range_date|  #範囲のstart/endのformatを補正
-              m = regex.match(range_date)
-              #マッチ結果から区切り文字を得てパースする書式を確定する "%Y<delimit1>%m<delimit2>%d" => "%Y/%m/%d"
-              parse_format = ""
-              # 複数の区切り文字のうち片方の区切りが''(区切りなし)である場合に意図しない置換を避ける ex. 2007/2008 => 2008/07/20
-              # 数字だけ(区切り文字がない)だと年月日が分かりにくいので8文字未満だと除外
-              if !(m.names.size >= 2 && m.names.select{|match_name| m[match_name] == ""}.size == 1) \
-                   && !(attr_val =~ /^\d+$/ && attr_val.size < 8)
-                m.names.each do |match_name|
-                  if parse_format == ""
-                    parse_format = def_parse_format.gsub("<#{match_name}>", m[match_name])
-                  else
-                    parse_format = parse_format.gsub("<#{match_name}>", m[match_name])
-                  end
-                end
-                #記述書式で日付をパースしてDDBJformatに置換する
-                formated_date = DateTime.strptime(range_date, parse_format)
-                range_date = formated_date.strftime(format["output_format"])
-                range_date
-              end
-            end
-            # 範囲の大小が逆であれば入れ替える
-            if DateTime.strptime(range_date_list[0], format["output_format"]) <= DateTime.strptime(range_date_list[1], format["output_format"])
-              attr_val = range_date_list[0] + "/" + range_date_list[1]
-            else
-              attr_val = range_date_list[1] + "/" + range_date_list[0]
-            end
-            break #置換したら抜ける
-          rescue ArgumentError
-            #invalid format
-          end
-        end
-      end
-
-      # (補正後の)値がDDBJフォーマットであるか
-      common = CommonUtils.new
-      is_ddbj_format = common.ddbj_date_format?(attr_val)
-      # 日付としてパースできるか14月や32日など不正でないか
-      parsable_date = true
-      @conf[:ddbj_date_format].each do |format|
-        regex_simple = Regexp.new(format["regex"]) #範囲ではない
-        regex_range = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #範囲での記述
-        parse_format = format["parse_format"]
-        begin
-          # 明らかにおかしな年代に置換しないように、1900年から5年後の範囲でチェック
-          limit_lower = Date.new(1900, 1, 1);
-          limit_upper = Date.new(DateTime.now.year + 5, 1, 1);
-
-          if attr_val =~ regex_simple
-            date = DateTime.strptime(attr_val, parse_format)
-            if !(date >= limit_lower && date < limit_upper)
-              parsable_date = false
-            end
-          elsif attr_val =~ regex_range
-            range_start =  Regexp.last_match[:start]
-            range_end =  Regexp.last_match[:end]
-            start_date = DateTime.strptime(range_start, parse_format)
-            end_date = DateTime.strptime(range_end, parse_format)
-            if !(start_date >= limit_lower && end_date < limit_upper)
-              parsable_date = false
-            end
-          end
-        rescue
-          parsable_date = false
-        end
-      end
-
-      if !is_ddbj_format || !parsable_date #無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
-        attr_val = attr_val_org
-      end
-
-      if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
-        annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_val_org}
-        ]
-        if attr_val_org != attr_val #replace_candidate
-          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-          annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-        else
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
-        end
-        @error_list.push(error_hash)
-        result = false
-      end
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end

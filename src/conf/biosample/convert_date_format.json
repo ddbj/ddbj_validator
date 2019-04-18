@@ -18,44 +18,20 @@
     "output_format": "%Y-%m-%d"
   },
   {
-    "_example": "2016/7/10T11Z => 2016-07-10T11Z",
-    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}T\\d{1,2}Z$",
-    "parse_format": "%Y<delimit1>%m<delimit2>%dT%HZ",
-    "output_format": "%Y-%m-%dT%HZ"
-  },
-  {
-    "_example": "2016/7/10T11 => 2016-07-10T11Z",
-    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}T\\d{1,2}$",
-    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H",
-    "output_format": "%Y-%m-%dT%HZ"
-  },
-  {
-    "_example": "2016/7/10T11:43Z => 2016-07-10T11:43Z",
-    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}T\\d{1,2}:\\d{1,2}Z$",
-    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H:%MZ",
-    "output_format": "%Y-%m-%dT%H:%MZ"
-  },
-  {
-    "_example": "2016/7/10T11:43 => 2016-07-10T11:43Z",
-    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}T\\d{1,2}:\\d{1,2}$",
-    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H:%M",
-    "output_format": "%Y-%m-%dT%H:%MZ"
-  },
-  {
-    "_example": "2016/7/10T11:43:30Z => 2016-07-10T11:43:30Z",
-    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}Z$",
-    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H:%M:%SZ",
-    "output_format": "%Y-%m-%dT%H:%M:%SZ"
-  },
-  {
-    "_example": "2016/7/10T11:43:30 => 2016-07-10T11:43:30Z",
-    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}T\\d{1,2}:\\d{1,2}:\\d{1,2}$",
-    "parse_format": "%Y<delimit1>%m<delimit2>%dT%H:%M:%S",
-    "output_format": "%Y-%m-%dT%H:%M:%SZ"
+    "_example": "2016/7/10T9Z => 2016-07-10T09Z",
+    "regex": "^\\d{4}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{1,2}([\\s]*T(2[0-3]|[01]?[0-9]))(:[0-5]?[0-9])?(:[0-5]?[0-9])?(z|Z|[zZ+-]+(?:2[0-3]|[01]?[0-9])(?::?(?:[0-5][0-9])?))?$",
+    "parse_format": "%Y<delimit1>%m<delimit2>%d",
+    "output_format": "%Y-%m-%d"
   },
   {
     "_example": "10/7/2016 => 2016-07-10",
     "regex": "^\\d{1,2}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{4}$",
+    "parse_format": "%d<delimit1>%m<delimit2>%Y",
+    "output_format": "%Y-%m-%d"
+  },
+  {
+    "_example": "10/7/2016T10Z => 2016-07-10T10Z",
+    "regex": "^\\d{1,2}(?<delimit1>[\\-\\/\\.\\,\\s]*)\\d{1,2}(?<delimit2>[\\-\\/\\.\\,\\s]*)\\d{4}([\\s]*T(2[0-3]|[01]?[0-9]))(:[0-5]?[0-9])?(:[0-5]?[0-9])?(z|Z|[zZ+-]+(?:2[0-3]|[01]?[0-9])(?::?(?:[0-5][0-9])?))?$",
     "parse_format": "%d<delimit1>%m<delimit2>%Y",
     "output_format": "%Y-%m-%d"
   }
