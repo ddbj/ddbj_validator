@@ -7,6 +7,7 @@ require 'date'
 require 'net/http'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/date_format.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/common/organism_validator.rb"
 require File.dirname(__FILE__) + "/common/sparql_base.rb"
@@ -26,6 +27,7 @@ class BioSampleValidator < ValidatorBase
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")))
     CommonUtils::set_config(@conf)
+    DateFormat::set_config(@conf)
 
     @error_list = error_list = []
 
@@ -1347,7 +1349,7 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(collection_date)
     result = nil
     @conf[:ddbj_date_format].each do |format|
-      parse_format = format["parse_format"]
+      parse_format = format["parse_date_format"]
 
       ## single date format
       regex = Regexp.new(format["regex"])
@@ -1460,19 +1462,19 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
 
     attr_val_org = attr_val
     result = true
-    common = CommonUtils.new
-    attr_val = common.format_month_name(attr_val) #月の表記を揃える
-    attr_val = common.format_delimiter_single_date(attr_val, attr_val_org) #区切り文字の表記を揃える
-    attr_val = common.format_delimiter_range_date(attr_val, attr_val_org) #区切り文字の表記を揃える(範囲表記)
 
-    # 補正後の値が
-    is_ddbj_format = common.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
-    parsable_date = common.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
+    # DDBJ 日付型へのフォーマットを試みる
+    df = DateFormat.new
+    attr_val = df.format_date2ddbj(attr_val)
+
+    # 補正後の値が妥当な日付、フォーマットであるかチェックする
+    is_ddbj_format = df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
+    parsable_date = df.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
 
     if !is_ddbj_format || !parsable_date #無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
       attr_val = attr_val_org

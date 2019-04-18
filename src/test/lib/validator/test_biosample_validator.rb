@@ -1008,11 +1008,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_nil get_auto_annotation(ret[:error_list])
-    ### Zの追加
+    ### timezoneがない場合にtimeを削除
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2015-04-16T12:00:00", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "2015-04-16T12:00:00Z", get_auto_annotation(ret[:error_list])
+    assert_equal "2015-04-16", get_auto_annotation(ret[:error_list])
     #月名のスペルミス
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
     assert_equal false, ret[:result]

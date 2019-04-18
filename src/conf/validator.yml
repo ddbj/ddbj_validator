@@ -6,14 +6,14 @@ ddbj_rdb:
   pg_timeout: 30
 
 sparql_endpoint:
-  master_endpoint: http://localhost:8890/sparql
-  slave_endpoint: http://localhost:8890/sparql
+  master_endpoint: http://localhost:8893/sparql
+  slave_endpoint: http://localhost:8893/sparql
 
 google_api_key:
-  key: your_api_key
+  key: AIzaSyD6EsZPdN2p5rZt5hkTeVIkM-1TKv_ng_U
 
 eutils_api_key:
-  key: your_api_key
+  key: a7be95ab1aeab55fc8e4fb8d26b38600aa09
 
 api_log:
   path: /Users/yoko/DDBJ/logs
