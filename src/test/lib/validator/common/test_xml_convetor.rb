@@ -38,27 +38,27 @@ class TestXmlConvertor < Minitest::Test
     # TODO
   end
 
-  def test_get_submitter_id
+  def test_get_biosample_submitter_id
     # no submit info
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
-    submitter_id = @convertor.get_submitter_id(xml_doc)
+    submitter_id = @convertor.get_biosample_submitter_id(xml_doc)
     assert_nil submitter_id
 
     # with submit info
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019_with_sub.xml")
-    submitter_id = @convertor.get_submitter_id(xml_doc)
+    submitter_id = @convertor.get_biosample_submitter_id(xml_doc)
     assert_equal "12345", submitter_id
   end
 
-  def test_get_submission_id
+  def test_get_biosample_submission_id
     # no submit info
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
-    submission_id = @convertor.get_submission_id(xml_doc)
+    submission_id = @convertor.get_biosample_submission_id(xml_doc)
     assert_nil submission_id
 
     # with submit info
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019_with_sub.xml")
-    submission_id = @convertor.get_submission_id(xml_doc)
+    submission_id = @convertor.get_biosample_submission_id(xml_doc)
     assert_equal "SSUBXXXXX", submission_id
   end
 

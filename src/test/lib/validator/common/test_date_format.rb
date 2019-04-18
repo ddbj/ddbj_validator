@@ -64,7 +64,7 @@ class TestDateFormat < Minitest::Test
     ret = @df.format_date2ddbj("2016-07-01T11:43Z+0900") # trim Z
     assert_equal "2016-07-01T11:43+0900", ret
     ret = @df.format_date2ddbj("2016/07/01 T11:43+09:00") # space before T
-    assert_equal "2016/07/01 T11:43+09:00", ret
+    assert_equal "2016-07-01T11:43+09:00", ret
     ## range
     ret = @df.format_date2ddbj("2016-July / 2016-Oct") # month name
     assert_equal "2016-07/2016-10", ret
