@@ -84,7 +84,7 @@
     "internal_ignore": false,
     "name": "Invalid date format",
     "method": "invalid_date_format",
-    "message": "Invalid date format.",
+    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\", \"YYYY-mm-ddThh:mm:ss+hh:mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (eg., 1990-10-30, 1990-10, 1990-10-30T14:41:36+09:00 or 1990-10-30T14:41:36Z).",
     "object": [
       "BioSample"
     ],
@@ -357,7 +357,6 @@
     "internal_ignore": false,
     "name": "Non-ASCII Attribute value",
     "method": "non_ascii_attribute_value",
-    "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
     "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values around [### Non-ASCII character ###] and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
     "object": [
       "BioSample"
