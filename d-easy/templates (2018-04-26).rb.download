@@ -1,0 +1,3849 @@
+define_rule "rule-1" do
+  feature "CDS"
+end
+
+define_rule "rule-2" do
+  feature "CDS"
+  feature "CDS"
+  feature "CDS"
+end
+
+define_rule "rule-3" do
+  feature "misc_feature"
+end
+
+define_rule "rule-4" do
+  feature "CDS"
+  feature "CDS"
+end
+
+define_rule "rule-5" do
+  feature "5'UTR"
+  feature "CDS"
+  feature "CDS"
+  feature "3'UTR"
+end
+
+define_rule "rule-6" do
+  feature "misc_RNA"
+end
+
+define_rule "rule-7" do
+  feature "rRNA"
+  feature "misc_RNA"
+  feature "rRNA"
+  feature "misc_RNA"
+  feature "rRNA"
+end
+
+define_rule "rule-8" do
+  feature "repeat_region"
+end
+
+define_rule "rule-9" do
+  feature "primer_bind"
+  feature "repeat_region"
+  feature "primer_bind"
+end
+
+define_rule "rule-10" do
+  feature "D-loop"
+end
+
+#define_rule "rule-11" do
+#  feature "tRNA"
+#  feature "tRNA"
+#  feature "misc_feature"
+#end
+
+#define_rule "rule-12" do
+#  feature "tRNA"
+#  feature "tRNA"
+#  feature "D-loop"
+#end
+
+define_rule "rule-13" do
+  feature "rRNA"
+end
+
+define_rule "rule-14" do
+  feature "tRNA"
+end
+
+define_rule "rule-15" do
+  feature "ncRNA"
+end
+
+define_rule "rule-16" do
+  feature "precursor_RNA"
+  feature "ncRNA"
+end
+
+define_rule "rule-17" do
+  feature "CDS"
+  feature "variation"
+end
+
+define_rule "rule-18" do
+  feature "5'UTR"
+  feature "CDS"
+  feature "3'UTR"
+end
+
+#define_rule "rule-19" do
+#  feature "intron"
+#end
+#
+#define_rule "rule-20" do
+#  feature "promoter"
+#end
+#
+#define_rule "rule-21" do
+#  feature "5'UTR"
+#end
+#
+#define_rule "rule-22" do
+#  feature "3'UTR"
+#end
+
+define_rule 'all_features' do
+  feature 'CDS'
+  feature 'C_region'
+  feature 'D-loop'
+  feature 'D_segment'
+  feature 'J_segment'
+  feature 'N_region'
+  feature 'STS'
+  feature 'S_region'
+  feature 'V_region'
+  feature 'V_segment'
+  feature 'centromere'
+  feature 'exon'
+  feature 'gap'
+  feature 'iDNA'
+  feature 'intron'
+  feature 'mRNA'
+  feature 'mat_peptide'
+  feature 'misc_RNA'
+  feature 'misc_binding'
+  feature 'misc_difference'
+  feature 'misc_feature'
+  feature 'misc_recomb'
+  feature 'misc_structure'
+  feature 'mobile_element'
+  feature 'modified_base'
+  feature 'ncRNA'
+  feature 'operon'
+  feature 'oriT'
+  feature 'polyA_site'
+  feature 'precursor_RNA'
+  feature 'prim_transcript'
+  feature 'primer_bind'
+  feature 'propeptide'
+  feature 'protein_bind'
+  feature 'rRNA'
+  feature 'regulatory'
+  feature 'rep_origin'
+  feature 'repeat_region'
+  feature 'sig_peptide'
+  feature 'source'
+  feature 'stem_loop'
+  feature 'tRNA'
+  feature 'telomere'
+  feature 'tmRNA'
+  feature 'transit_peptide'
+  feature 'unsure'
+  feature 'variation'
+  feature "3'UTR"
+  feature "5'UTR"
+end
+
+define_extended_division "BCT" do
+  name "Bacteria (including both eubacteria & archaea)"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collected_by do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :isolation_source do
+      type :recommended
+    end
+
+    qualifier :lat_lon do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :chromosome do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolate do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :mating_type do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :plasmid do
+      type :optional
+    end
+
+    qualifier :serotype do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :variety do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "ENV" do
+  name "Environmental Sample"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :environmental_sample do
+      type :mandatory
+    end
+
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :clone do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :isolation_source do
+      type :recommended
+    end
+
+    qualifier :lat_lon do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :chromosome do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :isolate do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :plasmid do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "HUM" do
+  name "Human"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :chromosome do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :map do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "HUM organelle" do
+  name "Human organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "INV" do
+  name "Invertebrate"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collected_by do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :isolation_source do
+      type :recommended
+    end
+
+    qualifier :lat_lon do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :cell_line do
+      type :optional
+    end
+
+    qualifier :cell_type do
+      type :optional
+    end
+
+    qualifier :chromosome do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :dev_stage do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :macronuclear do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :mating_type do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :serotype do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :tissue_type do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :variety do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "INV organelle" do
+  name "Invertebrate organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collected_by do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :isolation_source do
+      type :recommended
+    end
+
+    qualifier :lat_lon do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :cell_line do
+      type :optional
+    end
+
+    qualifier :cell_type do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :dev_stage do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :macronuclear do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :mating_type do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :serotype do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :tissue_type do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :variety do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "MAM" do
+  name "Mammal (other than primates & rodents)"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :chromosome do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :map do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "MAM organelle" do
+  name "Mammalian (other than primates & rodents) organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "PHG" do
+  name "Phage"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :host do
+      type :recommended
+    end
+
+    qualifier :segment do
+      type :recommended
+    end
+
+    qualifier :serotype do
+      type :recommended
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolate do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :PCR_primers do
+      type :optional
+    end
+
+    qualifier :proviral do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "PLN" do
+  name "Plant/Fungi (eukaryotes other than animals)"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collected_by do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :cultivar do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :isolation_source do
+      type :recommended
+    end
+
+    qualifier :lat_lon do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :cell_line do
+      type :optional
+    end
+
+    qualifier :cell_type do
+      type :optional
+    end
+
+    qualifier :chromosome do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :dev_stage do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :mating_type do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :plasmid do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :serotype do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :tissue_type do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :variety do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "PLN organelle" do
+  name "Plant/Fungi (eukaryotes other than animals) organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collected_by do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :cultivar do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :isolation_source do
+      type :recommended
+    end
+
+    qualifier :lat_lon do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :cell_line do
+      type :optional
+    end
+
+    qualifier :cell_type do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :dev_stage do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :mating_type do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :serotype do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :tissue_type do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :variety do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_chloroplast_matk"
+  annotation_type "cds_chloroplast_rbcl"
+  annotation_type "cds_chloroplast_whole"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "PRI" do
+  name "Primate (other than human)"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :chromosome do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :map do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "PRI organelle" do
+  name "Primate (other than human) organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "ROD" do
+  name "Rodent"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :chromosome do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :map do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "ROD organelle" do
+  name "Rodent organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "SYN" do
+  name "Synthetic sequence"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :clone do
+      type :recommended
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :PCR_primers do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "VRL" do
+  name "Virus"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :host do
+      type :recommended
+    end
+
+    qualifier :segment do
+      type :recommended
+    end
+
+    qualifier :serotype do
+      type :recommended
+    end
+
+    qualifier :strain do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolate do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :PCR_primers do
+      type :optional
+    end
+
+    qualifier :proviral do
+      type :optional
+    end
+
+    qualifier :serovar do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "influenza_a_cds"
+  annotation_type "influenza_a_genome"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "virus_polyprotein_complete"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "VRT" do
+  name "Vertebrate (other than mammals)"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :chromosome do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :map do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :germline do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :haplotype do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :organelle do
+      type :optional
+    end
+
+    qualifier :rearranged do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "igs"
+  annotation_type "its_norna"
+  annotation_type "its_rrna_boundary_known"
+  annotation_type "its_rrna_boundary_unknown"
+  annotation_type "microsatellite_minimal"
+  annotation_type "microsatellite_primerbind"
+  annotation_type "rna_rrna_18s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "rna_zero_mirna_matured"
+  annotation_type "rna_zero_mirna_precursor"
+  annotation_type "snp_single_cds"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_extended_division "VRT organelle" do
+  name "Vertebrate (other than mammals) organelle"
+
+  define_feature "source" do
+    url 'https://www.ddbj.nig.ac.jp/ddbj/features-e.html#source'
+    qualifier :mol_type do
+      type :mandatory
+    end
+
+    qualifier :organelle do
+      type :mandatory
+    end
+
+    qualifier :organism do
+      type :mandatory
+    end
+
+    qualifier :cell_line do
+      type :recommended
+    end
+
+    qualifier :cell_type do
+      type :recommended
+    end
+
+    qualifier :collection_date do
+      type :recommended
+    end
+
+    qualifier :country do
+      type :recommended
+    end
+
+    qualifier :dev_stage do
+      type :recommended
+    end
+
+    qualifier :haplotype do
+      type :recommended
+    end
+
+    qualifier :isolate do
+      type :recommended
+    end
+
+    qualifier :PCR_primers do
+      type :recommended
+    end
+
+    qualifier :tissue_type do
+      type :recommended
+    end
+
+    qualifier :altitude do
+      type :optional
+    end
+
+    qualifier :bio_material do
+      type :optional
+    end
+
+    qualifier :clone do
+      type :optional
+    end
+
+    qualifier :clone_lib do
+      type :optional
+    end
+
+    qualifier :collected_by do
+      type :optional
+    end
+
+    qualifier :culture_collection do
+      type :optional
+    end
+
+    qualifier :ecotype do
+      type :optional
+    end
+
+    qualifier :focus do
+      type :optional
+    end
+
+    qualifier :haplogroup do
+      type :optional
+    end
+
+    qualifier :host do
+      type :optional
+    end
+
+    qualifier :identified_by do
+      type :optional
+    end
+
+    qualifier :isolation_source do
+      type :optional
+    end
+
+    qualifier :lab_host do
+      type :optional
+    end
+
+    qualifier :lat_lon do
+      type :optional
+    end
+
+    qualifier :map do
+      type :optional
+    end
+
+    qualifier :note do
+      type :optional
+    end
+
+    qualifier :sex do
+      type :optional
+    end
+
+    qualifier :specimen_voucher do
+      type :optional
+    end
+
+    qualifier :strain do
+      type :optional
+    end
+
+    qualifier :sub_clone do
+      type :optional
+    end
+
+    qualifier :sub_species do
+      type :optional
+    end
+
+    qualifier :sub_strain do
+      type :optional
+    end
+
+    qualifier :transgenic do
+      type :optional
+    end
+
+    qualifier :circular do
+      type :optional
+    end
+
+  end
+
+  annotation_type "cds_1"
+  annotation_type "cds_2to3"
+  annotation_type "cds_mitochondrial_cox1"
+  annotation_type "cds_mitochondrial_whole"
+  annotation_type "igs"
+  annotation_type "organelle_mitochondrial_controlregion"
+  annotation_type "organelle_mitochondrial_dloop"
+  annotation_type "rna_rrna_12s"
+  annotation_type "rna_rrna_16s"
+  annotation_type "rna_rrna_other"
+  annotation_type "rna_trna_other"
+  annotation_type "rna_zero_coding"
+  annotation_type "z_miscfeature"
+  annotation_type "other"
+end
+
+define_annotation_type "cds_1" do
+  name "protein-coding sequence (CDS), single CDS"
+  location "1..E"
+  gencode true
+  rule "rule-1"
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "cds_2to3" do
+  name "protein-coding sequence (CDS), multi-CDS (until 3 CDSs)"
+  gencode true
+  rule "rule-2"
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "cds_chloroplast_matk" do
+  name "chloroplast single CDS, matK"
+  location "1..E"
+  gencode true
+  rule "rule-1"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "plastid:chloroplast"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "gene" do
+      default "matK"
+    end
+    qualifier "product" do
+      default "maturase K"
+    end
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "cds_chloroplast_rbcl" do
+  name "chloroplast single CDS, rbcL"
+  location "1..E"
+  gencode true
+  rule "rule-1"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "plastid:chloroplast"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "gene" do
+      default "rbcL"
+    end
+    qualifier "product" do
+      default "ribulose-1,5-bisphosphate carboxylase/oxygenase large subunit"
+    end
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "cds_chloroplast_whole" do
+  name "chloroplast single CDS"
+  location "1..E"
+  gencode true
+  rule "rule-1"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "plastid:chloroplast"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "cds_mitochondrial_cox1" do
+  name "mitochondrial single CDS, COX1"
+  location "1..E"
+  gencode true
+  rule "rule-1"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "mitochondrion"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "gene" do
+      default "COX1"
+    end
+    qualifier "product" do
+      default "cytochrome c oxidase subunit 1"
+    end
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "cds_mitochondrial_whole" do
+  name "mitochondrial single CDS, other"
+  location "1..E"
+  gencode true
+  rule "rule-1"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "mitochondrion"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "igs" do
+  name "intergenic spacer (IGS)"
+  location "<1..>E"
+  rule "rule-3"
+
+  feature "misc_feature" do
+    qualifier "note" do
+      default "Example   psbA-trnH intergenic spacer"
+    end
+  end
+end
+
+define_annotation_type "influenza_a_cds" do
+  name "Influenza A virus, UTR not contained, 1 or 2 CDS"
+  gencode true
+  rule "rule-4"
+
+  feature "source" do
+    qualifier "mol_type" do
+      default "viral cRNA"
+    end
+    qualifier "segment" do
+      default "Example   8"
+    end
+    qualifier "serotype" do
+      default "Example   H1N1"
+    end
+    qualifier "strain" do
+      default "Example   A/Alberta/071/2012"
+    end
+    qualifier "host" do
+      default "Example   Homo sapiens"
+    end
+    qualifier "country" do
+      default "Example   Canada: Alberta"
+    end
+    qualifier "collection_date" do
+      default "Example   2012-11-10"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "influenza_a_genome" do
+  name "Influenza A virus segment, complete or nearly complete genome"
+  gencode true
+  rule "rule-5"
+
+  feature "source" do
+    qualifier "mol_type" do
+      default "viral cRNA"
+    end
+    qualifier "segment" do
+      default "Example   8"
+    end
+    qualifier "serotype" do
+      default "Example   H1N1"
+    end
+    qualifier "strain" do
+      default "Example   A/Alberta/071/2012"
+    end
+    qualifier "host" do
+      default "Example   Homo sapiens"
+    end
+    qualifier "country" do
+      default "Example   Canada: Alberta"
+    end
+    qualifier "collection_date" do
+      default "Example   2012-11-10"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
+
+define_annotation_type "its_norna" do
+  name "internal transcribed spacer (ITS)"
+  location "<1..>E"
+  rule "rule-6"
+
+  feature "misc_RNA" do
+    qualifier "note" do
+      default "Example   internal transcribed spacer 1"
+    end
+  end
+end
+
+define_annotation_type "its_rrna_boundary_known" do
+  name "18S rRNA-ITS1-5.8S rRNA-ITS2-28S rRNA, boundary is known"
+  rule "rule-7"
+
+  feature "rRNA" do
+    qualifier "product" do
+      default "18S ribosomal RNA"
+    end
+  end
+
+  feature "misc_RNA" do
+    qualifier "note" do
+      default "internal transcribed spacer 1"
+    end
+  end
+
+  feature "rRNA" do
+    qualifier "product" do
+      default "5.8S ribosomal RNA"
+    end
+  end
+
+  feature "misc_RNA" do
+    qualifier "note" do
+      default "internal transcribed spacer 2"
+    end
+  end
+
+  feature "rRNA" do
+    qualifier "product" do
+      default "28S ribosomal RNA"
+    end
+  end
+end
+
+define_annotation_type "its_rrna_boundary_unknown" do
+  name "18S rRNA-ITS1-5.8S rRNA-ITS2-28S rRNA, boundary is unknown"
+  location "<1..>E"
+  rule "rule-6"
+
+  feature "misc_RNA" do
+    qualifier "note" do
+      default "contains 18S ribosomal RNA, internal transcribed spacer 1, 5.8S ribosomal RNA, internal transcribed spacer 2, and 28S ribosomal RNA"
+    end
+  end
+end
+
+define_annotation_type "microsatellite_minimal" do
+  name "microsatellite, minimal annotation"
+  location "##..##"
+  rule "rule-8"
+
+  feature "repeat_region" do
+    qualifier "rpt_type" do
+      default "tandem"
+    end
+    qualifier "rpt_unit_seq" do
+      default "Example   ca"
+    end
+    qualifier "satellite" do
+      default "microsatellite: ###   (replace ### with microsatellite name)"
+    end
+  end
+end
+
+define_annotation_type "microsatellite_primerbind" do
+  name "microsatellite, with primer_bind"
+  rule "rule-9"
+
+  feature "primer_bind" do
+    qualifier "PCR_conditions" do
+      default "Example   denaturation 94degC 2 min; 30 cycles 94degC 30 sec, 56degC 1 min, 72degC 1 min; final extention 72degC 1 min"
+    end
+  end
+
+  feature "repeat_region" do
+    qualifier "rpt_type" do
+      default "tandem"
+    end
+    qualifier "rpt_unit_seq" do
+      default "Example   ca"
+    end
+    qualifier "satellite" do
+      default "microsatellite: ###   (replace ### with microsatellite name)"
+    end
+  end
+
+  feature "primer_bind" do
+  end
+end
+
+define_annotation_type "organelle_mitochondrial_controlregion" do
+  name "mitochondrial control region"
+  location "<1..>E"
+  rule "rule-3"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "mitochondrion"
+    end
+  end
+
+  feature "misc_feature" do
+    qualifier "note" do
+      default "control region"
+    end
+  end
+end
+
+define_annotation_type "organelle_mitochondrial_dloop" do
+  name "mitochondrial D-loop"
+  location "<1..>E"
+  rule "rule-10"
+
+  feature "source" do
+    qualifier "organelle" do
+      default "mitochondrion"
+    end
+  end
+
+  feature "D-loop" do
+  end
+end
+
+#define_annotation_type "organelle_mitochondrial_trnt_trnp_controlregion" do
+#  name "mitochondrial tRNA-Thr, tRNA-Pro, control region"
+#  rule "rule-11"
+#
+#  feature "source" do
+#    qualifier "organelle" do
+#      default "mitochondrion"
+#    end
+#  end
+#
+#  feature "tRNA" do
+#    qualifier "product" do
+#      default "tRNA-Thr"
+#    end
+#  end
+#
+#  feature "tRNA" do
+#    qualifier "product" do
+#      default "tRNA-Pro"
+#    end
+#  end
+#
+#  feature "misc_feature" do
+#    qualifier "note" do
+#      default "control region"
+#    end
+#  end
+#end
+
+#define_annotation_type "organelle_mitochondrial_trnt_trnp_dloop" do
+#  name "mitochondrial tRNA-Thr, tRNA-Pro, D-loop"
+#  rule "rule-12"
+#
+#  feature "source" do
+#    qualifier "organelle" do
+#      default "mitochondrion"
+#    end
+#  end
+#
+#  feature "tRNA" do
+#    qualifier "product" do
+#      default "tRNA-Thr"
+#    end
+#  end
+#
+#  feature "tRNA" do
+#    qualifier "product" do
+#      default "tRNA-Pro"
+#    end
+#  end
+#
+#  feature "D-loop" do
+#  end
+#end
+
+define_annotation_type "rna_rrna_12s" do
+  name "ribosomal RNA for 12S rRNA"
+  location "<1..>E"
+  rule "rule-13"
+
+  feature "rRNA" do
+    qualifier "product" do
+      default "12S ribosomal RNA"
+    end
+  end
+end
+
+define_annotation_type "rna_rrna_16s" do
+  name "ribosomal RNA for 16S rRNA"
+  location "<1..>E"
+  rule "rule-13"
+
+  feature "rRNA" do
+    qualifier "product" do
+      default "16S ribosomal RNA"
+    end
+  end
+end
+
+define_annotation_type "rna_rrna_18s" do
+  name "ribosomal RNA for 18S rRNA"
+  location "<1..>E"
+  rule "rule-13"
+
+  feature "rRNA" do
+    qualifier "product" do
+      default "18S ribosomal RNA"
+    end
+  end
+end
+
+define_annotation_type "rna_rrna_other" do
+  name "ribosomal RNA, other"
+  location "<1..>E"
+  rule "rule-13"
+
+  feature "rRNA" do
+    qualifier "product" do
+      default ""
+    end
+  end
+end
+
+define_annotation_type "rna_trna_other" do
+  name "transfer RNA (tRNA)"
+  location "1..E"
+  rule "rule-14"
+
+  feature "tRNA" do
+    qualifier "product" do
+      default "Example   tRNA-Leu"
+    end
+  end
+end
+
+define_annotation_type "rna_zero_coding" do
+  name "non-coding RNA (ncRNA)"
+  location "1..E"
+  rule "rule-15"
+
+  feature "ncRNA" do
+  end
+end
+
+define_annotation_type "rna_zero_mirna_matured" do
+  name "miRNA matured"
+  location "1..E"
+  rule "rule-15"
+
+  feature "ncRNA" do
+    qualifier "ncRNA_class" do
+      default "miRNA"
+    end
+  end
+end
+
+define_annotation_type "rna_zero_mirna_precursor" do
+  name "miRNA precursor"
+  rule "rule-16"
+
+  feature "precursor_RNA" do
+  end
+
+  feature "ncRNA" do
+    qualifier "ncRNA_class" do
+      default "miRNA"
+    end
+  end
+end
+
+define_annotation_type "snp_single_cds" do
+  name "single nucleotide polymorphism within single CDS"
+  gencode true
+  rule "rule-17"
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+
+  feature "variation" do
+    qualifier "compare" do
+      default "Example   AB000000.1"
+    end
+    qualifier "replace" do
+      default "Example   t"
+    end
+    qualifier "note" do
+      default "Example   polymorphism; This substitution causes an amino acid substitution from Ala to Thr."
+    end
+  end
+end
+
+define_annotation_type "virus_polyprotein_complete" do
+  name "virus complete or nearly complete genome with a polyprotein"
+  gencode true
+  rule "rule-18"
+
+  feature "CDS" do
+    qualifier "product" do
+      default "polyprotein"
+    end
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+
+end
+
+#define_annotation_type "whole_intron" do
+#  name "intron"
+#  location "1..E"
+#  rule "rule-19"
+#
+#  feature "intron" do
+#  end
+#end
+
+#define_annotation_type "whole_promoter" do
+#  name "promoter"
+#  location "1..E"
+#  rule "rule-20"
+#
+#  feature "promoter" do
+#  end
+#end
+
+#define_annotation_type "whole_utr1" do
+#  name "5'UTR"
+#  location "1..E"
+#  rule "rule-21"
+#
+#  feature "5'UTR" do
+#  end
+#end
+
+#define_annotation_type "whole_utr2" do
+#  name "3'UTR"
+#  location "1..E"
+#  rule "rule-22"
+#
+#  feature "3'UTR" do
+#  end
+#end
+
+define_annotation_type "z_miscfeature" do
+  name "cannot be described any other feature keys (use of misc_feature)"
+  location "1..E"
+  rule "rule-3"
+
+  feature "misc_feature" do
+    qualifier "note" do
+      default "#   enter description here"
+    end
+  end
+end
+
+define_annotation_type 'other' do
+  name 'other'
+  rule 'all_features'
+  gencode true
+
+  feature "CDS" do
+    qualifier "codon_start" do
+      default "1"
+    end
+  end
+end
