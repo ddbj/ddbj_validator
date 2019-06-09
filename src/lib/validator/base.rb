@@ -40,9 +40,9 @@ class ValidatorBase
   # ==== Return
   # true/false
   #
-  def not_well_format_xml (rule_code, xml_file)
+  def not_well_format_xml (rule_code, file_data)
     result = true
-    document = Nokogiri::XML(File.read(xml_file))
+    document = Nokogiri::XML(file_data)
     if !document.errors.empty?
       result = false
       xml_error_msg = document.errors.map {|err|

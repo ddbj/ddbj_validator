@@ -4,7 +4,7 @@ require '../../../lib/validator/combination_validator.rb'
 
 class TestCombinationValidator < Minitest::Test
   def setup
-    @validator = CombinationValidator.new
+    @validator = CombinationValidator.new({})
     @test_file_dir = File.expand_path('../../../data/combination', __FILE__)
   end
 

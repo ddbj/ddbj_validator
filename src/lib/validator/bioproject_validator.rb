@@ -20,8 +20,15 @@ class BioProjectValidator < ValidatorBase
   #
   # Initializer
   #
-  def initialize
+  def initialize(params)
     super
+
+    # 外部(D-Way以外)の実行である場合にフラグを立てる TODO DDBJ DBを使用しているルールのスキップ
+    @external_exec = false
+    unless params[:executer].nil?
+      @external_exec = true
+    end
+
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/bioproject")))
     CommonUtils::set_config(@conf)
 

@@ -1,0 +1,73 @@
+[
+  {
+    "identifier": "SAMD00000328",
+    "name": "MTB313",
+    "title": "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes",
+    "description": "",
+    "organism": {
+      "name": "Streptococcus pyogenes",
+      "identifier": "1314"
+    },
+    "db_xrefs": [
+      {
+        "name": "BioProject",
+        "identifier": "PRJDB0000"
+      }
+    ],
+    "package": "MIGS.ba.microbial",
+    "attributes": [
+      {
+        "name": "strain",
+        "value": "MTB313"
+      },
+      {
+        "name": "env_biome",
+        "value": "urban biome"
+      },
+      {
+        "name": "collection_date",
+        "value": "2011"
+      },
+      {
+        "name": "env_feature",
+        "value": "town"
+      },
+      {
+        "name": "geo_loc_name",
+        "value": "Japan: Hikone-shi"
+      },
+      {
+        "name": "lat_lon",
+        "value": "136.225389 35.26224"
+      },
+      {
+        "name": "env_material",
+        "value": "interstitial fluid"
+      },
+      {
+        "name": "project_name",
+        "value": "Streptococcus pyogenes MTB313 genome sequencing"
+      },
+      {
+        "name": "isol_growth_condt",
+        "value": "24464696"
+      },
+      {
+        "name": "num_replicons",
+        "value": "1"
+      },
+      {
+        "name": "ref_biomaterial",
+        "value": "16088826"
+      },
+      {
+        "name": "elev",
+        "value": "88.8m"
+      },
+      {
+        "name": "depth",
+        "value": "0m"
+      }
+    ]
+  }
+]

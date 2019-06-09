@@ -123,13 +123,13 @@ class Validator
     def validate(object_type, params)
       case object_type
       when "biosample"
-        validator = BioSampleValidator.new
+        validator = BioSampleValidator.new(params)
         data = params[:biosample]
       when "bioproject"
-        validator = BioProjectValidator.new
+        validator = BioProjectValidator.new(params)
         data = params[:bioproject]
       when "combination"
-        validator = CombinationValidator.new
+        validator = CombinationValidator.new(params)
         data = params
       end
       validator.validate(data);

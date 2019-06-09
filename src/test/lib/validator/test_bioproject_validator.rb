@@ -5,7 +5,7 @@ require '../../../lib/validator/common/common_utils.rb'
 
 class TestBioProjectValidator < Minitest::Test
   def setup
-    @validator = BioProjectValidator.new
+    @validator = BioProjectValidator.new({})
     @test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
   end
 

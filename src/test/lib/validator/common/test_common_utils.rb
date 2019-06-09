@@ -182,4 +182,24 @@ class TestCommonUtils < Minitest::Test
     ret = @common.ddbj_date_format?(nil)
     assert_nil ret
   end
+
+  def test_get_file_format
+    json = <<'EOS'
+[
+  {
+    "identifier": "SAMD00000328"
+  }
+]
+EOS
+    assert_equal "json", CommonUtils.get_file_format(json)
+
+    xml = <<'EOS'
+<BioSampleSet>
+  <BioSample>
+  </BioSample>
+</BioSampleSet>
+EOS
+    assert_equal "xml", CommonUtils.get_file_format(xml)
+
+  end
 end

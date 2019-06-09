@@ -153,7 +153,7 @@ class OrganismValidator < SPARQLBase
     #該当するtax_idがない
     if tax_list.size == 0
       ret[:status] = "no exist"
-      ret [:tax_id] = TAX_ROOT
+      ret[:tax_id] = TAX_ROOT
       return ret
     end
     #synonymやcommon nameが同一の場合は同じtaxで複数候補がヒットするためグループ化
