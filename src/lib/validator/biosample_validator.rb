@@ -39,8 +39,9 @@ class BioSampleValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] #need?
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
-    unless @external_exec #外部実行者の場合DBへのアクセスはチェックしない
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    unless @external_exec
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])  #外部実行者の場合DBへのアクセスはチェックしない
+      @org_validator.set_public_mode(false) # private_taxonomyにはアクセスするprivateモードにする
     end
     @cache = ValidatorCache.new
   end

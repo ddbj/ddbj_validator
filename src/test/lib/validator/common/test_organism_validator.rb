@@ -9,6 +9,7 @@ class TestOrganismValidator < Minitest::Test
     setting = YAML.load(File.read(conf_dir + "/validator.yml"))
     conf = setting["sparql_endpoint"]
     @validator = OrganismValidator.new(conf["master_endpoint"])
+    @validator.set_public_mode(false)
   end
 
   def test_get_organism_name

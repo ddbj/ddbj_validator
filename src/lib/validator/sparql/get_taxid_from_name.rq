@@ -3,7 +3,7 @@ PREFIX id-tax: <http://identifiers.org/taxonomy/>
 PREFIX tax: <http://ddbj.nig.ac.jp/ontologies/taxonomy/>
 
 SELECT DISTINCT ?tax_no
-FROM <http://ddbj.nig.ac.jp/ontologies/taxonomy-private>
+FROM <<%= tax_graph_uri %>>
 WHERE
 {
   ?tax_id tax:scientificName "<%= organism_name %>" ;
