@@ -20,11 +20,10 @@ class TestJsonConvertor < Minitest::Test
     assert_equal "MTB313", attr["sample_name"]
     assert_equal "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", attr["sample_title"]
     assert_equal "Streptococcus pyogenes", attr["organism"]
-    assert_equal "1314", attr["taxonomy_id"]
     assert_equal "urban biome", attr["env_biome"]
     assert_equal "", attr["description"]
     assert_equal "PRJDB1654", attr["bioproject_id"]
-    assert_equal 19, biosample_list[0]["attribute_list"].size
+    assert_equal 18, biosample_list[0]["attribute_list"].size
 
     # multiple samples
     text = File.read("#{@test_file_dir}/text2obj_SSUB002415.json")
@@ -67,31 +66,32 @@ class TestJsonConvertor < Minitest::Test
 =end
   def test_location_from_attrname
     target_path = @convertor.location_from_attrname("sample_name" , 2)
-    assert_equal 2, target_path.size
+    assert_equal 1, target_path.size
     location = JSON.parse(target_path[0])
-    assert_equal ["name"], location["target"] #XMLの場合はattrの方もtargetとしている。DDBJがJSON対応する場合は検討する
-    location = JSON.parse(target_path[1])
     assert_equal ["attributes", {"name"=> "sample_name"}, "value"], location["target"]
 
     target_path = @convertor.location_from_attrname("sample_title" , 2)
     location = JSON.parse(target_path[0])
-    assert_equal ["title"], location["target"]
+    assert_equal ["attributes", {"name"=> "sample_title"}, "value"], location["target"]
 
     target_path = @convertor.location_from_attrname("description" , 2)
     location = JSON.parse(target_path[0])
-    assert_equal ["description"], location["target"]
+    assert_equal ["attributes", {"name"=> "description"}, "value"], location["target"]
 
     target_path = @convertor.location_from_attrname("organism" , 2)
     location = JSON.parse(target_path[0])
-    assert_equal ["organism", "name"], location["target"]
+    assert_equal ["attributes", {"name"=> "organism"}, "value"], location["target"]
 
     target_path = @convertor.location_from_attrname("taxonomy_id" , 2)
+    assert_equal 2, target_path.size
     location = JSON.parse(target_path[0])
-    assert_equal ["organism", "identifier"], location["target"]
+    assert_equal ["attributes", {"name"=> "organism"}, "reference"], location["target"]
+    location = JSON.parse(target_path[1])
+    assert_equal ["attributes", {"name"=> "taxonomy_id"}, "value"], location["target"]
 
     target_path = @convertor.location_from_attrname("bioproject_id" , 2)
     location = JSON.parse(target_path[0])
-    assert_equal ["db_xrefs", {"name"=> "BioProject"}, "identifier"], location["target"]
+    assert_equal ["attributes", {"name"=> "bioproject_id"}, "value"], location["target"]
 
     target_path = @convertor.location_from_attrname("attr name" , 2)
     location = JSON.parse(target_path[0])

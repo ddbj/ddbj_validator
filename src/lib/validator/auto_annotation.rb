@@ -168,7 +168,7 @@ class AutoAnnotation
   def replace_value(obj, target, replace_value)
     target.each_with_index do |path, index|
       if index == target.size - 1
-        obj[path] = replace_value
+        obj[path] = replace_value unless obj.nil? || obj[path].nil?
       else
         if path.kind_of?(Hash)
           key = path.keys[0]

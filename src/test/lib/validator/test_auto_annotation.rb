@@ -75,7 +75,7 @@ class TestAutoAnnotation < Minitest::Test
     #元ファイルのattribute_nameを取得
     org_file = "#{@test_file_dir}/save_auto_annotation_value.json"
     org_data = JSON.parse(File.read(org_file))[0]
-    org_tax = org_data["organism"]["identifier"]
+    org_tax = org_data["attributes"].find{|attr|attr["name"] == "organism" }["reference"]
     org_geo_loc_name = org_data["attributes"].find{|attr|attr["name"] == "geo_loc_name" }["value"]
 
     #Validationを実行し結果ファイルを出力
@@ -86,7 +86,7 @@ class TestAutoAnnotation < Minitest::Test
     annotated_file = "#{@test_file_dir}/save_auto_annotation_value_auto_annotated.json"
     @auto_annotater.create_annotated_file(org_file, ret_file, annotated_file, "BioSample","json")
     annotated_data = JSON.parse(File.read(annotated_file))[0]
-    annotated_tax = annotated_data["organism"]["identifier"]
+    annotated_tax =  annotated_data["attributes"].find{|attr|attr["name"] == "organism" }["reference"]
     annotated_geo_loc_name = annotated_data["attributes"].find{|attr|attr["name"] == "geo_loc_name" }["value"]
 
     puts "json"
@@ -111,9 +111,6 @@ class TestAutoAnnotation < Minitest::Test
     "name": "MTB313",
     "title": "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes",
     "description": "",
-    "organism": {
-      "name": "Streptococcus pyogenes"
-    },
     "db_xrefs": [
       {
         "name": "BioProject",
@@ -126,6 +123,11 @@ class TestAutoAnnotation < Minitest::Test
         "value": "2011"
       },
       {
+        "name": "organism",
+        "value": "Streptococcus pyogenes",
+        "reference": ""
+      },
+      {
         "name": "geo_loc_name",
         "value": "Japan: Hikone-shi"
       }
@@ -134,17 +136,14 @@ class TestAutoAnnotation < Minitest::Test
 ]
 EOS
     json_data = JSON.parse(json)[0]
-    replace_place = ["organism", "identifier"]
+    replace_place = ["attributes", {"name": "organism"}, "reference"]
     @auto_annotater.replace_value(json_data, replace_place, "1314")
 
     replace_place = ["attributes", {"name": "geo_loc_name"}, "value"]
     @auto_annotater.replace_value(json_data, replace_place,  "updated attr value")
 
-    replace_place = ["db_xrefs", {"name": "BioProject"}, "identifier"]
-    @auto_annotater.replace_value(json_data, replace_place,  "updated bioproject id")
 
-    assert_equal json_data["organism"]["identifier"], "1314"
+    assert_equal json_data["attributes"].find{|attr|attr["name"] == "organism" }["reference"], "1314"
     assert_equal json_data["attributes"].find{|attr|attr["name"] == "geo_loc_name" }["value"], "updated attr value"
-    assert_equal json_data["db_xrefs"].find{|attr|attr["name"] == "BioProject" }["identifier"], "updated bioproject id"
   end
 end

@@ -1,21 +1,29 @@
 [
   {
     "identifier": "SAMD00017269",
-    "name": "Human Genomic DNA, Female",
-    "title": "Human Genomic DNA, Female",
-    "description": "N. A.",
-    "organism": {
-      "name": "Homo sapiens",
-      "identifier": "9606"
-    },
-    "db_xrefs": [
-      {
-        "name": "BioProject",
-        "identifier": "PRJDB2884"
-      }
-    ],
     "package": "Generic",
     "attributes": [
+      {
+        "name": "sample_name",
+        "value": "Human Genomic DNA, Female"
+      },
+      {
+        "name": "sample_title",
+        "value": "Human Genomic DNA, Female"
+      },
+      {
+        "name": "description",
+        "value": "N. A."
+      },
+      {
+        "name": "organism",
+        "value": "Homo sapiens",
+        "reference": ""
+      },
+      {
+        "name": "bioproject_id",
+        "value": "PRJDB2884"
+      },
       {
         "name": "strain",
         "value": "N. A."
@@ -300,21 +308,29 @@
   },
   {
     "identifier": "SAMD00017270",
-    "name": "Human Genomic DNA, Female",
-    "title": "Genomic DNA isolated from IMR-90",
-    "description": "N. A.",
-    "organism": {
-      "name": "Homo sapiens",
-      "identifier": "9606"
-    },
-    "db_xrefs": [
-      {
-        "name": "BioProject",
-        "identifier": "PRJDB2884"
-      }
-    ],
     "package": "Generic",
     "attributes": [
+      {
+        "name": "sample_name",
+        "value": "Human Genomic DNA, Female"
+      },
+      {
+        "name": "sample_title",
+        "value": "Genomic DNA isolated from IMR-90"
+      },
+      {
+        "name": "description",
+        "value": "N. A."
+      },
+      {
+        "name": "organism",
+        "value": "Homo sapiens",
+        "reference": ""
+      },
+      {
+        "name": "bioproject_id",
+        "value": "PRJDB2884"
+      },
       {
         "name": "strain",
         "value": "N. A."

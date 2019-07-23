@@ -99,36 +99,6 @@ class JsonConvertor < ValidatorBase
     attributes = {}
     attribute_list = []
 
-    unless biosample_object["name"].nil?
-      attributes["sample_name"] = biosample_object["name"]
-      attribute_list.push({"sample_name" => attributes["sample_name"]});
-    end
-    unless biosample_object["title"].nil?
-      attributes["sample_title"] = biosample_object["title"]
-      attribute_list.push({"sample_title" => attributes["sample_title"]});
-    end
-    unless biosample_object["description"].nil?
-      attributes["description"] = biosample_object["description"]
-      attribute_list.push({"description" => attributes["description"]});
-    end
-    unless biosample_object["organism"].nil?
-      unless biosample_object["organism"]["name"].nil?
-        attributes["organism"] = biosample_object["organism"]["name"]
-        attribute_list.push({"organism" => attributes["organism"]});
-      end
-      unless biosample_object["organism"]["identifier"].nil?
-        attributes["taxonomy_id"] = biosample_object["organism"]["identifier"]
-        attribute_list.push({"taxonomy_id" => attributes["taxonomy_id"]});
-      end
-      unless biosample_object["db_xrefs"].nil?
-        bioproject = biosample_object["db_xrefs"].select{|xref| xref["name"] == "BioProject"}
-        bioproject.each do |project_data|
-          attributes["bioproject_id"] = project_data["identifier"]
-          attribute_list.push({"bioproject_id" =>  project_data["identifier"]})
-        end
-      end
-    end
-
     biosample_object["attributes"].each do |attr|
       attributes[attr["name"]] = attr["value"]
       attribute_list.push({attr["name"] => attr["value"]}) # 属性値をarrayで格納
@@ -162,19 +132,9 @@ class JsonConvertor < ValidatorBase
   def location_from_attrname (attr_name, item_no)
     location = []
     case attr_name
-    when "sample_name"
-      location.push(JSON.generate({"target" => ["name"], "line_no" => item_no}))
-      location.push(JSON.generate({"target" => ["attributes", {name: "sample_name"}, "value"], "line_no" => item_no}))
-    when "sample_title"
-      location.push(JSON.generate({"target" => ["title"], "line_no" => item_no}))
-    when "description"
-      location.push(JSON.generate({"target" => ["description"], "line_no" => item_no}))
-    when "organism"
-      location.push(JSON.generate({"target" => ["organism","name"], "line_no" => item_no}))
     when "taxonomy_id"
-      location.push(JSON.generate({"target" => ["organism","identifier"], "line_no" => item_no}))
-    when "bioproject_id"
-      location.push(JSON.generate({"target" => ["db_xrefs",{name: "BioProject"}, "identifier"], "line_no" => item_no}))
+      location.push(JSON.generate({"target" => ["attributes", {name: "organism"}, "reference"], "line_no" => item_no}))
+      location.push(JSON.generate({"target" => ["attributes", {name: "taxonomy_id"}, "value"], "line_no" => item_no}))
     else
       location.push(JSON.generate({"target" => ["attributes", {name: attr_name}, "value"], "line_no" => item_no}))
     end

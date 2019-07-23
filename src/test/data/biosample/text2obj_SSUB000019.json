@@ -1,21 +1,29 @@
 [
   {
     "identifier": "SAMD00000328",
-    "name": "MTB313",
-    "title": "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes",
-    "description": "",
-    "organism": {
-      "name": "Streptococcus pyogenes",
-      "identifier": "1314"
-    },
-    "db_xrefs": [
-      {
-        "name": "BioProject",
-        "identifier": "PRJDB1654"
-      }
-    ],
     "package": "MIGS.ba.microbial",
     "attributes": [
+      {
+        "name": "sample_name",
+        "value": "MTB313"
+      },
+      {
+        "name": "sample_title",
+        "value": "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"
+      },
+      {
+        "name": "description",
+        "value": ""
+      },
+      {
+        "name": "organism",
+        "value": "Streptococcus pyogenes",
+        "reference": "1314"
+      },
+      {
+        "name": "bioproject_id",
+        "value": "PRJDB1654"
+      },
       {
         "name": "strain",
         "value": "MTB313"
