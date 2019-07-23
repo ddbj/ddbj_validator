@@ -136,6 +136,50 @@ class Validator
       validator.error_list
     end
 
+    # resultのmessageをRuleID毎にグルーピンングしたものを返す
+    #
+    #[
+    # {
+    #  "id": "BS_R0013",
+    #  "message": "Invalid data format. An automatically-generated correction will be applied.",
+    #  "count": 3,
+    #  "level": "warning",
+    #  "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+    #  "external": false,
+    #  "value": [{元の個別メッセージ},{元の個別メッセージ}]
+    #  },
+    # {
+    #  "id": "BS_R0009",
+    # }...
+    # ]
+    #
+    def grouped_message(result)
+      group_list = []
+      result["messages"].each do |msg|
+        group_key = msg["id"]
+        group_data = group_list.select{|group| group["id"] == group_key}
+        if group_data.size == 0
+          group_list.push({
+                            "id" => group_key,
+                            "message" => msg["message"],
+                            "count" => 1,
+                            "level" => msg["level"],
+                            "reference" => msg["reference"],
+                            "external" => msg["external"],
+                            "value" => [msg]
+                          }
+          )
+        else
+          group_data[0]["count"] += 1
+          # messageはエラー出現箇所によって差し代わる可能性があり、ルール毎に一意にならない。せめて最も文字列が長いものを優先する。
+          group_data[0]["message"] = group_data[0]["message"].size >= msg["message"].size ? group_data[0]["message"] : msg["message"]
+          group_data[0]["value"].push(msg)
+        end
+      end
+      result.delete("messages")
+      result["grouped_messages"] = group_list
+      result
+    end
 #### Parse the arguments
 
     # Analyze the arguments of command line
