@@ -80,6 +80,11 @@ class CommonUtils
              source: file_path,
              annotation: annotation
            }
+    begin
+      location_renderer = JSON.parse(rule["location_renderer"])
+      hash[:location_renderer] = location_renderer
+    rescue # JSONでparseできない記述の場合にはスキップする
+    end
     hash
   end
 

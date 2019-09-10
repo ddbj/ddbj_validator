@@ -165,6 +165,7 @@ class Validator
                             "count" => 1,
                             "level" => msg["level"],
                             "reference" => msg["reference"],
+                            "location_renderer" => msg["location_renderer"],
                             "external" => msg["external"],
                             "value" => [msg]
                           }

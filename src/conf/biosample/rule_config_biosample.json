@@ -10,7 +10,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0001"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0001",
+    "location_renderer": "{\"attributes\": \"_all\", \"areas\":[\"value\"], \"value_condition\": [\"\"]}"
   },
   "ruleBS_R0002": {
     "rule_class": "BioSample",
@@ -23,7 +24,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0002"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0002",
+    "location_renderer": "{\"attributes\": config[:cv_attr].keys,\"areas\":[\"value\"]}"
   },
   "ruleBS_R0003": {
     "rule_class": "BioSample",
@@ -36,7 +38,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0003"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0003",
+    "location_renderer": "{\"attributes\": [\"sample_title\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0004": {
     "rule_class": "BioSample",
@@ -49,7 +52,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0004"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0004",
+    "location_renderer": "{\"attributes\": [\"organism\", \"taxonomy_id\"],\"area\":[\"value\"] }"
   },
   "ruleBS_R0005": {
     "rule_class": "BioSample",
@@ -62,7 +66,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0005"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0005",
+    "location_renderer": "{\"attributes\": [\"bioproject_id\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0006": {
     "rule_class": "BioSample",
@@ -75,7 +80,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0006"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0006",
+    "location_renderer": "{\"attributes\": [\"bioproject_id\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0007": {
     "rule_class": "BioSample",
@@ -84,11 +90,12 @@
     "internal_ignore": false,
     "name": "Invalid date format",
     "method": "invalid_date_format",
-    "message": "Invalid date format.",
+    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\", \"YYYY-mm-ddThh:mm:ss+hh:mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (eg., 1990-10-30, 1990-10, 1990-10-30T14:41:36+09:00 or 1990-10-30T14:41:36Z).",
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0007"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0007",
+    "location_renderer": "{\"attributes\": config[:ts_attr],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0008": {
     "rule_class": "BioSample",
@@ -101,7 +108,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0008"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0008",
+    "location_renderer": "{\"attributes\": [\"geo_loc_name\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0009": {
     "rule_class": "BioSample",
@@ -114,7 +122,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0009"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0009",
+    "location_renderer": "{\"attributes\": [\"lat_lon\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0011": {
     "rule_class": "BioSample",
@@ -127,7 +136,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0011"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0011",
+    "location_renderer": "{\"attributes\": [\"ref_biomaterial\", \"isol_growth_condt\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0012": {
     "rule_class": "BioSample",
@@ -140,7 +150,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0012"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0012",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"value\"] , \"value_condition\": special_chars.keys}"
   },
   "ruleBS_R0013": {
     "rule_class": "BioSample",
@@ -153,7 +164,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"name\", \"value\"] , \"value_condition\":[\"\",\"\\t\",\"\\n\",\"  \"]}"
   },
   "ruleBS_R0015": {
     "rule_class": "BioSample",
@@ -166,7 +178,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0015"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0015",
+    "location_renderer": "{\"attributes\": [\"host\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0018": {
     "rule_class": "BioSample",
@@ -179,7 +192,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0018"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0018",
+    "location_renderer": "{\"attributes\": [\"sample_name\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0020": {
     "rule_class": "BioSample",
@@ -192,7 +206,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0020"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0020",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0024": {
     "rule_class": "BioSample",
@@ -205,7 +220,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0024"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0024",
+    "location_renderer": "{\"attributes\": @biosample_list.delete_if {|item| !([\"sample_name\", \"sample_title\", \"bioproject_id\", \"description\"].include(item))},\"areas\":[\"value\"]}"
   },
   "ruleBS_R0025": {
     "rule_class": "BioSample",
@@ -218,7 +234,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0025"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0025",
+    "location_renderer": "{\"attributes\": [],\"areas\":[] }"
   },
   "ruleBS_R0026": {
     "rule_class": "BioSample",
@@ -231,7 +248,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0026"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0026",
+    "location_renderer": "{\"attributes\": [],\"areas\":[] }"
   },
   "ruleBS_R0027": {
     "rule_class": "BioSample",
@@ -244,7 +262,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0027"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0027",
+    "location_renderer": "{\"attributes\": config[:attr_list].select {|item| item[:require]  == \"mandatory\"}, \"areas\":[\"name\"] }"
   },
   "ruleBS_R0028": {
     "rule_class": "BioSample",
@@ -257,7 +276,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0028"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0028",
+    "location_renderer": "{\"attributes\": [\"sample_name\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0030": {
     "rule_class": "BioSample",
@@ -270,7 +290,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0030"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0030",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"name\"]}"
   },
   "ruleBS_R0034": {
     "rule_class": "BioSample",
@@ -283,7 +304,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0034"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0034",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"name\"], \"value_condition\": [\"\"]}"
   },
   "ruleBS_R0036": {
     "rule_class": "BioSample",
@@ -296,7 +318,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0036"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0036",
+    "location_renderer": "{\"attributes\": [],\"areas\":[] }"
   },
   "ruleBS_R0040": {
     "rule_class": "BioSample",
@@ -309,7 +332,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0040"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0040",
+    "location_renderer": "{\"attributes\": [\"collection_date\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0041": {
     "rule_class": "BioSample",
@@ -322,7 +346,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0041"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0041",
+    "location_renderer": "{\"attributes\": [\"lat_lon\",\"geo_loc_name\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0045": {
     "rule_class": "BioSample",
@@ -335,7 +360,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0045"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0045",
+    "location_renderer": "{\"attributes\": [\"organism\", \"taxonomy_id\"],\"area\":[\"value\"] }"
   },
   "ruleBS_R0048": {
     "rule_class": "BioSample",
@@ -348,7 +374,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0048"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0048",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0058": {
     "rule_class": "BioSample",
@@ -357,12 +384,12 @@
     "internal_ignore": false,
     "name": "Non-ASCII Attribute value",
     "method": "non_ascii_attribute_value",
-    "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
     "message": "Non-ASCII format characters detected. Please check for non-standard characters in your attribute values around [### Non-ASCII character ###] and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0058"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0058",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"value\"]}"
   },
   "ruleBS_R0059": {
     "rule_class": "BioSample",
@@ -375,7 +402,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0059"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0059",
+    "location_renderer": "{\"attributes\": [\"organism\", \"sex\"],\"area\":[\"value\"] }"
   },
   "ruleBS_R0061": {
     "rule_class": "BioSample",
@@ -388,7 +416,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0061"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0061",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"name\"]}"
   },
   "ruleBS_R0062": {
     "rule_class": "BioSample",
@@ -401,7 +430,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0062"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0062",
+    "location_renderer": "{\"attributes\": [\"specimen_voucher\", \" culture_collection\"],\"area\":[\"value\"] }"
   },
   "ruleBS_R0069": {
     "rule_class": "BioSample",
@@ -414,7 +444,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0069"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0069",
+    "location_renderer": "{\"attributes\": [\"bioproject_id\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0070": {
     "rule_class": "BioSample",
@@ -427,7 +458,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0070"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0070",
+    "location_renderer": "{\"attributes\": [\"bioproject_id\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0073": {
     "rule_class": "BioSample",
@@ -440,7 +472,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0073"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0073",
+    "location_renderer": "{\"attributes\": [\"organism\", \"host\",\"isolation_source\"],\"area\":[\"value\"] }"
   },
   "ruleBS_R0074": {
     "rule_class": "BioSample",
@@ -453,7 +486,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0074"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0074",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0075": {
     "rule_class": "BioSample",
@@ -466,7 +500,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0075"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0075",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0076": {
     "rule_class": "BioSample",
@@ -479,7 +514,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0076"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0076",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0077": {
     "rule_class": "BioSample",
@@ -492,7 +528,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0077"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0077",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0078": {
     "rule_class": "BioSample",
@@ -505,7 +542,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0078"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0078",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0080": {
     "rule_class": "BioSample",
@@ -518,7 +556,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0080"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0080",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0081": {
     "rule_class": "BioSample",
@@ -531,7 +570,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0081"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0081",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0082": {
     "rule_class": "BioSample",
@@ -544,7 +584,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0082"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0082",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0083": {
     "rule_class": "BioSample",
@@ -557,7 +598,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0083"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0083",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0084": {
     "rule_class": "BioSample",
@@ -570,7 +612,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0084"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0084",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0085": {
     "rule_class": "BioSample",
@@ -583,7 +626,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0085"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0085",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0086": {
     "rule_class": "BioSample",
@@ -596,7 +640,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0086"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0086",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0088": {
     "rule_class": "BioSample",
@@ -609,7 +654,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0088"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0088",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0089": {
     "rule_class": "BioSample",
@@ -622,7 +668,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0089"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0089",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0090": {
     "rule_class": "BioSample",
@@ -635,7 +682,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0090"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0090",
+    "location_renderer": "{\"attributes\": \"_all\",\"areas\":[\"value\"]}"
   },
   "ruleBS_R0091": {
     "rule_class": "BioSample",
@@ -661,7 +709,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0093"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0093",
+    "location_renderer": "{\"attributes\": config[:int_attr], \"areas\":[\"value\"]}"
   },
   "ruleBS_R0094": {
     "rule_class": "BioSample",
@@ -674,7 +723,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0094"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0094",
+    "location_renderer": "{\"attributes\": [\"geo_loc_name\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0095": {
     "rule_class": "BioSample",
@@ -687,7 +737,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0095"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0095",
+    "location_renderer": "{\"attributes\": [\"bioproject_id\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0096": {
     "rule_class": "BioSample",
@@ -700,7 +751,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0096"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0096",
+    "location_renderer": "{\"attributes\": [\"taxonomy_id\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0097": {
     "rule_class": "BioSample",
@@ -713,7 +765,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0097"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0097",
+    "location_renderer": "{\"attributes\": [],\"areas\":[] }"
   },
   "ruleBS_R0098": {
     "rule_class": "BioSample",
@@ -726,7 +779,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0098"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0098",
+    "location_renderer": "{\"attributes\": [],\"areas\":[] }"
   },
   "ruleBS_R0099": {
     "rule_class": "BioSample",
@@ -739,7 +793,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0099"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0099",
+    "location_renderer": "{\"attributes\": [\"locus_tag_prefix\"],\"areas\":[\"value\"]}"
   },
   "ruleBS_R0100": {
     "rule_class": "BioSample",
@@ -752,7 +807,8 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0100"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0100",
+    "location_renderer": "{\"attributes\": config[:attr_list].select {|item| item[:optional]  == \"mandatory\"}, \"areas\":[\"value\"] }"
   },
   "ruleBS_R0101": {
     "rule_class": "BioSample",
@@ -765,6 +821,91 @@
     "object": [
       "BioSample"
     ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0101"
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0101",
+    "location_renderer": "{\"attributes\": [\"sample_name\"],\"areas\":[\"value\"]}"
+  },
+  "ruleBS_R0102": {
+    "rule_class": "BioSample",
+    "code": "BS_R0102",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Duplicated locus tag prefix",
+    "method": "duplicated_locus_tag_prefix",
+    "message": "Locus tag prefix is duplicated in the submission.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0102",
+    "location_renderer": "{\"attributes\": [\"locus_tag_prefix\"],\"areas\":[\"value\"]}"
+  },
+  "ruleBS_R0103": {
+    "rule_class": "BioSample",
+    "code": "BS_R0103",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Taken locus tag prefix",
+    "method": "taken_locus_tag_prefix",
+    "message": "Locus tag prefix is already taken.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0103",
+    "location_renderer": "{\"attributes\": [\"locus_tag_prefix\"],\"areas\":[\"value\"]}"
+  },
+  "ruleBS_R0104": {
+    "rule_class": "BioSample",
+    "code": "BS_R0104",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid taxonomy for genome sample",
+    "method": "invalid_taxonomy_for_genome_sample",
+    "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" should be used.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0104",
+    "location_renderer": "{\"attributes\": [\"organism\"],\"areas\":[\"value\"]}"
+  },
+  "ruleBS_R0105": {
+    "rule_class": "BioSample",
+    "code": "BS_R0105",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Taxonomy warning",
+    "method": "taxonomy_warning",
+    "message": "An organism name in the taxonomy database should be used. If applicable, the organism will be corrected to the scientific name. When the organism is novel, please enter a proposed name in the component_organism.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0105",
+    "location_renderer": "{\"attributes\": [\"component_organism\"],\"areas\":[\"value\"]}"
+  },
+  "ruleBS_R0106": {
+    "rule_class": "BioSample",
+    "code": "BS_R0106",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid metagenome source",
+    "method": "invalid_metagenome_source",
+    "message": "A metagenomic organism name in the taxonomy database should be used. For example, 'soil metagenome'.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0106",
+    "location_renderer": "{\"attributes\": [\"metagenome_source\"],\"areas\":[\"value\"]}"
+  },
+  "ruleBS_R0107": {
+    "rule_class": "BioSample",
+    "code": "BS_R0107",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid institution code",
+    "method": "invalid_institution_code",
+    "message": "An institution code with an appropriate type ('c' for culture collection and 's' for specimen voucher) in the NCBI BioCollections database should be used. ",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0107",
+    "location_renderer": "{\"attributes\": [\"specimen_voucher\", \" culture_collection\"],\"area\":[\"value\"] }"
   }
 }

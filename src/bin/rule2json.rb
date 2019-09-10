@@ -26,13 +26,8 @@ class CreateRuleJson
     }
   end
 
-  def create_rule_file (type)
-    conf = @rule_conf[type]
-    unless conf.nil?
-      csv_file = conf[:csv_file]
-      rule_url = conf[:rule_url]
-      # download spreadsheets as csv
-      system(%Q[curl -o #{csv_file} "#{rule_url}"])
+  def create_rule_file (type, csv_file)
+    if File.exist?(csv_file)
 
       # parse csv
       csv_data = CSV.read("#{csv_file}", headers: true)
@@ -57,6 +52,14 @@ class CreateRuleJson
         unless row["reference"].nil? || row["reference"].strip == ""
           hash[:reference] = row["reference"]
         end
+        unless row["location_renderer"].nil? || row["location_renderer"].strip == ""
+          hash[:location_renderer] = row["location_renderer"]
+          begin
+            JSON.parse(hash[:location_renderer])
+          rescue
+            puts "#{hash[:code]}: WARNNING: Cannot parse location_renderer as JSON #{hash[:location_renderer]}"
+          end
+        end
         rule_config.push(hash)
       end
 
@@ -78,15 +81,14 @@ class CreateRuleJson
         end
       end
 
-      # delete temp file
-      system(%Q[rm #{csv_file}])
     end
   end
+
 end
 
-if ARGV.size == 0
-  puts "Usage: ruby rule2json.rb <biosample | bioproject | dra>"
+if ARGV.size < 2
+  puts "Usage: ruby rule2json.rb <biosample | bioproject | dra> csv_file"
   exit(1);
 end
 creator = CreateRuleJson.new
-creator.create_rule_file(ARGV[0])
+creator.create_rule_file(ARGV[0], ARGV[1])

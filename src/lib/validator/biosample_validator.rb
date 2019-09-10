@@ -632,6 +632,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute names", value: missing_attr_names.join(", ")}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash[:location_renderer] = {attributes: mandatory_attr_list, areas:['name']}
       @error_list.push(error_hash)
       false
     end
@@ -722,6 +723,7 @@ class BioSampleValidator < ValidatorBase
         else #置換候補がないエラー
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
         end
+        error_hash[:location_renderer] = {attributes: cv_attr.keys, areas:['value']}
         @error_list.push(error_hash)
         result = false
       end
@@ -1656,6 +1658,7 @@ class BioSampleValidator < ValidatorBase
         else
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
         end
+        error_hash[:location_renderer] = {attributes: ts_attr, areas:['value']}
         @error_list.push(error_hash)
         result = false
       end
@@ -1714,6 +1717,7 @@ class BioSampleValidator < ValidatorBase
       ]
       annotation.push({key:"Suggestion",value: replaced})
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash[:location_renderer] = {attributes: '_all', areas:['value'], "value_condition": special_chars.keys}
       @error_list.push(error_hash)
       result = false
     elsif target == "attr_value" && replaced != attr_val
@@ -1724,6 +1728,7 @@ class BioSampleValidator < ValidatorBase
       ]
       annotation.push({key:"Suggestion",value: replaced})
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      error_hash[:location_renderer] = {attributes: '_all', areas:['value'], "value_condition": special_chars.keys}
       @error_list.push(error_hash)
       result = false
     end
@@ -2006,6 +2011,9 @@ class BioSampleValidator < ValidatorBase
           {key: "Sample group without distinguishing attribute", value: error_list[:group]}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        all_attr_names = []
+        biosample_list.each {|sample| all_attr_names.concat(sample["attributes"].keys)}
+        error_hash[:location_renderer] = {attributes: all_attr_names.uniq - keys_excluding, areas: ['value']}
         @error_list.push(error_hash)
       end
       result = false
@@ -2079,6 +2087,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute value", value: attr_val}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        error_hash[:location_renderer] = {attributes: int_attr, areas:['value']}
         @error_list.push(error_hash)
       end
     end
