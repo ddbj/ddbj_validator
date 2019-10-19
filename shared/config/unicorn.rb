@@ -2,7 +2,7 @@ require "date"
 
 #APP_PATH = "/home/w3sw/ddbj/DDBJValidator/deploy/staging"
 APP_ROOT = "../"
-RUNNING_LOG_DIR = "#{APP_ROOT}/logs/running"
+RUNNING_LOG_DIR = "#{APP_ROOT}/shared/log/validator/running"
 
 listen            8090
 timeout 300
