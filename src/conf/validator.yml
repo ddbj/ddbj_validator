@@ -1,8 +1,8 @@
 ddbj_rdb:
   pg_host: localhost
   pg_port: 5432
-  pg_user: const
-  pg_pass: const
+  pg_user: user
+  pg_pass: pass
   pg_timeout: 30
 
 sparql_endpoint:
@@ -16,7 +16,7 @@ eutils_api_key:
   key: your_api_key
 
 api_log:
-  path: /Users/yoko/DDBJ/logs
+  path: ../logs
 
 monitoring:
   ssub_id: SSUB009526
