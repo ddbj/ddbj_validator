@@ -20,3 +20,6 @@ shared/log
 shared/tmp
 
 !.gitkeep
+
+shared/config/virtuoso/
+shared/data/

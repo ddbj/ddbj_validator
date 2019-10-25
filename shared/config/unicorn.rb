@@ -32,7 +32,7 @@ before_fork do |server, worker|
   rescue => e
     # 10秒待って再チェックする
     if e.message == "Running validation process"
-      puts "Validation process is in progress. Wait 10 seconds and recheck to create the workers.." 
+      puts "Validation process is in progress. Wait 10 seconds and recheck to create the workers.."
       sleep 10
       retry
     end

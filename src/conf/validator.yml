@@ -1,22 +1,22 @@
 ddbj_rdb:
-  pg_host: localhost
-  pg_port: 5432
-  pg_user: user
-  pg_pass: pass
-  pg_timeout: 30
+  pg_host: <%= ENV.fetch("MDB_VALIDATOR_API_POSTGRES_HOST") { "localhost" } %>
+  pg_port: <%= ENV.fetch("MDB_VALIDATOR_API_POSTGRES_PORT") { 5432 } %>
+  pg_user: <%= ENV.fetch("MDB_VALIDATOR_API_POSTGRES_USER") { user } %>
+  pg_pass: <%= ENV.fetch("MDB_VALIDATOR_API_POSTGRES_PASSWD") { pass } %>
+  pg_timeout: <%= ENV.fetch("MDB_VALIDATOR_API_POSTGRES_TIMEOUT") { 30 } %>
 
 sparql_endpoint:
-  master_endpoint: http://localhost:8890/sparql
-  slave_endpoint: http://localhost:8890/sparql
+  master_endpoint: <%= ENV.fetch("MDB_VALIDATOR_API_VIRTUOSO_ENDPOINT_MASTER") { "http://virtuoso:8890/sparql" } %>
+  slave_endpoint: <%= ENV.fetch("MDB_VALIDATOR_API_VIRTUOSO_ENDPOINT_SLAVE") { "http://virtuoso:8890/sparql" } %>
 
 google_api_key:
-  key: your_api_key
+  key: <%= ENV.fetch("MDB_VALIDATOR_API_APP_GOOGLE_API_KEY") { "your_api_key" } %>
 
 eutils_api_key:
-  key: your_api_key
+  key: <%= ENV.fetch("MDB_VALIDATOR_API_APP_EUTILS_API_KEY") { "your_api_key" } %>
 
 api_log:
   path: ../shared/log/validator/
 
 monitoring:
-  ssub_id: SSUB009526
+  ssub_id: <%= ENV.fetch("MDB_VALIDATOR_API_APP_SSUB_ID") { "SSUB009526" } %>
