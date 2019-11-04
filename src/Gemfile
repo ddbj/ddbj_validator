@@ -14,6 +14,6 @@ gem "pg"
 gem "minitest"
 gem "erubis"
 gem "nokogiri"
-gem "unicorn"
+gem "unicorn", "~> 5.5.0.1.g6836"
 gem "mail"
 gem 'unicorn-worker-killer'
