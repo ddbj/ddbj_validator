@@ -33,7 +33,7 @@ services:
       - ${PWD}/meeting-files:/usr/src/ddbj_validator/meeting-files
       - ${PWD}/monitoring:/usr/src/ddbj_validator/monitoring
       - ${PWD}/shared/config/unicorn.rb:/usr/src/ddbj_validator/shared/config/unicorn.rb
-      - ${PWD}/shared/log/validator:/usr/src/ddbj_validator/shared/log/validator
+      - ${PWD}/shared/log:/usr/src/ddbj_validator/shared/log
       - ${PWD}/shared/tmp/pids:/usr/src/ddbj_validator/shared/tmp/pids
 
   virtuoso:
