@@ -23,3 +23,5 @@ shared/tmp
 
 shared/config/virtuoso/
 shared/data/
+
+.env
