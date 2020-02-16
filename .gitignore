@@ -18,6 +18,9 @@ logs
 
 shared/log
 shared/tmp
+src/shared/log/
+src/shared/tmp/
+deploy_tools/log
 
 !.gitkeep
 

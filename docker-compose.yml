@@ -1,44 +1,41 @@
 version: '3'
 services:
   app:
-    container_name: ${MDB_VALIDATOR_APP_CONTAINER_NAME:-mdb_validator_app}
+    container_name: ${DDBJ_VALIDATOR_APP_CONTAINER_NAME:-ddbj_validator_app}
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${MDB_VALIDATOR_APP_IMAGE_NAME:-mdb_validator_app}
+    image: ${DDBJ_VALIDATOR_APP_IMAGE_NAME:-ddbj_validator_app}
     depends_on:
       - virtuoso
     networks:
-      - mdb
+      - ddbj
     ports:
-      - ${MDB_VALIDATOR_APP_PORT:-53003}:8090
+      - ${DDBJ_VALIDATOR_APP_PORT:-3000}:3000
     environment:
-      MDB_VALIDATOR_APP_EUTILS_API_KEY: ${MDB_VALIDATOR_APP_EUTILS_API_KEY:-your_api_key}
-      MDB_VALIDATOR_APP_GOOGLE_API_KEY: ${MDB_VALIDATOR_APP_GOOGLE_API_KEY:-your_api_key}
-      MDB_VALIDATOR_APP_SSUB_ID: ${MDB_VALIDATOR_APP_SSUB_ID:-SSUB009526}
-      MDB_VALIDATOR_POSTGRES_HOST: ${MDB_VALIDATOR_POSTGRES_HOST:-localhost}
-      MDB_VALIDATOR_POSTGRES_PASSWD: ${MDB_VALIDATOR_POSTGRES_PASSWD:-pass}
-      MDB_VALIDATOR_POSTGRES_PORT: ${MDB_VALIDATOR_POSTGRES_PORT:-5432}
-      MDB_VALIDATOR_POSTGRES_TIMEOUT: ${MDB_VALIDATOR_POSTGRES_TIMEOUT:-30}
-      MDB_VALIDATOR_POSTGRES_USER: ${MDB_VALIDATOR_POSTGRES_USER:-user}
-      MDB_VALIDATOR_VIRTUOSO_ENDPOINT_MASTER: ${MDB_VALIDATOR_VIRTUOSO_ENDPOINT_MASTER:-http://virtuoso:8890/sparql}
-      MDB_VALIDATOR_VIRTUOSO_ENDPOINT_SLAVE: ${MDB_VALIDATOR_VIRTUOSO_ENDPOINT_SLAVE:-http://virtuoso:8890/sparql}
+      DDBJ_VALIDATOR_APP_EUTILS_API_KEY: ${DDBJ_VALIDATOR_APP_EUTILS_API_KEY:-your_api_key}
+      DDBJ_VALIDATOR_APP_GOOGLE_API_KEY: ${DDBJ_VALIDATOR_APP_GOOGLE_API_KEY:-your_api_key}
+      DDBJ_VALIDATOR_APP_SSUB_ID: ${DDBJ_VALIDATOR_APP_SSUB_ID:-SSUB009526}
+      DDBJ_VALIDATOR_POSTGRES_HOST: ${DDBJ_VALIDATOR_POSTGRES_HOST:-localhost}
+      DDBJ_VALIDATOR_POSTGRES_PASSWD: ${DDBJ_VALIDATOR_POSTGRES_PASSWD:-pass}
+      DDBJ_VALIDATOR_POSTGRES_PORT: ${DDBJ_VALIDATOR_POSTGRES_PORT:-5432}
+      DDBJ_VALIDATOR_POSTGRES_TIMEOUT: ${DDBJ_VALIDATOR_POSTGRES_TIMEOUT:-30}
+      DDBJ_VALIDATOR_POSTGRES_USER: ${DDBJ_VALIDATOR_POSTGRES_USER:-user}
+      DDBJ_VALIDATOR_VIRTUOSO_ENDPOINT_MASTER: ${DDBJ_VALIDATOR_VIRTUOSO_ENDPOINT_MASTER:-http://virtuoso:8890/sparql}
+      DDBJ_VALIDATOR_VIRTUOSO_ENDPOINT_SLAVE: ${DDBJ_VALIDATOR_VIRTUOSO_ENDPOINT_SLAVE:-http://virtuoso:8890/sparql}
+      DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR: ${DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR:-/usr/src/ddbj_validator/logs}
+      DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator/src}
     user: ${UID:-0}:${GID:-0}
     volumes:
-      - ${PWD}/bulk_validator:/usr/src/ddbj_validator/bulk_validator
-      - ${PWD}/d-easy:/usr/src/ddbj_validator/d-easy
-      - ${PWD}/deploy_tools:/usr/src/ddbj_validator/deploy_tools
-      - ${PWD}/kyulee:/usr/src/ddbj_validator/kyulee
-      - ${PWD}/log_analysis:/usr/src/ddbj_validator/log_analysis
-      - ${PWD}/meeting-files:/usr/src/ddbj_validator/meeting-files
-      - ${PWD}/monitoring:/usr/src/ddbj_validator/monitoring
-      - ${PWD}/shared/config/unicorn.rb:/usr/src/ddbj_validator/shared/config/unicorn.rb
-      - ${PWD}/shared/log:/usr/src/ddbj_validator/shared/log
-      - ${PWD}/shared/tmp/pids:/usr/src/ddbj_validator/shared/tmp/pids
+      - ${PWD}/src:/usr/src/ddbj_validator/src
+      - ${PWD}/src/config:/usr/src/ddbj_validator/config
+      - ${PWD}/src/shared/log:/usr/src/ddbj_validator/shared/log
+      - ${PWD}/src/shared/tmp/pids:/usr/src/ddbj_validator/shared/tmp/pids
+      - ${PWD}/logs/:/usr/src/ddbj_validator/logs
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
-    container_name: ${MDB_VALIDATOR_VIRTUOSO_CONTAINER_NAME:-mdb_validator_virtuoso}
+    container_name: ${DDBJ_VALIDATOR_VIRTUOSO_CONTAINER_NAME:-ddbj_validator_virtuoso}
     environment:
       DBA_PASSWORD: "dba"
       VIRT_Parameters_DirsAllowed: "., ../vad, /usr/share/proj, /database"
@@ -51,13 +48,13 @@ services:
       VIRT_SPARQL_MaxQueryExecutionTime: "300"
       VIRT_SPARQL_MaxQueryCostEstimationTime: "-1"
     networks:
-      - mdb
+      - ddbj
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/shared/config/virtuoso:/settings
       - ${PWD}/shared/data/virtuoso:/database
 
 networks:
-  mdb:
+  ddbj:
     external:
-      name: ${MDB_NETWORK_NAME:-mdb}
+      name: ${DDBJ_NETWORK_NAME:-ddbj}

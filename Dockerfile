@@ -1,9 +1,10 @@
-FROM ruby:2.4
+FROM ruby:2.5
 
-COPY . /usr/src/ddbj_validator/
+COPY src /usr/src/ddbj_validator/src
+RUN mkdir -p /usr/src/ddbj_validator/logs
 WORKDIR /usr/src/ddbj_validator/src
 
-RUN bundle install --path vendor/bundle
+RUN bundle install
 
-EXPOSE 8090
-CMD ["bundle", "exec", "unicorn", "-c", "../shared/config/unicorn.rb", "-E", "development"]
+EXPOSE 3000
+CMD ["bundle", "exec", "unicorn", "-c", "conf/unicorn.rb", "-E", "development"]
