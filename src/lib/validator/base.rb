@@ -16,12 +16,12 @@ class ValidatorBase
   def read_common_config (config_file_dir)
     config = {}
     begin
-      setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
+      setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
       config[:sparql_config] = setting["sparql_endpoint"]
       config[:ddbj_db_config] = setting["ddbj_rdb"]
       config[:google_api_key] = setting["google_api_key"]
       config[:eutils_api_key] = setting["eutils_api_key"]
-      version = YAML.load(File.read(config_file_dir + "/version.yml"))
+      version = YAML.load(ERB.new(File.read(config_file_dir + "/version.yml")).result)
       config[:version] = version["version"]
       config
     rescue => ex

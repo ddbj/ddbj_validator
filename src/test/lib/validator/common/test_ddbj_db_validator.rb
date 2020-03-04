@@ -8,7 +8,7 @@ class TestDDBJDbValidator < Minitest::Test
 
   def setup
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
-    setting = YAML.load(File.read(conf_dir + "/validator.yml"))
+    setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)
     db_config = setting["ddbj_rdb"]
     @db_validator = DDBJDbValidator.new(db_config)
   end

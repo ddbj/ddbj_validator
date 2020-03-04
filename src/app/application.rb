@@ -12,7 +12,7 @@ require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
 
 module DDBJValidator
   class Application < Sinatra::Base
-    setting = YAML.load(File.read(File.dirname(__FILE__) + "/../conf/validator.yml"))
+    setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/validator.yml")).result)
     @@data_dir = setting["api_log"]["path"]
 
     configure do

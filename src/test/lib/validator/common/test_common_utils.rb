@@ -10,7 +10,7 @@ class TestCommonUtils < Minitest::Test
     config_obj = {}
     config_obj[:null_accepted] = JSON.parse(File.read("#{conf_dir}/null_accepted.json"))
     config_obj[:exchange_country_list] = JSON.parse(File.read("#{conf_dir}/exchange_country_list.json"))
-    setting = YAML.load(File.read("#{conf_dir}/../validator.yml"))
+    setting = YAML.load(ERB.new(File.read("#{conf_dir}/../validator.yml")).result)
     config_obj[:google_api_key] = setting["google_api_key"]
     config_obj[:eutils_api_key] = setting["eutils_api_key"]
     CommonUtils::set_config (config_obj)

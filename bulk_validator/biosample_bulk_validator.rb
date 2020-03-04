@@ -247,7 +247,7 @@ end
 param_conf_file = ARGV[0]
 param_output_dir = ARGV[1]
 conf_file = File.expand_path(param_conf_file, File.dirname(__FILE__))
-config = YAML.load(File.read(conf_file))
+config = YAML.load(ERB.new(File.read(conf_file)).result)
 validator = BioSampleBulkValidator.new(config, param_output_dir)
 validator.get_target_biosample_submission_id
 validator.download_xml
