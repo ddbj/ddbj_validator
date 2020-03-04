@@ -24,7 +24,13 @@ class AnalysisValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
   end
 
   #
@@ -73,7 +79,7 @@ class AnalysisValidator < ValidatorBase
       analysis_set.each_with_index do |analysis_node, idx|
         idx += 1
         analysis_name = get_analysis_label(analysis_node, idx)
-        invalid_center_name("DRA_R0004", analysis_name, analysis_node, idx)
+        invalid_center_name("DRA_R0004", analysis_name, analysis_node, idx) if @use_db
         missing_analysis_title("DRA_R0012", analysis_name, analysis_node, idx)
         missing_analysis_description("DRA_R0014", analysis_name, analysis_node, idx)
         missing_analysis_filename("DRA_R0022", analysis_name, analysis_node, idx)

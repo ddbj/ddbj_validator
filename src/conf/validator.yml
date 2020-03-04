@@ -1,9 +1,9 @@
 ddbj_rdb:
-  pg_host: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_HOST") { "localhost" } %>
-  pg_port: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_PORT") { 5432 } %>
-  pg_user: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_USER") { user } %>
-  pg_pass: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_PASSWD") { pass } %>
-  pg_timeout: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_TIMEOUT") { 30 } %>
+  pg_host: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_HOST") %>
+  pg_port: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_PORT") %>
+  pg_user: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_USER") %>
+  pg_pass: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_PASSWD") %>
+  pg_timeout: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_TIMEOUT") %>
 
 sparql_endpoint:
   master_endpoint: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER") { "http://virtuoso:8890/sparql" } %>

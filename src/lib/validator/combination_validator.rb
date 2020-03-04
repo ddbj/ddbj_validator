@@ -24,7 +24,13 @@ class CombinationValidator < ValidatorBase
     @error_list = error_list = []
 
     @dra_validation_config = @conf[:dra_validation_config] #need?
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
   end
 
   #
