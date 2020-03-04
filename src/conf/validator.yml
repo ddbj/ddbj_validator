@@ -1,13 +1,13 @@
 ddbj_rdb:
-  pg_host: <%= ENV.fetch("DDBJ_VALIDATOR_POSTGRES_HOST") { "localhost" } %>
-  pg_port: <%= ENV.fetch("DDBJ_VALIDATOR_POSTGRES_PORT") { 5432 } %>
-  pg_user: <%= ENV.fetch("DDBJ_VALIDATOR_POSTGRES_USER") { user } %>
-  pg_pass: <%= ENV.fetch("DDBJ_VALIDATOR_POSTGRES_PASSWD") { pass } %>
-  pg_timeout: <%= ENV.fetch("DDBJ_VALIDATOR_POSTGRES_TIMEOUT") { 30 } %>
+  pg_host: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_HOST") { "localhost" } %>
+  pg_port: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_PORT") { 5432 } %>
+  pg_user: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_USER") { user } %>
+  pg_pass: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_PASSWD") { pass } %>
+  pg_timeout: <%= ENV.fetch("DDBJ_VALIDATOR_APP_POSTGRES_TIMEOUT") { 30 } %>
 
 sparql_endpoint:
-  master_endpoint: <%= ENV.fetch("DDBJ_VALIDATOR_VIRTUOSO_ENDPOINT_MASTER") { "http://virtuoso:8890/sparql" } %>
-  slave_endpoint: <%= ENV.fetch("DDBJ_VALIDATOR_VIRTUOSO_ENDPOINT_SLAVE") { "http://virtuoso:8890/sparql" } %>
+  master_endpoint: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER") { "http://virtuoso:8890/sparql" } %>
+  slave_endpoint: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_SLAVE") { "http://virtuoso:8890/sparql" } %>
 
 google_api_key:
   key: <%= ENV.fetch("DDBJ_VALIDATOR_APP_GOOGLE_API_KEY") { "your_api_key" } %>
@@ -19,4 +19,4 @@ api_log:
   path: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR") { "../shared/log/validator/" } %>
 
 monitoring:
-  ssub_id: <%= ENV.fetch("DDBJ_VALIDATOR_APP_SSUB_ID") { "SSUB009526" } %>
+  ssub_id: <%= ENV.fetch("DDBJ_VALIDATOR_APP_MONITORING_SSUB_ID") { "SSUB009526" } %>

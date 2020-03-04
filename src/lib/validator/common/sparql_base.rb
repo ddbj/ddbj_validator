@@ -17,7 +17,7 @@ class SPARQLBase
   #
   def initialize(endpoint, slave_endpoint=nil)
     @endpoint_url = endpoint
-    unless slave_endpoint.nil?
+    if !(slave_endpoint.nil? || slave_endpoint.strip == "")
       @slave_endpoint_url = slave_endpoint
     end
   end
