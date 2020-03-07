@@ -6,4 +6,4 @@ WORKDIR /usr/src/ddbj_validator/src
 RUN bundle install
 
 EXPOSE 3000
-CMD ["bundle", "exec", "unicorn", "-c", "conf/unicorn.rb", "-E", "development"]
+CMD ["bundle", "exec", "unicorn", "-c", "/usr/src/ddbj_validator/src/conf/unicorn.rb", "-E", "development"]

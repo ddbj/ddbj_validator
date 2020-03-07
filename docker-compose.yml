@@ -27,9 +27,8 @@ services:
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/src:/usr/src/ddbj_validator/src
-      - ${PWD}/src/config:/usr/src/ddbj_validator/config
-      - ${PWD}/src/shared/log:/usr/src/ddbj_validator/shared/log
-      - ${PWD}/src/shared/tmp/pids:/usr/src/ddbj_validator/shared/tmp/pids
+      - ${PWD}/shared/log:/usr/src/ddbj_validator/shared/log
+      - ${PWD}/shared/tmp/pids:/usr/src/ddbj_validator/shared/tmp/pids
       - ${PWD}/logs/:/usr/src/ddbj_validator/logs
 
   virtuoso:
