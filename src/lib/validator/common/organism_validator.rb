@@ -30,8 +30,8 @@ class OrganismValidator < SPARQLBase
   # ==== Args
   # endpoint: endpoint url
   #
-  def initialize (endpoint, slave_endpoint=nil)
-    super(endpoint, slave_endpoint)
+  def initialize (endpoint)
+    super(endpoint)
     @template_dir = File.absolute_path(File.dirname(__FILE__) + "/../sparql")
   end
 

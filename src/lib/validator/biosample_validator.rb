@@ -33,7 +33,7 @@ class BioSampleValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -285,7 +285,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
       params[:version] = @conf[:version]["biosample_graph"]
@@ -454,7 +454,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name}
       params[:version] = @conf[:version]["biosample_graph"]
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
