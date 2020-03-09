@@ -1,8 +1,8 @@
 #!/bin/bash -l
 #set -e
 
-BASE_DIR=/data1/ddbj/DDBJValidator/staging
-VIRTUOSO_CONTAINER_NAME=ddbj_validator_virtuoso_staging
+BASE_DIR=/data1/ddbj/DDBJValidator/validator_production
+VIRTUOSO_CONTAINER_NAME=ddbj_validator_virtuoso_production
 VIRT_HOME=$BASE_DIR/shared/data/virtuoso/
 VIRT_PORT=58892
 
@@ -13,13 +13,15 @@ LOG()
 
 LOG "start update"
 LOG "copy dbfile"
-cp /data1/ddbj/DDBJValidator/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso.db.new
+scp it048:/data1/ddbj/DDBJValidator/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso.db.new
 
 cd $BASE_DIR
 active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
 if [[ $active_container -gt 0 ]]; then
   LOG "shutdown virtuoso"
   docker-compose exec -T virtuoso /opt/virtuoso-opensource/bin/isql 1111 dba dba exec="shutdown();"
+  active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
+  echo $active_container
 fi
 
 

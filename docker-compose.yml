@@ -14,6 +14,7 @@ services:
       - ${DDBJ_VALIDATOR_APP_PORT:-3000}:3000
     environment:
       DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator/src}
+      DDBJ_VALIDATOR_SHARED_PATH: ${DDBJ_ONTOLOGIES_SHARED_DIR:-/usr/src/ddbj_validator/shared}
       DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: ${DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER:-http://virtuoso:8890/sparql}
       DDBJ_VALIDATOR_APP_POSTGRES_HOST: ${DDBJ_VALIDATOR_APP_POSTGRES_HOST}
       DDBJ_VALIDATOR_APP_POSTGRES_PORT: ${DDBJ_VALIDATOR_APP_POSTGRES_PORT}
@@ -26,8 +27,7 @@ services:
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/src:/usr/src/ddbj_validator/src
-      - ${PWD}/shared/log:/usr/src/ddbj_validator/shared/log
-      - ${PWD}/shared/tmp/pids:/usr/src/ddbj_validator/shared/tmp/pids
+      - ${PWD}/shared:/usr/src/ddbj_validator/shared
       - ${PWD}/logs/:/usr/src/ddbj_validator/logs
 
   virtuoso:

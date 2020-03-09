@@ -1,12 +1,13 @@
 APP_PATH = ENV.fetch("DDBJ_VALIDATOR_APP_ROOT_PATH") { "/usr/src/ddbj_validator/src" }
+SHARED_PATH = ENV.fetch("DDBJ_VALIDATOR_SHARED_PATH") { "/usr/src/ddbj_validator/shared" }
 
 listen            3000
 timeout 300
 working_directory "#{APP_PATH}"
-pid "#{APP_PATH}/shared/tmp/pids/unicorn.pid"
+pid "#{SHARED_PATH}/tmp/pids/unicorn.pid"
 
-stderr_path       "#{APP_PATH}/shared/log/unicorn_err.log"
-stdout_path       "#{APP_PATH}/shared/log/unicorn.log"
+stderr_path       "#{SHARED_PATH}/log/unicorn_err.log"
+stdout_path       "#{SHARED_PATH}/log/unicorn.log"
 worker_processes  4
 preload_app       true
 
