@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #set -e
 
-BASE_DIR=/data1/ddbj/DDBJValidator/staging
+BASE_DIR=/data1/ddbj/DDBJValidator/validator_staging
 VIRTUOSO_CONTAINER_NAME=ddbj_validator_virtuoso_staging
 VIRT_HOME=$BASE_DIR/shared/data/virtuoso/
 VIRT_PORT=58892
