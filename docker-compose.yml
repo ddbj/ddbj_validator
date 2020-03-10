@@ -11,7 +11,7 @@ services:
     networks:
       - ddbj
     ports:
-      - ${DDBJ_VALIDATOR_APP_PORT:-3000}:3000
+      - ${DDBJ_VALIDATOR_APP_PORT:-18840}:3000
     environment:
       DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator/src}
       DDBJ_VALIDATOR_SHARED_PATH: ${DDBJ_ONTOLOGIES_SHARED_DIR:-/usr/src/ddbj_validator/shared}
@@ -47,7 +47,7 @@ services:
     networks:
       - ddbj
     ports:
-      - ${MDB_API_APP_PORT:-58892}:8890
+      - ${DDBJ_VALIDATOR_VIRTUOSO_PORT:-18841}:8890
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/shared/config/virtuoso:/settings
