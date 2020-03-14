@@ -1,11 +1,23 @@
 version: '3'
 services:
-#  ruby:
-#    image:
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-#    restart: always
+  ruby:
+    container_name: ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_CONTAINER_NAME:-ddbj_validator_log_analysis_ruby}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_CONTAINER_NAME:-ddbj_validator_log_analysis_ruby}
+    networks:
+      - ddbj
+    environment:
+      TZ: Asia/Tokyo
+      POSTGRES_PASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
+      POSTGRES_USER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: validation_log
+      POSTGRES_HOST: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_CONTAINER_NAME:-ddbj_validator_log_analysis_postgres}
+    volumes:
+      - ${PWD}:/usr/src/log_analysis
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_LOGS_DIR}:/usr/src/ddbj_validator/logs
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}:/usr/src/ddbj_validator/src
 
   postgres:
     image: postgres

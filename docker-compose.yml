@@ -13,6 +13,7 @@ services:
     ports:
       - ${DDBJ_VALIDATOR_APP_PORT:-18840}:3000
     environment:
+      TZ: Asia/Tokyo
       DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator/src}
       DDBJ_VALIDATOR_SHARED_PATH: ${DDBJ_ONTOLOGIES_SHARED_DIR:-/usr/src/ddbj_validator/shared}
       DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: ${DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER:-http://virtuoso:8890/sparql}
