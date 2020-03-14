@@ -22,6 +22,8 @@ src/shared/log/
 src/shared/tmp/
 deploy_tools/log
 
+log_analysis/data/
+
 !.gitkeep
 
 shared/config/virtuoso/

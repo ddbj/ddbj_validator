@@ -1,0 +1,29 @@
+version: '3'
+services:
+#  ruby:
+#    image:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    restart: always
+
+  postgres:
+    image: postgres
+    container_name: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_CONTAINER_NAME:-ddbj_validator_log_analysis_postgres}
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
+      POSTGRES_USER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: validation_log
+    networks:
+     - ddbj
+    ports:
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PORT:-18832}:5432
+    volumes:
+      - ${PWD}/data:/var/lib/postgresql/data
+      - ${PWD}/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+
+networks:
+  ddbj:
+    external:
+      name: ${DDBJ_NETWORK_NAME:-ddbj}
