@@ -1,7 +1,3 @@
-DROP TABLE IF EXISTS tbl_annotation cascade;
-DROP TABLE IF EXISTS tbl_message cascade;
-DROP TABLE IF EXISTS tbl_status cascade;
-
 CREATE TABLE tbl_status (
   uuid varchar(36) PRIMARY KEY,
   api_version varchar(20),
