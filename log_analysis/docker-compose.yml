@@ -10,17 +10,22 @@ services:
       - ddbj
     environment:
       TZ: Asia/Tokyo
-      POSTGRES_PASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
-      POSTGRES_USER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: validation_log
-      POSTGRES_HOST: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_CONTAINER_NAME:-ddbj_validator_log_analysis_postgres}
+      PGHOST: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_CONTAINER_NAME:-ddbj_validator_log_analysis_postgres}
+      PGDB: validation_log
+      PGUSER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-postgres}
+      PGPASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
+    user: ${UID:-0}:${DOCKER_GID:-0}
     volumes:
+      - /cm/local/apps/docker/current/bin/docker:/usr/bin/docker
+      - /var/lib/docker:/var/lib/docker
+      - /var/run/docker.sock:/var/run/docker.sock
       - ${PWD}:/usr/src/log_analysis
       - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_LOGS_DIR}:/usr/src/ddbj_validator/logs
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_SHARED_DIR}:/usr/src/ddbj_validator/shared
       - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}:/usr/src/ddbj_validator/src
 
   postgres:
-    image: postgres
+    image: postgres:9.4
     container_name: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_CONTAINER_NAME:-ddbj_validator_log_analysis_postgres}
     restart: always
     environment:
@@ -31,9 +36,11 @@ services:
      - ddbj
     ports:
       - ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PORT:-18832}:5432
+    user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/data:/var/lib/postgresql/data
       - ${PWD}/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_LOGS_DIR}:/usr/src/ddbj_validator/logs
 
 networks:
   ddbj:

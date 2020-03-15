@@ -8,7 +8,7 @@ require 'pg'
 require File.expand_path('/usr/src/ddbj_validator/src/lib/validator/common/xml_convertor.rb', __FILE__)
 
 class CreateLogIndex
-  ACCESS_LOG_DIR = "/usr/src/ddbj_validator/src/shared/log"
+  ACCESS_LOG_DIR = "/usr/src/ddbj_validator/shared/log"
   LOG_DIR = "/usr/src/ddbj_validator/logs"
   TSV_DIR = "/usr/src/ddbj_validator/logs/tsv"
   @target_date = ""
@@ -37,11 +37,11 @@ class CreateLogIndex
     @pg_refresh_views_file = "#{TSV_DIR}/#{@target_date}_refresh_views.sql"
     FileUtils.rm(@pg_refresh_views_file) if FileTest.exist?(@pg_refresh_views_file)
 
-    @pg_host = ENV.fetch("POSTGRES_HOST") { "localhost" }
+    @pg_host = ENV.fetch("PGHOST") { "localhost" }
     @pg_port = 5432
-    @pg_database = ENV.fetch("POSTGRES_DB") { "validation_log" }
-    @pg_user = ENV.fetch("POSTGRES_USER") { "postgres" }
-    @pg_user_password = ENV.fetch("POSTGRES_PASSWORD") { "pdb" }
+    @pg_database = ENV.fetch("PGDB") { "validation_log" }
+    @pg_user = ENV.fetch("PGUSER") { "postgres" }
+    @pg_user_password = ENV.fetch("PGPASSWORD") { "pdb" }
   end
 
   # hashデータからヘッダー付きTSVへ変換する
@@ -222,7 +222,8 @@ class CreateLogIndex
       puts "Not exist load file."
       return nil
     end
-    system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_load_file}")
+    #system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_load_file}")
+    system("docker exec -it -e PGPASSWORD=#{@pg_user_password} #{@pg_host} psql -h #{@pg_host} -p #{@pg_port} -d #{@pg_database} -U #{@pg_user} -f #{@pg_load_file}")
   end
 
   # pivot viewを更新する
@@ -268,7 +269,8 @@ class CreateLogIndex
 
       sql_file.flush
       sql_file.close
-      system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
+      #system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
+      system("docker exec -it -e PGPASSWORD=#{@pg_user_password} #{@pg_host} psql -h #{@pg_host} -p #{@pg_port} -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
     rescue => ex
       message = "Failed to execute the query to DDBJ 'validation_log'.\n"
       message += "#{ex.message} (#{ex.class})"
