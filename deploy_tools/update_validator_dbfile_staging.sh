@@ -26,7 +26,7 @@ fi
 LOG "switch virtuoso.db"
 cd $VIRT_HOME
 if [ -e $VIRT_HOME/virtuoso.db ]; then
-  mv $VIRT_HOME/virtuoso.db $VIRT_HOME/virtuoso.db.old 
+  mv $VIRT_HOME/virtuoso.db $VIRT_HOME/virtuoso.db.old
 fi
 dbfiles=($VIRT_HOME/virtuoso.pxa $VIRT_HOME/virtuoso-temp.db $VIRT_HOME/virtuoso.trx)
 for dbfile in ${dbfiles[@]}

@@ -4,7 +4,7 @@
 BASE_DIR=/data1/ddbj/DDBJValidator/validator_production
 VIRTUOSO_CONTAINER_NAME=ddbj_validator_virtuoso_production
 VIRT_HOME=$BASE_DIR/shared/data/virtuoso/
-VIRT_PORT=58892
+VIRT_PORT=18801
 
 LOG()
 {
@@ -20,15 +20,13 @@ active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
 if [[ $active_container -gt 0 ]]; then
   LOG "shutdown virtuoso"
   docker-compose exec -T virtuoso /opt/virtuoso-opensource/bin/isql 1111 dba dba exec="shutdown();"
-  active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
-  echo $active_container
 fi
 
 
 LOG "switch virtuoso.db"
 cd $VIRT_HOME
 if [ -e $VIRT_HOME/virtuoso.db ]; then
-  mv $VIRT_HOME/virtuoso.db $VIRT_HOME/virtuoso.db.old 
+  mv $VIRT_HOME/virtuoso.db $VIRT_HOME/virtuoso.db.old
 fi
 dbfiles=($VIRT_HOME/virtuoso.pxa $VIRT_HOME/virtuoso-temp.db $VIRT_HOME/virtuoso.trx)
 for dbfile in ${dbfiles[@]}
