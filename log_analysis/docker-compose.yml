@@ -12,7 +12,7 @@ services:
       TZ: Asia/Tokyo
       PGHOST: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_CONTAINER_NAME:-ddbj_validator_log_analysis_postgres}
       PGDB: validation_log
-      PGUSER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-postgres}
+      PGUSER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_USER:-postgres}
       PGPASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
     user: ${UID:-0}:${DOCKER_GID:-0}
     volumes:
@@ -30,7 +30,7 @@ services:
     restart: always
     environment:
       POSTGRES_PASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
-      POSTGRES_USER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_USER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_USER:-postgres}
       POSTGRES_DB: validation_log
     networks:
      - ddbj
