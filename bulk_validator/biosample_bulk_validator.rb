@@ -1,15 +1,17 @@
-require 'pg'
+#require 'pg'
 require 'fileutils'
 require 'csv'
 require 'yaml'
+require 'erb'
+require 'json'
 
 class BioSampleBulkValidator
   @@biosample_submission_list = "biosample_submission_list.json"
   def initialize (config, output_dir)
-    @pg_host = config["pg_host"]
-    @pg_port = config["pg_port"]
-    @pg_user = config["pg_user"]
-    @pg_pass = config["pg_pass"]
+ #   @pg_host = config["pg_host"]
+ #   @pg_port = config["pg_port"]
+ #   @pg_user = config["pg_user"]
+ #   @pg_pass = config["pg_pass"]
     @api_host = config["api_host"]
     @rule_json_path = config["rule_json_path"]
     @output_dir = File.expand_path(output_dir, File.dirname(__FILE__))
@@ -18,7 +20,11 @@ class BioSampleBulkValidator
     @uuid_output_dir = "#{@output_dir}/uuid"
     @result_output_dir = "#{@output_dir}/result"
     @result_detail_output_dir = "#{@output_dir}/result_by_id"
-    @submission_id_list = []
+    if File.exist?("#{@output_dir}/#{@@biosample_submission_list}")
+      @submission_id_list = JSON.parse(File.read("#{@output_dir}/#{@@biosample_submission_list}"))
+    else
+      @submission_id_list = []
+    end
     @summary = {}
   end
 
@@ -51,6 +57,7 @@ class BioSampleBulkValidator
   end
 
   def exec_validation
+
     FileUtils.mkdir_p(@uuid_output_dir) unless FileTest.exist?(@uuid_output_dir)
     #xml file exist check
     @submission_id_list.each do |submission_id|
@@ -249,8 +256,8 @@ param_output_dir = ARGV[1]
 conf_file = File.expand_path(param_conf_file, File.dirname(__FILE__))
 config = YAML.load(ERB.new(File.read(conf_file)).result)
 validator = BioSampleBulkValidator.new(config, param_output_dir)
-validator.get_target_biosample_submission_id
-validator.download_xml
+#validator.get_target_biosample_submission_id
+#validator.download_xml
 validator.exec_validation
 validator.get_result_json
 validator.output_stats
