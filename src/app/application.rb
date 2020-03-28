@@ -202,9 +202,9 @@ module DDBJValidator
         else
           submission_id = "SSUB009526"
         end
-
+        local_port = ENV.fetch("DDBJ_VALIDATOR_APP_UNICORN_PORT")
         # api url path
-        api_url = "http://" + request.env["HTTP_HOST"] + "/api/"
+        api_url = "http://localhost:#{local_port}/api/"
         # get xml file
         file_get_api = api_url + "submission/biosample/" + submission_id
         res = http_get_response(file_get_api, {"API_KEY" => "curator"})
