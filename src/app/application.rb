@@ -22,10 +22,6 @@ module DDBJValidator
       set :show_exceptions, development?
     end
 
-    configure :development do
-      register Sinatra::Reloader
-    end
-
     before do
       content_type 'application/json; charset=utf-8'
       response.headers["Access-Control-Allow-Origin"] = "*"
