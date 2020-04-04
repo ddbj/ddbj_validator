@@ -67,7 +67,7 @@ class CreateLogIndex
       file.each_line do |row|
         # I, [2018-04-10T17:24:29.396851 #38545]  INFO -- : execute validation:{:biosample=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/biosample/SSUB000061.xml", :output=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/result.json"}
         if row.include?("execute validation")
-          unless (row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
+          unless (row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB004022.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
             count += 1
             row = row.split("{").last.split("}").first
             log_reg = %r{^:biosample=>"(?<bs_file>.+)", :output=>"(?<op_file>.+)"$}
@@ -113,8 +113,11 @@ class CreateLogIndex
     ret = JSON.parse(File.read(output_file))
     uuid = status["uuid"]
     # access IP addressをunicornログから取得
-    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/unicorn_err.log > #{ACCESS_LOG_DIR}/#{uuid}.log])
-    #system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/unicorn_err_staging20180309-0501.log >> #{ACCESS_LOG_DIR}/#{uuid}.log])
+    log_file_name = "unicorn_err.log"
+    if File.exist?("#{ACCESS_LOG_DIR}/unicorn_err_all.log")
+      log_file_name = "unicorn_err_all.log"
+    end
+    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/#{log_file_name} > #{ACCESS_LOG_DIR}/#{uuid}.log])
     ip_list = []
     File.open("#{ACCESS_LOG_DIR}/#{uuid}.log") do |file|
       file.each_line do |row|
@@ -222,7 +225,6 @@ class CreateLogIndex
       puts "Not exist load file."
       return nil
     end
-    #system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_load_file}")
     system("docker exec -it -e PGPASSWORD=#{@pg_user_password} #{@pg_host} psql -h #{@pg_host} -p #{@pg_port} -d #{@pg_database} -U #{@pg_user} -f #{@pg_load_file}")
   end
 
