@@ -29,8 +29,9 @@ services:
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/src:/usr/src/ddbj_validator/src
-      - ${PWD}/shared:/usr/src/ddbj_validator/shared
-      - ${PWD}/logs/:/usr/src/ddbj_validator/logs
+      - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/usr/src/ddbj_validator/shared
+      - ${DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR:-./logs}:/usr/src/ddbj_validator/logs
+
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
