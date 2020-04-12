@@ -17,3 +17,4 @@ gem "nokogiri"
 gem "unicorn"
 gem "mail"
 gem 'unicorn-worker-killer'
+gem 'dotenv'

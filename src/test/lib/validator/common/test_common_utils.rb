@@ -1,10 +1,12 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'yaml'
+require 'dotenv'
 require '../../../../lib/validator/common/common_utils.rb'
 
 class TestCommonUtils < Minitest::Test
   def setup
+    Dotenv.load "../../../../../.env"
     conf_dir = File.expand_path('../../../../../conf/biosample', __FILE__)
     @common = CommonUtils.new
     config_obj = {}
@@ -129,7 +131,7 @@ class TestCommonUtils < Minitest::Test
     ret = @common.exist_pubmed_id?(nil)
     assert_nil ret
   end
-
+=begin NCBI APIを使用するチェックは廃止
   def test_exist_pmc?
     #ok
     ret = @common.exist_pmc_id?("5343844")
@@ -146,5 +148,5 @@ class TestCommonUtils < Minitest::Test
     ret = @common.exist_pmc_id?(nil)
     assert_nil ret
   end
-
+=end
 end

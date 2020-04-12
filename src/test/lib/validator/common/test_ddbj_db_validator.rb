@@ -1,5 +1,7 @@
 require 'json'
 require 'yaml'
+require 'erb'
+require 'dotenv'
 require 'bundler/setup'
 require 'minitest/autorun'
 require '../../../../lib/validator/common/ddbj_db_validator.rb'
@@ -7,6 +9,7 @@ require '../../../../lib/validator/common/ddbj_db_validator.rb'
 class TestDDBJDbValidator < Minitest::Test
 
   def setup
+    Dotenv.load "../../../../../.env"
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
     setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)
     db_config = setting["ddbj_rdb"]

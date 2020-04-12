@@ -1,11 +1,13 @@
 require 'bundler/setup'
 require 'minitest/autorun'
+require 'dotenv'
 require '../../../../lib/validator/biosample_validator.rb'
 require '../../../../lib/validator/common/validator_cache.rb'
 
 class TestValidatorCache < Minitest::Test
 
   def setup
+    Dotenv.load "../../../../../.env"
     @validator = BioSampleValidator.new
   end
 
@@ -137,7 +139,7 @@ class TestValidatorCache < Minitest::Test
     taxonomy_id = "1445577"
     sex = "male"
     organism_name = "Colletotrichum fioriniae PJ7"
-    fungi_linages = [OrganismValidator::TAX_FUNGI] 
+    fungi_linages = [OrganismValidator::TAX_FUNGI]
     cache_key = ValidatorCache::create_key(taxonomy_id, fungi_linages)
     ret3 = @validator.send("sex_for_bacteria", "BS_R0059", "SampleA", taxonomy_id, sex, organism_name, 1)
     cache = @validator.instance_variable_get (:@cache)
