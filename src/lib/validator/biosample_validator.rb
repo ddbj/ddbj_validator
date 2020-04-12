@@ -1356,6 +1356,9 @@ class BioSampleValidator < ValidatorBase
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
     return nil if CommonUtils::null_value?(collection_date)
     result = nil
+    # DDBJ 日付型へのフォーマットを試みる
+    df = DateFormat.new
+    collection_date = df.format_date2ddbj(collection_date)
     @conf[:ddbj_date_format].each do |format|
       parse_format = format["parse_date_format"]
 
@@ -1536,7 +1539,7 @@ class BioSampleValidator < ValidatorBase
     special_chars.each do |target_val, replace_val|
       pos = 0
       while pos < replaced.length
-        #再起的に置換してしまうためgsubは使用できない。
+        #再起的に置換してしまうとまずいケースを想定しgsubは使用できない。
         #"degree C" => "degree Celsius"と置換する場合、ユーザ入力値が"degree Celsius"だった場合には"degree C"にマッチするため"degree Celsiuselsius"になってしまう
         hit_pos = replaced.index(target_val, pos)
         break if hit_pos.nil?
