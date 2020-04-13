@@ -5,12 +5,12 @@ require "json"
 require "net/http"
 require 'csv'
 require 'pg'
-require File.expand_path('/home/w3sw/ddbj/DDBJValidator/deploy/staging/current/lib/validator/common/xml_convertor.rb', __FILE__)
+require File.expand_path('/usr/src/ddbj_validator/src/lib/validator/common/xml_convertor.rb', __FILE__)
 
-class CreateEsIndex
-  ACCESS_LOG_DIR = "/home/w3sw/ddbj/DDBJValidator/deploy/production/shared/log"
-  LOG_DIR = "/home/w3sw/ddbj/DDBJValidator/deploy/logs/production"
-  TSV_DIR = "/home/w3sw/ddbj/DDBJValidator/deploy/logs/tsv"
+class CreateLogIndex
+  ACCESS_LOG_DIR = "/usr/src/ddbj_validator/shared/log"
+  LOG_DIR = "/usr/src/ddbj_validator/logs"
+  TSV_DIR = "/usr/src/ddbj_validator/logs/tsv"
   @target_date = ""
   def initialize(target_date = nil)
     if target_date.nil?
@@ -25,6 +25,7 @@ class CreateEsIndex
       @target_date = target_date
     end
     puts "target date: #{@target_date}"
+    FileUtils.mkdir(TSV_DIR) unless FileTest.exist?(TSV_DIR)
     @log_tsv_status_file = "#{TSV_DIR}/#{@target_date}_status.tsv"
     FileUtils.rm(@log_tsv_status_file) if FileTest.exist?(@log_tsv_status_file)
     @log_tsv_message_file = "#{TSV_DIR}/#{@target_date}_message.tsv"
@@ -35,6 +36,12 @@ class CreateEsIndex
     FileUtils.rm(@pg_load_file) if FileTest.exist?(@pg_load_file)
     @pg_refresh_views_file = "#{TSV_DIR}/#{@target_date}_refresh_views.sql"
     FileUtils.rm(@pg_refresh_views_file) if FileTest.exist?(@pg_refresh_views_file)
+
+    @pg_host = ENV.fetch("PGHOST") { "localhost" }
+    @pg_port = 5432
+    @pg_database = ENV.fetch("PGDB") { "validation_log" }
+    @pg_user = ENV.fetch("PGUSER") { "postgres" }
+    @pg_user_password = ENV.fetch("PGPASSWORD") { "pdb" }
   end
 
   # hashデータからヘッダー付きTSVへ変換する
@@ -51,7 +58,7 @@ class CreateEsIndex
   def create_tsv
     #日付単位でのログを取得(yyyy-MM-dd.log)
     system(%Q[grep #{@target_date} #{LOG_DIR}/validator.log > #{LOG_DIR}/#{@target_date}.log])
-    system(%Q[grep #{@target_date} #{LOG_DIR}/validator_staging20180309-0501.log >> #{LOG_DIR}/#{@target_date}.log])
+    #system(%Q[grep #{@target_date} #{LOG_DIR}/validator_staging20180309-0501.log >> #{LOG_DIR}/#{@target_date}.log])
     @status_list = []
     @message_list = []
     @annotation_list = []
@@ -60,7 +67,7 @@ class CreateEsIndex
       file.each_line do |row|
         # I, [2018-04-10T17:24:29.396851 #38545]  INFO -- : execute validation:{:biosample=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/biosample/SSUB000061.xml", :output=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/result.json"}
         if row.include?("execute validation")
-          unless (row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
+          unless (row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB004022.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
             count += 1
             row = row.split("{").last.split("}").first
             log_reg = %r{^:biosample=>"(?<bs_file>.+)", :output=>"(?<op_file>.+)"$}
@@ -106,8 +113,11 @@ class CreateEsIndex
     ret = JSON.parse(File.read(output_file))
     uuid = status["uuid"]
     # access IP addressをunicornログから取得
-    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/unicorn_err.log > #{ACCESS_LOG_DIR}/#{uuid}.log])
-    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/unicorn_err_staging20180309-0501.log >> #{ACCESS_LOG_DIR}/#{uuid}.log])
+    log_file_name = "unicorn_err.log"
+    if File.exist?("#{ACCESS_LOG_DIR}/unicorn_err_all.log")
+      log_file_name = "unicorn_err_all.log"
+    end
+    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/#{log_file_name} > #{ACCESS_LOG_DIR}/#{uuid}.log])
     ip_list = []
     File.open("#{ACCESS_LOG_DIR}/#{uuid}.log") do |file|
       file.each_line do |row|
@@ -215,7 +225,7 @@ class CreateEsIndex
       puts "Not exist load file."
       return nil
     end
-    system("/usr/bin/psql -d validation_log -U const -f #{@pg_load_file}")
+    system("docker exec -it -e PGPASSWORD=#{@pg_user_password} #{@pg_host} psql -h #{@pg_host} -p #{@pg_port} -d #{@pg_database} -U #{@pg_user} -f #{@pg_load_file}")
   end
 
   # pivot viewを更新する
@@ -225,8 +235,7 @@ class CreateEsIndex
       return nil
     end
     begin
-      passwd = File.read("#{Dir.home}/.pgpass").split(":").last.chomp
-      connection = PG::Connection.connect('localhost', 5432, '', '', 'validation_log', 'const',  passwd)
+      connection = PG::Connection.connect(@pg_host, @pg_port, '', '', @pg_database, @pg_user,  @pg_user_password)
 
       sql_file = File.open(@pg_refresh_views_file, "w")
       # 全ruleのannotation項目名を取得
@@ -262,7 +271,8 @@ class CreateEsIndex
 
       sql_file.flush
       sql_file.close
-      system("/usr/bin/psql -d validation_log -U const -f #{@pg_refresh_views_file}")
+      #system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
+      system("docker exec -it -e PGPASSWORD=#{@pg_user_password} #{@pg_host} psql -h #{@pg_host} -p #{@pg_port} -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
     rescue => ex
       message = "Failed to execute the query to DDBJ 'validation_log'.\n"
       message += "#{ex.message} (#{ex.class})"
@@ -328,17 +338,18 @@ end
 
 
 if ARGV.size > 0
-  creator = CreateEsIndex.new(ARGV[0])
+  creator = CreateLogIndex.new(ARGV[0])
   target_date = ARGV[0]
 else
   # 引数無しの場合には昨日のログを出力
-  creator = CreateEsIndex.new()
+  creator = CreateLogIndex.new()
 end
 
 # TSV出力
 puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} Start create index"
 creator.create_tsv
 puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} End create index"
+
 # PostgreSQLロード
 puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} Start load index"
 creator.load_pg

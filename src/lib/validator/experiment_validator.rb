@@ -24,7 +24,13 @@ class ExperimentValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
   end
 
   #
@@ -73,7 +79,7 @@ class ExperimentValidator < ValidatorBase
       experiment_set.each_with_index do |experiment_node, idx|
         idx += 1
         experiment_name = get_experiment_label(experiment_node, idx)
-        invalid_center_name("DRA_R0004", submission_name, submission_node, acc_center_name, idx)
+        invalid_center_name("DRA_R0004", submission_name, submission_node, acc_center_name, idx) if @use_db
         missing_experiment_title("DRA_R0010", experiment_name, experiment_node, idx)
         missing_experiment_description("DRA_R0013", experiment_name, experiment_node, idx)
         missing_library_name("DRA_R0018", experiment_name, experiment_node, idx)

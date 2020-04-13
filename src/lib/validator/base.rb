@@ -1,6 +1,6 @@
 require 'yaml'
 
-class ValidatorBase 
+class ValidatorBase
 
   def initialize
     @conf = read_common_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
@@ -16,12 +16,25 @@ class ValidatorBase
   def read_common_config (config_file_dir)
     config = {}
     begin
-      setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
+      setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
       config[:sparql_config] = setting["sparql_endpoint"]
-      config[:ddbj_db_config] = setting["ddbj_rdb"]
+      @pg_host = config["pg_host"]
+      @pg_port = config["pg_port"]
+      @pg_user = config["pg_user"]
+      @pg_pass = config["pg_pass"]
+      @pg_timeout = config["pg_timeout"]
+      if setting["ddbj_rdb"].nil? \
+        || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == "" \
+        || setting["ddbj_rdb"]["pg_port"].nil? || setting["ddbj_rdb"]["pg_port"] == "" \
+        || setting["ddbj_rdb"]["pg_user"].nil? || setting["ddbj_rdb"]["pg_user"] == "" \
+        || setting["ddbj_rdb"]["pg_pass"].nil? || setting["ddbj_rdb"]["pg_pass"] == ""
+        config[:ddbj_db_config] = nil
+      else
+        config[:ddbj_db_config] = setting["ddbj_rdb"]
+      end
       config[:google_api_key] = setting["google_api_key"]
       config[:eutils_api_key] = setting["eutils_api_key"]
-      version = YAML.load(File.read(config_file_dir + "/version.yml"))
+      version = YAML.load(ERB.new(File.read(config_file_dir + "/version.yml")).result)
       config[:version] = version["version"]
       config
     rescue => ex

@@ -1,0 +1,19 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    geocoder (1.6.1)
+    mini_portile2 (2.4.0)
+    nokogiri (1.10.9)
+      mini_portile2 (~> 2.4.0)
+    pg (1.2.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  geocoder
+  nokogiri
+  pg
+
+BUNDLED WITH
+   1.17.3

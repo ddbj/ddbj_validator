@@ -1,0 +1,57 @@
+#!/bin/sh
+
+## validatorアプリケーション(ruby)のみを入れ替えるための起動/停止/再起動スクリプト
+
+ROOT_DIR=$(cd ../$(dirname $0); pwd)
+LOG_DIR=$ROOT_DIR/logs
+RUNNING_LOG_DIR=$LOG_DIR/running
+PID="${ROOT_DIR}/shared/tmp/pids/unicorn.pid"
+
+start()
+{
+  echo "Starting the process..."
+  cd ${ROOT_DIR} && ( docker-compose start app )
+}
+
+stop()
+{
+  # validatorが処理実行している間にdocker stopがかかると強制的にプロセスkillされ、途中で落ちたジョブは復帰しない
+  # その為、実行中ログファイルを監視して処理が終了したらコンテナ停止する
+  while :
+  do
+    # 実行中はlogs/running/*.tmp でファイルが存在するので、消えるまで待つ。10分以上経過したログファイルはゴミとみなす。
+    running_job_count="$(find ${RUNNING_LOG_DIR} -mmin -10 -name '*.tmp' | wc -l)"
+    if [[ $running_job_count -eq 0 ]]; then
+      break
+    fi
+    echo "Validation process is in progress. Wait 10 seconds and recheck to safety stopping.."
+    sleep 10
+  done
+  echo "All old validation proccess have finished. Stopping the process"
+  cd ${ROOT_DIR} && ( docker-compose stop app )
+  if [ -e ${PID} ]; then
+    rm ${PID}
+  fi
+}
+
+restart()
+{
+  stop
+  sleep 2;
+  start
+}
+
+case "$1" in
+  start)
+    start
+    ;;
+  stop)
+    stop
+    ;;
+  restart)
+    restart
+    ;;
+  *)
+    echo "Syntax Error: release [start|stop|restart]"
+    ;;
+esac

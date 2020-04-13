@@ -4,7 +4,7 @@ class SubmitterBase
 
   def initialize
     config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
-    setting = YAML.load(File.read(config_file_dir + "/validator.yml"))
+    setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
     config = setting["ddbj_rdb"]
 
     @pg_host = config["pg_host"]

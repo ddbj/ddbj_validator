@@ -33,8 +33,14 @@ class BioSampleValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
     @cache = ValidatorCache.new
   end
 
@@ -178,9 +184,11 @@ class BioSampleValidator < ValidatorBase
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         attribute_value_is_not_integer("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
-        ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        if @use_db
+          ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+            biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+          end
         end
       end
 
@@ -211,11 +219,11 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 特定の属性値に対する検証
-      invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-      bioproject_not_found("BS_R0006", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num)
-      invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
+      invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
+      bioproject_not_found("BS_R0006", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num) if @use_db
+      invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
       invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
-      duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num)
+      duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num) if @use_db
       ret = format_of_geo_loc_name_is_invalid("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
@@ -277,7 +285,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
       params[:version] = @conf[:version]["biosample_graph"]
@@ -446,7 +454,7 @@ class BioSampleValidator < ValidatorBase
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name}
       params[:version] = @conf[:version]["biosample_graph"]
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
@@ -776,7 +784,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Args
   # rule_code
   # bioproject_accession ex."PDBJ123456"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #

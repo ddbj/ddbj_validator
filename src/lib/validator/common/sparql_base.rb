@@ -15,15 +15,12 @@ class SPARQLBase
   # ==== Args
   # endpoint: endpoint url
   #
-  def initialize(endpoint, slave_endpoint=nil)
+  def initialize(endpoint)
     @endpoint_url = endpoint
-    unless slave_endpoint.nil?
-      @slave_endpoint_url = slave_endpoint
-    end
   end
 
   #
-  # Queries sparql query to endpoint, return result value 
+  # Queries sparql query to endpoint, return result value
   #
   # ==== Args
   # _query_ :: SPARQL query string
@@ -33,25 +30,20 @@ class SPARQLBase
   #  [{:s=>"...", :p=>"...", :o=>"..."}, {:s=>"...", :p=>"...", :o=>"..."}, ....]
   def query (query)
     sparql_ep = SPARQL.new("#{@endpoint_url}")
+    count = 0
+    max_retry_times = 10
     begin
+      count += 1
       result = sparql_ep.query(query, :format => 'json')
       result_json = JSON.parse(result)
     rescue => ex
-      unless @slave_endpoint_url.nil?
-        begin
-          sparql_ep = SPARQL.new("#{@slave_endpoint_url}")
-          result = sparql_ep.query(query, :format => 'json')
-          result_json = JSON.parse(result)
-        rescue => ex2
-          message = "Failed the sparql query. endpoint: '#{@endpoint_url}', '#{@slave_endpoint_url}' sparql query: '#{query}'.\n"
-          message += "#{ex2.message} (#{ex2.class})"
-          raise StandardError, message, ex2.backtrace
-        end
-      else
-        message = "Failed the sparql query. endpoint: '#{@endpoint_url}' sparql query: '#{query}'.\n"
-        message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
+      if count < max_retry_times
+        sleep 2
+        retry
       end
+      message = "Failed the sparql query. endpoint: '#{@endpoint_url}' sparql query: '#{query}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
     end
     return [] if result_json['results']['bindings'].empty?
     result = result_json['results']['bindings'].map do |b|

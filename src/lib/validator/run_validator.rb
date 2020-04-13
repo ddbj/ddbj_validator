@@ -24,7 +24,13 @@ class RunValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
   end
 
   #
@@ -73,7 +79,7 @@ class RunValidator < ValidatorBase
       run_set.each_with_index do |run_node, idx|
         idx += 1
         run_name = get_run_label(run_node, idx)
-        invalid_center_name("DRA_R0004", run_name, run_node, @submitter_id, idx)
+        invalid_center_name("DRA_R0004", run_name, run_node, @submitter_id, idx) if @use_db
         missing_run_title("DRA_R0011", run_name, run_node, idx)
         missing_run_filename("DRA_R0021", run_name, run_node, idx)
         invalid_run_filename("DRA_R0023", run_name, run_node, idx)

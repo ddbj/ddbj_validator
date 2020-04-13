@@ -28,8 +28,14 @@ class BioProjectValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:sparql_config]["slave_endpoint"])
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
   end
 
 
@@ -87,7 +93,7 @@ class BioProjectValidator < ValidatorBase
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
-      duplicated_project_name("BP_R0003", project_name, project_node, project_name_list, @submission_id, idx)
+      duplicated_project_name("BP_R0003", project_name, project_node, project_name_list, @submission_id, idx) if @use_db
       identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
       short_project_description("BP_R0006", project_name, project_node, idx)
       empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
@@ -103,8 +109,8 @@ class BioProjectValidator < ValidatorBase
       taxonomy_at_species_or_infraspecific_rank("BP_R0018", project_name, project_node, idx)
       empty_organism_description_for_multi_species("BP_R0019", project_name, project_node, idx)
       metagenome_or_environmental("BP_R0020", project_name, project_node, idx)
-      invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx)
-      invalid_biosample_accession("BP_R0022", project_name, project_node, idx)
+      invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx) if @use_db
+      invalid_biosample_accession("BP_R0022", project_name, project_node, idx) if @use_db
       missing_project_name("BP_R0036", project_name, project_node, idx)
       taxonomy_error_warning("BP_R0038", project_name, project_node, idx)
       taxonomy_name_and_id_not_match("BP_R0039", project_name, project_node, idx)
@@ -114,7 +120,7 @@ class BioProjectValidator < ValidatorBase
     link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
     #各リンク毎の検証
     link_set.each_with_index do |link_node, idx|
-      invalid_umbrella_project("BP_R0016", "Link", link_node, idx)
+      invalid_umbrella_project("BP_R0016", "Link", link_node, idx) if @use_db
     end
   end
 

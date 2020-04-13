@@ -1,0 +1,14 @@
+.dockerignore
+docker-compose.yml
+Dockerfile
+README.md
+shared/config/entrypoint.virtuoso.sh
+shared/config/virtuoso
+shared/data/virtuoso
+template.env
+d-easy
+deploy_tools
+kyulee
+monitoring
+webapp
+ykodama
