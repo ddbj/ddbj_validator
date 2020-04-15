@@ -252,6 +252,7 @@ class BioSampleValidator < ValidatorBase
         sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
         taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
       end
+      invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
 
       ### 重要属性の欠損検証
       missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
@@ -2251,6 +2252,16 @@ class BioSampleValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:101
+  # sample_nameが許容されたフォーマットであるかの検証
+  # 英数と使用可能記号で100文字まで許容
+  #
+  # ==== Args
+  # sample name ex."my sample 20"
+  # ==== Return
+  # true/false
+  #
   def invalid_sample_name_format (rule_code, sample_name, line_num)
     return nil if CommonUtils::null_value?(sample_name)
     result = true
@@ -2261,6 +2272,50 @@ class BioSampleValidator < ValidatorBase
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+  #
+  # rule:104
+  # ゲノム配列登録(MIGS.ba/MIGS.eu)の場合にstrain名が抜けていないかの検証
+  # 生物種名が"sp."で終わっていればエラー(https://github.com/ddbj/ddbj_validator/issues/68)
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # taxonomy_id "2306576"
+  # organism "Caryophanon sp."
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_taxonomy_for_genome_sample (rule_code, sample_name, package_name, taxonomy_id, organism, line_num)
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
+    result = true
+    if package_name.start_with?("MIGS.ba") || package_name.start_with?("MIGS.eu")
+      if organism.downcase.end_with?("sp.")
+        if (CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
+          # tax_idが不明な場合、新規生物種登録の可能性がありstrain名をつけてもらいたいためエラー
+          result = false
+        else
+          infraspecific = @org_validator.is_infraspecific_rank(taxonomy_id)
+          # species以下の場合でstrain名をつけるべきだが、species未満の場合はBS_R0096(taxonomy_at_species_or_infraspecific_rank)でエラーになるのでこのルールはスルーする
+          if infraspecific == true
+            result = false
+          end
+        end
+      end
+    end
+    if result == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute name", value: "organism"},
+          {key: "Attribute value", value: organism}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
     end
     result
   end

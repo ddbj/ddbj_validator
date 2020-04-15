@@ -820,9 +820,9 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("future_collection_date", "BS_R0040", "sampleA", "missing", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("future_collection_date", "BS_R0040", "sampleA", "1952.10.21", 1)
-    assert_nil ret[:result]
-    assert_equal 0, ret[:error_list].size
+    # ret = exec_validator("future_collection_date", "BS_R0040", "sampleA", "1952.10.21", 1)
+    # assert_nil ret[:result]
+    # assert_equal 0, ret[:error_list].size
   end
 
   def test_invalid_attribute_value_for_null
@@ -1448,6 +1448,35 @@ jkl\"  "
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ret = exec_validator("invalid_sample_name_format", "BS_R0101", "", 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
+  def test_invalid_taxonomy_for_genome_sample
+    # ok case
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.ba.microbial", "1198036",  "Caryophanon sp. AS70", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.ba.microbial", "564289",  "Cyprinidae hybrid sp.", 1) # sp. 終わりだがinfraspecificではない
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## ends with sp.
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.eu", "2306576",  "Caryophanon sp.", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## deeper rank than species
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.eu", "655401",  "Serratia symbiont of Stomaphis sp.", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not fixed taxonomy_id
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.eu", nil, "Caryophanon sp.", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.eu", "1198036", "", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
