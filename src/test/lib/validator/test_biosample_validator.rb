@@ -828,38 +828,45 @@ class TestBioSampleValidator < Minitest::Test
   def test_invalid_attribute_value_for_null
     null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_accepted.json"))
     null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
+    package_attr_list = @validator.get_attributes_of_package("MIMS.me.microbial")
     # ok case
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "MTB313", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "10m", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "NIAS", null_accepted, null_not_recommended, 1)
+    ## optional attribute(ignore)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     ## uppercase
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "not applicable", get_auto_annotation(ret[:error_list])
     ## not recommended
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "n. a.", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "n. a.", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", ".", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", ".", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "-", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "-", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ## optional attribute & not provide package_attr_list
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, nil, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "not applicable", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ## null like value
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "not applicable", null_accepted, null_not_recommended, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "not applicable", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -1403,7 +1410,6 @@ jkl\"  "
 
   end
 
-=begin (suppressed)
   def test_null_values_provided_for_optional_attributes
     null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_accepted.json"))
     null_not_recommended = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
@@ -1422,7 +1428,6 @@ jkl\"  "
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
   end
-=end
 
   def test_invalid_sample_name_format
     # ok case

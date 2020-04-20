@@ -27,8 +27,8 @@
     <Attributes>
         <Attribute attribute_name="sample_name">MTB313</Attribute>
         <Attribute attribute_name="strain">MTB313</Attribute>
-        <Attribute attribute_name="env_biome">urban biome</Attribute>
-        <Attribute attribute_name="collection_date">2011</Attribute>
+        <Attribute attribute_name="env_biome">n.a.</Attribute>
+        <Attribute attribute_name="collection_date">Unknown</Attribute>
         <Attribute attribute_name="env_feature">town</Attribute>
         <Attribute attribute_name="geo_loc_name">Japan: Hikone-shi</Attribute>
         <Attribute attribute_name="lat_lon">136.225389 35.262246</Attribute>

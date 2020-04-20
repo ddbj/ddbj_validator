@@ -15,7 +15,7 @@ require File.dirname(__FILE__) + "/common/validator_cache.rb"
 require File.dirname(__FILE__) + "/common/xml_convertor.rb"
 
 #
-# A class for BioSample validation 
+# A class for BioSample validation
 #
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
@@ -135,7 +135,8 @@ class BioSampleValidator < ValidatorBase
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
+        package_attr_list = get_attributes_of_package(biosample_data["package"])
+        ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
@@ -263,6 +264,7 @@ class BioSampleValidator < ValidatorBase
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
       missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
+      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list , line_num)
 
     end
   end
@@ -476,7 +478,7 @@ class BioSampleValidator < ValidatorBase
       false
     else
       true
-    end 
+    end
   end
 
   #
@@ -627,7 +629,7 @@ class BioSampleValidator < ValidatorBase
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
-    missing_attr_names = mandatory_attr_list - sample_attr.keys 
+    missing_attr_names = mandatory_attr_list - sample_attr.keys
     if missing_attr_names.size <= 0
       true
     else
@@ -654,7 +656,7 @@ class BioSampleValidator < ValidatorBase
   # line_num
   # ==== Return
   # true/false
-  # 
+  #
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
@@ -942,13 +944,13 @@ class BioSampleValidator < ValidatorBase
   # rule:15
   # host属性に記載された生物種名がTaxonomy ontologyにScientific nameとして存在するかの検証
   # host_taxidは記述がなくてもよく、あった場合にはhost_nameとの整合性をチェックする
-  # 
+  #
   # ==== Args
   # rule_code
   # sample_name
   # host_taxid ex."9606"
   # host_name ex."Homo sapiens"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1086,7 +1088,7 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # taxonomy_id ex."103690"
   # organism_name ex."Nostoc sp. PCC 7120"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1198,10 +1200,10 @@ class BioSampleValidator < ValidatorBase
   # taxonomy_id ex."103690"
   # package_name ex."MIGS.ba.microbial"
   # organism ex."Nostoc sp. PCC 7120"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
-  # 
+  #
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
     return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
@@ -1242,7 +1244,7 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # taxonomy_id ex."103690"
   # sex ex."male"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1407,6 +1409,7 @@ class BioSampleValidator < ValidatorBase
   # rule:1
   # "not applicable"のようなNULL値相当の値の表記ゆれ(大文字小文字)を補正
   # "N.A."のような非推奨値を規定の値(missing)に補正
+  # package_attr_listの指定がある場合、optional項目については無視される
   #
   # ==== Args
   # rule_code
@@ -1414,13 +1417,22 @@ class BioSampleValidator < ValidatorBase
   # attr_val 属性値
   # null_accepted_list NULL値として推奨される値(正規表現)のリスト
   # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
+  # package_attr_list パッケージに対する属性一覧(必須/任意の区分)
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, line_num)
+  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, package_attr_list, line_num)
     return nil if CommonUtils::null_value?(attr_val)
-
     result = true
+
+    unless package_attr_list.nil?
+      mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
+        attr[:attribute_name] if attr[:require] == "mandatory"
+      }.compact
+      unless mandatory_attr_list.include?(attr_name) # optionalの場合にはBS_R0100で空白置換されるためこのルールではスルー
+        return true
+      end
+    end
 
     attr_val_result = ""
     #推奨されている NULL 値の表記を揃える(小文字表記へ)
@@ -2210,7 +2222,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # rule:100 (suppressed)
+  # rule:100
   # 任意属性で提供情報が無い場合、missing 等の null value が記載されるケースではauto-correct で削除する
   #
   # ==== Args
