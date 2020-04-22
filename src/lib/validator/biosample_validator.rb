@@ -34,6 +34,7 @@ class BioSampleValidator < ValidatorBase
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
+    @institution_list = CommonUtils.new.parse_coll_dump(@conf[:institution_list_file])
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -68,6 +69,7 @@ class BioSampleValidator < ValidatorBase
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
+      config[:institution_list_file] = config_file_dir + "/coll_dump.txt"
       config[:google_api_key] = @conf[:google_api_key]
       config[:eutils_api_key] = @conf[:eutils_api_key]
       config
@@ -228,6 +230,14 @@ class BioSampleValidator < ValidatorBase
       ret = format_of_geo_loc_name_is_invalid("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
+      invalid_institution_code("BS_R0107", sample_name, "specimen_voucher", biosample_data["attributes"]["specimen_voucher"], @institution_list, line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["specimen_voucher"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
+      invalid_institution_code("BS_R0107", sample_name, "culture_collection", biosample_data["attributes"]["culture_collection"], @institution_list, line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["culture_collection"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
 
       invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
@@ -2332,4 +2342,50 @@ class BioSampleValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:107
+  # 同じ institution code をもつ値が複数の voucher attributes (specimen voucher, culture collection) に入力されていないかの検証
+  #
+  # ==== Args
+  # rule_code
+  # attr_name "specimen_voucher" or "culture_collection"
+  # attr_value value with institution name ex. "URM:52179", "ATCC:26370"
+  # institution_list institution_name
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_institution_code (rule_code, sample_name, attr_name, attr_value, institution_list, line_num)
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_value) || institution_list.nil?
+    return nil if !(attr_name == "specimen_voucher" || attr_name == "culture_collection")
+
+    ret = true
+    if attr_value =~ /^.*:.*$/
+      institution_name = attr_value.split(":").first.strip
+      replaced = ""
+      unless institution_list[attr_name.to_sym].include?(institution_name)
+        ret = false
+        replaced_candidate = institution_list[attr_name.to_sym].find {|inst| inst.downcase == institution_name.downcase }
+        unless replaced_candidate.nil? # case insensitive
+          replaced = replaced_candidate + ":" + attr_value.split(":")[1..-1].join(":")
+        end
+      end
+    else # institution_nameがなければNG
+      ret = false
+    end
+
+    if ret == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: attr_name, value: attr_value},
+      ]
+      unless replaced == ""
+        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
 end

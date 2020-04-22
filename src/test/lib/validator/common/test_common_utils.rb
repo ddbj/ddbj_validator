@@ -149,4 +149,20 @@ class TestCommonUtils < Minitest::Test
     assert_nil ret
   end
 =end
+
+  def test_parse_coll_dump
+    file_name = "coll_dump.txt"
+    #ok
+    # get file
+    FileUtils.rm(file_name) if File.exist?(file_name)
+    ret = @common.parse_coll_dump(file_name)
+    assert_equal true, ret[:specimen_voucher].include?("UWBM")
+    assert_equal true, ret[:culture_collection].include?("ATCC")
+    # exist file
+    ret = @common.parse_coll_dump(file_name)
+    assert_equal true, ret[:specimen_voucher].include?("UWBM")
+    assert_equal true, ret[:culture_collection].include?("ATCC")
+
+    FileUtils.rm(file_name) if File.exist?(file_name)
+  end
 end

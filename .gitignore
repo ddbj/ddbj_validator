@@ -21,6 +21,7 @@ shared/tmp
 src/shared/log/
 src/shared/tmp/
 deploy_tools/log
+src/conf/biosample/coll_dump.txt
 
 log_analysis/data/
 

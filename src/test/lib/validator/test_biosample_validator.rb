@@ -1485,4 +1485,61 @@ jkl\"  "
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+
+  def test_invalid_institution_code
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/biosample/coll_dump.txt")
+    # ok case
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "AAU:1234", institution_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "AAU<ETH>:1234", institution_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "UAM:Mamm:1234", institution_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "culture_collection", "ATCC : 1234", institution_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## invalid
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "NotExist:123456", institution_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## invalid format
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "KYO00019935", institution_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## need <JPN>
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "URM:1234", institution_list, 1) # expect URM<JPN>
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not institution for specimen (for culture_collection)
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "specimen_voucher", "NBRC:1234", institution_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## auto correct
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "culture_collection", "Coriell:12345", institution_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "CORIELL:12345", get_auto_annotation(ret[:error_list])
+
+    # nil case
+    # empty value
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "culture_collection", "", institution_list, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "culture_collection", "missing", institution_list, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not target attr name
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "not_culture_collection", "NBRC:1234", institution_list, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # without institution_list
+    ret = exec_validator("invalid_institution_code", "BS_R0107", "SampleA", "not_culture_collection", "NBRC:1234", nil, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
 end

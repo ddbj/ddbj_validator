@@ -3,6 +3,7 @@ require 'erubis'
 require 'geocoder'
 require 'net/http'
 require 'net/https'
+require 'net/ftp'
 require 'date'
 
 class CommonUtils
@@ -55,7 +56,7 @@ class CommonUtils
   # ==== Args
   # rule: ルールのオブジェクト
   # file_path: 検証対象のファイルパス
-  # annotation: annotation list for correcting the value 
+  # annotation: annotation list for correcting the value
   # auto_annotation: true/false Auto annotationかどうか
   # ==== Return
   # エラーのHashオブジェクト
@@ -526,5 +527,46 @@ class CommonUtils
       http.request(req)
     }
     res
+  end
+
+  #
+  # coll_dump.txtファイルをパースして、specimen_voucher/culture_collectionのinstitutionリストを返す
+  #
+  # ==== Args
+  # dump_file: coll_dump.txtのファイルパス
+  # ==== Return
+  # {
+  #   specimen_voucher: ["ASU", "NBSB",...],
+  #   culture_collection: ["ATCC", "NBRC",...]
+  # }
+  #
+  def parse_coll_dump(dump_file)
+    # 指定されたcoll_dump.txtがない場合はダウンロードする
+    unless File.exist?(dump_file)
+      begin
+        ftp = Net::FTP.new("ftp.ncbi.nlm.nih.gov")
+        ftp.login
+        ftp.passive = true
+        ftp.chdir("/pub/taxonomy/")
+        ftp.getbinaryfile('coll_dump.txt', dump_file, 1024)
+      rescue
+      ensure
+        ftp.close unless ftp.nil?
+      end
+    end
+    return nil if !File.exist?(dump_file) || File.size(dump_file) == 0
+    ret = {specimen_voucher: [], culture_collection: []}
+    File.open(dump_file) do |f|
+      f.each_line do |line|
+        row = line.split("\t")
+        next unless row.size >= 2
+        if row[1].strip.include?('s')
+          ret[:specimen_voucher].push(row[0].strip.split(":").first)
+        elsif row[1].strip.include?('c')
+          ret[:culture_collection].push(row[0].strip.split(":").first)
+        end
+      end
+    end
+    ret
   end
 end
