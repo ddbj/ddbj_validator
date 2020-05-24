@@ -536,8 +536,10 @@ class CommonUtils
   # dump_file: coll_dump.txtのファイルパス
   # ==== Return
   # {
-  #   specimen_voucher: ["ASU", "NBSB",...],
-  #   culture_collection: ["ATCC", "NBRC",...]
+  #   culture_collection: ["ATCC", "NBRC", "JMRC:SF", ...],
+  #   specimen_voucher: ["ASU", "NBSB", "NBSB:Bird", ...],
+  #   bio_material: ["ABRC", "CIAT", "CIAT:Bean",...],
+  #
   # }
   #
   def parse_coll_dump(dump_file)
@@ -555,17 +557,29 @@ class CommonUtils
       end
     end
     return nil if !File.exist?(dump_file) || File.size(dump_file) == 0
-    ret = {specimen_voucher: [], culture_collection: []}
+    ret = {culture_collection: [], specimen_voucher: [], bio_material: []}
     File.open(dump_file) do |f|
       f.each_line do |line|
         row = line.split("\t")
         next unless row.size >= 2
-        if row[1].strip.include?('s')
-          ret[:specimen_voucher].push(row[0].strip.split(":").first)
-        elsif row[1].strip.include?('c')
-          ret[:culture_collection].push(row[0].strip.split(":").first)
+
+        keys = []
+        keys.push("culture_collection") if row[1].strip.include?('c')
+        keys.push("specimen_voucher") if row[1].strip.include?('s')
+        keys.push("bio_material") if row[1].strip.include?('b')
+        next if keys.size == 0
+        keys.each do |key|
+          if row[0].strip.split(":").size == 1 # only institude name
+            ret[key.to_sym].push(row[0].strip.split(":").first)
+          elsif row[0].strip.split(":").size > 1 # with collection name (e.g. "NBSB:Bird")
+            ret[key.to_sym].push(row[0].strip.split(":")[0..-1].join(":"))
+            ret[key.to_sym].push(row[0].strip.split(":").first) #念のため　institution name だけを追加
+          end
         end
       end
+    end
+    ret.each do |k, v|
+      v.uniq! #重複削除
     end
     ret
   end

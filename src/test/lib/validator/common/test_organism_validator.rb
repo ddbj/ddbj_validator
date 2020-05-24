@@ -313,4 +313,14 @@ WHERE
     assert_equal "error", ret[:status]
   end
 
+  def test_target_organism_for_specimen_voucher?
+    ret = @validator.target_organism_for_specimen_voucher?("9606") #eukaryote
+    assert_equal true, ret
+    ret = @validator.target_organism_for_specimen_voucher?("103690") #cyanobacteria
+    assert_equal true, ret
+    ret = @validator.target_organism_for_specimen_voucher?("562") #bacteria (not cyano)
+    assert_equal false, ret
+    ret = @validator.target_organism_for_specimen_voucher?("410658") #soil metagenome
+    assert_equal false, ret
+  end
 end

@@ -158,6 +158,9 @@ class TestCommonUtils < Minitest::Test
     ret = @common.parse_coll_dump(file_name)
     assert_equal true, ret[:specimen_voucher].include?("UWBM")
     assert_equal true, ret[:culture_collection].include?("ATCC")
+    assert_equal true, ret[:bio_material].include?("CIAT")
+    assert_equal true, ret[:bio_material].include?("CIAT:Bean")
+    assert_equal true, ret[:bio_material].include?("ANDES:T")
     # exist file
     ret = @common.parse_coll_dump(file_name)
     assert_equal true, ret[:specimen_voucher].include?("UWBM")
