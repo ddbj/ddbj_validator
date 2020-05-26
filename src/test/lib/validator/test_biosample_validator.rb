@@ -1483,6 +1483,14 @@ jkl\"  "
     ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.eu", nil, "Caryophanon sp.", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## ends with "sp. (in: xxx)" https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.ba.microbial", "1409",  "Bacillus sp. (in: Bacteria)", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## ends with "sp. (ex xxx)"  https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
+    ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.ba.microbial", "1617264",  "Anaplasma sp. (ex Felis catus 'Sissi')", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
 
     # nil case
     ret = exec_validator("invalid_taxonomy_for_genome_sample", "BS_R0104", "SampleA", "MIGS.eu", "1198036", "", 1)

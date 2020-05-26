@@ -2330,7 +2330,8 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
     result = true
     if package_name.start_with?("MIGS.ba") || package_name.start_with?("MIGS.eu")
-      if organism.downcase.end_with?("sp.")
+      # "sp."終わり、または"xxx sp. (in: yyy)", "xxx sp. (ex yyy)"であればエラー seealso: https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
+      if organism.downcase.end_with?("sp.") || organism =~ /.+sp\.\s*\((in\:|ex)\s.*\)$/
         if (CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
           # tax_idが不明な場合、新規生物種登録の可能性がありstrain名をつけてもらいたいためエラー
           result = false
