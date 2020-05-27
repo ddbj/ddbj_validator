@@ -6,7 +6,7 @@
     "internal_ignore": false,
     "name": "Invalid Attribute value for null",
     "method": "invalid_attribute_value_for_null",
-    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing'.",
+    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory attribute.",
     "object": [
       "BioSample"
     ],
@@ -396,7 +396,7 @@
     "internal_ignore": false,
     "name": "Multiple vouchers",
     "method": "multiple_vouchers",
-    "message": "Multiple voucher attributes (specimen voucher, culture collection or biologic material) detected with the same institution code. Only one value is allowed.",
+    "message": "Multiple voucher attributes (culture_collection, specimen_voucher or bio_material) detected with the same institution code. Only one value is allowed. For the same voucher ID, prioritize specimen_voucher over bio_material.",
     "object": [
       "BioSample"
     ],
@@ -474,7 +474,7 @@
     "internal_ignore": true,
     "name": "package_vs_organism > Microbe",
     "method": "package_vs_organism___microbe",
-    "message": "Must have lineage Bacteria, Archaea, Viruses, Viroids or Fungi; or for unicellular eukaryotes, Must not have lineage Metazoa, Embryophyta, unclassified sequences or other sequences",
+    "message": "Must have lineage Bacteria, Archaea, Viruses, Viroids or Fungi; or for unicellular eukaryotes, must not have lineage Metazoa, Embryophyta, unclassified sequences or other sequences",
     "object": [
       "BioSample"
     ],
@@ -765,5 +765,226 @@
       "BioSample"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0101"
+  },
+  "ruleBS_R0102": {
+    "rule_class": "BioSample",
+    "code": "BS_R0102",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Duplicated locus tag prefix",
+    "method": "duplicated_locus_tag_prefix",
+    "message": "Locus tag prefix is duplicated in the submission.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0102"
+  },
+  "ruleBS_R0103": {
+    "rule_class": "BioSample",
+    "code": "BS_R0103",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Taken locus tag prefix",
+    "method": "taken_locus_tag_prefix",
+    "message": "Locus tag prefix is already taken.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0103"
+  },
+  "ruleBS_R0104": {
+    "rule_class": "BioSample",
+    "code": "BS_R0104",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid taxonomy for genome sample",
+    "method": "invalid_taxonomy_for_genome_sample",
+    "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" should be used.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0104"
+  },
+  "ruleBS_R0105": {
+    "rule_class": "BioSample",
+    "code": "BS_R0105",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Taxonomy warning",
+    "method": "taxonomy_warning",
+    "message": "An organism name in the taxonomy database should be used. If applicable, the organism will be corrected to the scientific name. When the organism is novel, please enter a proposed name in the component_organism.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0105"
+  },
+  "ruleBS_R0106": {
+    "rule_class": "BioSample",
+    "code": "BS_R0106",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid metagenome source",
+    "method": "invalid_metagenome_source",
+    "message": "A metagenomic organism name in the taxonomy database should be used. For example, 'soil metagenome'.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0106"
+  },
+  "ruleBS_R0108": {
+    "rule_class": "BioSample",
+    "code": "BS_R0108",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Locus tag prefix update",
+    "method": "locus_tag_prefix_update",
+    "message": "The submission contains new or updated locus tag prefixes. Available prefixes (<%=NUMBER%>):  <%=VALUE%>, Taken prefixes (<%=NUMBER%>): <%=VALUE%>",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0108"
+  },
+  "ruleBS_R0109": {
+    "rule_class": "BioSample",
+    "code": "BS_R0109",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "No locus tag prefix for genome sample",
+    "method": "no_locus_tag_prefix_for_genome_sample",
+    "message": "Locus tag prefix is required for annotated genome submission. If you are submitting genome with annotation, please take locus tag prefix.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0109"
+  },
+  "ruleBS_R0110": {
+    "rule_class": "BioSample",
+    "code": "BS_R0110",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "package_vs_organism > MIMAG",
+    "method": "package_vs_organism___mimag",
+    "message": "Must NOT be Homo sapiens and scientific name cannot contain the term 'metagenome'",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0110"
+  },
+  "ruleBS_R0111": {
+    "rule_class": "BioSample",
+    "code": "BS_R0111",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "package_vs_organism > MISAG",
+    "method": "package_vs_organism___misag",
+    "message": "Must NOT be Homo sapiens and scientific name cannot contain the term 'metagenome'",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0111"
+  },
+  "ruleBS_R0112": {
+    "rule_class": "BioSample",
+    "code": "BS_R0112",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "package_vs_organism > MIUVIG",
+    "method": "package_vs_organism___miuvig",
+    "message": "Must have lineage Viruses",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0112"
+  },
+  "ruleBS_R0113": {
+    "rule_class": "BioSample",
+    "code": "BS_R0113",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid culture_collection format",
+    "method": "invalid_culture_collection_format",
+    "message": "Valid culture collection format is \"<institution-code>:[<collection-code>:]<culture_id>\"",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0113"
+  },
+  "ruleBS_R0114": {
+    "rule_class": "BioSample",
+    "code": "BS_R0114",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid culture_collection",
+    "method": "invalid_culture_collection",
+    "message": "The institution-code and/or collection-code must be registered in the NCBI BioCollections.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0114"
+  },
+  "ruleBS_R0115": {
+    "rule_class": "BioSample",
+    "code": "BS_R0115",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Specimen voucher for bacteria and unclassified sequences.",
+    "method": "specimen_voucher_for_bacteria_and_unclassified_sequences.",
+    "message": "Attribute 'specimen_voucher' is not appropriate for bacteria and unclassified sequences.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0115"
+  },
+  "ruleBS_R0116": {
+    "rule_class": "BioSample",
+    "code": "BS_R0116",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid specimen_voucher format",
+    "method": "invalid_specimen_voucher_format",
+    "message": "Valid specimen voucher format is \"[<institution-code>:[<collection-code>:]]<specimen_id>\"",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0116"
+  },
+  "ruleBS_R0117": {
+    "rule_class": "BioSample",
+    "code": "BS_R0117",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid specimen_voucher",
+    "method": "invalid_specimen_voucher",
+    "message": "The institution-code and/or collection-code must be registered in the NCBI BioCollections. Valid specimen voucher format is \"[<institution-code>:[<collection-code>:]]<specimen_id>\"",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0117"
+  },
+  "ruleBS_R0118": {
+    "rule_class": "BioSample",
+    "code": "BS_R0118",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid bio_material format",
+    "method": "invalid_bio_material_format",
+    "message": "Valid bio_material format is \"[<institution-code>:[<collection-code>:]]<material_id>\"",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0118"
+  },
+  "ruleBS_R0119": {
+    "rule_class": "BioSample",
+    "code": "BS_R0119",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid bio_material",
+    "method": "invalid_bio_material",
+    "message": "The institution-code and/or collection-code must be registered in the NCBI BioCollections. Valid bio_material format is \"[<institution-code>:[<collection-code>:]]<material_id>\"",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0119"
   }
 }

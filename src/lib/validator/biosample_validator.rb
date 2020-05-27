@@ -15,7 +15,7 @@ require File.dirname(__FILE__) + "/common/validator_cache.rb"
 require File.dirname(__FILE__) + "/common/xml_convertor.rb"
 
 #
-# A class for BioSample validation 
+# A class for BioSample validation
 #
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
@@ -34,6 +34,7 @@ class BioSampleValidator < ValidatorBase
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
+    @institution_list = CommonUtils.new.parse_coll_dump(@conf[:institution_list_file])
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -68,6 +69,7 @@ class BioSampleValidator < ValidatorBase
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
+      config[:institution_list_file] = config_file_dir + "/coll_dump.txt"
       config[:google_api_key] = @conf[:google_api_key]
       config[:eutils_api_key] = @conf[:eutils_api_key]
       config
@@ -135,7 +137,8 @@ class BioSampleValidator < ValidatorBase
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], line_num)
+        package_attr_list = get_attributes_of_package(biosample_data["package"])
+        ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
@@ -228,8 +231,23 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
+      invalid_culture_collection_format("BS_R0113", sample_name, biosample_data["attributes"]["culture_collection"], line_num)
+      ret = invalid_culture_collection("BS_R0114", sample_name, biosample_data["attributes"]["culture_collection"], @institution_list, line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["culture_collection"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
+      invalid_specimen_voucher_format("BS_R0116", sample_name, biosample_data["attributes"]["specimen_voucher"], line_num)
+      ret = invalid_specimen_voucher("BS_R0117", sample_name, biosample_data["attributes"]["specimen_voucher"], @institution_list, line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["specimen_voucher"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
+      invalid_bio_material_format("BS_R0118", sample_name, biosample_data["attributes"]["bio_material"], line_num)
+      ret = invalid_bio_material("BS_R0119", sample_name, biosample_data["attributes"]["bio_material"], @institution_list, line_num)
+      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["bio_material"] = CommonUtils::get_auto_annotation(@error_list.last)
+      end
 
-      invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
+      ret = invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
@@ -243,7 +261,7 @@ class BioSampleValidator < ValidatorBase
 
       ### 複数属性の組合せの検証
       latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
-      multiple_vouchers("BS_R0062", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], line_num)
+      multiple_vouchers("BS_R0062", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], biosample_data["attributes"]["bio_material"], line_num)
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### taxonomy_idの値を使う検証
@@ -251,7 +269,9 @@ class BioSampleValidator < ValidatorBase
         package_versus_organism("BS_R0048", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
         sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
         taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+        specimen_voucher_for_bacteria_and_unclassified_sequences("BS_R0115", sample_name, biosample_data["attributes"]["specimen_voucher"], taxonomy_id, line_num)
       end
+      invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
 
       ### 重要属性の欠損検証
       missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
@@ -262,6 +282,7 @@ class BioSampleValidator < ValidatorBase
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
       missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
+      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list , line_num)
 
     end
   end
@@ -475,7 +496,7 @@ class BioSampleValidator < ValidatorBase
       false
     else
       true
-    end 
+    end
   end
 
   #
@@ -626,7 +647,7 @@ class BioSampleValidator < ValidatorBase
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
-    missing_attr_names = mandatory_attr_list - sample_attr.keys 
+    missing_attr_names = mandatory_attr_list - sample_attr.keys
     if missing_attr_names.size <= 0
       true
     else
@@ -653,7 +674,7 @@ class BioSampleValidator < ValidatorBase
   # line_num
   # ==== Return
   # true/false
-  # 
+  #
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
@@ -941,13 +962,13 @@ class BioSampleValidator < ValidatorBase
   # rule:15
   # host属性に記載された生物種名がTaxonomy ontologyにScientific nameとして存在するかの検証
   # host_taxidは記述がなくてもよく、あった場合にはhost_nameとの整合性をチェックする
-  # 
+  #
   # ==== Args
   # rule_code
   # sample_name
   # host_taxid ex."9606"
   # host_name ex."Homo sapiens"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1085,7 +1106,7 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # taxonomy_id ex."103690"
   # organism_name ex."Nostoc sp. PCC 7120"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1197,10 +1218,10 @@ class BioSampleValidator < ValidatorBase
   # taxonomy_id ex."103690"
   # package_name ex."MIGS.ba.microbial"
   # organism ex."Nostoc sp. PCC 7120"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
-  # 
+  #
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
     return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
@@ -1241,7 +1262,7 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # taxonomy_id ex."103690"
   # sex ex."male"
-  # line_num 
+  # line_num
   # ==== Return
   # true/false
   #
@@ -1296,32 +1317,37 @@ class BioSampleValidator < ValidatorBase
 
   #
   # rule:62
-  # 同じ institution code をもつ値が複数の voucher attributes (specimen voucher, culture collection) に入力されていないかの検証
+  # 同じ institution code をもつ値が複数の voucher attributes (specimen voucher, culture collection, bio_material) に入力されていないかの検証
   #
   # ==== Args
   # rule_code
   # specimen_voucher ex."UAM:Mamm:52179"
   # culture_collection ex."ATCC:26370"
+  # bio_material ex."ATCC:26370"
   # line_num
   # ==== Return
   # true/false
   #
-  def multiple_vouchers (rule_code, sample_name, specimen_voucher, culture_collection, line_num)
-    return nil if CommonUtils::blank?(specimen_voucher) && CommonUtils::null_value?(culture_collection)
+  def multiple_vouchers (rule_code, sample_name, specimen_voucher, culture_collection, bio_material, line_num)
+    return nil if CommonUtils::null_value?(specimen_voucher) && CommonUtils::null_value?(culture_collection) && CommonUtils::null_value?(bio_material)
 
-    if !(!CommonUtils::blank?(specimen_voucher) && !CommonUtils::null_value?(culture_collection)) #片方だけ入力されていた場合はOK
+    values = {}
+    values[:specimen_voucher] = specimen_voucher unless CommonUtils::null_value?(specimen_voucher)
+    values[:culture_collection] = culture_collection unless CommonUtils::null_value?(culture_collection)
+    values[:bio_material] = bio_material unless CommonUtils::null_value?(bio_material)
+    if values.keys.size <= 1  #1属性だけ入力されていた場合はOK
       return true
     else
-      specimen_inst = specimen_voucher.split(":").first.strip
-      culture_inst = culture_collection.split(":").first.strip
-      if specimen_inst != culture_inst
+      institution_list = values.map do |k, v|
+        v.split(":").first.strip
+      end
+      if institution_list.size == institution_list.uniq.size #同じinstitution_codeが含まれていないか
         return true
       else
         annotation = [
           {key: "Sample name", value: sample_name},
-          {key: "specimen_voucher", value: specimen_voucher},
-          {key: "culture_collection", value: culture_collection}
         ]
+        annotation.concat(values.map {|k, v|  {key: k, value: v}})
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         return false
@@ -1356,6 +1382,9 @@ class BioSampleValidator < ValidatorBase
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
     return nil if CommonUtils::null_value?(collection_date)
     result = nil
+    # DDBJ 日付型へのフォーマットを試みる
+    df = DateFormat.new
+    collection_date = df.format_date2ddbj(collection_date)
     @conf[:ddbj_date_format].each do |format|
       parse_format = format["parse_date_format"]
 
@@ -1403,6 +1432,7 @@ class BioSampleValidator < ValidatorBase
   # rule:1
   # "not applicable"のようなNULL値相当の値の表記ゆれ(大文字小文字)を補正
   # "N.A."のような非推奨値を規定の値(missing)に補正
+  # package_attr_listの指定がある場合、optional項目については無視される
   #
   # ==== Args
   # rule_code
@@ -1410,13 +1440,22 @@ class BioSampleValidator < ValidatorBase
   # attr_val 属性値
   # null_accepted_list NULL値として推奨される値(正規表現)のリスト
   # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
+  # package_attr_list パッケージに対する属性一覧(必須/任意の区分)
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, line_num)
+  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, package_attr_list, line_num)
     return nil if CommonUtils::null_value?(attr_val)
-
     result = true
+
+    unless package_attr_list.nil?
+      mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
+        attr[:attribute_name] if attr[:require] == "mandatory"
+      }.compact
+      unless mandatory_attr_list.include?(attr_name) # optionalの場合にはBS_R0100で空白置換されるためこのルールではスルー
+        return true
+      end
+    end
 
     attr_val_result = ""
     #推奨されている NULL 値の表記を揃える(小文字表記へ)
@@ -1536,7 +1575,7 @@ class BioSampleValidator < ValidatorBase
     special_chars.each do |target_val, replace_val|
       pos = 0
       while pos < replaced.length
-        #再起的に置換してしまうためgsubは使用できない。
+        #再起的に置換してしまうとまずいケースを想定しgsubは使用できない。
         #"degree C" => "degree Celsius"と置換する場合、ユーザ入力値が"degree Celsius"だった場合には"degree C"にマッチするため"degree Celsiuselsius"になってしまう
         hit_pos = replaced.index(target_val, pos)
         break if hit_pos.nil?
@@ -2206,7 +2245,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # rule:100 (suppressed)
+  # rule:100
   # 任意属性で提供情報が無い場合、missing 等の null value が記載されるケースではauto-correct で削除する
   #
   # ==== Args
@@ -2248,6 +2287,16 @@ class BioSampleValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:101
+  # sample_nameが許容されたフォーマットであるかの検証
+  # 英数と使用可能記号で100文字まで許容
+  #
+  # ==== Args
+  # sample name ex."my sample 20"
+  # ==== Return
+  # true/false
+  #
   def invalid_sample_name_format (rule_code, sample_name, line_num)
     return nil if CommonUtils::null_value?(sample_name)
     result = true
@@ -2260,6 +2309,281 @@ class BioSampleValidator < ValidatorBase
       result = false
     end
     result
+  end
+
+  #
+  # rule:104
+  # ゲノム配列登録(MIGS.ba/MIGS.eu)の場合にstrain名が抜けていないかの検証
+  # 生物種名が"sp."で終わっていればエラー(https://github.com/ddbj/ddbj_validator/issues/68)
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # taxonomy_id "2306576"
+  # organism "Caryophanon sp."
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_taxonomy_for_genome_sample (rule_code, sample_name, package_name, taxonomy_id, organism, line_num)
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
+    result = true
+    if package_name.start_with?("MIGS.ba") || package_name.start_with?("MIGS.eu")
+      # "sp."終わり、または"xxx sp. (in: yyy)", "xxx sp. (ex yyy)"であればエラー seealso: https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
+      if organism.downcase.end_with?("sp.") || organism =~ /.+sp\.\s*\((in\:|ex)\s.*\)$/
+        if (CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
+          # tax_idが不明な場合、新規生物種登録の可能性がありstrain名をつけてもらいたいためエラー
+          result = false
+        else
+          infraspecific = @org_validator.is_infraspecific_rank(taxonomy_id)
+          # species以下の場合でstrain名をつけるべきだが、species未満の場合はBS_R0096(taxonomy_at_species_or_infraspecific_rank)でエラーになるのでこのルールはスルーする
+          if infraspecific == true
+            result = false
+          end
+        end
+      end
+    end
+    if result == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute name", value: "organism"},
+          {key: "Attribute value", value: organism}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:113
+  # culture_collection の記述フォーマットが妥当であるかの検証
+  # <institution-code>:[<collection-code>:]<culture_id>
+  #
+  # ==== Args
+  # rule_code
+  # culture_collection ex. "JCM:18900"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_culture_collection_format (rule_code, sample_name, culture_collection, line_num)
+    return nil if CommonUtils::null_value?(culture_collection)
+
+    ret = true
+    if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
+      ret = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "culture_collection"},
+        {key: "Attribute value", value: culture_collection}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:114
+  # culture_collection の institution code が NCBI BioCollections に記載された組織名かの検証
+  #
+  # ==== Args
+  # rule_code
+  # culture_collection ex. "JCM:18900"
+  # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_culture_collection (rule_code, sample_name, culture_collection, institution_list, line_num)
+    return nil if CommonUtils::null_value?(culture_collection) || institution_list.nil?
+    return nil if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
+
+    invalid_institude_name(rule_code, sample_name, "culture_collection", culture_collection, institution_list, line_num)
+  end
+
+  #
+  # rule:115
+  # specimen_voucher の記述がある場合、その入力が許されたtaxonomy_idであるか
+  # Cyanobacteria(1117)以外のBacteria(2)とunclassified sequences(12908)以下はNG
+  #
+  # ==== Args
+  # rule_code
+  # specimen_voucher ex. "UAM:ES:48279"
+  # taxonomy_id  "2306576"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def specimen_voucher_for_bacteria_and_unclassified_sequences (rule_code, sample_name, specimen_voucher, taxonomy_id, line_num)
+    return nil if CommonUtils::null_value?(specimen_voucher) ||  CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+
+    ret = @org_validator.target_organism_for_specimen_voucher?(taxonomy_id)
+    if ret == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "specimen_voucher"},
+        {key: "Attribute value", value: specimen_voucher}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:116
+  # specimen_voucher の記述フォーマットが妥当であるかの検証
+  # [<institution-code>:[<collection-code>:]]<specimen_id>
+  #
+  # ==== Args
+  # rule_code
+  # specimen_voucher ex. "UAM:ES:48279"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_specimen_voucher_format (rule_code, sample_name, specimen_voucher, line_num)
+    return nil if CommonUtils::null_value?(specimen_voucher)
+
+    ret = true
+    if specimen_voucher.split(":").size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
+      ret = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "specimen_voucher"},
+        {key: "Attribute value", value: specimen_voucher}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:117
+  # specimen_voucher の institution code が NCBI BioCollections に記載された組織名かの検証
+  #
+  # ==== Args
+  # rule_code
+  # specimen_voucher ex. "UAM:ES:48279"
+  # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_specimen_voucher (rule_code, sample_name, specimen_voucher, institution_list, line_num)
+    return nil if CommonUtils::null_value?(specimen_voucher) || institution_list.nil?
+    return nil if specimen_voucher.split(":").size > 3
+
+    invalid_institude_name(rule_code, sample_name, "specimen_voucher", specimen_voucher, institution_list, line_num)
+  end
+
+  #
+  # rule:118
+  # bio_material の記述フォーマットが妥当であるかの検証
+  # [<institution-code>:[<collection-code>:]]<specimen_id>
+  #
+  # ==== Args
+  # rule_code
+  # bio_material ex. "ABRC:CS22676"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_bio_material_format (rule_code, sample_name, bio_material, line_num)
+    return nil if CommonUtils::null_value?(bio_material)
+
+    ret = true
+    if bio_material.split(":").size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
+      ret = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "bio_material"},
+        {key: "Attribute value", value: bio_material}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:119
+  # bio_material の institution code が NCBI BioCollections に記載された組織名かの検証
+  #
+  # ==== Args
+  # rule_code
+  # bio_material ex. "ABRC:CS22676"
+  # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_bio_material (rule_code, sample_name, bio_material, institution_list, line_num)
+    return nil if CommonUtils::null_value?(bio_material) || institution_list.nil?
+    return nil if bio_material.split(":").size > 3
+
+    invalid_institude_name(rule_code, sample_name, "bio_material", bio_material, institution_list, line_num)
+  end
+
+  #
+  # colture_collection/specimen_voucher/bio_material に記載されている institution code が NCBI BioCollections に記載された組織名かの検証
+  # rule:114,117,119 で使用される
+  #
+  # ==== Args
+  # rule_code
+  # attr_name colture_collection|specimen_voucher|bio_material
+  # attr_value ex. "JCM:18900"
+  # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_institude_name (rule_code, sample_name, attr_name, attr_value, institution_list, line_num)
+    return nil unless attr_name == "culture_collection" || attr_name == "specimen_voucher" || attr_name == "bio_material"
+
+    if attr_name == "culture_collection"
+      key = "culture_collection".to_sym
+    elsif attr_name == "specimen_voucher"
+      key = "specimen_voucher".to_sym
+    elsif attr_name == "bio_material"
+      key = "bio_material".to_sym
+    end
+
+    ret = true
+    replaced_value = attr_value.split(":").map{|txt| txt.strip.chomp }.join(":")
+    valid_institution_name = false
+    if replaced_value.split(":").size >= 2
+      institution_name = replaced_value.split(":")[0..-2].join(":")
+      unless institution_list[key].include?(institution_name) || institution_list[key].include?(institution_name)
+        ret = false
+        replaced_candidate = institution_list[key].find {|inst| inst.downcase == institution_name.downcase }
+        unless replaced_candidate.nil? # case insensitive
+          replaced_value = replaced_candidate + ":" + replaced_value.split(":").last
+          valid_institution_name = true
+        end
+      else
+        valid_institution_name = true
+      end
+    end
+
+    if ret == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: attr_name},
+          {key: "Attribute value", value: attr_value}
+      ]
+      if replaced_value != attr_value && valid_institution_name == true
+        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+        annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true))
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
   end
 
 end

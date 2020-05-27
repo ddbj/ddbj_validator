@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'minitest/autorun'
+require 'dotenv'
 require '../../../../lib/validator/biosample_validator.rb'
 require '../../../../lib/validator/common/xml_convertor.rb'
 
@@ -9,6 +10,7 @@ require '../../../../lib/validator/common/xml_convertor.rb'
 class TestSaveAutoAnnotation < Minitest::Test
 
   def setup
+    Dotenv.load "../../../../../.env"
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../../data/biosample', __FILE__)

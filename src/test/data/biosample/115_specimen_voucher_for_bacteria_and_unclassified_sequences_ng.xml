@@ -1,19 +1,20 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<BioSample access="public" publication_date="2015-02-25T09:59:23+09:00" last_update="2015-02-25T09:59:23+09:00">
+<?xml version="1.0" encoding="utf-8"?>
+<BioSampleSet submitter_id="harunoy" submission_id="SSUB000019">
+  <BioSample access="public" last_update="2014-03-20T10:32:03.806+09:00">
     <Ids>
         <Id is_primary="1" namespace="BioSample">SAMD00000328</Id>
     </Ids>
     <Description>
         <SampleName>MTB313</SampleName>
         <Title>MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes</Title>
-        <Organism taxonomy_id="1314">
-            <OrganismName>Streptococcus pyogenes</OrganismName>
+        <Organism>
+            <OrganismName>Escherichia coli</OrganismName>
         </Organism>
     </Description>
     <Owner>
         <Name url="https://www.kitasato-u.ac.jp/lisci/">Kitasato Institute of Life Sciences</Name>
         <Contacts>
-            <Contact email="harunoy@lisci.kitasato-u.ac.jp">
+            <Contact email="harunoy@lisci.kitasato-u.ac.jp.ddbj.test">
                 <Name>
                     <First>Haruno</First>
                     <Last>Yoshida</Last>
@@ -27,8 +28,8 @@
     <Attributes>
         <Attribute attribute_name="sample_name">MTB313</Attribute>
         <Attribute attribute_name="strain">MTB313</Attribute>
-        <Attribute attribute_name="env_biome">n.a.</Attribute>
-        <Attribute attribute_name="collection_date">Unknown</Attribute>
+        <Attribute attribute_name="env_biome">urban biome</Attribute>
+        <Attribute attribute_name="collection_date">2011-12-1T1:2:3</Attribute>
         <Attribute attribute_name="env_feature">town</Attribute>
         <Attribute attribute_name="geo_loc_name">Japan: Hikone-shi</Attribute>
         <Attribute attribute_name="lat_lon">136.225389 35.262246</Attribute>
@@ -40,7 +41,7 @@
         <Attribute attribute_name="elev">88.8m</Attribute>
         <Attribute attribute_name="depth">0m</Attribute>
         <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
-        <Attribute attribute_name="isolate">missing</Attribute>
-        <Attribute attribute_name="not_predefined_attribute">n.a.</Attribute>
+        <Attribute attribute_name="specimen_voucher">UAM:ES:12345</Attribute>
     </Attributes>
 </BioSample>
+</BioSampleSet>

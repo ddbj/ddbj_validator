@@ -2,6 +2,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     backports (3.8.0)
+    dotenv (2.7.5)
     erubis (2.7.0)
     geocoder (1.4.4)
     get_process_mem (0.2.1)
@@ -52,6 +53,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  dotenv
   erubis
   geocoder
   haml

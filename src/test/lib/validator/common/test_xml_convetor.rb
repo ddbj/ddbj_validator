@@ -1,9 +1,11 @@
 require 'bundler/setup'
 require 'minitest/autorun'
+require 'dotenv'
 require '../../../../lib/validator/common/xml_convertor.rb'
 
 class TestXmlConvertor < Minitest::Test
   def setup
+    Dotenv.load "../../../../../.env"
     @convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../../data/biosample', __FILE__)
   end

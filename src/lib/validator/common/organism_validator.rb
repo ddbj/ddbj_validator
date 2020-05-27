@@ -7,11 +7,12 @@ require File.dirname(__FILE__) + "/common_utils.rb"
 #
 # A class for BioSample validation that is relevant organism
 #
-class OrganismValidator < SPARQLBase 
+class OrganismValidator < SPARQLBase
 
   TAX_INVALID = "-1" #invalid id
   TAX_ROOT = "1" #root
   TAX_BACTERIA = "2" #bacteria
+  TAX_CYANOBACTERIA = "1117" #cyanobacteria
   TAX_VIRUSES = "10239" #viruses
   TAX_FUNGI = "4751" #fungi
   TAX_ARCHAEA = "2157" #archaea
@@ -51,7 +52,7 @@ class OrganismValidator < SPARQLBase
       false
     else
       true
-    end 
+    end
   end
 
   #
@@ -179,14 +180,14 @@ class OrganismValidator < SPARQLBase
   # ==== Return
   # returns true if tax_id has the linage specified
   #
-  def has_linage(tax_id, linages) 
+  def has_linage(tax_id, linages)
     parent_tax_id = linages.map {|linage|
-      "id-tax:" + linage  
+      "id-tax:" + linage
     }.join(" ")
     params = {tax_id: tax_id, parent_tax_id: parent_tax_id}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_linage.rq", params)
-    result = query(sparql_query) 
-    return result.size > 0 
+    result = query(sparql_query)
+    return result.size > 0
   end
 
   #
@@ -301,19 +302,19 @@ class OrganismValidator < SPARQLBase
       organism_name = get_organism_name(tax_id)
       if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
-      end 
+      end
     elsif package_name.start_with?("MIGS.ba") #rule BS_R0084
       rule_id = "BS_R0084"
       linages = [TAX_BACTERIA, TAX_ARCHAEA]
-      result = has_linage(tax_id, linages) 
+      result = has_linage(tax_id, linages)
     elsif package_name.start_with?("MIGS.eu") #rule BS_R0085
       rule_id = "BS_R0085"
       linages = [TAX_EUKARYOTA]
-      result = has_linage(tax_id, linages) 
+      result = has_linage(tax_id, linages)
     elsif package_name.start_with?("MIGS.vi") #rule BS_R0086
       rule_id = "BS_R0086"
       linages = [TAX_VIRUSES]
-      result = has_linage(tax_id, linages) 
+      result = has_linage(tax_id, linages)
     elsif package_name.start_with?("MIMARKS.specimen") #rule BS_R0087
       #no check
     elsif package_name.start_with?("MIMARKS.survey") #rule BS_R0088
@@ -323,7 +324,7 @@ class OrganismValidator < SPARQLBase
       organism_name = get_organism_name(tax_id)
       if organism_name.nil? || !organism_name.end_with?("metagenome")
         result = false
-      end 
+      end
     elsif package_name == "Beta-lactamase" #rule BS_R0089
       rule_id = "BS_R0089"
       linages = [TAX_BACTERIA]
@@ -336,4 +337,24 @@ class OrganismValidator < SPARQLBase
     end
   end
 
+  #
+  # Either tax_id specified is appropriate for specimen_voucher attribute or not.
+  # It's not appropriate when tax_id are Bacteria(excludes Cyanobacteria) or Unclassified sequences.
+  #
+  # ==== Args
+  # tax_id: target_tax_id ex. "103690"
+  # ==== Return
+  # returns true if tax_id specified that is appropriate for specimen_voucher attribute
+  #
+  def target_organism_for_specimen_voucher? (tax_id)
+    ret = true
+    linages = [TAX_BACTERIA, TAX_UNCLASSIFIED_SEQUENCES]
+    if has_linage(tax_id, linages)
+      linages = [TAX_CYANOBACTERIA]
+      unless has_linage(tax_id, linages)
+        ret = false
+      end
+    end
+    ret
+  end
 end
