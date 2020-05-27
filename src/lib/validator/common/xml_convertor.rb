@@ -20,7 +20,30 @@ class XmlConvertor < ValidatorBase
   # 引数のXMLデータをRubyオブジェクトにして返す
   #
   # ==== Args
-  # 変換するBioSampleのXMLデータ
+  # xml_document: 変換するXMLデータ文字列
+  # object_type: 変換対象オブジェクト "biosample"
+  #
+  def xml2obj(xml_document, object_type)
+    begin
+      doc = Nokogiri::XML(xml_document)
+    rescue => ex
+      message = "Failed to parse the biosample xml file. Please check the xml format.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+
+    if object_type == "biosample"
+      parseBioSampleSet(doc)
+    else
+      nil
+    end
+  end
+
+  #
+  # 引数のXMLデータをRubyオブジェクトにして返す
+  #
+  # ==== Args
+  # xml_doc: 変換するBioSampleのXMLのDocument(Nokogiri)
   #
   # ==== Return
   # 変換後のRubyオブジェクト
@@ -44,19 +67,11 @@ class XmlConvertor < ValidatorBase
   #   },
   #   {.....}, ....
   # ]
-
   #
   # attributesは属性名に重複がないハッシュ(重複時は最初に出現した属性値がセットされる)
   # attribute_listは属性名が重複している可能性があるリスト(属性名重複チェック(34.Multiple Attribute values)で仕様される)
   #
-  def xml2obj(xml_document)
-    begin
-      doc = Nokogiri::XML(xml_document)
-    rescue => ex
-      message = "Failed to parse the biosample xml file. Please check the xml format.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    end
+  def parseBioSampleSet(doc)
     sample_list = []
     if doc.root.name == "BioSampleSet"
       biosample_list = doc.xpath("//BioSample")
@@ -86,7 +101,7 @@ class XmlConvertor < ValidatorBase
     #attributes
     attributes = {}
     attribute_list = []
-    
+
     unless node_blank?(biosample_element, "Description/Title")
       attributes["sample_title"] = get_node_text(biosample_element, "Description/Title")
       attribute_list.push({"sample_title" => attributes["sample_title"]});

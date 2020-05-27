@@ -98,7 +98,7 @@ class BioSampleValidator < ValidatorBase
     return unless valid_xml
 
     # xml検証が通った場合のみ実行
-    @biosample_list = @xml_convertor.xml2obj(xml_document)
+    @biosample_list = @xml_convertor.xml2obj(xml_document, 'biosample')
 
     if submitter_id.nil?
       @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
