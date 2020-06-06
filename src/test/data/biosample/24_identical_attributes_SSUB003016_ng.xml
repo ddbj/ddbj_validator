@@ -30,12 +30,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A001</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -71,12 +71,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A002</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Tarenna sp.</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -112,12 +112,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A003</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Unidentified</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -153,12 +153,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A004</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -194,12 +194,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A005</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -235,12 +235,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A006</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Walsura trichostemon</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -276,12 +276,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A007</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Strychnos kerrii</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -317,12 +317,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A008</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -358,12 +358,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A017</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -399,12 +399,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A018</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Vatica cinerea</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -440,12 +440,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A019</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Luvunga scandens</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -481,12 +481,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A022</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Melodorum sp.</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -522,12 +522,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A023</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Walsura robusta</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -563,12 +563,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A024</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Walsura trichostemon</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -604,12 +604,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A025</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Shorea henryana</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -645,12 +645,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A026</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Schefflera bengalensis</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -686,12 +686,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A027</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dialium cochinchinense</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -727,12 +727,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A028</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Grewia paniculata</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -768,12 +768,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A029</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -809,12 +809,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A030</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -850,12 +850,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A031</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Ancistrocladus tectorius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -891,12 +891,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A032</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Alchornea rugosa</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -932,12 +932,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A033</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Strychnos kerrii</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -973,12 +973,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A034</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1014,12 +1014,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A035</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1055,12 +1055,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A036</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Alchornea rugosa</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1096,12 +1096,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A037</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1137,12 +1137,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A038</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dehaasia candolleana</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1178,12 +1178,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A039</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Lygodium sp.</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1219,12 +1219,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A040</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1260,12 +1260,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A042</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1301,12 +1301,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A043</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1342,12 +1342,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A046</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Alchornea rugosa</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1383,12 +1383,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A047</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1424,12 +1424,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A048</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dehaasia candolleana</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1465,12 +1465,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A049</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1506,12 +1506,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A050</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1547,12 +1547,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A051</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1588,12 +1588,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A052</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1629,12 +1629,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A053</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1670,12 +1670,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A054</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1711,12 +1711,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A055</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Alchornea rugosa</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1752,12 +1752,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A056</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1793,12 +1793,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A057</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1834,12 +1834,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A058</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Strychnos kerrii</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1875,12 +1875,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A059</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1916,12 +1916,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A060</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Ancistrocladus tectorius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1957,12 +1957,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A061</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -1998,12 +1998,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A062</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2039,12 +2039,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A063</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2080,12 +2080,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A064</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Ancistrocladus tectorius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2121,12 +2121,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A065</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2162,12 +2162,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A066</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2203,12 +2203,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A067</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Alchornea rugosa</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2244,12 +2244,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A068</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2285,12 +2285,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A069</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2326,12 +2326,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A070</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2367,12 +2367,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A071</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2408,12 +2408,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A072</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2449,12 +2449,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A073</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Ancistrocladus tectorius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2490,12 +2490,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A074</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2531,12 +2531,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A075</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2572,12 +2572,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A076</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2613,12 +2613,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A077</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2654,12 +2654,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A078</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2695,12 +2695,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A079</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Ancistrocladus tectorius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2736,12 +2736,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A080</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2777,12 +2777,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A082</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2818,12 +2818,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A083</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2859,12 +2859,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A084</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2900,12 +2900,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A085</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2941,12 +2941,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A086</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Ancistrocladus tectorius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -2982,12 +2982,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A087</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3023,12 +3023,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A088</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Walsura trichostemon</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3064,12 +3064,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A105</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dehaasia candolleana</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3105,12 +3105,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A106</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3146,12 +3146,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A107</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3187,12 +3187,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A108</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3228,12 +3228,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A109</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3269,12 +3269,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A110</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3310,12 +3310,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A111</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Walsura trichostemon</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3351,12 +3351,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A112</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dehaasia candolleana</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3392,12 +3392,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A113</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3433,12 +3433,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A114</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Walsura trichostemon</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3474,12 +3474,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A115</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3515,12 +3515,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A116</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3556,12 +3556,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A117</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3597,12 +3597,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A118</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3638,12 +3638,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A119</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dehaasia candolleana</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3679,12 +3679,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A121</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Chaetocarpus castanocarpus</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3720,12 +3720,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A122</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3761,12 +3761,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A123</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3802,12 +3802,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A124</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3843,12 +3843,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A125</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3884,12 +3884,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A126</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3925,12 +3925,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A127</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -3966,12 +3966,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A129</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4007,12 +4007,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A130</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4048,12 +4048,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A131</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4089,12 +4089,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A132</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4130,12 +4130,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A133</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4171,12 +4171,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A134</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4212,12 +4212,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A135</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4253,12 +4253,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A136</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4294,12 +4294,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A137</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4335,12 +4335,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A138</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4376,12 +4376,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A139</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4417,12 +4417,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A140</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4458,12 +4458,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A141</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Melodinus cambodiensis</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4499,12 +4499,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A142</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4540,12 +4540,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A143</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4581,12 +4581,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A145</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Melodinus cambodiensis</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4622,12 +4622,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130531_A146</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4663,12 +4663,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A112</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Fagerlindia sinensis</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4704,12 +4704,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A113</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Dialium cochinchinense</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4745,12 +4745,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A114</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4786,12 +4786,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A115</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Prismatomeris tetrandra</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4827,12 +4827,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A116</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Alchornea rugosa</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4868,12 +4868,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A117</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4909,12 +4909,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A118</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Aglaia pirifera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4950,12 +4950,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A119</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Fagerlindia sinensis</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -4991,12 +4991,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A120</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Melodorum rutecensis</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5032,12 +5032,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A121</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Grewia panicurata</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5073,12 +5073,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A122</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5114,12 +5114,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A123</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon ovatum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5155,12 +5155,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A124</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5196,12 +5196,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A125</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Memecylon caeruleum</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5237,12 +5237,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A126</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5278,12 +5278,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A127</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5319,12 +5319,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A128</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5360,12 +5360,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A129</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5401,12 +5401,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A130</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5442,12 +5442,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A131</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hydnocarpus ilicifolius</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5483,12 +5483,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A132</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5524,12 +5524,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A133</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5565,12 +5565,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A134</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5606,12 +5606,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A136</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5647,12 +5647,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A137</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5688,12 +5688,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A138</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5729,12 +5729,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A139</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Chaetocarpus castanocarpus</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5770,12 +5770,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A140</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5811,12 +5811,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A141</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5852,12 +5852,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A142</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Chaetocarpus castanocarpus</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>
@@ -5893,12 +5893,12 @@
     </Models>
     <Attributes>
       <Attribute attribute_name="sample_name">130921_A143</Attribute>
-      <Attribute attribute_name="env_biome">tropical forest</Attribute>
+      <Attribute attribute_name="env_broad_scale">tropical forest</Attribute>
       <Attribute attribute_name="collection_date">2012-11-27</Attribute>
-      <Attribute attribute_name="env_feature">tropical evergreen forest</Attribute>
+      <Attribute attribute_name="env_local_scale">tropical evergreen forest</Attribute>
       <Attribute attribute_name="geo_loc_name">Thailand; Sakaerat</Attribute>
       <Attribute attribute_name="lat_lon">14.5N 101.85E</Attribute>
-      <Attribute attribute_name="env_material">plant leaf</Attribute>
+      <Attribute attribute_name="env_medium">plant leaf</Attribute>
       <Attribute attribute_name="project_name">Phyllosphere fungal metagenome</Attribute>
       <Attribute attribute_name="host">Hopea ferrera</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3082</Attribute>

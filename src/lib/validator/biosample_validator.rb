@@ -151,7 +151,8 @@ class BioSampleValidator < ValidatorBase
       sample_name = biosample_data["attributes"]["sample_name"]
       non_ascii_header_line("BS_R0030", sample_name, biosample_data["attribute_list"], line_num)
       missing_attribute_name("BS_R0034", sample_name, biosample_data["attribute_list"], line_num)
-      multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], line_num)
+      package_attr_list = get_attributes_of_package(biosample_data["package"])
+      multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], package_attr_list, line_num)
     end
 
     ### 複数のサンプル間の関係(一意性など)の検証
@@ -317,10 +318,15 @@ class BioSampleValidator < ValidatorBase
         attr_require = "other"
         if row[:require] == "has_mandatory_attribute"
           attr_require = "mandatory"
-        elsif row[:require] == "has_optional_attribute"
+        else # has_either_one_mandatory_attribute, has_optional_attribute, has_attribute
           attr_require = "optional"
         end
-        attr = {attribute_name: row[:attribute], require: attr_require}
+        if row[:max_cardinality] == "1" || row[:max_cardinality] == 1
+          allow_multiple = false
+        else
+          allow_multiple = true
+        end
+        attr = {attribute_name: row[:attribute], require: attr_require, allow_multiple: allow_multiple}
         attr_list.push(attr)
       end
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
@@ -405,10 +411,11 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # attribute_list : ユーザ入力の属性リスト ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # multiple_attribute_values : サンプルのパッケージに対する属性情報
   # ==== Return
   # true/false
   #
-  def multiple_attribute_values (rule_code, sample_name, attribute_list, line_num)
+  def multiple_attribute_values (rule_code, sample_name, attribute_list, multiple_attribute_values, line_num)
     return if attribute_list.nil?
     result = true
 
@@ -417,8 +424,9 @@ class BioSampleValidator < ValidatorBase
     grouped = attribute_list.group_by do |attr|
       attr.keys.first
     end
+    allow_multiple_attr_list = multiple_attribute_values.select{|attr| attr[:allow_multiple] == true }.map {|attr| attr[:attribute_name]} # 複数記述を許可する属性名リスト
     grouped.each do |attr_name, attr_values|
-      if attr_values.size >= 2 #重複属性がある
+      if attr_values.size >= 2 && !(allow_multiple_attr_list.include?(attr_name)) #複数記述され、かつ複数許可許されていない属性
         all_attr_value = [] #属性値を列挙するためのリスト ex. ["1m", "2m"]
         attr_values.each{|attr|
           attr.each{|k,v| all_attr_value.push(v) }

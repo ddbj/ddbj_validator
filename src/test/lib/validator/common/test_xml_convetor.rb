@@ -13,7 +13,7 @@ class TestXmlConvertor < Minitest::Test
   def test_xml2obj
     # one sample
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB000019.xml")
-    biosample_list = @convertor.xml2obj(xml_doc)
+    biosample_list = @convertor.xml2obj(xml_doc, 'biosample')
     assert_equal 1, biosample_list.size
     assert_equal "SAMD00000328", biosample_list[0]["biosample_accession"]
     assert_equal "MIGS.ba.microbial", biosample_list[0]["package"]
@@ -22,13 +22,13 @@ class TestXmlConvertor < Minitest::Test
     assert_equal "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes", attr["sample_title"]
     assert_equal "Streptococcus pyogenes", attr["organism"]
     assert_equal "1314", attr["taxonomy_id"]
-    assert_equal "urban biome", attr["env_biome"]
+    assert_equal "urban biome", attr["env_broad_scale"]
     assert_nil biosample_list[0]["attributes"]["description"]
     assert_equal 18, biosample_list[0]["attribute_list"].size
 
     # multiple samples
     xml_doc = File.read("#{@test_file_dir}/xml2obj_SSUB002415.xml")
-    biosample_list = @convertor.xml2obj(xml_doc)
+    biosample_list = @convertor.xml2obj(xml_doc, 'biosample')
     assert_equal 2, biosample_list.size
     # discription check
     assert_equal "N. A.", biosample_list[0]["attributes"]["description"]

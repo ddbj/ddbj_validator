@@ -41,9 +41,9 @@
       <Attribute attribute_name="sample_name">coffee-1</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3929</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
-      <Attribute attribute_name="env_biome">village biome</Attribute>
-      <Attribute attribute_name="env_feature">farm</Attribute>
-      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="env_broad_scale">village biome</Attribute>
+      <Attribute attribute_name="env_local_scale">farm</Attribute>
+      <Attribute attribute_name="env_medium">farmsoil</Attribute>
       <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
       <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
       <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
@@ -91,9 +91,9 @@
     <Attributes>
       <Attribute attribute_name="sample_name">coffee-2</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
-      <Attribute attribute_name="env_biome">village biome</Attribute>
-      <Attribute attribute_name="env_feature">farm</Attribute>
-      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="env_broad_scale">village biome</Attribute>
+      <Attribute attribute_name="env_local_scale">farm</Attribute>
+      <Attribute attribute_name="env_medium">farmsoil</Attribute>
       <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
       <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
       <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
@@ -142,9 +142,9 @@
       <Attribute attribute_name="sample_name">coffee-3</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3931</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
-      <Attribute attribute_name="env_biome">village biome</Attribute>
-      <Attribute attribute_name="env_feature">farm</Attribute>
-      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="env_broad_scale">village biome</Attribute>
+      <Attribute attribute_name="env_local_scale">farm</Attribute>
+      <Attribute attribute_name="env_medium">farmsoil</Attribute>
       <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
       <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
       <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
@@ -193,9 +193,9 @@
       <Attribute attribute_name="sample_name">coffee-4</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3932</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
-      <Attribute attribute_name="env_biome">village biome</Attribute>
-      <Attribute attribute_name="env_feature">farm</Attribute>
-      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="env_broad_scale">village biome</Attribute>
+      <Attribute attribute_name="env_local_scale">farm</Attribute>
+      <Attribute attribute_name="env_medium">farmsoil</Attribute>
       <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
       <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
       <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
@@ -244,9 +244,9 @@
       <Attribute attribute_name="sample_name">goma-1</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB3933</Attribute>
       <Attribute attribute_name="collection_date">2015-05-08</Attribute>
-      <Attribute attribute_name="env_biome">village biome</Attribute>
-      <Attribute attribute_name="env_feature">farm</Attribute>
-      <Attribute attribute_name="env_material">farmsoil</Attribute>
+      <Attribute attribute_name="env_broad_scale">village biome</Attribute>
+      <Attribute attribute_name="env_local_scale">farm</Attribute>
+      <Attribute attribute_name="env_medium">farmsoil</Attribute>
       <Attribute attribute_name="geo_loc_name">Japan:Kanagawa, Sagamihara city</Attribute>
       <Attribute attribute_name="lat_lon">35.557247 N 139.266921 E</Attribute>
       <Attribute attribute_name="project_name">structural analysis of microbial community for feild soil and compost made from coffee lees</Attribute>
