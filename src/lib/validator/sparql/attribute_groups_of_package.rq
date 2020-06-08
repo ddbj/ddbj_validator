@@ -1,8 +1,7 @@
 PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
-SELECT
-  ?group_name ?attribute_name
+SELECT ?group_name ?attribute_name
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
@@ -17,4 +16,4 @@ WHERE
      rdfs:isDefinedBy dbs:Attribute_Group .
   ?attribute dc:identifier ?attribute_name ;
    rdfs:subClassOf dbs:Attribute .
-} GROUP BY  ?group_name
+} ORDER BY ?group_name

@@ -22,7 +22,7 @@
         </Contacts>
     </Owner>
     <Models>
-        <Model>Microbe</Model>
+        <Model>Plant</Model>
     </Models>
     <Attributes>
         <Attribute attribute_name="sample_name">MTB313</Attribute>
@@ -40,6 +40,8 @@
         <Attribute attribute_name="elev">88.8m</Attribute>
         <Attribute attribute_name="depth">0m</Attribute>
         <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
-        <Attribute attribute_name="host">human</Attribute>
+        <Attribute attribute_name="age">missing</Attribute>
+        <Attribute attribute_name="isolate">n.a.</Attribute>
+        <Attribute attribute_name="cultivar">n.a.</Attribute>
     </Attributes>
 </BioSample>

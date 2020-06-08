@@ -111,6 +111,27 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 0, attr_list.size
   end
 
+  def test_get_attribute_groups_of_package
+    # ok case
+    expect_value1 = {
+      :group_name => "Age/stage group attribute in Plant",
+      :attribute_set => ["age", "dev_stage"]
+    }
+    expect_value2 = {
+      :group_name => "Organism group attribute in Plant",
+      :attribute_set => ["ecotype", "cultivar", "isolate"]
+    }
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant")
+    assert_equal 2, attr_group_list.size
+    attr_group_list.sort!{|a, b| a[:group_name] <=> b[:group_name] }
+    assert_equal expect_value1, attr_group_list[0]
+    assert_equal expect_value2, attr_group_list[1]
+
+    # invalid package name
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package")
+    assert_equal 0, attr_group_list.size
+  end
+
 #### 各validationメソッドのユニットテスト ####
 
   def test_not_well_format_xml
@@ -329,6 +350,31 @@ class TestBioSampleValidator < Minitest::Test
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
     ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_missing_group_of_at_least_one_required_attributes
+    #ok case
+    xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ## not exist required attr name
+    xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_error1.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## brank required attr
+    xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_error2.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

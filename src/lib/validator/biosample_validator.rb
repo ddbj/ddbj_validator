@@ -283,8 +283,9 @@ class BioSampleValidator < ValidatorBase
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
       missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
-      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list , line_num)
-
+      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
+      attr_group = get_attribute_groups_of_package(biosample_data["package"])
+      missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
     end
   end
 
@@ -321,12 +322,13 @@ class BioSampleValidator < ValidatorBase
         else # has_either_one_mandatory_attribute, has_optional_attribute, has_attribute
           attr_require = "optional"
         end
+        type = row[:require].sub("has_","")  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
         if row[:max_cardinality] == "1" || row[:max_cardinality] == 1
           allow_multiple = false
         else
           allow_multiple = true
         end
-        attr = {attribute_name: row[:attribute], require: attr_require, allow_multiple: allow_multiple}
+        attr = {attribute_name: row[:attribute], type: type, require: attr_require, allow_multiple: allow_multiple}
         attr_list.push(attr)
       end
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
@@ -335,6 +337,52 @@ class BioSampleValidator < ValidatorBase
       puts "use cache in get_attributes_of_package" if $DEBUG
       attr_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
       attr_list
+    end
+  end
+
+  #
+  # 指定されたpackageの属性グループのリストを取得して返す
+  # 属性グループがないpackageの場合には空のリストを返す
+  #
+  # ==== Args
+  # package name ex."Plant"
+  #
+  # ==== Return
+  # array of hash of each attr group.
+  # [
+  #   {
+  #     :group_name => "Age/stage group attribute in Plant",
+  #     :attribute_set => ["age", "dev_stage"]
+  #   }
+  #   {
+  #     :group_name => "Organism group attribute in Plant",
+  #     :attribute_set => ["ecotype", "cultivar", "isolate"]
+  #   }
+  # ]
+  def get_attribute_groups_of_package (package_name)
+
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
+      params = {package_name: package_name}
+      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
+      params[:version] = @conf[:version]["biosample_graph"]
+      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
+      result = sparql.query(sparql_query)
+      attr_group_list = []
+      result.group_by {|row| row[:group_name] }.each do |group, item|
+        attribute_set = []
+        item.each do |row|
+          attribute_set.push(row[:attribute_name])
+        end
+        attr_group_list.push({group_name: group, attribute_set: attribute_set})
+      end
+      @cache.save(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name, attr_group_list) unless @cache.nil?
+      attr_group_list
+    else
+      puts "use cache in get_attribute_groups_of_package" if $DEBUG
+      attr_group_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name)
+      attr_group_list
     end
   end
 
@@ -634,6 +682,44 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
       false
     end
+  end
+
+  #
+  # rule:36
+  # 複数のうち最低1つは必須な属性グループの記載がないものを検証
+  #
+  # ==== Args
+  # rule_code
+  # sample_attr ユーザ入力の属性リスト
+  # package_attr_group_list パッケージに対するグループ属性リスト
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_group_of_at_least_one_required_attributes(rule_code, sample_name, sample_attr, package_attr_group_list, line_num)
+    return nil if sample_attr.nil? || package_attr_group_list.nil?
+    ret = true
+    package_attr_group_list.each do |attr_group|
+      attr_set = attr_group[:attribute_set]
+      exist_attr_list = []
+      attr_set.each do |mandatory_attr_name|
+        sample_attr.each do |attr_name, attr_value|
+          if mandatory_attr_name == attr_name && !(attr_value.nil? || attr_value.strip == "")
+            exist_attr_list.push(attr_name)
+          end
+        end
+      end
+      if exist_attr_list.size == 0 #記述属性が一つもない
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute names", value: attr_set.join(", ")}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        ret = false
+      end
+    end
+    ret
   end
 
   #
@@ -1458,7 +1544,7 @@ class BioSampleValidator < ValidatorBase
 
     unless package_attr_list.nil?
       mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-        attr[:attribute_name] if attr[:require] == "mandatory"
+        attr[:attribute_name] if attr[:require] == "mandatory" || attr[:type].downcase.include?("either_one_mandatory")
       }.compact
       unless mandatory_attr_list.include?(attr_name) # optionalの場合にはBS_R0100で空白置換されるためこのルールではスルー
         return true
@@ -2271,7 +2357,7 @@ class BioSampleValidator < ValidatorBase
     return nil if sample_attr.nil? || package_attr_list.nil?
     result = true
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-      attr[:attribute_name] if attr[:require] == "mandatory"
+      attr[:attribute_name] if attr[:require] == "mandatory" || attr[:type].downcase.include?("either_one_mandatory")
     }.compact
     optional_attr_list = sample_attr.keys - mandatory_attr_list #差分から必須ではない属性名だけを抽出
     #一つずつoptionalな属性の値を検証
