@@ -385,6 +385,9 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "aerobe", cv_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "source_uvig", "viral single amplified genome (vSAG)", cv_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #ng case
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
