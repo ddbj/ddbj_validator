@@ -1,0 +1,16 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX sio: <http://semanticscience.org/resource/>
+PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+
+SELECT DISTINCT ?package_group_uri ?package_group_id ?package_group_name ?description ?parent_package_group_uri
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
+WHERE
+{
+  ?package_group_uri rdfs:subClassOf ddbj_bs:PackageGroup ;
+    dc:identifier ?package_group_id ;
+    ddbj_bs:display_order ?order ;
+    rdfs:label ?package_group_name .
+   OPTIONAL { ?package_group_uri dcterms:description ?description }
+   OPTIONAL { ?package_group_uri sio:SIO_000095 ?parent_package_group_uri }
+} ORDER BY ?order

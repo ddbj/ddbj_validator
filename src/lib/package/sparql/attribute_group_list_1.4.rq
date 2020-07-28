@@ -1,0 +1,19 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+
+SELECT DISTINCT ?group_name ?attribute_name
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
+{
+  VALUES ?package_id { "<%= package_id %>" }
+  ?package_uri rdfs:subClassOf ddbj_bs:DDBJ_Defined_Package ;
+    dc:identifier ?package_id .
+  ?restriction owl:domain ?package ;
+    rdfs:label ?group_name ;
+    rdfs:range ?range .
+  ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
+  ?axiom owl:annotatedTarget ?restriction ;
+     owl:annotatedSource ?source ;
+     rdfs:isDefinedBy ddbj_bs:Attribute_Group .
+  ?attribute dc:identifier ?attribute_name ;
+   rdfs:subClassOf ddbj_bs:Attribute .
+} ORDER BY ?group_name

@@ -9,11 +9,14 @@ require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
+require File.expand_path('../../lib/package/package.rb', __FILE__)
 
 module DDBJValidator
   class Application < Sinatra::Base
     setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/validator.yml")).result)
     @@data_dir = setting["api_log"]["path"]
+    version = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/version.yml")).result)
+    @@biosample_graph_version = version["version"]["biosample_graph"]
 
     configure do
       set :public_folder  , File.expand_path('../../public', __FILE__)
@@ -247,6 +250,74 @@ module DDBJValidator
         ret_message = '{"status": "NG", "message": "Error has occurred during monitoring processing. Please check the validation service. ' + e.message + '"}'
       end
       ret_message
+    end
+
+    # package関連
+    get '/api/package_list' do
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_list(version)
+      if ret.nil? || ret.size == 0
+        {"status": "NG", "message": "processing finished with error."}.to_json
+      else
+        ret.to_json
+      end
+    end
+
+    get '/api/package_and_group_list' do
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_and_group_list(version)
+      if ret.nil? || ret.size == 0
+        status 500
+        {"status": "NG", "message": "wrong parameter or processing finished with error."}.to_json
+      else
+        ret.to_json
+      end
+    end
+
+    get '/api/attribute_list' do
+      if params["package"].nil? || params["package"].strip == ""
+        status 400
+        message = "'package' parameter is required"
+        ret = { status: "error", "message": message}.to_json
+        return ret
+      end
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).attribute_list(version, params["package"])
+      if ret.nil? || ret.size == 0
+        status 500
+        {"status": "NG", "message": "wrong parameter or processing finished with error."}.to_json
+      else
+        ret.to_json
+      end
+    end
+
+    get '/api/package_info' do
+      if params["package"].nil? || params["package"].strip == ""
+        status 400
+        message = "'package' parameter is required"
+        ret = { status: "error", "message": message}.to_json
+        return ret
+      end
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_info(version, params["package"])
+      if ret.nil? || ret.size == 0
+        status 500
+        {"status": "NG", "message": "wrong parameter or processing finished with error."}.to_json
+      else
+        ret.to_json
+      end
     end
 
     #error response
