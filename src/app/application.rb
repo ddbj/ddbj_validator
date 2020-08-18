@@ -263,10 +263,10 @@ module DDBJValidator
         ret[:data].to_json
       elsif ret[:status] == "fail"
         status 400
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       else # error
         status 500
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       end
     end
 
@@ -280,10 +280,10 @@ module DDBJValidator
         ret[:data].to_json
       elsif ret[:status] == "fail"
         status 400
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       else # error
         status 500
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       end
     end
 
@@ -303,10 +303,10 @@ module DDBJValidator
         ret[:data].to_json
       elsif ret[:status] == "fail"
         status 400
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       else # error
         status 500
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       end
     end
 
@@ -326,10 +326,10 @@ module DDBJValidator
         ret[:data].to_json
       elsif ret[:status] == "fail"
         status 400
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       else # error
         status 500
-        {"status": "NG", "message": ret[:message]}.to_json
+        {"status": "error", "message": ret[:message]}.to_json
       end
     end
 
