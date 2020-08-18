@@ -1,0 +1,14 @@
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX dcterms: <http://purl.org/dc/terms/>
+PREFIX sio: <http://semanticscience.org/resource/>
+PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+
+SELECT DISTINCT  (REPLACE(?package_name, " package", "") AS ?package_id) ?version ?package_name ?package_uri
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
+{
+  VALUES ?package_name { "<%= package_id %> package"@en }
+  ?package_uri rdfs:subClassOf ddbj_bs:DDBJ_Defined_Package ;
+    rdfs:label ?package_name ;
+    dc:identifier ?package_id ;
+    owl:versioInfo ?version .
+}

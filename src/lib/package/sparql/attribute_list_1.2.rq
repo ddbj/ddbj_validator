@@ -1,18 +1,15 @@
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 
 SELECT DISTINCT ?attribute_name (REPLACE(STR(?attr_type), "http://ddbj.nig.ac.jp/ontologies/biosample/","") AS ?require_type) ?attribute_no
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 {
-  VALUES ?package_id { "<%= package_id %>" }
-  ?package_uri rdfs:subClassOf ddbj_bs:DDBJ_Defined_Package ;
-    dc:identifier ?package_id ;
-    rdfs:label ?label .
-  ?axiom owl:annotatedSource ?package_uri ;
+  VALUES ?package_label { "<%= package_id %> package"@en }
+  ?package rdfs:label ?package_label .
+  ?axiom owl:annotatedSource ?package ;
     owl:annotatedTarget ?attr ;
-    owl:annotatedProperty ?restrict ;
+    owl:annotatedProperty ?attr_type ;
     dc:identifier ?attribute_no .
-  ?restrict owl:onProperty ?attr_type .
   ?attr rdfs:subClassOf ddbj_bs:Attribute ;
     dc:identifier ?attribute_name .
-} ORDER BY ?label ?attribute_no
+  BIND( IF(?attr_type = ddbj_bs:has_mandatory_attribute, 1,  IF(?attr_type = ddbj_bs:has_optional_attribute, 2,  IF(?attr_type = ddbj_bs:has_attribute, 3, 0))) AS ?type_order)
+} ORDER BY ?type_order ?attribute_no

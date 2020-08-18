@@ -1,0 +1,8 @@
+PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+
+SELECT DISTINCT (REPLACE(?label, " package", "") AS ?package_name) ?package_uri
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
+{
+ ?package_uri rdfs:subClassOf ddbj_bs:DDBJ_Defined_Package ;
+    rdfs:label ?label .
+} ORDER BY ?label

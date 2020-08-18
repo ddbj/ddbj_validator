@@ -1,0 +1,5 @@
+SELECT *
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
+{
+  ?s ?p ?o .
+} LIMIT 1

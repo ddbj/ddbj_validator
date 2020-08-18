@@ -259,10 +259,14 @@ module DDBJValidator
         version = @@biosample_graph_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_list(version)
-      if ret.nil? || ret.size == 0
-        {"status": "NG", "message": "processing finished with error."}.to_json
-      else
-        ret.to_json
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "NG", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "NG", "message": ret[:message]}.to_json
       end
     end
 
@@ -272,11 +276,14 @@ module DDBJValidator
         version = @@biosample_graph_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_and_group_list(version)
-      if ret.nil? || ret.size == 0
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "NG", "message": ret[:message]}.to_json
+      else # error
         status 500
-        {"status": "NG", "message": "wrong parameter or processing finished with error."}.to_json
-      else
-        ret.to_json
+        {"status": "NG", "message": ret[:message]}.to_json
       end
     end
 
@@ -292,11 +299,14 @@ module DDBJValidator
         version = @@biosample_graph_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).attribute_list(version, params["package"])
-      if ret.nil? || ret.size == 0
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "NG", "message": ret[:message]}.to_json
+      else # error
         status 500
-        {"status": "NG", "message": "wrong parameter or processing finished with error."}.to_json
-      else
-        ret.to_json
+        {"status": "NG", "message": ret[:message]}.to_json
       end
     end
 
@@ -312,11 +322,14 @@ module DDBJValidator
         version = @@biosample_graph_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_info(version, params["package"])
-      if ret.nil? || ret.size == 0
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "NG", "message": ret[:message]}.to_json
+      else # error
         status 500
-        {"status": "NG", "message": "wrong parameter or processing finished with error."}.to_json
-      else
-        ret.to_json
+        {"status": "NG", "message": ret[:message]}.to_json
       end
     end
 
