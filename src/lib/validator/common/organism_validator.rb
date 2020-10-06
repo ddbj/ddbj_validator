@@ -24,6 +24,7 @@ class OrganismValidator < SPARQLBase
   TAX_HOMO_SAPIENS = "9606" #homo sapiens
   TAX_VIRIDIPLANTAE = "33090" #viridiplantae
   TAX_EUKARYOTA = "2759" #eukaryota
+  TAX_METAGENOMES = "408169" #metagenome
 
   #
   # Initializer

@@ -17,6 +17,7 @@ class ValidatorCache
   IS_UMBRELLA_ID = "is_umbrella_id"
   BIOPROJECT_PRJD_ID = "bioproject_prjd_id"
   LOCUS_TAG_PREFIX = "locus_tag_prefix"
+  METAGE_SOURCE_LINEAGE = "metagenome_source_lineage"
 
   #
   # Initializer

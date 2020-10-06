@@ -256,9 +256,21 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
-      invalid_host_organism_name("BS_R0015", sample_name,  biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
+      invalid_host_organism_name("BS_R0015", sample_name, biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
       future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
       invalid_sample_name_format("BS_R0101", sample_name, line_num)
+
+      # 値が複数記述される可能性がある項目の検証
+      biosample_data["attribute_list"].each do |attr|
+        unless attr["metagenome_source"].nil?
+          invalid_metagenome_source("BS_R0106", sample_name, attr["metagenome_source"], line_num)
+        end
+      end
+#      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
+#        unless attr["component_organism"].nil?
+#          taxonomy_warning("BS_R0105", sample_name, attr["component_organism"], attr_idx, line_num)
+#        end
+#      end
 
       ### 複数属性の組合せの検証
       latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
@@ -2448,6 +2460,75 @@ class BioSampleValidator < ValidatorBase
         @error_list.push(error_hash)
     end
     result
+  end
+
+  #
+  # rule:105
+  # 指定されたcomponent_organismの値が、Taxonomy ontologyにScientific nameとして存在するかの検証
+  #
+  # ==== Args
+  # sample name ex."my sample"
+  # component_organism ex."Homo sapiens"
+  # ==== Return
+  # true/false
+#  def taxonomy_warning (rule_code, sample_name, component_organism, line_num)
+#    return nil if CommonUtils::null_value?(metagenome_source)
+#    result = true
+#    # Attributeの順番も含めてauto annotation
+#  end
+
+  #
+  # rule:106
+  # metagenome_sourceの値が"xxx metagenome"としてTaxonomy ontologyに存在するかの検証
+  #
+  # ==== Args
+  # sample name ex."my sample"
+  # metagenome_source ex. "soil metagenome"
+  # ==== Return
+  # true/false
+  def invalid_metagenome_source (rule_code, sample_name, metagenome_source, line_num)
+    return nil if CommonUtils::null_value?(metagenome_source)
+    result = true
+
+    metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
+    #あればキャッシュを使用
+    cache_key_metage_source = ValidatorCache::create_key(metagenome_source, metagenome_linages)
+    if @cache.nil? || @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source).nil?
+      org_ret = suggest_taxid_from_name(organism_name) # organims_nameからtax_idを検索
+      if org_ret[:status] == "exist" # tax_idが1件
+        linage_ret = @org_validator.has_linage(org_ret[:tax_id], cache_key_metage_source)
+        ret = false if linage_ret == false
+        has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: linage_ret}
+      elsif ret[:status] = "multiple exist" # tax_idが複数件ヒット. どれかがmetagenomeならOK
+        has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: false}
+        org_ret[:tax_id].each do |tax_id|
+          linage_ret = @org_validator.has_linage(tax_id.chomp.strip, cache_key_metage_source)
+          has_linage_metagenome[:lineage] = true if linage_ret == true
+        end
+      else # not exist
+        has_linage_metagenome = {tax_id: nil , lineage: nil}
+      end
+      @cache.save(ValidatorCache::METAGE_SOURCE, cache_key_metage_source, has_linage_metagenome) unless @cache.nil?
+    else
+      has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, metagenome_linages)
+    end
+    if has_linage_metagenome[:tax_id].nil?
+      message = "This metagenome_source name is not in the taxonomy database."
+      ret = false
+    elsif has_linage_metagenome[:lineage] == false
+      ret = false
+    end
+
+    if ret == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "metagenome_source", value: metagenome_source}
+      ]
+      annotation.push({key: "message", value: message}) unless message.nil?
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
   end
 
   #
