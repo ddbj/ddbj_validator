@@ -119,11 +119,11 @@ class XmlConvertor < ValidatorBase
       attribute_list.push({"taxonomy_id" => attributes["taxonomy_id"]});
     end
     attributes_list = biosample_element.xpath("Attributes/Attribute")
-    attributes_list.each do |attr|
+    attributes_list.each_with_index do |attr, idx|
       attr_name = attr.attribute("attribute_name").text
       attr_value = get_node_text(attr)
       attributes[attr_name] = attr_value
-      attribute_list.push({attr_name => attr_value});
+      attribute_list.push({attr_name => attr_value, "attr_no" => idx + 1});
     end
     sample_obj["attributes"] = attributes
     sample_obj["attribute_list"] = attribute_list
@@ -226,6 +226,24 @@ class XmlConvertor < ValidatorBase
     else
       xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]")
     end
+    xpath
+  end
+
+  #
+  # 属性名とその属性要素番号からXPathを返す
+  # 同一属性名が複数記述されている場合を想定
+  #
+  # ==== Args
+  # attr_name: 属性名 ex. organism
+  # item_no: BioSampleの出現順のNo
+  # attr_index: 属性の出現順のNo
+  # ==== Return
+  # XPathの配列
+  # ex. ["//BioSample[2]/Attributes/Attribute[position()=7 and @attribute_name=\"metagenome_source\"]"]
+  #
+  def xpath_from_attrname_with_index (attr_name, item_no, attr_index)
+    xpath = []
+    xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[position()=" + attr_index.to_s + " and @attribute_name=\"" + attr_name + "\"]")
     xpath
   end
 

@@ -263,7 +263,7 @@ class BioSampleValidator < ValidatorBase
       # 値が複数記述される可能性がある項目の検証
       biosample_data["attribute_list"].each do |attr|
         unless attr["metagenome_source"].nil?
-          invalid_metagenome_source("BS_R0106", sample_name, attr["metagenome_source"], line_num)
+          invalid_metagenome_source("BS_R0106", sample_name, attr["metagenome_source"], attr["attr_no"], line_num)
         end
       end
 #      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
@@ -2486,29 +2486,32 @@ class BioSampleValidator < ValidatorBase
   # metagenome_source ex. "soil metagenome"
   # ==== Return
   # true/false
-  def invalid_metagenome_source (rule_code, sample_name, metagenome_source, line_num)
+  def invalid_metagenome_source (rule_code, sample_name, metagenome_source, attr_idx, line_num)
     return nil if CommonUtils::null_value?(metagenome_source)
-    result = true
+    ret = true
 
     metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
     #あればキャッシュを使用
     cache_key_metage_source = ValidatorCache::create_key(metagenome_source, metagenome_linages)
     if @cache.nil? || @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source).nil?
-      org_ret = suggest_taxid_from_name(organism_name) # organims_nameからtax_idを検索
+      org_ret = @org_validator.suggest_taxid_from_name(metagenome_source) # metagenome_sourceからtax_idを検索
       if org_ret[:status] == "exist" # tax_idが1件
-        linage_ret = @org_validator.has_linage(org_ret[:tax_id], cache_key_metage_source)
+        linage_ret = @org_validator.has_linage(org_ret[:tax_id], metagenome_linages)
         ret = false if linage_ret == false
         has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: linage_ret}
-      elsif ret[:status] = "multiple exist" # tax_idが複数件ヒット. どれかがmetagenomeならOK
+        unless org_ret[:scientific_name] == metagenome_source
+          has_linage_metagenome[:annotation_name] = org_ret[:scientific_name]
+        end
+      elsif org_ret[:status] == "multiple exist" # tax_idが複数件ヒット. どれかがmetagenomeならOK
         has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: false}
         org_ret[:tax_id].each do |tax_id|
-          linage_ret = @org_validator.has_linage(tax_id.chomp.strip, cache_key_metage_source)
+          linage_ret = @org_validator.has_linage(tax_id.chomp.strip, metagenome_linages)
           has_linage_metagenome[:lineage] = true if linage_ret == true
         end
       else # not exist
         has_linage_metagenome = {tax_id: nil , lineage: nil}
       end
-      @cache.save(ValidatorCache::METAGE_SOURCE, cache_key_metage_source, has_linage_metagenome) unless @cache.nil?
+      @cache.save(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source, has_linage_metagenome) unless @cache.nil?
     else
       has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, metagenome_linages)
     end
@@ -2516,6 +2519,8 @@ class BioSampleValidator < ValidatorBase
       message = "This metagenome_source name is not in the taxonomy database."
       ret = false
     elsif has_linage_metagenome[:lineage] == false
+      ret = false
+    elsif !has_linage_metagenome[:annotation_name].nil?
       ret = false
     end
 
@@ -2525,6 +2530,13 @@ class BioSampleValidator < ValidatorBase
         {key: "metagenome_source", value: metagenome_source}
       ]
       annotation.push({key: "message", value: message}) unless message.nil?
+      if !has_linage_metagenome[:annotation_name].nil?
+        attr_no = " (Attribute no: #{attr_idx})"
+        annotation.push({key: "Suggested value" + attr_no, value: has_linage_metagenome[:annotation_name]})
+        #location = @xml_convertor.xpath_from_attrname_with_index("metagenome_source", line_num, attr_idx)
+        #annotation.push(CommonUtils::create_suggested_annotation([has_linage_metagenome[:anotation_name]], "metagenome_source", location, true))
+        #error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
     end
