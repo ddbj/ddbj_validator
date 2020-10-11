@@ -5,8 +5,10 @@ SELECT ?group_name ?attribute_name
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
+  VALUES ?package_id { "<%= package_name %>" }
   ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
-    rdfs:label "<%= package_name %> package"@en .
+    dc:identifier ?package_id ;
+    rdfs:label ?label .
   ?restriction owl:domain ?package ;
     rdfs:label ?group_name ;
     rdfs:range ?range .

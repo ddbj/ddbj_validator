@@ -5,6 +5,8 @@ SELECT (COUNT(?package) AS ?count)
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
-  ?package rdfs:subClassOf dbs:DDBJ_Defined_Package .
-  ?package rdfs:label "<%= package_name %> package"@en .
+  VALUES ?package_id { "<%= package_name %>" }
+  ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
+    dc:identifier ?package_id ;
+    rdfs:label ?label .
 }
