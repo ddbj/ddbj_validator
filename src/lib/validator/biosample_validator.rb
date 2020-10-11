@@ -266,11 +266,11 @@ class BioSampleValidator < ValidatorBase
           invalid_metagenome_source("BS_R0106", sample_name, attr["metagenome_source"], attr["attr_no"], line_num)
         end
       end
-#      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
-#        unless attr["component_organism"].nil?
-#          taxonomy_warning("BS_R0105", sample_name, attr["component_organism"], attr_idx, line_num)
-#        end
-#      end
+      biosample_data["attribute_list"].each do |attr|
+        unless attr["component_organism"].nil?
+          taxonomy_warning("BS_R0105", sample_name, attr["component_organism"], attr["attr_no"], line_num)
+        end
+      end
 
       ### 複数属性の組合せの検証
       latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
@@ -2471,11 +2471,49 @@ class BioSampleValidator < ValidatorBase
   # component_organism ex."Homo sapiens"
   # ==== Return
   # true/false
-#  def taxonomy_warning (rule_code, sample_name, component_organism, line_num)
-#    return nil if CommonUtils::null_value?(metagenome_source)
-#    result = true
-#    # Attributeの順番も含めてauto annotation
-#  end
+  def taxonomy_warning (rule_code, sample_name, component_organism, attr_idx, line_num)
+    return nil if CommonUtils::null_value?(component_organism)
+    ret = true
+
+    annotation = [
+      {key: "Sample name", value: sample_name},
+      {key: "component_organism", value: component_organism}
+    ]
+
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism).nil?
+      org_ret = @org_validator.suggest_taxid_from_name(component_organism)
+    else
+      puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
+      org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism)
+    end
+
+    if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+      scientific_name = org_ret[:scientific_name]
+      #ユーザ入力のcomponent_organismがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+      if scientific_name != component_organism
+        location = @xml_convertor.xpath_from_attrname_with_index("component_organism", line_num, attr_idx)
+        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "component_organism", location, true));
+        ret = false
+      end
+    elsif org_ret[:status] == "no exist" #該当するtaxonomy_idが無かった場合は単なるエラー
+      ret = false
+    elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、警告のみ
+      msg = "Multiple taxonomies detected with the same component organism name."
+      annotation.push({key: "Message", value: msg + " taxids:[#{org_ret[:tax_id]}]"})
+      ret = false
+    end
+
+    unless ret
+      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else #auto-annotation無
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      end
+      @error_list.push(error_hash)
+    end
+    ret
+  end
 
   #
   # rule:106
@@ -2513,7 +2551,7 @@ class BioSampleValidator < ValidatorBase
       end
       @cache.save(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source, has_linage_metagenome) unless @cache.nil?
     else
-      has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, metagenome_linages)
+      has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source)
     end
     if has_linage_metagenome[:tax_id].nil?
       message = "This metagenome_source name is not in the taxonomy database."

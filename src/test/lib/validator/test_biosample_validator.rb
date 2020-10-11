@@ -1555,6 +1555,35 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_taxonomy_warning
+    # ok case
+    ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "Homo sapiens", 8, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "Not exist organism", 8, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## case sensitive
+    ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "Homo Sapiens", 8, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
+    assert_equal "Homo sapiens", suggest_value
+    ## synonym
+    ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "Anabaena sp. PCC 7120", 8, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
+    assert_equal "Nostoc sp. PCC 7120", suggest_value
+
+    # nil case
+    ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "", 8, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
   def test_invalid_metagenome_source
     # ok case
     ret = exec_validator("invalid_metagenome_source", "BS_R0106", "SampleA", "soil metagenome", 8, 1)
@@ -1570,14 +1599,12 @@ jkl\"  "
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = ret[:error_list].first[:annotation].find{|anno|anno[:key].start_with?("Suggested value")}
-    p suggest_value
     assert_equal "soil metagenome", suggest_value[:value]
     ## synonym
     ret = exec_validator("invalid_metagenome_source", "BS_R0106", "SampleA", "Ocean metagenome", 8, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = ret[:error_list].first[:annotation].find{|anno|anno[:key].start_with?("Suggested value")}
-    p suggest_value
     assert_equal "marine metagenome", suggest_value[:value]
 
     # nil case
