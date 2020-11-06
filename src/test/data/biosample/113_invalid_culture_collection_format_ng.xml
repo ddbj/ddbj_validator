@@ -23,7 +23,7 @@
         </Contacts>
     </Owner>
     <Models>
-        <Model>MIGS.ba.microbial</Model>
+        <Model>Microbe</Model>
     </Models>
     <Attributes>
         <Attribute attribute_name="sample_name">MTB313</Attribute>
@@ -42,6 +42,7 @@
         <Attribute attribute_name="depth">0m</Attribute>
         <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
         <Attribute attribute_name="culture_collection">ATCC 1234</Attribute>
+        <Attribute attribute_name="culture_collection">ATCC 5678</Attribute>
         <Attribute attribute_name="specimen_voucher">UAM:ES:aaa:12345</Attribute>
         <Attribute attribute_name="bio_material">ANDES:T:aaa:CS22676</Attribute>
     </Attributes>

@@ -1,9 +1,9 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
-require '../../../lib/validator/biosample_validator.rb'
-require '../../../lib/validator/common/common_utils.rb'
-require '../../../lib/validator/common/xml_convertor.rb'
+require File.expand_path('../../../../lib/validator/biosample_validator.rb', __FILE__)
+require File.expand_path('../../../../lib/validator/common/common_utils.rb', __FILE__)
+require File.expand_path('../../../../lib/validator/common/xml_convertor.rb', __FILE__)
 
 class TestBioSampleValidator < Minitest::Test
   def setup
@@ -11,6 +11,12 @@ class TestBioSampleValidator < Minitest::Test
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../data/biosample', __FILE__)
+    # DDBJ RDBを使用するテストするか否か。を設定ファイルから判定
+    setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../../../conf/validator.yml")).result)
+    @ddbj_db_mode = true
+    if setting["ddbj_rdb"].nil? || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == ""
+      @ddbj_db_mode = false
+    end
   end
 
 #### テスト用共通メソッド ####
@@ -119,11 +125,13 @@ class TestBioSampleValidator < Minitest::Test
     }
     expect_value2 = {
       :group_name => "Organism group attribute in Plant",
-      :attribute_set => ["ecotype", "cultivar", "isolate"]
+      :attribute_set => ["cultivar", "ecotype", "isolate"]
     }
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant")
     assert_equal 2, attr_group_list.size
     attr_group_list.sort!{|a, b| a[:group_name] <=> b[:group_name] }
+    attr_group_list[0][:attribute_set].sort!
+    attr_group_list[1][:attribute_set].sort!
     assert_equal expect_value1, attr_group_list[0]
     assert_equal expect_value2, attr_group_list[1]
 
@@ -552,6 +560,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_bioproject_submission_id_replacement
+    return nil if @ddbj_db_mode == false
     #ok case
     ## not psub_id
     ret = exec_validator("bioproject_submission_id_replacement", "BS_R0095","", "PRJNA1", 1)
@@ -576,6 +585,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_bioproject_accession
+    return nil if @ddbj_db_mode == false
     #ok case
     ## ncbi
     ret = exec_validator("invalid_bioproject_accession", "BS_R0005","", "PRJNA1", 1)
@@ -670,7 +680,7 @@ class TestBioSampleValidator < Minitest::Test
     ## exist but not correct as scientific name
     ret = exec_validator("taxonomy_error_warning", "BS_R0045", "sampleA", "Anabaena sp. PCC 7120", 1)
     expect_taxid_annotation = "103690"
-    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
@@ -678,9 +688,9 @@ class TestBioSampleValidator < Minitest::Test
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "organism")
     assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case
-    ret = exec_validator("taxonomy_error_warning", "BS_R0045", "sampleA", "nostoc sp. pcc 7120", 1)
+    ret = exec_validator("taxonomy_error_warning", "BS_R0045", "sampleA", "nostoc sp. pcc 7120 = FACHB-418", 1)
     expect_taxid_annotation = "103690"
-    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
@@ -703,7 +713,7 @@ class TestBioSampleValidator < Minitest::Test
 
   def test_taxonomy_name_and_id_not_match
     #ok case
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "103690", "Nostoc sp. PCC 7120", 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BS_R0004", "sampleA", "103690", "Nostoc sp. PCC 7120 = FACHB-418", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ##tax_id=1
@@ -751,7 +761,7 @@ class TestBioSampleValidator < Minitest::Test
 
   def test_package_versus_organism
     #ok case
-    ret = exec_validator("package_versus_organism", "BS_R0048", "SampleA", "103690", "MIGS.ba.microbial", "Nostoc sp. PCC 7120", 1)
+    ret = exec_validator("package_versus_organism", "BS_R0048", "SampleA", "103690", "MIGS.ba.microbial", "Nostoc sp. PCC 7120 = FACHB-418", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
@@ -776,7 +786,7 @@ class TestBioSampleValidator < Minitest::Test
 
     #ng case
     ##bacteria
-    ret = exec_validator("sex_for_bacteria", "BS_R0059", "SampleA", "103690", "male", "Nostoc sp. PCC 7120", 1)
+    ret = exec_validator("sex_for_bacteria", "BS_R0059", "SampleA", "103690", "male", "Nostoc sp. PCC 7120 = FACHB-418", 1)
     expect_msg = "bacterial or viral organisms; did you mean 'host sex'?"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -795,7 +805,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
 
     #params are nil pattern
-    ret = exec_validator("sex_for_bacteria", "BS_R0059", "SampleA", "103690", nil, "Nostoc sp. PCC 7120", 1)
+    ret = exec_validator("sex_for_bacteria", "BS_R0059", "SampleA", "103690", nil, "Nostoc sp. PCC 7120 = FACHB-418", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -803,36 +813,52 @@ class TestBioSampleValidator < Minitest::Test
   def test_multiple_vouchers
     #ok case
     ## difference institution name
-    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", "UAM:Mamm:52179", "ATCC:26370", "ABRC:CS22676", 1)
+    attr_list = [{"specimen_voucher" => "UAM:Mamm:52179", "attr_no" => 5}, { "culture_collection" => "ATCC:26370", "attr_no" => 6}, {"bio_material" => "ABRC:CS22676", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## only culture_collection value
+    attr_list = [{ "culture_collection" => "ATCC:26370", "attr_no" => 6}, {"bio_material" => "missing", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## only specimen value
-    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", nil, "ATCC:26370", "missing", 1)
+    attr_list = [{ "specimen_voucher" => "UAM:Mamm:52179", "attr_no" => 5}, {"bio_material" => "missing", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ## only specimen value
-    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", "UAM:Mamm:52179", nil, "missing", 1)
+    ## multiple 'culture_collection', 'specimen_voucher'
+    attr_list = [{ "specimen_voucher" => "UAM:Mamm:52179", "attr_no" => 5}, { "specimen_voucher" => "ATCC:26370", "attr_no" => 6}, {"culture_collection" => "JCM:1234", "attr_no" => 7}, {"culture_collection" => "NBRC:1234", "attr_no" => 8}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
-    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", "UAM:Mamm:52179", "UAM:26370", nil, 1)
+    attr_list = [{"specimen_voucher" => "UAM:Mamm:52179", "attr_no" => 5}, { "culture_collection" => "UAM:26370", "attr_no" => 6}, {"bio_material" => "missing", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-
-    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", "ATCC:Mamm:52179", "ATCC:26370", "ATCC:26370", 1)
+    ## all ATCC
+    attr_list = [{"specimen_voucher" => "ATCC:Mamm:52179", "attr_no" => 5}, { "culture_collection" => "ATCC:26370", "attr_no" => 6}, {"bio_material" => "ATCC:26370", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple 'culture_collection' attr. same ATCC
+    attr_list = [{"culture_collection" => "ATCC:Mamm:52179", "attr_no" => 5}, { "culture_collection" => "ATCC:26370", "attr_no" => 6}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
 
     #params are nil pattern
-    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", nil, nil, "missing", 1)
+    attr_list = [{ "specimen_voucher" => "missing", "attr_no" => 5}, {"bio_material" => "missing", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
 
   def test_redundant_taxonomy_attributes
     #ok case
-    ret = exec_validator("redundant_taxonomy_attributes", "BS_R0073", "SampleA", "Nostoc sp. PCC 7120", "rumen", "Homo sapiens", 1)
+    ret = exec_validator("redundant_taxonomy_attributes", "BS_R0073", "SampleA", "Nostoc sp. PCC 7120 = FACHB-418", "rumen", "Homo sapiens", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
@@ -1214,6 +1240,7 @@ jkl\"  "
   end
 
   def test_bioproject_not_found
+    return nil if @ddbj_db_mode == false
     # ok case (given submitter_id matches DB response submitter_id)
     ## valid data
     ret = exec_validator("bioproject_not_found", "BS_R0006", "Sample A", "PSUB004388", "hirakawa", 1)
@@ -1293,6 +1320,7 @@ jkl\"  "
   end
 
   def test_invalid_bioproject_type
+    return nil if @ddbj_db_mode == false
     #ok case
     #PSUB
     ret = exec_validator("invalid_bioproject_type", "BS_R0070", "Sample A", "PSUB004142", 1)
@@ -1350,6 +1378,7 @@ jkl\"  "
   end
 
   def test_duplicated_locus_tag_prefix
+    return nil if @ddbj_db_mode == false
     # ok case
     xml_data = File.read("#{@test_file_dir}/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
@@ -1576,7 +1605,7 @@ jkl\"  "
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
-    assert_equal "Nostoc sp. PCC 7120", suggest_value
+    assert_equal "Nostoc sp. PCC 7120 = FACHB-418", suggest_value
 
     # nil case
     ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "", 8, 1)
@@ -1630,37 +1659,37 @@ jkl\"  "
   def test_invalid_culture_collection
     institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/biosample/coll_dump.txt")
     # ok case
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATCC:1234", institution_list, 1)
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATCC:1234", institution_list, 5, 1)
     assert_equal true, ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "OSUMZ:Mammal:12345", institution_list, 1)
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "OSUMZ:Mammal:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "AKU<JPN>:12345", institution_list, 1)
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "AKU<JPN>:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
 
     # ng case
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "HOGEHOGE:1234", institution_list, 1) # not exist institude code
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "HOGEHOGE:1234", institution_list, 5, 1) # not exist institude code
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "CIAT:HOGEHOGE:1234", institution_list, 1) # not exist collection code
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "CIAT:HOGEHOGE:1234", institution_list, 5, 1) # not exist collection code
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "AAU:1234", institution_list, 1) # institude code for not culture collection
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "AAU:1234", institution_list, 5, 1) # institude code for not culture collection
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATSC:12345", institution_list, 1) # need location "ATSC<AUS>"
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATSC:12345", institution_list, 5, 1) # need location "ATSC<AUS>"
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "Coriell: 1234", institution_list, 1) # auto correct
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "Coriell: 1234", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
     assert_equal "CORIELL:1234", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "atcc : 1234", institution_list, 1) # auto correct
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "atcc : 1234", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
     assert_equal "ATCC:1234", get_auto_annotation(ret[:error_list])
 
     # nil case
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "", institution_list, 1)
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "", institution_list, 5, 1)
     assert_nil ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "missing", institution_list, 1)
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "missing", institution_list, 5, 1)
     assert_nil ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "12345", institution_list, 1) # invalid format
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "12345", institution_list, 5, 1) # invalid format
     assert_nil ret[:result]
-    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "CIAT:Bean:aaa:12345", institution_list, 1) # 3 colons invalid format
+    ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "CIAT:Bean:aaa:12345", institution_list, 5, 1) # 3 colons invalid format
     assert_nil ret[:result]
   end
 
@@ -1703,31 +1732,31 @@ jkl\"  "
   def test_invalid_specimen_voucher
     institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/biosample/coll_dump.txt")
     # ok case
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:12345", institution_list, 1)
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:ES:12345", institution_list, 1)
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:ES:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
 
     # ng case
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "HOGEHOGE:1234", institution_list, 1) # not exist institude code
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "HOGEHOGE:1234", institution_list, 5, 1) # not exist institude code
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:HOGEHOGE:1234", institution_list, 1) # not exist collection code
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:HOGEHOGE:1234", institution_list, 5, 1) # not exist collection code
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ATCC:1234", institution_list, 1) # institude code for not specimen voucher
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ATCC:1234", institution_list, 5, 1) # institude code for not specimen voucher
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM : es : 12345", institution_list, 1) # auto correct
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM : es : 12345", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
     assert_equal "UAM:ES:12345", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ZMB:MAMMAL: 1234", institution_list, 1) # auto correct
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ZMB:MAMMAL: 1234", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
     assert_equal "ZMB:Mammal:1234", get_auto_annotation(ret[:error_list])
 
     # nil case
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "", institution_list, 1)
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "", institution_list, 5, 1)
     assert_nil ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "missing", institution_list, 1)
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "missing", institution_list, 5, 1)
     assert_nil ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "CIAT:Bean:aaa:12345", institution_list, 1) # 3 colons invalid format
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "CIAT:Bean:aaa:12345", institution_list, 5, 1) # 3 colons invalid format
     assert_nil ret[:result]
   end
 
