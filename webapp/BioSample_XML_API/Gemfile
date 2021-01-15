@@ -1,3 +1,0 @@
-gem 'unicorn'
-gem 'sinatra'
-gem 'sinatra-contrib'
