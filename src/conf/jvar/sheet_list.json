@@ -1,0 +1,10 @@
+[
+  {"name": "BioProject", "sheet_name": "BIOPROJECT", "json_key": "_BioProject"},
+  {"name": "BioSample", "sheet_name": "BIOSAMPLE", "json_key": "_BioSample"},
+  {"name": "Submitter", "sheet_name": "SUBMITTER", "json_key": "_Submitter"},
+  {"name": "Study", "sheet_name": "STUDY", "json_key": "_Study"},
+  {"name": "Assay", "sheet_name": "ASSAY", "json_key": "_Assay"},
+  {"name": "Sampleset", "sheet_name": "SAMPLESET", "json_key": "_Samplesets"},
+  {"name": "Sample", "sheet_name": "SAMPLE", "json_key": "_Samples"},
+  {"name": "Experiment", "sheet_name": "EXPERIMENT", "json_key": "_Experiments"}
+]

@@ -1,0 +1,122 @@
+{
+  "ruleJV_R0001": {
+    "rule_class": "JVar",
+    "code": "JV_R0001",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Not well-formed Excel",
+    "method": "not_well_formed_excel",
+    "message": "Excelファイルの読み込みに失敗しました。Excelファイルであるか確認して下さい。解決しない場合はDDBJにご連絡ください",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0002": {
+    "rule_class": "JVar",
+    "code": "JV_R0002",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Not well-formed Excel sheet",
+    "method": "not_well_formed_excel_sheet",
+    "message": "Excelファイルのシートの読み込みに失敗しました。解決しない場合はDDBJにご連絡ください",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0003": {
+    "rule_class": "JVar",
+    "code": "JV_R0003",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Header line not found",
+    "method": "header_line_not_found",
+    "message": "ヘッダー行が見つかりません。シートには＃から始まるヘッダー行が必要です。",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0004": {
+    "rule_class": "JVar",
+    "code": "JV_R0004",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Data line before header line",
+    "method": "data_line_before_header_line",
+    "message": "ヘッダー行より前にデータが記述されている可能性があります。この行は無視されます。",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0005": {
+    "rule_class": "JVar",
+    "code": "JV_R0005",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid cell position",
+    "method": "invalid_cell_position",
+    "message": "ヘッダーの無い列に値が記載されています。このセルは無視されます。",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0006": {
+    "rule_class": "JVar",
+    "code": "JV_R0006",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Blank line",
+    "method": "blank_line",
+    "message": "空のデータ行が見つかりました、この行は無視されます。",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0007": {
+    "rule_class": "JVar",
+    "code": "JV_R0007",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Exceed line number",
+    "method": "exceed_line_number",
+    "message": "行数が多すぎます。最大は10,000行です。これを超える取り扱いは管理者にご連絡ください。",
+    "object": [
+      "JVar"
+    ]
+  },
+  "ruleJV_R0008": {
+    "rule_class": "JVar",
+    "code": "JV_R0008",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "VCF header line not found",
+    "method": "vcf_header_line_not_found",
+    "message": "VCFにヘッダー行が見つかりません。シートには＃から始まるヘッダー行が必要です。",
+    "object": [
+      "VCF"
+    ]
+  },
+  "ruleJV_R0009": {
+    "rule_class": "JVar",
+    "code": "JV_R0009",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "VCF version line not found",
+    "method": "vcf_version_line_not_found",
+    "message": "VCFの最初のファイルはVCF version情報の記載が必要です",
+    "object": [
+      "VCF"
+    ]
+  },
+  "ruleJV_R0010": {
+    "rule_class": "JVar",
+    "code": "JV_R0010",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "VCF blank line",
+    "method": "vcf_blank_line",
+    "message": "VCFに空行が見つかりました、この行は無視されます。",
+    "object": [
+      "VCF"
+    ]
+  }
+}
