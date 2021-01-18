@@ -41,7 +41,7 @@ module DDBJValidator
 
     get '/api/apispec/' do
       content_type 'text/html; charset=utf-8'
-      send_file File.join(settings.public_folder, 'apispec/index.html')
+      send_file File.join(settings.public_folder, 'api/apispec/index.html')
     end
 
     get '/api/client/index' do

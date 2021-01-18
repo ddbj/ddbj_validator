@@ -47,6 +47,12 @@
           },
           {
             "$ref": "#/parameters/analysis"
+          },
+          {
+            "$ref": "#/parameters/jvar"
+          },
+          {
+            "$ref": "#/parameters/vcf"
           }
         ],
         "responses": {
@@ -197,7 +203,7 @@
         ],
         "responses": {
           "200": {
-            "description": "An original xml file validated",
+            "description": "An original xml file validated (converted json file on jvar|vcf)",
             "schema": {
               "type": "file"
             }
@@ -368,6 +374,20 @@
       "required": false,
       "type": "file"
     },
+    "jvar": {
+      "name": "jvar",
+      "in": "formData",
+      "description": "Upload JVar metadata Excel file.",
+      "required": false,
+      "type": "file"
+    },
+    "vcf": {
+      "name": "vcf",
+      "in": "formData",
+      "description": "Upload VCF file.",
+      "required": false,
+      "type": "file"
+    },
     "uuid": {
       "name": "uuid",
       "in": "path",
@@ -378,7 +398,7 @@
     "filetype": {
       "name": "filetype",
       "in": "path",
-      "description": "filetype e.g., submission, biosample, bioproject, run,",
+      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf,",
       "required": true,
       "type": "string"
     },
