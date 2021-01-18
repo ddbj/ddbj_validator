@@ -41,7 +41,7 @@ module DDBJValidator
 
     get '/api/apispec/' do
       content_type 'text/html; charset=utf-8'
-      send_file File.join(settings.public_folder, 'apispec/index.html')
+      send_file File.join(settings.public_folder, 'api/apispec/index.html')
     end
 
     get '/api/client/index' do
@@ -56,7 +56,7 @@ module DDBJValidator
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         validation_params = {}
-        input_file_list = %w(biosample bioproject submission experiment run analysis)
+        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)
@@ -135,7 +135,24 @@ module DDBJValidator
     get '/api/validation/:uuid/:filetype' do |uuid, filetype|
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
       file_list = Dir.glob("#{save_dir}/#{filetype}/*")
-      if file_list.size == 1
+      if filetype == 'jvar' #jvarは元ファイルがExcelだが変換したJSONを返して欲しいケースを想定 TODO コードが長い
+        if get_accept_header(request).include?("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+          file = file_list.select{|file| file.end_with?(".xlsx")} # TODO ファイル拡張子があるとは限らない
+          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        else
+          file = file_list.select{|file| file.end_with?(".json")} #変換できなかった場合はこのファイルは無い
+          type = "application/json"
+        end
+        if file.size == 0
+          status 400
+          message = "Invalid uuid or filetype"
+          { status: "error", "message": message}.to_json
+        else
+          file_name = File.basename(file.first)
+          file_path = file.first
+          send_file file_path, :filename => file_name, :type => type
+        end
+      elsif file_list.size == 1
         file_name = File.basename(file_list.first)
         file_path = file_list.first
         send_file file_path, :filename => file_name, :type => 'application/xml'
@@ -406,6 +423,15 @@ module DDBJValidator
           f.write params[validator_type.to_sym][:tempfile].read
         end
         save_path
+      end
+
+      # Acceptヘッダーをリストで返す
+      def get_accept_header(request)
+        accept = request.env.select { |k, v| k.start_with?('HTTP_ACCEPT') }
+        if accept.size == 0
+        else
+          accept
+        end
       end
 
       def http_get_response (uri, options)
