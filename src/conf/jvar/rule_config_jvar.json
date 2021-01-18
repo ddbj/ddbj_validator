@@ -6,7 +6,7 @@
     "internal_ignore": false,
     "name": "Not well-formed Excel",
     "method": "not_well_formed_excel",
-    "message": "Excelファイルの読み込みに失敗しました。Excelファイルであるか確認して下さい。解決しない場合はDDBJにご連絡ください",
+    "message": "Excelファイルの読み込みに失敗しました。Excelファイルであるか確認して下さい。解決しない場合はDDBJにご連絡ください。",
     "object": [
       "JVar"
     ]
@@ -18,7 +18,7 @@
     "internal_ignore": false,
     "name": "Not well-formed Excel sheet",
     "method": "not_well_formed_excel_sheet",
-    "message": "Excelファイルのシートの読み込みに失敗しました。解決しない場合はDDBJにご連絡ください",
+    "message": "Excelファイルのシートの読み込みに失敗しました。解決しない場合はDDBJにご連絡ください。",
     "object": [
       "JVar"
     ]
@@ -52,9 +52,9 @@
     "code": "JV_R0005",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Invalid cell position",
-    "method": "invalid_cell_position",
-    "message": "ヘッダーの無い列に値が記載されています。このセルは無視されます。",
+    "name": "Duplicated header line",
+    "method": "duplicated_header_line",
+    "message": "#から始まるヘッダー行が複数見つかりました。最初のヘッダー以外は無視されます。",
     "object": [
       "JVar"
     ]
@@ -64,9 +64,9 @@
     "code": "JV_R0006",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Blank line",
-    "method": "blank_line",
-    "message": "空のデータ行が見つかりました、この行は無視されます。",
+    "name": "Invalid cell position",
+    "method": "invalid_cell_position",
+    "message": "ヘッダーの無い列に値が記載されています。このセルは無視されます。",
     "object": [
       "JVar"
     ]
@@ -74,11 +74,11 @@
   "ruleJV_R0007": {
     "rule_class": "JVar",
     "code": "JV_R0007",
-    "level": "error",
+    "level": "warning",
     "internal_ignore": false,
-    "name": "Exceed line number",
-    "method": "exceed_line_number",
-    "message": "行数が多すぎます。最大は10,000行です。これを超える取り扱いは管理者にご連絡ください。",
+    "name": "Blank line",
+    "method": "blank_line",
+    "message": "空のデータ行が見つかりました、この行は無視されます。",
     "object": [
       "JVar"
     ]
@@ -88,11 +88,11 @@
     "code": "JV_R0008",
     "level": "error",
     "internal_ignore": false,
-    "name": "VCF header line not found",
-    "method": "vcf_header_line_not_found",
-    "message": "VCFにヘッダー行が見つかりません。シートには＃から始まるヘッダー行が必要です。",
+    "name": "Exceed line number",
+    "method": "exceed_line_number",
+    "message": "行数が多すぎます。最大は10,000行です。これを超える取り扱いは管理者にご連絡ください。",
     "object": [
-      "VCF"
+      "JVar"
     ]
   },
   "ruleJV_R0009": {
@@ -102,7 +102,7 @@
     "internal_ignore": false,
     "name": "VCF version line not found",
     "method": "vcf_version_line_not_found",
-    "message": "VCFの最初のファイルはVCF version情報の記載が必要です",
+    "message": "VCFの最初の行はVCF version情報の記載が必要です",
     "object": [
       "VCF"
     ]
@@ -110,11 +110,59 @@
   "ruleJV_R0010": {
     "rule_class": "JVar",
     "code": "JV_R0010",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "VCF header line not found",
+    "method": "vcf_header_line_not_found",
+    "message": "VCFにヘッダー行が見つかりません。シートには＃から始まるヘッダー行が必要です。",
+    "object": [
+      "VCF"
+    ]
+  },
+  "ruleJV_R0011": {
+    "rule_class": "JVar",
+    "code": "JV_R0011",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing VCF header line columns",
+    "method": "missing_vcf_header_line_columns",
+    "message": "VCFのヘッダー行に必要なカラムがありません。[CHROM, POS, ID, REF, ALT, QUAL, FILTER, INFO]は必須項目です。",
+    "object": [
+      "VCF"
+    ]
+  },
+  "ruleJV_R0012": {
+    "rule_class": "JVar",
+    "code": "JV_R0012",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "VCF data line before header line",
+    "method": "vcf_data_line_before_header_line",
+    "message": "ヘッダー行より前にデータが記述されている可能性があります。この行は無視されます。",
+    "object": [
+      "VCF"
+    ]
+  },
+  "ruleJV_R0013": {
+    "rule_class": "JVar",
+    "code": "JV_R0013",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "VCF Duplicated header line",
+    "method": "vcf_duplicated_header_line",
+    "message": "#から始まるヘッダー行が複数見つかりました。最初のヘッダー以外は無視されます。",
+    "object": [
+      "VCF"
+    ]
+  },
+  "ruleJV_R0014": {
+    "rule_class": "JVar",
+    "code": "JV_R0014",
     "level": "warning",
     "internal_ignore": false,
     "name": "VCF blank line",
     "method": "vcf_blank_line",
-    "message": "VCFに空行が見つかりました、この行は無視されます。",
+    "message": "VCFに空のデータ行が見つかりました、この行は無視されます。",
     "object": [
       "VCF"
     ]

@@ -158,12 +158,13 @@ class JVarValidator < ValidatorBase
       if row.first =~ /^\*/ # comment line
         # ignore
       elsif row.first =~ /^#/ # header
-        # TODO 2重ヘッダーチェック
-        header = parse_header_line(row)
+        if duplicated_header_line("JV_R0005", sheet_name, header, row_num) # 既にheader行が出現しているか
+          header = parse_header_line(row)
+        end
       else # data line
         # TODO method名が紛らわしい
         if data_line_before_header_line("JV_R0004", sheet_name, header, row_num) # headerより前に出現していない
-          if ignore_blank_line("JV_R0006", sheet_name, row, row_num) # 空白行では無い
+          if ignore_blank_line("JV_R0007", sheet_name, row, row_num) # 空白行では無い
             row_data = parse_data_row(sheet_name, header, row, row_num)
             data_list.push(row_data)
           end
@@ -211,7 +212,7 @@ class JVarValidator < ValidatorBase
     row_data[:isPartOf] = "jvar-study"
     annotations = []
     row.each_with_index do |cell, column_num|
-      if cell_value_with_no_header("JV_R0005", sheet_name, header, row_num, cell, column_num)
+      if cell_value_with_no_header("JV_R0006", sheet_name, header, row_num, cell, column_num)
         annotations.push({name: header[column_num], value: cell_value(cell)})
       end
     end
@@ -258,6 +259,25 @@ class JVarValidator < ValidatorBase
 
   #
   # rule:JV_R0005
+  # Check if a header line has already been set (duplication of header lines).
+  #
+  def duplicated_header_line(rule_code, sheet_name, header, row_num)
+    ret = true
+    if !(header.nil? || header == {})
+      ret = false
+      annotation = [
+        {key: "Excel file", value: @data_file},
+        {key: "Sheet name", value: sheet_name},
+        {key: "line number", value: row_num}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:JV_R0006
   # Check for values in lines with no header.
   #
   def cell_value_with_no_header(rule_code, sheet_name, header, row_num, cell, column_num)
@@ -280,13 +300,12 @@ class JVarValidator < ValidatorBase
   end
 
   #
-  # rule:JV_R0006
+  # rule:JV_R0007
   # If it is an empty line, add warnning information.
   #
   def ignore_blank_line(rule_code, sheet_name, row, row_num)
     ret = true
     if row.uniq == [nil]
-    #if row_data.nil? || row_data[:annotations].nil? || row_data[:annotations] == [] # blank line
       ret = false
       annotation = [
         {key: "Excel file", value: @data_file},
