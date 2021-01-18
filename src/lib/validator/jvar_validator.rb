@@ -28,6 +28,9 @@ class JVarValidator < ValidatorBase
   def initialize
     super()
     config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/jvar")
+    xlsx_error_log = File.absolute_path(@conf[:log_dir] + "/excel_error.log")
+
+    @log = Logger.new(xlsx_error_log)
     @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_jvar.json"))
     @conf[:sheet_list] = JSON.parse(File.read(config_file_dir + "/sheet_list.json"))
 
@@ -52,7 +55,7 @@ class JVarValidator < ValidatorBase
 
     # JSONファイル出力
     output_dir = File::dirname(data_xlsx)
-    json_file_name = @data_file.gsub(".xlsx", ".json")
+    json_file_name = @data_file.split(".")[0..-2].join(".") + ".json"
     File.open("#{output_dir}/#{json_file_name}", "w") do |out|
       out.puts JSON.pretty_generate(jvar_data)
     end
@@ -83,9 +86,10 @@ class JVarValidator < ValidatorBase
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
-      message = "Failed to load the Excel file.: Please check the files: '#{@data_file}'.\n"
+      message = "Failed to load the Excel file.: Please check the files: '#{data_xlsx}'.\n"
       message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
+      @log.warn("An Excel(Roo::Excelx) loading error has occurred.")
+      output_exception_log(ex, message)
     end
     xlsx
   end
@@ -122,6 +126,7 @@ class JVarValidator < ValidatorBase
   def load_sheet(rule_code, xlsx, sheet_name)
     sheet = nil
     begin
+      #TODO 存在しなくてもいいシートはあるはずで、全てをExceptionにしない
       sheet = xlsx.sheet(sheet_name)
     rescue => ex
       annotation = [
@@ -133,10 +138,8 @@ class JVarValidator < ValidatorBase
       @error_list.push(error_hash)
       message = "Failed to load the Excel file.: Please check the files: '#{@data_file}'.\n"
       message += "#{ex.message} (#{ex.class})"
-      puts message
-      puts ex.backtrace
-      #raise StandardError, message, ex.backtrace
-      #TODO log raise StandardError, message, ex.backtrace
+      @log.warn("An Excel(Roo::Excelx) sheet loading error has occurred.")
+      output_exception_log(ex, message)
     end
     sheet
   end
@@ -171,7 +174,7 @@ class JVarValidator < ValidatorBase
         end
       end
     end
-    exist_header_line("JV_R0003", header, sheet_name) # not found header line?
+    exist_header_line("JV_R0003", sheet_name, header) # not found header line?
     data_list
   end
 
@@ -224,7 +227,7 @@ class JVarValidator < ValidatorBase
   # rule:JV_R0003
   # If the header information is empty, add error information.
   #
-  def exist_header_line(rule_code, header, sheet_name)
+  def exist_header_line(rule_code, sheet_name, header)
     ret = true
     if header.nil? || header == {}
       ret = false
