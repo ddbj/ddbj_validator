@@ -5,8 +5,8 @@
       <Link>
         <ProjectIDRef accession="" archive="DDBJ" />
         <Hierarchical type="TopAdmin">
-          <MemberID accession="PRJDB3549" archive="DDBJ" />
-          <MemberID accession="PSUB990036" archive="DDBJ" />
+          <MemberID accession="PRJDB1554" archive="DDBJ" />
+          <MemberID accession="PSUB001851" archive="DDBJ" />
         </Hierarchical>
       </Link>
     </ProjectLinks>
