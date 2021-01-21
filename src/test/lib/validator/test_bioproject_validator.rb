@@ -1,10 +1,12 @@
 require 'bundler/setup'
 require 'minitest/autorun'
+require 'dotenv'
 require '../../../lib/validator/bioproject_validator.rb'
 require '../../../lib/validator/common/common_utils.rb'
 
 class TestBioProjectValidator < Minitest::Test
   def setup
+    Dotenv.load "../../../../.env"
     @validator = BioProjectValidator.new
     @test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
   end
