@@ -87,13 +87,14 @@ class BioProjectValidator < ValidatorBase
     @submission_id = @xml_convertor.get_bioproject_submission_id(xml_document)
 
     multiple_projects("BP_R0037", project_set)
-    project_name_list = @db_validator.get_bioproject_names(@submitter_id)
-    project_title_desc_list = @db_validator.get_bioproject_title_descs(@submitter_id)
+    project_name_list = @db_validator.get_bioproject_names(@submitter_id) if @use_db
+    project_title_desc_list = @db_validator.get_bioproject_title_descs(@submitter_id) if @use_db
     #各プロジェクト毎の検証
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
       duplicated_project_name("BP_R0003", project_name, project_node, project_name_list, @submission_id, idx) if @use_db
+      duplicated_project_title_and_description("BP_R0004", project_name, project_node, project_title_desc_list, @submission_id, idx) if @use_db
       identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
       short_project_description("BP_R0006", project_name, project_node, idx)
       empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
@@ -185,6 +186,7 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def duplicated_project_name (rule_code, project_label, project_node, project_name_list, submission_id, line_num)
+    return if project_name_list.nil?
     result = true
     name_path = "//Project/ProjectDescr/Name"
 
@@ -220,6 +222,7 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def duplicated_project_title_and_description (rule_code, project_label, project_node, project_title_desc_list, submission_id, line_num)
+    return if project_title_desc_list.nil?
     result = true
     title_path = "//Project/ProjectDescr/Title"
     desc_path = "//Project/ProjectDescr/Description"
