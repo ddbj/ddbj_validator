@@ -76,14 +76,16 @@ class BioProjectValidator < ValidatorBase
     doc = Nokogiri::XML(File.read(data_xml))
     project_set = doc.xpath("//PackageSet/Package/Project")
 
+    @xml_convertor = XmlConvertor.new
     if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_bioproject_submitter_id(xml_document)
+      @submitter_id = @xml_convertor.get_bioproject_submitter_id(File.read(data_xml))
     else
       @submitter_id = submitter_id
     end
 
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
-    @submission_id = @xml_convertor.get_bioproject_submission_id(xml_document)
+    @submission_id = @xml_convertor.get_bioproject_submission_id(File.read(data_xml))
+  else
 
     multiple_projects("BP_R0037", project_set)
     project_name_list = @db_validator.get_bioproject_names(@submitter_id) if @use_db
