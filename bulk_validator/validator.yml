@@ -1,6 +1,2 @@
-pg_host: localhost
-pg_port: 5432
-pg_user: user
-pg_pass: pass
-api_host: http://localhost:18800
+api_host: http://localhost:53000
 rule_json_path: /your/path/ddbj_validator/src/conf/biosample/rule_config_biosample.json
