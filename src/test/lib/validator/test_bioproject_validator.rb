@@ -3,6 +3,7 @@ require 'minitest/autorun'
 require 'dotenv'
 require '../../../lib/validator/bioproject_validator.rb'
 require '../../../lib/validator/common/common_utils.rb'
+require '../../../lib/validator/common/organism_validator.rb'
 
 class TestBioProjectValidator < Minitest::Test
   def setup
@@ -44,6 +45,24 @@ class TestBioProjectValidator < Minitest::Test
     xml_data = File.read(xml_file_path)
     doc = Nokogiri::XML(xml_data)
     doc.xpath("//PackageSet/Package/ProjectLinks")
+  end
+
+  def get_input_taxid (project_node)
+    taxonomy_id = OrganismValidator::TAX_INVALID
+    input_taxid = @validator.get_node_text(project_node,  "//Organism/@taxID")
+    unless CommonUtils::blank?(input_taxid) #taxonomy_idの記述があれば
+      taxonomy_id = input_taxid
+    end
+    taxonomy_id
+  end
+
+  def get_input_organism_name (project_node)
+    organism_name = ""
+    input_oganism_name = @validator.get_node_text(project_node,  "//Organism/OrganismName")
+    unless CommonUtils::blank?(input_oganism_name) #organism_nameの記述があれば
+      organism_name = input_oganism_name
+    end
+    organism_name
   end
 
 ####
@@ -481,27 +500,32 @@ class TestBioProjectValidator < Minitest::Test
     #ok case
     # exist tax_id
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist only organism name
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok2.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok3.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     # not infraspecific_rank, but sample_scope = eMultispecies. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok4.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not infraspecific_rank, but not primary project. validation =>  ok
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok5.xml")
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ng.xml")
-    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name" , project_set.first, 1)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
@@ -531,27 +555,27 @@ class TestBioProjectValidator < Minitest::Test
     #ok case
     # exist tax_id
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok.xml")
-    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist only organism name
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok2.xml")
-    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok3.xml")
-    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     # not metagenome tax_id, but sample_scope is not eEnvironment. validation =>  ok
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok4.xml")
-    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ng.xml")
-    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name" , project_set.first, 1)
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
@@ -679,57 +703,48 @@ class TestBioProjectValidator < Minitest::Test
     #ok case
     #exact match
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ok.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #taxid blank
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ok2.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
-    assert_equal true, ret[:result]
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
+    assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng1.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
-    expect_organism_annotation = "Nostoc sp. PCC 7120"
-    assert_equal expect_organism_annotation, suggest_value
+    assert_nil CommonUtils::get_auto_annotation(ret[:error_list].first)
     #organism name blank
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng2.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
-    expect_organism_annotation = "Nostoc sp. PCC 7120"
-    assert_equal expect_organism_annotation, suggest_value
+    assert_nil CommonUtils::get_auto_annotation(ret[:error_list].first)
     #not exist taxid
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng3.xml")
-    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
   # rule:BP_R0039
   def test_taxonomy_error_warning
-    #ok case
-    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ok.xml")
-    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
+    #このメソッドではokになるケースはない
     #ng case
     ## exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng1.xml")
-    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     expect_taxid_annotation = "103690"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
     assert_equal expect_taxid_annotation, suggest_value
-
     ##exist but not correct as scientific name ("Anabaena sp. PCC 7120"=>"Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng2.xml")
-    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     expect_taxid_annotation = "103690"
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
@@ -740,7 +755,7 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case ("nostoc sp. pcc 7120" => "Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng3.xml")
-    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     expect_taxid_annotation = "103690"
     expect_organism_annotation = "Nostoc sp. PCC 7120"
     assert_equal false, ret[:result]
@@ -751,12 +766,17 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng4.xml")
-    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng5.xml")
-    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", project_set, 1)
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## organism name is blank
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng6.xml")
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

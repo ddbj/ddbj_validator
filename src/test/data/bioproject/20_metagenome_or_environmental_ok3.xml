@@ -15,7 +15,7 @@
             <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci">
               <Organism>
                 <OrganismName>air metagenome aaaaaaa invalid name</OrganismName>
-              </Organism>             
+              </Organism>
             </Target>
             <Method method_type="eSequencing" />
             <Objectives>
