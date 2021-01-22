@@ -185,6 +185,26 @@ module DDBJValidator
       end
     end
 
+    get '/api/submission/ids/:filetype' do |filetype|
+      headers = request.env.select do |key, val|
+        key.start_with?("HTTP_")
+      end
+      if headers["HTTP_API_KEY"].nil? || headers["HTTP_API_KEY"] != "curator" #TODO change
+        status 401
+      else
+        ret = Submitter.new().submission_id_list(filetype)
+        if ret[:status] == "success"
+          ret[:data].to_json
+        elsif ret[:status] == "fail"
+          status 400
+          message = "Invalid filetype"
+          { status: "error", "message": message}.to_json
+        elsif ret[:status] == "error"
+          status 500
+        end
+      end
+    end
+
     get '/api/submission/:filetype/:submittion_id' do |filetype, submission_id|
       headers = request.env.select do |key, val|
         key.start_with?("HTTP_")

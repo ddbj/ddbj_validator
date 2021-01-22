@@ -5,6 +5,34 @@ require File.dirname(__FILE__) + "/base.rb"
 class BioSampleSubmitter < SubmitterBase
   BIOSAMPLE_DB_NAME = "biosample"
 
+  def public_submission_id_list()
+    begin
+      connection = get_connection(BIOSAMPLE_DB_NAME)
+      q = "SELECT DISTINCT submission_id
+           FROM mass.sample
+           WHERE (status_id IS NULL OR status_id IN (5400, 5500))
+           ORDER BY submission_id"
+      res = connection.exec(q)
+    rescue => ex
+      message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    ensure
+      connection.close if connection
+    end
+    submission_id_list = []
+    begin
+      res.each do |row|
+        submission_id_list.push(row["submission_id"])
+      end
+      submission_id_list.uniq
+    rescue => ex
+      message = "Failed to convert xml file"
+      message += "#{ex.message} (#{ex.class})"
+      raise StandardError, message, ex.backtrace
+    end
+  end
+
   def output_xml_file(submission_id, output)
     begin
       connection = get_connection(BIOSAMPLE_DB_NAME)

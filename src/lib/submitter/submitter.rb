@@ -14,8 +14,34 @@ class Submitter
     @latest_version = @version["version"]["validator"]
     @log_file = @setting["api_log"]["path"] + "/validator.log"
     @log = Logger.new(@log_file)
-    p @log_file
 
+  end
+  def submission_id_list(file_type)
+    ret = {status: "success"}
+    begin
+      case file_type
+      when "biosample"
+        submitter = BioSampleSubmitter.new
+        submission_id_list = submitter.public_submission_id_list()
+        ret[:data] = submission_id_list
+      when "bioproject"
+        submitter = BioProjectSubmitter.new
+        submission_id_list = submitter.public_submission_id_list()
+        ret[:data] = submission_id_list
+      #when "submission", "experiment", "run", "analysis"
+      #  submitter = DraSubmitter.new
+      #  submission_id_list = submitter.public_submission_id_list()
+      #  ret[:data] = submission_id_list
+      else
+        ret[:status] = "fail"
+      end
+      ret
+    rescue => ex
+      @log.error(ex.message)
+      trace = ex.backtrace.map {|row| row}.join("\n")
+      @log.error(trace)
+      ret[:status] = "error"
+    end
   end
 
   def submission_xml(file_type, submission_id, output_dir)
