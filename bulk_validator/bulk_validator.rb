@@ -162,11 +162,11 @@ class BulkValidator
     FileUtils.mkdir_p(@result_detail_output_dir) unless FileTest.exist?(@result_detail_output_dir)
     @summary[:rule_stats_list].each do |rule_hash|
       rule_id = rule_hash[:id]
-      rule_data = JSON.parse(File.read("#{@result_detail_output_dir}/#{rule_id}.json"))
+      rule_data_list = JSON.parse(File.read("#{@result_detail_output_dir}/#{rule_id}.json"))
       CSV.open("#{@result_detail_output_dir}/#{rule_id}.tsv", "w", :col_sep => "\t") do |file|
         #header
         header_list = ["Submission ID"]
-        rule_data.each do |item|
+        rule_data_list.each do |item|
           item["annotation"].each do |anno|
             unless header_list.include?(anno["key"])
               header_list.push(anno["key"])
@@ -178,7 +178,7 @@ class BulkValidator
         end
         file.puts(header_list)
         #details
-        rule_data.each do |item|
+        rule_data_list.each do |item|
           row = []
           row.push(item["source"].split(".").first)
           header_list[1..-1].each do |key|
@@ -186,16 +186,15 @@ class BulkValidator
             column = item["annotation"].select{|anno| anno["key"] == key}
             unless key == "Auto Annotation"
               if column.size > 0
-                if column.first["key"] == "Suggested value"
-                  if  column.first["suggested_value"].size == 1
-                    #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
-                    row.push(column.first["suggested_value"].first)
+                val = []
+                column.each do |col|
+                  if col["is_auto_annotation"]
+                    val.push(col["suggested_value"])
                   else
-                    row.push(column.first["suggested_value"])
+                    val.push(col["value"])
                   end
-                else
-                  row.push(column.first["value"])
                 end
+                row.push(val.join(" | "))
               else
                 row.push("")
               end
@@ -204,7 +203,7 @@ class BulkValidator
           #autoannotaionができるなら"true",それ以外(auto-annotationなし、複数候補あり等)だと"false"
           auto_annotatable = false
           item["annotation"].each do |anno|
-            if !anno["key"].nil? && anno["key"] == "Suggested value" && anno["suggested_value"].size ==1 && !anno["is_auto_annotation"].nil?
+            if !anno["key"].nil? && anno["is_auto_annotation"] && anno["suggested_value"].size == 1
               auto_annotatable = true
             end
           end
@@ -228,7 +227,7 @@ class BulkValidator
         ssub_id_list.push(item["source"])
         auto_annotatable = false
         item["annotation"].each do |anno|
-          if !anno["key"].nil? && anno["key"] == "Suggested value" && anno["suggested_value"].size ==1 && !anno["is_auto_annotation"].nil?
+          if !anno["key"].nil? && anno["is_auto_annotation"] && anno["suggested_value"].size ==1
             auto_annotatable = true
           end
         end
@@ -256,7 +255,7 @@ class BulkValidator
   end
 end
 
-if ARGV.size < 2
+if ARGV.size < 3
   puts "usage: ruby bulk_validator.rb <setting_file> <output_dir> <biosample|bioproject> <xml_dir>"
   exit(1)
 end
@@ -266,7 +265,7 @@ file_type = ARGV[2]
 conf_file = File.expand_path(param_conf_file, File.dirname(__FILE__))
 config = YAML.load(ERB.new(File.read(conf_file)).result)
 
-if ARGV.size >= 3
+if ARGV.size >= 4
   validator = BulkValidator.new(config, param_output_dir, file_type, ARGV[3])
 else
   validator = BulkValidator.new(config, param_output_dir, file_type)
