@@ -284,7 +284,7 @@ module DDBJValidator
         # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する
         file_combination = true
         form_vars = @env["rack.request.form_input"].read
-        Rack::Utils.key_space_limit = 10000000
+        Rack::Utils.key_space_limit = 68719476736
         form_vars = Rack::Utils.escape(form_vars)
         req_params = Rack::Utils.parse_query(form_vars)
         param_names = req_params["name"]
