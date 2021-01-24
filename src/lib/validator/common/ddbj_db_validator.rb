@@ -183,74 +183,48 @@ class DDBJDbValidator
   end
 
   #
-  # 指定されたsubmitter_idに紐付くプロジェクトのproject_name名をリストで返す
+  # 指定されたsubmitter_idに紐付くプロジェクトのnameとtitle,descriptionをリストで返す
   #
   # ==== Args
   # submitter_id
   # ==== Return
-  # project_nameのリスト。一つもない場合にも空のリストを返す
-  # [ "project name 1", "project name 2", ...]
+  # project_name, title, descriptionのリスト。一つもない場合にも空のリストを返す
+  # [ {submission_id: "PSUBxxx", project_name: "project name1", bioproject_title: "project title1", public_description:  "project desc1"},
+  #   {submission_id: "PSUBxxx", project_name: "project name2", bioproject_title: "project title2", public_description:  "project desc2"}, ...
+  # ]
   #
-  def get_bioproject_names (submitter_id)
-    bioproject_name_list = []
-    begin
-      connection = get_connection(BIOPROJCT_DB_NAME)
-      q = "SELECT submitter_id, submission_id, data_value AS bioproject_name
-           FROM mass.submission_data
-           LEFT OUTER JOIN mass.submission USING(submission_id)
-           WHERE data_name = 'project_name'
-            AND submitter_id = $1
-            AND (status_id IS NULL OR status_id NOT IN (5600, 5700))"
-
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [submitter_id])
-
-      res.each do |item|
-        unless item["bioproject_name"].empty?
-          bioproject_name_list.push(item["bioproject_name"])
-        end
-      end
-
-    rescue => ex
-      message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    ensure
-      connection.close if connection
-    end
-
-    bioproject_name_list
-  end
-
-  #
-  # 指定されたsubmitter_idに紐付くプロジェクトのtitleとdescriptionをカンマ連結した文字列をリストで返す
-  #
-  # ==== Args
-  # submitter_id
-  # ==== Return
-  # project_nameのリスト。一つもない場合にも空のリストを返す
-  # [ "project name 1", "project name 2", ...]
-  #
-  def get_bioproject_title_descs  (submitter_id)
+  def get_bioproject_names_list  (submitter_id)
+    return [] if submitter_id.nil?
     bioproject_title_desc_list = []
     begin
       connection = get_connection(BIOPROJCT_DB_NAME)
       q = "SELECT submitter_id, submission_id, data_name, data_value
-           FROM mass.submission_data
-           LEFT OUTER JOIN mass.submission USING(submission_id)
-           WHERE (data_name = 'project_title' OR data_name = 'public_description')
-            AND submitter_id = $1
-            AND (status_id IS NULL OR status_id NOT IN (5600, 5700))"
+           FROM mass.project p
+           LEFT OUTER JOIN mass.submission_data sd USING(submission_id)
+           LEFT OUTER JOIN mass.submission s USING(submission_id)
+           WHERE (data_name = 'project_name' OR data_name = 'project_title' OR data_name = 'public_description')
+           AND submitter_id = $1
+           AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
 
       connection.prepare("pre_query", q)
       res = connection.exec_prepared("pre_query", [submitter_id])
 
-      #属性(title, description)毎に行が出力されるので、submission_id単位でグルーピングし、
+      #属性(name, title, description)毎に行が出力されるので、submission_id単位でグルーピングし、
       #それぞれの属性の値を取得した後、カンマで連結してリストに格納する
+      keys = ["project_name", "project_title", "public_description"]
       res.group_by {|item| item["submission_id"]}.each do |submission, data_list|
-        title = data_list.select {|data| data["data_name"] == "project_title"}.first["data_value"]
-        desc = data_list.select {|data| data["data_name"] == "public_description"}.first["data_value"]
-        bioproject_title_desc_list.push([title, desc].join(","))
+        hash = {}
+        keys.each do |key|
+          values_list = data_list.select {|data| data["data_name"] == key}
+          if values_list.size == 1
+            hash[key.to_sym] = values_list.first["data_value"]
+          elsif values_list.size > 1
+            hash[key.to_sym] = values_list.map{|item| item["data_value"]}.uniq.join(", ")
+          else
+            hash[key.to_sym] = ""
+          end
+        end
+        bioproject_title_desc_list.push(hash)
       end
 
     rescue => ex

@@ -88,14 +88,14 @@ class BioProjectValidator < ValidatorBase
   else
 
     multiple_projects("BP_R0037", project_set)
-    project_name_list = @db_validator.get_bioproject_names(@submitter_id) if @use_db
-    project_title_desc_list = @db_validator.get_bioproject_title_descs(@submitter_id) if @use_db
+    project_names_list = @db_validator.get_bioproject_names_list(@submitter_id) if @use_db
+
     #各プロジェクト毎の検証
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
-      duplicated_project_name("BP_R0003", project_name, project_node, project_name_list, @submission_id, idx) if @use_db
-      duplicated_project_title_and_description("BP_R0004", project_name, project_node, project_title_desc_list, @submission_id, idx) if @use_db
+      duplicated_project_name("BP_R0003", project_name, project_node, project_names_list, @submission_id, idx) if @use_db
+      duplicated_project_title_and_description("BP_R0004", project_name, project_node, project_names_list, @submission_id, idx) if @use_db
       identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
       short_project_description("BP_R0006", project_name, project_node, idx)
       empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
@@ -125,6 +125,8 @@ class BioProjectValidator < ValidatorBase
       end
 
       input_organism = get_node_text(project_node, @orgname_path)
+      p input_organism
+      p input_organism.strip
       if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
         ret = taxonomy_name_and_id_not_match("BP_R0038", project_name, taxonomy_id, input_organism, project_node, idx)
       else
@@ -215,17 +217,18 @@ class BioProjectValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def duplicated_project_name (rule_code, project_label, project_node, project_name_list, submission_id, line_num)
-    return if project_name_list.nil?
+  def duplicated_project_name (rule_code, project_label, project_node, project_names_list, submission_id, line_num)
+    return if project_names_list.nil?
     result = true
     name_path = "//Project/ProjectDescr/Name"
 
     if !project_node.xpath(name_path).empty? #要素あり
       project_name = get_node_text(project_node, name_path)
+      duplicated_submission = project_names_list.select{|item| item[:project_name] == project_name}
       # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じproject nameがあるとNG
-      result = false if submission_id.nil? && project_name_list.count(project_name) >= 1
+      result = false if submission_id.nil? && duplicated_submission.size >= 1
       # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-      result = false if !submission_id.nil? && project_name_list.count(project_name) >= 2
+      result = false if !submission_id.nil? && duplicated_submission.size >= 2
 
       if result == false
         annotation = [
@@ -251,8 +254,8 @@ class BioProjectValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def duplicated_project_title_and_description (rule_code, project_label, project_node, project_title_desc_list, submission_id, line_num)
-    return if project_title_desc_list.nil?
+  def duplicated_project_title_and_description (rule_code, project_label, project_node, project_names_list, submission_id, line_num)
+    return if project_names_list.nil?
     result = true
     title_path = "//Project/ProjectDescr/Title"
     desc_path = "//Project/ProjectDescr/Description"
@@ -264,11 +267,12 @@ class BioProjectValidator < ValidatorBase
     if !project_node.xpath(desc_path).empty? #要素あり
       description = get_node_text(project_node, desc_path)
     end
-    combination_text = [title, description].join(",")
+
+    duplicated_submission = project_names_list.select{|item| item[:bioproject_title] == title && item[:public_description] == description}
     # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じtitle&descがあるとNG
-    result = false if submission_id.nil? && project_title_desc_list.count(combination_text) >= 1
+    result = false if submission_id.nil? && duplicated_submission.size >= 1
     # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-    result = false if !submission_id.nil? && project_title_desc_list.count(combination_text) >= 2
+    result = false if !submission_id.nil? && duplicated_submission.size >= 2
 
     if result == false
       annotation = [
@@ -1072,63 +1076,6 @@ class BioProjectValidator < ValidatorBase
       end
     end
     result
-  end
-
-  #
-  # node_objで指定された対象ノードに対してxpathで検索し、ノードが存在しないまたはテキストが空（空白のみを含む）だった場合にtrueを返す
-  # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
-  # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
-  #
-  def node_blank? (node_obj, xpath = ".")
-    ret = false
-    target_node = node_obj.xpath(xpath)
-    if target_node.empty?
-      ret = true
-    else
-      text_value = ""
-      #xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
-      target_node.each do |node|
-        #空白文字のみの場合もblank扱いとする
-        text_value += get_node_text(node).chomp.strip
-      end
-      if text_value == "" #要素/属性はあるが、テキスト/値が空白である
-        ret =  true
-      end
-    end
-    ret
-  end
-
-  #
-  # node_objで指定された対象ノードに対してxpathで検索し、ノードのテキストを返す
-  # もしノードが存在しなければ空文字を返す
-  # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
-  # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
-  #
-  def get_node_text (node_obj, xpath = ".")
-    text_value = ""
-    target_node = node_obj.xpath(xpath)
-    unless target_node.empty?
-      #xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
-      target_node.each do |node|
-        if node.class == Nokogiri::XML::Element
-          #elementの場合にはelementの要素自身のテキストを検索
-          target_text_node = node.xpath("text()") #子供のテキストを含まないテキスト要素を取得
-          text_value += target_text_node.map {|text_node|
-            text_node.text
-          }.join  #前後の空白を除去した文字列を繋げて返す
-        elsif node.class == Nokogiri::XML::Attr
-          #attributeの場合にはattributeの値を検索
-          text_value += node.text
-        elsif node.class == Nokogiri::XML::Text
-          text_value += node.text
-        else
-          unless node.text.nil?
-            text_value += node.text
-          end
-        end
-      end
-    end
-    text_value
   end
 
 end
