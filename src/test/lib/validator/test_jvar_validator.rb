@@ -5,12 +5,9 @@ require 'fileutils'
 require File.expand_path('../../../../lib/validator/jvar_validator.rb', __FILE__)
 require File.expand_path('../../../../lib/validator/common/common_utils.rb', __FILE__)
 
-# Excelのエラー発生内容が不明な為、ここだけアドホックにログを残す
-# DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR=../../../../logs/ ruby test_jvar_validator.rb
-#
-
 class TestJVarValidator < Minitest::Test
   def setup
+    Dotenv.load "../../../../.env"
     @validator = JVarValidator.new
     @test_file_dir = File.expand_path('../../../data/jvar', __FILE__)
   end

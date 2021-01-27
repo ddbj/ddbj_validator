@@ -104,11 +104,26 @@ class JVarValidator < ValidatorBase
   #
   def xlsx2obj(xlsx)
     jvar_data = {}
-    @conf[:sheet_list].each do |row|
-      sheet_name = row["sheet_name"]
-      sheet_info = {}
-      sheet = load_sheet("JV_R0002", xlsx, sheet_name)
-      jvar_data[row["json_key"]] = parse_sheet_data(sheet_name, sheet)
+    @conf[:sheet_list].each do |conf|
+      sheet_name = ""
+      if conf["sheet_name"]== "VARIANT CALL" || conf["sheet_name"] == "VARIANT REGION" # TODO 現状は無視する
+        jvar_data[conf["json_key"]] = []
+        next
+      end
+      hit = xlsx.sheets.select {|sheet| sheet.strip.downcase.gsub(" ", "") == conf["sheet_name"].strip.downcase.gsub(" ", "") } # allow case-insensitive and white space
+      if hit.size == 1
+        sheet_name = hit[0]
+      elsif hit.size > 1
+        hit = xlsx.sheets.select {|sheet| sheet.downcase == conf["sheet_name"].downcase } # allow case-insensitive
+        sheet_name = hit[0] if hit.size >= 1
+      end
+      if sheet_name == ""
+        #TODO 存在必須シートではエラーを出す。ここか？(OWL定義が来てから)
+        jvar_data[conf["json_key"]] = []
+      else
+        sheet = load_sheet("JV_R0002", xlsx, sheet_name)
+        jvar_data[conf["json_key"]] = parse_sheet_data(sheet_name, sheet)
+      end
     end
     jvar_data
   end
@@ -126,7 +141,6 @@ class JVarValidator < ValidatorBase
   def load_sheet(rule_code, xlsx, sheet_name)
     sheet = nil
     begin
-      #TODO 存在しなくてもいいシートはあるはずで、全てをExceptionにしない
       sheet = xlsx.sheet(sheet_name)
     rescue => ex
       annotation = [
@@ -195,24 +209,16 @@ class JVarValidator < ValidatorBase
   end
 
   #
-  # Parse header line.
+  # Parse one data line.
   #
   # ==== Args
   # row: Roo::Excel row object
   # ==== Return
   # row object:
-  # { identifier: "xxx",
-  #   name:"xxx",
-  #   url: "xxx",
-  #   isPartOf: "jvar-study",
-  #   annotations: [ {name: "study_id", value: "Mishima2020"}, {name: "study_description", value: "xxxxx"}, ... ]
-  # }
+  # { annotations: [ {name: "study_id", value: "Mishima2020"}, {name: "study_description", value: "xxxxx"}, ... ] }
+  #
   def parse_data_row(sheet_name, header,row, row_num)
     row_data = {}
-    row_data[:identifier] = "#{@data_file}:#{sheet_name}"
-    row_data[:name] = "#{@data_file}:#{sheet_name}"
-    row_data[:url] = "https://ddbj.nig.ac.jp/entries/jvar/:uuid/study/1"
-    row_data[:isPartOf] = "jvar-study"
     annotations = []
     row.each_with_index do |cell, column_num|
       if cell_value_with_no_header("JV_R0006", sheet_name, header, row_num, cell, column_num)
