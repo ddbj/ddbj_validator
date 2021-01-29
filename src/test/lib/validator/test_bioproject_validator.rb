@@ -123,7 +123,10 @@ class TestBioProjectValidator < Minitest::Test
   # rule:BP_R0004
   def test_duplicated_project_title_and_description
     #ok case
-    project_title_desc_list = ["Title text 1,Description text 1", "Title text 2,Description text 2"]
+    project_title_desc_list = [
+      {submission_id: "PSUBxxx", project_name: "project name1", bioproject_title: "Title text 1", public_description:  "Description text 1"},
+      {submission_id: "PSUBxxx", project_name: "project name2", bioproject_title: "Title text 2", public_description:  "Description text 2"}
+    ]
     ## without submission_id (is new text)
     project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok1.xml")
     ret = exec_validator("duplicated_project_title_and_description", "BP_R0004", "project name" , project_set.first, project_title_desc_list, nil, 1)
@@ -141,7 +144,11 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## with submission_id (already duplicate in DB)
-    project_title_desc_list = ["Title text 1,Description text 1", "Title text 2,Description text 2", "Title text 2,Description text 2"]
+    project_title_desc_list = [
+      {submission_id: "PSUBxxx", project_name: "project name1", bioproject_title: "Title text 1", public_description:  "Description text 1"},
+      {submission_id: "PSUBxxx", project_name: "project name2", bioproject_title: "Title text 2", public_description:  "Description text 2"},
+      {submission_id: "PSUBxxx", project_name: "project name2", bioproject_title: "Title text 2", public_description:  "Description text 2"}
+    ]
     project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng2.xml")
     ret = exec_validator("duplicated_project_title_and_description", "BP_R0004", "project name" , project_set.first, project_title_desc_list, "psub", 1)
     assert_equal false, ret[:result]
@@ -873,10 +880,10 @@ class TestBioProjectValidator < Minitest::Test
     ## only space element
     xpath = "//Project/Element/OnlySpace"
     ret = @validator.get_node_text(project_set, xpath)
-    assert_equal "  ", ret
+    assert_equal "", ret
     xpath = "//Project/Element/OnlySpace/text()"
     ret = @validator.get_node_text(project_set, xpath)
-    assert_equal "  ", ret
+    assert_equal "", ret
 
     ## only child node has text
     xpath = "//Project/Element/ChildHasText"
@@ -906,7 +913,7 @@ class TestBioProjectValidator < Minitest::Test
     ## only space element
     xpath = "//Project/Attribute/OnlySpace/@attr"
     ret = @validator.get_node_text(project_set, xpath)
-    assert_equal "  ", ret
+    assert_equal "", ret
 
 
     #multi data
