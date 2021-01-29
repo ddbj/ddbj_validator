@@ -736,10 +736,10 @@ class BioProjectValidator < ValidatorBase
     locus_tag_path = "//Project/ProjectDescr/LocusTagPrefix"
     project_node.xpath(locus_tag_path).each_with_index do |locus_tag_node, idx| #XSD定義では複数記述可能
       isvalid = true
-      # locus_tagとbiosampleのどちらか指定が欠けているればエラー
-      if (node_blank?(locus_tag_node, ".") || node_blank?(locus_tag_node, "@biosample_id"))
+      # locus_tagのテキストが欠けているればエラー
+      if (node_blank?(locus_tag_node, "."))
         isvalid = result = false #複数ノードの一つでもエラーがあればresultをfalseとする
-      else
+      elsif !(node_blank?(locus_tag_node, "@biosample_id")) # biosample_idがある
         # biosample_idからDB検索してlocus_tag_prefixが取得できない、値が異なる場合にエラー
         biosample_accession = get_node_text(locus_tag_node, "@biosample_id")
         locus_tag_prefix = get_node_text(locus_tag_node)
@@ -763,11 +763,11 @@ class BioProjectValidator < ValidatorBase
           annotation.push({key: "LocusTagPrefix", value: locus_tag_node.xpath("text()").text})
         end
         if node_blank?(locus_tag_node, "@biosample_id")
-          annotation.push({key: "biosample_id", value: ""})
+          annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]"]})
         else
           annotation.push({key: "biosample_id", value: locus_tag_node.xpath("@biosample_id").text})
+          annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]", "#{locus_tag_path}[#{idx + 1}]/@biosample_id"]})
         end
-        annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]", "#{locus_tag_path}[#{idx + 1}]/@biosample_id"]})
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
       end

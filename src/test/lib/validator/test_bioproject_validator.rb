@@ -530,13 +530,13 @@ class TestBioProjectValidator < Minitest::Test
     ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    # exist locus_tag_prefix but not exist biosample_id => ok
+    project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ok4.xml")
+    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #ng case
-    # exist locus_tag_prefix but not exist biosample_id
-    project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng1.xml")
-    ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
     # exist biosample_id but not exist locus_tag_prefix
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ng2.xml")
     ret = exec_validator("invalid_locus_tag_prefix", "BP_R0021", "project name" , project_set.first, 1)
