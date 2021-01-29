@@ -94,7 +94,6 @@ class BioProjectValidator < ValidatorBase
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
-      duplicated_project_name("BP_R0003", project_name, project_node, project_names_list, @submission_id, idx) if @use_db
       duplicated_project_title_and_description("BP_R0004", project_name, project_node, project_names_list, @submission_id, idx) if @use_db
       identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
       short_project_description("BP_R0006", project_name, project_node, idx)
@@ -107,11 +106,9 @@ class BioProjectValidator < ValidatorBase
       empty_data_description_for_other_data_type("BP_R0013", project_name, project_node, idx)
       invalid_publication_identifier("BP_R0014", project_name, project_node, idx)
       empty_publication_reference("BP_R0015", project_name, project_node, idx)
-      missing_strain_isolate_cultivar("BP_R0017", project_name, project_node, idx)
       empty_organism_description_for_multi_species("BP_R0019", project_name, project_node, idx)
       invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx) if @use_db
       invalid_biosample_accession("BP_R0022", project_name, project_node, idx) if @use_db
-      missing_project_name("BP_R0036", project_name, project_node, idx)
       invalid_project_type("BP_R0040", project_name, project_node, idx)
 
       ### organismの検証とtaxonomy_idの確定
@@ -205,43 +202,6 @@ class BioProjectValidator < ValidatorBase
   end
 
 ### validate method ###
-
-  #
-  # rule:BP_R0003
-  # project name がアカウント単位でユニークではない
-  #
-  # ==== Args
-  # project_label: project label for error displaying
-  # project_node: a bioproject node object
-  # project_name_list: submitter_idに紐付くプロジェクトのproject_nameの一覧
-  # ==== Return
-  # true/false
-  #
-  def duplicated_project_name (rule_code, project_label, project_node, project_names_list, submission_id, line_num)
-    return if project_names_list.nil?
-    result = true
-    name_path = "//Project/ProjectDescr/Name"
-
-    if !project_node.xpath(name_path).empty? #要素あり
-      project_name = get_node_text(project_node, name_path)
-      duplicated_submission = project_names_list.select{|item| item[:project_name] == project_name}
-      # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じproject nameがあるとNG
-      result = false if submission_id.nil? && duplicated_submission.size >= 1
-      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-      result = false if !submission_id.nil? && duplicated_submission.size >= 2
-
-      if result == false
-        annotation = [
-            {key: "Project name", value: project_label},
-            {key: "Project name", value: project_name},
-            {key: "Path", value: [name_path]},
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-      end
-    end
-    result
-  end
 
   #
   # rule:BP_R0004
@@ -664,38 +624,6 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:BP_R0017
-  # organism: sample scope = "mono-isolate" の場合は strain or breed or cultivar or isolate or label 必須
-  #
-  # ==== Args
-  # project_label: project label for error displaying
-  # project_node: a bioproject node object
-  # ==== Return
-  # true/false
-  #
-  def missing_strain_isolate_cultivar (rule_code, project_label, project_node, line_num)
-    result = true
-    sample_scope_attr = "//Target[@sample_scope='eMonoisolate']"
-    monoisolate = project_node.xpath(sample_scope_attr)
-    unless monoisolate.empty? #eMonoisolateである場合にチェック
-      if ( node_blank?(project_node, "//Organism/Label") \
-           && node_blank?(project_node, "//Organism/Strain") \
-           && node_blank?(project_node, "//Organism/IsolateName") \
-           && node_blank?(project_node, "//Organism/Breed") \
-           && node_blank?(project_node, "//Organism/Cultivar"))
-        annotation = [
-          {key: "Project name", value: project_label},
-          {key: "Path", value: "//Organism/Label | //Organism/Strain | //Organism/IsolateName | //Organism/Breed | //Organism/Cultivar"}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-        result = false
-      end
-    end
-    result
-  end
-
-  #
   # rule:BP_R0018
   # organismがspecies レベル以下の taxonomy が必須 (multi-species の場合、任意で species レベル以上を許容)
   # Primary BioProjectの場合と、scope = "multi-species" 以外の場合に適用する
@@ -882,31 +810,6 @@ class BioProjectValidator < ValidatorBase
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
       end
-    end
-    result
-  end
-
-  #
-  # rule:BP_R0036
-  # 参照ラベルとしての project name 必須
-  #
-  # ==== Args
-  # project_label: project label for error displaying
-  # project_node: a bioproject node object
-  # ==== Return
-  # true/false
-  #
-  def missing_project_name (rule_code, project_label, project_node, line_num)
-    result = true
-    project_name_path = "//Project/ProjectDescr/Name"
-    if node_blank?(project_node, project_name_path)
-      annotation = [
-        {key: "Project name", value: project_label},
-        {key: "Path", value: "#{project_name_path}"}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      result = false
     end
     result
   end

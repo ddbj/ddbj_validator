@@ -120,34 +120,6 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:BP_R0003
-  def test_duplicated_project_name
-    #ok case
-    project_name_list = ["project name 1", "project name 2"]
-    ## without submission_id ("project name 0" is new name)
-    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ok1.xml")
-    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, nil, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## with submission_id  ("project name 1" has 1 entity in DB, but allows with submission_id)
-    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ok2.xml")
-    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, "psub", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    ## without submission_id ("project name 1" has 1 entity in DB, not allow without submission_id)
-    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ng1.xml")
-    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, nil, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## with submission_id ("project name 1" already duplicate in DB)
-    project_name_list = ["project name 1", "project name 1", "project name 2"]
-    project_set = get_project_set_node("#{@test_file_dir}/3_duplicated_project_name_ng2.xml")
-    ret = exec_validator("duplicated_project_name", "BP_R0003", "project name" , project_set.first, project_name_list, "psub", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-
   # rule:BP_R0004
   def test_duplicated_project_title_and_description
     #ok case
@@ -455,46 +427,6 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:BP_R0017
-  def test_missing_strain_isolate_cultivar
-    #ok case
-    # exist Label text
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_label.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    # exist Strain text
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_strain.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    # exist isolateName text
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_isolatename.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    # exist Breed text
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_breed.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    # exist Cultivar text
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok_has_cultivar.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #not eMonoisolate attribute
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ok2.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    project_set = get_project_set_node("#{@test_file_dir}/17_missing_strain_isolate_cultivar_ng.xml")
-    ret = exec_validator("missing_strain_isolate_cultivar", "BP_R0017", "project name" , project_set.first, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-
   # rule:BP_R0018
   def test_taxonomy_at_species_or_infraspecific_rank
     #ok case
@@ -655,28 +587,6 @@ class TestBioProjectValidator < Minitest::Test
     # valid biosample_id format but not exist on ddbj db
     project_set = get_project_set_node("#{@test_file_dir}/22_invalid_biosample_accession_ng2.xml")
     ret = exec_validator("invalid_biosample_accession", "BP_R0022", "project name" , project_set.first, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-
-  # rule:BP_R0036
-  def test_missing_project_name
-    #ok case
-    # exist bioproject_name
-    project_set = get_project_set_node("#{@test_file_dir}/36_missing_project_name_ok.xml")
-    ret = exec_validator("missing_project_name", "BP_R0036", "project name" , project_set.first, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-
-    #ng case
-    # blank bioproject_name
-    project_set = get_project_set_node("#{@test_file_dir}/36_missing_project_name_ng.xml")
-    ret = exec_validator("missing_project_name", "BP_R0036", "project name" , project_set.first, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    # not exist bioproject_name
-    project_set = get_project_set_node("#{@test_file_dir}/36_missing_project_name_ng2.xml")
-    ret = exec_validator("missing_project_name", "BP_R0036", "project name" , project_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
