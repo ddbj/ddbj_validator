@@ -110,6 +110,8 @@ class BioProjectValidator < ValidatorBase
       invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx) if @use_db
       invalid_biosample_accession("BP_R0022", project_name, project_node, idx) if @use_db
       invalid_project_type("BP_R0040", project_name, project_node, idx)
+      invalid_locus_tag_prefix_format("BP_R0041", project_name, project_node, idx)
+      locus_tag_prefix_in_umbrella_project("BP_R0042", project_name, project_node, idx)
 
       ### organismの検証とtaxonomy_idの確定
       @taxid_path = "//Organism/@taxID"
@@ -949,10 +951,8 @@ class BioProjectValidator < ValidatorBase
   # 3-12文字の英数字で、数字では始まらない
   #
   # ==== Args
-  # rule_code
-  # sample_name サンプル名
-  # locus_tag locus_tag
-  # line_num
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -981,4 +981,32 @@ class BioProjectValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:BP_R0042
+  # locus_tag_prefixがumbrella projectの場合に記載されていないか検証
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def locus_tag_prefix_in_umbrella_project (rule_code, project_label, project_node, line_num)
+    result = true
+    project_type_path = "//Project/ProjectType/ProjectTypeTopAdmin"
+    locus_tag_path = "//Project/ProjectDescr/LocusTagPrefix"
+    if !project_node.xpath(project_type_path).empty?
+      project_node.xpath(locus_tag_path).each_with_index do |locus_tag_node, idx| #XSD定義では複数記述可能
+        result = false # Textの記述の有無に関わらずタグがあればエラー
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "LocusTagPrefix", value: get_node_text(locus_tag_node)},
+          {key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]"]}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
 end

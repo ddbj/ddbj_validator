@@ -730,6 +730,33 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
+  # rule:BP_R0042
+  def test_locus_tag_prefix_in_umbrella_project
+    #ok case
+    # umbrella project without LTP
+    project_set = get_project_set_node("#{@test_file_dir}/42_locus_tag_prefix_in_umbrella_project_ok.xml")
+    ret = exec_validator("locus_tag_prefix_in_umbrella_project", "BP_R0042", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # primaty project with LTP
+    project_set = get_project_set_node("#{@test_file_dir}/42_locus_tag_prefix_in_umbrella_project_ok2.xml")
+    ret = exec_validator("locus_tag_prefix_in_umbrella_project", "BP_R0042", "project name" , project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # umbrella project with LTP
+    project_set = get_project_set_node("#{@test_file_dir}/42_locus_tag_prefix_in_umbrella_project_ng.xml")
+    ret = exec_validator("locus_tag_prefix_in_umbrella_project", "BP_R0042", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # umbrella project without LTP(blank tag)
+    project_set = get_project_set_node("#{@test_file_dir}/42_locus_tag_prefix_in_umbrella_project_ng2.xml")
+    ret = exec_validator("locus_tag_prefix_in_umbrella_project", "BP_R0042", "project name" , project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   def test_node_blank?
     #element
     ##has text element
