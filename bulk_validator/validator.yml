@@ -1,2 +1,1 @@
 api_host: http://localhost:53000
-rule_json_path: /your/path/ddbj_validator/src/conf/biosample/rule_config_biosample.json
