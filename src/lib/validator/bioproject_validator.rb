@@ -907,10 +907,10 @@ class BioProjectValidator < ValidatorBase
       scientific_name = ret[:scientific_name]
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_name
-        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", @orgname_path, true));
+        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", [@orgname_path], true));
       end
       annotation.push({key: "taxID", value: ""})
-      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxID", @taxid_path, true))
+      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxID", [@taxid_path], true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
