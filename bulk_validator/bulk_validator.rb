@@ -6,6 +6,7 @@ require 'json'
 
 class BulkValidator
   def initialize (config, output_dir, file_type, xml_dir=nil)
+    @rule_json_path = "#{File.expand_path("../../src/conf/#{file_type}/rule_config_#{file_type}.json", __FILE__)}"
     @api_host = config["api_host"]
     @output_dir = File.expand_path(output_dir, File.dirname(__FILE__))
     FileUtils.mkdir_p(@output_dir) unless FileTest.exist?(@output_dir)
@@ -23,7 +24,6 @@ class BulkValidator
       @xml_dir = xml_dir
     end
     @file_type = file_type # bioproject|biosample
-    @rule_json_path = "#{File.dirname(__FILE__)}/../src/conf/#{file_type}/rule_config_#{file_type}.json"
     @uuid_output_dir = "#{@output_dir}/uuid"
     @result_output_dir = "#{@output_dir}/result"
     @result_detail_output_dir = "#{@output_dir}/result_by_id"
