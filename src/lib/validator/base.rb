@@ -174,7 +174,7 @@ class ValidatorBase
         end
       end
     end
-    text_value
+    text_value.strip.chomp
   end
 
 end

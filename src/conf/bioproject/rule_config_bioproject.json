@@ -25,19 +25,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0002"
   },
-  "ruleBP_R0003": {
-    "rule_class": "BioProject",
-    "code": "BP_R0003",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Duplicated project name",
-    "method": "duplicated_project_name",
-    "message": "The following project name was used in the submitted projects more than one time. Please provide unique project name.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0003"
-  },
   "ruleBP_R0004": {
     "rule_class": "BioProject",
     "code": "BP_R0004",
@@ -207,19 +194,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0016"
   },
-  "ruleBP_R0017": {
-    "rule_class": "BioProject",
-    "code": "BP_R0017",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Missing strain/isolate/cultivar",
-    "method": "missing_strain_isolate_cultivar",
-    "message": "At least one of strain/isolate/cultivar is required for monoisolate organism.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0017"
-  },
   "ruleBP_R0018": {
     "rule_class": "BioProject",
     "code": "BP_R0018",
@@ -285,19 +259,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0022"
   },
-  "ruleBP_R0036": {
-    "rule_class": "BioProject",
-    "code": "BP_R0036",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Missing project name",
-    "method": "missing_project_name",
-    "message": "Project name is required.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0036"
-  },
   "ruleBP_R0037": {
     "rule_class": "BioProject",
     "code": "BP_R0037",
@@ -362,5 +323,18 @@
       "BioProject"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0041"
+  },
+  "ruleBP_R0042": {
+    "rule_class": "BioProject",
+    "code": "BP_R0042",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Locus tag prefix in umbrella project",
+    "method": "locus_tag_prefix_in_umbrella_project",
+    "message": "Locus tag prefix must be described in primary project.",
+    "object": [
+      "BioProject"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0042"
   }
 }

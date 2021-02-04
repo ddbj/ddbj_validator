@@ -11,19 +11,13 @@
           <Description>Description text</Description>
         </ProjectDescr>
         <ProjectType>
-          <ProjectTypeSubmission>
-            <Target sample_scope="eMonoisolate" material="ePartialGenome" capture="eTargetedLocusLoci">
-              <Organism taxID="1314752">
-                <OrganismName>Bacillus drentensis NBRC 102427</OrganismName>
-                <Strain></strain>
-                <IsolateName>IsolateName text</IsolateName>
-              </Organism>
-            </Target>
+          <ProjectTypeTopAdmin>
+            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
             <Method method_type="eSequencing" />
             <Objectives>
               <Data data_type="eRawSequenceReads" />
             </Objectives>
-          </ProjectTypeSubmission>
+          </ProjectTypeTopAdmin>
         </ProjectType>
       </Project>
     </Project>

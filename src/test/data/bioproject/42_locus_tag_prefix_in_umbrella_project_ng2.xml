@@ -9,15 +9,16 @@
         <ProjectDescr>
           <Title>Title text</Title>
           <Description>Description text</Description>
+          <LocusTagPrefix></LocusTagPrefix>
         </ProjectDescr>
         <ProjectType>
-          <ProjectTypeSubmission>
+          <ProjectTypeTopAdmin>
             <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
             <Method method_type="eSequencing" />
             <Objectives>
               <Data data_type="eRawSequenceReads" />
             </Objectives>
-          </ProjectTypeSubmission>
+          </ProjectTypeTopAdmin>
         </ProjectType>
       </Project>
     </Project>

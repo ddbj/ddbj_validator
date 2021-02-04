@@ -1,68 +1,77 @@
-#require 'pg'
 require 'fileutils'
 require 'csv'
 require 'yaml'
 require 'erb'
 require 'json'
 
-class BioSampleBulkValidator
-  @@biosample_submission_list = "biosample_submission_list.json"
-  def initialize (config, output_dir)
- #   @pg_host = config["pg_host"]
- #   @pg_port = config["pg_port"]
- #   @pg_user = config["pg_user"]
- #   @pg_pass = config["pg_pass"]
+class BulkValidator
+  def initialize (config, output_dir, file_type, xml_dir=nil)
+    @rule_json_path = "#{File.expand_path("../../src/conf/#{file_type}/rule_config_#{file_type}.json", __FILE__)}"
     @api_host = config["api_host"]
-    @rule_json_path = config["rule_json_path"]
     @output_dir = File.expand_path(output_dir, File.dirname(__FILE__))
     FileUtils.mkdir_p(@output_dir) unless FileTest.exist?(@output_dir)
-    @xml_output_dir = "#{@output_dir}/xml"
+    if xml_dir.nil?
+      #TODO既存XMLからsubmission_id_listを構築してvalidate
+      @submission_id_list = get_target_submission_id()
+      @xml_dir = "#{@output_dir}/xml"
+      download_xml(submission_id_list, xml_output_dir)
+    else
+      unless File.exist?(xml_dir) #TODO absolute path and dir check
+        # TODO error message
+        exit 1
+      end
+      @submission_id_list = get_submission_list_from_dir(xml_dir)
+      @xml_dir = xml_dir
+    end
+    @file_type = file_type # bioproject|biosample
     @uuid_output_dir = "#{@output_dir}/uuid"
     @result_output_dir = "#{@output_dir}/result"
     @result_detail_output_dir = "#{@output_dir}/result_by_id"
-    if File.exist?("#{@output_dir}/#{@@biosample_submission_list}")
-      @submission_id_list = JSON.parse(File.read("#{@output_dir}/#{@@biosample_submission_list}"))
-    else
-      @submission_id_list = []
-    end
     @summary = {}
   end
 
-  def get_target_biosample_submission_id
-    connection = PG::Connection.connect(@pg_host, @pg_port, '', '', 'biosample', @pg_user,  @pg_pass)
-    q = "SELECT DISTINCT submission_id
-         FROM mass.sample
-         WHERE (status_id IS NULL OR status_id IN (5400, 5500))
-         ORDER BY submission_id"
-    res = connection.exec(q)
-    res.each do |row|
-      #unless (row["submission_id"] == 'SSUB006337' || row["submission_id"] == 'SSUB008429')
-        @submission_id_list.push(row["submission_id"])
-      #end
-    end
-    @summary[:target_sample_number] = @submission_id_list.size 
-    file = File.open("#{@output_dir}/#{@@biosample_submission_list}", "w")
-    file.puts JSON.pretty_generate(@submission_id_list)
-    file.flush
-    file.close
+  def get_target_submission_id
+    submission_list_file = "submission_list.json"
+    command = %Q(curl -o #{@output_dir}/#{submission_list_file} -X GET "#{@api_host}/api/submission/ids/#{@file_type}" -H "accept: application/json" -H "api_key: curator")
+    system(command)
+    # TODO error check
+    JSON.parse(File.read("#{@output_dir}/#{submission_list_file}"))
   end
 
-  def download_xml
-    FileUtils.mkdir_p(@xml_output_dir) unless FileTest.exist?(@xml_output_dir)
-    @submission_id_list.each do |submission_id|
-      #next unless submission_id == "SSUB000019"
-      command = %Q(curl -o #{@xml_output_dir}/#{submission_id}.xml -X GET "#{@api_host}/api/submission/biosample/#{submission_id}" -H "accept: application/xml" -H "api_key: curator")
+  def download_xml(submission_id_list, xml_output_dir)
+    FileUtils.mkdir_p(xml_output_dir) unless FileTest.exist?(xml_output_dir)
+    submission_id_list.each do |submission_id|
+      command = %Q(curl -o #{xml_output_dir}/#{submission_id}.xml -X GET "#{@api_host}/api/submission/#{@file_type}/#{submission_id}" -H "accept: application/xml" -H "api_key: curator")
       system(command)
     end
   end
 
-  def exec_validation
+  def get_submission_list_from_dir(xml_dir)
+    submission_id_list = []
+    Dir::chdir(xml_dir) # TODO absolute
+    Dir.glob("**/*.xml").each do |file|
+      submission_id_list.push(File.basename(file, ".xml"))
+    end
+    submission_id_list
+  end
 
+  def bulk_validate()
+    exec_validation(@xml_dir)
+    get_result_json
+    output_stats
+    split_message_by_rule_id
+    output_stats_by_rule_id
+    output_tsv_by_rule_id
+    output_summary
+  end
+
+  def exec_validation(input_xml_dir)
     FileUtils.mkdir_p(@uuid_output_dir) unless FileTest.exist?(@uuid_output_dir)
     #xml file exist check
     @submission_id_list.each do |submission_id|
       #next unless (submission_id == "SSUB006337" || submission_id == "SSUB008429")
-      command = %Q(curl -o #{@uuid_output_dir}/#{submission_id}.json -X POST "#{@api_host}/api/validation" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "biosample=@#{@xml_output_dir}/#{submission_id}.xml;type=text/xml")
+      command = %Q(curl -o #{@uuid_output_dir}/#{submission_id}.json -X POST "#{@api_host}/api/validation" -H "accept: application/json" -H "Content-Type: multipart/form-data" -F "#{@file_type}=@#{input_xml_dir}/#{submission_id}.xml;type=text/xml")
+      puts command
       system(command)
     end
   end
@@ -153,11 +162,11 @@ class BioSampleBulkValidator
     FileUtils.mkdir_p(@result_detail_output_dir) unless FileTest.exist?(@result_detail_output_dir)
     @summary[:rule_stats_list].each do |rule_hash|
       rule_id = rule_hash[:id]
-      rule_data = JSON.parse(File.read("#{@result_detail_output_dir}/#{rule_id}.json"))
+      rule_data_list = JSON.parse(File.read("#{@result_detail_output_dir}/#{rule_id}.json"))
       CSV.open("#{@result_detail_output_dir}/#{rule_id}.tsv", "w", :col_sep => "\t") do |file|
         #header
         header_list = ["Submission ID"]
-        rule_data.each do |item|
+        rule_data_list.each do |item|
           item["annotation"].each do |anno|
             unless header_list.include?(anno["key"])
               header_list.push(anno["key"])
@@ -169,7 +178,7 @@ class BioSampleBulkValidator
         end
         file.puts(header_list)
         #details
-        rule_data.each do |item|
+        rule_data_list.each do |item|
           row = []
           row.push(item["source"].split(".").first)
           header_list[1..-1].each do |key|
@@ -177,16 +186,15 @@ class BioSampleBulkValidator
             column = item["annotation"].select{|anno| anno["key"] == key}
             unless key == "Auto Annotation"
               if column.size > 0
-                if column.first["key"] == "Suggested value"
-                  if  column.first["suggested_value"].size == 1
-                    #suggestion候補が一つだけの場合には見やすいように、配列表記を解く　
-                    row.push(column.first["suggested_value"].first)
+                val = []
+                column.each do |col|
+                  if col["is_auto_annotation"]
+                    val.push(col["suggested_value"])
                   else
-                    row.push(column.first["suggested_value"])
+                    val.push(col["value"])
                   end
-                else
-                  row.push(column.first["value"])
                 end
+                row.push(val.join(" | "))
               else
                 row.push("")
               end
@@ -195,7 +203,7 @@ class BioSampleBulkValidator
           #autoannotaionができるなら"true",それ以外(auto-annotationなし、複数候補あり等)だと"false"
           auto_annotatable = false
           item["annotation"].each do |anno|
-            if !anno["key"].nil? && anno["key"] == "Suggested value" && anno["suggested_value"].size ==1 && !anno["is_auto_annotation"].nil?
+            if !anno["key"].nil? && anno["is_auto_annotation"] && anno["suggested_value"].size == 1
               auto_annotatable = true
             end
           end
@@ -219,7 +227,7 @@ class BioSampleBulkValidator
         ssub_id_list.push(item["source"])
         auto_annotatable = false
         item["annotation"].each do |anno|
-          if !anno["key"].nil? && anno["key"] == "Suggested value" && anno["suggested_value"].size ==1 && !anno["is_auto_annotation"].nil?
+          if !anno["key"].nil? && anno["is_auto_annotation"] && anno["suggested_value"].size ==1
             auto_annotatable = true
           end
         end
@@ -247,21 +255,19 @@ class BioSampleBulkValidator
   end
 end
 
-if ARGV.size < 2
-  puts "usage: ruby biosample_bulk_validator.rb <setting_file> <output_dir>"
+if ARGV.size < 3
+  puts "usage: ruby bulk_validator.rb <setting_file> <output_dir> <biosample|bioproject> <xml_dir>"
   exit(1)
 end
 param_conf_file = ARGV[0]
 param_output_dir = ARGV[1]
+file_type = ARGV[2]
 conf_file = File.expand_path(param_conf_file, File.dirname(__FILE__))
 config = YAML.load(ERB.new(File.read(conf_file)).result)
-validator = BioSampleBulkValidator.new(config, param_output_dir)
-#validator.get_target_biosample_submission_id
-#validator.download_xml
-validator.exec_validation
-validator.get_result_json
-validator.output_stats
-validator.split_message_by_rule_id
-validator.output_stats_by_rule_id
-validator.output_tsv_by_rule_id
-validator.output_summary
+
+if ARGV.size >= 4
+  validator = BulkValidator.new(config, param_output_dir, file_type, ARGV[3])
+else
+  validator = BulkValidator.new(config, param_output_dir, file_type)
+end
+validator.bulk_validate()

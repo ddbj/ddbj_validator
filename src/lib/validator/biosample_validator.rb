@@ -1216,7 +1216,7 @@ class BioSampleValidator < ValidatorBase
   # rule:4
   # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
   # Taxonomy ontologyのScientific nameとの比較を行う
-  # 一致しなかった場合にはtaxonomy_idを元にorganismの自動補正情報をエラーリストに出力する
+  # 一致しなかった場合にはtaxonomy_idを元にorganism_nameの推奨情報をエラーリストに出力する
   #
   # ==== Args
   # rule_code
@@ -1246,7 +1246,7 @@ class BioSampleValidator < ValidatorBase
         {key: "organism", value: organism_name},
         {key: "taxonomy_id", value: taxonomy_id}
       ]
-      unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameで自動補正する
+      unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameを提案する(自動補正はしない)
         annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)

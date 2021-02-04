@@ -13,8 +13,8 @@
         <ProjectType>
           <ProjectTypeSubmission>
             <Target sample_scope="eMonoisolate" material="ePartialGenome" capture="eTargetedLocusLoci">
-              <Organism taxID="103690">
-                <OrganismName>Nostoc sp. PCC 7120</OrganismName>
+              <Organism>
+                <OrganismName> </OrganismName>
               </Organism>
             </Target>
             <Method method_type="eSequencing" />

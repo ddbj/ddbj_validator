@@ -9,15 +9,11 @@
         <ProjectDescr>
           <Title>Title text</Title>
           <Description>Description text</Description>
+          <LocusTagPrefix biosample_id="SAMD00000007">ATW</LocusTagPrefix>
         </ProjectDescr>
         <ProjectType>
           <ProjectTypeSubmission>
-            <Target sample_scope="eMonoisolate" material="ePartialGenome" capture="eTargetedLocusLoci">
-              <Organism taxID="1314752">
-                <OrganismName>Bacillus drentensis NBRC 102427</OrganismName>
-                <Label>Organism label text</Label>
-              </Organism>
-            </Target>
+            <Target sample_scope="eEnvironment" material="ePartialGenome" capture="eTargetedLocusLoci"></Target>
             <Method method_type="eSequencing" />
             <Objectives>
               <Data data_type="eRawSequenceReads" />
