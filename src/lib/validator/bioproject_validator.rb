@@ -21,7 +21,7 @@ class BioProjectValidator < ValidatorBase
   # Initializer
   #
   def initialize
-    super
+    super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/bioproject")))
     CommonUtils::set_config(@conf)
 
@@ -76,24 +76,25 @@ class BioProjectValidator < ValidatorBase
     doc = Nokogiri::XML(File.read(data_xml))
     project_set = doc.xpath("//PackageSet/Package/Project")
 
+    @xml_convertor = XmlConvertor.new
     if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_bioproject_submitter_id(xml_document)
+      @submitter_id = @xml_convertor.get_bioproject_submitter_id(File.read(data_xml))
     else
       @submitter_id = submitter_id
     end
-    #TODO @submitter_id が取得できない場合はエラーにする?
 
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
-    @submission_id = @xml_convertor.get_bioproject_submission_id(xml_document)
+    @submission_id = @xml_convertor.get_bioproject_submission_id(File.read(data_xml))
+  else
 
     multiple_projects("BP_R0037", project_set)
-    project_name_list = @db_validator.get_bioproject_names(@submitter_id)
-    project_title_desc_list = @db_validator.get_bioproject_title_descs(@submitter_id)
+    project_names_list = @db_validator.get_bioproject_names_list(@submitter_id) if @use_db
+
     #各プロジェクト毎の検証
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
-      duplicated_project_name("BP_R0003", project_name, project_node, project_name_list, @submission_id, idx) if @use_db
+      duplicated_project_title_and_description("BP_R0004", project_name, project_node, project_names_list, @submission_id, idx) if @use_db
       identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
       short_project_description("BP_R0006", project_name, project_node, idx)
       empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
@@ -105,16 +106,47 @@ class BioProjectValidator < ValidatorBase
       empty_data_description_for_other_data_type("BP_R0013", project_name, project_node, idx)
       invalid_publication_identifier("BP_R0014", project_name, project_node, idx)
       empty_publication_reference("BP_R0015", project_name, project_node, idx)
-      missing_strain_isolate_cultivar("BP_R0017", project_name, project_node, idx)
-      taxonomy_at_species_or_infraspecific_rank("BP_R0018", project_name, project_node, idx)
       empty_organism_description_for_multi_species("BP_R0019", project_name, project_node, idx)
-      metagenome_or_environmental("BP_R0020", project_name, project_node, idx)
       invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx) if @use_db
       invalid_biosample_accession("BP_R0022", project_name, project_node, idx) if @use_db
-      missing_project_name("BP_R0036", project_name, project_node, idx)
-      taxonomy_error_warning("BP_R0038", project_name, project_node, idx)
-      taxonomy_name_and_id_not_match("BP_R0039", project_name, project_node, idx)
       invalid_project_type("BP_R0040", project_name, project_node, idx)
+      invalid_locus_tag_prefix_format("BP_R0041", project_name, project_node, idx)
+      locus_tag_prefix_in_umbrella_project("BP_R0042", project_name, project_node, idx)
+
+      ### organismの検証とtaxonomy_idの確定
+      @taxid_path = "//Organism/@taxID"
+      @orgname_path = "//Organism/OrganismName"
+      input_taxid = get_node_text(project_node, @taxid_path)
+      if input_taxid.nil? || CommonUtils::blank?(input_taxid) #taxonomy_idの記述がない
+        taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
+      else
+        taxonomy_id = input_taxid
+      end
+
+      input_organism = get_node_text(project_node, @orgname_path)
+      p input_organism
+      p input_organism.strip
+      if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
+        ret = taxonomy_name_and_id_not_match("BP_R0038", project_name, taxonomy_id, input_organism, project_node, idx)
+      else
+        ret = taxonomy_error_warning("BP_R0039", project_name, input_organism, project_node, idx)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
+          taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxID")
+          unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
+            taxonomy_id = taxid_annotation
+          end
+          organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "OrganismName")
+          unless organism_annotation.nil? #organismの補正があれば値を置き換える
+            input_organism = organism_annotation
+          end
+        end
+      end
+      ### taxonomy_idの値を使う検証
+      if taxonomy_id != OrganismValidator::TAX_INVALID #無効なtax_idでなければ実行
+        taxonomy_at_species_or_infraspecific_rank("BP_R0018", project_name, taxonomy_id, input_organism, project_node, idx)
+        metagenome_or_environmental("BP_R0020", project_name, taxonomy_id, input_organism, project_node, idx)
+      end
+
     end
 
     link_set = doc.xpath("//PackageSet/Package/ProjectLinks")
@@ -174,41 +206,6 @@ class BioProjectValidator < ValidatorBase
 ### validate method ###
 
   #
-  # rule:BP_R0003
-  # project name がアカウント単位でユニークではない
-  #
-  # ==== Args
-  # project_label: project label for error displaying
-  # project_node: a bioproject node object
-  # project_name_list: submitter_idに紐付くプロジェクトのproject_nameの一覧
-  # ==== Return
-  # true/false
-  #
-  def duplicated_project_name (rule_code, project_label, project_node, project_name_list, submission_id, line_num)
-    result = true
-    name_path = "//Project/ProjectDescr/Name"
-
-    if !project_node.xpath(name_path).empty? #要素あり
-      project_name = get_node_text(project_node, name_path)
-      # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じproject nameがあるとNG
-      result = false if submission_id.nil? && project_name_list.count(project_name) >= 1
-      # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-      result = false if !submission_id.nil? && project_name_list.count(project_name) >= 2
-
-      if result == false
-        annotation = [
-            {key: "Project name", value: project_label},
-            {key: "Project name", value: project_name},
-            {key: "Path", value: [name_path]},
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-      end
-    end
-    result
-  end
-
-  #
   # rule:BP_R0004
   # project title & description がアカウント単位でユニークではない
   #
@@ -219,7 +216,8 @@ class BioProjectValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def duplicated_project_title_and_description (rule_code, project_label, project_node, project_title_desc_list, submission_id, line_num)
+  def duplicated_project_title_and_description (rule_code, project_label, project_node, project_names_list, submission_id, line_num)
+    return if project_names_list.nil?
     result = true
     title_path = "//Project/ProjectDescr/Title"
     desc_path = "//Project/ProjectDescr/Description"
@@ -231,11 +229,12 @@ class BioProjectValidator < ValidatorBase
     if !project_node.xpath(desc_path).empty? #要素あり
       description = get_node_text(project_node, desc_path)
     end
-    combination_text = [title, description].join(",")
+
+    duplicated_submission = project_names_list.select{|item| item[:bioproject_title] == title && item[:public_description] == description}
     # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じtitle&descがあるとNG
-    result = false if submission_id.nil? && project_title_desc_list.count(combination_text) >= 1
+    result = false if submission_id.nil? && duplicated_submission.size >= 1
     # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-    result = false if !submission_id.nil? && project_title_desc_list.count(combination_text) >= 2
+    result = false if !submission_id.nil? && duplicated_submission.size >= 2
 
     if result == false
       annotation = [
@@ -627,78 +626,35 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:BP_R0017
-  # organism: sample scope = "mono-isolate" の場合は strain or breed or cultivar or isolate or label 必須
+  # rule:BP_R0018
+  # organismがspecies レベル以下の taxonomy が必須 (multi-species の場合、任意で species レベル以上を許容)
+  # Primary BioProjectの場合と、scope = "multi-species" 以外の場合に適用する
+  # biosample rule: BS_R0096相当
   #
   # ==== Args
   # project_label: project label for error displaying
+  # taxonomy_id: ex."103690"
+  # organism_name: ex."Nostoc sp. PCC 7120"
   # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
-  def missing_strain_isolate_cultivar (rule_code, project_label, project_node, line_num)
+  def taxonomy_at_species_or_infraspecific_rank (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
     result = true
-    sample_scope_attr = "//Target[@sample_scope='eMonoisolate']"
-    monoisolate = project_node.xpath(sample_scope_attr)
-    unless monoisolate.empty? #eMonoisolateである場合にチェック
-      if ( node_blank?(project_node, "//Organism/Label") \
-           && node_blank?(project_node, "//Organism/Strain") \
-           && node_blank?(project_node, "//Organism/IsolateName") \
-           && node_blank?(project_node, "//Organism/Breed") \
-           && node_blank?(project_node, "//Organism/Cultivar"))
+    primary_taxid = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission")
+    multispecies = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eMultispecies']")
+    unless (primary_taxid.empty? || !multispecies.empty?) # Primary BioProjectではない場合と、eMultispeciesである場合はスキップ
+      result = @org_validator.is_infraspecific_rank(taxonomy_id)
+      if result == false
         annotation = [
           {key: "Project name", value: project_label},
-          {key: "Path", value: "//Organism/Label | //Organism/Strain | //Organism/IsolateName | //Organism/Breed | //Organism/Cultivar"}
+          {key: "Path", value: [@taxid_path, @orgname_path]},
+          {key: "OrganismName", value: organism_name},
+          {key: "taxID", value: taxonomy_id}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
-        result = false
-      end
-    end
-    result
-  end
-
-  #
-  # rule:BP_R0018
-  # organism: sample scope = "multi-species" 以外の場合、species レベル以下の taxonomy が必須 (multi-species の場合、任意で species レベル以上を許容)
-  # biosample rule:4,45,96と関連
-  #
-  # ==== Args
-  # project_label: project label for error displaying
-  # project_node: a bioproject node object
-  # ==== Return
-  # true/false
-  #
-  def taxonomy_at_species_or_infraspecific_rank (rule_code, project_label, project_node, line_num)
-    result = true
-    # tax_idが記述されていればtax_idを使用し、なければorganism_nameからtax_idを取得する
-    tax_id = nil
-    taxid_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/@taxID"
-    if !node_blank?(project_node, taxid_path) && get_node_text(project_node, taxid_path).chomp.strip != "1" #tax_id=1(root)は未指定として扱う
-      tax_id = get_node_text(project_node, taxid_path).chomp.strip
-    else
-      orgname_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/OrganismName"
-      unless node_blank?(project_node, orgname_path)
-        organism_name = get_node_text(project_node, orgname_path).chomp.strip
-        ret = @org_validator.suggest_taxid_from_name(organism_name)
-        if ret[:status] == "exist"
-          tax_id = ret[:tax_id]
-        end
-      end
-    end
-    unless tax_id.nil? #taxIDが確定できない場合はチェックしない
-      multispecies = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eMultispecies']")
-      if multispecies.empty? #eMultispeciesではない場合にチェックする
-        result = @org_validator.is_infraspecific_rank(tax_id)
-        if result == false
-          annotation = [
-            {key: "Project name", value: project_label},
-            {key: "Path", value: [taxid_path, orgname_path]}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-          result = false
-        end
       end
     end
     result
@@ -739,43 +695,29 @@ class BioProjectValidator < ValidatorBase
   #
   # ==== Args
   # project_label: project label for error displaying
+  # taxonomy_id: ex."103690"
   # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
-  def metagenome_or_environmental (rule_code, project_label, project_node, line_num)
+  def metagenome_or_environmental (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
     result = true
-    # tax_idが記述されていればtax_idを使用し、なければorganism_nameからtax_idを取得する
-    # TODO rule18と同じコードまとめたい
-    tax_id = nil
-    taxid_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/@taxID"
-    if !node_blank?(project_node, taxid_path) && get_node_text(project_node, taxid_path).chomp.strip != "1" #tax_id=1(root)は未指定として扱う
-      tax_id = get_node_text(project_node, taxid_path).chomp.strip
-    else
-     orgname_path = "//Project/ProjectType/ProjectTypeSubmission/Target/Organism/OrganismName"
-      unless node_blank?(project_node, orgname_path)
-        organism_name = get_node_text(project_node, orgname_path).chomp.strip
-        ret = @org_validator.suggest_taxid_from_name(organism_name)
-        if ret[:status] == "exist"
-          tax_id = ret[:tax_id]
-        end
-      end
-    end
-    unless tax_id.nil? #taxIDが確定できない場合はチェックしない
-      environment = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eEnvironment']")
-      unless environment.empty? #eEnvironmentである場合にチェック
-        #tax_id がmetagenome配下かどうか
-        linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
-        db_org_name = @org_validator.get_organism_name(tax_id)
-        unless @org_validator.has_linage(tax_id, linages) && !db_org_name.nil? && db_org_name.end_with?("metagenome")
-          annotation = [
-            {key: "Project name", value: project_label},
-            {key: "Path", value: [taxid_path, orgname_path]}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-          result = false
-        end
+
+    environment = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eEnvironment']")
+    unless environment.empty? #eEnvironmentである場合にチェック
+      #tax_id がmetagenome配下かどうか
+      linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
+      unless @org_validator.has_linage(taxonomy_id, linages) && !organism_name.nil? && organism_name.end_with?("metagenome")
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "Path", value: [@taxid_path, @orgname_path]},
+          {key: "OrganismName", value: organism_name},
+          {key: "taxID", value: taxonomy_id}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
       end
     end
     result
@@ -796,10 +738,10 @@ class BioProjectValidator < ValidatorBase
     locus_tag_path = "//Project/ProjectDescr/LocusTagPrefix"
     project_node.xpath(locus_tag_path).each_with_index do |locus_tag_node, idx| #XSD定義では複数記述可能
       isvalid = true
-      # locus_tagとbiosampleのどちらか指定が欠けているればエラー
-      if (node_blank?(locus_tag_node, ".") || node_blank?(locus_tag_node, "@biosample_id"))
+      # locus_tagのテキストが欠けているればエラー
+      if (node_blank?(locus_tag_node, "."))
         isvalid = result = false #複数ノードの一つでもエラーがあればresultをfalseとする
-      else
+      elsif !(node_blank?(locus_tag_node, "@biosample_id")) # biosample_idがある
         # biosample_idからDB検索してlocus_tag_prefixが取得できない、値が異なる場合にエラー
         biosample_accession = get_node_text(locus_tag_node, "@biosample_id")
         locus_tag_prefix = get_node_text(locus_tag_node)
@@ -823,11 +765,11 @@ class BioProjectValidator < ValidatorBase
           annotation.push({key: "LocusTagPrefix", value: locus_tag_node.xpath("text()").text})
         end
         if node_blank?(locus_tag_node, "@biosample_id")
-          annotation.push({key: "biosample_id", value: ""})
+          annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]"]})
         else
           annotation.push({key: "biosample_id", value: locus_tag_node.xpath("@biosample_id").text})
+          annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]", "#{locus_tag_path}[#{idx + 1}]/@biosample_id"]})
         end
-        annotation.push({key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]", "#{locus_tag_path}[#{idx + 1}]/@biosample_id"]})
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
       end
@@ -875,31 +817,6 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # rule:BP_R0036
-  # 参照ラベルとしての project name 必須
-  #
-  # ==== Args
-  # project_label: project label for error displaying
-  # project_node: a bioproject node object
-  # ==== Return
-  # true/false
-  #
-  def missing_project_name (rule_code, project_label, project_node, line_num)
-    result = true
-    project_name_path = "//Project/ProjectDescr/Name"
-    if node_blank?(project_node, project_name_path)
-      annotation = [
-        {key: "Project name", value: project_label},
-        {key: "Path", value: "#{project_name_path}"}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      result = false
-    end
-    result
-  end
-
-  #
   # rule:BP_R0037
   # 1 BioProject XML - 1 BioProject であるか
   #
@@ -925,41 +842,37 @@ class BioProjectValidator < ValidatorBase
   # rule:BP_R0038
   # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
   # Taxonomy ontologyのScientific nameとの比較を行う
-  # 一致しなかった場合にはtaxonomy_idを元にorganismの自動補正情報をエラーリストに出力する
+  # 一致しなかった場合にはtaxonomy_idを元にorganism_nameの推奨情報をエラーリストに出力する
+  # biosample rule: BS_R0004 相当
   #
   # ==== Args
   # project_label: project label for error displaying
+  # taxonomy_id: ex."103690"
+  # organism_name: ex."Nostoc sp. PCC 7120"
   # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
-  def taxonomy_name_and_id_not_match (rule_code, project_label, project_node, line_num)
+  def taxonomy_name_and_id_not_match (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
     result = true
-    taxid_path = "//Organism/@taxID"
-    orgname_path = "//Organism/OrganismName"
-    if !project_node.xpath(orgname_path).empty? && !node_blank?(project_node, taxid_path) #両方要素あり
-      organism_name = get_node_text(project_node, orgname_path)
-      taxonomy_id = get_node_text(project_node, taxid_path)
-      scientific_name = @org_validator.get_organism_name(taxonomy_id)
-      #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
-      if !scientific_name.nil? && scientific_name == organism_name && taxonomy_id != OrganismValidator::TAX_ROOT
-        retuls = true
-      else
-        annotation = [
-          {key: "Project name", value: project_label},
-          {key: "Path", value: [taxid_path, orgname_path]},
-          {key: "OrganismName", value: organism_name},
-          {key: "taxID", value: taxonomy_id}
-        ]
-        if scientific_name.nil? || taxonomy_id == OrganismValidator::TAX_ROOT
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        else #taxonomy_idのscientific_nameで自動補正する
-          annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", orgname_path, true));
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-        end
-        @error_list.push(error_hash)
-        result = false
+    organism_name = "" if CommonUtils::blank?(organism_name)
+    scientific_name = @org_validator.get_organism_name(taxonomy_id)
+    if !scientific_name.nil? && scientific_name == organism_name
+      retuls = true
+    else
+      annotation = [
+        {key: "Project name", value: project_label},
+        {key: "Path", value: [@taxid_path, @orgname_path]},
+        {key: "OrganismName", value: organism_name},
+        {key: "taxID", value: taxonomy_id}
+      ]
+      unless scientific_name.nil?
+        annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end
@@ -967,56 +880,44 @@ class BioProjectValidator < ValidatorBase
   #
   # rule:BP_R0039
   # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
+  # biosample rule: BS_R0045 相当
   #
   # ==== Args
   # project_label: project label for error displaying
+  # organism_name: ex."Nostoc sp. PCC 7120"
   # project_set_node: a bioproject set node object
   # ==== Return
   # true/false
   #
-  def taxonomy_error_warning (rule_code, project_label, project_node, line_num)
+  def taxonomy_error_warning (rule_code, project_label, organism_name, project_node, line_num)
+    organism_name = "" if CommonUtils::blank?(organism_name)
     result = false
-    taxid_path = "//Organism/@taxID"
-    orgname_path = "//Organism/OrganismName"
-    unless project_node.xpath(orgname_path).empty?
-      organism_name = get_node_text(project_node, orgname_path)
-      ret = @org_validator.suggest_taxid_from_name(organism_name)
 
-      annotation = [
-        {key: "Project name", value: project_label},
-        {key: "Path", value: [taxid_path, orgname_path]},
-        {key: "OrganismName", value: organism_name}
-      ]
-      if ret[:status] == "exist" #該当するtaxonomy_idがあった場合
-        scientific_name = ret[:scientific_name]
-        user_edit_taxid = "" #ユーザ入力のtaxid
-        user_edit_taxid = get_node_text(project_node, taxid_path) unless node_blank?(project_node, taxid_path)
-        if scientific_name == organism_name && user_edit_taxid == ret[:tax_id]
-          result = true #ユーザ入力のorganism_nameとtax_idの組み合わせが正しい場合のみtrue
-        else
-          #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
-          if scientific_name != organism_name
-            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", orgname_path, true));
-          end
-          if user_edit_taxid != ret[:tax_id]
-            annotation.push({key: "taxID", value: user_edit_taxid})
-            annotation.push(CommonUtils::create_suggested_annotation([ret[:tax_id]], "taxID", taxid_path, true));
-          end
-        end
-      else ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
-        msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
-        annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
-      end #該当するtaxonomy_idが無かった場合は単なるエラー
-      if result == false
-        unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-        else #auto-annotation無
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        end
-        @error_list.push(error_hash)
-      end
+    unless organism_name == ""
+      ret = @org_validator.suggest_taxid_from_name(organism_name)
     end
-    result
+    annotation = [
+      {key: "Project name", value: project_label},
+      {key: "Path", value: @orgname_path},
+      {key: "OrganismName", value: organism_name}
+    ]
+    if ret.nil? # organism name is blank
+      annotation.push({key: "Message", value: "OrganismName is blank"})
+    elsif ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+      scientific_name = ret[:scientific_name]
+      #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+      if scientific_name != organism_name
+        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", [@orgname_path], true));
+      end
+      annotation.push({key: "taxID", value: ""})
+      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxID", [@taxid_path], true))
+    elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+      msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
+      annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
+    end #該当するtaxonomy_idが無かった場合は単なるエラー
+    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
+    @error_list.push(error_hash)
+    false
   end
 
   #
@@ -1050,10 +951,8 @@ class BioProjectValidator < ValidatorBase
   # 3-12文字の英数字で、数字では始まらない
   #
   # ==== Args
-  # rule_code
-  # sample_name サンプル名
-  # locus_tag locus_tag
-  # line_num
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
   # ==== Return
   # true/false
   #
@@ -1083,59 +982,31 @@ class BioProjectValidator < ValidatorBase
   end
 
   #
-  # node_objで指定された対象ノードに対してxpathで検索し、ノードが存在しないまたはテキストが空（空白のみを含む）だった場合にtrueを返す
-  # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
-  # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
+  # rule:BP_R0042
+  # locus_tag_prefixがumbrella projectの場合に記載されていないか検証
   #
-  def node_blank? (node_obj, xpath = ".")
-    ret = false
-    target_node = node_obj.xpath(xpath)
-    if target_node.empty?
-      ret = true
-    else
-      text_value = ""
-      #xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
-      target_node.each do |node|
-        #空白文字のみの場合もblank扱いとする
-        text_value += get_node_text(node).chomp.strip
-      end
-      if text_value == "" #要素/属性はあるが、テキスト/値が空白である
-        ret =  true
-      end
-    end
-    ret
-  end
-
+  # ==== Args
+  # project_label: project label for error displaying
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
   #
-  # node_objで指定された対象ノードに対してxpathで検索し、ノードのテキストを返す
-  # もしノードが存在しなければ空文字を返す
-  # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
-  # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
-  #
-  def get_node_text (node_obj, xpath = ".")
-    text_value = ""
-    target_node = node_obj.xpath(xpath)
-    unless target_node.empty?
-      #xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
-      target_node.each do |node|
-        if node.class == Nokogiri::XML::Element
-          #elementの場合にはelementの要素自身のテキストを検索
-          target_text_node = node.xpath("text()") #子供のテキストを含まないテキスト要素を取得
-          text_value += target_text_node.map {|text_node|
-            text_node.text
-          }.join  #前後の空白を除去した文字列を繋げて返す
-        elsif node.class == Nokogiri::XML::Attr
-          #attributeの場合にはattributeの値を検索
-          text_value += node.text
-        elsif node.class == Nokogiri::XML::Text
-          text_value += node.text
-        else
-          unless node.text.nil?
-            text_value += node.text
-          end
-        end
+  def locus_tag_prefix_in_umbrella_project (rule_code, project_label, project_node, line_num)
+    result = true
+    project_type_path = "//Project/ProjectType/ProjectTypeTopAdmin"
+    locus_tag_path = "//Project/ProjectDescr/LocusTagPrefix"
+    if !project_node.xpath(project_type_path).empty?
+      project_node.xpath(locus_tag_path).each_with_index do |locus_tag_node, idx| #XSD定義では複数記述可能
+        result = false # Textの記述の有無に関わらずタグがあればエラー
+        annotation = [
+          {key: "Project name", value: project_label},
+          {key: "LocusTagPrefix", value: get_node_text(locus_tag_node)},
+          {key: "Path", value: ["#{locus_tag_path}[#{idx + 1}]"]}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
       end
     end
-    text_value
+    result
   end
 end

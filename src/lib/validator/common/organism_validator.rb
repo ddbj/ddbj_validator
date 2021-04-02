@@ -24,6 +24,7 @@ class OrganismValidator < SPARQLBase
   TAX_HOMO_SAPIENS = "9606" #homo sapiens
   TAX_VIRIDIPLANTAE = "33090" #viridiplantae
   TAX_EUKARYOTA = "2759" #eukaryota
+  TAX_METAGENOMES = "408169" #metagenome
 
   #
   # Initializer
@@ -103,7 +104,7 @@ class OrganismValidator < SPARQLBase
   def get_organism_name(tax_id)
     params = {tax_id: tax_id}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_organism_name.rq", params)
-    result = query(sparql_query) 
+    result = query(sparql_query)
     if result.size <= 0
       nil
     else
@@ -242,6 +243,7 @@ class OrganismValidator < SPARQLBase
   #  {status: "error", error_code: rule_id}
   def org_vs_package_validate (tax_id, package_name)
     result = true
+    tax_id = tax_id.to_s
     rule_id = ""
     if package_name == "Pathogen.cl" #rule BS_R0074
       rule_id = "BS_R0074"
@@ -267,7 +269,7 @@ class OrganismValidator < SPARQLBase
       rule_id = "BS_R0077"
       linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_FUNGI, TAX_VIROIDS, TAX_UNCLASSIFIED_SEQUENCES, TAX_OTHER_SEQUENCES]
       has_linage = has_linage(tax_id, linages)
-      if (tax_id == "9606" || has_linage)
+      if (tax_id.to_s == TAX_HOMO_SAPIENS || has_linage)
         result = false
       end
     elsif package_name == "Metagenome.environmental" #rule BS_R0078
@@ -280,7 +282,7 @@ class OrganismValidator < SPARQLBase
       end
     elsif package_name == "Human" #rule BS_R0080
       rule_id = "BS_R0080"
-      unless tax_id == "9606"
+      unless tax_id.to_s == TAX_HOMO_SAPIENS
         result = false
       end
     elsif package_name == "Plant" #rule BS_R0081
@@ -328,6 +330,22 @@ class OrganismValidator < SPARQLBase
     elsif package_name == "Beta-lactamase" #rule BS_R0089
       rule_id = "BS_R0089"
       linages = [TAX_BACTERIA]
+      result = has_linage(tax_id, linages)
+    elsif package_name.start_with?("MIMAG") #rule BS_R0110
+      rule_id = "BS_R0110"
+      organism_name = get_organism_name(tax_id)
+      if organism_name.nil? || tax_id.to_s == TAX_HOMO_SAPIENS || organism_name.downcase.include?("metagenome")
+        result = false
+      end
+    elsif package_name.start_with?("MISAG") #rule BS_R0111
+      rule_id = "BS_R0111"
+      organism_name = get_organism_name(tax_id)
+      if organism_name.nil? || tax_id.to_s == TAX_HOMO_SAPIENS || organism_name.downcase.include?("metagenome")
+        result = false
+      end
+    elsif package_name.start_with?("MIUVIG") #rule BS_R0112
+      rule_id = "BS_R0112"
+      linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
     end
     if result

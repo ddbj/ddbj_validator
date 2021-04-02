@@ -9,11 +9,14 @@ require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
+require File.expand_path('../../lib/package/package.rb', __FILE__)
 
 module DDBJValidator
   class Application < Sinatra::Base
     setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/validator.yml")).result)
     @@data_dir = setting["api_log"]["path"]
+    version = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/version.yml")).result)
+    @@biosample_graph_version = version["version"]["biosample_graph"]
 
     configure do
       set :public_folder  , File.expand_path('../../public', __FILE__)
@@ -38,7 +41,7 @@ module DDBJValidator
 
     get '/api/apispec/' do
       content_type 'text/html; charset=utf-8'
-      send_file File.join(settings.public_folder, 'apispec/index.html')
+      send_file File.join(settings.public_folder, 'api/apispec/index.html')
     end
 
     get '/api/client/index' do
@@ -53,7 +56,7 @@ module DDBJValidator
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         validation_params = {}
-        input_file_list = %w(biosample bioproject submission experiment run analysis)
+        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)
@@ -132,7 +135,24 @@ module DDBJValidator
     get '/api/validation/:uuid/:filetype' do |uuid, filetype|
       save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
       file_list = Dir.glob("#{save_dir}/#{filetype}/*")
-      if file_list.size == 1
+      if filetype == 'jvar' #jvarは元ファイルがExcelだが変換したJSONを返して欲しいケースを想定 TODO コードが長い
+        if get_accept_header(request).include?("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+          file = file_list.select{|file| file.end_with?(".xlsx")} # TODO ファイル拡張子があるとは限らない
+          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        else
+          file = file_list.select{|file| file.end_with?(".json")} #変換できなかった場合はこのファイルは無い
+          type = "application/json"
+        end
+        if file.size == 0
+          status 400
+          message = "Invalid uuid or filetype"
+          { status: "error", "message": message}.to_json
+        else
+          file_name = File.basename(file.first)
+          file_path = file.first
+          send_file file_path, :filename => file_name, :type => type
+        end
+      elsif file_list.size == 1
         file_name = File.basename(file_list.first)
         file_path = file_list.first
         send_file file_path, :filename => file_name, :type => 'application/xml'
@@ -162,6 +182,26 @@ module DDBJValidator
         status 400
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
         { status: "error", "message": message}.to_json
+      end
+    end
+
+    get '/api/submission/ids/:filetype' do |filetype|
+      headers = request.env.select do |key, val|
+        key.start_with?("HTTP_")
+      end
+      if headers["HTTP_API_KEY"].nil? || headers["HTTP_API_KEY"] != "curator" #TODO change
+        status 401
+      else
+        ret = Submitter.new().submission_id_list(filetype)
+        if ret[:status] == "success"
+          ret[:data].to_json
+        elsif ret[:status] == "fail"
+          status 400
+          message = "Invalid filetype"
+          { status: "error", "message": message}.to_json
+        elsif ret[:status] == "error"
+          status 500
+        end
       end
     end
 
@@ -249,6 +289,87 @@ module DDBJValidator
       ret_message
     end
 
+    # package関連
+    get '/api/package_list' do
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_list(version)
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "error", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "error", "message": ret[:message]}.to_json
+      end
+    end
+
+    get '/api/package_and_group_list' do
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_and_group_list(version)
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "error", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "error", "message": ret[:message]}.to_json
+      end
+    end
+
+    get '/api/attribute_list' do
+      if params["package"].nil? || params["package"].strip == ""
+        status 400
+        message = "'package' parameter is required"
+        ret = { status: "error", "message": message}.to_json
+        return ret
+      end
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).attribute_list(version, params["package"])
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "error", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "error", "message": ret[:message]}.to_json
+      end
+    end
+
+    get '/api/package_info' do
+      if params["package"].nil? || params["package"].strip == ""
+        status 400
+        message = "'package' parameter is required"
+        ret = { status: "error", "message": message}.to_json
+        return ret
+      end
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_graph_version
+      end
+      ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_info(version, params["package"])
+      if ret[:status] == "success"
+        ret[:data].to_json
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "error", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "error", "message": ret[:message]}.to_json
+      end
+    end
+
     #error response
     error 400..599 do
       if status == 400 #400番の場合は詳細メッセージを表示するために、設定されたresponseをそのまま返す
@@ -322,6 +443,15 @@ module DDBJValidator
           f.write params[validator_type.to_sym][:tempfile].read
         end
         save_path
+      end
+
+      # Acceptヘッダーをリストで返す
+      def get_accept_header(request)
+        accept = request.env.select { |k, v| k.start_with?('HTTP_ACCEPT') }
+        if accept.size == 0
+        else
+          accept
+        end
       end
 
       def http_get_response (uri, options)

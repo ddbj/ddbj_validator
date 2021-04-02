@@ -32,5 +32,7 @@
   "tidal_stage": ["", "low", "high"],
   "tillage": ["", "drill", "cutting disc", "ridge till", "strip tillage", "zonal tillage", "chisel", "tined", "mouldboard", "disc plough"],
   "trophic_level": ["", "autotroph", "carboxydotroph", "chemoautotroph", "chemoheterotroph", "chemolithoautotroph", "chemolithotroph", "chemoorganoheterotroph", "chemoorganotroph", "chemosynthetic", "chemotroph", "copiotroph", "diazotroph", "facultative", "heterotroph", "lithoautotroph", "lithoheterotroph", "lithotroph", "methanotroph", "methylotroph", "mixotroph", "obligate", "chemoautolithotroph", "oligotroph", "organoheterotroph", "organotroph", "photoautotroph", "photoheterotroph", "photolithoautotroph", "photolithotroph", "photosynthetic", "phototroph"],
-  "urine_collect_meth": ["", "clean catch", "catheter"]
+  "urine_collect_meth": ["", "clean catch", "catheter"],
+  "source_uvig": ["", "metagenome (not viral targeted)", "viral fraction metagenome (virome)", "sequence-targeted metagenome", "metatranscriptome (not viral targeted)", "viral fraction RNA metagenome (RNA virome)", "sequence-targeted RNA metagenome", "microbial single amplified genome (SAG)", "viral single amplified genome (vSAG)", "isolate microbial genome"],
+  "virus_enrich_appr": ["", "filtration", "ultrafiltration", "centrifugation", "ultracentrifugation", "PEG Precipitation", "FeCl Precipitation", "CsCl density gradient", "DNAse", "RNAse", "targeted sequence capture"]
 }

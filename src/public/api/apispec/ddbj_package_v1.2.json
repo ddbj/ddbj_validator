@@ -1,0 +1,217 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "DDBJ Biosample Package & Attribute API",
+    "description": "DDBJ Biosample Package & Attribute API",
+    "version": "1.2.0"
+  },
+  "host": "ddbj.nig.ac.jp",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/api",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/package_list": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "all package list",
+        "description": "Get all package list",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/PackageList"
+            }
+          },
+          "400": {
+            "description": "Bad Request. Invalid package version.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/attribute_list": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "attribute list of specific package",
+        "description": "Get attribute list of specific package. The list is arranged in the order in which it is recommended to be displayed",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          },
+          {
+            "$ref": "#/parameters/package"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/AttributeList"
+            }
+          },
+          "400": {
+            "description": "Invalid package version or package.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/package_info": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "specific package infomation",
+        "description": "Get the information of specific package",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          },
+          {
+            "$ref": "#/parameters/package"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/PackageInfo"
+            }
+          },
+          "400": {
+            "description": ". Invalid package version or package.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "version": {
+      "name": "version",
+      "in": "query",
+      "description": "Version of biosample package set. \"1.4.0\", \"1.5.0\"",
+      "required": true,
+      "type": "string"
+    },
+    "package": {
+      "name": "package",
+      "in": "query",
+      "description": "Package identifier of package set. e.g. \"MIGS.ba.air\"",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "PackageList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PackageInfo"
+      }
+    },
+    "PackageInfo": {
+      "type": "object",
+      "properties": {
+        "package_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "package_name": {
+          "type": "string"
+        },
+        "package_uri": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "package_id": "MIGS.ba",
+        "version": "1.1",
+        "package_name": "MIGS.ba package",
+        "package_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/MIGS.ba_Package"
+      }
+    },
+    "AttributeList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AttributeInfo"
+      }
+    },
+    "AttributeInfo": {
+      "type": "object",
+      "properties": {
+        "attribute_name": {
+          "type": "string"
+        },
+        "require_type": {
+          "type": "string",
+          "description": "\"has_mandatory_attribute\",  \"has_optional_attribute\" or \"has_attribute\""
+        },
+        "attribute_no": {
+          "type": "string"
+        },
+        "group_name": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "attribute_name": "strain",
+        "require_type": "has_optional_attribute",
+        "attribute_no": "migs.ba_attribute016"
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "status": "error",
+        "message": "Wrong parameter: invalid package version."
+      }
+    }
+  }
+}

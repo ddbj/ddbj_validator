@@ -34,6 +34,8 @@ class ValidatorBase
       end
       config[:google_api_key] = setting["google_api_key"]
       config[:eutils_api_key] = setting["eutils_api_key"]
+      config[:log_dir] = setting["api_log"]["path"]
+      config[:log_file] = setting["api_log"]["path"] + "/validator.log"
       version = YAML.load(ERB.new(File.read(config_file_dir + "/version.yml")).result)
       config[:version] = version["version"]
       config
@@ -44,6 +46,19 @@ class ValidatorBase
     end
   end
 
+  #
+  # Exception発生時のlog出力(backtraceを含む)
+  #
+  # ==== Args
+  # ex: Exception class
+  # message: 追加メッセージ
+  #
+  def output_exception_log(ex, message)
+    message += "#{ex.message} (#{ex.class})"
+    @log.error(message)
+    trace = ex.backtrace.map {|row| row}.join("\n")
+    @log.error(trace)
+  end
 
   #
   # 正しいXML文書であるかの検証
@@ -159,7 +174,7 @@ class ValidatorBase
         end
       end
     end
-    text_value
+    text_value.strip.chomp
   end
 
 end

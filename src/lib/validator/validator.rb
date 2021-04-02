@@ -6,10 +6,11 @@ require 'fileutils'
 
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
+require File.expand_path('../jvar_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
-    @@filetype = %w(biosample bioproject submission experiment run analysis)
+    @@filetype = %w(biosample bioproject submission experiment run analysis jvar vcf)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -44,7 +45,7 @@ class Validator
       permission_error_list = []
       params.each do |k,v|
         case k.to_s
-        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'output'
+        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'vcf', 'output'
           params[k] = File.expand_path(v)
           #TODO check file exist and permission, need write permission to output file
           if k.to_s == 'output'
@@ -81,6 +82,8 @@ class Validator
         error_list = []
         error_list.concat(validate("biosample", params)) if !params[:biosample].nil?
         error_list.concat(validate("bioproject", params))if !params[:bioproject].nil?
+        error_list.concat(validate("jvar", params))if !params[:jvar].nil?
+        error_list.concat(validate("vcf", params))if !params[:vcf].nil?
         #error_list.concat(validate("combination", params))
         #TODO dra validator
 
@@ -128,6 +131,12 @@ class Validator
       when "bioproject"
         validator = BioProjectValidator.new
         data = params[:bioproject]
+      when "jvar"
+        validator = JVarValidator.new
+        data = params[:jvar]
+      when "vcf"
+        validator = VCFValidator.new
+        data = params[:vcf]
       when "combination"
         validator = CombinationValidator.new
         data = params

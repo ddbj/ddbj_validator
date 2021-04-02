@@ -313,6 +313,35 @@ WHERE
     assert_equal "error", ret[:status]
   end
 
+  def test_org_vs_packagea_110
+    ret = @validator.org_vs_package_validate("1148", "MIMAG.human-skin") #bacteria
+    assert_equal "ok", ret[:status]
+    ret = @validator.org_vs_package_validate("9606", "MIMAG.human-skin") #human
+    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate("539655", "MIMAG.human-skin") #human skin metagenome
+    assert_equal "error", ret[:status]
+  end
+
+  def test_org_vs_packagea_111
+    ret = @validator.org_vs_package_validate("1148", "MISAG.soil") #bacteria
+    assert_equal "ok", ret[:status]
+    ret = @validator.org_vs_package_validate("9606", "MISAG.soil") #human
+    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate("410658", "MISAG.soil") #soil metagenome
+    assert_equal "error", ret[:status]
+  end
+
+  def test_org_vs_packagea_112
+    ret = @validator.org_vs_package_validate("11320", "MIUVIG.human-oral") #Influenza A virus
+    assert_equal "ok", ret[:status]
+    ret = @validator.org_vs_package_validate("1148", "MIUVIG.human-oral") #bacteria
+    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate("9606", "MIUVIG.human-oral") #human
+    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate("447426", "MIUVIG.human-oral") #human oral metagenome
+    assert_equal "error", ret[:status]
+  end
+
   def test_target_organism_for_specimen_voucher?
     ret = @validator.target_organism_for_specimen_voucher?("9606") #eukaryote
     assert_equal true, ret

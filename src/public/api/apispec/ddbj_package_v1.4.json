@@ -1,0 +1,332 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "DDBJ Biosample Package & Attribute API",
+    "description": "DDBJ Biosample Package & Attribute API",
+    "version": "1.4.0"
+  },
+  "host": "ddbj.nig.ac.jp",
+  "schemes": [
+    "https"
+  ],
+  "basePath": "/api",
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/package_list": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "all package list",
+        "description": "Get all package list",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/PackageList"
+            }
+          },
+          "400": {
+            "description": "Bad Request. Invalid package version.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/package_and_group_list": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "package and package group",
+        "description": "Get package and package group. The list is arranged in the order in which it is recommended to be displayed. Packages belonging to each package group are represented by a tree structure.The depth of a package group is arbitrary (e.g. MIxS(package group) => MIGS.ba(package group) => MIGS.ba.air(package)), and some packages do not belong to the group (e.g. Invertebrate(package))",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/PackageAndGroupList"
+            }
+          },
+          "400": {
+            "description": "Bad Request. Invalid package version.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/attribute_list": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "attribute list of specific package",
+        "description": "Get attribute list of specific package. The list is arranged in the order in which it is recommended to be displayed",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          },
+          {
+            "$ref": "#/parameters/package"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/AttributeList"
+            }
+          },
+          "400": {
+            "description": "Invalid package version or package.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/package_info": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "specific package infomation",
+        "description": "Get the information of specific package",
+        "produces": [
+          "application/json"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          },
+          {
+            "$ref": "#/parameters/package"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "$ref": "#/definitions/PackageInfo"
+            }
+          },
+          "400": {
+            "description": ". Invalid package version or package.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "parameters": {
+    "version": {
+      "name": "version",
+      "in": "query",
+      "description": "Version of biosample package set. \"1.4.0\", \"1.5.0\"",
+      "required": true,
+      "type": "string"
+    },
+    "package": {
+      "name": "package",
+      "in": "query",
+      "description": "Package identifier of package set. e.g. \"MIGS.ba.air\"",
+      "required": true,
+      "type": "string"
+    }
+  },
+  "definitions": {
+    "PackageList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PackageInfo"
+      }
+    },
+    "PackageInfo": {
+      "type": "object",
+      "properties": {
+        "package_uri": {
+          "type": "string"
+        },
+        "package_id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "package_name": {
+          "type": "string"
+        },
+        "env_package": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "parent_package_group_uri": {
+          "type": "string"
+        },
+        "parent_package_grounp_name": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "package_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen.cl_Package",
+        "package_id": "Pathogen.cl",
+        "version": "1.0",
+        "package_name": "Pathogen: clinical or host-associated; version 1.0",
+        "env_package": null,
+        "description": "Pathogen: clinical or host-associated; version 1.0",
+        "parent_package_group_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen_PackageGroup",
+        "parent_package_grounp_name": "Pathogen affecting public health"
+      }
+    },
+    "AttributeList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/AttributeInfo"
+      }
+    },
+    "AttributeInfo": {
+      "type": "object",
+      "properties": {
+        "attribute_name": {
+          "type": "string"
+        },
+        "require_type": {
+          "type": "string",
+          "description": "\"has_mandatory_attribute\", \"has_either_one_mandatory_attribute\",  \"has_optional_attribute\" or \"has_attribute\""
+        },
+        "attribute_no": {
+          "type": "string"
+        },
+        "group_name": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "attribute_name": "strain",
+        "require_type": "has_either_one_mandatory_attribute",
+        "attribute_no": "migs.ba.air_attribute018",
+        "group_name": "Organism group attribute in MIMARKS.specimen.human-gut"
+      }
+    },
+    "PackageAndGroupList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/PackageGroupInfo"
+      }
+    },
+    "PackageGroupInfo": {
+      "type": "object",
+      "properties": {
+        "package_group_uri": {
+          "type": "string"
+        },
+        "package_group_id": {
+          "type": "string"
+        },
+        "package_group_name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "description": "\"package_group\" or \"package\""
+        },
+        "package_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PackageInfo"
+          }
+        }
+      },
+      "example": {
+        "package_group_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen_PackageGroup",
+        "package_group_id": "Pathogen",
+        "package_group_name": "Pathogen affecting public health",
+        "description": "Use for pathogen samples that are relevant to public health. Required attributes include those considered useful for the rapid analysis and trace back of pathogens.",
+        "type": "package_group",
+        "package_list": [
+          {
+            "package_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen.cl_Package",
+            "package_id": "Pathogen.cl",
+            "version": "1.0",
+            "package_name": "Pathogen: clinical or host-associated; version 1.0",
+            "env_package": "",
+            "description": "",
+            "parent_package_group_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen_PackageGroup",
+            "parent_package_grounp_name": "Pathogen affecting public health",
+            "type": "package"
+          },
+          {
+            "package_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen.env_Package",
+            "package_id": "Pathogen.env",
+            "version": "1.0",
+            "package_name": "Pathogen: environmental/food/other; version 1.0",
+            "env_package": "",
+            "description": "",
+            "parent_package_group_uri": "http://ddbj.nig.ac.jp/ontologies/biosample/Pathogen_PackageGroup",
+            "parent_package_grounp_name": "Pathogen affecting public health",
+            "type\"": "package"
+          }
+        ]
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "example": {
+        "status": "error",
+        "message": "Wrong parameter: invalid package version."
+      }
+    }
+  }
+}

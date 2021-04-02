@@ -27,12 +27,12 @@
     <Attributes>
         <Attribute attribute_name="sample_name">MTB313</Attribute>
         <Attribute attribute_name="strain">MTB313</Attribute>
-        <Attribute attribute_name="env_biome">urban biome</Attribute>
+        <Attribute attribute_name="env_broad_scale">urban biome</Attribute>
         <Attribute attribute_name="collection_date">2011</Attribute>
-        <Attribute attribute_name="env_feature">town</Attribute>
+        <Attribute attribute_name="env_local_scale">town</Attribute>
         <Attribute attribute_name="geo_loc_name">Japan: Hikone-shi</Attribute>
         <Attribute attribute_name="lat_lon">136.225389 35.262246</Attribute>
-        <Attribute attribute_name="env_material">interstitial fluid</Attribute>
+        <Attribute attribute_name="env_medium">interstitial fluid</Attribute>
         <Attribute attribute_name="project_name">Streptococcus pyogenes MTB313 genome sequencing</Attribute>
         <Attribute attribute_name="isol_growth_condt">24464696</Attribute>
         <Attribute attribute_name="num_replicons">1</Attribute>

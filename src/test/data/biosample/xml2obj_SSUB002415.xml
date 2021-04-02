@@ -35,13 +35,13 @@
       <Attribute attribute_name="cultivar">N. A.</Attribute>
       <Attribute attribute_name="isolate">N. A.</Attribute>
       <Attribute attribute_name="label">N. A.</Attribute>
-      <Attribute attribute_name="env_biome">N. A.</Attribute>
+      <Attribute attribute_name="env_broad_scale">N. A.</Attribute>
       <Attribute attribute_name="collection_date">N. A.</Attribute>
       <Attribute attribute_name="geo_loc_name">N. A.</Attribute>
       <Attribute attribute_name="host">N. A.</Attribute>
       <Attribute attribute_name="subspecf_gen_lin">N. A.</Attribute>
       <Attribute attribute_name="age">Unknown</Attribute>
-      <Attribute attribute_name="host_body_site">Blood</Attribute>
+      <Attribute attribute_name="host_tissue_sampled">Blood</Attribute>
       <Attribute attribute_name="genotype">N. A.</Attribute>
       <Attribute attribute_name="phenotype">N. A.</Attribute>
       <Attribute attribute_name="sex">Female</Attribute>
@@ -63,7 +63,7 @@
       <Attribute attribute_name="health_state">Good</Attribute>
       <Attribute attribute_name="sample_type">N. A.</Attribute>
       <Attribute attribute_name="teleomorph">N. A.</Attribute>
-      <Attribute attribute_name="tissue_type">N. A.</Attribute>
+      <Attribute attribute_name="tissue">N. A.</Attribute>
       <Attribute attribute_name="pathovar">N. A.</Attribute>
     </Attributes>
   </BioSample>
@@ -102,13 +102,13 @@
       <Attribute attribute_name="cultivar">N. A.</Attribute>
       <Attribute attribute_name="isolate">N. A.</Attribute>
       <Attribute attribute_name="label">N. A.</Attribute>
-      <Attribute attribute_name="env_biome">N. A.</Attribute>
+      <Attribute attribute_name="env_broad_scale">N. A.</Attribute>
       <Attribute attribute_name="collection_date">N. A.</Attribute>
       <Attribute attribute_name="geo_loc_name">N. A.</Attribute>
       <Attribute attribute_name="host">N. A.</Attribute>
       <Attribute attribute_name="subspecf_gen_lin">N. A.</Attribute>
       <Attribute attribute_name="age">N. A.</Attribute>
-      <Attribute attribute_name="host_body_site">Lung</Attribute>
+      <Attribute attribute_name="host_tissue_sampled">Lung</Attribute>
       <Attribute attribute_name="genotype">N. A.</Attribute>
       <Attribute attribute_name="phenotype">N. A.</Attribute>
       <Attribute attribute_name="sex">Female</Attribute>
@@ -130,7 +130,7 @@
       <Attribute attribute_name="health_state">Good</Attribute>
       <Attribute attribute_name="sample_type">N. A.</Attribute>
       <Attribute attribute_name="teleomorph">N. A.</Attribute>
-      <Attribute attribute_name="tissue_type">N. A.</Attribute>
+      <Attribute attribute_name="tissue">N. A.</Attribute>
       <Attribute attribute_name="pathovar">N. A.</Attribute>
       <Attribute attribute_name="bioproject_id">PRJDB2884</Attribute>
     </Attributes>

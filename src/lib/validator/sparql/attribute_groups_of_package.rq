@@ -1,22 +1,21 @@
 PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
-SELECT
-  ?group_name ?attribute_name
+SELECT ?group_name ?attribute_name
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
+  VALUES ?package_id { "<%= package_name %>" }
   ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ;
-    rdfs:label "<%= package_name %> package"@en .
-  ?source owl:domain ?package .
-
-  ?axiom owl:annotatedSource ?source .
-  ?axiom a owl:Axiom .
-  ?axiom owl:annotatedTarget ?group_attribute .
-
-  ?source rdfs:label ?group_name .
-  ?source rdfs:range ?range .
+    dc:identifier ?package_id ;
+    rdfs:label ?label .
+  ?restriction owl:domain ?package ;
+    rdfs:label ?group_name ;
+    rdfs:range ?range .
   ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
-  ?attribute rdfs:subClassOf dbs:Attribute .
-  ?attribute dc:identifier ?attribute_name .
-} GROUP BY  ?group_name
+  ?axiom owl:annotatedTarget ?restriction ;
+     owl:annotatedSource ?source ;
+     rdfs:isDefinedBy dbs:Attribute_Group .
+  ?attribute dc:identifier ?attribute_name ;
+   rdfs:subClassOf dbs:Attribute .
+} ORDER BY ?group_name

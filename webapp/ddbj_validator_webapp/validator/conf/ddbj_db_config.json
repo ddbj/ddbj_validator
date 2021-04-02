@@ -1,6 +1,0 @@
-{
-  "pg_host": "xsm.ddbj.nig.ac.jp",
-  "pg_port": "5432",
-  "pg_user": "const",
-  "pg_pass": "const"
-}

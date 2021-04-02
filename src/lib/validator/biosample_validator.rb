@@ -98,7 +98,7 @@ class BioSampleValidator < ValidatorBase
     return unless valid_xml
 
     # xml検証が通った場合のみ実行
-    @biosample_list = @xml_convertor.xml2obj(xml_document)
+    @biosample_list = @xml_convertor.xml2obj(xml_document, 'biosample')
 
     if submitter_id.nil?
       @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
@@ -151,7 +151,8 @@ class BioSampleValidator < ValidatorBase
       sample_name = biosample_data["attributes"]["sample_name"]
       non_ascii_header_line("BS_R0030", sample_name, biosample_data["attribute_list"], line_num)
       missing_attribute_name("BS_R0034", sample_name, biosample_data["attribute_list"], line_num)
-      multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], line_num)
+      package_attr_list = get_attributes_of_package(biosample_data["package"])
+      multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], package_attr_list, line_num)
     end
 
     ### 複数のサンプル間の関係(一意性など)の検証
@@ -231,16 +232,7 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
-      invalid_culture_collection_format("BS_R0113", sample_name, biosample_data["attributes"]["culture_collection"], line_num)
-      ret = invalid_culture_collection("BS_R0114", sample_name, biosample_data["attributes"]["culture_collection"], @institution_list, line_num)
-      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["culture_collection"] = CommonUtils::get_auto_annotation(@error_list.last)
-      end
-      invalid_specimen_voucher_format("BS_R0116", sample_name, biosample_data["attributes"]["specimen_voucher"], line_num)
-      ret = invalid_specimen_voucher("BS_R0117", sample_name, biosample_data["attributes"]["specimen_voucher"], @institution_list, line_num)
-      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["specimen_voucher"] = CommonUtils::get_auto_annotation(@error_list.last)
-      end
+
       invalid_bio_material_format("BS_R0118", sample_name, biosample_data["attributes"]["bio_material"], line_num)
       ret = invalid_bio_material("BS_R0119", sample_name, biosample_data["attributes"]["bio_material"], @institution_list, line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
@@ -255,21 +247,52 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
-      invalid_host_organism_name("BS_R0015", sample_name,  biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
+      invalid_host_organism_name("BS_R0015", sample_name, biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
       future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
       invalid_sample_name_format("BS_R0101", sample_name, line_num)
 
+      ### 値が複数記述される可能性がある項目の検証
+      biosample_data["attribute_list"].each do |attr|
+        unless attr["metagenome_source"].nil?
+          invalid_metagenome_source("BS_R0106", sample_name, attr["metagenome_source"], attr["attr_no"], line_num)
+        end
+        unless attr["component_organism"].nil?
+          taxonomy_warning("BS_R0105", sample_name, attr["component_organism"], attr["attr_no"], line_num)
+        end
+        unless attr["culture_collection"].nil?
+          invalid_culture_collection_format("BS_R0113", sample_name, attr["culture_collection"], line_num)
+          ret = invalid_culture_collection("BS_R0114", sample_name, attr["culture_collection"], @institution_list, attr["attr_no"], line_num)
+          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+            attr["culture_collection"] = CommonUtils::get_auto_annotation(@error_list.last)
+          end
+        end
+        unless attr["specimen_voucher"].nil?
+          invalid_specimen_voucher_format("BS_R0116", sample_name, attr["specimen_voucher"], line_num)
+          ret = invalid_specimen_voucher("BS_R0117", sample_name, attr["specimen_voucher"], @institution_list, attr["attr_no"], line_num)
+          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+            attr["specimen_voucher"] = CommonUtils::get_auto_annotation(@error_list.last)
+          end
+        end
+      end
+
       ### 複数属性の組合せの検証
       latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
-      multiple_vouchers("BS_R0062", sample_name, biosample_data["attributes"]["specimen_voucher"], biosample_data["attributes"]["culture_collection"], biosample_data["attributes"]["bio_material"], line_num)
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
+
+      ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
+      multiple_vouchers("BS_R0062", sample_name, biosample_data["attribute_list"], line_num) # 引数が可変なので属性リストを渡す
 
       ### taxonomy_idの値を使う検証
       if taxonomy_id != OrganismValidator::TAX_INVALID #無効なtax_idでなければ実行
         package_versus_organism("BS_R0048", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
         sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
         taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
-        specimen_voucher_for_bacteria_and_unclassified_sequences("BS_R0115", sample_name, biosample_data["attributes"]["specimen_voucher"], taxonomy_id, line_num)
+        ### 値が複数記述される可能性がある項目
+        biosample_data["attribute_list"].each do |attr|
+          unless attr["specimen_voucher"].nil?
+            specimen_voucher_for_bacteria_and_unclassified_sequences("BS_R0115", sample_name, attr["specimen_voucher"], taxonomy_id, line_num)
+          end
+        end
       end
       invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
 
@@ -282,8 +305,9 @@ class BioSampleValidator < ValidatorBase
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"])
       missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
-      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list , line_num)
-
+      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
+      attr_group = get_attribute_groups_of_package(biosample_data["package"])
+      missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
     end
   end
 
@@ -317,10 +341,16 @@ class BioSampleValidator < ValidatorBase
         attr_require = "other"
         if row[:require] == "has_mandatory_attribute"
           attr_require = "mandatory"
-        elsif row[:require] == "has_optional_attribute"
+        else # has_either_one_mandatory_attribute, has_optional_attribute, has_attribute
           attr_require = "optional"
         end
-        attr = {attribute_name: row[:attribute], require: attr_require}
+        type = row[:require].sub("has_","")  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
+        if row[:max_cardinality] == "1" || row[:max_cardinality] == 1
+          allow_multiple = false
+        else
+          allow_multiple = true
+        end
+        attr = {attribute_name: row[:attribute], type: type, require: attr_require, allow_multiple: allow_multiple}
         attr_list.push(attr)
       end
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
@@ -329,6 +359,52 @@ class BioSampleValidator < ValidatorBase
       puts "use cache in get_attributes_of_package" if $DEBUG
       attr_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
       attr_list
+    end
+  end
+
+  #
+  # 指定されたpackageの属性グループのリストを取得して返す
+  # 属性グループがないpackageの場合には空のリストを返す
+  #
+  # ==== Args
+  # package name ex."Plant"
+  #
+  # ==== Return
+  # array of hash of each attr group.
+  # [
+  #   {
+  #     :group_name => "Age/stage group attribute in Plant",
+  #     :attribute_set => ["age", "dev_stage"]
+  #   }
+  #   {
+  #     :group_name => "Organism group attribute in Plant",
+  #     :attribute_set => ["ecotype", "cultivar", "isolate"]
+  #   }
+  # ]
+  def get_attribute_groups_of_package (package_name)
+
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
+      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
+      params = {package_name: package_name}
+      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
+      params[:version] = @conf[:version]["biosample_graph"]
+      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
+      result = sparql.query(sparql_query)
+      attr_group_list = []
+      result.group_by {|row| row[:group_name] }.each do |group, item|
+        attribute_set = []
+        item.each do |row|
+          attribute_set.push(row[:attribute_name])
+        end
+        attr_group_list.push({group_name: group, attribute_set: attribute_set})
+      end
+      @cache.save(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name, attr_group_list) unless @cache.nil?
+      attr_group_list
+    else
+      puts "use cache in get_attribute_groups_of_package" if $DEBUG
+      attr_group_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name)
+      attr_group_list
     end
   end
 
@@ -405,10 +481,11 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # attribute_list : ユーザ入力の属性リスト ex.[{"sample_name" => "xxxx"}, {"sample_tilte" => "xxxx"}, ...]
+  # multiple_attribute_values : サンプルのパッケージに対する属性情報
   # ==== Return
   # true/false
   #
-  def multiple_attribute_values (rule_code, sample_name, attribute_list, line_num)
+  def multiple_attribute_values (rule_code, sample_name, attribute_list, multiple_attribute_values, line_num)
     return if attribute_list.nil?
     result = true
 
@@ -417,8 +494,9 @@ class BioSampleValidator < ValidatorBase
     grouped = attribute_list.group_by do |attr|
       attr.keys.first
     end
+    allow_multiple_attr_list = multiple_attribute_values.select{|attr| attr[:allow_multiple] == true }.map {|attr| attr[:attribute_name]} # 複数記述を許可する属性名リスト
     grouped.each do |attr_name, attr_values|
-      if attr_values.size >= 2 #重複属性がある
+      if attr_values.size >= 2 && !(allow_multiple_attr_list.include?(attr_name)) #複数記述され、かつ複数許可許されていない属性
         all_attr_value = [] #属性値を列挙するためのリスト ex. ["1m", "2m"]
         attr_values.each{|attr|
           attr.each{|k,v| all_attr_value.push(v) }
@@ -626,6 +704,44 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
       false
     end
+  end
+
+  #
+  # rule:36
+  # 複数のうち最低1つは必須な属性グループの記載がないものを検証
+  #
+  # ==== Args
+  # rule_code
+  # sample_attr ユーザ入力の属性リスト
+  # package_attr_group_list パッケージに対するグループ属性リスト
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_group_of_at_least_one_required_attributes(rule_code, sample_name, sample_attr, package_attr_group_list, line_num)
+    return nil if sample_attr.nil? || package_attr_group_list.nil?
+    ret = true
+    package_attr_group_list.each do |attr_group|
+      attr_set = attr_group[:attribute_set]
+      exist_attr_list = []
+      attr_set.each do |mandatory_attr_name|
+        sample_attr.each do |attr_name, attr_value|
+          if mandatory_attr_name == attr_name && !(attr_value.nil? || attr_value.strip == "")
+            exist_attr_list.push(attr_name)
+          end
+        end
+      end
+      if exist_attr_list.size == 0 #記述属性が一つもない
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute names", value: attr_set.join(", ")}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        ret = false
+      end
+    end
+    ret
   end
 
   #
@@ -1100,7 +1216,7 @@ class BioSampleValidator < ValidatorBase
   # rule:4
   # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
   # Taxonomy ontologyのScientific nameとの比較を行う
-  # 一致しなかった場合にはtaxonomy_idを元にorganismの自動補正情報をエラーリストに出力する
+  # 一致しなかった場合にはtaxonomy_idを元にorganism_nameの推奨情報をエラーリストに出力する
   #
   # ==== Args
   # rule_code
@@ -1130,7 +1246,7 @@ class BioSampleValidator < ValidatorBase
         {key: "organism", value: organism_name},
         {key: "taxonomy_id", value: taxonomy_id}
       ]
-      unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameで自動補正する
+      unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameを提案する(自動補正はしない)
         annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
@@ -1321,33 +1437,48 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # rule_code
-  # specimen_voucher ex."UAM:Mamm:52179"
-  # culture_collection ex."ATCC:26370"
-  # bio_material ex."ATCC:26370"
+  # attr_list 属性のリスト(複数記述可能項目を含むためhashではない)
   # line_num
   # ==== Return
   # true/false
   #
-  def multiple_vouchers (rule_code, sample_name, specimen_voucher, culture_collection, bio_material, line_num)
-    return nil if CommonUtils::null_value?(specimen_voucher) && CommonUtils::null_value?(culture_collection) && CommonUtils::null_value?(bio_material)
+  def multiple_vouchers (rule_code, sample_name, attr_list, line_num)
+    vouchers_list = []
+    attr_list.each do |attr|
+      unless attr["culture_collection"].nil?
+        vouchers_list.push({attr_name: "culture_collection", attr_no: attr["attr_no"], value: attr["culture_collection"], institution_code: attr["culture_collection"].split(":").first.strip}) unless CommonUtils::null_value?(attr["culture_collection"])
+      end
+      unless attr["specimen_voucher"].nil?
+        vouchers_list.push({attr_name: "specimen_voucher", attr_no: attr["attr_no"], value: attr["specimen_voucher"], institution_code: attr["specimen_voucher"].split(":").first.strip}) unless CommonUtils::null_value?(attr["specimen_voucher"])
+      end
+      unless attr["bio_material"].nil?
+        vouchers_list.push({attr_name: "bio_material", attr_no: attr["attr_no"], value: attr["bio_material"], institution_code: attr["bio_material"].split(":").first.strip}) unless CommonUtils::null_value?(attr["bio_material"])
+      end
+    end
 
-    values = {}
-    values[:specimen_voucher] = specimen_voucher unless CommonUtils::null_value?(specimen_voucher)
-    values[:culture_collection] = culture_collection unless CommonUtils::null_value?(culture_collection)
-    values[:bio_material] = bio_material unless CommonUtils::null_value?(bio_material)
-    if values.keys.size <= 1  #1属性だけ入力されていた場合はOK
+    if vouchers_list.size == 0 # 当該属性の記述がない
+      return nil
+    elsif vouchers_list.size == 1 # 当該属性の記述が1つだけ
       return true
     else
-      institution_list = values.map do |k, v|
-        v.split(":").first.strip
+      # 重複しているinstitusion_codeをリストアップ
+      multiple_list = []
+      vouchers_list.group_by {|attr| attr[:institution_code]}.each do|inst_code, inst_list|
+        if inst_list.size > 1 # 2つ以上同じinstitution_codeが書かれている
+          multiple_list.concat(inst_list)
+        end
       end
-      if institution_list.size == institution_list.uniq.size #同じinstitution_codeが含まれていないか
+      if multiple_list.size == 0 #同じinstitution_codeが含まれていない
         return true
       else
+        values = multiple_list.map {|voucher|
+          "[#{voucher[:attr_name]} : #{voucher[:value]}]"
+        }.join(", ")
         annotation = [
           {key: "Sample name", value: sample_name},
+          {key: "Attributes", value: multiple_list.map{|voucher|voucher[:attr_name]}.uniq.join(", ")},
+          {key: "Values", value: values},
         ]
-        annotation.concat(values.map {|k, v|  {key: k, value: v}})
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
         return false
@@ -1450,7 +1581,7 @@ class BioSampleValidator < ValidatorBase
 
     unless package_attr_list.nil?
       mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-        attr[:attribute_name] if attr[:require] == "mandatory"
+        attr[:attribute_name] if attr[:require] == "mandatory" || attr[:type].downcase.include?("either_one_mandatory")
       }.compact
       unless mandatory_attr_list.include?(attr_name) # optionalの場合にはBS_R0100で空白置換されるためこのルールではスルー
         return true
@@ -2263,7 +2394,7 @@ class BioSampleValidator < ValidatorBase
     return nil if sample_attr.nil? || package_attr_list.nil?
     result = true
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-      attr[:attribute_name] if attr[:require] == "mandatory"
+      attr[:attribute_name] if attr[:require] == "mandatory" || attr[:type].downcase.include?("either_one_mandatory")
     }.compact
     optional_attr_list = sample_attr.keys - mandatory_attr_list #差分から必須ではない属性名だけを抽出
     #一つずつoptionalな属性の値を検証
@@ -2357,6 +2488,123 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
+  # rule:105
+  # 指定されたcomponent_organismの値が、Taxonomy ontologyにScientific nameとして存在するかの検証
+  #
+  # ==== Args
+  # sample name ex."my sample"
+  # component_organism ex."Homo sapiens"
+  # ==== Return
+  # true/false
+  def taxonomy_warning (rule_code, sample_name, component_organism, attr_idx, line_num)
+    return nil if CommonUtils::null_value?(component_organism)
+    ret = true
+
+    annotation = [
+      {key: "Sample name", value: sample_name},
+      {key: "component_organism", value: component_organism}
+    ]
+
+    #あればキャッシュを使用
+    if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism).nil?
+      org_ret = @org_validator.suggest_taxid_from_name(component_organism)
+    else
+      puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
+      org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism)
+    end
+
+    if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+      scientific_name = org_ret[:scientific_name]
+      #ユーザ入力のcomponent_organismがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+      if scientific_name != component_organism
+        location = @xml_convertor.xpath_from_attrname_with_index("component_organism", line_num, attr_idx)
+        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "component_organism", location, true));
+        ret = false
+      end
+    elsif org_ret[:status] == "no exist" #該当するtaxonomy_idが無かった場合は単なるエラー
+      ret = false
+    elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、警告のみ
+      msg = "Multiple taxonomies detected with the same component organism name."
+      annotation.push({key: "Message", value: msg + " taxids:[#{org_ret[:tax_id]}]"})
+      ret = false
+    end
+
+    unless ret
+      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      else #auto-annotation無
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      end
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:106
+  # metagenome_sourceの値が"xxx metagenome"としてTaxonomy ontologyに存在するかの検証
+  #
+  # ==== Args
+  # sample name ex."my sample"
+  # metagenome_source ex. "soil metagenome"
+  # attr_idx 属性が記述されている配列要素番号。複数記述される可能性がある属性のために修正位置を提示するために必要
+  # ==== Return
+  # true/false
+  def invalid_metagenome_source (rule_code, sample_name, metagenome_source, attr_idx, line_num)
+    return nil if CommonUtils::null_value?(metagenome_source)
+    ret = true
+
+    metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
+    #あればキャッシュを使用
+    cache_key_metage_source = ValidatorCache::create_key(metagenome_source, metagenome_linages)
+    if @cache.nil? || @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source).nil?
+      org_ret = @org_validator.suggest_taxid_from_name(metagenome_source) # metagenome_sourceからtax_idを検索
+      if org_ret[:status] == "exist" # tax_idが1件
+        linage_ret = @org_validator.has_linage(org_ret[:tax_id], metagenome_linages)
+        ret = false if linage_ret == false
+        has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: linage_ret}
+        unless org_ret[:scientific_name] == metagenome_source
+          has_linage_metagenome[:annotation_name] = org_ret[:scientific_name]
+        end
+      elsif org_ret[:status] == "multiple exist" # tax_idが複数件ヒット. どれかがmetagenomeならOK
+        has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: false}
+        org_ret[:tax_id].each do |tax_id|
+          linage_ret = @org_validator.has_linage(tax_id.chomp.strip, metagenome_linages)
+          has_linage_metagenome[:lineage] = true if linage_ret == true
+        end
+      else # not exist
+        has_linage_metagenome = {tax_id: nil , lineage: nil}
+      end
+      @cache.save(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source, has_linage_metagenome) unless @cache.nil?
+    else
+      has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source)
+    end
+    if has_linage_metagenome[:tax_id].nil?
+      message = "This metagenome_source name is not in the taxonomy database."
+      ret = false
+    elsif has_linage_metagenome[:lineage] == false
+      ret = false
+    elsif !has_linage_metagenome[:annotation_name].nil?
+      ret = false
+    end
+
+    if ret == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "metagenome_source", value: metagenome_source}
+      ]
+      annotation.push({key: "message", value: message}) unless message.nil?
+      if !has_linage_metagenome[:annotation_name].nil?
+        attr_no = " (Attribute no: #{attr_idx})"
+        annotation.push({key: "Suggested value" + attr_no, value: has_linage_metagenome[:annotation_name]})
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
   # rule:113
   # culture_collection の記述フォーマットが妥当であるかの検証
   # <institution-code>:[<collection-code>:]<culture_id>
@@ -2393,15 +2641,16 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # culture_collection ex. "JCM:18900"
   # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # attr_idx 属性が記述されている配列要素番号。複数記述される可能性がある属性のために修正位置を提示するために必要
   # line_num
   # ==== Return
   # true/false
   #
-  def invalid_culture_collection (rule_code, sample_name, culture_collection, institution_list, line_num)
+  def invalid_culture_collection (rule_code, sample_name, culture_collection, institution_list, attr_idx, line_num)
     return nil if CommonUtils::null_value?(culture_collection) || institution_list.nil?
     return nil if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
 
-    invalid_institude_name(rule_code, sample_name, "culture_collection", culture_collection, institution_list, line_num)
+    invalid_institude_name(rule_code, sample_name, "culture_collection", culture_collection, institution_list, attr_idx, line_num)
   end
 
   #
@@ -2470,15 +2719,16 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # specimen_voucher ex. "UAM:ES:48279"
   # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # attr_idx 属性が記述されている配列要素番号。複数記述される可能性がある属性のために修正位置を提示するために必要
   # line_num
   # ==== Return
   # true/false
   #
-  def invalid_specimen_voucher (rule_code, sample_name, specimen_voucher, institution_list, line_num)
+  def invalid_specimen_voucher (rule_code, sample_name, specimen_voucher, institution_list, attr_idx, line_num)
     return nil if CommonUtils::null_value?(specimen_voucher) || institution_list.nil?
     return nil if specimen_voucher.split(":").size > 3
 
-    invalid_institude_name(rule_code, sample_name, "specimen_voucher", specimen_voucher, institution_list, line_num)
+    invalid_institude_name(rule_code, sample_name, "specimen_voucher", specimen_voucher, institution_list, attr_idx, line_num)
   end
 
   #
@@ -2526,7 +2776,7 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(bio_material) || institution_list.nil?
     return nil if bio_material.split(":").size > 3
 
-    invalid_institude_name(rule_code, sample_name, "bio_material", bio_material, institution_list, line_num)
+    invalid_institude_name(rule_code, sample_name, "bio_material", bio_material, institution_list, nil, line_num)
   end
 
   #
@@ -2538,11 +2788,12 @@ class BioSampleValidator < ValidatorBase
   # attr_name colture_collection|specimen_voucher|bio_material
   # attr_value ex. "JCM:18900"
   # institution_list institutionの名称リスト(coll_dump.txt由来)
+  # attr_idx 属性が記述されている配列要素番号。複数記述される可能性がある属性のために修正位置を提示するために必要. nilの場合はautocorrectで要素番号を指定しない
   # line_num
   # ==== Return
   # true/false
   #
-  def invalid_institude_name (rule_code, sample_name, attr_name, attr_value, institution_list, line_num)
+  def invalid_institude_name (rule_code, sample_name, attr_name, attr_value, institution_list, attr_idx, line_num)
     return nil unless attr_name == "culture_collection" || attr_name == "specimen_voucher" || attr_name == "bio_material"
 
     if attr_name == "culture_collection"
@@ -2577,7 +2828,11 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute value", value: attr_value}
       ]
       if replaced_value != attr_value && valid_institution_name == true
-        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+        if attr_idx.nil?
+          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+        else
+          location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_idx)
+        end
         annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true))
       end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
