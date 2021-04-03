@@ -32,6 +32,7 @@ class ValidatorBase
       else
         config[:ddbj_db_config] = setting["ddbj_rdb"]
       end
+      config[:named_graph_uri] = setting["named_graph_uri"]
       config[:google_api_key] = setting["google_api_key"]
       config[:eutils_api_key] = setting["eutils_api_key"]
       config[:log_dir] = setting["api_log"]["path"]

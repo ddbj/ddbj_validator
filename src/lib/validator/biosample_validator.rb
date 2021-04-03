@@ -33,7 +33,7 @@ class BioSampleValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @institution_list = CommonUtils.new.parse_coll_dump(@conf[:institution_list_file])
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])

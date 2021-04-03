@@ -9,6 +9,8 @@ require File.dirname(__FILE__) + "/common_utils.rb"
 #
 class OrganismValidator < SPARQLBase
 
+  TAX_GRAPH_URI = "http://ddbj.nig.ac.jp/ontologies/taxonomy"
+
   TAX_INVALID = "-1" #invalid id
   TAX_ROOT = "1" #root
   TAX_BACTERIA = "2" #bacteria
@@ -32,9 +34,13 @@ class OrganismValidator < SPARQLBase
   # ==== Args
   # endpoint: endpoint url
   #
-  def initialize (endpoint)
+  def initialize (endpoint, tax_graph_uri=nil)
     super(endpoint)
     @template_dir = File.absolute_path(File.dirname(__FILE__) + "/../sparql")
+    @tax_graph_uri = tax_graph_uri
+    if @tax_graph_uri.nil?
+      @tax_graph_uri = TAX_GRAPH_URI
+    end
   end
 
   #
@@ -46,7 +52,7 @@ class OrganismValidator < SPARQLBase
   # true/false
   #
   def exist_organism_name? (organism_name)
-    params = {organism_name: organism_name}
+    params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_taxid_from_name.rq", params)
     result = query(sparql_query)
     if result.size <= 0
@@ -66,7 +72,7 @@ class OrganismValidator < SPARQLBase
   # if the parameter value isn't exist as synonym, returns the empty array.
   #
   def organism_name_of_synonym (synonym)
-    params = {synonym: synonym}
+    params = {synonym: synonym, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/organism_name_of_synonym.rq", params)
     result = query(sparql_query)
     result.map do |row|
@@ -84,7 +90,7 @@ class OrganismValidator < SPARQLBase
   # if the parameter value isn't exist as organism(scientific) name, returns the empty array.
   #
   def get_taxid_from_name (organism_name)
-    params = {organism_name: organism_name}
+    params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_taxid_from_name.rq", params)
     result = query(sparql_query)
     result.map do |row|
@@ -102,7 +108,7 @@ class OrganismValidator < SPARQLBase
   # if the tax_id hasn't scientific name, returns nil
   #
   def get_organism_name(tax_id)
-    params = {tax_id: tax_id}
+    params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_organism_name.rq", params)
     result = query(sparql_query)
     if result.size <= 0
@@ -131,7 +137,7 @@ class OrganismValidator < SPARQLBase
     organism_name = organism_name.gsub("\t", '\\t').gsub("\n", '\\n').gsub("\r", '\\r').gsub("\b", '\\b').gsub("\f", '\\f')
     organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub("\"", "")
     organism_name = organism_name.gsub("'", "\\\\'").gsub("\"", "\\\\\\\\\\\"")
-    params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search }
+    params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/search_taxid_from_fuzzy_name.rq", params)
     result = query(sparql_query)
   end
@@ -185,7 +191,7 @@ class OrganismValidator < SPARQLBase
     parent_tax_id = linages.map {|linage|
       "id-tax:" + linage
     }.join(" ")
-    params = {tax_id: tax_id, parent_tax_id: parent_tax_id}
+    params = {tax_id: tax_id, parent_tax_id: parent_tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_linage.rq", params)
     result = query(sparql_query)
     return result.size > 0
@@ -201,7 +207,7 @@ class OrganismValidator < SPARQLBase
   # returns true if tax_id has plastid flag(has geneticCodePt 4 or 11)
   #
   def has_plastids(tax_id)
-    params = {tax_id: tax_id}
+    params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_plastid.rq", params)
     result = query(sparql_query)
     return result.size > 0
@@ -217,7 +223,7 @@ class OrganismValidator < SPARQLBase
   #
   def is_infraspecific_rank (tax_id)
     infraspecific_rank = ["Species", "Subspecies", "Varietas", "Forma"]
-    params = {tax_id: tax_id}
+    params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
     #いずれかのランク以下であるかを検証
     result = []
     infraspecific_rank.each do |rank|

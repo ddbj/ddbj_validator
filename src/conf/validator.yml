@@ -8,6 +8,9 @@ ddbj_rdb:
 sparql_endpoint:
   master_endpoint: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER") { "http://virtuoso:8890/sparql" } %>
 
+named_graph_uri:
+  taxonomy: <%= ENV.fetch("DDBJ_VALIDATOR_APP_NAMED_GRAPHE_URI_TAXONOMY") { "http://ddbj.nig.ac.jp/ontologies/taxonomy" } %>
+
 google_api_key:
   key: <%= ENV.fetch("DDBJ_VALIDATOR_APP_GOOGLE_API_KEY") { "your_api_key" } %>
 
