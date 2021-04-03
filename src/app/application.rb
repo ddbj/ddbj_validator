@@ -434,13 +434,20 @@ module DDBJValidator
         file_combination
       end
 
-      #file保存を保存し、ファイルパスを返す
+      #fileを保存し、ファイルパスを返す
       def save_file (output_dir, validator_type, params)
         save_dir = "#{output_dir}/#{validator_type}"
         FileUtils.mkdir_p(save_dir)
-        save_path = save_dir + "/" + params[validator_type.to_sym][:filename]
-        File.open(save_path, 'wb') do |f|
-          f.write params[validator_type.to_sym][:tempfile].read
+        if params[validator_type.to_sym].is_a?(String) #fileではなくデータで送られた場合
+          save_path = save_dir + "/#{validator_type}" #ファイル名はデータの種類名("biosample"等)
+          File.open(save_path, 'wb') do |f|
+            f.write params[validator_type.to_sym]
+          end
+        else
+          save_path = save_dir + "/" + params[validator_type.to_sym][:filename]
+          File.open(save_path, 'wb') do |f|
+            f.write params[validator_type.to_sym][:tempfile].read
+          end
         end
         save_path
       end
