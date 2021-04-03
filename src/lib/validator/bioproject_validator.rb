@@ -28,7 +28,7 @@ class BioProjectValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
