@@ -105,6 +105,9 @@ module DDBJValidator
           status 500
         else
           status_json = JSON.parse(File.open(status_file_path).read)
+          if params.keys.include?("grouped_messages")
+            result_json = Validator.new().grouped_message(result_json)
+          end
           status_json["result"] = result_json
           status_json.to_json
         end
