@@ -11,6 +11,9 @@ sparql_endpoint:
 named_graph_uri:
   taxonomy: <%= ENV.fetch("DDBJ_VALIDATOR_APP_NAMED_GRAPHE_URI_TAXONOMY") { "http://ddbj.nig.ac.jp/ontologies/taxonomy" } %>
 
+biosample:
+  package_version: <%= ENV.fetch("DDBJ_VALIDATOR_APP_BIOSAMPLE_PACKAGE_VERSION") { "1.4.0" } %>
+
 google_api_key:
   key: <%= ENV.fetch("DDBJ_VALIDATOR_APP_GOOGLE_API_KEY") { "your_api_key" } %>
 

@@ -1,0 +1,10 @@
+PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+
+SELECT (COUNT(?package) AS ?count)
+FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
+WHERE
+{
+  ?package rdfs:subClassOf dbs:DDBJ_Defined_Package .
+  ?package rdfs:label "<%= package_name %> package"@en .
+}

@@ -7,6 +7,7 @@ require 'net/http'
 require 'net/https'
 require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
+require File.expand_path('../../lib/validator/biosample_validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
 require File.expand_path('../../lib/package/package.rb', __FILE__)
@@ -15,8 +16,7 @@ module DDBJValidator
   class Application < Sinatra::Base
     setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/validator.yml")).result)
     @@data_dir = setting["api_log"]["path"]
-    version = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../conf/version.yml")).result)
-    @@biosample_graph_version = version["version"]["biosample_graph"]
+    @@biosample_package_version = BioSampleValidator::DEFAULT_PACKAGE_VERSION
 
     configure do
       set :public_folder  , File.expand_path('../../public', __FILE__)
@@ -296,7 +296,7 @@ module DDBJValidator
     get '/api/package_list' do
       version = params["version"]
       if params["version"].nil? || params["version"].strip == ""
-        version = @@biosample_graph_version
+        version = @@biosample_package_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_list(version)
       if ret[:status] == "success"
@@ -313,7 +313,7 @@ module DDBJValidator
     get '/api/package_and_group_list' do
       version = params["version"]
       if params["version"].nil? || params["version"].strip == ""
-        version = @@biosample_graph_version
+        version = @@biosample_package_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_and_group_list(version)
       if ret[:status] == "success"
@@ -336,7 +336,7 @@ module DDBJValidator
       end
       version = params["version"]
       if params["version"].nil? || params["version"].strip == ""
-        version = @@biosample_graph_version
+        version = @@biosample_package_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).attribute_list(version, params["package"])
       if ret[:status] == "success"
@@ -359,7 +359,7 @@ module DDBJValidator
       end
       version = params["version"]
       if params["version"].nil? || params["version"].strip == ""
-        version = @@biosample_graph_version
+        version = @@biosample_package_version
       end
       ret = Package.new(setting["sparql_endpoint"]["master_endpoint"]).package_info(version, params["package"])
       if ret[:status] == "success"

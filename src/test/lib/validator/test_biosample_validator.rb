@@ -17,6 +17,7 @@ class TestBioSampleValidator < Minitest::Test
     if setting["ddbj_rdb"].nil? || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == ""
       @ddbj_db_mode = false
     end
+    @package_version = setting["biosample"]["package_version"]
   end
 
 #### テスト用共通メソッド ####
@@ -109,12 +110,22 @@ class TestBioSampleValidator < Minitest::Test
 #### 属性取得メソッドのユニットテスト ####
 
   def test_get_attributes_of_package
-    attr_list = @validator.send("get_attributes_of_package", "MIGS.vi.soil")
+    attr_list = @validator.send("get_attributes_of_package", "MIGS.vi.soil", @package_version)
     assert_equal true, attr_list.size > 0
     assert_equal false, attr_list.first[:attribute_name].nil?
     assert_equal false, attr_list.first[:require].nil?
-    attr_list = @validator.send("get_attributes_of_package", "Invalid Package")
+    assert_equal false, attr_list.first[:type].nil?
+    # invalid package name
+    attr_list = @validator.send("get_attributes_of_package", "Invalid Package", @package_version)
     assert_equal 0, attr_list.size
+
+    # old package version
+    attr_list = @validator.send("get_attributes_of_package", "MIGS.vi.soil", "1.2.0")
+    assert_equal true, attr_list.size > 0
+    assert_equal false, attr_list.first[:attribute_name].nil?
+    assert_equal false, attr_list.first[:require].nil?
+    assert_equal false, attr_list.first[:type].nil?
+    assert_equal false, attr_list.first[:allow_multiple] #always false
   end
 
   def test_get_attribute_groups_of_package
@@ -127,7 +138,7 @@ class TestBioSampleValidator < Minitest::Test
       :group_name => "Organism group attribute in Plant",
       :attribute_set => ["cultivar", "ecotype", "isolate"]
     }
-    attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant")
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant", @package_version)
     assert_equal 2, attr_group_list.size
     attr_group_list.sort!{|a, b| a[:group_name] <=> b[:group_name] }
     attr_group_list[0][:attribute_set].sort!
@@ -136,7 +147,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal expect_value2, attr_group_list[1]
 
     # invalid package name
-    attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package")
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package", @package_version)
+    assert_equal 0, attr_group_list.size
+
+    # old package version(always blank array)
+    attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant", "1.2.0")
     assert_equal 0, attr_group_list.size
   end
 
@@ -202,19 +217,19 @@ class TestBioSampleValidator < Minitest::Test
 
   def test_multiple_attribute_values
     #ok case
-    package_attr_list = @validator.get_attributes_of_package("Generic")
+    package_attr_list = @validator.get_attributes_of_package("Generic", @package_version)
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"organism" => "c"}, {"host" => "d"}]
     ret = exec_validator("multiple_attribute_values", "BS_R0061", "SampleA", attribute_list, package_attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # in Plant package allows multiple attr "locus_tag_prefix", "specimen_voucher"
-    package_attr_list = @validator.get_attributes_of_package("Plant")
+    package_attr_list = @validator.get_attributes_of_package("Plant", @package_version)
     attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"locus_tag_prefix" => "LTP1"}, {"specimen_voucher" => "sv1"}, {"locus_tag_prefix" => "LTP2"}, {"specimen_voucher" => "sv2"}]
     ret = exec_validator("multiple_attribute_values", "BS_R0061", "SampleA", attribute_list, package_attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    package_attr_list = @validator.get_attributes_of_package("Plant")
+    package_attr_list = @validator.get_attributes_of_package("Plant", @package_version)
     attribute_list = [{"depth" => "1m"}, {"depth" => "2m"}, {"elev" => "-1m"}, {"elev" => "-2m"}]
     ret = exec_validator("multiple_attribute_values", "BS_R0061", "SampleA", attribute_list, package_attr_list, 1)
     assert_equal false, ret[:result]
@@ -238,15 +253,15 @@ class TestBioSampleValidator < Minitest::Test
 
   def test_unknown_package
     #ok case
-    ret = exec_validator("unknown_package", "BS_R0026", "SampleA", "MIGS.ba.microbial", 1)
+    ret = exec_validator("unknown_package", "BS_R0026", "SampleA", "MIGS.ba.microbial", @package_version, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("unknown_package", "BS_R0026", "SampleA", "Not_exist_package_name", 1)
+    ret = exec_validator("unknown_package", "BS_R0026", "SampleA", "Not_exist_package_name", @package_version, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    ret = exec_validator("unknown_package", "BS_R0026", "SampleA", nil, 1)
+    ret = exec_validator("unknown_package", "BS_R0026", "SampleA", nil, @package_version, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -341,7 +356,7 @@ class TestBioSampleValidator < Minitest::Test
     #ok case
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
@@ -349,14 +364,14 @@ class TestBioSampleValidator < Minitest::Test
     ## not exist required attr name
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error1.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## brank required attr
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -366,7 +381,7 @@ class TestBioSampleValidator < Minitest::Test
     #ok case
     xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
@@ -374,14 +389,14 @@ class TestBioSampleValidator < Minitest::Test
     ## not exist required attr name
     xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_error1.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## brank required attr
     xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_error2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"])
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -915,7 +930,7 @@ class TestBioSampleValidator < Minitest::Test
   def test_invalid_attribute_value_for_null
     null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_accepted.json"))
     null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
-    package_attr_list = @validator.get_attributes_of_package("MIMS.me.microbial")
+    package_attr_list = @validator.get_attributes_of_package("MIMS.me.microbial", @package_version)
     # ok case
     ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "10m", null_accepted, null_not_recommended, package_attr_list, 1)
     assert_equal true, ret[:result]
@@ -1506,14 +1521,14 @@ jkl\"  "
     #ok case
     xml_data = File.read("#{@test_file_dir}/100_null_values_provided_for_optional_attributes_SSUB000019_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("null_values_provided_for_optional_attributes", "BS_R0100", "SampleA", biosample_data[0]["attributes"], null_accepted, null_not_recommended, attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
     xml_data = File.read("#{@test_file_dir}/100_null_values_provided_for_optional_attributes_SSUB000019_ng.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
     ret = exec_validator("null_values_provided_for_optional_attributes", "BS_R0100", "SampleA", biosample_data[0]["attributes"], null_accepted, null_not_recommended, attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size

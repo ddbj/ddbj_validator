@@ -19,7 +19,7 @@ require File.dirname(__FILE__) + "/common/xml_convertor.rb"
 #
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
-
+  DEFAULT_PACKAGE_VERSION = "1.4.0"
   #
   # Initializer
   #
@@ -35,6 +35,11 @@ class BioSampleValidator < ValidatorBase
     @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @institution_list = CommonUtils.new.parse_coll_dump(@conf[:institution_list_file])
+    if @conf[:biosample].nil? || @conf[:biosample]["package_version"].nil?
+      @package_version = DEFAULT_PACKAGE_VERSION
+    else
+      @package_version =  @conf[:biosample]["package_version"]
+    end
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -137,7 +142,7 @@ class BioSampleValidator < ValidatorBase
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        package_attr_list = get_attributes_of_package(biosample_data["package"])
+        package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
         ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
@@ -151,7 +156,7 @@ class BioSampleValidator < ValidatorBase
       sample_name = biosample_data["attributes"]["sample_name"]
       non_ascii_header_line("BS_R0030", sample_name, biosample_data["attribute_list"], line_num)
       missing_attribute_name("BS_R0034", sample_name, biosample_data["attribute_list"], line_num)
-      package_attr_list = get_attributes_of_package(biosample_data["package"])
+      package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
       multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], package_attr_list, line_num)
     end
 
@@ -173,7 +178,7 @@ class BioSampleValidator < ValidatorBase
 
       ### パッケージの関する検証
       missing_package_information("BS_R0025", sample_name, biosample_data, line_num)
-      unknown_package("BS_R0026", sample_name, biosample_data["package"], line_num)
+      unknown_package("BS_R0026", sample_name, biosample_data["package"], @package_version, line_num)
 
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
@@ -303,10 +308,10 @@ class BioSampleValidator < ValidatorBase
       ### 属性名や必須項目に関する検証
       # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
       # パッケージから属性情報(必須項目やグループ)を取得
-      attr_list = get_attributes_of_package(biosample_data["package"])
+      attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
       missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
       null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
-      attr_group = get_attribute_groups_of_package(biosample_data["package"])
+      attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
       missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
     end
   end
@@ -316,25 +321,31 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # package name ex."MIGS.ba.soil"
+  # package_version ex. "1.2.0", "1.4.0"
   #
   # ==== Return
   # An array of the attributes.
   # [
   #   {
-  #     :attribute_name=>"collection_date",
-  #     :require=>"mandatory"
+  #     :attribute_name => "collection_date",
+  #     :type => "mandatory_attribute",
+  #     :require => "mandatory",
+  #     :allow_multiple => "false"
   #   },
   #   {...}, ...
   # ]
-  def get_attributes_of_package (package_name)
+  def get_attributes_of_package (package_name, package_version)
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
-      params = {package_name: package_name}
+      params = {package_name: package_name, version: package_version}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      params[:version] = @conf[:version]["biosample_graph"]
-      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
+      if Gem::Version.create(package_version) >= Gem::Version.create('1.4.0')
+        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
+      else
+        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package_1.2.rq", params)
+      end
       result = sparql.query(sparql_query)
       attr_list = []
       result.each do |row|
@@ -345,7 +356,9 @@ class BioSampleValidator < ValidatorBase
           attr_require = "optional"
         end
         type = row[:require].sub("has_","")  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
-        if row[:max_cardinality] == "1" || row[:max_cardinality] == 1
+        if Gem::Version.create(package_version) < Gem::Version.create('1.4.0') #package version 1.4未満では同一属性複数記述は許可されない
+          allow_multiple = false
+        elsif row[:max_cardinality] == "1" || row[:max_cardinality] == 1
           allow_multiple = false
         else
           allow_multiple = true
@@ -368,6 +381,7 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # package name ex."Plant"
+  # package_version ex. "1.2.0", "1.4.0"
   #
   # ==== Return
   # array of hash of each attr group.
@@ -381,14 +395,15 @@ class BioSampleValidator < ValidatorBase
   #     :attribute_set => ["ecotype", "cultivar", "isolate"]
   #   }
   # ]
-  def get_attribute_groups_of_package (package_name)
+  def get_attribute_groups_of_package (package_name, package_version)
+    # package version 1.4未満ではgroup attributeの定義はない
+    return [] if Gem::Version.create(package_version) < Gem::Version.create('1.4.0')
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
-      params = {package_name: package_name}
+      params = {package_name: package_name, version: package_version}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      params[:version] = @conf[:version]["biosample_graph"]
       sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
       result = sparql.query(sparql_query)
       attr_group_list = []
@@ -545,19 +560,23 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # package name ex."MIGS.ba.microbial"
+  # package_version ex. "1.2.0", "1.4.0"
   # ==== Return
   # true/false
   #
-  def unknown_package (rule_code, sample_name, package_name, line_num)
+  def unknown_package (rule_code, sample_name, package_name, package_version, line_num)
     return nil if CommonUtils::blank?(package_name)
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
-      params = {package_name: package_name}
-      params[:version] = @conf[:version]["biosample_graph"]
+      params = {package_name: package_name, version: package_version}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
+      if Gem::Version.create(package_version) >= Gem::Version.create('1.4.0')
+        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
+      else
+        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name_1.2.rq", params)
+      end
       result = sparql.query(sparql_query)
       @cache.save(ValidatorCache::UNKNOWN_PACKAGE, package_name, result) unless @cache.nil?
     else
