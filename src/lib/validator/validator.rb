@@ -51,7 +51,7 @@ class Validator
           if k.to_s == 'output'
             dir_path = File.dirname(params[k])
             unless File.writable? dir_path
-              permission_error_list.push(dir_path)
+              permission_error_list.push(params[k])
             end
           else
             unless File.readable? params[k]
@@ -61,8 +61,10 @@ class Validator
         end
       end
       if permission_error_list.size > 0
+        @log.error("File not found or permision denied: #{permission_error_list.join(', ')}")
         ret = {status: "error", format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
         JSON.generate(ret)
+        FileUtils.rm(running_file)
         return
       end
 
