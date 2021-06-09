@@ -1,6 +1,17 @@
 APP_PATH = ENV.fetch("DDBJ_VALIDATOR_APP_ROOT_PATH") { "/usr/src/ddbj_validator/src" }
 SHARED_PATH = ENV.fetch("DDBJ_VALIDATOR_SHARED_PATH") { "/usr/src/ddbj_validator/shared" }
 
+unless File.exist?("#{SHARED_PATH}")
+  Dir.mkdir("#{SHARED_PATH}")
+end
+unless File.exist?("#{SHARED_PATH}/tmp/pids")
+  Dir.mkdir("#{SHARED_PATH}/tmp")
+  Dir.mkdir("#{SHARED_PATH}/tmp/pids")
+end
+unless File.exist?("#{SHARED_PATH}/log")
+  Dir.mkdir("#{SHARED_PATH}/log")
+end
+
 listen  ENV.fetch("DDBJ_VALIDATOR_APP_UNICORN_PORT") { 3000 }
 timeout 300
 working_directory "#{APP_PATH}"
