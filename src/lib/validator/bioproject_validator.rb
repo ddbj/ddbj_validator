@@ -85,7 +85,6 @@ class BioProjectValidator < ValidatorBase
 
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
     @submission_id = @xml_convertor.get_bioproject_submission_id(File.read(data_xml))
-  else
 
     multiple_projects("BP_R0037", project_set)
     project_names_list = @db_validator.get_bioproject_names_list(@submitter_id) if @use_db
