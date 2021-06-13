@@ -1,0 +1,215 @@
+{
+  "ruleTR_R0001": {
+    "rule_class": "Trad",
+    "code": "TR_R0001",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid hold_date",
+    "method": "invalid_hold_date",
+    "message": "DATE/hold_dateの日付が不正です。形式はYYYYMMDDで3年以内の日付を指定してください。",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/file-format.html#date"
+  },
+  "ruleTR_R0002": {
+    "rule_class": "Trad",
+    "code": "TR_R0002",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing hold_date",
+    "method": "missing_hold_date",
+    "message": "DATE/hold_dateの記載がなく、このSubmissionはAccession番号発行後に即日公開されますのでご注意ください。非公開期間を設けたい場合にはDate/hold_dateに公開日を記載してください。",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/file-format.html#date"
+  },
+  "ruleTR_R0003": {
+    "rule_class": "Trad",
+    "code": "TR_R0003",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Taxonomy error warning",
+    "method": "taxonomy_error_warning",
+    "message": "If applicable, the taxonomy id will be automatically filled and the organism will be corrected to the scientific name. When the organism(s) is novel, please enter proposed name(s) in the organism, leave the taxonomy id empty and submit the BioSample.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/organism.html"
+  },
+  "ruleTR_R0004": {
+    "rule_class": "Trad",
+    "code": "TR_R0004",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Taxonomy at species or infraspecific rank",
+    "method": "taxonomy_at_species_or_infraspecific_rank",
+    "message": "Taxonomy should be species or infraspecific level.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/organism.html"
+  },
+  "ruleTR_R0005": {
+    "rule_class": "Trad",
+    "code": "TR_R0005",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Unnecessary WGS keywords",
+    "method": "unnecessary_wgs_keywords",
+    "message": "Completeゲノムの場合にはKEYWORD\"WGS\"は不要ですので削除して下さい。Contigレベルの場合にはそのまま\"WGS\"を残してください。",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/genome.html"
+  },
+  "ruleTR_R0006": {
+    "rule_class": "Trad",
+    "code": "TR_R0006",
+    "level": "--",
+    "internal_ignore": false,
+    "name": "--",
+    "method": "__",
+    "message": "--",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#parser"
+  },
+  "ruleTR_R0007": {
+    "rule_class": "Trad",
+    "code": "TR_R0007",
+    "level": "--",
+    "internal_ignore": false,
+    "name": "--",
+    "method": "__",
+    "message": "--",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#parser"
+  },
+  "ruleTR_R0008": {
+    "rule_class": "Trad",
+    "code": "TR_R0008",
+    "level": "--",
+    "internal_ignore": false,
+    "name": "--",
+    "method": "__",
+    "message": "--",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#parser"
+  },
+  "ruleTR_R0009": {
+    "rule_class": "Trad",
+    "code": "TR_R0009",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Missing DBLINK",
+    "method": "missing_dblink",
+    "message": "事前にBioProject/BioSample(or DRA)の登録が必要で、それらのAccession番号をDBLINKとして記載する必要があります。",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/file-format.html#dblink"
+  },
+  "ruleTR_R0010": {
+    "rule_class": "Trad",
+    "code": "TR_R0010",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid BioProject accession",
+    "method": "invalid_bioproject_accession",
+    "message": "DBLINK/projectにはDDBJで登録したBioProjectのAccessionID PRJDxxxxを記入してください",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0011": {
+    "rule_class": "Trad",
+    "code": "TR_R0011",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid BioSample accession",
+    "method": "invalid_biosample_accession",
+    "message": "DBLINK/biosampleにはDDBJで登録したBioProjectのAccessionID SAMDxxxxを記入してください",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0012": {
+    "rule_class": "Trad",
+    "code": "TR_R0012",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid DRR accession",
+    "method": "invalid_drr_accession",
+    "message": "DBLINK/sequence read archiveにはDDBJで登録したRUNのAccessionID DRRxxxxを記入してください",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0013": {
+    "rule_class": "Trad",
+    "code": "TR_R0013",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid combination of accessions",
+    "method": "invalid_combination_of_accessions",
+    "message": "DBLINK/project、DBLINK/biosampl、DBLINK/sequence read archiveのAccession番号が同一Projectのものでない可能性があります。IDをご確認ください。",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0020": {
+    "rule_class": "Trad",
+    "code": "TR_R0020",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid locus_tag",
+    "method": "invalid_locus_tag",
+    "message": "locus_tagがBioSampleのlocus_tag_prefix属性として記載されていないものです。(BSのlocus_tag_prefixを表示)",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0021": {
+    "rule_class": "Trad",
+    "code": "TR_R0021",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid date format",
+    "method": "invalid_date_format",
+    "message": "Invalid /collection_date foramt. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\", \"YYYY-mm-ddThh:mm:ss+hh:mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (eg., 1990-10-30, 1990-10, 1990-10-30T14:41:36+09:00 or 1990-10-30T14:41:36Z).",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0022": {
+    "rule_class": "Trad",
+    "code": "TR_R0022",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Future collection date",
+    "method": "future_collection_date",
+    "message": "/collection_date is a future date, please specify a date from the past.",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0023": {
+    "rule_class": "Trad",
+    "code": "TR_R0023",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Duplicate locus_tag",
+    "method": "duplicate_locus_tag",
+    "message": "The following locus_tag were used in this file more than one time. Please provide unique locus_tag.",
+    "object": [
+      "Trad"
+    ]
+  }
+}

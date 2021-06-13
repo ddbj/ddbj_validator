@@ -1,0 +1,36 @@
+COMMON	SUBMITTER		contact	Hanako Mishima
+			ab_name	Mishima,H.
+			ab_name	Yamada,T.
+			ab_name	Park,C.S.
+			ab_name	Liu,G.Q.
+			email	mishima@ddbj.nig.ac.jp
+			phone	81-55-981-6853
+			fax	81-55-981-6849
+			institute	National Institute of Genetics
+			department	DNA Data Bank of Japan
+			country	Japan
+			state	Shizuoka
+			city	Mishima
+			street	Yata 1111
+			zip	411-8540
+	REFERENCE		ab_name	Mishima,H.
+			ab_name	Yamada,T.
+			ab_name	Park,C.S.
+			ab_name	Liu,G.Q.
+			title	Aquaporin genes
+			year	2013
+			status	Unpublished
+	DATE		hold_date	20191125
+ENT01	source	1..2878	organism	Homo sapiens
+			isolate	FA01
+			mol_type	mRNA
+			tissue_type	liver
+	CDS	217..1104	gene	AQP9
+			product	aquaporin 9
+ENT02	source	1..1409	organism	Shigella flexneri
+			strain	BM123
+			mol_type	genomic DNA
+	CDS	<1..1051	gene	APQZ
+			product	aquaporin Z
+			transl_table	11
+			codon_start	2

@@ -56,7 +56,7 @@ module DDBJValidator
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         validation_params = {}
-        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf)
+        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf trad_anno trad_seq trad_arq)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)

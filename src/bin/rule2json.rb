@@ -12,7 +12,8 @@ class CreateRuleJson
   # biosample: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=0&format=csv"
   # bioproject: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=423271243&format=csv"
   # dra: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=2114094606&format=csv"
-  # jvar: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/edit?ts=56a1c03e#gid=1910595238"
+  # jvar: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=1910595238&format=csv"
+  # trad: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=1886458756&format=csv"
 
   def create_rule_file (type, csv_file)
     unless File.exist?(csv_file)
@@ -64,7 +65,7 @@ class CreateRuleJson
 end
 
 if ARGV.size < 2
-  puts "Usage: ruby rule2json.rb <biosample | bioproject | dra | jvar> rule_file.csv"
+  puts "Usage: ruby rule2json.rb <biosample | bioproject | dra | jvar | trad> rule_file.csv"
   exit(1);
 end
 creator = CreateRuleJson.new
