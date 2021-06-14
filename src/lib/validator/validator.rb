@@ -11,7 +11,7 @@ require File.expand_path('../trad_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
-    @@filetype = %w(biosample bioproject submission experiment run analysis jvar vcf trad_ann trad_seq trad_arq)
+    @@filetype = %w(biosample bioproject submission experiment run analysis jvar vcf trad_anno trad_seq trad_arq)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -46,7 +46,7 @@ class Validator
       permission_error_list = []
       params.each do |k,v|
         case k.to_s
-        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_ann', 'trad_seq', 'trad_arq', 'vcf', 'output'
+        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_arq', 'vcf', 'output'
           params[k] = File.expand_path(v)
           #TODO check file exist and permission, need write permission to output file
           if k.to_s == 'output'

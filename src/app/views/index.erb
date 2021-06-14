@@ -34,7 +34,7 @@
                     <div class="input-group">
                         <input id="biosample" class="selected_file" name="biosample" type="file" style="display: none">
                         <span class="input-group-btn">
-                            <button id="biosample_file_select" class="btn btn-default file_select" type="button">
+                            <button id="biosample_file_select" class="btn btn-default file_select" type="button" disabled>
                             <span>BioSample file(.xml)</span>
                             <i class="glyphicon glyphicon-folder-open"></i></button>
                         </span>
@@ -43,13 +43,31 @@
                     <div class="input-group">
                         <input id="bioproject" class="selected_file" name="bioproject" type="file" style="display: none">
                         <span class="input-group-btn">
-                            <button id="bioproject_file_select" class="btn btn-default file_select" type="button">
+                            <button id="bioproject_file_select" class="btn btn-default file_select" type="button" disabled>
                             <span>BioProject file(.xml)</span>
                             <i class="glyphicon glyphicon-folder-open"></i></button>
                         </span>
                         <input id="bioproject_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
                     </div>
-        
+                    <div class="input-group">
+                        <input id="trad_anno" class="selected_file" name="trad_anno" type="file" style="display: none">
+                        <span class="input-group-btn">
+                            <button id="trad_anno_file_select" class="btn btn-default file_select" type="button">
+                            <span>Trad annotation file(.tsv)</span>
+                            <i class="glyphicon glyphicon-folder-open"></i></button>
+                        </span>
+                        <input id="trad_anno_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
+                    </div>
+                    <div class="input-group">
+                        <input id="trad_seq" class="selected_file" name="trad_seq" type="file" style="display: none">
+                        <span class="input-group-btn">
+                            <button id="trad_seq_file_select" class="btn btn-default file_select" type="button">
+                            <span>Trad FASTA file(.fasta or .fa)</span>
+                            <i class="glyphicon glyphicon-folder-open"></i></button>
+                        </span>
+                        <input id="trad_seq_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
+                    </div>
+
                     <div class="sbmt">
                         <div class="row options">
                             <div class="col-sm-1 gutter-0">

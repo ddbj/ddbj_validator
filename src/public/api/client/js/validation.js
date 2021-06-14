@@ -9,6 +9,10 @@
             $('input[id=biosample]').click();
         } else if (clicked === 'bioproject_file_select') {
             $('input[id=bioproject]').click();
+        } else if (clicked === 'trad_anno_file_select') {
+            $('input[id=trad_anno]').click();
+        } else if (clicked === 'trad_seq_file_select') {
+            $('input[id=trad_seq]').click();
         }
     });
 
@@ -21,6 +25,10 @@
                 $('#biosample_file_name').val(output_f);
             } else if (changed === 'bioproject') {
                 $('#bioproject_file_name').val(output_f);
+            } else if (changed === 'trad_anno') {
+                $('#trad_anno_file_name').val(output_f);
+            } else if (changed === 'trad_seq') {
+                $('#trad_seq_file_name').val(output_f);
             }
         }
     });
