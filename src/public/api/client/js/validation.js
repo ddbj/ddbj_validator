@@ -13,6 +13,8 @@
             $('input[id=trad_anno]').click();
         } else if (clicked === 'trad_seq_file_select') {
             $('input[id=trad_seq]').click();
+        } else if (clicked === 'trad_agp_file_select') {
+            $('input[id=trad_agp]').click();
         }
     });
 
@@ -29,6 +31,8 @@
                 $('#trad_anno_file_name').val(output_f);
             } else if (changed === 'trad_seq') {
                 $('#trad_seq_file_name').val(output_f);
+            } else if (changed === 'trad_agp') {
+                $('#trad_agp_file_name').val(output_f);
             }
         }
     });

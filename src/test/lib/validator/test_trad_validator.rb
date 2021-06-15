@@ -35,6 +35,10 @@ class TestTradValidator < Minitest::Test
     {result: ret, error_list: error_list}
   end
 
+  def test_anno_tsv2obj
+    #TODO test
+  end
+
   def test_data_by_feat
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/CDS.ann")
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
@@ -216,6 +220,115 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("missing_hold_date", "TR_R0002", [])
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:TR_R0006
+  def test_check_by_jparser
+    #TODO test
+  end
+
+  # rule:TR_R0007
+  def test_check_by_transchecker
+    #TODO test
+  end
+
+  # rule:TR_R0008
+  def test_check_by_agpparser
+    #TODO test
+  end
+
+  def test_file_path_on_log_dir
+    root_dir = ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR']
+    file_path = "dir/path/file.txt"
+    ret = @validator.file_path_on_log_dir("#{root_dir}/#{file_path}")
+    assert_equal "./dir/path/file.txt", ret
+    # not set env #他のテストに影響するかも
+    ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'] = nil
+    file_path = "/other/root/dir/path/file.txt"
+    ret = @validator.file_path_on_log_dir(file_path)
+    assert_equal file_path, ret
+    ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'] = root_dir
+  end
+
+  def test_ddbj_parser
+    # TODO 正常系テスト
+    # invalid file path
+    params = {anno_file_path: "not_exist_ann_file", fasta_file_path: "not_exist_fasta_file", result_file_path: "not_exist_output_file"}
+    e = assert_raises StandardError do
+      ret = @validator.ddbj_parser(ENV['DDBJ_PARSER_APP_SERVER'], params, "jparser")
+    end
+    assert e.message.include?("Parse error")
+    # invalid host
+    e = assert_raises StandardError do
+      @validator.ddbj_parser("http://hogehoge.com", {}, "jparser")
+    end
+    assert e.message.include?("Parse error")
+  end
+
+  def test_parse_parser_msg
+    #jParser
+    line = "JP0011:ER1:STX:AxS:Line [#N1] in annotation file: [#ENTRY NAME1] does not match with [#ENTRY NAME2] at Line [#N2] in sequence file."
+    ret = @validator.parse_parser_msg(line, "jparser")
+    assert_equal "JP0011", ret[:code]
+    assert_equal "ER1", ret[:level]
+    assert_equal "STX", ret[:type]
+    assert_equal "AxS", ret[:file]
+    assert_equal "Line [#N1] in annotation file", ret[:location]
+    assert_equal " [#ENTRY NAME1] does not match with [#ENTRY NAME2] at Line [#N2] in sequence file.", ret[:message]
+
+    line = "JP0005:ER1:SYS:ANN:Ambiguous annotation file specification [#FILE NAME1] <=> [#FILE NAME2]."
+    ret = @validator.parse_parser_msg(line, "jparser")
+    assert_equal "JP0005", ret[:code]
+    assert_equal "ER1", ret[:level]
+    assert_equal "SYS", ret[:type]
+    assert_equal "ANN", ret[:file]
+    assert_equal "Ambiguous annotation file specification [#FILE NAME1] <=> [#FILE NAME2].", ret[:message]
+
+    line = "JP0001:FAT:SYS:Internal error occurred."
+    ret = @validator.parse_parser_msg(line, "jparser")
+    assert_equal "JP0001", ret[:code]
+    assert_equal "FAT", ret[:level]
+    assert_equal "SYS", ret[:type]
+    assert_equal "Internal error occurred.", ret[:message]
+
+    line = "JP0000:FAT:Typeless error occurred." #現状ではない
+    ret = @validator.parse_parser_msg(line, "jparser")
+    assert_equal "JP0000", ret[:code]
+    assert_equal "FAT", ret[:level]
+    assert_equal "Typeless error occurred.", ret[:message]
+
+    line = "JParser: finished"
+    ret = @validator.parse_parser_msg(line, "jparser")
+    assert_nil ret
+
+    #transChecker
+    line = "TC0004:FAT:Unable to execute transChecker."
+    ret = @validator.parse_parser_msg(line, "transchecker")
+    assert_equal "TC0004", ret[:code]
+    assert_equal "FAT", ret[:level]
+    assert_equal "Unable to execute transChecker.", ret[:message]
+
+    line = "TransChecker (Ver. 2.22) finished at Tue Jun 15 03:52:34 UTC 2021"
+    ret = @validator.parse_parser_msg(line, "transchecker")
+    assert_nil ret
+
+    #AGPParser
+    line = "AP0007:ER2:Line [#N]: Inconsistency between [#COLUMN_NAME1] and [#COLUMN_NAME2]."
+    ret = @validator.parse_parser_msg(line, "agpparser")
+    assert_equal "AP0007", ret[:code]
+    assert_equal "ER2", ret[:level]
+    assert_equal "Line [#N]", ret[:location]
+    assert_equal " Inconsistency between [#COLUMN_NAME1] and [#COLUMN_NAME2].", ret[:message]
+
+    line = "AP0001:FAT:System error [#MESSAGE]."
+    ret = @validator.parse_parser_msg(line, "agpparser")
+    assert_equal "AP0001", ret[:code]
+    assert_equal "FAT", ret[:level]
+    assert_equal "System error [#MESSAGE].", ret[:message]
+
+    line = "MES: AGPParser (Ver. 1.17) finished."
+    ret = @validator.parse_parser_msg(line, "agpparser")
+    assert_nil ret
   end
 
 end

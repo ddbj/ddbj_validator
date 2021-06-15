@@ -67,11 +67,11 @@
   "ruleTR_R0006": {
     "rule_class": "Trad",
     "code": "TR_R0006",
-    "level": "--",
+    "level": "warning",
     "internal_ignore": false,
-    "name": "--",
-    "method": "__",
-    "message": "--",
+    "name": "Check by jParser",
+    "method": "check_by_jparser",
+    "message": "jParserの実行でエラーが発生しました",
     "object": [
       "Trad"
     ],
@@ -80,11 +80,11 @@
   "ruleTR_R0007": {
     "rule_class": "Trad",
     "code": "TR_R0007",
-    "level": "--",
+    "level": "warning",
     "internal_ignore": false,
-    "name": "--",
-    "method": "__",
-    "message": "--",
+    "name": "Check by Transchecker",
+    "method": "check_by_transchecker",
+    "message": "transCheckerの実行でエラーが発生しました",
     "object": [
       "Trad"
     ],
@@ -93,11 +93,11 @@
   "ruleTR_R0008": {
     "rule_class": "Trad",
     "code": "TR_R0008",
-    "level": "--",
+    "level": "warning",
     "internal_ignore": false,
-    "name": "--",
-    "method": "__",
-    "message": "--",
+    "name": "Check by AGPParser",
+    "method": "check_by_agpparser",
+    "message": "AGPParserの実行でエラーが発生しました",
     "object": [
       "Trad"
     ],

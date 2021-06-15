@@ -25,6 +25,7 @@ class TradValidator < ValidatorBase
     config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/trad")
 
     @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_trad.json"))
+    @conf[:validation_parser_config] = JSON.parse(File.read(config_file_dir + "/rule_config_parser.json"))
 
     @error_list = error_list = []
     @validation_config = @conf[:validation_config] #need?
@@ -43,14 +44,16 @@ class TradValidator < ValidatorBase
   def validate(anno_file, seq_file, agp_file=nil, submitter_id=nil)
     # TODO check mandatory files(anno_file, seq_file)
     @anno_file = File::basename(anno_file)
-    #@seq_file = File::basename(seq_file) # need to validation?
-    @agp_file = File::basename(agp_file) unless agp_file.nil? # need to validation?
+    @seq_file = File::basename(seq_file)
+    @agp_file = File::basename(agp_file) unless agp_file.nil?
     annotation_list = anno_tsv2obj(anno_file)
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     invalid_hold_date("TR_R0001", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
-    # jparser
-    # transchecker
+    # parser
+    check_by_jparser("TR_R0006", anno_file, seq_file)
+    check_by_transchecker("TR_R0007", anno_file, seq_file)
+    check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
   end
 
   #
@@ -283,5 +286,332 @@ class TradValidator < ValidatorBase
     else
       true
     end
+  end
+
+  #
+  # rule:TR_R0006
+  # jParserを実行してエラー/ワーニングが返ってきた場合には、個々のエラー/ワーニングを出力する
+  #
+  # ==== Args
+  # rule_code
+  # anno_file_path アノテーションファイルパス
+  # seq_file_path シーケンスファイルパス
+  # ==== Return
+  # true/false
+  #
+  def check_by_jparser(rule_code, anno_file_path, seq_file_path)
+    return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path)
+    ret = true
+
+    # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
+    anno_file_path = file_path_on_log_dir(anno_file_path)
+    seq_file_path = file_path_on_log_dir(seq_file_path)
+    output_file_path = File.dirname(anno_file_path) + "/jparser_result.txt"
+    params = {anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path}
+
+    message_list = []
+    begin
+      message_list = ddbj_parser(ddbj_parser_api_server(), params, "jParser")
+    rescue => ex # parser実行に失敗(fatal/systemエラー含む)
+      annotation = [
+        {key: "Message", value: "#{ex.message}" },
+        {key: "annotation file", value: @anno_file},
+        {key: "fasta file", value: @seq_file}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      @error_list.push(error_hash)
+      ret = false
+    end
+    # 個別のerror/warningからエラーメッセージを追加する
+    message_list.each do |msg|
+      ret = false
+      annotation = [
+        {key: "Code", value: msg[:code]},
+        {key: "Level", value: msg[:level]}
+      ]
+      annotation.push({key: "Type", value: msg[:type]}) if msg[:type]
+      if msg[:file]
+        if msg[:file] == "ANN"
+          annotation.push({key: "File name", value: @anno_file})
+        elsif msg[:file] == "SEQ"
+          annotation.push({key: "File name", value: @seq_file})
+        elsif msg[:file] == "AxS"
+          annotation.push({key: "File name", value: "#{@anno_file} and #{@seq_file}"})
+        end
+      end
+      annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
+      annotation.push({key: "Message", value: msg[:message]})
+      parser_rule_code = msg[:code]
+      error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0007
+  # TransCheckerを実行してエラー/ワーニングが返ってきた場合には、個々のエラー/ワーニングを出力する
+  #
+  # ==== Args
+  # rule_code
+  # anno_file_path アノテーションファイルパス
+  # seq_file_path シーケンスファイルパス
+  # ==== Return
+  # true/false
+  #
+  def check_by_transchecker(rule_code, anno_file_path, seq_file_path)
+    return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path)
+    ret = true
+
+    # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
+    anno_file_path = file_path_on_log_dir(anno_file_path)
+    seq_file_path = file_path_on_log_dir(seq_file_path)
+    output_file_path = File.dirname(seq_file_path) + "/transchecker_result.txt"
+    rsl_file_path = File.dirname(seq_file_path) + "/rsl.fasta"
+    aln_file_path = File.dirname(seq_file_path) + "/aln.txt"
+    params = {anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path, rsl_file_path: rsl_file_path, aln_file_path: aln_file_path}
+
+    message_list = []
+    begin
+      message_list = ddbj_parser(ddbj_parser_api_server(), params, "transChecker")
+    rescue => ex # parser実行に失敗(fatal/systemエラー含む)
+      annotation = [
+        {key: "Message", value: "#{ex.message}" },
+        {key: "annotation file", value: @anno_file},
+        {key: "fasta file", value: @seq_file}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      @error_list.push(error_hash)
+      ret = false
+    end
+    # 個別のerror/warningからエラーメッセージを追加する
+    message_list.each do |msg|
+      ret = false
+      annotation = [
+        {key: "Code", value: msg[:code]},
+        {key: "Level", value: msg[:level]},
+        {key: "Message", value: msg[:message]}
+      ]
+      parser_rule_code = msg[:code]
+      error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0008
+  # AGPParserを実行してエラー/ワーニングが返ってきた場合には、個々のエラー/ワーニングを出力する
+  #
+  # ==== Args
+  # rule_code
+  # anno_file_path アノテーションファイルパス
+  # seq_file_path シーケンスファイルパス
+  # agp_file_path AGPファイルパス
+  # ==== Return
+  # true/false
+  #
+  def check_by_agpparser(rule_code, anno_file_path, seq_file_path, agp_file_path)
+    return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path) || CommonUtils::blank?(agp_file_path)
+    ret = true
+
+    # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
+    anno_file_path = file_path_on_log_dir(anno_file_path)
+    seq_file_path = file_path_on_log_dir(seq_file_path)
+    agp_file_path = file_path_on_log_dir(agp_file_path)
+    output_file_path = File.dirname(agp_file_path) + "/agpparser_result.txt"
+    params = {agp_file_path: agp_file_path, anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path}
+
+    message_list = []
+    begin
+      message_list = ddbj_parser(ddbj_parser_api_server(), params, "AGPParser")
+    rescue => ex # parser実行に失敗(fatal/systemエラー含む)
+      annotation = [
+        {key: "Message", value: "#{ex.message}" },
+        {key: "annotation file", value: @anno_file},
+        {key: "fasta file", value: @seq_file}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      @error_list.push(error_hash)
+      ret = false
+    end
+    # 個別のerror/warningからエラーメッセージを追加する
+    message_list.each do |msg|
+      ret = false
+      annotation = [
+        {key: "Code", value: msg[:code]},
+        {key: "Level", value: msg[:level]}
+      ]
+      annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
+      annotation.push({key: "Message", value: msg[:message]})
+      parser_rule_code = msg[:code]
+      error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # logディレクトリ(validation対象ファイルが保存されるディレクトリ)の設定がある場合は、logディレクトリ配下でのパスを返す。
+  # Parserコンテナとのファイルを共有する際に必要。Parserコンテナもlogディレクトリをマウントする為、フルパスではなくlogディレクトリ配下のパスを渡す必要がある。
+  #
+  def file_path_on_log_dir(file_path)
+    unless ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'].nil?
+      file_path = file_path.sub(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'],"")
+      file_path = "." + file_path if file_path.start_with?("/") #絶対パス表現を避ける
+    else
+      file_path
+    end
+    file_path
+  end
+
+  #
+  # 環境変数の設定から、DDBJ Parser(jParaser等) APIのサーバURLを返す
+  # 設定がない場合はnilを返す
+  # ==== Return
+  # api_server "http://localhost:18080" "http://ddbj.parser.app:8080"
+  #
+  def ddbj_parser_api_server()
+    api_server_name = nil
+    if parser_server_host = ENV['DDBJ_PARSER_APP_SERVER']
+      api_server_name = ENV['DDBJ_PARSER_APP_SERVER']
+    elsif ENV['DDBJ_PARSER_APP_CONTAINER_NAME']
+      parser_server_host = ENV['DDBJ_PARSER_APP_CONTAINER_NAME']
+      if ENV['DDBJ_PARSER_APP_CONTAINER_PORT']
+        api_server_name = "http://" + parser_server_host + ":" + ENV['DDBJ_PARSER_APP_CONTAINER_PORT']
+      else
+        api_server_name = "http://" + parser_server_host
+      end
+    end
+    api_server_name
+  end
+  #
+  # jParser/transChecker/AGPParserを実行して、error/warningのリストを返す
+  # TR_R0006/TR_R0007/TR_R0008で使用される
+  #
+  # DDBJのparserはJavaコマンドで実行できるが、Validatorがコンテナ(ベースイメージはRuby)で稼働する事を想定しているので、
+  # HTTP経由で実行できるParser用APIを別途用意し、それにリクエストする構成を取る。ParserをJavaでDocker化してSiblingsで実行する構成も可能だがLinux環境に限られるため見送った。
+  # Parser用APIには対象ファイルを投げると転送時間が発生する為、対象ファイルが含まれるディレクトリを共有（両コンテナからマウント）する。
+  #
+  # ==== Args
+  # params APIのパラメータに渡す値のハッシュ
+  #   jParser:      {anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path}
+  #   transChecker: {anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path, rsl_file_path: rsl_file_path, aln_file_path: aln_file_path}
+  #   AGPParser:    {agp_file_path: agp_file_path, anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path}
+  # parser_name Parserの種類 jParser | transChecker | AGPParser
+  # ==== Return
+  # message_list パーサで返されたメッセージを構造化したリスト
+  #   [
+  #     {code: "JP0181", level: "ER2", type: "STX", file: "ANN", location: "Entry [scaffold1]", message: "[WGS] entry should have [submitter_seqid] qualifier."},
+  #     {code: "JP0045", level: "ER1", type: "LOC", file: "AxS", location: "Line [44] in annotation file", message: "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file."},
+  #   ]
+  #
+  #
+  def ddbj_parser(api_server, params, parser_name)
+    return nil if params.nil? || parser_name.nil?
+    if api_server.nil?
+      raise "'ddbj_parser' setting is not ready. The check by #{parser_name} did not run correctly, so please run it separately.\n"
+    end
+    api_server = api_server[0..-2] if api_server.end_with?("/")
+    # リクエストURLの組み立て
+    # parser/jparser/?anno_file_path=CDS.ann&fasta_file_path=CDS.fasta&result_file_path=CDS.result.txt
+    # parser/transchecker/?anno_file_path=CDS.ann&fasta_file_path=CDS.fasta&result_file_path=CDS.result.txt&rsl_file_path=rsl.fasta&aln_file_path=aln.txt
+    # parser/agpparser/?agp_file_path=WGS_scaffold_error.agp&anno_file_path=WGS_scaffold.ann&fasta_file_path=WGS_piece.fasta&result_file_path=WGS.result.txt
+    if parser_name.downcase == "transchecker"
+      method = "/parser/transchecker/?"
+    elsif parser_name.downcase == "agpparser"
+      method = "/parser/agpparser/?"
+    else # default "jParser"
+      method = "/parser/jparser/?"
+    end
+    params = URI.encode_www_form(params)
+    url = api_server + method + params
+
+    # リクエスト実行
+    begin
+      res = CommonUtils.new.http_get_response(url)
+      if res.code =~ /^5/ # server error
+        raise "Parse error: 'ddbj_parser' returns a server error. The check by #{parser_name} did not run correctly, so please run it separately.\n"
+      elsif res.code =~ /^4/ # client error
+        raise "Parse error: 'ddbj_parser' returns a error or server not found. The check by #{parser_name} did not run correctly, so please run it separately.\n"
+      else
+        begin
+          finished_flag = false
+          message_list = []
+          res.body.each_line do |line|
+            message_list.push(parse_parser_msg(line.chomp, parser_name))
+            if line.include?("finished") && line.downcase.include?(parser_name.downcase) # 実行完了メッセージ "jParser (Ver. 6.65) finished." or" "TransChecker (Ver. 2.22) finished" or "MES: AGPParser (Ver. 1.17) finished."
+              finished_flag = true
+            end
+          end
+          message_list.compact!
+          # 実質的なシステムエラー(Parserが最後まで実行できなかった)が発生した場合は補足する
+          fat_list = message_list.select{|row| row[:level] == "FAT"}
+          if fat_list.size > 0 # FATALはユーザエラーとしては扱わない
+            raise "Parse error: 'ddbj_parser'. Fatal error has occurred. The check by #{parser_name} did not run correctly, so please run it separately.[#{fat_list}]\n"
+          end
+          sys_list = message_list.select{|row| row[:type] && row[:type] == "SYS"}
+          if sys_list.size > 0 # SystemエラーもユーザエラーでなくFATAL扱い
+            raise "Parse error: 'ddbj_parser'. System error has occurred. The check by #{parser_name} did not run correctly, so please run it separately.[#{sys_list}]\n"
+          end
+          if finished_flag == false # finished 行が見当たらず、最後まで実行されたか不明
+            raise "Parse error: 'ddbj_parser' did not exit normally. The check by #{parser_name} did not run correctly, so please run it separately.\n"
+          end
+          message_list
+        rescue => ex
+          # TODO log取っておく?
+          if ex.message.start_with?("Parse error")
+            raise ex.message
+          else
+            raise "Parse error: 'ddbj_parser'. The check by #{parser_name} did not run correctly, so please run it separately.\n"
+          end
+        end
+      end
+    rescue => ex
+      if ex.message.start_with?("Parse error")
+        message = ex.message
+      else
+        message = "Connection to 'ddbj_parser' server failed. The check by #{parser_name} did not run correctly, so please run it separately.\n"
+      end
+      raise StandardError, message, ex.backtrace
+    end
+  end
+
+  #
+  # jParser/TransChecker/AGPParserを実行して返されたテキスト行を解釈し、エラー/ワーニング行なら構造化したhashを返す。
+  # エラー/ワーニング行出なければnilを返す
+  #
+  # ==== Args
+  # line "JP0045:ER1:LOC:AxS:Line [44] in annotation file: [scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file."
+  # parser_name Parserの種類 jParser | transChecker | AGPParser
+  # ==== Return
+  # メッセージを構造化したリスト
+  #   {code: "JP0045", level: "ER1", type: "LOC", file: "AxS", location: "Line [44] in annotation file", message: "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file."},
+  #
+  def parse_parser_msg(line, parser_name)
+    ret = nil
+    parser_name = parser_name.downcase
+    if parser_name == "jparser"
+      if m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<file>(ANN|SEQ|AxS)):(?<loc>[^:]+):(?<message>.+)/)
+        ret = {code: m[:code], level: m[:level], type: m[:type], file: m[:file], location: m[:loc], message: m[:message]}
+      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<file>(ANN|SEQ|AxS)):(?<message>.+)/) #エラー位置なし
+        ret = {code: m[:code], level: m[:level], type: m[:type], file: m[:file], message: m[:message]}
+      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<message>.+)/) #Fileとエラー位置なし
+        ret = {code: m[:code], level: m[:level], type: m[:type], message: m[:message]}
+      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<message>.+)/)
+        ret = {code: m[:code], level: m[:level], message: m[:message]}
+      end
+    elsif parser_name == "transchecker"
+      if m = line.match(/^(?<code>TC[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR)):(?<message>.+)/)
+        ret = {code: m[:code], level: m[:level], message: m[:message]}
+      end
+    elsif parser_name == "agpparser"
+      if m = line.match(/^(?<code>AP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR)):(?<loc>[^:]+):(?<message>.+)/)
+        ret = {code: m[:code], level: m[:level], location: m[:loc], message: m[:message]}
+      elsif m = line.match(/^(?<code>AP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR)):(?<message>.+)/)
+        ret = {code: m[:code], level: m[:level], message: m[:message]}
+      end
+    end
+    ret
   end
 end

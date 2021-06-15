@@ -11,7 +11,7 @@ require File.expand_path('../trad_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
-    @@filetype = %w(biosample bioproject submission experiment run analysis jvar vcf trad_anno trad_seq trad_arq)
+    @@filetype = %w(biosample bioproject submission experiment run analysis jvar vcf trad_anno trad_seq trad_agp)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -46,7 +46,7 @@ class Validator
       permission_error_list = []
       params.each do |k,v|
         case k.to_s
-        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_arq', 'vcf', 'output'
+        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_agp', 'vcf', 'output'
           params[k] = File.expand_path(v)
           #TODO check file exist and permission, need write permission to output file
           if k.to_s == 'output'
@@ -87,7 +87,7 @@ class Validator
         error_list.concat(validate("bioproject", params))if !params[:bioproject].nil?
         error_list.concat(validate("jvar", params))if !params[:jvar].nil?
         error_list.concat(validate("vcf", params))if !params[:vcf].nil?
-        error_list.concat(validate("trad", params))if (params[:trad_anno] || params[:trad_seq] || params[:trad_arq])
+        error_list.concat(validate("trad", params))if (params[:trad_anno] || params[:trad_seq] || params[:trad_agp])
         #error_list.concat(validate("combination", params))
         #TODO dra validator
 
@@ -132,8 +132,8 @@ class Validator
         validator = TradValidator.new
         anno_file = params[:trad_anno]
         seq_file = params[:trad_seq]
-        arq_file = params[:trad_arq]
-        validator.validate(anno_file, seq_file, arq_file);
+        agp_file = params[:trad_agp]
+        validator.validate(anno_file, seq_file, agp_file);
         validator.error_list
       else
         case object_type
