@@ -239,9 +239,11 @@ class TestTradValidator < Minitest::Test
     #ok case (case J)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Homo sapiens", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    organism_info_list = []
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    assert_equal "9606", organism_info_list.first[:tax_id]  #確定されたTaxID
     ## skip case (exist biosample id)(case A,B,C)
     biosample_data_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
@@ -257,9 +259,11 @@ class TestTradValidator < Minitest::Test
     ## multiple taxa were hit, but only one hit as ScientificName.(case E)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    organism_info_list = []
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    assert_equal "2", organism_info_list.first[:tax_id] #菌側のBacteriaのTaxIDで確定される
 
     #ng case
     ## not exist value(case D)
@@ -291,10 +295,12 @@ class TestTradValidator < Minitest::Test
     ## multiple taxa were hit, but only one hit infrascpecific organism (case G)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "mouse", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    organism_info_list = []
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "Mus musculus", get_auto_annotation(ret[:error_list])
+    assert_equal "10090", organism_info_list.first[:tax_id]  #Speciesランク側のTaxIDで確定される
     ## multiple taxa were hit, and infrascpecific organism is not hit or multi hit(case H)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacillus", line_no: 24}]
@@ -312,6 +318,34 @@ class TestTradValidator < Minitest::Test
     organism_data_list = nil
     ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_nil ret[:result]
+  end
+
+  # rule:TR_R0004
+  def test_taxonomy_at_species_or_infraspecific_rank
+    #ok case
+    organism_info_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Homo sapiens", line_no: 24, tax_id: "9606"}]
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "TR_R0004", organism_info_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    organism_info_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24, tax_id: "2"}]
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "TR_R0004", organism_info_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #nil case
+    organism_info_list = []
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "TR_R0004", organism_info_list)
+    assert_nil ret[:result]
+    organism_info_list = nil
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "TR_R0004", organism_info_list)
+    assert_nil ret[:result]
+    ## not exist tax_id => OK
+    organism_info_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "TR_R0004", organism_info_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   # rule:TR_R0006

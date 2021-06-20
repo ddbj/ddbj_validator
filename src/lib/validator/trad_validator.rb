@@ -58,8 +58,10 @@ class TradValidator < ValidatorBase
     check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
 
     #biosampleはNOTEにも記載されているケースがある
-    taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample",anno_by_qual))
-    # TODO tax_idを保持しなくて良いのか？
+    @organism_info_list = []
+    taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample",anno_by_qual), @organism_info_list)
+    taxonomy_at_species_or_infraspecific_rank("TR_R0004", @organism_info_list)
+
   end
 
   #
@@ -297,7 +299,7 @@ class TradValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def taxonomy_error_warning(rule_code, organism_data_list, biosample_data_list)
+  def taxonomy_error_warning(rule_code, organism_data_list, biosample_data_list, organism_info_list=[])
     return nil if organism_data_list.nil? || organism_data_list.size == 0
     ret = true
     biosample_data_list = [] if biosample_data_list.nil?
@@ -322,6 +324,8 @@ class TradValidator < ValidatorBase
       ]
       if ret_org[:status] == "exist" #該当するtaxonomy_idがあった場合
         scientific_name = ret_org[:scientific_name]
+        line[:tax_id] = ret_org[:tax_id]
+        organism_info_list.push(line)
         #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
         if scientific_name != organism_name
           valid_flag = false
@@ -336,7 +340,10 @@ class TradValidator < ValidatorBase
         else
           scientific_name_hit = ret_org[:tax_list].select{|hit_tax| hit_tax[:scientific_name] == organism_name}
           # scientific nameに合致するTaxonomyが一件の場合はOK. "Bacteria"のようなケースで菌側を選択
-          unless scientific_name_hit.size == 1 # scientific nameに合致するものが0件または複数件ある
+          if scientific_name_hit.size == 1
+            line[:tax_id] = scientific_name_hit.first[:tax_no] # TaxID確定
+            organism_info_list.push(line)
+          else # scientific nameに合致するものが0件または複数件ある
             infraspecific_tax_id_list = []
             tax_id_list = ret_org[:tax_list].map{|hit_tax| hit_tax[:tax_no]}
             tax_id_list.each do |hit_tax_id|
@@ -346,6 +353,8 @@ class TradValidator < ValidatorBase
               # ヒットしたinfraspecificな生物種のscientific_nameではなかった場合には補正をかける
               infraspecific_tax_list = ret_org[:tax_list].select{|hit_tax| hit_tax[:tax_no] == infraspecific_tax_id_list.first}
               scientific_name = infraspecific_tax_list.first[:scientific_name]
+              line[:tax_id] = infraspecific_tax_id_list.first # TaxID確定
+              organism_info_list.push(line)
               unless scientific_name == organism_name
                 valid_flag = false
                 annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
@@ -364,6 +373,43 @@ class TradValidator < ValidatorBase
         ret = false
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
         @error_list.push(error_hash)
+      end
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0004
+  # Organism名から確定したTaxonomyIDがSpeciesランクまたはそれ以下のランクであるかの検証
+  #
+  # ==== Args
+  # rule_code
+  # organism_info_list organismを記述している行データリストのうちTaxonomyIDが確定しているリスト
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_at_species_or_infraspecific_rank(rule_code, organism_info_list)
+    return nil if organism_info_list.nil? || organism_info_list.size == 0
+    ret = true
+    organism_info_list.each do |organism|
+      valid_flag = true
+      next if organism[:tax_id].nil?
+      if @org_validator.is_infraspecific_rank(organism[:tax_id])
+        organism[:is_infraspecific] = true
+      else
+        organism[:is_infraspecific] = false
+        valid_flag = false
+        annotation = [
+          {key: "organism", value: organism[:value]},
+          {key: "File name", value: @anno_file},
+          {key: "Location", value: "Line: #{organism[:line_no]}"},
+          {key: "taxonomy_id", value: organism[:tax_id]}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
+        @error_list.push(error_hash)
+      end
+      if valid_flag == false
+        ret = false
       end
     end
     ret
