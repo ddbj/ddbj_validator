@@ -134,38 +134,26 @@ class TestTradValidator < Minitest::Test
 
     # 年末年始を跨ぐケース
     # https://ddbj-dev.atlassian.net/browse/VALIDATOR-56?focusedCommentId=206146
+    ret = @validator.range_hold_date(Date.new(2021, 12, 19))
+    assert_equal "20211226", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 20))
     assert_equal "20220105", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 21))
-    assert_equal "20220106", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2021, 12, 22))
-    assert_equal "20220107", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2021, 12, 23))
-    assert_equal "20220108", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2021, 12, 24))
-    assert_equal "20220109", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2021, 12, 25))
-    assert_equal "20220110", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220105", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 26))
-    assert_equal "20220111", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220105", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 27))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2021, 12, 28))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220105", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 29))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220105", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 30))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220106", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2021, 12, 31))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220107", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2022, 1, 1))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2022, 1, 2))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
-    ret = @validator.range_hold_date(Date.new(2022, 1, 3))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220108", ret[:min].strftime("%Y%m%d")
     ret = @validator.range_hold_date(Date.new(2022, 1, 4))
-    assert_equal "20220112", ret[:min].strftime("%Y%m%d")
+    assert_equal "20220111", ret[:min].strftime("%Y%m%d")
 
     # 年始明け通常営業
     ret = @validator.range_hold_date(Date.new(2022, 1, 5))
@@ -189,7 +177,7 @@ class TestTradValidator < Minitest::Test
 
     #ng case
     ## too early
-    data.first[:value] = "20210612"
+    data.first[:value] = "20210612" # past date
     ret = exec_validator("invalid_hold_date", "TR_R0001", data)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size

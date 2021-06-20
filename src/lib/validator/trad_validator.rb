@@ -237,27 +237,18 @@ class TradValidator < ValidatorBase
     end
     ret
   end
+
   #
-  # 引数の日付を基準日として、DATE/hold_dateの指定可能な日付の
+  # 引数の日付を基準日として、DATE/hold_dateの指定可能な日付の範囲を返す。
+  # 年末年始は範囲から除外する。
   # https://ddbj-dev.atlassian.net/browse/VALIDATOR-56?focusedCommentId=206146
   #
   def range_hold_date(date)
     min_date = date + 7
     if min_date.month == 12 && min_date.day >= 27
-      workday =  7 - (27 - date.day) # 年末の稼働日を差し引く
-      min_date = Date.new(min_date.year + 1, 1, 5 + workday)
-    elsif min_date.month == 1 && min_date.day <= (4 + 7)
-      workday = 0
-      if date.month == 12
-        if date.day <= 27
-          workday = 7 - (27 - date.day) # 年末の稼働日を差し引く
-        else
-          workday = 7 # 年末休暇中
-        end
-      elsif date.month == 1 && date.day <= 4 #年始休暇中
-        workday = 7
-      end
-      min_date = Date.new(min_date.year, 1, 5 + workday)
+      min_date = Date.new(min_date.year + 1, 1, 5)
+    elsif min_date.month == 1 && min_date.day <= 4
+      min_date = Date.new(min_date.year, 1, 5)
     end
 
     max_date = Date.new(date.year + 3, date.month, date.day)
