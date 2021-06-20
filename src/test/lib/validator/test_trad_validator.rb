@@ -35,6 +35,30 @@ class TestTradValidator < Minitest::Test
     {result: ret, error_list: error_list}
   end
 
+  #
+  # 指定されたエラーリストの最初のauto-annotationの値を返す
+  #
+  # ==== Args
+  # error_list
+  # anno_index index of annotation ex. 0
+  #
+  # ==== Return
+  # An array of all suggest values
+  #
+  def get_auto_annotation (error_list)
+    if error_list.size <= 0 || error_list[0][:annotation].nil?
+      nil
+    else
+      ret = nil
+      error_list[0][:annotation].each do |annotation|
+       if annotation[:is_auto_annotation] == true
+         ret = annotation[:suggested_value].first
+       end
+      end
+      ret
+    end
+  end
+
   def test_anno_tsv2obj
     #TODO test
   end
@@ -220,6 +244,86 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("missing_hold_date", "TR_R0002", [])
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:TR_R0003
+  def test_taxonomy_error_warning
+    #ok case (case J)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Homo sapiens", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## skip case (exist biosample id)(case A,B,C)
+    biosample_data_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## skip case (exist biosample id at COMMON)(case A,B,C)
+    biosample_data_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
+    organism_data_list = [{entry: "ENT", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## multiple taxa were hit, but only one hit as ScientificName.(case E)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## not exist value(case D)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not skip case (exist biosample id but at other entry)(case D)
+    biosample_data_list = [{entry: "ENT", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## hit one tax. need auto-annotation (case I)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "human", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "Homo sapiens", get_auto_annotation(ret[:error_list])
+    ## "environmental samples" is not accepted (case F)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "environmental samples", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:annotation].to_s.include?("more detail")
+    ## multiple taxa were hit, but only one hit infrascpecific organism (case G)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "mouse", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "Mus musculus", get_auto_annotation(ret[:error_list])
+    ## multiple taxa were hit, and infrascpecific organism is not hit or multi hit(case H)
+    biosample_data_list = []
+    organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacillus", line_no: 24}]
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:annotation].to_s.include?("Multiple taxonomies")
+
+    #nil case
+    biosample_data_list = []
+    organism_data_list = []
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_nil ret[:result]
+    biosample_data_list = []
+    organism_data_list = nil
+    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    assert_nil ret[:result]
   end
 
   # rule:TR_R0006

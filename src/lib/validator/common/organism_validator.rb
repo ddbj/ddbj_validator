@@ -174,6 +174,7 @@ class OrganismValidator < SPARQLBase
     else ##候補が二つある
       ret[:status] = "multiple exist"
       ret[:tax_id] = grouped_list.keys.join(", ")
+      ret[:tax_list] = tax_list
     end
     ret
   end

@@ -27,8 +27,10 @@ class TradValidator < ValidatorBase
     @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_trad.json"))
     @conf[:validation_parser_config] = JSON.parse(File.read(config_file_dir + "/rule_config_parser.json"))
 
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @error_list = error_list = []
     @validation_config = @conf[:validation_config] #need?
+    @cache = ValidatorCache.new
   end
 
   #
@@ -54,6 +56,10 @@ class TradValidator < ValidatorBase
     check_by_jparser("TR_R0006", anno_file, seq_file)
     check_by_transchecker("TR_R0007", anno_file, seq_file)
     check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
+
+    #biosampleはNOTEにも記載されているケースがある
+    taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample",anno_by_qual))
+    # TODO tax_idを保持しなくて良いのか？
   end
 
   #
@@ -286,6 +292,90 @@ class TradValidator < ValidatorBase
     else
       true
     end
+  end
+
+  #
+  # rule:TR_R0003
+  # organismがTaxonomy Ontology(Private)に記載のない名称の場合にはワーニングを出す。
+  # BioSampleIDが紐づくエントリの場合はBioSampleとの整合性をチェックし、このチェックは行わない。
+  #
+  # ==== Args
+  # rule_code
+  # organism_data_list organismを記述している行データリスト
+  # biosample_data_list biosampleを記述している行データリスト
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_error_warning(rule_code, organism_data_list, biosample_data_list)
+    return nil if organism_data_list.nil? || organism_data_list.size == 0
+    ret = true
+    biosample_data_list = [] if biosample_data_list.nil?
+    organism_data_list.each do |line|
+      # BioSampleの記載があればスキップする
+      next if biosample_data_list.select{|bs_line| bs_line[:entry] == line[:entry]}.size > 0 || biosample_data_list.select{|bs_line| bs_line[:entry] == "COMMON"}.size > 0
+
+      valid_flag = true
+      organism_name = line[:value]
+      #あればキャッシュを使用
+      if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
+        ret_org = @org_validator.suggest_taxid_from_name(organism_name)
+        @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret_org) unless @cache.nil?
+      else
+        puts "use cache in taxonomy_error_warning" if $DEBUG
+        ret_org = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
+      end
+      annotation = [
+        {key: "organism", value: organism_name},
+        {key: "File name", value: @anno_file},
+        {key: "Location", value: "Line: #{line[:line_no]}"}
+      ]
+      if ret_org[:status] == "exist" #該当するtaxonomy_idがあった場合
+        scientific_name = ret_org[:scientific_name]
+        #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+        if scientific_name != organism_name
+          valid_flag = false
+          location = {column: "value", line_no: line[:line_no]}
+          annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+        end
+      elsif ret_org[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、trad用に分岐
+        if organism_name.downcase == "environmental samples" #大量にある為除外
+          valid_flag = false
+          msg = "Please enter a more detailed organism name."
+          annotation.push({key: "Message", value: msg})
+        else
+          scientific_name_hit = ret_org[:tax_list].select{|hit_tax| hit_tax[:scientific_name] == organism_name}
+          # scientific nameに合致するTaxonomyが一件の場合はOK. "Bacteria"のようなケースで菌側を選択
+          unless scientific_name_hit.size == 1 # scientific nameに合致するものが0件または複数件ある
+            infraspecific_tax_id_list = []
+            tax_id_list = ret_org[:tax_list].map{|hit_tax| hit_tax[:tax_no]}
+            tax_id_list.each do |hit_tax_id|
+              infraspecific_tax_id_list.push(hit_tax_id) if @org_validator.is_infraspecific_rank(hit_tax_id) #cacheしてもいいが、あまり通る経路ではない
+            end
+            if infraspecific_tax_id_list.size == 1
+              # ヒットしたinfraspecificな生物種のscientific_nameではなかった場合には補正をかける
+              infraspecific_tax_list = ret_org[:tax_list].select{|hit_tax| hit_tax[:tax_no] == infraspecific_tax_id_list.first}
+              scientific_name = infraspecific_tax_list.first[:scientific_name]
+              unless scientific_name == organism_name
+                valid_flag = false
+                annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+              end
+            else # ヒットしたinfraspecificな生物種が複数、またはない。"Bacillus"のような両方infraspecificではないケース
+              valid_flag = false
+              msg = "Multiple taxonomies detected with the same organism name. Please use the Scientific name. taxonomy_id:[#{ret_org[:tax_id]}]"
+              annotation.push({key: "Message", value: msg})
+            end
+          end
+        end
+      else #該当するtaxonomy_idが無かった場合は単なるエラー
+        valid_flag = false
+      end
+      if valid_flag == false
+        ret = false
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    ret
   end
 
   #

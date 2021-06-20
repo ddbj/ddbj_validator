@@ -5,7 +5,7 @@ memo/*
 memo/
 db_conf/*
 db_conf
-tmp/*
+tmp/
 memo
 node_modules/*
 *_test_.*
