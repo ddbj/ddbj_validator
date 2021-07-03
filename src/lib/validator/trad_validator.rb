@@ -52,15 +52,17 @@ class TradValidator < ValidatorBase
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     invalid_hold_date("TR_R0001", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
+    missing_hold_date("TR_R0002", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
     # parser
     check_by_jparser("TR_R0006", anno_file, seq_file)
     check_by_transchecker("TR_R0007", anno_file, seq_file)
     check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
 
-    #biosampleはNOTEにも記載されているケースがある
+    #TODO biosampleはNOTEにも記載されているケースがある
     @organism_info_list = []
-    taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample",anno_by_qual), @organism_info_list)
+    taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
     taxonomy_at_species_or_infraspecific_rank("TR_R0004", @organism_info_list)
+    unnecessary_wgs_keywords("TR_R0005", annotation_list, anno_by_qual)
 
   end
 
@@ -147,11 +149,10 @@ class TradValidator < ValidatorBase
   def data_by_feat_qual(feature_name, qualifier_name, anno_by_qual)
     ret = nil
     qual_lists = anno_by_qual[qualifier_name]
-    unless qual_lists.nil?
+    if qual_lists.nil?
+      ret = []
+    else
       ret = qual_lists.select{|row| row[:feature] == feature_name}
-      if ret.size == 0
-        ret = nil
-      end
     end
     ret
   end
@@ -171,11 +172,10 @@ class TradValidator < ValidatorBase
   def data_by_ent_feat_qual(entry_name, feature_name, qualifier_name, anno_by_qual)
     ret = nil
     feat_qual_list = data_by_feat_qual(feature_name, qualifier_name, anno_by_qual)
-    unless feat_qual_list.nil?
+    if feat_qual_list.nil?
+      ret = []
+    else
       ret = feat_qual_list.select{|row| row[:entry] == entry_name}
-      if ret.size == 0
-        ret = nil
-      end
     end
     ret
   end
@@ -411,6 +411,95 @@ class TradValidator < ValidatorBase
       if valid_flag == false
         ret = false
       end
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0005
+  # WGS keywordが記載されているが、Completeゲノムである可能性がある場合にwarningを出す
+  # https://ddbj-dev.atlassian.net/browse/VALIDATOR-54?focusedCommentId=205055
+  #
+  # ==== Args
+  # rule_code
+  # anno_file_path アノテーションファイルパス
+  # seq_file_path シーケンスファイルパス
+  # ==== Return
+  # true/false
+  #
+  def unnecessary_wgs_keywords(rule_code, annotation_list, anno_by_qual, anno_by_feat)
+    ret = true
+    # WGSの記載があるかチェック
+    wgs_keyword = false
+    data_type = data_by_feat_qual("DATATYPE", "type", anno_by_qual)
+    keyword = data_by_feat_qual("KEYWORD", "keyword", anno_by_qual)
+    wgs_datatype_list = data_type.select{|line| line[:value].upcase == "WGS" }
+    wgs_keyword_list = keyword.select{|line| line[:value].upcase == "WGS" }
+    if wgs_datatype_list.size > 0 || wgs_keyword_list.size > 0
+      wgs_keyword = true
+    end
+    # WGSの記載があった場合に complete genome のような内容ではないかチェックする
+    message = ""
+    if wgs_keyword == true
+      anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+      entry_size = anno_by_ent.keys.delete_if{|ent| ent == "COMMON"}.size
+      if entry_size <= 10 # entry数が10以下(少ない)
+        # titleに"complete genome"という文字列が含まれている
+        title_lines = data_by_feat_qual("REFERENCE", "title", anno_by_qual)
+        title_lines.concat(data_by_feat_qual("source", "ff_definition", anno_by_qual))
+        if title_lines.select{|line| line[:value].downcase.include?("complete genome")}.size > 0
+          message = "There is a description of 'complete genome' in REFERENCE/title or source/ff_definition"
+          ret = false
+        else
+          # 複数のエントリがあり、そのうちplasmidが1つ以上含まれている。ただし全てがplasmidではない(chromosomeと推測)
+          plasmid_lines = data_by_feat_qual("source", "plasmid", anno_by_qual)
+          if entry_size >= 2 && plasmid_lines.size > 0 && (entry_size - plasmid_lines.size) > 0
+            message = "A small number of entries contain one or more plasmid entries"
+            ret = false
+          else
+            # COMMONまたはChromosomeの全てのエントリにTOPOLOGY=circularの記載がある
+            if data_by_ent_feat_qual("COMMON", "TOPOLOGY", "circular", anno_by_qual).size > 0
+              message = "There is a description of 'circular' in COMMON/TOPOLOGY/circular"
+              ret = false
+            else
+              # TODO plasmidではないentryをchromosomeとみなしているが(原核ではchromosomeエントリはqualifiereで明示されない)、
+              # 実際はそれ以外のentryも混じっていて、"plasmidよりも長いエントリー"というフィルタリングが必要。
+              # ただし重たくなるので割愛。全てのchromosomeがcirclularであるというチェックが望ましいが、一つでもcirclularであれば、というチェックにしている。
+              circlar_lines = data_by_feat_qual("TOPOLOGY", "circular", anno_by_qual)
+              circlar_entry_list = circlar_lines.map{|row| row[:entry]}.uniq
+              plasmid_entry_list = plasmid_lines.map{|row| row[:entry]}.uniq #plasmidが含まれていると前の条件ではじくので基本0件
+              chromosome_circlar_entry_list = circlar_entry_list - plasmid_entry_list
+              if chromosome_circlar_entry_list.size > 0
+                entry_names = chromosome_circlar_entry_list.join(", ")
+                message = "There is a description of 'circular' in TOPOLOGY/circular at entry: #{entry_names}"
+                ret = false
+              else
+                # TODO 全てのchromosomeの長さを足して、既知のゲノムサイズの範囲内であればfalseとするチェックを追加する。外部APIを叩く為優先度を下げる。
+              end
+            end
+          end
+        end
+      end
+    end
+    if ret == false
+      line = []
+      key = []
+      if wgs_datatype_list.size > 0
+        key.push("DATATYPE/type")
+        line.push(wgs_datatype_list.first[:line_no])
+      end
+      if wgs_keyword_list.size > 0
+        key.push("KEYWORD/keyword")
+        line.push(wgs_keyword_list.first[:line_no])
+      end
+      annotation = [
+        {key: key.join(", "), value: "WGS"},
+        {key: "File name", value: @anno_file},
+        {key: "Location", value: "Line: #{line.join(", ")}"}
+      ]
+      annotation.push({key: "Message", value: message}) unless message == ""
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
+      @error_list.push(error_hash)
     end
     ret
   end

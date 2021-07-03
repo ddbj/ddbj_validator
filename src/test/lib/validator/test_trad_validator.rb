@@ -100,11 +100,11 @@ class TestTradValidator < Minitest::Test
     assert_equal 1, qual_lines.size
     # not exist
     qual_lines = @validator.data_by_feat_qual("mRNA", "gene", anno_by_qual) ## not exist feature
-    assert_nil qual_lines
+    assert_equal [], qual_lines
     qual_lines = @validator.data_by_feat_qual("CDS", "locus_tag", anno_by_qual) ## not exist qualifier
-    assert_nil qual_lines
+    assert_equal [], qual_lines
     qual_lines = @validator.data_by_feat_qual("mRNA", "locus_tag", anno_by_qual) ## not exist both
-    assert_nil qual_lines
+    assert_equal [], qual_lines
   end
 
   def test_data_by_ent_feat_qual
@@ -117,11 +117,11 @@ class TestTradValidator < Minitest::Test
     assert_equal 1, qual_lines.size
     # not exist
     qual_lines = @validator.data_by_ent_feat_qual("COMMOOON", "DATE", "hold_date", anno_by_qual) ## not exist entry
-    assert_nil qual_lines
+    assert_equal [], qual_lines
     qual_lines = @validator.data_by_ent_feat_qual("ENT01", "mRNA", "gene", anno_by_qual) ## not exist feature
-    assert_nil qual_lines
+    assert_equal [], qual_lines
     qual_lines = @validator.data_by_ent_feat_qual("ENT02", "CDS", "locus_tag", anno_by_qual) ## not exist qualifier
-    assert_nil qual_lines
+    assert_equal [], qual_lines
   end
 
   def test_range_hold_date
@@ -346,6 +346,63 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "TR_R0004", organism_info_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+  end
+
+  # rule:TR_R0005
+  def test_unnecessary_wgs_keywords
+    #ok case
+    ## not exist WGS keyword
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ok_no_wgs.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## over 10 entries
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ok_over_10_entry.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## 'complete genome' at title
+    ### on source/ff_defisition
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_complete_genome_title.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ### on REFERENCE/title
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_complete_genome_title2.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## has plasmid
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_has_plasmid.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## topology circular in COMMON
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_topology_circular_in_common.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## topology circular in Chromosome(not plasmid) entry
+    annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_topology_circular_in_chr_entry.ann")
+    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # rule:TR_R0006

@@ -1,0 +1,61 @@
+COMMON	DATATYPE		type	WGS
+	KEYWORD		keyword	WGS
+	SUBMITTER		contact	Toshihisa OKIDO
+			ab_name	Okido,T.
+			email	mass@ddbj.nig.ac.jp
+			phone	81-55-981-6853
+			institute	NIG
+			department	DDBJ
+			country	Japan
+			state	Shizuoka
+			city	Mishima
+			street	Yata 1111
+			zip	411-8581
+	COMMENT		line	Annotated at DFAST https://dfast.nig.ac.jp/
+	ST_COMMENT		tagset_id	Genome-Assembly-Data
+			Assembly Method	Flye v. 2.8.3
+			Genome Coverage	150x
+			Sequencing Technology	Illumina Hiseq; Nanopore Minion
+	DBLINK		project	PRJDB11508
+			biosample	SAMD00297130
+			sequence read archive	DRR286856
+			sequence read archive	DRR286857
+	REFERENCE		title	Complete genome sequence of colistin-resistant Escherichia coli derived from pigs
+			ab_name	Okido,T.
+			year	2021
+entry1	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry2	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry3	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry4	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry5	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry6	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry7	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry8	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
+entry9	source	1..4773053	ff_definition	@@[organism]@@ @@[strain]@@ DNA
+			mol_type	genomic DNA
+			organism	Escherichia coli
+			strain	Ec387
