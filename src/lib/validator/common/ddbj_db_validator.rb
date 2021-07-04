@@ -610,4 +610,65 @@ class DDBJDbValidator
     result
   end
 
+  #
+  # 指定されたRUN accession idのリストに対して、各IDがDBで有効なIDであるか検証してフラグをつけて返す
+  #
+  # ==== Args
+  # run_accession_list ex. ["DRR060518", "DRR000000"]
+  # ==== Return
+  # 存在フラグを付与したリスト ex. [{accession_id: "DRR060518", is_exist: true}, {accession_id: "DRR000000", is_exist: false}]
+  #
+  def exist_check_run_ids(run_accession_list)
+    return nil if run_accession_list.nil? || run_accession_list.size == 0
+    result_run_list = run_accession_list.map {|run_id| {accession_id: run_id, is_exist: false}}
+    acc_list = []
+    run_accession_list.each do |run_accession|
+      if m = run_accession.chomp.strip.match(/^(?<acc_type>[D|S]RR)(?<acc_no>\d{6})$/)
+        acc_list.push({acc_type: m[:acc_type], acc_no: m[:acc_no].to_i})
+      end
+    end
+    unless acc_list.size == 0
+      # RUN IDのパラメータ分のIN句のquery parameterを組み立てる
+      # SQL側 =>  IN ( ($1, $2), ($3, $4) )
+      # parameter => ["DRR", 60518, "DRR", 60519]
+      query_text = ""
+      param_index = 0
+      query_params = []
+      acc_list.each do |param|
+        query_text += ", " unless param_index == 0
+        query_text += "($#{param_index += 1}, $#{param_index += 1})"
+        query_params.concat([param[:acc_type], param[:acc_no]])
+      end
+
+      begin
+        connection = get_connection(DRA_DB_NAME)
+        q = "SELECT ent2.acc_type drr, ent2.acc_no drrno, rel.grp_id r_grp_id, g_view.status
+               FROM mass.accession_entity ent1
+               JOIN mass.accession_relation rel ON(ent1.acc_id=rel.p_acc_id)
+               JOIN mass.accession_entity ent2 ON(rel.acc_id=ent2.acc_id)
+               JOIN mass.current_dra_submission_group_view g_view ON (rel.grp_id = g_view.grp_id)
+             WHERE
+               ent2.is_delete != TRUE
+               AND g_view.status NOT IN (900, 1000, 1100)
+               AND (ent2.acc_type, ent2.acc_no) IN ( #{query_text} )"
+
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", query_params)
+
+        res.each do |row|
+          run_accession_id = "#{row["drr"]}#{row["drrno"].rjust(6, '0')}" # 0埋め6桁
+          result_run_list.each do |search_run|
+            search_run[:is_exist] = true if search_run[:accession_id] == run_accession_id
+          end
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result_run_list
+  end
 end

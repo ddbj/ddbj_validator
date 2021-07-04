@@ -30,6 +30,13 @@ class TradValidator < ValidatorBase
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @error_list = error_list = []
     @validation_config = @conf[:validation_config] #need?
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
     @cache = ValidatorCache.new
   end
 
@@ -58,12 +65,19 @@ class TradValidator < ValidatorBase
     check_by_transchecker("TR_R0007", anno_file, seq_file)
     check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
 
-    #TODO biosampleはNOTEにも記載されているケースがある
     @organism_info_list = []
     taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
     taxonomy_at_species_or_infraspecific_rank("TR_R0004", @organism_info_list)
     unnecessary_wgs_keywords("TR_R0005", annotation_list, anno_by_qual)
 
+    # DBLINKチェック
+    if @use_db
+      invalid_bioproject_accession("TR_R0010", data_by_feat_qual("DBLINK", "project", anno_by_qual))
+      invalid_biosample_accession("TR_R0011", data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
+      invalid_drr_accession("TR_R0012", data_by_feat_qual("DBLINK", "sequence read archive", anno_by_qual))
+      # BioSample整合性チェック
+      # TODO biosampleはNOTEにも記載されているケースがあるがそれを対象に含めるか？
+    end
   end
 
   #
@@ -830,4 +844,161 @@ class TradValidator < ValidatorBase
     end
     ret
   end
+
+  #
+  # rule:TR_R0009
+  # DBLINKの記載が不足していないかチェックする
+  #
+  # ==== Args
+  # rule_code
+  # ==== Return
+  # true/false
+  #
+  def missing_dblink(rule_code)
+  end
+
+  #
+  # rule:TR_R0010
+  # DBLINKに記載されているBioProjectのAccessionが実在するかチェック
+  #
+  # ==== Args
+  # rule_code
+  # bioproject_list: BioProject accession IDが記述された行のリスト [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]
+  # ==== Return
+  # true/false
+  #
+  def invalid_bioproject_accession(rule_code, bioproject_list)
+    return nil if bioproject_list.nil? || bioproject_list.size == 0
+
+    result = true
+    invalid_id_list = []
+    line_no_list = []
+    bioproject_list.each do |bioproject_line|
+      bioproject_accession = bioproject_line[:value]
+      if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/
+        unless @db_validator.nil?
+          unless @db_validator.valid_bioproject_id?(bioproject_accession)
+            result = false
+            invalid_id_list.push(bioproject_accession)
+            line_no_list.push(bioproject_line[:line_no].to_s)
+          end
+        end
+      else # submission id(/^PSUB\d{6}$/)も認めない
+        result = false
+        invalid_id_list.push(bioproject_accession)
+        line_no_list.push(bioproject_line[:line_no].to_s)
+      end
+    end
+
+    if result == false
+      annotation = [
+        {key: "DBLINK/project", value: invalid_id_list.join(", ")},
+        {key: "File name", value: @anno_file},
+        {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:TR_R0011
+  # DBLINKに記載されているBioSampleのAccessionが実在するかチェック
+  #
+  # ==== Args
+  # rule_code
+  # biosample_list: BioSample accession IDが記述された行のリスト [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00025188", line_no: 24}]
+  # ==== Return
+  # true/false
+  #
+  def invalid_biosample_accession(rule_code, biosample_list)
+    return nil if biosample_list.nil? || biosample_list.size == 0
+
+    result = true
+    invalid_id_list = []
+    line_no_list = []
+    biosample_list.each do |biosample_line|
+      biosample_accession = biosample_line[:value]
+      if biosample_accession =~ /^SAM[D|E|N]\w?\d{1,}$/
+        unless @db_validator.nil?
+          unless @db_validator.is_valid_biosample_id?(biosample_accession)
+            result = false
+            invalid_id_list.push(biosample_accession)
+            line_no_list.push(biosample_line[:line_no].to_s)
+          end
+        end
+      else # submission id(/^SSUB\d{6}$/)も認めない
+        result = false
+        invalid_id_list.push(biosample_accession)
+        line_no_list.push(biosample_line[:line_no].to_s)
+      end
+    end
+
+    if result == false
+      annotation = [
+        {key: "DBLINK/biosample", value: invalid_id_list.join(", ")},
+        {key: "File name", value: @anno_file},
+        {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:TR_R0012
+  # DBLINKに記載されているDRRのAccessionが実在するかチェック
+  #
+  # ==== Args
+  # rule_code
+  # drr_list: RUN accession ID が記述された行のリスト [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 24}]
+  # ==== Return
+  # true/false
+  #
+  def invalid_drr_accession(rule_code, drr_list)
+    return nil if drr_list.nil? || drr_list.size == 0
+
+    result = true
+    invalid_id_list = []
+    line_no_list = []
+    # DRRは複数記載されるケースがあり、まとめてDBチェックする
+    drr_accession_id_list = drr_list.map {|row| row[:value]}
+    unless @db_validator.nil?
+      result_run_list = @db_validator.exist_check_run_ids(drr_accession_id_list)
+    end
+    result_run_list.each do |result_run_id|
+      if result_run_id[:is_exist] == false
+        invalid_id_list.push(result_run_id[:accession_id])
+        lines = drr_list.select {|row| row[:value] == result_run_id[:accession_id]}
+        line_no_list.concat(lines.map{|row| row[:line_no]})
+        result = false
+      end
+    end
+
+    if result == false
+      annotation = [
+        {key: "DBLINK/sequence read archive", value: invalid_id_list.join(", ")},
+        {key: "File name", value: @anno_file},
+        {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:TR_R0013
+  # DBLINKに記載されているBioProject/BioSample/DRRのAccessionの組合せが正しいかチェック
+  #
+  # ==== Args
+  # rule_code
+  # ==== Return
+  # true/false
+  #
+  def invalid_combination_of_accessions(rule_code)
+  end
+
 end

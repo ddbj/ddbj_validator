@@ -10,6 +10,12 @@ class TestTradValidator < Minitest::Test
     Dotenv.load "../../../../.env"
     @validator = TradValidator.new
     @test_file_dir = File.expand_path('../../../data/trad', __FILE__)
+    # DDBJ RDBを使用するテストするか否か。を設定ファイルから判定
+    setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../../../conf/validator.yml")).result)
+    @ddbj_db_mode = true
+    if setting["ddbj_rdb"].nil? || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == ""
+      @ddbj_db_mode = false
+    end
   end
 
   #### テスト用共通メソッド ####
@@ -514,4 +520,88 @@ class TestTradValidator < Minitest::Test
     assert_nil ret
   end
 
+  # rule:TR_R0009
+  def test_missing_dblink
+    return nil if @ddbj_db_mode == false
+    #TODO test
+  end
+
+  # rule:TR_R0010
+  def test_invalid_bioproject_accession
+    return nil if @ddbj_db_mode == false
+    #ok case
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_accession", "TR_R0010", bioproject_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## PSUB
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PSUB004141", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_accession", "TR_R0010", bioproject_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB0000", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_accession", "TR_R0010", bioproject_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## nil
+    ret = exec_validator("invalid_bioproject_accession", "TR_R0010", [])
+    assert_nil ret[:result]
+  end
+
+  # rule:TR_R0011
+  def test_invalid_biosample_accession
+    return nil if @ddbj_db_mode == false
+    #ok case
+    biosample_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00025188", line_no: 24}]
+    ret = exec_validator("invalid_biosample_accession", "TR_R0011", biosample_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## SSUB
+    biosample_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SSUB003675", line_no: 24}]
+    ret = exec_validator("invalid_biosample_accession", "TR_R0011", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist
+    biosample_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00000000", line_no: 24}]
+    ret = exec_validator("invalid_biosample_accession", "TR_R0011", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## nil
+    ret = exec_validator("invalid_biosample_accession", "TR_R0011", [])
+    assert_nil ret[:result]
+  end
+
+  # rule:TR_R0012
+  def test_invalid_drr_accession
+    return nil if @ddbj_db_mode == false
+    #ok case
+    drr_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 24}]
+    drr_list.push({entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060519", line_no: 24})
+    ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## SSUB
+    drr_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 24}]
+    drr_list.push({entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR000000", line_no: 24}) # <= not exist
+    ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    p ret[:error_list]
+    ## not exist
+    drr_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "not exist", line_no: 24}]
+    drr_list.push({entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR000000", line_no: 24})
+    ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## nil
+    ret = exec_validator("invalid_drr_accession", "TR_R0012", [])
+    assert_nil ret[:result]
+  end
 end

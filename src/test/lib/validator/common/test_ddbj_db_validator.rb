@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'json'
 require 'yaml'
 require 'erb'
@@ -85,6 +86,7 @@ class TestDDBJDbValidator < Minitest::Test
 
   end
 
+  #TODO get_bioproject_names_list に修正
   def test_get_bioproject_names
     # exist case
     ret = @db_validator.get_bioproject_names("ddbj_ffpri")
@@ -94,6 +96,7 @@ class TestDDBJDbValidator < Minitest::Test
     assert_equal 0, ret.size
   end
 
+  #TODO get_bioproject_names_list に修正
   def test_get_bioproject_title_descs
     # exist case
     ret = @db_validator.get_bioproject_title_descs("ddbj_ffpri")
@@ -235,6 +238,16 @@ class TestDDBJDbValidator < Minitest::Test
 
     # not exist id
     assert_nil @db_validator.get_submitter_contact_list("not id")
+  end
+
+  def test_exist_check_run_ids
+    ret = @db_validator.exist_check_run_ids(["DRR060518","DRR060519"])
+    assert_equal ret.select{|row| row[:accession_id] == "DRR060518"}.first[:is_exist], true
+    assert_equal ret.select{|row| row[:accession_id] == "DRR060519"}.first[:is_exist], true
+
+    ret = @db_validator.exist_check_run_ids(["DRR000000","Not RUN ID"])
+    assert_equal ret.select{|row| row[:accession_id] == "DRR000000"}.first[:is_exist], false
+    assert_equal ret.select{|row| row[:accession_id] == "Not RUN ID"}.first[:is_exist], false
   end
 
 end
