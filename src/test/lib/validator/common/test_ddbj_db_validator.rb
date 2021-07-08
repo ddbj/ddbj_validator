@@ -250,4 +250,12 @@ class TestDDBJDbValidator < Minitest::Test
     assert_equal ret.select{|row| row[:accession_id] == "Not RUN ID"}.first[:is_exist], false
   end
 
+  def test_get_biosample_metadata
+    ret = @db_validator.get_biosample_metadata(["SAMD00052344","SAMD00052345", "SAMD00000000", "SSUB000000"])
+    assert ret["SAMD00052344"][:attribute_list].size > 0
+    assert ret["SAMD00052345"][:attribute_list].size > 0
+    assert_nil ret["SAMD00000000"]
+    assert_nil ret["SSUB000000"]
+  end
+
 end

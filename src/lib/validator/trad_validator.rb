@@ -58,6 +58,7 @@ class TradValidator < ValidatorBase
     annotation_list = anno_tsv2obj(anno_file)
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
     invalid_hold_date("TR_R0001", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
     missing_hold_date("TR_R0002", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
     # parser
@@ -72,11 +73,25 @@ class TradValidator < ValidatorBase
 
     # DBLINKチェック
     if @use_db
+      missing_dblink("TR_R0009", data_by_feat("DBLINK", anno_by_feat), anno_by_ent)
       invalid_bioproject_accession("TR_R0010", data_by_feat_qual("DBLINK", "project", anno_by_qual))
       invalid_biosample_accession("TR_R0011", data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
       invalid_drr_accession("TR_R0012", data_by_feat_qual("DBLINK", "sequence read archive", anno_by_qual))
+      # biosampleの情報を取得(note.derived_from属性の参照サンプル含む)
+      biosample_info_list = get_biosample_info(data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
+      # TODO ID整合性チェック
+      # invalid_combination_of_accessions("TR_R0013")
+
+      # TODO submitter_check(先のIDチェック時に有効IDを保存した方が良い？)
+      # inconsistent_submitter
+
       # BioSample整合性チェック
-      # TODO biosampleはNOTEにも記載されているケースがあるがそれを対象に含めるか？
+      inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_isolate_with_biosample("TR_R0016", data_by_qual("isolate", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_isolation_source_with_biosample("TR_R0017", data_by_qual("isolation_source", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_country_with_biosample("TR_R0019", data_by_qual("country", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_locus_tag_with_biosample("TR_R0020", data_by_qual("locus_tag", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
     end
   end
 
@@ -441,7 +456,7 @@ class TradValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def unnecessary_wgs_keywords(rule_code, annotation_list, anno_by_qual, anno_by_feat)
+  def unnecessary_wgs_keywords(rule_code, annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     ret = true
     # WGSの記載があるかチェック
     wgs_keyword = false
@@ -455,7 +470,6 @@ class TradValidator < ValidatorBase
     # WGSの記載があった場合に complete genome のような内容ではないかチェックする
     message = ""
     if wgs_keyword == true
-      anno_by_ent = annotation_list.group_by{|row| row[:entry]}
       entry_size = anno_by_ent.keys.delete_if{|ent| ent == "COMMON"}.size
       if entry_size <= 10 # entry数が10以下(少ない)
         # titleに"complete genome"という文字列が含まれている
@@ -848,13 +862,68 @@ class TradValidator < ValidatorBase
   #
   # rule:TR_R0009
   # DBLINKの記載が不足していないかチェックする
+  # TODO: 登録の種類によってはDBLINKが不要なケースもあるが、ひとまずDFAST向けに全てのファイルに必須であるというチェック。
   #
   # ==== Args
   # rule_code
+  # dblink_list: DBLINKが記述された行のリスト　e.g.[ {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}]
+  # anno_by_ent: annotationをentry事にgroupingしたハッシュ
   # ==== Return
   # true/false
   #
-  def missing_dblink(rule_code)
+  def missing_dblink(rule_code, dblink_list, anno_by_ent)
+    result = true
+    message = ""
+
+    #COMMON entryにDBLINKがあるか
+    common_dblink_exist = false
+    common_dblink = dblink_list.select{|row| row[:entry] == "COMMON"}
+    if common_dblink.size > 0
+      qual_list = common_dblink.map{|row| row[:qualifier]}
+      if qual_list.include?("project") && qual_list.include?("biosample")
+        common_dblink_exist = true
+      else
+        result = false
+        message = "COMMON/DBLINK requires both 'project' and 'biosample'."
+      end
+    end
+
+    # 各entry(COMMON)に記載があるか、あった場合にproject/biosampleが揃っているか
+    missing_dblink_entry_list = []
+    entry_dblink_count = 0
+    anno_by_ent.each do |entry_name, data|
+      next if entry_name == "COMMON"
+      entry_dblink = dblink_list.select{|row| row[:entry] == entry_name}
+      if entry_dblink.size > 0
+        entry_dblink_count += entry_dblink.size
+        qual_list = entry_dblink.map{|row| row[:qualifier]}
+        unless qual_list.include?("project") && qual_list.include?("biosample")
+          message += "#{entry_name}/DBLINK requires both 'project' and 'biosample'."
+          missing_dblink_entry_list.push(entry_name)
+          result = false
+        end
+      elsif !common_dblink_exist
+        missing_dblink_entry_list.push(entry_name)
+        result = false
+      end
+    end
+
+    # COMMONを除くentryにDBLINKに記載がなく、かつCOMMONにも記載がない
+    if entry_dblink_count == 0  && !common_dblink_exist
+      message = "COMMON/DBLINK requires." if message == ""
+    end
+
+    if result == false
+      annotation = [
+        {key: "entry", value: missing_dblink_entry_list.join(", ")},
+        {key: "File name", value: @anno_file}
+      ]
+      annotation.push({key: "Message", value: message}) unless message == ""
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+
+    result
   end
 
   #
@@ -990,6 +1059,141 @@ class TradValidator < ValidatorBase
   end
 
   #
+  # 指定されたBioSample accession idごとのメタデータを取得して返す。note,derived_from属性に他のSampleID(SAMD)が記載されたている場合はそれらのメタデータも取得する。
+  # accession idがDBに存在しないサンプルについては結果に含まれない
+  # ==== Args
+  # biosample_list accession_idのリスト e.g. ["SAMD00052344","SAMD00052345", "SAMD00000000", "SAMD00060421"]
+  #
+  # ==== Return
+  # accession id毎のBioSampleのメタデータ
+  # {
+  #  "SAMD00052344": {
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB4841"},
+  #                      {attribute_name: "collection_date", attribute_value: "missing"}, ... # 空白は除外されるが"missing"や""NA"は取得される
+  #                    ]
+  #                  },
+  #  "SAMD00052345": {
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB4841"},
+  #                      {attribute_name: "collection_date", attribute_value: "missing"}, ...
+  #                    ]
+  #                  },
+  #  "SAMD00060421": {
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB5067"},
+  #                      {attribute_name: "collection_date", attribute_value: "2014"},
+  #                      {attribute_name: "derived_from",  attribute_value: "SAMD00056903, SAMD00056904"}, # note, derived_fromに埋まっている参照BioSampleもメタデータ取得対象
+  #                      {attribute_name: "note",  attribute_value: "This biosample is a metagenomic assembly obtained from the biogas fermenter metagenome BioSample: SAMD00056903, SAMD00056904."}
+  #                    ],
+  #                    ref_biosample_list: ["SAMD00056903", "SAMD00056904"] #参照BioSample accession id リスト(一意)
+  #                  },
+  #  "SAMD00056903": { # SAMD00060421 の note属性に記載されているBiosample
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB5067"},
+  #                      {attribute_name: "collection_date", attribute_value: "2014"}, ...
+  #                    ]
+  #                  },
+  #  "SAMD00056904": { # SAMD00060421 の note属性に記載されているBiosample
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB5067"},
+  #                      {attribute_name: "collection_date", attribute_value: "2014"}, ...
+  #                    ]
+  #                  }
+  #  }
+  # SAMD00000000 はdbから値が取得できないため結果には含まれない
+  #
+  def get_biosample_info(biosample_list)
+    return {} if biosample_list.nil? || biosample_list.size == 0
+
+    unless @db_validator.nil?
+      ref_biosample_id_list = []
+      biosample_info = @db_validator.get_biosample_metadata(biosample_list)
+      biosample_info.each do |biosample_id, biosample_data|
+        biosample_data[:attribute_list].each do |attr|
+          if attr[:attribute_name] == "note" || attr[:attribute_name] == "derived_from"
+            ref_list = attr[:attribute_value].scan(/SAMD\w?\d{1,}/)
+            biosample_data[:ref_biosample_list] = [] if biosample_data[:ref_biosample_list].nil?
+            biosample_data[:ref_biosample_list].concat(ref_list).uniq!
+            ref_biosample_id_list.concat(ref_list)
+          end
+        end
+      end
+      # noteかderived_fromに記載された
+      if ref_biosample_id_list.size > 0
+        ref_biosample_info = @db_validator.get_biosample_metadata(ref_biosample_id_list.uniq)
+        biosample_info.merge!(ref_biosample_info)
+      end
+    end
+    biosample_info
+  end
+
+  #
+  # 渡されたannotationリスト(行のリスト)に、対応するbiosampleの指定された属性値を加えて返す。
+  # biosample属性との整合性チェック用。
+  #
+  # 同じエントリーにDBLINK/biosampleがあればその属性を参照し、同じエントリーにDBLINK/biosampleに記載がなければCOMMONエントリーのDBLINKを参照する。
+  # 対応するDBLINK/biosampleがない場合や、記載されたBioSampleIDがdb上で見つからない場合はbiosampleの情報は付与しない。エラーにはしない
+  # BioSampleIDがdbに登録されていて、
+  #
+  # ==== Args
+  # annotation_line_list: 対象とするannotation行のリスト. /isolate 記載行等. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
+  # attribute_name: 取得するbiosample属性名 e.g. "isolate", "geo_loc_name"
+  #
+  # ==== Return
+  # annotation_line_listにbiosampleの属性値を加えたリスト
+  #  [
+  #    { entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24,
+  #      biosample: {biosample_id: "SAMD00081372", attr_value_list: ["BMS3Abin12"]} #locus_tag_prefixなど複数の値が存在する場合があるのでリストで返す
+  #    }
+  #  ]
+  #  // BioSampleIDはあるが、属性が存在しない(or空白)場合はattr_value_listはnilで返す
+  #  [
+  #    { entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24,
+  #      biosample: {biosample_id: "SAMD00081372", attr_value_list: nil}
+  #    }
+  #  ]
+  #  // 対応するDBLINK/biosampleがない場合や、あってもBioSampleIDがdbに存在しない場合はbiosampleid情報自体を付与しない(元のまま)
+  #  [
+  #    { entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}
+  #  ]
+  def corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, attribute_name)
+    return [] if annotation_line_list.nil? || annotation_line_list.size == 0
+    target_line_list = annotation_line_list.clone
+    set_list = []
+    target_line_list.each do |target_line|
+      trad_value = target_line[:value]
+      entry_name = target_line[:entry]
+      # 同じエントリにDBLINK/biosampleの値を検索
+      biosample_line = biosample_data_list.select{|bs_line| bs_line[:entry] == entry_name}
+      if biosample_line.size == 0 # なければCOMMON/DBLINK/biosampleの値を検索
+        biosample_line = biosample_data_list.select{|bs_line| bs_line[:entry] == "COMMON"}
+      end
+      if biosample_line.size == 0
+        ## TR_R0009:missing_dblink で別途チェックされるのでここでは無視
+      else
+        biosample_id = biosample_line.first[:value]
+        if biosample_info[biosample_id].nil?
+          # biosample_idの記載はあるがDBから情報取得できなかったケース。
+          # TR_R0011:invalid_biosample_accessionで別途チェックされるので無視
+        else
+          attr_list = biosample_info[biosample_id][:attribute_list]
+          target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
+          if target_attribute_list.size == 0 # BioSample側に当該属性の値がない
+            target_line[:biosample] = {biosample_id: biosample_id, attr_value: nil}
+          else
+            # attribute_value
+            target_line[:biosample] = {biosample_id: biosample_id, attr_value_list: target_attribute_list.map{|row| row[:attribute_value]}}
+          end
+        end
+      end
+    end
+    target_line_list
+  end
+
+  #
   # rule:TR_R0013
   # DBLINKに記載されているBioProject/BioSample/DRRのAccessionの組合せが正しいかチェック
   #
@@ -999,6 +1203,366 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_combination_of_accessions(rule_code)
+
   end
 
+  #
+  # rule:TR_R0014
+  # submitterが他の登録(BioProject/BioSample/DRA)のsubmitterと異なっている
+  #
+  def inconsistent_submitter(rule_code, submitter)
+
+  end
+
+  #
+  # rule:TR_R0015
+  # /organismと/strainの値が対応するBioSampleのorganismとstrain属性値と一致しているかチェック。
+  # strain属性には記載はないが、/stgain記載がある場合にもワーニングとする。
+  #
+  # ==== Args
+  # rule_code
+  # organism_data_list: /organismの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+  # strain_data_list: /strainの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"}, {attribute_name: "strain", attribute_value: "RI-137"}, {}....]}}
+  #
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_organism_with_biosample(rule_code, orgnism_data_list, strain_data_list, biosample_data_list, biosample_info)
+    # annotationの/organismは必須項目であり、記述がなければjParserでエラーになるため、BioSampleにしか記載がないというチェックは行わない。
+    return nil if orgnism_data_list.nil? || orgnism_data_list.size == 0
+
+    ret = true
+    # 対応するBioSampleとそのorganismとstrain属性値を取得
+    organism_data_list_with_bs_value = corresponding_biosample_attr_value(orgnism_data_list, biosample_data_list, biosample_info, "organism")
+    strain_data_list_with_bs_value = corresponding_biosample_attr_value(strain_data_list, biosample_data_list, biosample_info, "strain")
+    organism_data_list_with_bs_value.each do |organism_line|
+      check = true
+      message = ""
+      trad_organism_value = organism_line[:value]
+      unless organism_line[:biosample].nil? #対応biosampleがある
+        biosample_organism_attr_values = ""
+        biosample_strain_attr_values = ""
+        trad_strain_value = ""
+        # /organismと同じfeatureに/strainの記述があれば対応するBioSampleのstrain属性を取得する
+        strain_lines = strain_data_list_with_bs_value.select{|strain_line| strain_line[:feature_no] == organism_line[:feature_no]}
+        if strain_lines.size > 0
+          trad_strain_value = strain_lines.first[:value]
+          unless strain_lines.first[:biosample][:attr_value_list].nil?
+            biosample_strain_attr_values = strain_lines.first[:biosample][:attr_value_list].join(", ")
+          end
+        end
+        if organism_line[:biosample][:attr_value_list].nil? #organism属性がない(mandatory属性なのでまずここは通らない)
+          check = false
+          message = "The organism attribute is not described on BioSample"
+        else # organism属性がある
+          if !organism_line[:biosample][:attr_value_list].include?(trad_organism_value) # organismの値が異なる
+            check = false
+            biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
+            message = "The organism is not match on BioSample"
+          else #organismの値が一致する場合はstrainのチェックを行う
+            biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
+            if strain_lines.size > 0 #annotation側に/strainの記述がある
+              if strain_lines.first[:biosample][:attr_value_list].nil? #strain属性がない #TODO ここでmissingを排除する？
+                check = false
+                message = "The strain attribute is not described on BioSample"
+              elsif !strain_lines.first[:biosample][:attr_value_list].include?(trad_strain_value) # strainの値が異なる
+                check = false
+                message = "The strain is not match on BioSample"
+              end
+            else #annotation側に/strainの記述がない
+              #organismのbiosampleidを辿ってstrain属性値を取得
+              bs_info = biosample_info[organism_line[:biosample][:biosample_id]]
+              strain_attr_values = bs_info[:attribute_list].select{|attr| attr[:attribute_name] == 'strain'}
+              # TODO ここでmissing等の値を除外するか
+              if strain_attr_values.size > 0 # BioSample側にはstrainの記述がある
+                check = false
+                biosample_strain_attr_values = strain_attr_values.map{|attr| attr[:attribute_value]}.join(", ")
+                message = "The strain attribute is described on BioSample, but /strain qualifier is not exist"
+              end
+            end
+          end
+        end
+        if check == false
+          ret = false #1行でもエラーがあればfalse
+          annotation = [
+            {key: "organism", value: trad_organism_value},
+            {key: "strain", value: trad_strain_value},
+            {key: "BioSample value[organism]", value: biosample_organism_attr_values},
+            {key: "BioSample value[strain]", value: biosample_strain_attr_values},
+            {key: "BioSample ID", value: organism_line[:biosample][:biosample_id]},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{organism_line[:line_no]}"}
+          ]
+          annotation.push({key: "Message", value: message}) unless message == ""
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0016
+  # /isolateの値が対応するBioSampleのisolate属性値と一致しているかチェック。
+  # isolate属性には記載はないが、/isolateに記載がある場合にもワーニングとする。
+  #
+  # TODO: このルールの適用は全ゲノムのみ対象とし、それ以外の登録ではチェック不要(/isolateの値がBS同一でなくてもよい)。
+  # 取り急ぎDFAST対応のため全ファイルを対象とする。
+  #
+  # ==== Args
+  # rule_code
+  # isolate_data_list: /isolateの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_isolate_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info)
+    return nil if isolate_data_list.nil? || isolate_data_list.size == 0
+    ret = true
+    # 対応するBioSampleとそのisolate属性値を取得
+    isolate_data_list_with_bs_value = corresponding_biosample_attr_value(isolate_data_list, biosample_data_list, biosample_info, "isolate")
+    isolate_data_list_with_bs_value.each do |isolate_line|
+      check = true
+      message = ""
+      trad_isolate_value = isolate_line[:value]
+      unless isolate_line[:biosample].nil?
+        if isolate_line[:biosample][:attr_value_list].nil?
+          check = false
+          biosample_attr_values = ""
+          message = "The isolate attribute is not described on BioSample"
+        elsif !isolate_line[:biosample][:attr_value_list].include?(trad_isolate_value)
+          check = false
+          biosample_attr_values = isolate_line[:biosample][:attr_value_list].join(", ")
+        end
+        if check == false
+          ret = false #1行でもエラーがあればfalse
+          annotation = [
+            {key: "isolate", value: trad_isolate_value},
+            {key: "BioSample value[isolate]", value: biosample_attr_values},
+            {key: "BioSample ID", value: isolate_line[:biosample][:biosample_id]},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{isolate_line[:line_no]}"}
+          ]
+          annotation.push({key: "Message", value: message}) unless message == ""
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    # TODO biosample側にしか記載がない場合にwarningを出す
+    ret
+  end
+
+  #
+  # rule:TR_R0017
+  # /isolation_sourceの値が対応するBioSampleのisolation_source属性値と一致しているかチェック。
+  # isolation_source属性には記載はないが、/isolation_sourceに記載がある場合にもワーニングとする。
+  #
+  # ==== Args
+  # rule_code
+  # isolation_source_data_list: /isolation_sourceの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolation_source", value: "Sub-seafloor massive sulfide deposits", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolation_source", attribute_value: "Sub-seafloor massive sulfide deposits"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_isolation_source_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info)
+    return nil if isolation_source_data_list.nil? || isolation_source_data_list.size == 0
+    ret = true
+    # 対応するBioSampleとそのisolation_source属性値を取得
+    isolation_source_data_list_with_bs_value = corresponding_biosample_attr_value(isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source")
+    isolation_source_data_list_with_bs_value.each do |isolation_source_line|
+      check = true
+      message = ""
+      trad_isolation_source_value = isolation_source_line[:value]
+      unless isolation_source_line[:biosample].nil?
+        if isolation_source_line[:biosample][:attr_value_list].nil?
+          check = false
+          biosample_attr_values = ""
+          message = "The isolation_source attribute is not described on BioSample"
+        elsif !isolation_source_line[:biosample][:attr_value_list].include?(trad_isolation_source_value)
+          check = false
+          biosample_attr_values = isolation_source_line[:biosample][:attr_value_list].join(", ")
+        end
+        if check == false
+          ret = false #1行でもエラーがあればfalse
+          annotation = [
+            {key: "isolation_source", value: trad_isolation_source_value},
+            {key: "BioSample value[isolation_source]", value: biosample_attr_values},
+            {key: "BioSample ID", value: isolation_source_line[:biosample][:biosample_id]},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{isolation_source_line[:line_no]}"}
+          ]
+          annotation.push({key: "Message", value: message}) unless message == ""
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    # TODO biosample側にしか記載がない場合にwarningを出す
+    ret
+  end
+
+  #
+  # rule:TR_R0018
+  # /collection_dateの値が対応するBioSampleのcollection_date属性値と一致しているかチェック。
+  # collection_date属性には記載はないが、/collection_dateに記載がある場合にもワーニングとする。
+  #
+  # ==== Args
+  # rule_code
+  # collection_date_data_list: /collection_dateの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "collection_date", value: "2010-06-16", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "collection_date", attribute_value: "2010-06-16"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_collection_date_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info)
+    return nil if collection_date_data_list.nil? || collection_date_data_list.size == 0
+    ret = true
+    collection_date_data_list_with_bs_value = corresponding_biosample_attr_value(collection_date_data_list, biosample_data_list, biosample_info, "collection_date")
+    collection_date_data_list_with_bs_value.each do |collection_date_line|
+      check = true
+      message = ""
+      trad_collection_date_value = collection_date_line[:value]
+      unless collection_date_line[:biosample].nil?
+        if collection_date_line[:biosample][:attr_value_list].nil?
+          check = false
+          biosample_attr_values = ""
+          message = "The collection_date attribute is not described on BioSample"
+        elsif !collection_date_line[:biosample][:attr_value_list].include?(trad_collection_date_value)
+          check = false
+          biosample_attr_values = collection_date_line[:biosample][:attr_value_list].join(", ")
+        end
+        if check == false
+          ret = false #1行でもエラーがあればfalse
+          annotation = [
+            {key: "collection_date", value: trad_collection_date_value},
+            {key: "BioSample value[collection_date]", value: biosample_attr_values},
+            {key: "BioSample ID", value: collection_date_line[:biosample][:biosample_id]},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{collection_date_line[:line_no]}"}
+          ]
+          annotation.push({key: "Message", value: message}) unless message == ""
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    # TODO biosample側にしか記載がない場合にwarningを出す
+    ret
+  end
+
+  #
+  # rule:TR_R0019
+  # /countryの値の国名が対応するBioSampleのgeo_loc_name属性値の国名と一致しているかチェック。
+  # geo_loc_name属性には記載はないが、/countryに記載がある場合にもワーニングとする。
+  # /country も geo_loc_name属性も":"区切りの最初の単語を国名として期待するフォーマットで、国名だけを比較する
+  #
+  # ==== Args
+  # rule_code
+  # country_data_list: /countryの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "country", value: "Japan:Yamanashi, Lake Mizugaki", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "geo_loc_name", attribute_value: "Japan"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_country_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info)
+    return nil if country_data_list.nil? || country_data_list.size == 0
+    ret = true
+    country_data_list_with_bs_value = corresponding_biosample_attr_value(country_data_list, biosample_data_list, biosample_info, "geo_loc_name")
+    country_data_list_with_bs_value.each do |country_line|
+      check = true
+      message = ""
+      trad_country_value = country_line[:value]
+      unless country_line[:biosample].nil?
+        if country_line[:biosample][:attr_value_list].nil?
+          check = false
+          biosample_attr_values = ""
+          message = "The country attribute is not described on BioSample"
+        else
+          # /country も geo_loc_name属性も":"区切りの最初の単語を国名として期待するフォーマット
+          trad_country_name = trad_country_value.split(":").first.chomp.strip
+          bs_count_name_list = country_line[:biosample][:attr_value_list].map{|attr_val| attr_val.split(":").first.chomp.strip }
+          if !bs_count_name_list.include?(trad_country_name)
+            check = false
+            biosample_attr_values = country_line[:biosample][:attr_value_list].join(", ")
+          end
+        end
+        if check == false
+          ret = false #1行でもエラーがあればfalse
+          annotation = [
+            {key: "country", value: trad_country_value},
+            {key: "BioSample value[geo_loc_name]", value: biosample_attr_values},
+            {key: "BioSample ID", value: country_line[:biosample][:biosample_id]},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{country_line[:line_no]}"}
+          ]
+          annotation.push({key: "Message", value: message}) unless message == ""
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    # TODO biosample側にしか記載がない場合にwarningを出す
+    ret
+  end
+
+  #
+  # rule:TR_R0020
+  # /locus_tagの値で使用されているprefixが、対応するBioSampleのlocus_tag_prefix属性値と一致しているかチェック。
+  # locus_tag_prefix属性には記載はないが、/locus_tagに記載がある場合にもワーニングとする。
+  # /locus_tagは"_"区切りの最初の単語をprefixとして期待するフォーマットで、prefix部分を比較する
+  #
+  # ==== Args
+  # rule_code
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_locus_tag_with_biosample(rule_code, locus_tag_data_list, biosample_data_list, biosample_info)
+    return nil if locus_tag_data_list.nil? || locus_tag_data_list.size == 0
+    ret = true
+    locus_tag_data_list_with_bs_value = corresponding_biosample_attr_value(locus_tag_data_list, biosample_data_list, biosample_info, "locus_tag_prefix")
+    faild_list = []
+    locus_tag_data_list_with_bs_value.each do |locus_tag_line|
+      check = true
+      message = ""
+      trad_locus_tag_value = locus_tag_line[:value]
+      unless locus_tag_line[:biosample].nil?
+        # /locus_tagは　"#{locus_tag_prefix}_XXXX"形式
+        trad_locus_tag_prefix_name = trad_locus_tag_value.split("_").first.chomp.strip
+        locus_tag_line[:trad_locus_tag_prefix_value] = trad_locus_tag_prefix_name
+        if locus_tag_line[:biosample][:attr_value_list].nil?
+          locus_tag_line[:biosample_attr_values] = "(not described)"
+          faild_list.push(locus_tag_line)
+        else
+          if !locus_tag_line[:biosample][:attr_value_list].include?(trad_locus_tag_prefix_name)
+            biosample_attr_values = locus_tag_line[:biosample][:attr_value_list].join(", ")
+            locus_tag_line[:biosample_attr_values] = biosample_attr_values
+            faild_list.push(locus_tag_line)
+          end
+        end
+      end
+    end
+
+    # locus_tagは大量に記述されている可能性があるため、locus_tag_prefix単位にまとめてエラーを出力
+    if faild_list.size > 0
+      ret = false #1行でもエラーがあればfalse
+      faild_list.group_by{|row| row[:trad_locus_tag_prefix_value]}.each do |locus_tag_prefix, lines|
+        annotation = [
+          {key: "locus_tag", value: locus_tag_prefix},
+          {key: "BioSample value[locus_tag]", value: lines.map{|row| row[:biosample_attr_values]}.uniq.join(", ")},
+          {key: "BioSample ID", value: lines.map{|row| row[:biosample][:biosample_id]}.uniq.join(", ")},
+          {key: "File name", value: @anno_file},
+          {key: "Location", value: "Line: #{lines.map{|row| row[:line_no].to_s}.join(", ")}"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    ret
+  end
 end

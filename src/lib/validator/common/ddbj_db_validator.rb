@@ -671,4 +671,74 @@ class DDBJDbValidator
     end
     result_run_list
   end
+
+  #
+  # 指定されたBioSampl accession idのリストに対して、IDがDBで有効な場合にメタデータをs取得して返す
+  #
+  # ==== Args
+  # biosample_accession_list ex. ["SAMD00052344", "SAMD00052345", "SAMD00000000"]
+  # ==== Return
+  # biosample accession idをキーとしたハッシュ。
+  # BioSample情報が取得できなかったIDは含まない
+  # ==== Return
+  # accession id毎のBioSampleのメタデータ
+  # {
+  #  "SAMD00052344": {
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB4841"},
+  #                      {attribute_name: "collection_date", attribute_value: "missing"}, ... # 空白は除外されるが"missing"や""NA"は取得される
+  #                    ]
+  #                  },
+  #  "SAMD00052345": {
+  #                    attribute_list: [
+  #                      {attribute_name: "bioproject_id", attribute_value: "PRJDB4841"},
+  #                      {attribute_name: "collection_date", attribute_value: "missing"}, ...
+  #                    ]
+  #                  },
+  #  }
+  #  SAMD00000000 はdbから値が取得できないため結果には含まれない
+  #
+  def get_biosample_metadata(biosample_accession_list)
+    return {} if biosample_accession_list.nil? || biosample_accession_list.size == 0
+    sample_id_list = []
+    biosample_accession_list.each do |accession_id|
+      if accession_id =~ /^SAMD\d+/
+        sample_id_list.push(accession_id)
+      end
+    end
+    if sample_id_list.size == 0
+      return {}
+    else
+      id_place_holder = (1..sample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+      begin
+        connection = get_connection(BIOSAMPLE_DB_NAME)
+
+        q = "SELECT attr.attribute_name, attr.attribute_value, acc.accession_id
+             FROM mass.sample smp
+               JOIN mass.accession acc USING(smp_id)
+               JOIN mass.attribute attr USING(smp_id)
+             WHERE
+               acc.accession_id IN (#{id_place_holder})
+               AND attr.attribute_value != ''
+               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", sample_id_list)
+
+        result = {}
+        res.group_by{|row| row["accession_id"]}.each do |acc_id, ret_list|
+          result[acc_id.to_s] = {attribute_list: []}
+          ret_list.each do |row|
+            result[acc_id.to_s][:attribute_list].push({attribute_name: row["attribute_name"], attribute_value: row["attribute_value"]})
+          end
+        end
+        result
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+  end
 end

@@ -164,6 +164,78 @@
       "Trad"
     ]
   },
+  "ruleTR_R0014": {
+    "rule_class": "Trad",
+    "code": "TR_R0014",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Inconsistent submitter",
+    "method": "inconsistent_submitter",
+    "message": "BioProject/BioSample/DRA accession is not registered in your account. Please provide a valid BioProject accession.",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0015": {
+    "rule_class": "Trad",
+    "code": "TR_R0015",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Inconsistent organism with biosample ",
+    "method": "inconsistent_organism_with_biosample_",
+    "message": "BioSampleに記載されたorganism/strainと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0016": {
+    "rule_class": "Trad",
+    "code": "TR_R0016",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Inconsistent isolate with biosample ",
+    "method": "inconsistent_isolate_with_biosample_",
+    "message": "BioSampleに記載されたisolateと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0017": {
+    "rule_class": "Trad",
+    "code": "TR_R0017",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Inconsistent isolation_source with biosample ",
+    "method": "inconsistent_isolation_source_with_biosample_",
+    "message": "BioSampleに記載されたisolation_sourceと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0018": {
+    "rule_class": "Trad",
+    "code": "TR_R0018",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Inconsistent collection_date with biosample",
+    "method": "inconsistent_collection_date_with_biosample",
+    "message": "BioSampleに記載されたcollection_dateと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0019": {
+    "rule_class": "Trad",
+    "code": "TR_R0019",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Inconsistent country with biosample",
+    "method": "inconsistent_country_with_biosample",
+    "message": "BioSampleに記載されたcountryと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
   "ruleTR_R0020": {
     "rule_class": "Trad",
     "code": "TR_R0020",
@@ -208,6 +280,66 @@
     "name": "Duplicate locus_tag",
     "method": "duplicate_locus_tag",
     "message": "The following locus_tag were used in this file more than one time. Please provide unique locus_tag.",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0025": {
+    "rule_class": "Trad",
+    "code": "TR_R0025",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "More detailed organism",
+    "method": "more_detailed_organism",
+    "message": "より詳細な生物種名の記載が必要です",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0026": {
+    "rule_class": "Trad",
+    "code": "TR_R0026",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Virus organism name",
+    "method": "virus_organism_name",
+    "message": "このウィルスではspecies名記載して下さい？",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0027": {
+    "rule_class": "Trad",
+    "code": "TR_R0027",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Oryza sativa organism name",
+    "method": "oryza_sativa_organism_name",
+    "message": "Oryza sativaの場合はより詳細な生物種名の記載を推奨します",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0028": {
+    "rule_class": "Trad",
+    "code": "TR_R0028",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Brassica organism name",
+    "method": "brassica_organism_name",
+    "message": "記載されたBrassicaでは、より詳細な生物種名の記載を推奨します",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0029": {
+    "rule_class": "Trad",
+    "code": "TR_R0029",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid taxonomy for genome sample",
+    "method": "invalid_taxonomy_for_genome_sample",
+    "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" should be used.",
     "object": [
       "Trad"
     ]

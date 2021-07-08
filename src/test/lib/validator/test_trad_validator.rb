@@ -361,14 +361,16 @@ class TestTradValidator < Minitest::Test
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ok_no_wgs.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## over 10 entries
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ok_over_10_entry.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -378,35 +380,40 @@ class TestTradValidator < Minitest::Test
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_complete_genome_title.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ### on REFERENCE/title
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_complete_genome_title2.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## has plasmid
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_has_plasmid.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## topology circular in COMMON
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_topology_circular_in_common.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## topology circular in Chromosome(not plasmid) entry
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/5_unnecessary_wgs_keywords_ng_topology_circular_in_chr_entry.ann")
     anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
     anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat)
+    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
+    ret = exec_validator("unnecessary_wgs_keywords", "TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
@@ -522,8 +529,75 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0009
   def test_missing_dblink
-    return nil if @ddbj_db_mode == false
-    #TODO test
+    #ok case
+    dblink_list = [ {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+                    {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}]
+    entry_data = {"COMMON" => [
+                    {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+                    {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # same entry
+    dblink_list = [ {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+                    {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}]
+    entry_data = {"Entry1" =>  [
+                    {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+                    {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ## not exist DBLINK in same entry, but exist COMMON
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}
+    ]
+    entry_data = {
+      "Entry1" => [
+        {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+        {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}
+      ]
+    }
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## missing biosample dblink on COMMON
+    dblink_list = [ {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]
+    entry_data = {"COMMON" => [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    ## missing biosample dblink on each Entry
+    dblink_list = [ {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]
+    entry_data = {"Entry1"=> [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    ## DBLINK is described at only diffrence entry(missing in Entry2)
+    dblink_list = [ {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+                    {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}]
+    entry_data = {"Entry1" =>  [
+                    {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24},
+                    {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRJDB3490", line_no: 25}],
+                  "Entry2" =>  [
+                    {entry: "Entry2", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    ## DBLINK is not described anywhere.
+    dblink_list = []
+    entry_data = {"Entry1" =>  [{entry: "Entry2", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
   end
 
   # rule:TR_R0010
@@ -593,7 +667,6 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    p ret[:error_list]
     ## not exist
     drr_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "not exist", line_no: 24}]
     drr_list.push({entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR000000", line_no: 24})
@@ -603,5 +676,312 @@ class TestTradValidator < Minitest::Test
     ## nil
     ret = exec_validator("invalid_drr_accession", "TR_R0012", [])
     assert_nil ret[:result]
+  end
+
+  def test_get_biosample_info
+    return nil if @ddbj_db_mode == false
+    ret = @validator.get_biosample_info(["SAMD00052344","SAMD00052345", "SAMD00000000", "SSUB000000"])
+    assert_equal 2, ret.keys.size
+
+    # has other biosample id in note, derived_from attribute
+    ret = @validator.get_biosample_info(["SAMD00060421", "SAMD00081372"])
+    assert_equal 6, ret.keys.size
+    assert_equal ["SAMD00056903", "SAMD00056904"], ret["SAMD00060421"][:ref_biosample_list].sort
+    assert_equal ["SAMD00080626", "SAMD00080628"], ret["SAMD00081372"][:ref_biosample_list].sort
+  end
+
+  def test_corresponding_biosample_attr_value
+    return nil if @ddbj_db_mode == false
+    # same entry
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = @validator.corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, "isolate")
+    assert_equal ["BMS3Abin12"], ret.first[:biosample][:attr_value_list]
+
+    # ref common if not exist same entry
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = @validator.corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, "isolate")
+    assert_equal ["BMS3Abin12"], ret.first[:biosample][:attr_value_list]
+
+    # high priority same entry than COMMON entry
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00000000", line_no: 20},
+      {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 22}
+    ]
+    biosample_info = {"SAMD00081372" =>  {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = @validator.corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, "isolate")
+    assert_equal "SAMD00081372", ret.first[:biosample][:biosample_id]
+    assert_equal ["BMS3Abin12"], ret.first[:biosample][:attr_value_list]
+
+    #not exist attribute
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" =>  {attribute_list: []}}
+    ret = @validator.corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, "isolate")
+    assert_nil ret.first[:biosample][:attr_value_list]
+
+    # not exist both same entry and COMMON
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry2", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" =>  {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = @validator.corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, "isolate")
+    assert_nil ret.first[:biosample] #biosampleの情報自体が取得できない
+
+    # not exist biosample id
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00000000", line_no: 20}]
+    biosample_info = {}
+    ret = @validator.corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, "isolate")
+    assert_nil ret.first[:biosample] #biosampleの情報自体が取得できない
+  end
+
+  # rule:TR_R0015
+  def test_inconsistent_organism_with_biosample
+    #ok case
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"},
+                                                          {attribute_name: "strain", attribute_value: "RI-137"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## both not exist /strain qualifier and strain attribute
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = []
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## both not exist /strain qualifier and strain attribute (/strain qualifier described on difference feature than organism)
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 22}] # <= difference feature than organism
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## not match organism value
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Not match value"},
+                                                          {attribute_name: "strain", attribute_value: "RI-137"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not match strain value
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"},
+                                                          {attribute_name: "strain", attribute_value: "Not match value"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## organism attribute is not exist on BioSample
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: []}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## strain attribute is not exist on BioSample, but /strain qualifier is exist
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## /strain qualifier is not exist , but strain attribute is exist on BioSample(but exist
+    organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+    strain_line_list = []
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"},
+                                                          {attribute_name: "strain", attribute_value: "RI-137"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #nil case
+    organism_line_list = []
+    strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Not match value"},
+                                                          {attribute_name: "strain", attribute_value: "RI-137"}]}}
+    ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+    assert_nil ret[:result]
+
+  end
+
+  # rule:TR_R0016
+  def test_inconsistent_isolate_with_biosample
+    return nil if @ddbj_db_mode == false
+    #ok case
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = exec_validator("inconsistent_isolate_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not describe biosampleid (no check)
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = []
+    biosample_info = {}
+    ret = exec_validator("inconsistent_isolate_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not exist biosampleid (no check)
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00000000", line_no: 20}]
+    biosample_info = {}
+    ret = exec_validator("inconsistent_isolate_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## isolate value does not match
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "other value"}]}}
+    ret = exec_validator("inconsistent_isolate_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist biosample 'isolate' attribute
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" =>  {attribute_list: []}}
+    ret = exec_validator("inconsistent_isolate_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    annotation_line_list = []
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "other value"}]}}
+    ret = exec_validator("inconsistent_isolate_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info)
+    assert_nil ret[:result]
+  end
+
+
+  # rule:TR_R0017
+  def test_inconsistent_isolation_source_with_biosample
+    return nil if @ddbj_db_mode == false
+    # ほぼ TR_R0016と同様のためテスト一部省略
+    #ok case
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolation_source", value: "Sub-seafloor massive sulfide deposits", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolation_source", attribute_value: "Sub-seafloor massive sulfide deposits"}]}}
+    ret = exec_validator("inconsistent_isolation_source_with_biosample", "TR_R0017", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## isolation_source value does not match
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolation_source", value: "Sub-seafloor massive sulfide deposits", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolation_source", attribute_value: "other value"}]}}
+    ret = exec_validator("inconsistent_isolation_source_with_biosample", "TR_R0017", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:TR_R0018
+  def test_inconsistent_collection_date_with_biosample
+    return nil if @ddbj_db_mode == false
+    # ほぼ TR_R0016と同様のためテスト一部省略
+    #ok case
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "collection_date", value: "2010-06-16", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "collection_date", attribute_value: "2010-06-16"}]}}
+    ret = exec_validator("inconsistent_collection_date_with_biosample", "TR_R0018", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## collection_date value does not match
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "collection_date", value: "2010-06-16", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "collection_date", attribute_value: "other value"}]}}
+    ret = exec_validator("inconsistent_collection_date_with_biosample", "TR_R0018", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:TR_R0019
+  def test_inconsistent_country_with_biosample
+    return nil if @ddbj_db_mode == false
+    # ほぼ TR_R0016と同様のためテスト一部省略
+    #ok case
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "country", value: "Japan:Yamanashi, Lake Mizugaki", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081395", line_no: 20}]
+    biosample_info = {"SAMD00081395" => {attribute_list: [{attribute_name: "geo_loc_name", attribute_value: "Japan:Yamanashi, Lake Mizugaki"}]}}
+    ret = exec_validator("inconsistent_country_with_biosample", "TR_R0019", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # only country value check
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "country", value: "Japan:Yamanashi, Lake Mizugaki", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081395", line_no: 20}]
+    biosample_info = {"SAMD00081395" => {attribute_list: [{attribute_name: "geo_loc_name", attribute_value: "Japan : other city"}]}}
+    ret = exec_validator("inconsistent_country_with_biosample", "TR_R0019", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## country value does not match
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "country", value: "Japan:Yamanashi, Lake Mizugaki", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081395", line_no: 20}]
+    biosample_info = {"SAMD00081395" => {attribute_list: [{attribute_name: "geo_loc_name", attribute_value: "other value"}]}}
+    ret = exec_validator("inconsistent_country_with_biosample", "TR_R0019", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:TR_R0020
+  def test_inconsistent_locus_tag_with_biosample
+    return nil if @ddbj_db_mode == false
+    # ほぼ TR_R0016と同様のためテスト一部省略
+    #ok case
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "locus_tag", value: "EFBL_00001", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081395", line_no: 20}]
+    biosample_info = {"SAMD00081395" => {attribute_list: [{attribute_name: "locus_tag_prefix", attribute_value: "EFBL"}]}}
+    ret = exec_validator("inconsistent_locus_tag_with_biosample", "TR_R0020", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## locus_tag_prefix value does not match
+    annotation_line_list = [{entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "NOTPREFIX_00001", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081395", line_no: 20}]
+    biosample_info = {"SAMD00081395" => {attribute_list: [{attribute_name: "locus_tag_prefix", attribute_value: "EFBL"}]}}
+    ret = exec_validator("inconsistent_locus_tag_with_biosample", "TR_R0020", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## locus_tag_prefix value does not match
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "AAA_00001", line_no: 24},
+      {entry: "Entry1", feature: "exon", location: "", qualifier: "locus_tag", value: "AAA_00002", line_no: 28},
+      {entry: "Entry2", feature: "CDS", location: "", qualifier: "locus_tag", value: "BBBB_00003", line_no: 38},
+    ]
+    biosample_data_list = [
+      {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081395", line_no: 20},
+      {entry: "Entry2", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081300", line_no: 30}
+    ]
+    biosample_info = {
+      "SAMD00081395" => {attribute_list: [{attribute_name: "locus_tag_prefix", attribute_value: "EFBL"}]},
+      "SAMD00081300" => {attribute_list: []}
+    }
+    ret = exec_validator("inconsistent_locus_tag_with_biosample", "TR_R0020", annotation_line_list, biosample_data_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size #3行ともエラーだが、locus_tag_prefix単位でまとめられる
   end
 end
