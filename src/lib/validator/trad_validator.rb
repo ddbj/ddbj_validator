@@ -69,7 +69,7 @@ class TradValidator < ValidatorBase
     @organism_info_list = []
     taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
     taxonomy_at_species_or_infraspecific_rank("TR_R0004", @organism_info_list)
-    unnecessary_wgs_keywords("TR_R0005", annotation_list, anno_by_qual)
+    unnecessary_wgs_keywords("TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
 
     # DBLINKチェック
     if @use_db
@@ -86,7 +86,7 @@ class TradValidator < ValidatorBase
       # inconsistent_submitter
 
       # BioSample整合性チェック
-      inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_qual("strain", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_isolate_with_biosample("TR_R0016", data_by_qual("isolate", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_isolation_source_with_biosample("TR_R0017", data_by_qual("isolation_source", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
