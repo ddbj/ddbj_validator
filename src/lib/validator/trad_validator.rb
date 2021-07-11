@@ -27,6 +27,9 @@ class TradValidator < ValidatorBase
     @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_trad.json"))
     @conf[:validation_parser_config] = JSON.parse(File.read(config_file_dir + "/rule_config_parser.json"))
 
+    bs_config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")
+    @conf[:bs_null_accepted] = JSON.parse(File.read(bs_config_file_dir + "/null_accepted.json"))
+
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @error_list = error_list = []
     @validation_config = @conf[:validation_config] #need?
@@ -1214,17 +1217,21 @@ class TradValidator < ValidatorBase
           check = false
           biosample_attr_values = ""
           message = "The #{attribute_name} attribute is not described on BioSample"
-        elsif qualifier_name == 'country'
-          # /countryは":"区切りの最初の単語を国名として期待するフォーマット
-          trad_country_name = trad_value.split(":").first.chomp.strip
-          bs_count_name_list = line[:biosample][:attr_value_list].map{|attr_val| attr_val.split(":").first.chomp.strip }
-          if !bs_count_name_list.include?(trad_country_name)
+        else
+          bs_attribute_value_list = line[:biosample][:attr_value_list].dup
+          bs_attribute_value_list.delete_if{|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
+          if qualifier_name == 'country'
+            # /countryは":"区切りの最初の単語を国名として期待するフォーマット
+            trad_country_name = trad_value.split(":").first.chomp.strip
+            bs_count_name_list = bs_attribute_value_list.map{|attr_val| attr_val.split(":").first.chomp.strip }
+            if !bs_count_name_list.include?(trad_country_name)
+              check = false
+              biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
+            end
+          elsif !bs_attribute_value_list.include?(trad_value)
             check = false
             biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
           end
-        elsif !line[:biosample][:attr_value_list].include?(trad_value)
-          check = false
-          biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
         end
         if check == false
           ret = false #1行でもエラーがあればfalse
@@ -1265,6 +1272,7 @@ class TradValidator < ValidatorBase
       if (!biosample_info[biosample_id].nil?) && (!biosample_info[biosample_id][:attribute_list].nil?) # BioSampleの情報が取得できる
         attr_list = biosample_info[biosample_id][:attribute_list]
         target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
+        target_attribute_list.delete_if{|attr|  @conf[:bs_null_accepted].include?(attr[:attribute_value]) } # 属性値がnull相当の場合は入力無し扱いとする
         if target_attribute_list.size > 0 # Biosampleの属性値はある
           qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == entry_name}
           if qual_line.size == 0 # 同じエントリにqualifierデータがなければCOMMONの値を検索
@@ -1361,12 +1369,16 @@ class TradValidator < ValidatorBase
           else #organismの値が一致する場合はstrainのチェックを行う
             biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
             if strain_lines.size > 0 #annotation側に/strainの記述がある
-              if strain_lines.first[:biosample][:attr_value_list].nil? #strain属性がない #TODO ここでmissingを排除する？
+              if strain_lines.first[:biosample][:attr_value_list].nil? #strain属性がない
                 check = false
-                message = "The strain attribute is not described on BioSample"
-              elsif !strain_lines.first[:biosample][:attr_value_list].include?(trad_strain_value) # strainの値が異なる
-                check = false
-                message = "The strain is not match on BioSample"
+                message = "The strain attribute does not described on BioSample"
+              else
+                strain_attr_list = strain_lines.first[:biosample][:attr_value_list].dup
+                strain_attr_list.delete_if{|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
+                if !strain_attr_list.include?(trad_strain_value) # strainの値が異なる
+                  check = false
+                  message = "The strain does not match on BioSample"
+                end
               end
             else #annotation側に/strainの記述がない
               #organismのbiosampleidを辿ってstrain属性値を取得

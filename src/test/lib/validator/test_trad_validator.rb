@@ -778,6 +778,13 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("inconsistent_qualifier_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info, "isolate", "isolate")
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## biosample 'isolate' attribute is null value
+    annotation_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "not provided"}]}}  # null_accepted.json にある値
+    ret = exec_validator("inconsistent_qualifier_with_biosample", "TR_R0016", annotation_line_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # call by TR_R0016(isolate), TR_R0017(isolation_source), TR_R0018(collection_date), TR_R0019(country), TR_R0030(culture_collection), TR_R0031(host)
@@ -794,6 +801,27 @@ class TestTradValidator < Minitest::Test
     qual_line_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
     biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
     biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = exec_validator("missing_qualifier_against_biosample", "TR_R0016", qual_line_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## qualifier and biosample both not exist
+    qual_line_list = []
+    biosample_data_list = []
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = exec_validator("missing_qualifier_against_biosample", "TR_R0016", qual_line_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## qualifier not exist, and invalid biosample id
+    qual_line_list = []
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00000000", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}]}}
+    ret = exec_validator("missing_qualifier_against_biosample", "TR_R0016", qual_line_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## qualifier not exist, and biosample attribute value is null value(missing, not proided)
+    qual_line_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+    biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+    biosample_info = {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "missing"}]}} # null_accepted.json にある値
     ret = exec_validator("missing_qualifier_against_biosample", "TR_R0016", qual_line_list, biosample_data_list, biosample_info, "isolate", "isolate")
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
@@ -878,6 +906,15 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+     ## strain attribute is null value on BioSample, but /strain qualifier is exist
+     organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
+     strain_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "strain", value: "RI-137", line_no: 25, feature_no: 1}]
+     biosample_data_list = [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 20}]
+     biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "organism", attribute_value: "Lotus japonicus"},
+                                                           {attribute_name: "strain", attribute_value: "missing"}]}} # null_accepted.json にある値
+     ret = exec_validator("inconsistent_organism_with_biosample", "TR_R0015", organism_line_list, strain_line_list, biosample_data_list, biosample_info)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
     ## /strain qualifier is not exist , but strain attribute is exist on BioSample(but exist
     organism_line_list = [{entry: "Entry1", feature: "source", location: "", qualifier: "organism", value: "Lotus japonicus", line_no: 24, feature_no: 1}]
     strain_line_list = []
