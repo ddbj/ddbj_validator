@@ -30,6 +30,14 @@ class TradValidator < ValidatorBase
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @error_list = error_list = []
     @validation_config = @conf[:validation_config] #need?
+
+    if @conf[:ddbj_parser_config].nil?
+      @use_parser = false
+    else
+      @use_parser = true
+      @parser_url = @conf[:ddbj_parser_config]
+    end
+
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -62,9 +70,11 @@ class TradValidator < ValidatorBase
     invalid_hold_date("TR_R0001", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
     missing_hold_date("TR_R0002", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
     # parser
-    check_by_jparser("TR_R0006", anno_file, seq_file)
-    check_by_transchecker("TR_R0007", anno_file, seq_file)
-    check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
+    if @use_parser
+      check_by_jparser("TR_R0006", anno_file, seq_file)
+      check_by_transchecker("TR_R0007", anno_file, seq_file)
+      check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
+    end
 
     @organism_info_list = []
     taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
@@ -545,6 +555,7 @@ class TradValidator < ValidatorBase
   #
   def check_by_jparser(rule_code, anno_file_path, seq_file_path)
     return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path)
+    return if @use_parser.nil? || @use_parser == false
     ret = true
 
     # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
@@ -555,7 +566,7 @@ class TradValidator < ValidatorBase
 
     message_list = []
     begin
-      message_list = ddbj_parser(ddbj_parser_api_server(), params, "jParser")
+      message_list = ddbj_parser(@parser_url, params, "jParser")
     rescue => ex # parser実行に失敗(fatal/systemエラー含む)
       annotation = [
         {key: "Message", value: "#{ex.message}" },
@@ -605,6 +616,7 @@ class TradValidator < ValidatorBase
   #
   def check_by_transchecker(rule_code, anno_file_path, seq_file_path)
     return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path)
+    return if @use_parser.nil? || @use_parser == false
     ret = true
 
     # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
@@ -617,7 +629,7 @@ class TradValidator < ValidatorBase
 
     message_list = []
     begin
-      message_list = ddbj_parser(ddbj_parser_api_server(), params, "transChecker")
+      message_list = ddbj_parser(@parser_url, params, "transChecker")
     rescue => ex # parser実行に失敗(fatal/systemエラー含む)
       annotation = [
         {key: "Message", value: "#{ex.message}" },
@@ -657,6 +669,7 @@ class TradValidator < ValidatorBase
   #
   def check_by_agpparser(rule_code, anno_file_path, seq_file_path, agp_file_path)
     return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path) || CommonUtils::blank?(agp_file_path)
+    return if @use_parser.nil? || @use_parser == false
     ret = true
 
     # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
@@ -668,7 +681,7 @@ class TradValidator < ValidatorBase
 
     message_list = []
     begin
-      message_list = ddbj_parser(ddbj_parser_api_server(), params, "AGPParser")
+      message_list = ddbj_parser(@parser_url, params, "AGPParser")
     rescue => ex # parser実行に失敗(fatal/systemエラー含む)
       annotation = [
         {key: "Message", value: "#{ex.message}" },
@@ -709,26 +722,6 @@ class TradValidator < ValidatorBase
     file_path
   end
 
-  #
-  # 環境変数の設定から、DDBJ Parser(jParaser等) APIのサーバURLを返す
-  # 設定がない場合はnilを返す
-  # ==== Return
-  # api_server "http://localhost:18080" "http://ddbj.parser.app:8080"
-  #
-  def ddbj_parser_api_server()
-    api_server_name = nil
-    if parser_server_host = ENV['DDBJ_PARSER_APP_SERVER']
-      api_server_name = ENV['DDBJ_PARSER_APP_SERVER']
-    elsif ENV['DDBJ_PARSER_APP_CONTAINER_NAME']
-      parser_server_host = ENV['DDBJ_PARSER_APP_CONTAINER_NAME']
-      if ENV['DDBJ_PARSER_APP_CONTAINER_PORT']
-        api_server_name = "http://" + parser_server_host + ":" + ENV['DDBJ_PARSER_APP_CONTAINER_PORT']
-      else
-        api_server_name = "http://" + parser_server_host
-      end
-    end
-    api_server_name
-  end
   #
   # jParser/transChecker/AGPParserを実行して、error/warningのリストを返す
   # TR_R0006/TR_R0007/TR_R0008で使用される
@@ -773,7 +766,7 @@ class TradValidator < ValidatorBase
 
     # リクエスト実行
     begin
-      res = CommonUtils.new.http_get_response(url)
+      res = CommonUtils.new.http_get_response(url, 600)
       if res.code =~ /^5/ # server error
         raise "Parse error: 'ddbj_parser' returns a server error. The check by #{parser_name} did not run correctly, so please run it separately.\n"
       elsif res.code =~ /^4/ # client error

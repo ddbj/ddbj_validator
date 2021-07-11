@@ -451,7 +451,7 @@ class TestTradValidator < Minitest::Test
     # invalid file path
     params = {anno_file_path: "not_exist_ann_file", fasta_file_path: "not_exist_fasta_file", result_file_path: "not_exist_output_file"}
     e = assert_raises StandardError do
-      ret = @validator.ddbj_parser(ENV['DDBJ_PARSER_APP_SERVER'], params, "jparser")
+      ret = @validator.ddbj_parser(ENV['DDBJ_PARSER_APP_URL'], params, "jparser")
     end
     assert e.message.include?("Parse error")
     # invalid host
