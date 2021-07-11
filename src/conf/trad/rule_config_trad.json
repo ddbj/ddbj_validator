@@ -241,8 +241,8 @@
     "code": "TR_R0020",
     "level": "error",
     "internal_ignore": false,
-    "name": "Invalid locus_tag",
-    "method": "invalid_locus_tag",
+    "name": "Inconsistent locus_tag_prefix with biosample",
+    "method": "inconsistent_locus_tag_prefix_with_biosample",
     "message": "locus_tagがBioSampleのlocus_tag_prefix属性として記載されていないものです。(BSのlocus_tag_prefixを表示)",
     "object": [
       "Trad"
@@ -340,6 +340,30 @@
     "name": "Invalid taxonomy for genome sample",
     "method": "invalid_taxonomy_for_genome_sample",
     "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" should be used.",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0030": {
+    "rule_class": "Trad",
+    "code": "TR_R0030",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Inconsistent culture_collection with biosample ",
+    "method": "inconsistent_culture_collection_with_biosample_",
+    "message": "BioSampleに記載されたculture_collectionと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0031": {
+    "rule_class": "Trad",
+    "code": "TR_R0031",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Inconsistent host with biosample",
+    "method": "inconsistent_host_with_biosample",
+    "message": "BioSampleに記載されたhostと一致しません",
     "object": [
       "Trad"
     ]

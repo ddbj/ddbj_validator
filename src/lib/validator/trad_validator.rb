@@ -102,6 +102,8 @@ class TradValidator < ValidatorBase
       inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_country_with_biosample("TR_R0019", data_by_qual("country", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_locus_tag_with_biosample("TR_R0020", data_by_qual("locus_tag", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
     end
   end
 
@@ -1187,6 +1189,108 @@ class TradValidator < ValidatorBase
   end
 
   #
+  # 特定のqualifierの値と、それに対応するBioSampleIDの属性値に整合性がなければwarningを出力する。
+  # BioSample属性には記載はないが、qualifierだけに記載がある場合にもワーニングとする。
+  # TR_R0016(isolate), TR_R0017(isolation_source), TR_R0018(collection_date), TR_R0019(country), TR_R0030(culture_collection), TR_R0031(host) から呼ばれる
+  #
+  # ==== Args
+  # rule_code
+  # qual_data_list: 特定qualifierの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_qualifier_with_biosample(rule_code, data_list, biosample_data_list, biosample_info, qualifier_name, attribute_name)
+    ret = true
+    # 対応するBioSampleと指定した属性値を取得
+    data_list_with_bs_value = corresponding_biosample_attr_value(data_list, biosample_data_list, biosample_info, attribute_name)
+    data_list_with_bs_value.each do |line|
+      check = true
+      message = ""
+      trad_value = line[:value]
+      unless line[:biosample].nil?
+        if line[:biosample][:attr_value_list].nil?
+          check = false
+          biosample_attr_values = ""
+          message = "The #{attribute_name} attribute is not described on BioSample"
+        elsif qualifier_name == 'country'
+          # /countryは":"区切りの最初の単語を国名として期待するフォーマット
+          trad_country_name = trad_value.split(":").first.chomp.strip
+          bs_count_name_list = line[:biosample][:attr_value_list].map{|attr_val| attr_val.split(":").first.chomp.strip }
+          if !bs_count_name_list.include?(trad_country_name)
+            check = false
+            biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
+          end
+        elsif !line[:biosample][:attr_value_list].include?(trad_value)
+          check = false
+          biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
+        end
+        if check == false
+          ret = false #1行でもエラーがあればfalse
+          annotation = [
+            {key: "#{qualifier_name}", value: trad_value},
+            {key: "BioSample ID", value: line[:biosample][:biosample_id]},
+            {key: "BioSample value[#{attribute_name}]", value: biosample_attr_values},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{line[:line_no]}"}
+          ]
+          annotation.push({key: "Message", value: message}) unless message == ""
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    ret
+  end
+
+  #
+  # BioSampleの属性値として記載があるが、それに対応するqualifierの記述がない場合にwarningを出力する。
+  # TR_R0016(isolate), TR_R0017(isolation_source), TR_R0018(collection_date), TR_R0019(country), TR_R0030(culture_collection), TR_R0031(host) から呼ばれる
+  #
+  # ==== Args
+  # rule_code
+  # qual_data_list: 特定qualifierの記載のあるannotation行のリスト. e.g. []
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def missing_qualifier_against_biosample(rule_code, qual_data_list, biosample_data_list, biosample_info, qualifier_name, attribute_name)
+    ret = true
+    # DBLINK/biosampleのBioSampleに属性値が記述されているが、qualifierの記述がないケース
+    biosample_data_list.each do |biosample_line|
+      biosample_id = biosample_line[:value]
+      entry_name = biosample_line[:entry]
+      if (!biosample_info[biosample_id].nil?) && (!biosample_info[biosample_id][:attribute_list].nil?) # BioSampleの情報が取得できる
+        attr_list = biosample_info[biosample_id][:attribute_list]
+        target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
+        if target_attribute_list.size > 0 # Biosampleの属性値はある
+          qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == entry_name}
+          if qual_line.size == 0 # 同じエントリにqualifierデータがなければCOMMONの値を検索
+            qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == "COMMON"}
+          end
+          if qual_line.size == 0 # qualifierデータがない
+            biosample_attr_values = target_attribute_list.map{|attr| attr[:attribute_value]}.join(", ")
+            ret = false #1行でもエラーがあればfalse
+            annotation = [
+              {key: "#{qualifier_name}", value: ""},
+              {key: "BioSample ID", value: biosample_id},
+              {key: "BioSample value[#{attribute_name}]", value: biosample_attr_values},
+              {key: "File name", value: @anno_file},
+              {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
+            ]
+            annotation.push({key: "Message", value: "BioSample[#{attribute_name})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' does not described."})
+            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+            @error_list.push(error_hash)
+          end
+        end
+      end
+    end
+    ret
+  end
+
+  #
   # rule:TR_R0013
   # DBLINKに記載されているBioProject/BioSample/DRRのAccessionの組合せが正しいかチェック
   #
@@ -1314,39 +1418,14 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def inconsistent_isolate_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info)
-    return nil if isolate_data_list.nil? || isolate_data_list.size == 0
+    return nil if isolate_data_list.nil?
     ret = true
-    # 対応するBioSampleとそのisolate属性値を取得
-    isolate_data_list_with_bs_value = corresponding_biosample_attr_value(isolate_data_list, biosample_data_list, biosample_info, "isolate")
-    isolate_data_list_with_bs_value.each do |isolate_line|
-      check = true
-      message = ""
-      trad_isolate_value = isolate_line[:value]
-      unless isolate_line[:biosample].nil?
-        if isolate_line[:biosample][:attr_value_list].nil?
-          check = false
-          biosample_attr_values = ""
-          message = "The isolate attribute is not described on BioSample"
-        elsif !isolate_line[:biosample][:attr_value_list].include?(trad_isolate_value)
-          check = false
-          biosample_attr_values = isolate_line[:biosample][:attr_value_list].join(", ")
-        end
-        if check == false
-          ret = false #1行でもエラーがあればfalse
-          annotation = [
-            {key: "isolate", value: trad_isolate_value},
-            {key: "BioSample value[isolate]", value: biosample_attr_values},
-            {key: "BioSample ID", value: isolate_line[:biosample][:biosample_id]},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{isolate_line[:line_no]}"}
-          ]
-          annotation.push({key: "Message", value: message}) unless message == ""
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      end
+
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    missing_qual = missing_qualifier_against_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    if inconsistent == false || missing_qual == false
+      ret = false
     end
-    # TODO biosample側にしか記載がない場合にwarningを出す
     ret
   end
 
@@ -1364,39 +1443,14 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def inconsistent_isolation_source_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info)
-    return nil if isolation_source_data_list.nil? || isolation_source_data_list.size == 0
+    return nil if isolation_source_data_list.nil?
     ret = true
-    # 対応するBioSampleとそのisolation_source属性値を取得
-    isolation_source_data_list_with_bs_value = corresponding_biosample_attr_value(isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source")
-    isolation_source_data_list_with_bs_value.each do |isolation_source_line|
-      check = true
-      message = ""
-      trad_isolation_source_value = isolation_source_line[:value]
-      unless isolation_source_line[:biosample].nil?
-        if isolation_source_line[:biosample][:attr_value_list].nil?
-          check = false
-          biosample_attr_values = ""
-          message = "The isolation_source attribute is not described on BioSample"
-        elsif !isolation_source_line[:biosample][:attr_value_list].include?(trad_isolation_source_value)
-          check = false
-          biosample_attr_values = isolation_source_line[:biosample][:attr_value_list].join(", ")
-        end
-        if check == false
-          ret = false #1行でもエラーがあればfalse
-          annotation = [
-            {key: "isolation_source", value: trad_isolation_source_value},
-            {key: "BioSample value[isolation_source]", value: biosample_attr_values},
-            {key: "BioSample ID", value: isolation_source_line[:biosample][:biosample_id]},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{isolation_source_line[:line_no]}"}
-          ]
-          annotation.push({key: "Message", value: message}) unless message == ""
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      end
+
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
+    missing_qual = missing_qualifier_against_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
+    if inconsistent == false || missing_qual == false
+      ret = false
     end
-    # TODO biosample側にしか記載がない場合にwarningを出す
     ret
   end
 
@@ -1414,38 +1468,14 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def inconsistent_collection_date_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info)
-    return nil if collection_date_data_list.nil? || collection_date_data_list.size == 0
+    return nil if collection_date_data_list.nil?
     ret = true
-    collection_date_data_list_with_bs_value = corresponding_biosample_attr_value(collection_date_data_list, biosample_data_list, biosample_info, "collection_date")
-    collection_date_data_list_with_bs_value.each do |collection_date_line|
-      check = true
-      message = ""
-      trad_collection_date_value = collection_date_line[:value]
-      unless collection_date_line[:biosample].nil?
-        if collection_date_line[:biosample][:attr_value_list].nil?
-          check = false
-          biosample_attr_values = ""
-          message = "The collection_date attribute is not described on BioSample"
-        elsif !collection_date_line[:biosample][:attr_value_list].include?(trad_collection_date_value)
-          check = false
-          biosample_attr_values = collection_date_line[:biosample][:attr_value_list].join(", ")
-        end
-        if check == false
-          ret = false #1行でもエラーがあればfalse
-          annotation = [
-            {key: "collection_date", value: trad_collection_date_value},
-            {key: "BioSample value[collection_date]", value: biosample_attr_values},
-            {key: "BioSample ID", value: collection_date_line[:biosample][:biosample_id]},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{collection_date_line[:line_no]}"}
-          ]
-          annotation.push({key: "Message", value: message}) unless message == ""
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      end
+
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
+    missing_qual = missing_qualifier_against_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
+    if inconsistent == false || missing_qual == false
+      ret = false
     end
-    # TODO biosample側にしか記載がない場合にwarningを出す
     ret
   end
 
@@ -1464,43 +1494,14 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def inconsistent_country_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info)
-    return nil if country_data_list.nil? || country_data_list.size == 0
+    return nil if country_data_list.nil?
     ret = true
-    country_data_list_with_bs_value = corresponding_biosample_attr_value(country_data_list, biosample_data_list, biosample_info, "geo_loc_name")
-    country_data_list_with_bs_value.each do |country_line|
-      check = true
-      message = ""
-      trad_country_value = country_line[:value]
-      unless country_line[:biosample].nil?
-        if country_line[:biosample][:attr_value_list].nil?
-          check = false
-          biosample_attr_values = ""
-          message = "The country attribute is not described on BioSample"
-        else
-          # /country も geo_loc_name属性も":"区切りの最初の単語を国名として期待するフォーマット
-          trad_country_name = trad_country_value.split(":").first.chomp.strip
-          bs_count_name_list = country_line[:biosample][:attr_value_list].map{|attr_val| attr_val.split(":").first.chomp.strip }
-          if !bs_count_name_list.include?(trad_country_name)
-            check = false
-            biosample_attr_values = country_line[:biosample][:attr_value_list].join(", ")
-          end
-        end
-        if check == false
-          ret = false #1行でもエラーがあればfalse
-          annotation = [
-            {key: "country", value: trad_country_value},
-            {key: "BioSample value[geo_loc_name]", value: biosample_attr_values},
-            {key: "BioSample ID", value: country_line[:biosample][:biosample_id]},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{country_line[:line_no]}"}
-          ]
-          annotation.push({key: "Message", value: message}) unless message == ""
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      end
+
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
+    missing_qual = missing_qualifier_against_biosample(rule_code, country_data_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
+    if inconsistent == false || missing_qual == false
+      ret = false
     end
-    # TODO biosample側にしか記載がない場合にwarningを出す
     ret
   end
 
@@ -1555,6 +1556,64 @@ class TradValidator < ValidatorBase
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
       end
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0030
+  # /culture_collectionの値が対応するBioSampleのculture_collection属性値と一致しているかチェック。
+  # culture_collection属性には記載はないが、/culture_collection記載がある場合にもワーニングとする。
+  # culture_collection属性には記載はあるのに、/culture_collection記載がない場合にもワーニングとする。
+  #
+  # TODO: このルールの適用は全ゲノムのみ対象とし、それ以外の登録ではチェック不要(/isolateの値がBS同一でなくてもよい)。
+  # 取り急ぎDFAST対応のため全ファイルを対象とする。
+  #
+  # ==== Args
+  # rule_code
+  # culture_collection_data_list: /culture_collectionの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_culture_collection_with_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info)
+    return nil if culture_collection_data_list.nil?
+    ret = true
+
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
+    missing_qual = missing_qualifier_against_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
+    if inconsistent == false || missing_qual == false
+      ret = false
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0031
+  # /hostの値が対応するBioSampleのhost属性値と一致しているかチェック。
+  # host属性には記載はないが、/host記載がある場合にもワーニングとする。
+  # host属性には記載はあるのに、/host記載がない場合にもワーニングとする。
+  #
+  # TODO: このルールの適用は全ゲノムのみ対象とし、それ以外の登録ではチェック不要(/isolateの値がBS同一でなくてもよい)。
+  # 取り急ぎDFAST対応のため全ファイルを対象とする。
+  #
+  # ==== Args
+  # rule_code
+  # host_data_list: /hostの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
+  # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_host_with_biosample(rule_code, host_data_list, biosample_data_list, biosample_info)
+    return nil if host_data_list.nil?
+    ret = true
+
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, host_data_list, biosample_data_list, biosample_info, "host", "host")
+    missing_qual = missing_qualifier_against_biosample(rule_code, host_data_list, biosample_data_list, biosample_info, "host", "host")
+    if inconsistent == false || missing_qual == false
+      ret = false
     end
     ret
   end
