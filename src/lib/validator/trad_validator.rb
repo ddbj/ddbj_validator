@@ -162,7 +162,12 @@ class TradValidator < ValidatorBase
   # annotation_line_list
   #
   def data_by_feat(feature_name, anno_by_feat)
-    anno_by_feat[feature_name]
+    feature_list = anno_by_feat[feature_name]
+    if feature_list.nil?
+      []
+    else
+      feature_list
+    end
   end
 
   #
