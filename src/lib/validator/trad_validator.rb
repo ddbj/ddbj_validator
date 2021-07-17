@@ -1397,8 +1397,8 @@ class TradValidator < ValidatorBase
       ret = false
       unmatch_submitter_accession_list.each do |error_line|
         annotation = [
-          {key: "DBLINK/#{error_line[:qualifier]}", value: error_line[:value]},
-          {key: "your submitter_id", value: submitter_id},
+          {key: "DBLINK", value: error_line[:value]},
+          {key: "Trad submitter_id", value: submitter_id},
           {key: "File name", value: @anno_file},
           {key: "Location", value: "Line: #{error_line[:line_no]}"}
         ]
