@@ -107,7 +107,7 @@ class TradValidator < ValidatorBase
       inconsistent_isolate_with_biosample("TR_R0016", data_by_qual("isolate", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_isolation_source_with_biosample("TR_R0017", data_by_qual("isolation_source", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_country_with_biosample("TR_R0019", data_by_qual("country", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      inconsistent_country_with_biosample("TR_R0019", data_by_feat_qual("source", "country", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_locus_tag_with_biosample("TR_R0020", data_by_qual("locus_tag", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
