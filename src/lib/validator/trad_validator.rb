@@ -94,7 +94,8 @@ class TradValidator < ValidatorBase
       invalid_biosample_accession("TR_R0011", data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
       invalid_drr_accession("TR_R0012", data_by_feat_qual("DBLINK", "sequence read archive", anno_by_qual))
       # biosampleの情報を取得(note.derived_from属性の参照サンプル含む)
-      biosample_info_list = get_biosample_info(data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
+      biosample_id_list = data_by_feat_qual("DBLINK", "biosample", anno_by_qual).map{|row| row[:value]}
+      biosample_info_list = get_biosample_info(biosample_id_list)
       # TODO ID整合性チェック
       # invalid_combination_of_accessions("TR_R0013")
 
@@ -611,7 +612,11 @@ class TradValidator < ValidatorBase
       annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
       annotation.push({key: "Message", value: msg[:message]})
       parser_rule_code = msg[:code]
-      error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      if @conf[:validation_parser_config]["rule" + parser_rule_code].nil?
+        error_hash = CommonUtils::error_obj(ddbj_parser_rule(msg), "#{@anno_file}, #{@seq_file}", annotation)
+      else
+        error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      end
       @error_list.push(error_hash)
     end
     ret
@@ -663,7 +668,11 @@ class TradValidator < ValidatorBase
         {key: "Message", value: msg[:message]}
       ]
       parser_rule_code = msg[:code]
-      error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      if @conf[:validation_parser_config]["rule" + parser_rule_code].nil?
+        error_hash = CommonUtils::error_obj(ddbj_parser_rule(msg), "#{@anno_file}, #{@seq_file}", annotation)
+      else
+        error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      end
       @error_list.push(error_hash)
     end
     ret
@@ -716,7 +725,11 @@ class TradValidator < ValidatorBase
       annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
       annotation.push({key: "Message", value: msg[:message]})
       parser_rule_code = msg[:code]
-      error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      if @conf[:validation_parser_config]["rule" + parser_rule_code].nil?
+        error_hash = CommonUtils::error_obj(ddbj_parser_rule(msg), "#{@anno_file}, #{@seq_file}", annotation)
+      else
+        error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
+      end
       @error_list.push(error_hash)
     end
     ret
@@ -864,6 +877,30 @@ class TradValidator < ValidatorBase
       end
     end
     ret
+  end
+
+  #
+  # jParser/TransChecker/AGPParserのエラーメッセージ行からルールの情報を返す
+  # 定義ファイルに記載のないコードだった場合に生成する事を想定
+  #
+  # ==== Args
+  # パーサーのerror/warningメッセージのオブジェクト
+  #   {code: "JP0045", level: "ER1", type: "LOC", file: "AxS", location: "Line [44] in annotation file", message: "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file."}
+  # ==== Return
+  # ルール定義
+  #   {"rule_class" => "Trad", "code" => "JP0045", "level" => "error", "level_original" => "ER1", "internal_ignore" => true, "message" => "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file.", "reference" => "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0045" }
+  #
+  def ddbj_parser_rule(message)
+    rule_info = {"rule_class" => "Trad"}
+    rule_info["code"] = message[:code]
+    rule_level = (message[:level].start_with?("ER") ||  message[:level].start_with?("FAT")) ? "error" : "warning"
+    rule_info["level"] = rule_level
+    rule_info["level_orginal"] = message[:level]
+    internal_ignore = message[:level].start_with?("ER1") ? true : false
+    rule_info["internal_ignore"] = internal_ignore
+    rule_info["message"] = message[:message]
+    rule_info["reference"] = "https://www.ddbj.nig.ac.jp/ddbj/validator.html#" + message[:code]
+    rule_info
   end
 
   #
@@ -1110,12 +1147,11 @@ class TradValidator < ValidatorBase
   #  }
   # SAMD00000000 はdbから値が取得できないため結果には含まれない
   #
-  def get_biosample_info(biosample_list)
-    return {} if biosample_list.nil? || biosample_list.size == 0
+  def get_biosample_info(biosample_id_list)
+    return {} if biosample_id_list.nil? || biosample_id_list.size == 0
 
     unless @db_validator.nil?
       ref_biosample_id_list = []
-      biosample_id_list = biosample_list.map{|row| row[:value]}
       biosample_info = @db_validator.get_biosample_metadata(biosample_id_list)
       biosample_info.each do |biosample_id, biosample_data|
         biosample_data[:attribute_list].each do |attr|

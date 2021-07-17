@@ -527,6 +527,17 @@ class TestTradValidator < Minitest::Test
     assert_nil ret
   end
 
+  def test_ddbj_parser_rule
+    message = {code: "JP0045", level: "ER1", type: "LOC", file: "AxS", location: "Line [44] in annotation file", message: "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file."}
+    ret = @validator.ddbj_parser_rule(message)
+    assert_equal "Trad", ret["rule_class"]
+    assert_equal "JP0045", ret["code"]
+    assert_equal "error", ret["level"]
+    assert_equal "ER1", ret["level_orginal"]
+    assert_equal true, ret["internal_ignore"]
+    assert_equal "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file.", ret["message"]
+  end
+
   # rule:TR_R0009
   def test_missing_dblink
     #ok case
