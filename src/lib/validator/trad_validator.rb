@@ -1115,7 +1115,8 @@ class TradValidator < ValidatorBase
 
     unless @db_validator.nil?
       ref_biosample_id_list = []
-      biosample_info = @db_validator.get_biosample_metadata(biosample_list)
+      biosample_id_list = biosample_list.map{|row| row[:value]}
+      biosample_info = @db_validator.get_biosample_metadata(biosample_id_list)
       biosample_info.each do |biosample_id, biosample_data|
         biosample_data[:attribute_list].each do |attr|
           if attr[:attribute_name] == "note" || attr[:attribute_name] == "derived_from"
