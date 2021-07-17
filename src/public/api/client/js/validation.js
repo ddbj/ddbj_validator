@@ -87,6 +87,14 @@
                         render_user_error(data);
                     } else {
                         render_system_error();
+                        // 選択したファイルが編集された場合、再び同じファイルを選んでもエラーになるため、エラーがあった場合は一旦リセット
+                        $('.selected_file').each(function() {
+                            if ($(this)[0].files.length > 0) {
+                                $(this)[0].value = '';
+                                let file_name_id = '#' + $(this)[0].id + '_file_name';
+                                $(file_name_id)[0].value = '';
+                            }
+                        });
                     }
                 });
             }
