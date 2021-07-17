@@ -77,7 +77,7 @@ class DDBJDbValidator
   end
 
   #
-  # 指定されたBioSample Accession IDを参照許可submitter_idの配列返す
+  # 指定されたBioProject Accession IDを参照許可submitter_idの配列返す
   # DBにない場合や、statusが5600,5700の場合には空の配列を返す
   #
   # ==== Args
@@ -619,57 +619,20 @@ class DDBJDbValidator
   # 存在フラグを付与したリスト ex. [{accession_id: "DRR060518", is_exist: true}, {accession_id: "DRR000000", is_exist: false}]
   #
   def exist_check_run_ids(run_accession_list)
-    return nil if run_accession_list.nil? || run_accession_list.size == 0
-    result_run_list = run_accession_list.map {|run_id| {accession_id: run_id, is_exist: false}}
-    acc_list = []
-    run_accession_list.each do |run_accession|
-      if m = run_accession.chomp.strip.match(/^(?<acc_type>[D|S]RR)(?<acc_no>\d{6})$/)
-        acc_list.push({acc_type: m[:acc_type], acc_no: m[:acc_no].to_i})
+    return nil if run_accession_list.nil?
+    run_with_submitter_list = get_run_submitter_ids(run_accession_list)
+    result = []
+    # submitter_idが取得できればそのRUN IDは有効であるとみなす
+    run_with_submitter_list.each do |run|
+      hash = {accession_id: run[:run_id]}
+      if run[:submitter_id].nil?
+        hash[:is_exist] = false
+      else
+        hash[:is_exist] = true
       end
+      result.push(hash)
     end
-    unless acc_list.size == 0
-      # RUN IDのパラメータ分のIN句のquery parameterを組み立てる
-      # SQL側 =>  IN ( ($1, $2), ($3, $4) )
-      # parameter => ["DRR", 60518, "DRR", 60519]
-      query_text = ""
-      param_index = 0
-      query_params = []
-      acc_list.each do |param|
-        query_text += ", " unless param_index == 0
-        query_text += "($#{param_index += 1}, $#{param_index += 1})"
-        query_params.concat([param[:acc_type], param[:acc_no]])
-      end
-
-      begin
-        connection = get_connection(DRA_DB_NAME)
-        q = "SELECT ent2.acc_type drr, ent2.acc_no drrno, rel.grp_id r_grp_id, g_view.status
-               FROM mass.accession_entity ent1
-               JOIN mass.accession_relation rel ON(ent1.acc_id=rel.p_acc_id)
-               JOIN mass.accession_entity ent2 ON(rel.acc_id=ent2.acc_id)
-               JOIN mass.current_dra_submission_group_view g_view ON (rel.grp_id = g_view.grp_id)
-             WHERE
-               ent2.is_delete != TRUE
-               AND g_view.status NOT IN (900, 1000, 1100)
-               AND (ent2.acc_type, ent2.acc_no) IN ( #{query_text} )"
-
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", query_params)
-
-        res.each do |row|
-          run_accession_id = "#{row["drr"]}#{row["drrno"].rjust(6, '0')}" # 0埋め6桁
-          result_run_list.each do |search_run|
-            search_run[:is_exist] = true if search_run[:accession_id] == run_accession_id
-          end
-        end
-      rescue => ex
-        message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
-        message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
-      ensure
-        connection.close if connection
-      end
-    end
-    result_run_list
+    result
   end
 
   #
@@ -740,5 +703,173 @@ class DDBJDbValidator
         connection.close if connection
       end
     end
+  end
+
+  #
+  # 指定されたBioProject Accession IDに対するsubmitter_idを付与して配列で返す
+  # IDがDBにない場合や、statusが5600,5700の場合にはsubmitter_idを付与しない
+  #
+  # ==== Args
+  # bioproject_accession_list ex. ["PRJDB3490", "PRJDB00000", "PSUB004141"]
+  # ==== Return
+  # accession_idとsubmitter_idの配列
+  # [ {bioproject_id: "PRJDB3490", submitter_id: "sgibbons"}, {bioproject_id: "PRJDB00000"},  {bioproject_id: "PSUB004141"}]
+  #
+  def get_bioproject_submitter_ids(bioproject_accession_list)
+    return nil if bioproject_accession_list.nil?
+    result = []
+    prj_counter_id_list = []
+    bioproject_accession_list.each do |bioproject_accession|
+      result.push({bioproject_id: bioproject_accession})
+      if bioproject_accession =~ /^PRJDB\d+/
+        prj_counter_id_list.push(bioproject_accession.gsub("PRJDB", "").to_i)
+      end
+    end
+
+    if prj_counter_id_list.size > 0
+      begin
+        connection = get_connection(BIOPROJCT_DB_NAME)
+
+        id_place_holder = (1..prj_counter_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+
+        q = "SELECT project_id_prefix, project_id_counter, submitter_id
+             FROM mass.submission sub
+              LEFT OUTER JOIN mass.project p USING(submission_id)
+             WHERE p.project_id_counter IN (#{id_place_holder})
+              AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", prj_counter_id_list)
+
+        res.each do |row|
+          # 結果が返ってきたBioProjectがあればsubmitter_id情報を足す
+          bioproject_accession_id = "#{row["project_id_prefix"]}#{row["project_id_counter"]}"
+          selected = result.select{|bioproject| bioproject[:bioproject_id] == bioproject_accession_id}
+          selected.each{|hit| hit[:submitter_id] = row["submitter_id"]}
+        end
+
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+  end
+
+  #
+  # 指定されたBioSample Accession IDに対するsubmitter_idを付与して配列で返す
+  # IDがDBにない場合や、statusが5600,5700の場合にはsubmitter_idを付与しない
+  #
+  # ==== Args
+  # biosample_accession_list ex. ["SAMD00000001", "SAMDB00000", "SSUB001848"]
+  # ==== Return
+  # accession_idとsubmitter_idの配列
+  # [ {biosample_id: "SAMD00000001", submitter_id: "sokazaki"}, {biosample_id: "SAMDB00000"},  {biosample_id: "SSUB001848"}]
+  #
+  def get_biosample_submitter_ids(biosample_accession_list)
+    return nil if biosample_accession_list.nil?
+    result = []
+    biosample_id_list = []
+    biosample_accession_list.each do |biosample_accession|
+      result.push({biosample_id: biosample_accession})
+      if biosample_accession =~ /^SAMD\d+/
+        biosample_id_list.push(biosample_accession)
+      end
+    end
+    if biosample_id_list.size > 0
+      begin
+        connection = get_connection(BIOSAMPLE_DB_NAME)
+        id_place_holder = (1..biosample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+
+        q = "SELECT DISTINCT sub.submitter_id, acc.accession_id, sub.submission_id
+              FROM mass.sample smp
+                JOIN mass.accession acc USING(smp_id)
+                JOIN mass.submission sub USING(submission_id)
+              WHERE acc.accession_id IN (#{id_place_holder})
+                AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", biosample_id_list)
+
+        res.each do |row|
+          # 結果が返ってきたBioSampleがあればsubmitter_id情報を足す
+          selected = result.select{|biosample| biosample[:biosample_id] == row["accession_id"]}
+          selected.each{|hit| hit[:submitter_id] = row["submitter_id"]}
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+  end
+
+  #
+  # 指定されたDRR Accession IDに対するsubmitter_idを付与して配列で返す
+  # IDがDBにない場合や、statusが900,1000,1100の場合にはsubmitter_idを付与しない
+  #
+  # ==== Args
+  # drr_accession_list ex. ["DRR060518", "DRR000000"]
+  # ==== Return
+  # accession_idとsubmitter_idの配列
+  # [ {run_id: "DRR060518", submitter_id: "tomohiro"}, {run_id: "DRR000000"}]
+  #
+  def get_run_submitter_ids(run_accession_list)
+    return nil if run_accession_list.nil?
+    result = []
+    run_id_list = []
+    run_accession_list.each do |run_accession|
+      result.push({run_id: run_accession})
+      if m = run_accession.chomp.strip.match(/^(?<acc_type>[D|S]RR)(?<acc_no>\d{6})$/)
+        run_id_list.push({acc_type: m[:acc_type], acc_no: m[:acc_no].to_i})
+      end
+    end
+    unless run_id_list.size == 0
+      # RUN IDのパラメータ分のIN句のquery parameterを組み立てる
+      # SQL側 =>  IN ( ($1, $2), ($3, $4) )
+      # parameter => ["DRR", 60518, "DRR", 60519]
+      query_text = ""
+      param_index = 0
+      query_params = []
+      run_id_list.each do |param|
+        query_text += ", " unless param_index == 0
+        query_text += "($#{param_index += 1}, $#{param_index += 1})"
+        query_params.concat([param[:acc_type], param[:acc_no]])
+      end
+
+      begin
+        connection = get_connection(DRA_DB_NAME)
+        q = "SELECT ent2.acc_type drr, ent2.acc_no drrno, rel.grp_id r_grp_id, g_view.status, g_view.sub_id, g_view.submitter_id
+               FROM mass.accession_entity ent1
+               JOIN mass.accession_relation rel ON(ent1.acc_id=rel.p_acc_id)
+               JOIN mass.accession_entity ent2 ON(rel.acc_id=ent2.acc_id)
+               JOIN mass.current_dra_submission_group_view g_view ON (rel.grp_id = g_view.grp_id)
+             WHERE
+               ent2.is_delete != TRUE
+               AND g_view.status NOT IN (900, 1000, 1100)
+               AND (ent2.acc_type, ent2.acc_no) IN ( #{query_text} )"
+
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", query_params)
+
+        res.each do |row|
+          # 結果が返ってきたRunがあればsubmitter_id情報を足す
+          run_accession_id = "#{row["drr"]}#{row["drrno"].rjust(6, '0')}" # 0埋め6桁
+          selected = result.select {|search_run| search_run[:run_id] == run_accession_id}
+          selected.each{|hit| hit[:submitter_id] = row["submitter_id"]}
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
   end
 end

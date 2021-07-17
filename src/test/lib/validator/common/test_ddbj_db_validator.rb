@@ -258,4 +258,42 @@ class TestDDBJDbValidator < Minitest::Test
     assert_nil ret["SSUB000000"]
   end
 
+  def test_get_bioproject_submitter_ids
+    ret = @db_validator.get_bioproject_submitter_ids(["PRJDB3490", "PRJDB4841"])
+    assert ret.first[:submitter_id], "sgibbons"
+    assert ret[1][:submitter_id], "hirakawa"
+    ret = @db_validator.get_bioproject_submitter_ids(["PRJDB3490", "PRJDB00000", "PSUB004141"])
+    assert ret.first[:submitter_id], "sgibbons"
+    assert_nil ret[1][:submitter_id]
+    assert_nil ret[2][:submitter_id]
+    ret = @db_validator.get_bioproject_submitter_ids(["Not Accession ID", "PSUB004141"]) # all id is not accession
+    assert_nil ret[0][:submitter_id]
+    assert_nil ret[1][:submitter_id]
+  end
+
+  def test_get_biosample_submitter_ids
+    ret = @db_validator.get_biosample_submitter_ids(["SAMD00000001", "SAMD00052344"])
+    assert ret.first[:submitter_id], "sokazaki"
+    assert ret[1][:submitter_id], "hirakawa"
+    ret = @db_validator.get_biosample_submitter_ids(["SAMD00000001", "SAMD00000000", "SSUB001848"])
+    assert ret.first[:submitter_id] == "sokazaki"
+    assert_nil ret[1][:submitter_id]
+    assert_nil ret[2][:submitter_id]
+    ret = @db_validator.get_biosample_submitter_ids(["Not Accession ID", "SSUB001848"])
+    assert_nil ret[0][:submitter_id]
+    assert_nil ret[1][:submitter_id]
+  end
+
+  def test_get_run_submitter_ids
+    ret = @db_validator.get_run_submitter_ids(["DRR060518"])
+    assert ret.first[:submitter_id], "hirakawa"
+    ret = @db_validator.get_run_submitter_ids(["DRR060518", "DRR000000", "SSUB001848"])
+    assert ret.first[:submitter_id], "hirakawa"
+    assert_nil ret[1][:submitter_id]
+    assert_nil ret[2][:submitter_id]
+    ret = @db_validator.get_run_submitter_ids(["Not Accession ID", "SSUB001848"])
+    assert_nil ret[0][:submitter_id]
+    assert_nil ret[1][:submitter_id]
+  end
+
 end

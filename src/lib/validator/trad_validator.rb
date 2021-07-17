@@ -61,7 +61,10 @@ class TradValidator < ValidatorBase
   # apg: AGP TSV file path
   #
   #
-  def validate(anno_file, seq_file, agp_file=nil, submitter_id=nil)
+  def validate(anno_file, seq_file, agp_file=nil, params={})
+    unless params["submitter_id"].nil?
+      submitter_id = params["submitter_id"]
+    end
     # TODO check mandatory files(anno_file, seq_file)
     @anno_file = File::basename(anno_file)
     @seq_file = File::basename(seq_file)
@@ -95,8 +98,9 @@ class TradValidator < ValidatorBase
       # TODO ID整合性チェック
       # invalid_combination_of_accessions("TR_R0013")
 
-      # TODO submitter_check(先のIDチェック時に有効IDを保存した方が良い？)
-      # inconsistent_submitter
+      unless submitter_id.nil? || submitter_id.chomp.strip == ""
+        inconsistent_submitter("TR_R0014", data_by_feat("DBLINK", anno_by_feat), submitter_id)
+      end
 
       # BioSample整合性チェック
       inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_qual("strain", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
@@ -1312,16 +1316,100 @@ class TradValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_combination_of_accessions(rule_code)
+  def invalid_combination_of_accessions(rule_code, dblink_list)
 
   end
 
   #
   # rule:TR_R0014
-  # submitterが他の登録(BioProject/BioSample/DRA)のsubmitterと異なっている
+  # submitter_id(D-wayアカウントID)が他の登録(BioProject/BioSample/DRA)のsubmitter_idと異なっている
   #
-  def inconsistent_submitter(rule_code, submitter)
+  # ==== Args
+  # rule_code
+  # dblink_list: DBLINKの記載のあるannotation行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24}, {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}]
+  # submitter_id: Trad登録時の指定submitter_id(D-wayアカウントID). e.g. "hirakawa"
+  #
+  # ==== Return
+  # true/false
+  #
+  def inconsistent_submitter(rule_code, dblink_list, submitter_id)
+    return nil if dblink_list.nil? || dblink_list.size == 0
+    return nil if submitter_id.nil? || submitter_id == ""
+    return nil if @db_validator.nil?
+    ret = true
 
+    unmatch_submitter_accession_list = []
+    features = dblink_list.group_by{|row| row[:qualifier]}
+    features.each do |link_type, lines|
+      if link_type ==  "project"
+        bioproject_id_list = lines.map{|line| line[:value]}
+        with_submitter_list = @db_validator.get_bioproject_submitter_ids(bioproject_id_list)
+        unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
+      elsif link_type == "biosample"
+        biosample_id_list = lines.map{|line| line[:value]}
+        with_submitter_list = @db_validator.get_biosample_submitter_ids(biosample_id_list)
+        unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
+      elsif link_type == "sequence read archive"
+        run_id_list = lines.map{|line| line[:value]}
+        with_submitter_list = @db_validator.get_run_submitter_ids(run_id_list)
+        unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
+      end
+    end
+    if unmatch_submitter_accession_list.size > 0
+      ret = false
+      unmatch_submitter_accession_list.each do |error_line|
+        annotation = [
+          {key: "DBLINK/#{error_line[:qualifier]}", value: error_line[:value]},
+          {key: "your submitter_id", value: submitter_id},
+          {key: "File name", value: @anno_file},
+          {key: "Location", value: "Line: #{error_line[:line_no]}"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    ret
+  end
+
+  #
+  # DBから取得したsubmiter_id情報が引数のsubmiter_idと同一でない、あるいはsubmitter_idが取得できなかった場合に、
+  # そのDBLINKのannotation行のリストを返す
+  #
+  # ==== Args
+  # type: linkの種類. project / biosample / sequence read archive
+  # dblink_list: DBLINKの記載のあるannotation行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}]
+  # with_submitter_id_list: DB検索した各AccessionIDのsubmitter_id付きリスト. e.g. [{biosample_id: "SAMD00052344", submitter_id: "hirakawa"}]
+  # submitter_id: Trad登録用のsubmitter_id. e.g. "hirakawa"
+  #
+  # ==== Return
+  # unmatch_list: submitter_idが一致しないDBLINKのannotation行のリスト。accession_idがDBに登録のないIDである場合にもリストに含む。submitter_idが全て一致した場合には空のリストを返す
+  #
+  def unmatch_submitter_id(type, dblink_list, with_submitter_id_list, submitter_id)
+    return [] if submitter_id.nil? || submitter_id == ""
+    if type == "project"
+      key = "bioproject_id"
+    elsif type == "biosample"
+      key = "biosample_id"
+    elsif type == "sequence read archive"
+      key = "run_id"
+    else
+      return []
+    end
+    unmatch_list = []
+    dblink_list.each do |dblink|
+      hit_list = with_submitter_id_list.select{|row| row[key.to_sym] == dblink[:value] }
+      if hit_list.size == 0
+      else
+        hit_list.each do |hit|
+          if hit[:submitter_id].nil?
+            unmatch_list.push(dblink)
+          elsif hit[:submitter_id] != submitter_id
+            unmatch_list.push(dblink)
+          end
+        end
+      end
+    end
+    unmatch_list
   end
 
   #

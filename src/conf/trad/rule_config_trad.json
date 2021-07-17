@@ -167,7 +167,7 @@
   "ruleTR_R0014": {
     "rule_class": "Trad",
     "code": "TR_R0014",
-    "level": "error",
+    "level": "warning",
     "internal_ignore": false,
     "name": "Inconsistent submitter",
     "method": "inconsistent_submitter",

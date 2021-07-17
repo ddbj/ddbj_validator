@@ -80,7 +80,7 @@ class TestTradValidator < Minitest::Test
     assert_equal 36, sorted_feat_lines.last[:line_no]
     # not exist
     feat_lines = @validator.data_by_feat("COMMENT", anno_by_feat)
-    assert_nil feat_lines
+    assert [], feat_lines
   end
 
   def test_data_by_qual
@@ -93,7 +93,7 @@ class TestTradValidator < Minitest::Test
     assert_equal 2, qual_lines.size
     # not exist
     qual_lines = @validator.data_by_feat("locus_tag", anno_by_qual)
-    assert_nil qual_lines
+    assert [], qual_lines
   end
 
   def test_data_by_feat_qual
@@ -676,6 +676,91 @@ class TestTradValidator < Minitest::Test
     ## nil
     ret = exec_validator("invalid_drr_accession", "TR_R0012", [])
     assert_nil ret[:result]
+  end
+
+  # rule:TR_R0013
+  def test_invalid_combination_of_accessions
+  end
+
+  # rule:TR_R0014
+  def test_inconsistent_submitter
+    return nil if @ddbj_db_mode == false
+    #ok case
+    ## all accessions submit by 'hirakawa'
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## without DRR ID
+     dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## other submitter_id BioSampleAccession
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00000001", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist DRR Accession
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRDJB0000", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SSUB00000", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not exist DRR ID 1", line_no: 26},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not exist DRR ID 2", line_no: 27}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal false, ret[:result]
+    assert_equal 4, ret[:error_list].size
+  end
+
+  def test_unmatch_submitter_id
+    # no error
+    ## correct data
+    biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}]
+    with_submitter_id_list = [{biosample_id: "SAMD00052344", submitter_id: "hirakawa"}]
+    submitter_id = "hirakawa"
+    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
+    assert_equal 0, ret.size
+    ## blank dblink
+    biosamle_dblink_list = []
+    with_submitter_id_list = [{biosample_id: "SAMD00052344", submitter_id: "hirakawa"}]
+    submitter_id = "hirakawa"
+    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
+    assert_equal 0, ret.size
+    ## hasn't submitter_id (no check)
+    biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}]
+    with_submitter_id_list = [{biosample_id: "SAMD00052344", submitter_id: "hirakawa"}]
+    submitter_id = nil
+    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
+    assert_equal 0, ret.size
+
+    # has error
+    ## other submitter
+    biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "SAMD00000001", line_no: 25}]
+    with_submitter_id_list = [{biosample_id: "SAMD00000001", submitter_id: "other person"}]
+    submitter_id = "hirakawa"
+    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
+    assert_equal 1, ret.size
+    ## invalid id
+    biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRDJB0000", line_no: 25}]
+    with_submitter_id_list = [{biosample_id: "PRDJB0000"}]
+    submitter_id = "hirakawa"
+    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
+    assert_equal 1, ret.size
+
   end
 
   def test_get_biosample_info

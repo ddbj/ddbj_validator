@@ -63,6 +63,14 @@ module DDBJValidator
             validation_params[file_category.to_sym] = save_path
           end
         end
+        allow_params = %w(submitter_id)
+        validation_params[:params] = {}
+        allow_params.each do |param_name|
+          if params[param_name.to_sym]
+            validation_params[:params][param_name] = params[param_name.to_sym]
+          end
+        end
+
         output_file_path = "#{save_dir}/result.json"
         validation_params[:output] = output_file_path
 

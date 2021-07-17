@@ -133,7 +133,8 @@ class Validator
         anno_file = params[:trad_anno]
         seq_file = params[:trad_seq]
         agp_file = params[:trad_agp]
-        validator.validate(anno_file, seq_file, agp_file);
+        params = params[:params]
+        validator.validate(anno_file, seq_file, agp_file, params);
         validator.error_list
       else
         case object_type
