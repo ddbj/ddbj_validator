@@ -1,5 +1,5 @@
 (function(){
-    var api_url = "/api";
+    var api_url = "../";
 
     //ファイル選択ボタン押下時に選択ウィンドウを表示
     var output_f = "";
@@ -45,9 +45,9 @@
 
     //テンプレートファイルをロードする
     $.when(
-        $.get("/api/client/ejs/error_message.ejs"),
-        $.get("/api/client/ejs/error_message_group.ejs"),
-        $.get("/api/client/ejs/result_summary.ejs")
+        $.get("../client/ejs/error_message.ejs"),
+        $.get("../client/ejs/error_message_group.ejs"),
+        $.get("../client/ejs/result_summary.ejs")
     ).done(function(tmpl_bs, tmpl_bs_group, tmpl_summary){ready(tmpl_bs, tmpl_bs_group, tmpl_summary)});
 
     //初期状態
