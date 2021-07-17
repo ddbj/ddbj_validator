@@ -608,6 +608,12 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## DBLINK is not described COMMON.
+    dblink_list = []
+    entry_data = {"COMMON" =>  [{entry: "Entry2", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]}
+    ret = exec_validator("missing_dblink", "TR_R0009", dblink_list, entry_data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
 
   end
 

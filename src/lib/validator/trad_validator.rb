@@ -954,12 +954,13 @@ class TradValidator < ValidatorBase
 
     # COMMONを除くentryにDBLINKに記載がなく、かつCOMMONにも記載がない
     if entry_dblink_count == 0  && !common_dblink_exist
-      message = "COMMON/DBLINK requires." if message == ""
+      result = false
     end
 
     if result == false
+      entry_name = missing_dblink_entry_list.size > 0 ? missing_dblink_entry_list.join(", ") : "COMMON"
       annotation = [
-        {key: "entry", value: missing_dblink_entry_list.join(", ")},
+        {key: "entry", value: entry_name},
         {key: "File name", value: @anno_file}
       ]
       annotation.push({key: "Message", value: message}) unless message == ""
