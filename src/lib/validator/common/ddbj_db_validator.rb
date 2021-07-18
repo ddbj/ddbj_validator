@@ -128,7 +128,6 @@ class DDBJDbValidator
     result
   end
 
-  
   #
   # 指定されたBioSample Accession IDがUmbrella projectである場合にtrueを返す
   # Umbrella projectではない、または無効なBioSample Accession IDである場合にはfalseを返す
@@ -744,7 +743,7 @@ class DDBJDbValidator
           # 結果が返ってきたBioProjectがあればsubmitter_id情報を足す
           bioproject_accession_id = "#{row["project_id_prefix"]}#{row["project_id_counter"]}"
           selected = result.select{|bioproject| bioproject[:bioproject_id] == bioproject_accession_id}
-          selected.each{|hit| hit[:submitter_id] = row["submitter_id"]}
+          selected.each{|ret| ret[:submitter_id] = row["submitter_id"]}
         end
 
       rescue => ex
@@ -795,7 +794,7 @@ class DDBJDbValidator
         res.each do |row|
           # 結果が返ってきたBioSampleがあればsubmitter_id情報を足す
           selected = result.select{|biosample| biosample[:biosample_id] == row["accession_id"]}
-          selected.each{|hit| hit[:submitter_id] = row["submitter_id"]}
+          selected.each{|ret| ret[:submitter_id] = row["submitter_id"]}
         end
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
@@ -860,7 +859,7 @@ class DDBJDbValidator
           # 結果が返ってきたRunがあればsubmitter_id情報を足す
           run_accession_id = "#{row["drr"]}#{row["drrno"].rjust(6, '0')}" # 0埋め6桁
           selected = result.select {|search_run| search_run[:run_id] == run_accession_id}
-          selected.each{|hit| hit[:submitter_id] = row["submitter_id"]}
+          selected.each{|ret| ret[:submitter_id] = row["submitter_id"]}
         end
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
@@ -871,5 +870,210 @@ class DDBJDbValidator
       end
     end
     result
+  end
+
+  #
+  # 指定されたBioSample Accession IDに対するsmp_idを付与して配列で返す
+  # IDがDBにない場合や、statusが5600, 5700の場合にはsmp_idを付与しない
+  #
+  # ==== Args
+  # biosample_accession_list ex. ["SAMD00052344", "SAMD00000000"]
+  # ==== Return
+  # accession_idとsubmitter_idの配列
+  # [ {biosample_id: "SAMD00052344", smp_id: "64274"}, {biosample_id: "SAMD00000000"}]
+  #
+  def get_valid_smp_id(biosample_accession_list)
+    return nil if biosample_accession_list.nil?
+    result = []
+    biosample_id_list = []
+    biosample_accession_list.each do |biosample_accession|
+      result.push({biosample_id: biosample_accession})
+      if biosample_accession =~ /^SAMD\d+/
+        biosample_id_list.push(biosample_accession)
+      end
+    end
+    if biosample_id_list.size > 0
+      begin
+        connection = get_connection(BIOSAMPLE_DB_NAME)
+        id_place_holder = (1..biosample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+
+        q = "SELECT accession_id, smp_id
+             FROM mass.accession
+            JOIN mass.sample smp USING(smp_id)
+            WHERE accession_id IN (#{id_place_holder})
+             AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", biosample_id_list)
+
+        res.each do |row|
+          # 結果が返ってきたBioSampleがあればsmp_id情報を足す
+          selected = result.select{|biosample| biosample[:biosample_id] == row["accession_id"]}
+          selected.each{|ret| ret[:smp_id] = row["smp_id"]}
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+  end
+
+  #
+  # 指定されたBioSample の smp_id に対する BioProject Accession ID のリストを付与して配列で返す。DRA登録を通して検索する。
+  # IDがDBにない場合や、statusが無効な場合にはsmp_idを付与しない
+  #
+  # ==== Args
+  # biosample_smp_id_list ex. ["64274", "00000"]
+  # ==== Return
+  # smp_idとBioProject Accession IDの配列
+  # [ {smp_id: "64274", bioproject_accession_id_list: ["64274"]}, {smp_id: "00000"}]
+  #
+  def get_bioproject_id_via_dra(biosample_smp_id_list)
+    return nil if biosample_smp_id_list.nil?
+    result = []
+    biosample_smp_id_list.each do |smp_id|
+      result.push({smp_id: smp_id})
+    end
+    if biosample_smp_id_list.size > 0
+      begin
+        connection = get_connection(DRA_DB_NAME)
+        id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+
+        q = "SELECT DISTINCT acc_id, acc_type AS ext_acc_type, ref_name
+               FROM mass.ext_entity smp_ext
+               JOIN mass.ext_relation ext_ref USING(ext_id)
+               JOIN mass.current_dra_submission_group_view g_view USING(grp_id)
+             WHERE ext_ref.acc_id IN
+              (
+                SELECT acc_id
+                  FROM mass.ext_entity smp_ext
+                  JOIN mass.ext_relation smp_rel USING(ext_id)
+                WHERE smp_ext.ref_name IN (#{id_place_holder})
+                  AND acc_type = 'SSUB'
+                  AND acc_id IS NOT NULL
+              )
+              AND g_view.status NOT IN (900, 1000, 1100)"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", biosample_smp_id_list)
+
+        res.group_by{|row| row["acc_id"]}.each do |acc_id, ref_list|
+          # DRA accessionに紐づくBioProjectIDを取得(一応リスト)
+          bioproject_submission_id_list = ref_list.select{|row| row["ext_acc_type"] == "PSUB"}.map{|row| row["ref_name"]}
+          bioproject_accession_id_list = []
+          bioproject_submission_id_list.each do |bioproject_submission_id|
+            bioproject_accession_id_list.push(get_bioproject_accession(bioproject_submission_id))
+          end
+          bioproject_accession_id_list.compact!
+          # 結果が返ってきたsmp_idに対してproject_id情報を足す
+          ref_list.each do |row|
+            selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
+            selected.each{|ret| ret[:bioproject_accession_id_list] = bioproject_accession_id_list}
+          end
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+  end
+
+  #
+  # 指定されたBioSample の smp_id に対する BioProject Accession ID のリストを付与して配列で返す。DRA登録を通して検索する。
+  # IDがDBにない場合や、statusが無効な場合にはsmp_idを付与しない
+  #
+  # ==== Args
+  # biosample_smp_id_list ex. ["64274", "00000"]
+  # ==== Return
+  # smp_idとBioProject Accession IDの配列
+  # [ {smp_id: "64274", bioproject_accession_id_list: ["64274"]}, {smp_id: "00000"}]
+  #
+  def get_run_id_via_dra(biosample_smp_id_list)
+    return nil if biosample_smp_id_list.nil?
+    result = []
+    biosample_smp_id_list.each do |smp_id|
+      result.push({smp_id: smp_id})
+    end
+    if biosample_smp_id_list.size > 0
+      begin
+        connection = get_connection(DRA_DB_NAME)
+        id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+
+        q = "SELECT ext_ent.ref_name, drr_ent.acc_type, drr_ent.acc_no, drx_drr_rel.grp_id
+              FROM mass.ext_entity ext_ent
+              JOIN mass.ext_relation ext_rel USING(ext_id)
+              JOIN mass.accession_entity drx_ent ON(ext_rel.acc_id = drx_ent.acc_id)
+              JOIN mass.accession_relation drx_drr_rel ON(drx_ent.acc_id = drx_drr_rel.p_acc_id)
+              JOIN mass.accession_entity drr_ent ON(drx_drr_rel.acc_id = drr_ent.acc_id)
+              JOIN mass.current_dra_submission_group_view g_view ON(drx_drr_rel.grp_id = g_view.grp_id)
+             WHERE ext_ent.ref_name IN (#{id_place_holder})
+              AND drx_drr_rel.grp_id = ext_rel.grp_id
+              AND drr_ent.is_delete != TRUE
+              AND g_view.status NOT IN (900, 1000, 1100)"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", biosample_smp_id_list)
+        res.each do |row|
+          # 結果が返ってきたBioSampleがあればsmp_id情報を足す
+          selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
+          selected.each do |ret|
+            ret[:drr_accession_id_list] = [] if ret[:drr_accession_id_list].nil?
+            run_accession_id = "#{row["acc_type"]}#{row["acc_no"].rjust(6, '0')}" # 0埋め6桁
+            ret[:drr_accession_id_list].push(run_accession_id)
+          end
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+  end
+
+  #
+  # 指定されたBioSample Accession IDに紐づくBioSample Acccession ID のリストと DRR ID のリストを付与して配列で返す
+  # 紐づくIDがない場合には各IDリストは空リストを返す
+  #
+  # ==== Args
+  # biosample_accession_list ex. ["SAMD00052344", "SAMD00000000"]
+  # ==== Return
+  # smp_idとBioProject Accession IDの配列
+  # [
+  #   { biosample_id: "SAMD00052344", smp_id: "64274", bioproject_accession_id_list: ["PRJDB4841"], drr_accession_id_list: ["DRR060518"] },
+  #   { biosample_id: "SAMD00052344", bioproject_accession_id_list: [], drr_accession_id_list: [] }
+  # ]
+  #
+  def get_biosample_related_id(biosample_accession_list)
+    return [] if biosample_accession_list.nil?
+
+    biosample_list_with_smp_id = get_valid_smp_id(biosample_accession_list)
+    biosample_list_with_smp_id.each{|row|
+      row[:bioproject_accession_id_list] = []
+      row[:drr_accession_id_list] = []
+    }
+    smp_id_list = biosample_list_with_smp_id.map{|row| row[:smp_id] }
+    project_id_list = get_bioproject_id_via_dra(smp_id_list)
+    run_id_list = get_run_id_via_dra(smp_id_list)
+    biosample_list_with_smp_id.each do |biosample|
+      unless biosample[:smp_id].nil?
+        related_project = project_id_list.select{|row| row[:smp_id] == biosample[:smp_id]}
+        if related_project.size > 0 && !related_project[0][:bioproject_accession_id_list].nil?
+          biosample[:bioproject_accession_id_list] = related_project[0][:bioproject_accession_id_list]
+        end
+        related_run = run_id_list.select{|row| row[:smp_id] == biosample[:smp_id]}
+        if related_run.size > 0 && !related_run[0][:drr_accession_id_list].nil?
+          biosample[:drr_accession_id_list] = related_run[0][:drr_accession_id_list]
+        end
+      end
+    end
+    biosample_list_with_smp_id
   end
 end

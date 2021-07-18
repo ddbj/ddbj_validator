@@ -260,10 +260,10 @@ class TestDDBJDbValidator < Minitest::Test
 
   def test_get_bioproject_submitter_ids
     ret = @db_validator.get_bioproject_submitter_ids(["PRJDB3490", "PRJDB4841"])
-    assert ret.first[:submitter_id], "sgibbons"
-    assert ret[1][:submitter_id], "hirakawa"
+    assert_equal ret.first[:submitter_id], "sgibbons"
+    assert_equal ret[1][:submitter_id], "hirakawa"
     ret = @db_validator.get_bioproject_submitter_ids(["PRJDB3490", "PRJDB00000", "PSUB004141"])
-    assert ret.first[:submitter_id], "sgibbons"
+    assert_equal ret.first[:submitter_id], "sgibbons"
     assert_nil ret[1][:submitter_id]
     assert_nil ret[2][:submitter_id]
     ret = @db_validator.get_bioproject_submitter_ids(["Not Accession ID", "PSUB004141"]) # all id is not accession
@@ -273,10 +273,10 @@ class TestDDBJDbValidator < Minitest::Test
 
   def test_get_biosample_submitter_ids
     ret = @db_validator.get_biosample_submitter_ids(["SAMD00000001", "SAMD00052344"])
-    assert ret.first[:submitter_id], "sokazaki"
-    assert ret[1][:submitter_id], "hirakawa"
+    assert_equal ret.first[:submitter_id], "sokazaki"
+    assert_equal ret[1][:submitter_id], "hirakawa"
     ret = @db_validator.get_biosample_submitter_ids(["SAMD00000001", "SAMD00000000", "SSUB001848"])
-    assert ret.first[:submitter_id] == "sokazaki"
+    assert_equal ret.first[:submitter_id], "sokazaki"
     assert_nil ret[1][:submitter_id]
     assert_nil ret[2][:submitter_id]
     ret = @db_validator.get_biosample_submitter_ids(["Not Accession ID", "SSUB001848"])
@@ -286,9 +286,9 @@ class TestDDBJDbValidator < Minitest::Test
 
   def test_get_run_submitter_ids
     ret = @db_validator.get_run_submitter_ids(["DRR060518"])
-    assert ret.first[:submitter_id], "hirakawa"
+    assert_equal ret.first[:submitter_id], "hirakawa"
     ret = @db_validator.get_run_submitter_ids(["DRR060518", "DRR000000", "SSUB001848"])
-    assert ret.first[:submitter_id], "hirakawa"
+    assert_equal ret.first[:submitter_id], "hirakawa"
     assert_nil ret[1][:submitter_id]
     assert_nil ret[2][:submitter_id]
     ret = @db_validator.get_run_submitter_ids(["Not Accession ID", "SSUB001848"])
@@ -296,4 +296,56 @@ class TestDDBJDbValidator < Minitest::Test
     assert_nil ret[1][:submitter_id]
   end
 
+  def test_get_valid_smp_id
+    ret = @db_validator.get_valid_smp_id(["SAMD00052344"])
+    assert_equal ret.first[:smp_id], "64274"
+    ret = @db_validator.get_valid_smp_id(["SAMD00000000"])
+    assert_nil ret.first[:smp_id]
+    ret = @db_validator.get_valid_smp_id(["SAMD00052344", "SAMD00000000", "SSUB00000000"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_nil ret[1][:smp_id]
+    assert_nil ret[2][:smp_id]
+  end
+
+  def test_get_bioproject_id_via_dra
+    ret = @db_validator.get_bioproject_id_via_dra(["64274"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    ret = @db_validator.get_bioproject_id_via_dra(["0000"])
+    assert_equal ret.first[:smp_id], "0000"
+    assert_nil ret.first[:bioproject_accession_id_list]
+    ret = @db_validator.get_bioproject_id_via_dra(["64274", "not exist smp id"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    assert_equal ret[1][:smp_id], "not exist smp id"
+    assert_nil ret[1][:bioproject_accession_id_list]
+  end
+
+  def test_get_run_id_via_dra
+    ret = @db_validator.get_run_id_via_dra(["64274"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:drr_accession_id_list], ["DRR060518"]
+    ret = @db_validator.get_run_id_via_dra(["0000"])
+    assert_equal ret.first[:smp_id], "0000"
+    assert_nil ret.first[:drr_accession_id_list]
+    ret = @db_validator.get_run_id_via_dra(["64274", "not exist smp id"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:drr_accession_id_list], ["DRR060518"]
+    assert_equal ret[1][:smp_id], "not exist smp id"
+    assert_nil ret[1][:drr_accession_id_list]
+  end
+
+  def test_get_biosample_related_id
+    ret = @db_validator.get_biosample_related_id(["SAMD00052344"])
+    assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    assert_equal ret.first[:drr_accession_id_list], ["DRR060518"]
+    # exist sample but hasn't DRA accession
+    ret = @db_validator.get_biosample_related_id(["SAMD00060421"])
+    assert_equal ret.first[:bioproject_accession_id_list], []
+    assert_equal ret.first[:drr_accession_id_list], []
+    ret = @db_validator.get_biosample_related_id(["SAMD00000000"])
+    assert_equal ret.first[:bioproject_accession_id_list], []
+    assert_equal ret.first[:drr_accession_id_list], []
+    ret = @db_validator.get_biosample_related_id(["SAMD00052344", "SAMD00000000"])
+  end
 end
