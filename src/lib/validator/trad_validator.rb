@@ -665,6 +665,7 @@ class TradValidator < ValidatorBase
       annotation = [
         {key: "Code", value: msg[:code]},
         {key: "Level", value: msg[:level]},
+        {key: "Location", value: msg[:location].nil? ? "" : msg[:location] },
         {key: "Message", value: msg[:message]}
       ]
       parser_rule_code = msg[:code]
@@ -802,8 +803,21 @@ class TradValidator < ValidatorBase
         begin
           finished_flag = false
           message_list = []
+          current_location = ""
           res.body.each_line do |line|
-            message_list.push(parse_parser_msg(line.chomp, parser_name))
+            if parser_name.downcase == "transchecker" # transcheckerの場合にはfasta-likeなフォーマットでlocationが出力される
+              if line.start_with?(">")
+                current_location = line.chomp.strip[1..-1]
+              elsif line.start_with?("//")
+                current_location = ""
+              else
+                msg = parse_parser_msg(line.chomp, parser_name)
+                msg[:location] = current_location if !(msg.nil? || current_location.nil? || current_location == "")
+                message_list.push(msg)
+              end
+            else
+              message_list.push(parse_parser_msg(line.chomp, parser_name))
+            end
             if line.include?("finished") && line.downcase.include?(parser_name.downcase) # 実行完了メッセージ "jParser (Ver. 6.65) finished." or" "TransChecker (Ver. 2.22) finished" or "MES: AGPParser (Ver. 1.17) finished."
               finished_flag = true
             end
@@ -1351,7 +1365,7 @@ class TradValidator < ValidatorBase
   #
   # ==== Args
   # rule_code
-  # dblink_list: DBLINKの記載のあるannotation行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24}, {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}]
+  # dblink_list: DBLINKの記載のあるannotation行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB5067", line_no: 24}, {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00060421", line_no: 25}]
   # ==== Return
   # true/false
   #

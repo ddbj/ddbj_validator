@@ -792,7 +792,6 @@ class TestTradValidator < Minitest::Test
                       "SAMD00056904" => {  attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB5067"}]}
                     }
     ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
-    p ret
     assert_equal false, ret[:result]
     assert_equal 3, ret[:error_list].size # referenceの2つも合わせて計3エラー
   end
