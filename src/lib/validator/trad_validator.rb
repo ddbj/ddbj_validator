@@ -114,7 +114,11 @@ class TradValidator < ValidatorBase
       inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
     end
+
+    # locus_tagチェック
+    missing_locus_tag("TR_R0023", data_by_qual("locus_tag", anno_by_qual), annotation_list)
     missing_locus_tag("TR_R0024", anno_by_feat)
+
   end
 
   #
@@ -1830,6 +1834,87 @@ class TradValidator < ValidatorBase
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
+      end
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0023
+  # locus_tagの値が重複している場合にエラーとする
+  #
+  # ==== Args
+  # rule_code
+  # locus_tag_data_list: locus_tagの記載のあるアノテーション行 : [
+  #     {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+  #     {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00002", line_no: 34, feature_no: 2}
+  #   ]
+  # annotation_line_list: アノテーション全行 : [
+  #     {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+  #     {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+  #     {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "bbb", line_no: 33, feature_no: 2},
+  #     {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+  #   ]
+  # ==== Return
+  # true/false
+  #
+  def duplicate_locus_tag(rule_code, locus_tag_data_list, annotation_line_list)
+    return nil if locus_tag_data_list.nil? || locus_tag_data_list.size == 0
+    ret = true
+    locus_tag_group = locus_tag_data_list.group_by{|row| row[:value]}
+    duplicated_locus_tag = {}
+    locus_tag_group.each do |locus_tag_value, lines|
+      if lines.size > 1 # locus_tagの値に重複がある
+        duplicated_locus_tag[locus_tag_value] = lines
+      end
+    end
+    if duplicated_locus_tag.keys.size > 0 #重複データが一つでもある場合
+      all_features = annotation_line_list.group_by{|row| row[:feature_no]} #全行を出現feature毎にグルーピング
+      duplicated_locus_tag.each do |locus_tag_value, lines|
+        duplicated = false
+        gene_value_list = []
+        entry_value_list = []
+        feature_name_list = []
+        message = ""
+        lines.each do |line|
+          line[:same_feature_lines] = all_features[line[:feature_no]] #同じfeatureの行を取得
+          gene_value_list.concat(line[:same_feature_lines].select{|row| row[:qualifier] == "gene"}.map{|row| row[:value]}) # 同じfeatureのgeneの値を取得
+          feature_name_list.push(line[:feature])
+          entry_value_list.push(line[:entry])
+        end
+        if entry_value_list.compact.uniq.size > 1 # 複数のentryまたがって同じlocus_tagが使用されるのはNG
+          duplicated = true
+          message = "Not allow in multiple entry"
+        elsif gene_value_list.compact.uniq.size > 1 # geneの値が全て同じ(一種類)であればlocus_tagの値が同一であっても問題ない
+          if feature_name_list.size > feature_name_list.uniq.size
+            # 同じfeature("CDS"等が含まれている場合はNG)
+            duplicated = true
+            message = "Not allow in same feature type"
+          else
+            # 特定のfeature種の組合せの場合には許容する
+            if (feature_name_list - ["regulatory", "mRNA", "5’UTR", "3’UTR", "CDS", "exon", "intron", "sig_peptide", "propeptide", "mat_peptide", "transit_peptide"]).size == 0
+            elsif (feature_name_list - ["rRNA", "exon", "intron"]).size == 0
+            elsif (feature_name_list - ["tRNA", "exon", "intron"]).size == 0
+            elsif (feature_name_list - ["nc_RNA", "exon", "intron"]).size == 0
+            elsif (feature_name_list - ["tmRNA", "exon", "intron"]).size == 0
+            else
+              duplicated = true
+              message = "Not allow feature type combination"
+            end
+          end
+        end
+        if duplicated == true #許容できない重複がある
+          ret = false
+          line_no = lines.map{|row| row[:line_no]}.sort.map{|line_no| line_no.to_s}.join(", ")
+          annotation = [
+            {key: "locus_tag", value: locus_tag_value},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{line_no}"},
+            {key: "Message", value: message}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
       end
     end
     ret

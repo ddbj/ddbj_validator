@@ -1297,6 +1297,116 @@ class TestTradValidator < Minitest::Test
     assert_equal 2, ret[:error_list].size #3行ともエラーだが、locus_tag_prefix単位でまとめられる
   end
 
+  # rule:TR_R0023
+  def test_duplicate_locus_tag
+    #ok case
+    ## only one locus_tag
+    locus_tag_data_list = [{entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1}]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not duplicate locus_tag
+    locus_tag_data_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00002", line_no: 34, feature_no: 2}
+    ]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "bbb", line_no: 33, feature_no: 2},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## duplicated locus_tag but in same gene
+    locus_tag_data_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "same gene", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "same gene", line_no: 33, feature_no: 2},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## duplicated locus_tag but in allowed feature combinations
+    locus_tag_data_list = [
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "exon", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2},
+      {entry: "Entry1", feature: "intron", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 44, feature_no: 3}
+    ]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "exon", location: "", qualifier: "gene", value: "bbb", line_no: 33, feature_no: 2},
+      {entry: "Entry1", feature: "exon", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2},
+      {entry: "Entry1", feature: "intron", location: "", qualifier: "gene", value: "ccc", line_no: 43, feature_no: 2},
+      {entry: "Entry1", feature: "intron", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 44, feature_no: 3}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## duplicated locus_tag in other entry
+    locus_tag_data_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry2", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry2", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 33, feature_no: 2},
+      {entry: "Entry2", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## duplicated locus_tag in other gene
+    locus_tag_data_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "bbb", line_no: 33, feature_no: 2},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## duplicated locus_tag in not allowed feature combinations
+    locus_tag_data_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 1},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 1},
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "gene", value: "bbb", line_no: 33, feature_no: 2},
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 34, feature_no: 2}
+    ]
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ## duplicated locus_tag in not allowed feature combinations
+    locus_tag_data_list = []
+    annotation_line_list = []
+    ret = exec_validator("duplicate_locus_tag", "TR_R0023", locus_tag_data_list, annotation_line_list)
+    assert_nil ret[:result]
+  end
+
   # rule:TR_R0024
   def test_missing_locus_tag
     #ok case
