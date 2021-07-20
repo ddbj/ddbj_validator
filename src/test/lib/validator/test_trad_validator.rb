@@ -625,6 +625,16 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("invalid_bioproject_accession", "TR_R0010", bioproject_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## ignore NCBI
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA748162", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_accession", "TR_R0010", bioproject_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore EBI
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJEB5129", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_accession", "TR_R0010", bioproject_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #ng case
     ## PSUB
@@ -647,6 +657,16 @@ class TestTradValidator < Minitest::Test
     return nil if @ddbj_db_mode == false
     #ok case
     biosample_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00025188", line_no: 24}]
+    ret = exec_validator("invalid_biosample_accession", "TR_R0011", biosample_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore NCBI
+    biosample_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMN01984938", line_no: 24}]
+    ret = exec_validator("invalid_biosample_accession", "TR_R0011", biosample_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore EBI
+    biosample_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMEA3275619", line_no: 24}]
     ret = exec_validator("invalid_biosample_accession", "TR_R0011", biosample_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
@@ -676,6 +696,16 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## ignore NCBI
+    drr_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "SRR123425", line_no: 24}]
+    ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore EBI
+    drr_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "ERR867757", line_no: 24}]
+    ret = exec_validator("invalid_drr_accession", "TR_R0012", drr_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #ng case
     ## SSUB
@@ -700,34 +730,54 @@ class TestTradValidator < Minitest::Test
     return nil if @ddbj_db_mode == false
     #ok case
     ##common name
-    #dblink_list = [
-    #  {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
-    #  {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25},
-    #  {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
-    #]
-    #biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB4841"}]}}
-    #ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
-    #assert_equal true, ret[:result]
-    #assert_equal 0, ret[:error_list].size
-    ###entry name
-    #dblink_list = [
-    #  {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
-    #  {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25},
-    #  {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
-    #]
-    #biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB4841"}]}}
-    #ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
-    #assert_equal true, ret[:result]
-    #assert_equal 0, ret[:error_list].size
-    ### no DRR ID
-    #dblink_list = [
-    #  {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
-    #  {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}
-    #]
-    #biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB4841"}]}}
-    #ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
-    #assert_equal true, ret[:result]
-    #assert_equal 0, ret[:error_list].size
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
+    ]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB4841"}]}}
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##entry name
+    dblink_list = [
+      {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25},
+      {entry: "Entry1", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
+    ]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB4841"}]}}
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## no DRR ID
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}
+    ]
+    biosample_info = {"SAMD00052344" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB4841"}]}}
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore NCBI id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA188932", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMN01984938", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "SRR1173646", line_no: 26}
+    ]
+    biosample_info = {"SAMN01984938" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJNA188932"}]}} # 実際このデータは取れない
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore EBI id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJEB8682", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMEA3275619", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "ERR867757", line_no: 26}
+    ]
+    biosample_info = {"SAMEA3275619" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJEB8682"}]}}  # 実際このデータは取れない
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     ## has derived biosample_id
     dblink_list = [
@@ -810,9 +860,27 @@ class TestTradValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## without DRR ID
-     dblink_list = [
+    dblink_list = [
       {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
       {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore NCBI id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA188932", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMN01984938", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "SRR1173646", line_no: 26}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## ignore EBI id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJEB8682", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMEA3275619", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "ERR867757", line_no: 26}
     ]
     ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
     assert_equal true, ret[:result]
@@ -1527,5 +1595,38 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("inconsistent_host_with_biosample", "TR_R0031", annotation_line_list, biosample_data_list, biosample_info)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:TR_R0033
+  def test_other_insdc_partners_accession
+    #ok case
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB4841", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00052344", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR060518", line_no: 26}
+    ]
+    ret = exec_validator("other_insdc_partners_accession", "TR_R0033", dblink_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## ignore NCBI id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA188932", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMN01984938", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "SRR1173646", line_no: 26}
+    ]
+    ret = exec_validator("other_insdc_partners_accession", "TR_R0033", dblink_list)
+    assert_equal false, ret[:result]
+    assert_equal 3, ret[:error_list].size
+    ## ignore EBI id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJEB8682", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMEA3275619", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "ERR867757", line_no: 26}
+    ]
+    ret = exec_validator("other_insdc_partners_accession", "TR_R0033", dblink_list)
+    assert_equal false, ret[:result]
+    assert_equal 3, ret[:error_list].size
   end
 end

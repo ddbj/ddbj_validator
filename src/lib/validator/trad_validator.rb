@@ -114,6 +114,7 @@ class TradValidator < ValidatorBase
       inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
     end
+    other_insdc_partners_accession("TR_R0033", data_by_feat("DBLINK", anno_by_feat))
 
     # locus_tagチェック
     missing_locus_tag("TR_R0023", data_by_qual("locus_tag", anno_by_qual), annotation_list)
@@ -1009,7 +1010,7 @@ class TradValidator < ValidatorBase
     line_no_list = []
     bioproject_list.each do |bioproject_line|
       bioproject_accession = bioproject_line[:value]
-      if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/
+      if bioproject_accession =~ /^PRJD\w?\d{1,}$/
         unless @db_validator.nil?
           unless @db_validator.valid_bioproject_id?(bioproject_accession)
             result = false
@@ -1017,6 +1018,8 @@ class TradValidator < ValidatorBase
             line_no_list.push(bioproject_line[:line_no].to_s)
           end
         end
+      elsif bioproject_accession =~ /^PRJ(E|N)\w?\d{1,}$/
+        # 他極データは無視(TR_R0033でチェックする)
       else # submission id(/^PSUB\d{6}$/)も認めない
         result = false
         invalid_id_list.push(bioproject_accession)
@@ -1054,7 +1057,7 @@ class TradValidator < ValidatorBase
     line_no_list = []
     biosample_list.each do |biosample_line|
       biosample_accession = biosample_line[:value]
-      if biosample_accession =~ /^SAM[D|E|N]\w?\d{1,}$/
+      if biosample_accession =~ /^SAMD\w?\d{1,}$/
         unless @db_validator.nil?
           unless @db_validator.is_valid_biosample_id?(biosample_accession)
             result = false
@@ -1062,6 +1065,8 @@ class TradValidator < ValidatorBase
             line_no_list.push(biosample_line[:line_no].to_s)
           end
         end
+      elsif biosample_accession =~ /^SAM(E|N)\w?\d{1,}$/
+        # 他極データは無視(TR_R0033でチェックする)
       else # submission id(/^SSUB\d{6}$/)も認めない
         result = false
         invalid_id_list.push(biosample_accession)
@@ -1099,6 +1104,7 @@ class TradValidator < ValidatorBase
     line_no_list = []
     # DRRは複数記載されるケースがあり、まとめてDBチェックする
     drr_accession_id_list = drr_list.map {|row| row[:value]}
+    drr_accession_id_list.delete_if{|run_id| run_id =~ /^(S|E)RR\w?\d{1,}$/} # 他極データは無視(TR_R0033でチェックする)
     unless @db_validator.nil?
       result_run_list = @db_validator.exist_check_run_ids(drr_accession_id_list)
     end
@@ -1381,6 +1387,12 @@ class TradValidator < ValidatorBase
     return nil if @db_validator.nil?
     ret = true
 
+    # 他極データは無視
+    dblink_list.delete_if{|row|
+      (row[:qualifier] == "project" && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == "biosample" && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == "sequence read archive" && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
+    }
     # 記載されているbiosampleと同じ(or COMMOM)エントリにあるBioProjectIDとRunIDのリストを追加する。
     #[{:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00060421", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[]},
     # {:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00056903", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[], :derived_biosample_id=>"SAMD00060421"}, <= note/derived_from属性値から取得したBioSampleID
@@ -1512,6 +1524,12 @@ class TradValidator < ValidatorBase
     return nil if @db_validator.nil?
     ret = true
 
+    # 他極データは無視
+    dblink_list.delete_if{|row|
+      (row[:qualifier] == "project" && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == "biosample" && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == "sequence read archive" && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
+    }
     unmatch_submitter_accession_list = []
     features = dblink_list.group_by{|row| row[:qualifier]}
     features.each do |link_type, lines|
@@ -2012,6 +2030,38 @@ class TradValidator < ValidatorBase
     if inconsistent == false || missing_qual == false
       ret = false
     end
+    ret
+  end
+
+  #
+  # rule:TR_R0033
+  # DBLINKの値が他極のIDの場合にwarningを出す
+  #
+  # ==== Args
+  # rule_code
+  # dblink_list: DBLINKの記載のあるannotation行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA188932", line_no: 24}, {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMN01984938", line_no: 25}]
+  # ==== Return
+  # true/false
+  #
+  def other_insdc_partners_accession(rule_code, dblink_list)
+    return nil if dblink_list.nil? || dblink_list.size == 0
+    ret = true
+
+    dblink_list.each{|row|
+      if ((row[:qualifier] == "project" && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
+         (row[:qualifier] == "biosample" && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
+         (row[:qualifier] == "sequence read archive" && row[:value] =~ /^(S|E)RR\w?\d{1,}$/))
+
+        ret = false
+        annotation = [
+          {key: "DBLINK/#{row[:qualifier]}", value: row[:value]},
+          {key: "File name", value: @anno_file},
+          {key: "Location", value: "Line: #{row[:line_no]}"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    }
     ret
   end
 end
