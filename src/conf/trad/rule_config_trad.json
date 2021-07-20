@@ -284,6 +284,18 @@
       "Trad"
     ]
   },
+  "ruleTR_R0024": {
+    "rule_class": "Trad",
+    "code": "TR_R0024",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing locus_tag",
+    "method": "missing_locus_tag",
+    "message": "locus_tagの記載が推奨されるfeatureにlocus_tag qualifierの記載がありません",
+    "object": [
+      "Trad"
+    ]
+  },
   "ruleTR_R0025": {
     "rule_class": "Trad",
     "code": "TR_R0025",
@@ -364,6 +376,18 @@
     "name": "Inconsistent host with biosample",
     "method": "inconsistent_host_with_biosample",
     "message": "BioSampleに記載されたhostと一致しません",
+    "object": [
+      "Trad"
+    ]
+  },
+  "ruleTR_R0033": {
+    "rule_class": "Trad",
+    "code": "TR_R0033",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "other INSDC partners accession",
+    "method": "other_insdc_partners_accession",
+    "message": "DBLINKに記載されているAccession IDはDDBJのものではありません",
     "object": [
       "Trad"
     ]

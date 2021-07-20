@@ -1297,6 +1297,56 @@ class TestTradValidator < Minitest::Test
     assert_equal 2, ret[:error_list].size #3行ともエラーだが、locus_tag_prefix単位でまとめられる
   end
 
+  # rule:TR_R0024
+  def test_missing_locus_tag
+    #ok case
+    ## exist
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 5},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "locus_tag", value: "LOCUS_00001", line_no: 24, feature_no: 5}
+    ]
+    anno_by_feat = annotation_line_list.group_by{|row| row[:feature]}
+    ret = exec_validator("missing_locus_tag", "TR_R0024", anno_by_feat)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not require locus_tag feature
+    annotation_line_list = [
+      {entry: "Entry1", feature: "repeat_region", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 5}
+    ]
+    anno_by_feat = annotation_line_list.group_by{|row| row[:feature]}
+    ret = exec_validator("missing_locus_tag", "TR_R0024", anno_by_feat)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    # not exist locus_tag on CDS feature
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 5}
+    ]
+    anno_by_feat = annotation_line_list.group_by{|row| row[:feature]}
+    ret = exec_validator("missing_locus_tag", "TR_R0024", anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # not exist locus_tag on two CDS feature and rRNA
+    annotation_line_list = [
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "aaa", line_no: 23, feature_no: 5},
+      {entry: "Entry1", feature: "rRNA", location: "", qualifier: "rRNA", value: "bbb", line_no: 28, feature_no: 8},
+      {entry: "Entry1", feature: "CDS", location: "", qualifier: "gene", value: "bbb", line_no: 33, feature_no: 11}
+    ]
+    anno_by_feat = annotation_line_list.group_by{|row| row[:feature]}
+    ret = exec_validator("missing_locus_tag", "TR_R0024", anno_by_feat)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size  # group by feature
+
+    # nil case
+    annotation_line_list = []
+    anno_by_feat = annotation_line_list.group_by{|row| row[:feature]}
+    ret = exec_validator("missing_locus_tag", "TR_R0023", anno_by_feat)
+    assert_nil ret[:result]
+    ret = exec_validator("missing_locus_tag", "TR_R0023", nil)
+    assert_nil ret[:result]
+  end
+
   # rule:TR_R0030
   def test_inconsistent_culture_collection_with_biosample
     return nil if @ddbj_db_mode == false

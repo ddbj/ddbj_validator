@@ -26,6 +26,7 @@ class TradValidator < ValidatorBase
 
     @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_trad.json"))
     @conf[:validation_parser_config] = JSON.parse(File.read(config_file_dir + "/rule_config_parser.json"))
+    @conf[:locus_tag_require_features] = JSON.parse(File.read(config_file_dir + "/locus_tag_require_features.json"))
 
     bs_config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")
     @conf[:bs_null_accepted] = JSON.parse(File.read(bs_config_file_dir + "/null_accepted.json"))
@@ -113,6 +114,7 @@ class TradValidator < ValidatorBase
       inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
       inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
     end
+    missing_locus_tag("TR_R0024", anno_by_feat)
   end
 
   #
@@ -1828,6 +1830,43 @@ class TradValidator < ValidatorBase
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
+      end
+    end
+    ret
+  end
+
+  #
+  # rule:TR_R0024
+  # ==== Args
+  # rule_code
+  # anno_by_feat: feature毎にgroupingされたアノテーション {"CDS"=>[{:entry=>"Entry1", :feature=>"CDS", :location=>"", :qualifier=>"gene", :value=>"aaa", :line_no=>23, :feature_no=>5}, {:entry=>"Entry1", :feature=>"CDS", :location=>"", :qualifier=>"locus_tag", :value=>"LOCUS_00001", :line_no=>24, :feature_no=>5}]}
+  # ==== Return
+  # true/false
+  #
+  def missing_locus_tag(rule_code, anno_by_feat)
+    return nil if anno_by_feat.nil? || anno_by_feat == {}
+    ret = true
+
+    anno_by_feat.each do |feature, lines|
+      if @conf[:locus_tag_require_features].include?(feature) # locus_tagの記述が望ましいfeatureであれば
+        location_list = []
+        feature_group = lines.group_by{|row| row[:feature_no]} # 個々のfeature毎にgrouping
+        feature_group.each do |feature_no, feature_line|
+          locus_tag_line = feature_line.select{|row| row[:qualifier] == "locus_tag"}
+          if locus_tag_line.size == 0 # locus_tagの記述が見当たらない
+            ret = false
+            location_list.push(feature_line.map{|row| row[:line_no]}.min)
+          end
+        end
+        if location_list.size > 0
+          annotation = [
+            {key: "feature", value: feature},
+            {key: "File name", value: @anno_file},
+            {key: "Location", value: "Line: #{location_list.sort.map{|line_no| line_no.to_s}.join(", ")}"}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
       end
     end
     ret
