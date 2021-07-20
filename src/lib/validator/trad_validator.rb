@@ -117,7 +117,7 @@ class TradValidator < ValidatorBase
     other_insdc_partners_accession("TR_R0033", data_by_feat("DBLINK", anno_by_feat))
 
     # locus_tagチェック
-    missing_locus_tag("TR_R0023", data_by_qual("locus_tag", anno_by_qual), annotation_list)
+    duplicate_locus_tag("TR_R0023", data_by_qual("locus_tag", anno_by_qual), annotation_list)
     missing_locus_tag("TR_R0024", anno_by_feat)
 
   end
