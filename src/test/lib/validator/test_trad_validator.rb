@@ -1629,4 +1629,31 @@ class TestTradValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 3, ret[:error_list].size
   end
+
+  # rule:TR_R0034
+  def test_invalid_bioproject_type
+    return nil if @ddbj_db_mode == false
+    #ok case
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_type", "TR_R0034", bioproject_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## not ddbj accession ID
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA188932", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_type", "TR_R0034", bioproject_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    bioproject_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB1554", line_no: 24}]
+    ret = exec_validator("invalid_bioproject_type", "TR_R0034", bioproject_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #nil case
+    bioproject_list = []
+    ret = exec_validator("invalid_bioproject_type", "TR_R0034", bioproject_list)
+    assert_nil ret[:result]
+
+  end
 end

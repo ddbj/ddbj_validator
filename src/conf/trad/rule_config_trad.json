@@ -391,5 +391,17 @@
     "object": [
       "Trad"
     ]
+  },
+  "ruleTR_R0034": {
+    "rule_class": "Trad",
+    "code": "TR_R0034",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid BioProject type",
+    "method": "invalid_bioproject_type",
+    "message": "BioProject is an Umbrella project, not a primary data type of BioProject. Please provide the accession of the correct primary data BioProject or create a new BioProject, if necessary.",
+    "object": [
+      "Trad"
+    ]
   }
 }

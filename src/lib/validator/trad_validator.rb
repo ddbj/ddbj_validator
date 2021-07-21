@@ -94,6 +94,7 @@ class TradValidator < ValidatorBase
       invalid_bioproject_accession("TR_R0010", data_by_feat_qual("DBLINK", "project", anno_by_qual))
       invalid_biosample_accession("TR_R0011", data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
       invalid_drr_accession("TR_R0012", data_by_feat_qual("DBLINK", "sequence read archive", anno_by_qual))
+      invalid_bioproject_type("TR_R0034", data_by_feat_qual("DBLINK", "project", anno_by_qual))
       # biosampleの情報を取得(note.derived_from属性の参照サンプル含む)
       biosample_id_list = data_by_feat_qual("DBLINK", "biosample", anno_by_qual).map{|row| row[:value]}
       biosample_info_list = get_biosample_info(biosample_id_list)
@@ -2062,6 +2063,40 @@ class TradValidator < ValidatorBase
         @error_list.push(error_hash)
       end
     }
+    ret
+  end
+
+  #
+  # rule:TR_R0034
+  # DBLINK/projectの BioProjectIDがumbrellaプロジェクトではないか
+  #
+  # ==== Args
+  # rule_code
+  # bioproject_list: BioProject accession IDが記述された行のリスト [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB3490", line_no: 24}]
+  # ==== Return
+  # true/false
+  #
+  def invalid_bioproject_type(rule_code, bioproject_list)
+    return nil if bioproject_list.nil? || bioproject_list.size == 0
+    return nil if @db_validator.nil?
+
+    ret  = true
+    bioproject_list.each do |row|
+      bioproject_accession = row[:value]
+      if bioproject_accession =~ /^PRJD\w?\d{1,}$/
+        is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
+        if is_umbrella == true #NG
+          annotation = [
+              {key: "DBLINK/project", value: bioproject_accession},
+              {key: "File name", value: @anno_file},
+              {key: "Location", value: "Line: #{row[:line_no]}"}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          ret = false
+        end
+      end
+    end
     ret
   end
 end
