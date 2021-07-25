@@ -311,6 +311,9 @@ class TestDDBJDbValidator < Minitest::Test
     ret = @db_validator.get_bioproject_id_via_dra(["64274"])
     assert_equal ret.first[:smp_id], "64274"
     assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    ret = @db_validator.get_bioproject_id_via_dra(["64274", "104969"])
+    assert_equal ret[1][:smp_id], "104969"
+    assert_equal ret[1][:bioproject_accession_id_list], ["PRJDB5969"]
     ret = @db_validator.get_bioproject_id_via_dra(["0000"])
     assert_equal ret.first[:smp_id], "0000"
     assert_nil ret.first[:bioproject_accession_id_list]

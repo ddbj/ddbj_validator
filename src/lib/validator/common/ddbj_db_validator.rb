@@ -941,38 +941,39 @@ class DDBJDbValidator
       begin
         connection = get_connection(DRA_DB_NAME)
         id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
-
-        q = "SELECT DISTINCT acc_id, acc_type AS ext_acc_type, ref_name, g_view.status
+        # sub queryでの記述では数秒掛かるケースもあったため、クエリを分離して実行
+        q = "SELECT acc_id
                FROM mass.ext_entity smp_ext
-               JOIN mass.ext_relation ext_ref USING(ext_id)
-               JOIN mass.current_dra_submission_group_view g_view USING(grp_id)
-             WHERE ext_ref.acc_id IN
-              (
-                SELECT acc_id
-                  FROM mass.ext_entity smp_ext
-                  JOIN mass.ext_relation smp_rel USING(ext_id)
-                WHERE smp_ext.ref_name IN (#{id_place_holder})
-                  AND acc_type = 'SSUB'
-                  AND acc_id IS NOT NULL
-              )"
-              # AND g_view.status NOT IN (900, 1000, 1100)"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", biosample_smp_id_list)
-
-        ret_list = []
-        res.each{|row| ret_list.push(row) unless ["900", "1000", "1100"].include?(row["status"])} #improve query speed
-        ret_list.group_by{|row| row["acc_id"]}.each do |acc_id, ref_list|
-          # DRA accessionに紐づくBioProjectIDを取得(一応リスト)
-          bioproject_submission_id_list = ref_list.select{|row| row["ext_acc_type"] == "PSUB"}.map{|row| row["ref_name"]}
-          bioproject_accession_id_list = []
-          bioproject_submission_id_list.each do |bioproject_submission_id|
-            bioproject_accession_id_list.push(get_bioproject_accession(bioproject_submission_id))
-          end
-          bioproject_accession_id_list.compact!
-          # 結果が返ってきたsmp_idに対してproject_id情報を足す
-          ref_list.each do |row|
-            selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
-            selected.each{|ret| ret[:bioproject_accession_id_list] = bioproject_accession_id_list}
+               JOIN mass.ext_relation smp_rel USING(ext_id)
+             WHERE smp_ext.ref_name IN (#{id_place_holder})
+               AND acc_type = 'SSUB'
+              AND acc_id IS NOT NULL"
+        connection.prepare("pre_query_ssub", q)
+        res = connection.exec_prepared("pre_query_ssub", biosample_smp_id_list)
+        if res.ntuples > 0 # hit ssub
+          ssub_list = res.map{|row| row["acc_id"]}
+          id_place_holder = (1..ssub_list.size).map{|idx| "$" + idx.to_s}.join(",")
+          q = "SELECT DISTINCT acc_id, acc_type AS ext_acc_type, ref_name, g_view.status
+                 FROM mass.ext_entity smp_ext
+                 JOIN mass.ext_relation ext_ref USING(ext_id)
+                 JOIN mass.current_dra_submission_group_view g_view USING(grp_id)
+               WHERE ext_ref.acc_id IN (#{id_place_holder})
+                 AND g_view.status NOT IN (900, 1000, 1100)"
+          connection.prepare("pre_query", q)
+          res = connection.exec_prepared("pre_query", ssub_list)
+          res.group_by{|row| row["acc_id"]}.each do |acc_id, ref_list|
+            # DRA accessionに紐づくBioProjectIDを取得(一応リスト)
+            bioproject_submission_id_list = ref_list.select{|row| row["ext_acc_type"] == "PSUB"}.map{|row| row["ref_name"]}
+            bioproject_accession_id_list = []
+            bioproject_submission_id_list.each do |bioproject_submission_id|
+              bioproject_accession_id_list.push(get_bioproject_accession(bioproject_submission_id))
+            end
+            bioproject_accession_id_list.compact!
+            # 結果が返ってきたsmp_idに対してproject_id情報を足す
+            ref_list.each do |row|
+              selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
+              selected.each{|ret| ret[:bioproject_accession_id_list] = bioproject_accession_id_list}
+            end
           end
         end
       rescue => ex

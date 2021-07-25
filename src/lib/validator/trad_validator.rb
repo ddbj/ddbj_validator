@@ -1362,7 +1362,7 @@ class TradValidator < ValidatorBase
               {key: "File name", value: @anno_file},
               {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
             ]
-            annotation.push({key: "Message", value: "BioSample[#{attribute_name})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' does not described."})
+            annotation.push({key: "Message", value: "BioSample[#{biosample_id})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' does not described."})
             error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
             @error_list.push(error_hash)
           end
