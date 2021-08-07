@@ -1419,6 +1419,7 @@ class TradValidator < ValidatorBase
     # {:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00056903", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[], :derived_biosample_id=>"SAMD00060421"}, <= note/derived_from属性値から取得したBioSampleID
     # {:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00056904", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[], :derived_biosample_id=>"SAMD00060421"}] <= note/derived_from属性値から取得したBioSampleID
     biosample_list = []
+    biosample_id_list = []
     biosample_line_by_entry = dblink_list.select{|row| row[:qualifier] == "biosample"}.group_by{|row| row[:enty]}
     biosample_line_by_entry.each do |entry, biosample_line_list|
       biosample_line_list.each do |biosample_line|
@@ -1433,94 +1434,70 @@ class TradValidator < ValidatorBase
         end
         biosample_line_with_id[:bioproject_id_list] = bioproject_line_list.map{|row| row[:value]}
         biosample_line_with_id[:run_id_list] = run_line_list.map{|row| row[:value]}
-        biosample_list.push(biosample_line_with_id)
 
-        # note属性やderived_from属性に記載されているBioSampleIDもチェック対象とする
+        # note属性やderived_from属性に記載されているBioSampleIDの情報を加える
         biosample_id = biosample_line_with_id[:value]
         if !biosample_info[biosample_id].nil? && !biosample_info[biosample_id][:ref_biosample_list].nil?
-          biosample_info[biosample_id][:ref_biosample_list].each do |ref_biosample_id|
-            biosample_ref_line_with_id = biosample_line_with_id.dup #記述行情報をコピー
-            biosample_ref_line_with_id[:value] = ref_biosample_id # biosample_idを入れ替える
-            biosample_ref_line_with_id[:derived_biosample_id] = biosample_id # 参照元のBioSampleIDを残す
-            biosample_list.push(biosample_ref_line_with_id)
-          end
+          biosample_line_with_id[:ref_biosample_list] = biosample_info[biosample_id][:ref_biosample_list]
+          biosample_id_list.concat(biosample_info[biosample_id][:ref_biosample_list])
         end
+        biosample_list.push(biosample_line_with_id)
+        biosample_id_list.push(biosample_line[:value])
       end
     end
 
-    # 出現するBioSampleIDのリストを抽出し、紐づくBioProject/RunのIDリストを取得する
+    # 出現するBioSampleIDのリストから、DRA経由で紐づくBioProject/RunのIDリストを取得する
     # {"SAMD00060421"=>{:biosample_id=>"SAMD00060421", :smp_id=>"75930", :bioproject_accession_id_list=>[], :drr_accession_id_list=>[]},
     #  "SAMD00056903"=>{:biosample_id=>"SAMD00056903", :smp_id=>"69937", :bioproject_accession_id_list=>["PRJDB5067"], :drr_accession_id_list=>["DRR066661", "DRR066655"]},
     #  "SAMD00056904"=>{:biosample_id=>"SAMD00056904", :smp_id=>"69938", :bioproject_accession_id_list=>["PRJDB5067"], :drr_accession_id_list=>["DRR066656", "DRR066662", "DRR066667"]}}
-    biosample_id_list = biosample_list.map {|row| row[:value]}
     biosample_list_with_project_run_id_on_db = @db_validator.get_biosample_related_id(biosample_id_list).group_by{|row| row[:biosample_id]}
     biosample_list_with_project_run_id_on_db.each {|biosample_id, list| biosample_list_with_project_run_id_on_db[biosample_id] = list.first}
 
-    # チェック対象BioSampleID事に、BioProject IDの整合性、DRR IDの整合性をチェック
     biosample_list.each do |biosample_line|
       biosample_id = biosample_line[:value]
-      # BioProject ID check
-      if biosample_list_with_project_run_id_on_db[biosample_id][:bioproject_accession_id_list].size > 0 # DRAで紐づくBioProjectIDがある
-        # Annotationファイルに記述されているBioProjectIDからDBで紐づくIDを引いて、余分なIDがあるかチェックする
-        extra_project_id = biosample_line[:bioproject_id_list] - biosample_list_with_project_run_id_on_db[biosample_id][:bioproject_accession_id_list]
-        if extra_project_id.size > 0
-          ret = false
-          unless biosample_line[:derived_biosample_id].nil?
-            disp_biosample_id = "#{biosample_line[:derived_biosample_id]}(#{biosample_id})" #SAMD00060421(SAMD00056903)  記述BioSampleID(derivedのBioSampleID)
-          end
-          annotation = [
-            {key: "DBLINK/biosample", value: disp_biosample_id},
-            {key: "DBLINK/project", value: extra_project_id.join(", ")},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      else # DRAで紐づくBioProjectIDがない場合はbioproject_id属性値を参照
-        unless biosample_info[biosample_id][:attribute_list].nil?
-          bioproject_id_attribute = biosample_info[biosample_id][:attribute_list].select{|attr| attr[:attribute_name] == 'bioproject_id'}
-          if bioproject_id_attribute.size > 0 # bioproject_id 属性に値がある
-            # Annotationファイルに記述されているBioProjectIDからbioproject_id属性の値を引いて、余分なIDがあるかチェックする
-            bioproject_id_attr_value = bioproject_id_attribute.first[:attribute_value]
-            extra_project_id = biosample_line[:bioproject_id_list] - [bioproject_id_attr_value]
-            if extra_project_id.size > 0
-              ret = false
-              unless biosample_line[:derived_biosample_id].nil?
-                disp_biosample_id = "#{biosample_line[:derived_biosample_id]}(#{biosample_id})" #SAMD00060421(SAMD00056903)  記述BioSampleID(derivedのBioSampleID)
-              end
-              annotation = [
-                {key: "DBLINK/biosample", value: disp_biosample_id},
-                {key: "DBLINK/project", value: extra_project_id.join(", ")},
-                {key: "File name", value: @anno_file},
-                {key: "Location", value: "Line: #{biosample_line[:line_no]}"},
-                {key: "Message", value: "Unmatched 'bioproject_id' attribute value of #{biosample_id}"}
-              ]
-              error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-              @error_list.push(error_hash)
-            end
-          end
+      linked_bioproject_id_list = []
+      linked_run_id_list = []
+      unless biosample_list_with_project_run_id_on_db[biosample_id][:bioproject_accession_id_list].nil? # DRA経由で紐づくBioProjectIDがある
+        linked_bioproject_id_list.concat(biosample_list_with_project_run_id_on_db[biosample_id][:bioproject_accession_id_list])
+      end
+      unless biosample_list_with_project_run_id_on_db[biosample_id][:drr_accession_id_list].nil? # DRA経由で紐づくDRRIDがある
+        linked_run_id_list.concat(biosample_list_with_project_run_id_on_db[biosample_id][:drr_accession_id_list])
+      end
+      unless biosample_line[:ref_biosample_list].nil? # note属性やderived_from属性に書かれたBioSampleIDに紐づくBioProjectID/DRRIDも記述許容する
+        biosample_line[:ref_biosample_list].each do |ref_biosample_id|
+          linked_bioproject_id_list.concat(biosample_list_with_project_run_id_on_db[ref_biosample_id][:bioproject_accession_id_list])
+          linked_run_id_list.concat(biosample_list_with_project_run_id_on_db[ref_biosample_id][:drr_accession_id_list])
         end
       end
 
-      # DRR ID check
-      if biosample_list_with_project_run_id_on_db[biosample_id][:drr_accession_id_list].size > 0
-        # Annotationファイルに記述されているDRRIDからDBで紐づくIDを引いて、余分なIDがあるかチェックする
-        extra_run_id = biosample_line[:run_id_list] - biosample_list_with_project_run_id_on_db[biosample_id][:drr_accession_id_list]
-        if extra_run_id.size > 0
+      # Annotationファイルに記述されているBioProjectIDからDRA経由で紐づくIDを引いて、余分なIDがあるかチェックする
+      if linked_bioproject_id_list.size > 0 # BioProjectIDはDRA経由で紐づかないケースもある為、その場合はチェックしない
+        extra_bioproject_id = biosample_line[:bioproject_id_list] - linked_bioproject_id_list
+        if extra_bioproject_id.size > 0
           ret = false
-          unless biosample_line[:derived_biosample_id].nil?
-            disp_biosample_id = "#{biosample_line[:derived_biosample_id]}(#{biosample_id})" #SAMD00060421(SAMD00056903)  記述BioSampleID(derivedのBioSampleID)
-          end
           annotation = [
-            {key: "DBLINK/biosample", value: disp_biosample_id},
-            {key: "DBLINK/sequence read archive", value: extra_run_id.join(", ")},
+            {key: "DBLINK/biosample", value: biosample_id},
+            {key: "DBLINK/project", value: extra_bioproject_id.join(", ")},
             {key: "File name", value: @anno_file},
             {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           @error_list.push(error_hash)
         end
+      end
+
+      # Annotationファイルに記述されているDRRIDからDBAで経由で紐づくIDを引いて、余分なIDがあるかチェックする
+      extra_run_id = biosample_line[:run_id_list] - linked_run_id_list
+      if extra_run_id.size > 0
+        ret = false
+        annotation = [
+          {key: "DBLINK/biosample", value: biosample_id},
+          {key: "DBLINK/sequence read archive", value: extra_run_id.join(", ")},
+          {key: "File name", value: @anno_file},
+          {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
       end
     end
 

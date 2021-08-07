@@ -758,6 +758,15 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## not link via DRA
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB6348", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00093784", line_no: 25}
+    ]
+    biosample_info = {"SAMD00093784" => {attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB6348"}]}}
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     ## ignore NCBI id
     dblink_list = [
       {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJNA188932", line_no: 24},
@@ -790,6 +799,24 @@ class TestTradValidator < Minitest::Test
                                         },
                       "SAMD00056903" => {  attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB5067"}]},
                       "SAMD00056904" => {  attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB5067"}]}
+                    }
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ## has drr_id via ref_biosample_id
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB6348", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00093784", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR101361", line_no: 26}, #SAMD00093579に紐づくRUN
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR101362", line_no: 27}  #SAMD00093580に紐づくRUN
+    ]
+    biosample_info = {"SAMD00093784" => {
+                                          attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB6348"}],
+                                          ref_biosample_list: ["SAMD00093579", "SAMD00093580"]
+                                        },
+                      "SAMD00093579" => {  attribute_list: []},
+                      "SAMD00093580" => {  attribute_list: []},
                     }
     ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
     assert_equal true, ret[:result]
@@ -829,7 +856,7 @@ class TestTradValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
 
-    ## has derived biosample_id and incorrect  BioProjectID
+    ## has drr_id via ref_biosample_id, but not include BioProjectID
     dblink_list = [
       {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "Not correct ID", line_no: 24},
       {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00060421", line_no: 25}
@@ -843,7 +870,27 @@ class TestTradValidator < Minitest::Test
                     }
     ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
     assert_equal false, ret[:result]
-    assert_equal 3, ret[:error_list].size # referenceの2つも合わせて計3エラー
+    assert_equal 1, ret[:error_list].size
+
+    ## has drr_id via ref_biosample_id, but not include DRR ID
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRJDB6348", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00093784", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR101361", line_no: 26},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "DRR101362", line_no: 27},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not correct ID", line_no: 28}
+    ]
+    biosample_info = {"SAMD00093784" => {
+                                          attribute_list: [{attribute_name: "bioproject_id", attribute_value: "PRJDB6348"}],
+                                          ref_biosample_list: ["SAMD00093579", "SAMD00093580"]
+                                        },
+                      "SAMD00093579" => {  attribute_list: []},
+                      "SAMD00093580" => {  attribute_list: []},
+                    }
+    ret = exec_validator("invalid_combination_of_accessions", "TR_R0013", dblink_list, biosample_info)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
   end
 
   # rule:TR_R0014
