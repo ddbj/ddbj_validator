@@ -106,14 +106,16 @@ class TradValidator < ValidatorBase
       end
 
       # BioSample整合性チェック
-      inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_qual("strain", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_isolate_with_biosample("TR_R0016", data_by_qual("isolate", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_isolation_source_with_biosample("TR_R0017", data_by_qual("isolation_source", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_country_with_biosample("TR_R0019", data_by_feat_qual("source", "country", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_locus_tag_with_biosample("TR_R0020", data_by_qual("locus_tag", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
-      inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), biosample_info_list)
+      all_entry_name_list = anno_by_ent.keys
+      biosample_line = data_by_feat_qual("DBLINK", "biosample", anno_by_qual)
+      inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_qual("strain", anno_by_qual), biosample_line, biosample_info_list)
+      inconsistent_isolate_with_biosample("TR_R0016", data_by_qual("isolate", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_isolation_source_with_biosample("TR_R0017", data_by_qual("isolation_source", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_country_with_biosample("TR_R0019", data_by_feat_qual("source", "country", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_locus_tag_with_biosample("TR_R0020", data_by_qual("locus_tag", anno_by_qual), biosample_line, biosample_info_list)
+      inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
     end
     other_insdc_partners_accession("TR_R0033", data_by_feat("DBLINK", anno_by_feat))
 
@@ -1332,12 +1334,13 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # qual_data_list: 特定qualifierの記載のあるannotation行のリスト. e.g. []
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "Entry1", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def missing_qualifier_against_biosample(rule_code, qual_data_list, biosample_data_list, biosample_info, qualifier_name, attribute_name)
+  def missing_qualifier_against_biosample(rule_code, qual_data_list, all_entry_name_list, biosample_data_list, biosample_info, qualifier_name, attribute_name)
     ret = true
     # DBLINK/biosampleのBioSampleに属性値が記述されているが、qualifierの記述がないケース
     biosample_data_list.each do |biosample_line|
@@ -1348,14 +1351,31 @@ class TradValidator < ValidatorBase
         target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
         target_attribute_list.delete_if{|attr|  @conf[:bs_null_accepted].include?(attr[:attribute_value]) } # 属性値がnull相当の場合は入力無し扱いとする
         if target_attribute_list.size > 0 # Biosampleの属性値はある
+          flag = true
           qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == entry_name}
           if qual_line.size == 0 # 同じエントリにqualifierデータがなければCOMMONの値を検索
             qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == "COMMON"}
           end
-          if qual_line.size == 0 # qualifierデータがない
+          missing_qual_entry_list = []
+          if qual_line.size == 0 # COMMONのqualifierにも記載がない場合には個別Entryの記載をチェック
+            if entry_name == "COMMON" #BioSampleIDがCOMMONに、qualifierがCOMMON以外に記載されているケースをカバー
+              #COMMON以外の全エントリに値があればOK
+              exist_entry_name_list = qual_data_list.map{|row| row[:entry]}
+              missing_qual_entry_list = all_entry_name_list - exist_entry_name_list - ["COMMON"]
+              # 一つでも値がないエントリがあればNG。どのエントリに値がないかを確認
+              if missing_qual_entry_list.size > 0
+                flag = false
+              end
+            else
+              missing_qual_entry_list.push(entry_name)
+              flag = false
+            end
+          end
+          if flag == false
             biosample_attr_values = target_attribute_list.map{|attr| attr[:attribute_value]}.join(", ")
             ret = false #1行でもエラーがあればfalse
             annotation = [
+              {key: "Entry", value: missing_qual_entry_list.join(",")},
               {key: "#{qualifier_name}", value: ""},
               {key: "BioSample ID", value: biosample_id},
               {key: "BioSample value[#{attribute_name}]", value: biosample_attr_values},
@@ -1710,17 +1730,18 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # isolate_data_list: /isolateの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def inconsistent_isolate_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info)
+  def inconsistent_isolate_with_biosample(rule_code, isolate_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if isolate_data_list.nil?
     ret = true
 
     inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info, "isolate", "isolate")
-    missing_qual = missing_qualifier_against_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    missing_qual = missing_qualifier_against_biosample(rule_code, isolate_data_list, all_entry_name_list, biosample_data_list, biosample_info, "isolate", "isolate")
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1735,17 +1756,18 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # isolation_source_data_list: /isolation_sourceの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolation_source", value: "Sub-seafloor massive sulfide deposits", line_no: 24}]
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolation_source", attribute_value: "Sub-seafloor massive sulfide deposits"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def inconsistent_isolation_source_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info)
+  def inconsistent_isolation_source_with_biosample(rule_code, isolation_source_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if isolation_source_data_list.nil?
     ret = true
 
     inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
-    missing_qual = missing_qualifier_against_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
+    missing_qual = missing_qualifier_against_biosample(rule_code, isolation_source_data_list, all_entry_name_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1760,17 +1782,18 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # collection_date_data_list: /collection_dateの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "collection_date", value: "2010-06-16", line_no: 24}]
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "collection_date", attribute_value: "2010-06-16"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def inconsistent_collection_date_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info)
+  def inconsistent_collection_date_with_biosample(rule_code, collection_date_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if collection_date_data_list.nil?
     ret = true
 
     inconsistent = inconsistent_qualifier_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
-    missing_qual = missing_qualifier_against_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
+    missing_qual = missing_qualifier_against_biosample(rule_code, collection_date_data_list, all_entry_name_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1786,17 +1809,17 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # country_data_list: /countryの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "country", value: "Japan:Yamanashi, Lake Mizugaki", line_no: 24}]
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "geo_loc_name", attribute_value: "Japan"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def inconsistent_country_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info)
+  def inconsistent_country_with_biosample(rule_code, country_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if country_data_list.nil?
     ret = true
-
     inconsistent = inconsistent_qualifier_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
-    missing_qual = missing_qualifier_against_biosample(rule_code, country_data_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
+    missing_qual = missing_qualifier_against_biosample(rule_code, country_data_list, all_entry_name_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1988,17 +2011,18 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # culture_collection_data_list: /culture_collectionの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def inconsistent_culture_collection_with_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info)
+  def inconsistent_culture_collection_with_biosample(rule_code, culture_collection_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if culture_collection_data_list.nil?
     ret = true
 
     inconsistent = inconsistent_qualifier_with_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
-    missing_qual = missing_qualifier_against_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
+    missing_qual = missing_qualifier_against_biosample(rule_code, culture_collection_data_list, all_entry_name_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -2017,17 +2041,18 @@ class TradValidator < ValidatorBase
   # ==== Args
   # rule_code
   # host_data_list: /hostの記載のあるannotation行のリスト. e.g. [{entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}]
+  # all_entry_name_list: annotationファイルにあるEntry名のリスト e.g. ["COMMON", "Entry1"]
   # biosample_data_list: DBLINK/biosample記載の行のリスト. e.g. [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD00081372", line_no: 20}]
   # biosample_info: biosampleのメタデータ e.g. {"SAMD00081372" => {attribute_list: [{attribute_name: "isolate", attribute_value: "BMS3Abin12"}, {}....]}}
   # ==== Return
   # true/false
   #
-  def inconsistent_host_with_biosample(rule_code, host_data_list, biosample_data_list, biosample_info)
+  def inconsistent_host_with_biosample(rule_code, host_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if host_data_list.nil?
     ret = true
 
     inconsistent = inconsistent_qualifier_with_biosample(rule_code, host_data_list, biosample_data_list, biosample_info, "host", "host")
-    missing_qual = missing_qualifier_against_biosample(rule_code, host_data_list, biosample_data_list, biosample_info, "host", "host")
+    missing_qual = missing_qualifier_against_biosample(rule_code, host_data_list, all_entry_name_list, biosample_data_list, biosample_info, "host", "host")
     if inconsistent == false || missing_qual == false
       ret = false
     end
