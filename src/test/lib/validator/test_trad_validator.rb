@@ -885,6 +885,16 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    ## not exist Accession ID
+    dblink_list = [
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRDJB0000", line_no: 24},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SSUB00000", line_no: 25},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not exist DRR ID 1", line_no: 26},
+      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not exist DRR ID 2", line_no: 27}
+    ]
+    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #ng case
     ## other submitter_id BioSampleAccession
@@ -896,16 +906,6 @@ class TestTradValidator < Minitest::Test
     ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    ## not exist DRR Accession
-    dblink_list = [
-      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "PRDJB0000", line_no: 24},
-      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SSUB00000", line_no: 25},
-      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not exist DRR ID 1", line_no: 26},
-      {entry: "COMMON", feature: "DBLINK", location: "", qualifier: "sequence read archive", value: "Not exist DRR ID 2", line_no: 27}
-    ]
-    ret = exec_validator("inconsistent_submitter", "TR_R0014", dblink_list, "hirakawa")
-    assert_equal false, ret[:result]
-    assert_equal 4, ret[:error_list].size
   end
 
   def test_unmatch_submitter_id
@@ -928,17 +928,17 @@ class TestTradValidator < Minitest::Test
     submitter_id = nil
     ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
     assert_equal 0, ret.size
+    ## invalid id (no check)
+    biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRDJB0000", line_no: 25}]
+    with_submitter_id_list = [{biosample_id: "PRDJB0000"}]
+    submitter_id = "hirakawa"
+    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
+    assert_equal 0, ret.size
 
     # has error
     ## other submitter
     biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "project", value: "SAMD00000001", line_no: 25}]
     with_submitter_id_list = [{biosample_id: "SAMD00000001", submitter_id: "other person"}]
-    submitter_id = "hirakawa"
-    ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
-    assert_equal 1, ret.size
-    ## invalid id
-    biosamle_dblink_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "PRDJB0000", line_no: 25}]
-    with_submitter_id_list = [{biosample_id: "PRDJB0000"}]
     submitter_id = "hirakawa"
     ret = @validator.unmatch_submitter_id("biosample", biosamle_dblink_list, with_submitter_id_list, submitter_id)
     assert_equal 1, ret.size

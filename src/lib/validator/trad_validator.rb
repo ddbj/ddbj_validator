@@ -1615,7 +1615,7 @@ class TradValidator < ValidatorBase
       else
         hit_list.each do |hit|
           if hit[:submitter_id].nil?
-            unmatch_list.push(dblink)
+            # submitter_idが取得できない(IDが正しくない)場合は無視
           elsif hit[:submitter_id] != submitter_id
             unmatch_list.push(dblink)
           end
