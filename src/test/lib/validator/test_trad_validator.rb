@@ -241,32 +241,32 @@ class TestTradValidator < Minitest::Test
   end
 
   # rule:TR_R0003
-  def test_taxonomy_error_warning
+  def test_organism_warning
     #ok case (case J)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Homo sapiens", line_no: 24}]
     organism_info_list = []
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     assert_equal "9606", organism_info_list.first[:tax_id]  #確定されたTaxID
     ## skip case (exist biosample id)(case A,B,C)
     biosample_data_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## skip case (exist biosample id at COMMON)(case A,B,C)
     biosample_data_list = [{entry: "COMMON", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
     organism_data_list = [{entry: "ENT", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## multiple taxa were hit, but only one hit as ScientificName.(case E)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacteria", line_no: 24}]
     organism_info_list = []
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     assert_equal "2", organism_info_list.first[:tax_id] #菌側のBacteriaのTaxIDで確定される
@@ -275,34 +275,34 @@ class TestTradValidator < Minitest::Test
     ## not exist value(case D)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not skip case (exist biosample id but at other entry)(case D)
     biosample_data_list = [{entry: "ENT", feature: "DBLINK", location: "", qualifier: "biosample", value: "SAMD90000000", line_no: 20}]
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Not Exist Organism", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## hit one tax. need auto-annotation (case I)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "human", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "Homo sapiens", get_auto_annotation(ret[:error_list])
     ## "environmental samples" is not accepted (case F)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "environmental samples", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal true, ret[:error_list].first[:annotation].to_s.include?("more detail")
+    assert_equal true, ret[:error_list].first[:annotation].to_s.include?("Use organism name for lower rank taxon")
     ## multiple taxa were hit, but only one hit infrascpecific organism (case G)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "mouse", line_no: 24}]
     organism_info_list = []
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list, organism_info_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "Mus musculus", get_auto_annotation(ret[:error_list])
@@ -310,19 +310,19 @@ class TestTradValidator < Minitest::Test
     ## multiple taxa were hit, and infrascpecific organism is not hit or multi hit(case H)
     biosample_data_list = []
     organism_data_list = [{entry: "COMMON", feature: "source", location: "", qualifier: "organism", value: "Bacillus", line_no: 24}]
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal true, ret[:error_list].first[:annotation].to_s.include?("Multiple taxonomies")
+    assert_equal true, ret[:error_list].first[:annotation].to_s.include?("Two or more taxa")
 
     #nil case
     biosample_data_list = []
     organism_data_list = []
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_nil ret[:result]
     biosample_data_list = []
     organism_data_list = nil
-    ret = exec_validator("taxonomy_error_warning", "TR_R0003", organism_data_list, biosample_data_list)
+    ret = exec_validator("organism_warning", "TR_R0003", organism_data_list, biosample_data_list)
     assert_nil ret[:result]
   end
 

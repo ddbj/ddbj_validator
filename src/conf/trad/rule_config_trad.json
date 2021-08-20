@@ -6,7 +6,7 @@
     "internal_ignore": true,
     "name": "Invalid hold_date",
     "method": "invalid_hold_date",
-    "message": "DATE/hold_dateの日付が不正です。形式はYYYYMMDDで3年以内の日付を指定してください。",
+    "message": "Invalid value in DATE/hold_date. hold_date must be within 3 years in YYYYMMDD format.",
     "object": [
       "Trad"
     ],
@@ -19,7 +19,7 @@
     "internal_ignore": false,
     "name": "Missing hold_date",
     "method": "missing_hold_date",
-    "message": "DATE/hold_dateの記載がなく、このSubmissionはAccession番号発行後に即日公開されますのでご注意ください。非公開期間を設けたい場合にはDate/hold_dateに公開日を記載してください。",
+    "message": "No value in DATE/hold_date. Your data will be immediately released after issuing accession numbers. Input DATE/hold_date if you like to hold your data until academic publication. ",
     "object": [
       "Trad"
     ],
@@ -30,9 +30,9 @@
     "code": "TR_R0003",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Taxonomy error warning",
-    "method": "taxonomy_error_warning",
-    "message": "If applicable, the taxonomy id will be automatically filled and the organism will be corrected to the scientific name. When the organism(s) is novel, please enter proposed name(s) in the organism, leave the taxonomy id empty and submit the BioSample.",
+    "name": "Organism warning",
+    "method": "organism_warning",
+    "message": "Value of organism qualifier is not found in scientific names of NCBI taxonomy database. Please check spelling and other mistakes.\nWhen the species name is validly published, please ignore this warning. \nIn case of novel species and not yet published, please change to a tentative name including with strain/isolate etc. If any other cases, please contact us.  ",
     "object": [
       "Trad"
     ],
@@ -45,7 +45,7 @@
     "internal_ignore": true,
     "name": "Taxonomy at species or infraspecific rank",
     "method": "taxonomy_at_species_or_infraspecific_rank",
-    "message": "Taxonomy should be species or infraspecific level.",
+    "message": "Rank of organism should be species or infraspecific level.",
     "object": [
       "Trad"
     ],
@@ -58,7 +58,7 @@
     "internal_ignore": false,
     "name": "Unnecessary WGS keywords",
     "method": "unnecessary_wgs_keywords",
-    "message": "Completeゲノムの場合にはKEYWORD\"WGS\"は不要ですので削除して下さい。Contigレベルの場合にはそのまま\"WGS\"を残してください。",
+    "message": "In case of complete genome, KEYWORD \"WGS\" is not required. Remove it if sequence data are not draft level of genome.",
     "object": [
       "Trad"
     ],
@@ -71,7 +71,7 @@
     "internal_ignore": false,
     "name": "Check by jParser",
     "method": "check_by_jparser",
-    "message": "jParserの実行でエラーが発生しました",
+    "message": "jParser can not run because of unexpected error.",
     "object": [
       "Trad"
     ],
@@ -84,7 +84,7 @@
     "internal_ignore": false,
     "name": "Check by Transchecker",
     "method": "check_by_transchecker",
-    "message": "transCheckerの実行でエラーが発生しました",
+    "message": "transChecker can not run because of unexpected error.",
     "object": [
       "Trad"
     ],
@@ -97,7 +97,7 @@
     "internal_ignore": false,
     "name": "Check by AGPParser",
     "method": "check_by_agpparser",
-    "message": "AGPParserの実行でエラーが発生しました",
+    "message": "AGPParser can not run because of unexpected error.",
     "object": [
       "Trad"
     ],
@@ -110,7 +110,7 @@
     "internal_ignore": true,
     "name": "Missing DBLINK",
     "method": "missing_dblink",
-    "message": "事前にBioProject/BioSample(or DRA)の登録が必要で、それらのAccession番号をDBLINKとして記載する必要があります。",
+    "message": "BioProject and BioSample accessions are required for DBLINK/project and DBLINK/sample. Submit BioProjet and BioSample before sequence submission. ",
     "object": [
       "Trad"
     ],
@@ -119,11 +119,11 @@
   "ruleTR_R0010": {
     "rule_class": "Trad",
     "code": "TR_R0010",
-    "level": "error",
+    "level": "warning",
     "internal_ignore": true,
     "name": "Invalid BioProject accession",
     "method": "invalid_bioproject_accession",
-    "message": "DBLINK/projectにはDDBJで登録したBioProjectのAccessionID PRJDxxxxを記入してください",
+    "message": "DBLINK/project is not in format PRJD##### issued by DDBJ BioProject Accession. ",
     "object": [
       "Trad"
     ]
@@ -131,11 +131,11 @@
   "ruleTR_R0011": {
     "rule_class": "Trad",
     "code": "TR_R0011",
-    "level": "error",
+    "level": "warning",
     "internal_ignore": true,
     "name": "Invalid BioSample accession",
     "method": "invalid_biosample_accession",
-    "message": "DBLINK/biosampleにはDDBJで登録したBioProjectのAccessionID SAMDxxxxを記入してください",
+    "message": "DBLINK/sample is not in format SAMD##### issued by DDBJ BioSample Accession. ",
     "object": [
       "Trad"
     ]
@@ -143,11 +143,11 @@
   "ruleTR_R0012": {
     "rule_class": "Trad",
     "code": "TR_R0012",
-    "level": "error",
+    "level": "warning",
     "internal_ignore": true,
     "name": "Invalid DRR accession",
     "method": "invalid_drr_accession",
-    "message": "DBLINK/sequence read archiveにはDDBJで登録したRUNのAccessionID DRRxxxxを記入してください",
+    "message": "DBLINK/sequence read archive is not in format DRR##### issued by DRA Run Accession.",
     "object": [
       "Trad"
     ]
@@ -159,7 +159,7 @@
     "internal_ignore": false,
     "name": "Invalid combination of accessions",
     "method": "invalid_combination_of_accessions",
-    "message": "DBLINK/project、DBLINK/biosampl、DBLINK/sequence read archiveのAccession番号が同一Projectのものでない可能性があります。IDをご確認ください。",
+    "message": "DBLINK/project and DBLINK/sample or DBLINK/sequence read archive may not belong to the same BioProject. ",
     "object": [
       "Trad"
     ]
@@ -171,7 +171,7 @@
     "internal_ignore": false,
     "name": "Inconsistent submitter",
     "method": "inconsistent_submitter",
-    "message": "BioProject/BioSample/DRA accession is not registered in your account. Please provide a valid BioProject accession.",
+    "message": "Either accessions of BioProject, BioSample or DRA Run in DBLINK is not submitted from your account. ",
     "object": [
       "Trad"
     ]
@@ -183,7 +183,7 @@
     "internal_ignore": false,
     "name": "Inconsistent organism with biosample ",
     "method": "inconsistent_organism_with_biosample_",
-    "message": "BioSampleに記載されたorganism/strainと一致しません",
+    "message": "Value of either of organism/strain qualifier is not matched with BioSample attribute.",
     "object": [
       "Trad"
     ]
@@ -195,7 +195,7 @@
     "internal_ignore": false,
     "name": "Inconsistent isolate with biosample ",
     "method": "inconsistent_isolate_with_biosample_",
-    "message": "BioSampleに記載されたisolateと一致しません",
+    "message": "Value of isolate qualifier is not matched with BioSample attribute.",
     "object": [
       "Trad"
     ]
@@ -207,7 +207,7 @@
     "internal_ignore": false,
     "name": "Inconsistent isolation_source with biosample ",
     "method": "inconsistent_isolation_source_with_biosample_",
-    "message": "BioSampleに記載されたisolation_sourceと一致しません",
+    "message": "Value of isolation_source qualifier is not matched with BioSample attribute.",
     "object": [
       "Trad"
     ]
@@ -219,7 +219,7 @@
     "internal_ignore": false,
     "name": "Inconsistent collection_date with biosample",
     "method": "inconsistent_collection_date_with_biosample",
-    "message": "BioSampleに記載されたcollection_dateと一致しません",
+    "message": "Value of collection_date qualifier is not matched with BioSample attribute.",
     "object": [
       "Trad"
     ]
@@ -231,7 +231,7 @@
     "internal_ignore": false,
     "name": "Inconsistent country with biosample",
     "method": "inconsistent_country_with_biosample",
-    "message": "BioSampleに記載されたcountryと一致しません",
+    "message": "Value of country qualifier is not matched with geo_loc_name in BioSample attribute.",
     "object": [
       "Trad"
     ]
@@ -243,7 +243,7 @@
     "internal_ignore": false,
     "name": "Inconsistent locus_tag_prefix with biosample",
     "method": "inconsistent_locus_tag_prefix_with_biosample",
-    "message": "locus_tagがBioSampleのlocus_tag_prefix属性として記載されていないものです。(BSのlocus_tag_prefixを表示)",
+    "message": "Prefix of locus_tag qualifier is not matched wiith locus_tag_prefix in BioSample attribute. ",
     "object": [
       "Trad"
     ]
@@ -267,7 +267,7 @@
     "internal_ignore": true,
     "name": "Future collection date",
     "method": "future_collection_date",
-    "message": "/collection_date is a future date, please specify a date from the past.",
+    "message": "Value of collection_date qualifier is a future date. It must be a past date.",
     "object": [
       "Trad"
     ]
@@ -279,7 +279,7 @@
     "internal_ignore": false,
     "name": "Duplicate locus_tag",
     "method": "duplicate_locus_tag",
-    "message": "The following locus_tag were used in this file more than one time. Please provide unique locus_tag.",
+    "message": "Values of locus_tag qualifiers are duplicated. ",
     "object": [
       "Trad"
     ]
@@ -291,7 +291,7 @@
     "internal_ignore": false,
     "name": "Missing locus_tag",
     "method": "missing_locus_tag",
-    "message": "locus_tagの記載が推奨されるfeatureにlocus_tag qualifierの記載がありません",
+    "message": "locus_tag qualifier is not found in feature recommended to use.",
     "object": [
       "Trad"
     ]
@@ -299,11 +299,11 @@
   "ruleTR_R0025": {
     "rule_class": "Trad",
     "code": "TR_R0025",
-    "level": "error",
+    "level": "warning",
     "internal_ignore": false,
-    "name": "More detailed organism",
-    "method": "more_detailed_organism",
-    "message": "より詳細な生物種名の記載が必要です",
+    "name": "Suggesting lower taxon",
+    "method": "suggesting_lower_taxon",
+    "message": "Lower taxon would be used for organism qualifier. ",
     "object": [
       "Trad"
     ]
@@ -315,7 +315,7 @@
     "internal_ignore": false,
     "name": "Virus organism name",
     "method": "virus_organism_name",
-    "message": "このウィルスではspecies名記載して下さい？",
+    "message": "For frequently submitted viruses, species name without strain/isolate/serotype should be used for organism qualifier. ",
     "object": [
       "Trad"
     ]
@@ -327,7 +327,7 @@
     "internal_ignore": false,
     "name": "Oryza sativa organism name",
     "method": "oryza_sativa_organism_name",
-    "message": "Oryza sativaの場合はより詳細な生物種名の記載を推奨します",
+    "message": "For Oryza sativa, value of organism qualifer should be 'Oryza sativa Indica Group' or 'Oryza sativa Japonica Group'.  ",
     "object": [
       "Trad"
     ]
@@ -339,7 +339,7 @@
     "internal_ignore": false,
     "name": "Brassica organism name",
     "method": "brassica_organism_name",
-    "message": "記載されたBrassicaでは、より詳細な生物種名の記載を推奨します",
+    "message": "For genus Brassica, value of organism qualifer should be used with subspecies/variety. ",
     "object": [
       "Trad"
     ]
@@ -351,7 +351,7 @@
     "internal_ignore": true,
     "name": "Invalid taxonomy for genome sample",
     "method": "invalid_taxonomy_for_genome_sample",
-    "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" should be used.",
+    "message": "In case of genome from unidentified/unpublished species, a species-level informal name in \"[genus] sp. [strain]\" or \"[family] [strain]\" is required for organism qualifier. ",
     "object": [
       "Trad"
     ]
@@ -363,7 +363,7 @@
     "internal_ignore": false,
     "name": "Inconsistent culture_collection with biosample ",
     "method": "inconsistent_culture_collection_with_biosample_",
-    "message": "BioSampleに記載されたculture_collectionと一致しません",
+    "message": "Value of culture_collection qualifier is not matched with BioSample attribute. ",
     "object": [
       "Trad"
     ]
@@ -375,7 +375,7 @@
     "internal_ignore": false,
     "name": "Inconsistent host with biosample",
     "method": "inconsistent_host_with_biosample",
-    "message": "BioSampleに記載されたhostと一致しません",
+    "message": "Value of host qualifier is not matched with BioSample attribute. ",
     "object": [
       "Trad"
     ]
@@ -387,7 +387,7 @@
     "internal_ignore": false,
     "name": "other INSDC partners accession",
     "method": "other_insdc_partners_accession",
-    "message": "DBLINKに記載されているAccession IDはDDBJのものではありません",
+    "message": "Accession number in DBLINK is not issued by DDBJ.",
     "object": [
       "Trad"
     ]
@@ -399,7 +399,7 @@
     "internal_ignore": false,
     "name": "Invalid BioProject type",
     "method": "invalid_bioproject_type",
-    "message": "BioProject is an Umbrella project, not a primary data type of BioProject. Please provide the accession of the correct primary data BioProject or create a new BioProject, if necessary.",
+    "message": "Value of DBLINK/project is umbrella, not primary BioProject accession. It should be primary BioProject accession.",
     "object": [
       "Trad"
     ]

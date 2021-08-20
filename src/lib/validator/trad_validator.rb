@@ -84,7 +84,7 @@ class TradValidator < ValidatorBase
     end
 
     @organism_info_list = []
-    taxonomy_error_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
+    organism_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
     taxonomy_at_species_or_infraspecific_rank("TR_R0004", @organism_info_list)
     unnecessary_wgs_keywords("TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
 
@@ -272,23 +272,23 @@ class TradValidator < ValidatorBase
       hold_date = hold_date_list.first[:value]
       if hold_date !~ /^[0-9]{8}$/ # YYYYMMDD strptimeは多少由来でも解釈するため
         ret = false
-        message = "Invalid date format. Expected format is 'YYYYMMDD'"
+        message = "Invalid format. hold_date should be 'YYYYMMDD'"
       else
         begin
           d = Date.strptime(hold_date, "%Y%m%d")
           range = range_hold_date(Date.today)
           unless (d >= range[:min] && d <= range[:max]) # 実行日基準で7日後3年以内の範囲
             ret = false
-            message = "Expected date range is from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
+            message = "hold_date should be from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
           else #範囲内であっても年末年始の日付は無効
             if (d.month == 12 && d.day >= 27) || (d.month == 1 && d.day <= 4)
               ret = false
-              message = "Cannot be specified 12/27 - 1/4. Expected date range is from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
+              message = "Avoid to specify 12/27 to 1/4. hold_date should be from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
             end
           end
         rescue ArgumentError #日付が読めなかった場合
           ret = false
-          message = "Invalid date format. Expected format is 'YYYYMMDD'"
+          message = "Invalid format. hold_date should be 'YYYYMMDD'"
         end
       end
       unless ret
@@ -339,7 +339,7 @@ class TradValidator < ValidatorBase
   def missing_hold_date(rule_code, hold_date_list)
     if hold_date_list.nil? || hold_date_list.size == 0
       range = range_hold_date(Date.today)
-      message = "If you want to specify a publication date, you can specify it within from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")} at 'COMMON/DATE/hold_date'"
+      message = "If you like to hold your data until publication, specify 'COMMON/DATE/hold_date' from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
       annotation = [
         {key: "Message", value: message},
       ]
@@ -363,7 +363,7 @@ class TradValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def taxonomy_error_warning(rule_code, organism_data_list, biosample_data_list, organism_info_list=[])
+  def organism_warning(rule_code, organism_data_list, biosample_data_list, organism_info_list=[])
     return nil if organism_data_list.nil? || organism_data_list.size == 0
     ret = true
     biosample_data_list = [] if biosample_data_list.nil?
@@ -378,7 +378,7 @@ class TradValidator < ValidatorBase
         ret_org = @org_validator.suggest_taxid_from_name(organism_name)
         @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret_org) unless @cache.nil?
       else
-        puts "use cache in taxonomy_error_warning" if $DEBUG
+        puts "use cache in organism_warning" if $DEBUG
         ret_org = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
       end
       annotation = [
@@ -399,7 +399,7 @@ class TradValidator < ValidatorBase
       elsif ret_org[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、trad用に分岐
         if organism_name.downcase == "environmental samples" #大量にある為除外
           valid_flag = false
-          msg = "Please enter a more detailed organism name."
+          msg = "Use organism name for lower rank taxon."
           annotation.push({key: "Message", value: msg})
         else
           scientific_name_hit = ret_org[:tax_list].select{|hit_tax| hit_tax[:scientific_name] == organism_name}
@@ -425,7 +425,7 @@ class TradValidator < ValidatorBase
               end
             else # ヒットしたinfraspecificな生物種が複数、またはない。"Bacillus"のような両方infraspecificではないケース
               valid_flag = false
-              msg = "Multiple taxonomies detected with the same organism name. Please use the Scientific name. taxonomy_id:[#{ret_org[:tax_id]}]"
+              msg = "Two or more taxa found with the same organism name. Please use the scientific name of taxonomy_id:[#{ret_org[:tax_id]}]"
               annotation.push({key: "Message", value: msg})
             end
           end
@@ -511,18 +511,18 @@ class TradValidator < ValidatorBase
         title_lines = data_by_feat_qual("REFERENCE", "title", anno_by_qual)
         title_lines.concat(data_by_feat_qual("source", "ff_definition", anno_by_qual))
         if title_lines.select{|line| line[:value].downcase.include?("complete genome")}.size > 0
-          message = "There is a description of 'complete genome' in REFERENCE/title or source/ff_definition"
+          message = "Found 'complete genome' in REFERENCE/title or source/ff_definition."
           ret = false
         else
           # 複数のエントリがあり、そのうちplasmidが1つ以上含まれている。ただし全てがplasmidではない(chromosomeと推測)
           plasmid_lines = data_by_feat_qual("source", "plasmid", anno_by_qual)
           if entry_size >= 2 && plasmid_lines.size > 0 && (entry_size - plasmid_lines.size) > 0
-            message = "A small number of entries contain one or more plasmid entries"
+            message = "Number of entries is a few with including some plasmid entries."
             ret = false
           else
             # COMMONまたはChromosomeの全てのエントリにTOPOLOGY=circularの記載がある
             if data_by_ent_feat_qual("COMMON", "TOPOLOGY", "circular", anno_by_qual).size > 0
-              message = "There is a description of 'circular' in COMMON/TOPOLOGY/circular"
+              message = "Found 'circular' in COMMON/TOPOLOGY/circular"
               ret = false
             else
               # TODO plasmidではないentryをchromosomeとみなしているが(原核ではchromosomeエントリはqualifiereで明示されない)、
@@ -534,7 +534,7 @@ class TradValidator < ValidatorBase
               chromosome_circlar_entry_list = circlar_entry_list - plasmid_entry_list
               if chromosome_circlar_entry_list.size > 0
                 entry_names = chromosome_circlar_entry_list.join(", ")
-                message = "There is a description of 'circular' in TOPOLOGY/circular at entry: #{entry_names}"
+                message = "Found 'circular' in TOPOLOGY/circular at entry: #{entry_names}"
                 ret = false
               else
                 # TODO 全てのchromosomeの長さを足して、既知のゲノムサイズの範囲内であればfalseとするチェックを追加する。外部APIを叩く為優先度を下げる。
@@ -952,7 +952,7 @@ class TradValidator < ValidatorBase
         common_dblink_exist = true
       else
         result = false
-        message = "COMMON/DBLINK requires both 'project' and 'biosample'."
+        message = "COMMON entry requires both 'project' and 'biosample' for DBLINK."
       end
     end
 
@@ -966,7 +966,7 @@ class TradValidator < ValidatorBase
         entry_dblink_count += entry_dblink.size
         qual_list = entry_dblink.map{|row| row[:qualifier]}
         unless qual_list.include?("project") && qual_list.include?("biosample")
-          message += "#{entry_name}/DBLINK requires both 'project' and 'biosample'."
+          message += "#{entry_name} entry requires both 'project' and 'biosample' for DBLINK.."
           missing_dblink_entry_list.push(entry_name)
           result = false
         end
@@ -1292,7 +1292,7 @@ class TradValidator < ValidatorBase
         if line[:biosample][:attr_value_list].nil?
           check = false
           biosample_attr_values = ""
-          message = "The #{attribute_name} attribute is not described on BioSample"
+          message = "The #{attribute_name} attribute is not used in BioSample"
         else
           bs_attribute_value_list = line[:biosample][:attr_value_list].dup
           bs_attribute_value_list.delete_if{|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
@@ -1382,7 +1382,7 @@ class TradValidator < ValidatorBase
               {key: "File name", value: @anno_file},
               {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
             ]
-            annotation.push({key: "Message", value: "BioSample[#{biosample_id})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' does not described."})
+            annotation.push({key: "Message", value: "BioSample[#{biosample_id})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' is not used."})
             error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
             @error_list.push(error_hash)
           end
@@ -1643,24 +1643,24 @@ class TradValidator < ValidatorBase
         end
         if organism_line[:biosample][:attr_value_list].nil? #organism属性がない(mandatory属性なのでまずここは通らない)
           check = false
-          message = "The organism attribute is not described on BioSample"
+          message = "The organism attribute is not used in BioSample."
         else # organism属性がある
           if !organism_line[:biosample][:attr_value_list].include?(trad_organism_value) # organismの値が異なる
             check = false
             biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
-            message = "The organism is not match on BioSample"
+            message = "Value of organism qualifier is not matched with BioSample attribute."
           else #organismの値が一致する場合はstrainのチェックを行う
             biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
             if strain_lines.size > 0 #annotation側に/strainの記述がある
               if strain_lines.first[:biosample][:attr_value_list].nil? #strain属性がない
                 check = false
-                message = "The strain attribute does not described on BioSample"
+                message = "The strain attribute is not used in BioSample."
               else
                 strain_attr_list = strain_lines.first[:biosample][:attr_value_list].dup
                 strain_attr_list.delete_if{|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
                 if !strain_attr_list.include?(trad_strain_value) # strainの値が異なる
                   check = false
-                  message = "The strain does not match on BioSample"
+                  message = "Value of strain qualifier is not matched with BioSample attribute."
                 end
               end
             else #annotation側に/strainの記述がない
@@ -1671,7 +1671,7 @@ class TradValidator < ValidatorBase
               if strain_attr_values.size > 0 # BioSample側にはstrainの記述がある
                 check = false
                 biosample_strain_attr_values = strain_attr_values.map{|attr| attr[:attribute_value]}.join(", ")
-                message = "The strain attribute is described on BioSample, but /strain qualifier is not exist"
+                message = "The strain qualifier is not found, though the strain attribute is used in BioSample."
               end
             end
           end
@@ -1903,12 +1903,12 @@ class TradValidator < ValidatorBase
         end
         if entry_value_list.compact.uniq.size > 1 # 複数のentryまたがって同じlocus_tagが使用されるのはNG
           duplicated = true
-          message = "Not allow in multiple entry"
+          message = "Not use the same value in two or more entries."
         elsif gene_value_list.compact.uniq.size > 1 # geneの値が全て同じ(一種類)であればlocus_tagの値が同一であっても問題ない
           if feature_name_list.size > feature_name_list.uniq.size
             # 同じfeature("CDS"等が含まれている場合はNG)
             duplicated = true
-            message = "Not allow in same feature type"
+            message = "Not use the same value for different genes."
           else
             # 特定のfeature種の組合せの場合には許容する
             if (feature_name_list - ["regulatory", "mRNA", "5’UTR", "3’UTR", "CDS", "exon", "intron", "sig_peptide", "propeptide", "mat_peptide", "transit_peptide"]).size == 0
@@ -1918,7 +1918,7 @@ class TradValidator < ValidatorBase
             elsif (feature_name_list - ["tmRNA", "exon", "intron"]).size == 0
             else
               duplicated = true
-              message = "Not allow feature type combination"
+              message = "Not use the same locus_tag for different genes."
             end
           end
         end
