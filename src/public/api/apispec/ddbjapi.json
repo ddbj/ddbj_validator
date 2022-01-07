@@ -53,6 +53,18 @@
           },
           {
             "$ref": "#/parameters/vcf"
+          },
+          {
+            "$ref": "#/parameters/trad_anno"
+          },
+          {
+            "$ref": "#/parameters/trad_seq"
+          },
+          {
+            "$ref": "#/parameters/trad_agp"
+          },
+          {
+            "$ref": "#/parameters/submitter_id"
           }
         ],
         "responses": {
@@ -388,6 +400,34 @@
       "required": false,
       "type": "file"
     },
+    "trad_anno": {
+      "name": "trad_anno",
+      "in": "formData",
+      "description": "Upload Trad annotation file.",
+      "required": false,
+      "type": "file"
+    },
+    "trad_seq": {
+      "name": "trad_seq",
+      "in": "formData",
+      "description": "Upload Trad fasta file.",
+      "required": false,
+      "type": "file"
+    },
+    "trad_agp": {
+      "name": "trad_agp",
+      "in": "formData",
+      "description": "Upload Trad AGP file.",
+      "required": false,
+      "type": "file"
+    },
+    "submitter_id": {
+      "name": "submitter_id",
+      "in": "formData",
+      "description": "submitter_id",
+      "required": false,
+      "type": "string"
+    },
     "uuid": {
       "name": "uuid",
       "in": "path",
@@ -398,7 +438,7 @@
     "filetype": {
       "name": "filetype",
       "in": "path",
-      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf,",
+      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf, trad_anno, trad_seq, trad_agp",
       "required": true,
       "type": "string"
     },

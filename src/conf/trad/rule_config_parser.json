@@ -1,0 +1,2720 @@
+{
+  "ruleJP0001": {
+    "rule_class": "Trad",
+    "code": "JP0001",
+    "level": "warning",
+    "level_orginal": "FAT",
+    "internal_ignore": false,
+    "type": "SYS",
+    "message": "The internal error is detected.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0001"
+  },
+  "ruleJP0002": {
+    "rule_class": "Trad",
+    "code": "JP0002",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "message": "Some error is occurred, when the system is reading the file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0002"
+  },
+  "ruleJP0003": {
+    "rule_class": "Trad",
+    "code": "JP0003",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "message": "The system file cannot be opened. Please reinstall the system.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0003"
+  },
+  "ruleJP0005": {
+    "rule_class": "Trad",
+    "code": "JP0005",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "file": "ANN",
+    "message": "Annotation file cannot be specified. Please specify the one annotation file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0005"
+  },
+  "ruleJP0006": {
+    "rule_class": "Trad",
+    "code": "JP0006",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "file": "SEQ",
+    "message": "Sequence file cannot be specified. Please specify the one sequence file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0006"
+  },
+  "ruleJP0007": {
+    "rule_class": "Trad",
+    "code": "JP0007",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "message": "Please check the parameter that is specified invalidly.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0007"
+  },
+  "ruleJP0008": {
+    "rule_class": "Trad",
+    "code": "JP0008",
+    "level": "warning",
+    "level_orginal": "MES",
+    "internal_ignore": false,
+    "type": "SYS",
+    "message": "Please specify the parameter as the following format; [-x&lt;annotation file&gt;] [-s&lt;sequence file&gt;]",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0008"
+  },
+  "ruleJP0009": {
+    "rule_class": "Trad",
+    "code": "JP0009",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "AxS",
+    "message": "The number of entries in the sequence file is different from that in the annotation file.<br>Please unify the number of entries.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0009"
+  },
+  "ruleJP0011": {
+    "rule_class": "Trad",
+    "code": "JP0011",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "AxS",
+    "message": "The entry name in the annotation file is different from that in the sequence file.<br>It is required to sort entries in the same order for both annotation and sequence files.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0011"
+  },
+  "ruleJP0012": {
+    "rule_class": "Trad",
+    "code": "JP0012",
+    "level": "warning",
+    "level_orginal": "MES",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "In the sequence file, some extra information is found in the entry line.<br>Please confirm and re-enter the entry name again, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0012"
+  },
+  "ruleJP0013": {
+    "rule_class": "Trad",
+    "code": "JP0013",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "In the sequence file, there is no entry line. Please enter the entry name.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0013"
+  },
+  "ruleJP0014": {
+    "rule_class": "Trad",
+    "code": "JP0014",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "In the sequence file, an invalid code is found. Please correct the nucleotide code.<br>See <a href=\"https://www.ddbj.nig.ac.jp/ddbj/code-e.html#nucleotide-1\">the acceptable nucleotide codes</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0014"
+  },
+  "ruleJP0015": {
+    "rule_class": "Trad",
+    "code": "JP0015",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "In the sequence file, the termination code for the sequence, \"//\" is not found.<br>Please enter the code \"//\" for the end of sequence.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0015"
+  },
+  "ruleJP0016": {
+    "rule_class": "Trad",
+    "code": "JP0016",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "In the sequence file, the entry name is found two or more times. Please correct them to be unique.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0016"
+  },
+  "ruleJP0017": {
+    "rule_class": "Trad",
+    "code": "JP0017",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In the annotation file, the entry name is found two or more times. Please correct them to be unique.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0017"
+  },
+  "ruleJP0019": {
+    "rule_class": "Trad",
+    "code": "JP0019",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In the annotation file, you entered 6 or more columns in the line. Please delete the illegal column(s).<br>The number of acceptable columns is five; for Entry, Feature, Location, Qualifier and Value, respectively.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0019"
+  },
+  "ruleJP0020": {
+    "rule_class": "Trad",
+    "code": "JP0020",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The number of characters is greater than 40959 bytes/line that is the maximum for a line.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0020"
+  },
+  "ruleJP0021": {
+    "rule_class": "Trad",
+    "code": "JP0021",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The following features are required at least one for COMMON or each of entries;<br>SUBMITTER, REFERENCE and source",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0021"
+  },
+  "ruleJP0022": {
+    "rule_class": "Trad",
+    "code": "JP0022",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Null and/or illegal characters are found in the entry name.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0022"
+  },
+  "ruleJP0023": {
+    "rule_class": "Trad",
+    "code": "JP0023",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "No <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">feature</a> is specified. Please use some appropriate <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">feature</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0023"
+  },
+  "ruleJP0024": {
+    "rule_class": "Trad",
+    "code": "JP0024",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "DATE and DATATAPE feature can be only entered in the COMMON entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0024"
+  },
+  "ruleJP0025": {
+    "rule_class": "Trad",
+    "code": "JP0025",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The location is not specified for a <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">biological feature</a>. Please describe some appropriate <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0025"
+  },
+  "ruleJP0026": {
+    "rule_class": "Trad",
+    "code": "JP0026",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "An invalid name for <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">feature</a> is found. <br>Please note frequently mistyped cases as follows;<br>1) case sensitivity, to distinguish upper or lower case;<br>2) missing the underscore character, \"_\";<br>i.e. \"TRNA\" --&gt; \"tRNA\" ; \"misc feature\" --&gt; \"misc_feature\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0026"
+  },
+  "ruleJP0027": {
+    "rule_class": "Trad",
+    "code": "JP0027",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "An invalid name for <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a> is found. <br>Please note frequently mistyped cases as follows;<br>1) the case sensitivity, to distinguish upper or lower case;<br>2) missing the underscore character, \"_\";<br>i.e. \"Codon start\" --&gt; \"codon_start\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0027"
+  },
+  "ruleJP0029": {
+    "rule_class": "Trad",
+    "code": "JP0029",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "DATATYPE/type is specified, the required keyword corresponding to the type is not found.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0029"
+  },
+  "ruleJP0031": {
+    "rule_class": "Trad",
+    "code": "JP0031",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Either one of two qualifiers is required for the feature. Please specify one of them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0031"
+  },
+  "ruleJP0032": {
+    "rule_class": "Trad",
+    "code": "JP0032",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The feature can be used only one for one entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0032"
+  },
+  "ruleJP0033": {
+    "rule_class": "Trad",
+    "code": "JP0033",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for the status qualifier, \"Published Only in Database\" can only be described for the first REFERENCE feature of the entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0033"
+  },
+  "ruleJP0034": {
+    "rule_class": "Trad",
+    "code": "JP0034",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "There are two or more values, \"Published Only in Database\" in the entry. <br>Please specify the status, \"Published Only in Database\", for the only 1st REFERENCE feature of the entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0034"
+  },
+  "ruleJP0035": {
+    "rule_class": "Trad",
+    "code": "JP0035",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "There is no ab_name qualifier with the value corresponding to the value of the contact qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0035"
+  },
+  "ruleJP0036": {
+    "rule_class": "Trad",
+    "code": "JP0036",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Invalid qualifier is described in REFERENCE with a specified status. Please correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0036"
+  },
+  "ruleJP0037": {
+    "rule_class": "Trad",
+    "code": "JP0037",
+    "level": "warning",
+    "level_orginal": "MES",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The descriptions of the locations are ignored for the following features; SUBMITTER, REFERENCE and COMMENT. <br>When the number of REFERENCE or COMMENT features is plural, the order of the features in the annotation file is to be same with the order in the flat file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0037"
+  },
+  "ruleJP0038": {
+    "rule_class": "Trad",
+    "code": "JP0038",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "In principle, the acceptable length of sequence is more than 20bp.<br>Please confirm it again, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0038"
+  },
+  "ruleJP0039": {
+    "rule_class": "Trad",
+    "code": "JP0039",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "The range of the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> of  source feature is greater than the sequence length in the sequence file.<br>Please correct the sequence and/or the description of the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0039"
+  },
+  "ruleJP0040": {
+    "rule_class": "Trad",
+    "code": "JP0040",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "The sequence length in the sequence file is greater than all ranges of source locations.<br>Please correct the sequence and/or the description of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0040"
+  },
+  "ruleJP0041": {
+    "rule_class": "Trad",
+    "code": "JP0041",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "<a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">The description of location</a> for source feature may be invalid. <br>Please confirm the sequence and the description of the location again and revise them, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0041"
+  },
+  "ruleJP0042": {
+    "rule_class": "Trad",
+    "code": "JP0042",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The longest <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> of the source features is not started from 1.<br>Please confirm the location again and revise it, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0042"
+  },
+  "ruleJP0043": {
+    "rule_class": "Trad",
+    "code": "JP0043",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "The first base code of the sequence is \"n\". <br>Please remove it, because the first nucleotide should not be \"n\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0043"
+  },
+  "ruleJP0044": {
+    "rule_class": "Trad",
+    "code": "JP0044",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "The last base code of the sequence is \"n\". <br>Please remove it, because the last nucleotide should not be \"n\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0044"
+  },
+  "ruleJP0045": {
+    "rule_class": "Trad",
+    "code": "JP0045",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "In the sequence file, the base code other than \"n\" is found at the location of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#gap\">gap</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature specified in the annotation file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0045"
+  },
+  "ruleJP0046": {
+    "rule_class": "Trad",
+    "code": "JP0046",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "In the sequence file, the location that is greater than 10 in the length consists of the only base code, \"n\", however, there is neither <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#gap\">gap</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature corresponding to the location in the annotation file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0046"
+  },
+  "ruleJP0047": {
+    "rule_class": "Trad",
+    "code": "JP0047",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The location of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#unsure\">unsure</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#gap\">gap</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature is invalid. <br>Any operators, \"join\", \"order\" or \"complement\" are not acceptable for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#unsure\">unsure</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#gap\">gap</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0047"
+  },
+  "ruleJP0053": {
+    "rule_class": "Trad",
+    "code": "JP0053",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In an entry with two or more source features, each <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#mol_type\">mol_type</a> qualifier must have the same value.<br>Please unify them with the same values.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0053"
+  },
+  "ruleJP0054": {
+    "rule_class": "Trad",
+    "code": "JP0054",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Either <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#focus\">focus</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transgenic\">transgenic</a> is required for the qualifier in either of the source features, when two or more source features in an entry with the different values of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/organism-e.html\">organism</a> qualifiers.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0054"
+  },
+  "ruleJP0056": {
+    "rule_class": "Trad",
+    "code": "JP0056",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Please delete the qualifier (<a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#focus\">focus</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transgenic\">transgenic</a>) from the source feature. <br>It can be only used to specify the main source from two or more source features.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0056"
+  },
+  "ruleJP0058": {
+    "rule_class": "Trad",
+    "code": "JP0058",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When there are some source features and all of them have the same <a href=\"https://www.ddbj.nig.ac.jp/ddbj/organism-e.html\">organism</a> qualifier, the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#focus\">focus</a> qualifier cannot be used.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0058"
+  },
+  "ruleJP0059": {
+    "rule_class": "Trad",
+    "code": "JP0059",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transgenic\">transgenic</a> qualifiers are found in the entry. <br>Only one <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transgenic\">transgenic</a> qualifier can be used for an entry. <br>Please remove them except either one in the main source feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0059"
+  },
+  "ruleJP0060": {
+    "rule_class": "Trad",
+    "code": "JP0060",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transgenic\">transgenic</a> qualifier can be only used for the entry of \"SYN\" division.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0060"
+  },
+  "ruleJP0061": {
+    "rule_class": "Trad",
+    "code": "JP0061",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The division of the entry is \"ENV\", however, there is no <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#environmental_sample\">environmental_sample</a> qualifier in the source feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0061"
+  },
+  "ruleJP0062": {
+    "rule_class": "Trad",
+    "code": "JP0062",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#environmental_sample\">environmental_sample</a> qualifier is used for the entry, however, 'ENV' is not found in the value of the keyword qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0062"
+  },
+  "ruleJP0063": {
+    "rule_class": "Trad",
+    "code": "JP0063",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The division is not specified as \"ENV\", though the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#environmental_sample\">environmental_sample</a> qualifier is used.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0063"
+  },
+  "ruleJP0064": {
+    "rule_class": "Trad",
+    "code": "JP0064",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The feature cannot refer any other entry for its location. <br>This rule is applied to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#operon\">operon</a> and other relevant features belonging to the operon transcript.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0064"
+  },
+  "ruleJP0065": {
+    "rule_class": "Trad",
+    "code": "JP0065",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The location of the feature is overlapped with that of some <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#operon\">operon feature</a>.<br>Please add the common <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#operon\">operon qualifier</a>s for both features, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0065"
+  },
+  "ruleJP0066": {
+    "rule_class": "Trad",
+    "code": "JP0066",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The feature has an <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#operon\">operon qualifier</a>, but there is no <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#operon\">operon feature</a> that has the same <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#operon\">operon qualifier</a> in its value. <br>Please check the values of operon qualifiers.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0066"
+  },
+  "ruleJP0067": {
+    "rule_class": "Trad",
+    "code": "JP0067",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "To describe the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#operon\">operon feature</a>, at least one another feature related to the operon is required.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0067"
+  },
+  "ruleJP0068": {
+    "rule_class": "Trad",
+    "code": "JP0068",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The feature has an <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#operon\">operon qualifier</a>, but it is not overlapped with any <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#operon\">operon feature</a> in its location.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0068"
+  },
+  "ruleJP0070": {
+    "rule_class": "Trad",
+    "code": "JP0070",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more ff_definition qualifiers are found in the entry. <br>Only one ff_definition qualifier can be used for an entry. Please remove them except either one.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0070"
+  },
+  "ruleJP0072": {
+    "rule_class": "Trad",
+    "code": "JP0072",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The description of location is invalid. Please correct according to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">Description of Location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0072"
+  },
+  "ruleJP0073": {
+    "rule_class": "Trad",
+    "code": "JP0073",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The qualifier is not legal for the feature. <br>Please correct according to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">Feature/Qualifier Usage Matrix</a>",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0073"
+  },
+  "ruleJP0074": {
+    "rule_class": "Trad",
+    "code": "JP0074",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The mandatory <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a> for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">feature</a> is not found.<br>Please correct according to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">Feature/Qualifier Usage Matrix</a>",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0074"
+  },
+  "ruleJP0075": {
+    "rule_class": "Trad",
+    "code": "JP0075",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a> is invalid. Please revise the value.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0075"
+  },
+  "ruleJP0077": {
+    "rule_class": "Trad",
+    "code": "JP0077",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a> is not described with the prescribed characters. Please revise the value.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0077"
+  },
+  "ruleJP0078": {
+    "rule_class": "Trad",
+    "code": "JP0078",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a> is not described in the prescribed length. Please revise the value.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0078"
+  },
+  "ruleJP0079": {
+    "rule_class": "Trad",
+    "code": "JP0079",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#experiment\">experiment</a> qualifier is recommended to be less than 1000 in the number of letters.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0079"
+  },
+  "ruleJP0080": {
+    "rule_class": "Trad",
+    "code": "JP0080",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Please correct the duplication of the feature in the entry, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0080"
+  },
+  "ruleJP0081": {
+    "rule_class": "Trad",
+    "code": "JP0081",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "In <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">the description of the location</a>, the pieces of \"join\" or \"order\" can be merged each other.<br>i.e. \"join(1..100,101..200)\" → \"1..200\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0081"
+  },
+  "ruleJP0082": {
+    "rule_class": "Trad",
+    "code": "JP0082",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "In <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">the description of the location</a>, the pieces of \"join\" or \"order\" are overlapped with each other.<br>i.e. \"join(1..100,50..200)\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0082"
+  },
+  "ruleJP0083": {
+    "rule_class": "Trad",
+    "code": "JP0083",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When the [#QUALIFIER NAME1] qualifier is used for the feature, the [#QUALIFIER NAME2] qualifier is required.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0083"
+  },
+  "ruleJP0085": {
+    "rule_class": "Trad",
+    "code": "JP0085",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "No qualifier is described, though the location is described in the line.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0085"
+  },
+  "ruleJP0086": {
+    "rule_class": "Trad",
+    "code": "JP0086",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "For EST entries, either of three following keywords is required; &quot;unspecified EST&quot;, &quot;5'-end sequence (5'-EST)&quot; or &quot;3'-end sequence (3'-EST)&quot;",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0086"
+  },
+  "ruleJP0087": {
+    "rule_class": "Trad",
+    "code": "JP0087",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "For <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tpa-e.html\">TPA</a> entry, either of the following three keywords is required; &quot;TPA:experimental&quot;, &quot;TPA:inferential&quot; or &quot;TPA:assembly&quot;. ",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0087"
+  },
+  "ruleJP0088": {
+    "rule_class": "Trad",
+    "code": "JP0088",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The qualifier is duplicated in the same feature. Please confirm and correct them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0088"
+  },
+  "ruleJP0103": {
+    "rule_class": "Trad",
+    "code": "JP0103",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "There are some '@' letters that do not contribute to the meta-description in the value of qualifier which is allowed to use meta-description.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0103"
+  },
+  "ruleJP0104": {
+    "rule_class": "Trad",
+    "code": "JP0104",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In the value of qualifier, there is a description similar to the meta-description of '[qualifier name or entry]'.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0104"
+  },
+  "ruleJP0105": {
+    "rule_class": "Trad",
+    "code": "JP0105",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "There is no value for the qualifier specified by the meta-description in the \"ff_definition\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0105"
+  },
+  "ruleJP0106": {
+    "rule_class": "Trad",
+    "code": "JP0106",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "AxS",
+    "message": "The orders of entries in annotation and sequence files are different from each other.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0106"
+  },
+  "ruleJP0107": {
+    "rule_class": "Trad",
+    "code": "JP0107",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "AxS",
+    "message": "The entry name is found in the annotation file, however, it is not found in the sequence file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0107"
+  },
+  "ruleJP0108": {
+    "rule_class": "Trad",
+    "code": "JP0108",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The same keyword is found two times in the entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0108"
+  },
+  "ruleJP0109": {
+    "rule_class": "Trad",
+    "code": "JP0109",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Since the amino acid abbreviation in the qualifier is ambiguous (Asx, Glx, or Xle) or particular (Sec or Pyl), it would cause some problem.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0109"
+  },
+  "ruleJP0110": {
+    "rule_class": "Trad",
+    "code": "JP0110",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "There is no keyword that is required for the specified DIVISION/division.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0110"
+  },
+  "ruleJP0111": {
+    "rule_class": "Trad",
+    "code": "JP0111",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The given keyword is specific to some DIVISION/division, however, the DIVISION/division is not specified.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0111"
+  },
+  "ruleJP0112": {
+    "rule_class": "Trad",
+    "code": "JP0112",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "In the sequence file, the location that is greater than 10 in the length consists of the only base code, \"n\", however, the corresponding <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#gap\">gap</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature indicates different location in the annotation file.<br>Please modify sequence file and/or annotation file to resolve this disagreement.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0112"
+  },
+  "ruleJP0113": {
+    "rule_class": "Trad",
+    "code": "JP0113",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#codon_start\">codon_start</a> is not 1, the location value must be 5' partial type.<br>Please check the frame of translated amino acid sequence for the corresponding CDS feature.<br>Please correct either of them, according to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">Description of Location</a> and <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html#frame\">Offset of the frame at translation initiation by /codon_start</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0113"
+  },
+  "ruleJP0114": {
+    "rule_class": "Trad",
+    "code": "JP0114",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value of ab_name has possibly format error. Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0114"
+  },
+  "ruleJP0115": {
+    "rule_class": "Trad",
+    "code": "JP0115",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The same ab_name is found two times in a feature SUBMITTER or REFERENCE.<br>Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0115"
+  },
+  "ruleJP0116": {
+    "rule_class": "Trad",
+    "code": "JP0116",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for the qualifier is not described in the prescribed format. Please revise the value.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0116"
+  },
+  "ruleJP0117": {
+    "rule_class": "Trad",
+    "code": "JP0117",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Please remove either one of two qualifiers, because both of two cannot be used in the same feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0117"
+  },
+  "ruleJP0118": {
+    "rule_class": "Trad",
+    "code": "JP0118",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "message": "When you specify the option \"-b\", it is required to specify the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/con-e.html\">CON</a> division in annotation file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0118"
+  },
+  "ruleJP0119": {
+    "rule_class": "Trad",
+    "code": "JP0119",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for volume, start_page, end_page qualifier is usually described in only numeric character.<br>Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0119"
+  },
+  "ruleJP0120": {
+    "rule_class": "Trad",
+    "code": "JP0120",
+    "level": "warning",
+    "level_orginal": "FAT",
+    "internal_ignore": false,
+    "type": "SYS",
+    "message": "There is insufficient memory. Please allocate memory.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0120"
+  },
+  "ruleJP0121": {
+    "rule_class": "Trad",
+    "code": "JP0121",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The symbolic entry name, COMMON, can be used only in the first of your entries, when you need to specify eatures shared with all of entries in the COMMON entry.<br>If the following description is entered on the first line, please remove the line.<br>e.g.) Entry Feature Location Qualifier Value.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0121"
+  },
+  "ruleJP0122": {
+    "rule_class": "Trad",
+    "code": "JP0122",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more qualifiers are found in the feature, however, the qualifier can be specified only one for the feature.Please delete one of them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0122"
+  },
+  "ruleJP0123": {
+    "rule_class": "Trad",
+    "code": "JP0123",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "<a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">Location</a> includes some invalid character(s). Please revise the location.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0123"
+  },
+  "ruleJP0124": {
+    "rule_class": "Trad",
+    "code": "JP0124",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In the beginning or the end of value, extra space(s) is found. Please remove it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0124"
+  },
+  "ruleJP0125": {
+    "rule_class": "Trad",
+    "code": "JP0125",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more qualifiers are found in the feature, however, the qualifier can be specified only one for the feature.Please change one of them into another qualifier (e.g. note qualifier).",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0125"
+  },
+  "ruleJP0126": {
+    "rule_class": "Trad",
+    "code": "JP0126",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more consecutive spaces are found in the value. Please remove extra space(s).",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0126"
+  },
+  "ruleJP0127": {
+    "rule_class": "Trad",
+    "code": "JP0127",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "An entry in the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/con-e.html\">CON</a> division can not be with any entries in other divisions in an annotation file.Please divide the entries into two or more submission files, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0127"
+  },
+  "ruleJP0128": {
+    "rule_class": "Trad",
+    "code": "JP0128",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Entry name is too long. Please describe it in less than 33 letters of characters.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0128"
+  },
+  "ruleJP0129": {
+    "rule_class": "Trad",
+    "code": "JP0129",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Entry name has invalid character(s). Please remove them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0129"
+  },
+  "ruleJP0130": {
+    "rule_class": "Trad",
+    "code": "JP0130",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "A comma is found at the end of the value.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0130"
+  },
+  "ruleJP0131": {
+    "rule_class": "Trad",
+    "code": "JP0131",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">locations</a> of two source features are possibly overlapping each other.Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0131"
+  },
+  "ruleJP0132": {
+    "rule_class": "Trad",
+    "code": "JP0132",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The same meta-description is found two or more times in the value of qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0132"
+  },
+  "ruleJP0133": {
+    "rule_class": "Trad",
+    "code": "JP0133",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Invalid meta-description is found in the value of the specified qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0133"
+  },
+  "ruleJP0134": {
+    "rule_class": "Trad",
+    "code": "JP0134",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Only \"organism\" qualifier can be specified by meta-description at the beginning of the value of the \"ff_definition\" qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0134"
+  },
+  "ruleJP0135": {
+    "rule_class": "Trad",
+    "code": "JP0135",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Please insert a space after \"@@[organism]@@\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0135"
+  },
+  "ruleJP0136": {
+    "rule_class": "Trad",
+    "code": "JP0136",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Except for \"@@[organism]@@\", please insert a space or beginning parenthesis before meta-description, and insert a space or comma-space, beginning parenthesis or ending parenthesis after meta-description.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0136"
+  },
+  "ruleJP0137": {
+    "rule_class": "Trad",
+    "code": "JP0137",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Specified feature should be described for <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tsa-e.html\">TSA</a> entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0137"
+  },
+  "ruleJP0138": {
+    "rule_class": "Trad",
+    "code": "JP0138",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Both \"start_page\" and \"end_page\" are not described. <br>If the reference is a one-page article, please input the same page number in both \"start_page\" and \"end_page\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0138"
+  },
+  "ruleJP0144": {
+    "rule_class": "Trad",
+    "code": "JP0144",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "No volume qualifier is described, though the \"start_page\" and \"end_page\" qualifiers are described in REFERENCE. Please input it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0144"
+  },
+  "ruleJP0145": {
+    "rule_class": "Trad",
+    "code": "JP0145",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Nonsense qualifier is described in REFERENCE with a specified status.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0145"
+  },
+  "ruleJP0146": {
+    "rule_class": "Trad",
+    "code": "JP0146",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value of \"end_page\" is less than that of \"start_page\". Please correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0146"
+  },
+  "ruleJP0147": {
+    "rule_class": "Trad",
+    "code": "JP0147",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The values of start_page and end_page are the same.<br>If the reference is a one-page article, please ignore the message.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0147"
+  },
+  "ruleJP0148": {
+    "rule_class": "Trad",
+    "code": "JP0148",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "A base number in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> should not have leading zeros. Please remove them.<br>i.e. \"01..100\", \"1..0100\" --&gt; \"1..100\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0148"
+  },
+  "ruleJP0149": {
+    "rule_class": "Trad",
+    "code": "JP0149",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The 'hold_date' is specified within 10 days. <br>We recommend you specify the date with enough time (e.g. six month later). <br>If your data should be open to public immediately, please delete DATE line.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0149"
+  },
+  "ruleJP0150": {
+    "rule_class": "Trad",
+    "code": "JP0150",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Please select keyword defined in standard list.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0150"
+  },
+  "ruleJP0151": {
+    "rule_class": "Trad",
+    "code": "JP0151",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "For <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tpa-e.html\">TPA</a> entry, either of the following three keywords is required; &quot;TPA:experimental&quot;, &quot;TPA:inferential&quot; or &quot;TPA:assembly&quot;. <br>Please use either one of the three.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0151"
+  },
+  "ruleJP0152": {
+    "rule_class": "Trad",
+    "code": "JP0152",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "For <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#anticodon\">anticodon</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#rpt_unit_range\">rpt_unit_range</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#tag_peptide\">tag_peptide</a> and <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier, their position must be located within each Feature location.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0152"
+  },
+  "ruleJP0154": {
+    "rule_class": "Trad",
+    "code": "JP0154",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Qualifier in ST_COMMENT feature is too long. Please describe it in less than 64 letters of characters.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0154"
+  },
+  "ruleJP0155": {
+    "rule_class": "Trad",
+    "code": "JP0155",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Qualifier in ST_COMMENT feature has invalid character(s). Please remove them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0155"
+  },
+  "ruleJP0156": {
+    "rule_class": "Trad",
+    "code": "JP0156",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "You can't use \"@@&amp;&amp;,::\" in Qualifier in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature (except tagset_id qualifier).",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0156"
+  },
+  "ruleJP0157": {
+    "rule_class": "Trad",
+    "code": "JP0157",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "There is no value for the qualifier in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a>. Please enter the value, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0157"
+  },
+  "ruleJP0158": {
+    "rule_class": "Trad",
+    "code": "JP0158",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The tagset_id qualifier must be set at the beginning of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0158"
+  },
+  "ruleJP0159": {
+    "rule_class": "Trad",
+    "code": "JP0159",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature with same value of tagset_id qualifiers are found in an entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0159"
+  },
+  "ruleJP0160": {
+    "rule_class": "Trad",
+    "code": "JP0160",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The tagset_id qualifier can be specified only one for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature. Please delete one of them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0160"
+  },
+  "ruleJP0161": {
+    "rule_class": "Trad",
+    "code": "JP0161",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "2 or more qualifiers are found in the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature. Please delete one of them, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0161"
+  },
+  "ruleJP0162": {
+    "rule_class": "Trad",
+    "code": "JP0162",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Invalid qualifier is entered in COMMON entry. Please correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0162"
+  },
+  "ruleJP0163": {
+    "rule_class": "Trad",
+    "code": "JP0163",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#exception\">exception</a> qualifier is \"annotated by transcript or proteomic data\", <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#inference\">inference</a> qualifier is required in the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0163"
+  },
+  "ruleJP0164": {
+    "rule_class": "Trad",
+    "code": "JP0164",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The use of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#artificial_location\">artificial_location</a> qualifier is allowed only for genome-scale annotation.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0164"
+  },
+  "ruleJP0165": {
+    "rule_class": "Trad",
+    "code": "JP0165",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Since <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#mRNA\">mRNA</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#operon\">operon</a> feature should be described as a genome annotation, please confirm the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#mol_type\">mol_type</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0165"
+  },
+  "ruleJP0166": {
+    "rule_class": "Trad",
+    "code": "JP0166",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The combination of feature and qualifier is not recommended for new submissions.<br>Please correct according to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">Feature/Qualifier Usage Matrix</a>.<br>If you need to describe it, please contact us.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0166"
+  },
+  "ruleJP0167": {
+    "rule_class": "Trad",
+    "code": "JP0167",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">feature</a> is not recommended for new submissions.<br>If you need to describe it, please contact us.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0167"
+  },
+  "ruleJP0168": {
+    "rule_class": "Trad",
+    "code": "JP0168",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "The sequence length is greater than all location ranges of PRIMARY_CONTIG features.<br>Please check alignment between its sequence and cited sequences and locations of PRIMARY_CONTIG features, and correct them, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0168"
+  },
+  "ruleJP0169": {
+    "rule_class": "Trad",
+    "code": "JP0169",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "You described an old country name for value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#country\">country</a> qualifier.<br>Please update it to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/country-e.html\">the current name</a>, when feasible.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0169"
+  },
+  "ruleJP0170": {
+    "rule_class": "Trad",
+    "code": "JP0170",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When you use qualifier 1, qualifier 2 or qualifier 3 is required for the feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0170"
+  },
+  "ruleJP0171": {
+    "rule_class": "Trad",
+    "code": "JP0171",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The pair, qualifier 1 and qualifier 2, are found in other feature(s), however, the values are not described in the same way among the features.<br>Please correct them, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0171"
+  },
+  "ruleJP0172": {
+    "rule_class": "Trad",
+    "code": "JP0172",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#gap_type\">gap_type</a> qualifier is \"within scaffold\" or \"repeat within scaffold\", <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#linkage_evidence\">linkage_evidence</a> qualifier is required for the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0172"
+  },
+  "ruleJP0173": {
+    "rule_class": "Trad",
+    "code": "JP0173",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The pseudo qualifier is used.  Please replace it by <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#pseudogene\">pseudogene</a> qualifier, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0173"
+  },
+  "ruleJP0174": {
+    "rule_class": "Trad",
+    "code": "JP0174",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The partial flag, \"&gt;\" and/or \"&lt;\", is found in the location of source feature. Please remove it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0174"
+  },
+  "ruleJP0175": {
+    "rule_class": "Trad",
+    "code": "JP0175",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The partial flag, \"&gt;\" and/or \"&lt;\", is found in the mid of location. Please correct it according to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">Description of Location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0175"
+  },
+  "ruleJP0176": {
+    "rule_class": "Trad",
+    "code": "JP0176",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "There is some region in the location of either of gap or assembly_gap features overlapping with a CDS feature. <br>Please divide CDS into two CDS features to avoid the overlap, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0176"
+  },
+  "ruleJP0177": {
+    "rule_class": "Trad",
+    "code": "JP0177",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value for tagset_id qualifier in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature is not included in the standard list. <br>Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0177"
+  },
+  "ruleJP0178": {
+    "rule_class": "Trad",
+    "code": "JP0178",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The qualifier name in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/file-format-e.html#comment\">ST_COMMENT</a> feature is not included in the standard list. <br>Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0178"
+  },
+  "ruleJP0179": {
+    "rule_class": "Trad",
+    "code": "JP0179",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The length of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#unsure\">unsure</a> feature location is greater than 10. <br>Please reconfirm it, and, if necessary, correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0179"
+  },
+  "ruleJP0180": {
+    "rule_class": "Trad",
+    "code": "JP0180",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html#assembly_gap\">assembly_gap</a> feature, the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#gap_type\">gap_type</a> qualifier is not appropriate, or the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#linkage_evidence\">linkage_evidence</a> qualifier should be removed. <br>Please confirm and correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0180"
+  },
+  "ruleJP0181": {
+    "rule_class": "Trad",
+    "code": "JP0181",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "It is strongly recommended for <a href=\"https://www.ddbj.nig.ac.jp/ddbj/wgs-e.html\">WGS</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/con-e.html\">CON</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tsa-e.html\">TSA</a> and <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tls.html\">TLS</a> to describe <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#submitter_seqid\">submitter_seqid</a> qualifier. <br>Please confirm and add it, if necessary.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0181"
+  },
+  "ruleJP0182": {
+    "rule_class": "Trad",
+    "code": "JP0182",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When you use @@[entry]@@ for the value of  the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#submitter_seqid\">submitter_seqid</a> qualifier, do NOT use any other character with it. ",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0182"
+  },
+  "ruleJP0183": {
+    "rule_class": "Trad",
+    "code": "JP0183",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "When the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#gap_type\">gap_type</a> qualifier is &quot;contamination&quot;, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#linkage_evidence\">linkage_evidence</a> qualifier with &quot;unspecified&quot; in value is required.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0183"
+  },
+  "ruleJP1015": {
+    "rule_class": "Trad",
+    "code": "JP1015",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The given keyword is specific to some DATATYPE, however, the DATATYPE/type is not specified in the COMMON entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1015"
+  },
+  "ruleJP1027": {
+    "rule_class": "Trad",
+    "code": "JP1027",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "For <a href=\"https://www.ddbj.nig.ac.jp/ddbj/mga-e.html\">MGA</a>, all of features, SUBMITTER, REFERENCE and source, are required for COMMON entry.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1027"
+  },
+  "ruleJP1028": {
+    "rule_class": "Trad",
+    "code": "JP1028",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "SEQ",
+    "message": "For <a href=\"https://www.ddbj.nig.ac.jp/ddbj/mga-e.html\">MGA</a>, the header line for the sequence includes some invalid character(s). Please revise it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1028"
+  },
+  "ruleJP1029": {
+    "rule_class": "Trad",
+    "code": "JP1029",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "In <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tpa-e.html\">TPA</a> submission, \"Published Only in Database\" cannot be specified for the status qualifier in the REFERENCE feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1029"
+  },
+  "ruleJP1030": {
+    "rule_class": "Trad",
+    "code": "JP1030",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Neither DATATYPE/type=TPA nor DIVISION/division=TSA is specified in COMMON entry, though the PRIMARY_CONTIG feature that is specific to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tpa-e.html\">TPA</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tsa-e.html\">TSA</a> entry is used.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1030"
+  },
+  "ruleJP1032": {
+    "rule_class": "Trad",
+    "code": "JP1032",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "The combination of the start and the end positions is invalid in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">the description of the location</a>.<br>The direction of the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> can be only described from 5' to 3'. <br>i.e. \"500..345\" --&gt; \"complement(345..500)\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1032"
+  },
+  "ruleJP1033": {
+    "rule_class": "Trad",
+    "code": "JP1033",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "ANN",
+    "message": "There is only one piece of \"join\" or \"order\" in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">the description of the location</a>. Please correct it. <br>i.e. \"join(1..100)\" → \"1..100\"",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1033"
+  },
+  "ruleJP1034": {
+    "rule_class": "Trad",
+    "code": "JP1034",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "LOC",
+    "file": "AxS",
+    "message": "The specified <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> in the annotation file is greater than the sequence length in the sequence file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1034"
+  },
+  "ruleJP1036": {
+    "rule_class": "Trad",
+    "code": "JP1036",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Please remove either one of two <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a>s, because both of two cannot be used in the same feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1036"
+  },
+  "ruleJP1038": {
+    "rule_class": "Trad",
+    "code": "JP1038",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Though the value is described, no corresponding <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a> is found in the line.<br>Please specify some appropriate <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1038"
+  },
+  "ruleJP1039": {
+    "rule_class": "Trad",
+    "code": "JP1039",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The same <a href=\"https://www.ddbj.nig.ac.jp/ddbj/features-e.html\">feature</a>s whose <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a>s and <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">qualifier</a>s cannot be distinguished are found at 2 lines.<br>Please confirm and correct them.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1039"
+  },
+  "ruleJP1042": {
+    "rule_class": "Trad",
+    "code": "JP1042",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The value of the citation qualifier is greater than the number of REFERENCE features.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1042"
+  },
+  "ruleJP1044": {
+    "rule_class": "Trad",
+    "code": "JP1044",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "SYS",
+    "message": "The checking process is stopped, because the file cannot be opened.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1044"
+  },
+  "ruleJP1045": {
+    "rule_class": "Trad",
+    "code": "JP1045",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The qualifier specified by the meta-description in the \"ff_definition\" is not found in the source feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1045"
+  },
+  "ruleJP1046": {
+    "rule_class": "Trad",
+    "code": "JP1046",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "type": "STX",
+    "file": "ANN",
+    "message": "The qualifier specified by the meta-description in the \"ff_definition\" is found two or more times in the source feature.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1046"
+  },
+  "ruleJP1048": {
+    "rule_class": "Trad",
+    "code": "JP1048",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "type": "STX",
+    "file": "ANN",
+    "message": "Specified feature required for <a href=\"https://www.ddbj.nig.ac.jp/ddbj/tpa-e.html\">TPA</a> submission is not found.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP1048"
+  },
+  "ruleTC0004": {
+    "rule_class": "Trad",
+    "code": "TC0004",
+    "level": "warning",
+    "level_orginal": "FAT",
+    "internal_ignore": false,
+    "message": "This tool can not be started. <br>Since it is probably caused by system disorder, please <a href=\"https://www.ddbj.nig.ac.jp/contact-e.html#to-ddbj\">contact us</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0004"
+  },
+  "ruleTC0005": {
+    "rule_class": "Trad",
+    "code": "TC0005",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The location of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a> is invalid. It is required to fix the error. <br>Please refer to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">Description of Location</a> to correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0005"
+  },
+  "ruleTC0006": {
+    "rule_class": "Trad",
+    "code": "TC0006",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>The three-letter abbreviation of amino acid in the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier is invalid.<br>Please confirm the acceptable abbreviations in the site; <a href=\"https://www.ddbj.nig.ac.jp/ddbj/code-e.html#amino\">Amino Acid Codes</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0006"
+  },
+  "ruleTC0007": {
+    "rule_class": "Trad",
+    "code": "TC0007",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#codon_start\">codon_start</a>, <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a>, or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_table\">transl_table</a> qualifier. <br>When you find it, correction is required.<br>Please refer to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html\">the format of the qualifier</a> to correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0007"
+  },
+  "ruleTC0008": {
+    "rule_class": "Trad",
+    "code": "TC0008",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>Some locations (&lt;base_range&gt;) in values of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifiers are overlapped each other. <br>So, amino acid translation is performed with regardless <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifiers.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0008"
+  },
+  "ruleTC0009": {
+    "rule_class": "Trad",
+    "code": "TC0009",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>The location (&lt;base_range&gt;) in value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier is invalid.<br>Please refer to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">the format of transl_except qualifier</a> to correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0009"
+  },
+  "ruleTC0011": {
+    "rule_class": "Trad",
+    "code": "TC0011",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#codon_start\">codon_start</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_table\">transl_table</a> qualifier. <br>When you find it, correction is required.<br>Amino acid translation is performed as the default value, \"1\".<br>There are two or more qualifiers in a <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>, though the qualifier is available only one by one <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>. <br>Amino acid translation is performed as the default value, \"1\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0011"
+  },
+  "ruleTC0015": {
+    "rule_class": "Trad",
+    "code": "TC0015",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The entry name specified in the annotation file is not found in the sequence file.<br>Confirm and correct the entry name.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0015"
+  },
+  "ruleTC0016": {
+    "rule_class": "Trad",
+    "code": "TC0016",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "In the sequence file, an invalid code is found. Confirm and correct the sequence file. <br>See <a href=\"https://www.ddbj.nig.ac.jp/ddbj/code-e.html#nucleotide-1\">the acceptable nucleotide codes</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0016"
+  },
+  "ruleTC0017": {
+    "rule_class": "Trad",
+    "code": "TC0017",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a> is not started by initiation codon. Confirm and correct it.<br>If the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a> is not complete at 5' end, use partial symbol \"&lt;\" in the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0017"
+  },
+  "ruleTC0018": {
+    "rule_class": "Trad",
+    "code": "TC0018",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a> is not ended by termination codon. Confirm and correct it.<br>If the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a> is not complete at 3' end, use partial symbol \"&gt;\" in the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0018"
+  },
+  "ruleTC0019": {
+    "rule_class": "Trad",
+    "code": "TC0019",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "Termination codon is found in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html#stop\">the mid of the location</a> of the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>. Confirm and correct it.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0019"
+  },
+  "ruleTC0020": {
+    "rule_class": "Trad",
+    "code": "TC0020",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "message": "Either of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#codon_start\">codon_start</a> or <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_table\">transl_table</a> qualifier is unspecified.<br>Amino acid translation is performed as the default value, \"1\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0020"
+  },
+  "ruleTC0022": {
+    "rule_class": "Trad",
+    "code": "TC0022",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>Since the base range of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier is not matched in <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html#frame\">reading frame of CDS feature</a>, correct the &lt;base_range&gt; of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0022"
+  },
+  "ruleTC0023": {
+    "rule_class": "Trad",
+    "code": "TC0023",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>Since the amino acid of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier is identical to conceptual translation of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>, remove the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0023"
+  },
+  "ruleTC0024": {
+    "rule_class": "Trad",
+    "code": "TC0024",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "message": "Since you do not specify the amino acid, Met, with the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier, translation start site is not \"M\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0024"
+  },
+  "ruleTC0025": {
+    "rule_class": "Trad",
+    "code": "TC0025",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>Since you do not specify stop codon with <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier, the end of CDS location is not stop codon. <br>Correct CDS <a href=\"https://www.ddbj.nig.ac.jp/ddbj/location-e.html\">location</a> or the value of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0025"
+  },
+  "ruleTC0026": {
+    "rule_class": "Trad",
+    "code": "TC0026",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The error related to <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier. <br>When you find it, correction is required.<br>Since you specify stop codon with the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier, a stop codon is found in the mid of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>. <br>Remove the <a href=\"https://www.ddbj.nig.ac.jp/ddbj/qualifiers-e.html#transl_except\">transl_except</a> qualifier.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0026"
+  },
+  "ruleTC0029": {
+    "rule_class": "Trad",
+    "code": "TC0029",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "message": "During amino acid translation of <a href=\"https://www.ddbj.nig.ac.jp/ddbj/cds-e.html\">CDS feature</a>, N of codons can not be translated into any of specific amino acids. ",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0029"
+  },
+  "ruleTC0030": {
+    "rule_class": "Trad",
+    "code": "TC0030",
+    "level": "warning",
+    "level_orginal": "FAT",
+    "internal_ignore": false,
+    "message": "The resource file required to run transChecker is not in the directory.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#TC0030"
+  },
+  "ruleAP0001": {
+    "rule_class": "Trad",
+    "code": "AP0001",
+    "level": "warning",
+    "level_orginal": "FAT",
+    "internal_ignore": false,
+    "message": "Unforeseen error is found. Please <a href=\"https://www.ddbj.nig.ac.jp/contact-e.html#to-ddbj\">contact us</a>.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0001"
+  },
+  "ruleAP0002": {
+    "rule_class": "Trad",
+    "code": "AP0002",
+    "level": "warning",
+    "level_orginal": "FAT",
+    "internal_ignore": false,
+    "message": "Some error is found during opening the specified file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0002"
+  },
+  "ruleAP0005": {
+    "rule_class": "Trad",
+    "code": "AP0005",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "message": "The number of columns in a line must be 9, however, the line is not 9 in its number of columns.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0005"
+  },
+  "ruleAP0006": {
+    "rule_class": "Trad",
+    "code": "AP0006",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "message": "The value of the column in the line is invalid.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0006"
+  },
+  "ruleAP0007": {
+    "rule_class": "Trad",
+    "code": "AP0007",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "Some inconsistency is found in the values between gap_type and linkage or linkage and linkage_evidence.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0007"
+  },
+  "ruleAP0009": {
+    "rule_class": "Trad",
+    "code": "AP0009",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "In an object, the minimum value of object_beg must be \"1\", however, it is not \"1\".",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0009"
+  },
+  "ruleAP0010": {
+    "rule_class": "Trad",
+    "code": "AP0010",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "In the object, the maximum value of object_end must be sum of all component lengths.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0010"
+  },
+  "ruleAP0012": {
+    "rule_class": "Trad",
+    "code": "AP0012",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The range between object_beg and object_end is different from the range between component_beg and component_end.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0012"
+  },
+  "ruleAP0013": {
+    "rule_class": "Trad",
+    "code": "AP0013",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The range between object_beg and object_end is different from the value of gap_length.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0013"
+  },
+  "ruleAP0014": {
+    "rule_class": "Trad",
+    "code": "AP0014",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The gap that cannot be estimated its length must be set 100.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0014"
+  },
+  "ruleAP0015": {
+    "rule_class": "Trad",
+    "code": "AP0015",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "message": "The cited sequence specified as this component_id is not found in the file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0015"
+  },
+  "ruleAP0016": {
+    "rule_class": "Trad",
+    "code": "AP0016",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The component is not found.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0016"
+  },
+  "ruleAP0017": {
+    "rule_class": "Trad",
+    "code": "AP0017",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The region of the component is cited two or more times in the object.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0017"
+  },
+  "ruleAP0018": {
+    "rule_class": "Trad",
+    "code": "AP0018",
+    "level": "error",
+    "level_orginal": "ER2",
+    "internal_ignore": false,
+    "message": "The specified region of the component is out of cited sequence range in the multi-fasta file.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0018"
+  },
+  "ruleAP0021": {
+    "rule_class": "Trad",
+    "code": "AP0021",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "message": "The specified file is not found.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0021"
+  },
+  "ruleAP0027": {
+    "rule_class": "Trad",
+    "code": "AP0027",
+    "level": "warning",
+    "level_orginal": "WAR",
+    "internal_ignore": false,
+    "message": "When you cite an accession number as a component_id, its version number is required.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0027"
+  },
+  "ruleAP0029": {
+    "rule_class": "Trad",
+    "code": "AP0029",
+    "level": "error",
+    "level_orginal": "ER1",
+    "internal_ignore": true,
+    "message": "When you cite an accession number as a component_id, its version number must be a positive integer.",
+    "object": [
+      "Trad"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/ddbj/validator.html#AP0029"
+  }
+}

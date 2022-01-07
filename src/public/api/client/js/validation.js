@@ -1,5 +1,5 @@
 (function(){
-    var api_url = "/api";
+    var api_url = "../";
 
     //ファイル選択ボタン押下時に選択ウィンドウを表示
     var output_f = "";
@@ -9,6 +9,12 @@
             $('input[id=biosample]').click();
         } else if (clicked === 'bioproject_file_select') {
             $('input[id=bioproject]').click();
+        } else if (clicked === 'trad_anno_file_select') {
+            $('input[id=trad_anno]').click();
+        } else if (clicked === 'trad_seq_file_select') {
+            $('input[id=trad_seq]').click();
+        } else if (clicked === 'trad_agp_file_select') {
+            $('input[id=trad_agp]').click();
         }
     });
 
@@ -21,6 +27,12 @@
                 $('#biosample_file_name').val(output_f);
             } else if (changed === 'bioproject') {
                 $('#bioproject_file_name').val(output_f);
+            } else if (changed === 'trad_anno') {
+                $('#trad_anno_file_name').val(output_f);
+            } else if (changed === 'trad_seq') {
+                $('#trad_seq_file_name').val(output_f);
+            } else if (changed === 'trad_agp') {
+                $('#trad_agp_file_name').val(output_f);
             }
         }
     });
@@ -33,9 +45,9 @@
 
     //テンプレートファイルをロードする
     $.when(
-        $.get("/api/client/ejs/error_message.ejs"),
-        $.get("/api/client/ejs/error_message_group.ejs"),
-        $.get("/api/client/ejs/result_summary.ejs")
+        $.get("../client/ejs/error_message.ejs"),
+        $.get("../client/ejs/error_message_group.ejs"),
+        $.get("../client/ejs/result_summary.ejs")
     ).done(function(tmpl_bs, tmpl_bs_group, tmpl_summary){ready(tmpl_bs, tmpl_bs_group, tmpl_summary)});
 
     //初期状態
@@ -75,6 +87,14 @@
                         render_user_error(data);
                     } else {
                         render_system_error();
+                        // 選択したファイルが編集された場合、再び同じファイルを選んでもエラーになるため、エラーがあった場合は一旦リセット
+                        $('.selected_file').each(function() {
+                            if ($(this)[0].files.length > 0) {
+                                $(this)[0].value = '';
+                                let file_name_id = '#' + $(this)[0].id + '_file_name';
+                                $(file_name_id)[0].value = '';
+                            }
+                        });
                     }
                 });
             }

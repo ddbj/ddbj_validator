@@ -1,3 +1,4 @@
+require 'bundler/setup'
 require 'json'
 require 'yaml'
 require 'erb'
@@ -85,6 +86,7 @@ class TestDDBJDbValidator < Minitest::Test
 
   end
 
+  #TODO get_bioproject_names_list に修正
   def test_get_bioproject_names
     # exist case
     ret = @db_validator.get_bioproject_names("ddbj_ffpri")
@@ -94,6 +96,7 @@ class TestDDBJDbValidator < Minitest::Test
     assert_equal 0, ret.size
   end
 
+  #TODO get_bioproject_names_list に修正
   def test_get_bioproject_title_descs
     # exist case
     ret = @db_validator.get_bioproject_title_descs("ddbj_ffpri")
@@ -237,4 +240,115 @@ class TestDDBJDbValidator < Minitest::Test
     assert_nil @db_validator.get_submitter_contact_list("not id")
   end
 
+  def test_exist_check_run_ids
+    ret = @db_validator.exist_check_run_ids(["DRR060518","DRR060519"])
+    assert_equal ret.select{|row| row[:accession_id] == "DRR060518"}.first[:is_exist], true
+    assert_equal ret.select{|row| row[:accession_id] == "DRR060519"}.first[:is_exist], true
+
+    ret = @db_validator.exist_check_run_ids(["DRR000000","Not RUN ID"])
+    assert_equal ret.select{|row| row[:accession_id] == "DRR000000"}.first[:is_exist], false
+    assert_equal ret.select{|row| row[:accession_id] == "Not RUN ID"}.first[:is_exist], false
+  end
+
+  def test_get_biosample_metadata
+    ret = @db_validator.get_biosample_metadata(["SAMD00052344","SAMD00052345", "SAMD00000000", "SSUB000000"])
+    assert ret["SAMD00052344"][:attribute_list].size > 0
+    assert ret["SAMD00052345"][:attribute_list].size > 0
+    assert_nil ret["SAMD00000000"]
+    assert_nil ret["SSUB000000"]
+  end
+
+  def test_get_bioproject_submitter_ids
+    ret = @db_validator.get_bioproject_submitter_ids(["PRJDB3490", "PRJDB4841"])
+    assert_equal ret.first[:submitter_id], "sgibbons"
+    assert_equal ret[1][:submitter_id], "hirakawa"
+    ret = @db_validator.get_bioproject_submitter_ids(["PRJDB3490", "PRJDB00000", "PSUB004141"])
+    assert_equal ret.first[:submitter_id], "sgibbons"
+    assert_nil ret[1][:submitter_id]
+    assert_nil ret[2][:submitter_id]
+    ret = @db_validator.get_bioproject_submitter_ids(["Not Accession ID", "PSUB004141"]) # all id is not accession
+    assert_nil ret[0][:submitter_id]
+    assert_nil ret[1][:submitter_id]
+  end
+
+  def test_get_biosample_submitter_ids
+    ret = @db_validator.get_biosample_submitter_ids(["SAMD00000001", "SAMD00052344"])
+    assert_equal ret.first[:submitter_id], "sokazaki"
+    assert_equal ret[1][:submitter_id], "hirakawa"
+    ret = @db_validator.get_biosample_submitter_ids(["SAMD00000001", "SAMD00000000", "SSUB001848"])
+    assert_equal ret.first[:submitter_id], "sokazaki"
+    assert_nil ret[1][:submitter_id]
+    assert_nil ret[2][:submitter_id]
+    ret = @db_validator.get_biosample_submitter_ids(["Not Accession ID", "SSUB001848"])
+    assert_nil ret[0][:submitter_id]
+    assert_nil ret[1][:submitter_id]
+  end
+
+  def test_get_run_submitter_ids
+    ret = @db_validator.get_run_submitter_ids(["DRR060518"])
+    assert_equal ret.first[:submitter_id], "hirakawa"
+    ret = @db_validator.get_run_submitter_ids(["DRR060518", "DRR000000", "SSUB001848"])
+    assert_equal ret.first[:submitter_id], "hirakawa"
+    assert_nil ret[1][:submitter_id]
+    assert_nil ret[2][:submitter_id]
+    ret = @db_validator.get_run_submitter_ids(["Not Accession ID", "SSUB001848"])
+    assert_nil ret[0][:submitter_id]
+    assert_nil ret[1][:submitter_id]
+  end
+
+  def test_get_valid_smp_id
+    ret = @db_validator.get_valid_smp_id(["SAMD00052344"])
+    assert_equal ret.first[:smp_id], "64274"
+    ret = @db_validator.get_valid_smp_id(["SAMD00000000"])
+    assert_nil ret.first[:smp_id]
+    ret = @db_validator.get_valid_smp_id(["SAMD00052344", "SAMD00000000", "SSUB00000000"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_nil ret[1][:smp_id]
+    assert_nil ret[2][:smp_id]
+  end
+
+  def test_get_bioproject_id_via_dra
+    ret = @db_validator.get_bioproject_id_via_dra(["64274"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    ret = @db_validator.get_bioproject_id_via_dra(["64274", "104969"])
+    assert_equal ret[1][:smp_id], "104969"
+    assert_equal ret[1][:bioproject_accession_id_list], ["PRJDB5969"]
+    ret = @db_validator.get_bioproject_id_via_dra(["0000"])
+    assert_equal ret.first[:smp_id], "0000"
+    assert_nil ret.first[:bioproject_accession_id_list]
+    ret = @db_validator.get_bioproject_id_via_dra(["64274", "not exist smp id"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    assert_equal ret[1][:smp_id], "not exist smp id"
+    assert_nil ret[1][:bioproject_accession_id_list]
+  end
+
+  def test_get_run_id_via_dra
+    ret = @db_validator.get_run_id_via_dra(["64274"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:drr_accession_id_list], ["DRR060518"]
+    ret = @db_validator.get_run_id_via_dra(["0000"])
+    assert_equal ret.first[:smp_id], "0000"
+    assert_nil ret.first[:drr_accession_id_list]
+    ret = @db_validator.get_run_id_via_dra(["64274", "not exist smp id"])
+    assert_equal ret.first[:smp_id], "64274"
+    assert_equal ret.first[:drr_accession_id_list], ["DRR060518"]
+    assert_equal ret[1][:smp_id], "not exist smp id"
+    assert_nil ret[1][:drr_accession_id_list]
+  end
+
+  def test_get_biosample_related_id
+    ret = @db_validator.get_biosample_related_id(["SAMD00052344"])
+    assert_equal ret.first[:bioproject_accession_id_list], ["PRJDB4841"]
+    assert_equal ret.first[:drr_accession_id_list], ["DRR060518"]
+    # exist sample but hasn't DRA accession
+    ret = @db_validator.get_biosample_related_id(["SAMD00060421"])
+    assert_equal ret.first[:bioproject_accession_id_list], []
+    assert_equal ret.first[:drr_accession_id_list], []
+    ret = @db_validator.get_biosample_related_id(["SAMD00000000"])
+    assert_equal ret.first[:bioproject_accession_id_list], []
+    assert_equal ret.first[:drr_accession_id_list], []
+    ret = @db_validator.get_biosample_related_id(["SAMD00052344", "SAMD00000000"])
+  end
 end

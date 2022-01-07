@@ -56,13 +56,21 @@ module DDBJValidator
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         validation_params = {}
-        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf)
+        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf trad_anno trad_seq trad_agp)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)
             validation_params[file_category.to_sym] = save_path
           end
         end
+        allow_params = %w(submitter_id)
+        validation_params[:params] = {}
+        allow_params.each do |param_name|
+          if params[param_name.to_sym]
+            validation_params[:params][param_name] = params[param_name.to_sym]
+          end
+        end
+
         output_file_path = "#{save_dir}/result.json"
         validation_params[:output] = output_file_path
 
@@ -408,7 +416,7 @@ module DDBJValidator
         # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する
         file_combination = true
         form_vars = @env["rack.request.form_input"].read
-        Rack::Utils.key_space_limit = 10000000
+        Rack::Utils.key_space_limit = 100000000
         form_vars = Rack::Utils.escape(form_vars)
         req_params = Rack::Utils.parse_query(form_vars)
         param_names = req_params["name"]

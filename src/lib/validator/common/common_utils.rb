@@ -517,13 +517,14 @@ class CommonUtils
   # ==== Return
   # returns Net::HTTPResponse
   #
-  def http_get_response (uri)
+  def http_get_response (uri, timeout=120)
     #error and cache
     url = URI.parse(uri)
     req = Net::HTTP::Get.new(url)
     ssl_flag = false
     ssl_flag = true if uri.start_with?("https")
     res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag) {|http|
+      http.read_timeout = timeout
       http.request(req)
     }
     res

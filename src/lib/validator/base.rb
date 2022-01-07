@@ -32,6 +32,12 @@ class ValidatorBase
       else
         config[:ddbj_db_config] = setting["ddbj_rdb"]
       end
+      # parser settings for trad
+      if setting["ddbj_parser"].nil? || setting["ddbj_parser"]["parser_api_url"].nil? || setting["ddbj_parser"]["parser_api_url"] == ""
+        config[:ddbj_parser_config] = nil
+      else
+        config[:ddbj_parser_config] = setting["ddbj_parser"]["parser_api_url"]
+      end
       config[:named_graph_uri] = setting["named_graph_uri"]
       config[:biosample] = setting["biosample"]
       config[:google_api_key] = setting["google_api_key"]
