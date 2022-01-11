@@ -6,6 +6,7 @@ require 'fileutils'
 
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
+require File.expand_path('../bioproject_tsv_validator.rb', __FILE__)
 require File.expand_path('../jvar_validator.rb', __FILE__)
 require File.expand_path('../trad_validator.rb', __FILE__)
 
@@ -142,7 +143,8 @@ class Validator
           validator = BioSampleValidator.new
           data = params[:biosample]
         when "bioproject"
-          validator = BioProjectValidator.new
+          #validator = BioProjectValidator.new #TODO delete or switch
+          validator = BioProjectTsvValidator.new
           data = params[:bioproject]
         when "jvar"
           validator = JVarValidator.new

@@ -64,84 +64,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0006"
   },
-  "ruleBP_R0007": {
-    "rule_class": "BioProject",
-    "code": "BP_R0007",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty description for other relevance",
-    "method": "empty_description_for_other_relevance",
-    "message": "Text description for the Relevance 'Other' is not provided. Please provide description of the Relevance 'Other'.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0007"
-  },
-  "ruleBP_R0008": {
-    "rule_class": "BioProject",
-    "code": "BP_R0008",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty description for other subtype",
-    "method": "empty_description_for_other_subtype",
-    "message": "Text description for the subtype 'Other' is not provided. Please provide DescriptionSubtypeOther.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0008"
-  },
-  "ruleBP_R0009": {
-    "rule_class": "BioProject",
-    "code": "BP_R0009",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty target description for other sample_scope",
-    "method": "empty_target_description_for_other_sample_scope",
-    "message": "Text description for the sample_scope 'Other' is not provided. Please provide description of target.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0009"
-  },
-  "ruleBP_R0010": {
-    "rule_class": "BioProject",
-    "code": "BP_R0010",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty target description for other material",
-    "method": "empty_target_description_for_other_material",
-    "message": "Text description for the material 'Other' is not provided. Please provide description of target.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0010"
-  },
-  "ruleBP_R0011": {
-    "rule_class": "BioProject",
-    "code": "BP_R0011",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty target description for other capture",
-    "method": "empty_target_description_for_other_capture",
-    "message": "Text description for the capture 'Other' is not provided. Please provide description of target.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0011"
-  },
-  "ruleBP_R0012": {
-    "rule_class": "BioProject",
-    "code": "BP_R0012",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty method description for other method_type",
-    "method": "empty_method_description_for_other_method_type",
-    "message": "Text description for the method_type 'Other' is not provided. Please provide description of method.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0012"
-  },
   "ruleBP_R0013": {
     "rule_class": "BioProject",
     "code": "BP_R0013",
@@ -206,19 +128,6 @@
       "BioProject"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0018"
-  },
-  "ruleBP_R0019": {
-    "rule_class": "BioProject",
-    "code": "BP_R0019",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty organism description for multi-species",
-    "method": "empty_organism_description_for_multi_species",
-    "message": "Organism description is required when sample scope is multi-species.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0019"
   },
   "ruleBP_R0020": {
     "rule_class": "BioProject",
@@ -336,5 +245,259 @@
       "BioProject"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0042"
+  },
+  "ruleBP_R0043": {
+    "rule_class": "BioProject",
+    "code": "BP_R0043",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing mandatory field",
+    "method": "missing_mandatory_field",
+    "message": "Project has missing mandatory field(s).",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0044": {
+    "rule_class": "BioProject",
+    "code": "BP_R0044",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing mandatory field",
+    "method": "missing_mandatory_field",
+    "message": "Project has missing mandatory field(s).",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0045": {
+    "rule_class": "BioProject",
+    "code": "BP_R0045",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid value for controlled terms",
+    "method": "invalid_value_for_controlled_terms",
+    "message": "Provided value is not in controlled terms.",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0046": {
+    "rule_class": "BioProject",
+    "code": "BP_R0046",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid value for controlled terms",
+    "method": "invalid_value_for_controlled_terms",
+    "message": "Provided value is not in controlled terms.",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0047": {
+    "rule_class": "BioProject",
+    "code": "BP_R0047",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Multiple values",
+    "method": "multiple_values",
+    "message": "Only single value is allowed but multiple values are provided. First value was used for validation.",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0049": {
+    "rule_class": "BioProject",
+    "code": "BP_R0049",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid value format",
+    "method": "invalid_value_format",
+    "message": "Value must be in defined format.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0050": {
+    "rule_class": "BioProject",
+    "code": "BP_R0050",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid value format",
+    "method": "invalid_value_format",
+    "message": "Value must be in defined format.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0051": {
+    "rule_class": "BioProject",
+    "code": "BP_R0051",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing at least one required fields in a group",
+    "method": "missing_at_least_one_required_fields_in_a_group",
+    "message": "Project has missing field(s), at least one of <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0052": {
+    "rule_class": "BioProject",
+    "code": "BP_R0052",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing at least one required fields in a group",
+    "method": "missing_at_least_one_required_fields_in_a_group",
+    "message": "Project has missing field(s), at least one of <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0053": {
+    "rule_class": "BioProject",
+    "code": "BP_R0053",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing required fields in a group",
+    "method": "missing_required_fields_in_a_group",
+    "message": "Project has missing field(s), <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0054": {
+    "rule_class": "BioProject",
+    "code": "BP_R0054",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing required fields in a group",
+    "method": "missing_required_fields_in_a_group",
+    "message": "Project has missing field(s), <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0055": {
+    "rule_class": "BioProject",
+    "code": "BP_R0055",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Null value is not allowed",
+    "method": "null_value_is_not_allowed",
+    "message": "Null value ('not collected', 'not applicable' or 'missing') is not allowed.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0056": {
+    "rule_class": "BioProject",
+    "code": "BP_R0056",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Null value is not allowed",
+    "method": "null_value_is_not_allowed",
+    "message": "Null value ('not collected', 'not applicable' or 'missing') is not allowed.",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0057": {
+    "rule_class": "BioProject",
+    "code": "BP_R0057",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing conditionally required field",
+    "method": "missing_conditionally_required_field",
+    "message": "When <%=SOURCE_FIELD%> is '<%=VALUE=>', <%=TARGET_FIELD%> is required.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0058": {
+    "rule_class": "BioProject",
+    "code": "BP_R0058",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing conditionally required field",
+    "method": "missing_conditionally_required_field",
+    "message": "When <%=SOURCE_FIELD%> is '<%=VALUE=>', <%=TARGET_FIELD%> is required.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0059": {
+    "rule_class": "BioProject",
+    "code": "BP_R0059",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid data format",
+    "method": "invalid_data_format",
+    "message": "Invalid data format.",
+    "object": [
+      "BioProject"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013"
+  },
+  "ruleBP_R0060": {
+    "rule_class": "BioProject",
+    "code": "BP_R0060",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Non-ASCII characters",
+    "method": "non_ascii_characters",
+    "message": "Non-ASCII format characters detected. Please check for non-standard characters in your field values around [### Non-ASCII character ###] and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
+    "object": [
+      "BioProject"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0058"
+  },
+  "ruleBP_R0061": {
+    "rule_class": "BioProject",
+    "code": "BP_R0061",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid value for null",
+    "method": "invalid_value_for_null",
+    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory field.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0062": {
+    "rule_class": "BioProject",
+    "code": "BP_R0062",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing field name",
+    "method": "missing_field_name",
+    "message": "Field name is missing.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0063": {
+    "rule_class": "BioProject",
+    "code": "BP_R0063",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Null value in optional field",
+    "method": "null_value_in_optional_field",
+    "message": "Null values are not neccesary in optional fields. Leave values empty when there is no information.",
+    "object": [
+      "BIoProject"
+    ]
+  },
+  "ruleBP_R0064": {
+    "rule_class": "BioProject",
+    "code": "BP_R0064",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing organism",
+    "method": "missing_organism",
+    "message": null,
+    "object": [
+      "BIoProject"
+    ]
   }
 }
