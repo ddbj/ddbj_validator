@@ -986,5 +986,41 @@
       "BioSample"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0119"
+  },
+  "ruleBS_R0120": {
+    "rule_class": "BioSample",
+    "code": "BS_R0120",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "package_vs_organism > SARS-CoV-2.cl",
+    "method": "package_vs_organism___sars_cov_2.cl",
+    "message": "Must be Severe acute respiratory syndrome coronavirus 2",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0121": {
+    "rule_class": "BioSample",
+    "code": "BS_R0121",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "package_vs_organism > SARS-CoV-2.wwsurv",
+    "method": "package_vs_organism___sars_cov_2.wwsurv",
+    "message": "Must be wastewater metagenome",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0122": {
+    "rule_class": "BioSample",
+    "code": "BS_R0122",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid GISAID accession",
+    "method": "invalid_gisaid_accession",
+    "message": "Invalid GISAID accession number",
+    "object": [
+      "BioSample"
+    ]
   }
 }

@@ -27,6 +27,8 @@ class OrganismValidator < SPARQLBase
   TAX_VIRIDIPLANTAE = "33090" #viridiplantae
   TAX_EUKARYOTA = "2759" #eukaryota
   TAX_METAGENOMES = "408169" #metagenome
+  TAX_SARSCOV2 = "2697049" #SARS-CoV-2
+  TAX_WASTEWATER_METAGENOME = "527639" #wastewater metagenome
 
   #
   # Initializer
@@ -354,6 +356,16 @@ class OrganismValidator < SPARQLBase
       rule_id = "BS_R0112"
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
+    elsif package_name.start_with?("SARS-CoV-2.cl") #rule BS_R0120
+      rule_id = "BS_R0120"
+      unless tax_id.to_s == TAX_SARSCOV2
+        result = false
+      end
+    elsif package_name.start_with?("SARS-CoV-2.wwsurv") #rule BS_R0121
+      rule_id = "BS_R0121"
+      unless tax_id.to_s == TAX_WASTEWATER_METAGENOME
+        result = false
+      end
     end
     if result
       return {status: "ok"}
