@@ -66,7 +66,7 @@
     "error_internal_ignore": [],
     "warning": []
   },
-  "least_one_mandatory": {
+  "selective_mandatory": {
     "error": [],
     "error_internal_ignore": [],
     "warning": [

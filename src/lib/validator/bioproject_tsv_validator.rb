@@ -78,8 +78,15 @@ class BioProjectTsvValidator < ValidatorBase
 
     missing_mandatory_field("BP_R0043", bp_data, field_settings["mandatory_field"], "error")
     missing_mandatory_field("BP_R0044", bp_data, field_settings["mandatory_field"], "warning")
+    invalid_value_for_controlled_terms("BP_R0045", bp_data, field_settings["cv_check"], "error")
+    invalid_value_for_controlled_terms("BP_R0046", bp_data, field_settings["cv_check"], "warning")
+    multiple_values("BP_R0047", bp_data, field_settings["allow_multiple_values"])
     invalid_value_format("BP_R0049", bp_data, field_settings["format_check"], "error")
     invalid_value_format("BP_R0050", bp_data, field_settings["format_check"], "warning")
+    missing_at_least_one_required_fields_in_a_group("BP_R0051", bp_data, field_settings["selective_mandatory"], "error")
+    missing_at_least_one_required_fields_in_a_group("BP_R0052", bp_data, field_settings["selective_mandatory"], "warning")
+    missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], "error")
+    missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], "error")
 
   end
 
@@ -117,7 +124,74 @@ class BioProjectTsvValidator < ValidatorBase
         end
       end
     end
+    result
+  end
 
+  #
+  # rule:BP_R0045, BP_R0046
+  # 規定されたfieldのCVに沿っているかのチェック
+  #
+  # ==== Args
+  # data: project data
+  # format_check_conf: settings of format_check
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def invalid_value_for_controlled_terms(rule_code, data, format_check_conf, level)
+    result = true
+    invalid_list = {}
+    invalid_list[level] = @tsv_validator.invalid_value_for_controlled_terms(data, format_check_conf[level])
+    if level == "error" # errorの場合は、internal_ignore もチェック
+      invalid_list["error_internal_ignore"] = @tsv_validator.invalid_value_for_controlled_terms(data, format_check_conf["error_internal_ignore"])
+    end
+
+    invalid_list.each do |level, list|
+      unless list.size == 0
+        result = false
+        list.each do |invalid|
+          annotation = [
+            {key: "Field_name", value: invalid[:field_name]},
+            {key: "Value", value: invalid[:value]},
+            {key: "Position", value: invalid[:row_num]}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          if level == "error_internal_ignore"
+            error_hash[:external] = true
+          end
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0047
+  # 許容されていないFieldで2つ以上の値が記載されていないか、同じFiled名が複数出現しないか
+  #
+  # ==== Args
+  # data: project data
+  # allow_multiple_values: settings of allow_multiple_values
+  # ==== Return
+  # true/false
+  #
+  def multiple_values(rule_code, data, allow_multiple_values)
+    result = true
+    invalid_list = @tsv_validator.multiple_values(data, allow_multiple_values)
+
+    unless invalid_list.size == 0
+      result = false
+      invalid_list.each do |invalid|
+        annotation = [
+          {key: "Field_name", value: invalid[:field_name]},
+          {key: "Value", value: invalid[:value]},
+          {key: "Position", value: "#{invalid[:row_num]}"} # TSVだと++1?
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
     result
   end
 
@@ -127,7 +201,7 @@ class BioProjectTsvValidator < ValidatorBase
   #
   # ==== Args
   # data: project data
-  # format_check_conf: settings of filed format
+  # format_check_conf: settings of format_check
   # level: error level (error or warning)
   # ==== Return
   # true/false
@@ -139,15 +213,15 @@ class BioProjectTsvValidator < ValidatorBase
     if level == "error" # errorの場合は、internal_ignore もチェック
       invalid_list["error_internal_ignore"] = @tsv_validator.check_field_format(data, format_check_conf["error_internal_ignore"])
     end
-    p "invalid_value_format"
-    p invalid_list
 
     invalid_list.each do |level, list|
       unless list.size == 0
         result = false
         list.each do |invalid|
           annotation = [
-            {key: invalid[:field_name], value: invalid[:value], format_type: invalid[:format_type]}
+            {key: "Field_name", value: invalid[:field_name]},
+            {key: "Value", value: invalid[:value]},
+            {key: "format_type", value: invalid[:format_type]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           if level == "error_internal_ignore"
@@ -157,7 +231,34 @@ class BioProjectTsvValidator < ValidatorBase
         end
       end
     end
-
     result
+  end
+
+  #
+  # rule:BP_R0051, BP_R0052
+  # Group内でいずれかは必須になるfieldのチェック
+  #
+  # ==== Args
+  # data: project data
+  # format_check_conf: settings of format_check
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def missing_at_least_one_required_fields_in_a_group(rule_code, data, selective_mandatory_conf, level)
+  end
+
+  #
+  # rule:BP_R0053, BP_R0054
+  # Groupに関する記述があれば必須になるfieldのチェック
+  #
+  # ==== Args
+  # data: project data
+  # format_check_conf: settings of format_check
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def missing_required_fields_in_a_group(rule_code, data, mandatory_fields_in_a_group_conf, level)
   end
 end

@@ -34,9 +34,6 @@
     "values": []
   }, {
     "key": "title",
-    "values" : ["My project"]
-  }, {
-    "key": "title",
     "values" : ["My project title"]
   }, {
     "key": "description",
