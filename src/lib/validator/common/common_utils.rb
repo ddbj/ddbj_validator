@@ -232,6 +232,25 @@ class CommonUtils
   end
 
   #
+  # テキストが正規表現に沿っているかチェックする
+  #
+  # ==== Args
+  # value: 検査する値
+  # regex: 正規表現のテキスト "^.{100,}$"
+  # ==== Return
+  # true/false
+  #
+  def self.format_check_with_regexp(value, regex)
+    value = value.to_s
+    regex = Regexp.new(regex)
+    ret = false
+    if value =~ regex
+      ret = true
+    end
+    ret
+  end
+
+  #
   # Formats a lat_lon text for INSDC format if available
   #
   # ==== Args

@@ -80,16 +80,16 @@
       {
         "field_name": "umbrella_bioproject_accession",
         "regex": "^PRJ(DA|DB|EA|EB|NA)\\d{1,}$"
-      },  {
+      }
+    ],
+    "error_internal_ignore": [
+      {
         "field_name": "title",
         "regex": "^.{10,}$"
       }, {
         "field_name": "description",
         "regex": "^.{100,}$"
       }
-    ],
-    "error_internal_ignore": [
-     
     ],
     "warning": [
       {

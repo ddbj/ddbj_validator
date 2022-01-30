@@ -255,7 +255,7 @@
     "method": "missing_mandatory_field",
     "message": "Project has missing mandatory field(s).",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0044": {
@@ -267,7 +267,7 @@
     "method": "missing_mandatory_field",
     "message": "Project has missing mandatory field(s).",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0045": {
@@ -279,7 +279,7 @@
     "method": "invalid_value_for_controlled_terms",
     "message": "Provided value is not in controlled terms.",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0046": {
@@ -291,7 +291,7 @@
     "method": "invalid_value_for_controlled_terms",
     "message": "Provided value is not in controlled terms.",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0047": {
@@ -303,7 +303,7 @@
     "method": "multiple_values",
     "message": "Only single value is allowed but multiple values are provided. First value was used for validation.",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0049": {
@@ -351,7 +351,7 @@
     "method": "missing_at_least_one_required_fields_in_a_group",
     "message": "Project has missing field(s), at least one of <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0053": {
@@ -399,7 +399,7 @@
     "method": "null_value_is_not_allowed",
     "message": "Null value ('not collected', 'not applicable' or 'missing') is not allowed.",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0057": {
@@ -485,7 +485,7 @@
     "method": "null_value_in_optional_field",
     "message": "Null values are not neccesary in optional fields. Leave values empty when there is no information.",
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   },
   "ruleBP_R0064": {
@@ -497,7 +497,7 @@
     "method": "missing_organism",
     "message": null,
     "object": [
-      "BIoProject"
+      "BioProject"
     ]
   }
 }

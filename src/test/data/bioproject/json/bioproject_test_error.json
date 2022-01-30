@@ -1,0 +1,54 @@
+[
+  {
+    "key": "# Submission",
+    "values": []
+  }, {
+    "key": "first_name",
+    "values": []
+  }, {
+    "key": "middle_name",
+    "values": []
+  }, {
+    "key": "last_name",
+    "values": []
+  }, {
+    "key": "organization",
+    "values": ["DDBJ"]
+  }, {
+    "key": "organization_url",
+    "values": ["https://www.ddbj.nig.ac.jp/index.html"]
+  }, {
+    "key": "consortium_name",
+    "values": ["my consortium"]
+  }, {
+    "key": "consortium_url",
+    "values": ["https://www.ddbj.nig.ac.jp/index.html"]
+  }, {
+    "key": "",
+    "values": []
+  }, {
+    "key": "# Project info",
+    "values": []
+  }, {
+    "key": "title",
+    "values" : ["My project"]
+  }, {
+    "key": "title",
+    "values" : ["My project title"]
+  }, {
+    "key": "description",
+    "values" : ["My project description. This is a test project for new BioProject submission sysmtem. (< 100)"]
+  }, {
+    "key": "project_data_type",
+    "values": ["Metabolome", "Assembly"]
+  }, {
+    "key": "sample_scope",
+    "values": ["Monoisolate"]
+  }, {
+    "key": "organism",
+    "values": ["Homo sapiens"]
+  }, {
+    "key": "taxonomy",
+    "values": ["9606"]
+  }
+]

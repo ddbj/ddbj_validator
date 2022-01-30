@@ -78,6 +78,8 @@ class BioProjectTsvValidator < ValidatorBase
 
     missing_mandatory_field("BP_R0043", bp_data, field_settings["mandatory_field"], "error")
     missing_mandatory_field("BP_R0044", bp_data, field_settings["mandatory_field"], "warning")
+    invalid_value_format("BP_R0049", bp_data, field_settings["format_check"], "error")
+    invalid_value_format("BP_R0050", bp_data, field_settings["format_check"], "warning")
 
   end
 
@@ -106,6 +108,46 @@ class BioProjectTsvValidator < ValidatorBase
         list.each do |invalid_field|
           annotation = [
             {key: "Field name", value: invalid_field}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          if level == "error_internal_ignore"
+            error_hash[:external] = true
+          end
+          @error_list.push(error_hash)
+        end
+      end
+    end
+
+    result
+  end
+
+  #
+  # rule:BP_R0049, BP_R0050
+  # 規定されたfieldのデータフォーマットに沿っているかのチェック
+  #
+  # ==== Args
+  # data: project data
+  # format_check_conf: settings of filed format
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def invalid_value_format(rule_code, data, format_check_conf, level)
+    result = true
+    invalid_list = {}
+    invalid_list[level] = @tsv_validator.check_field_format(data, format_check_conf[level])
+    if level == "error" # errorの場合は、internal_ignore もチェック
+      invalid_list["error_internal_ignore"] = @tsv_validator.check_field_format(data, format_check_conf["error_internal_ignore"])
+    end
+    p "invalid_value_format"
+    p invalid_list
+
+    invalid_list.each do |level, list|
+      unless list.size == 0
+        result = false
+        list.each do |invalid|
+          annotation = [
+            {key: invalid[:field_name], value: invalid[:value], format_type: invalid[:format_type]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           if level == "error_internal_ignore"
