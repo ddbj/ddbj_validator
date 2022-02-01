@@ -92,6 +92,69 @@ class TsvFieldValidator
     invalid_list
   end
 
+  # selective(least one mandatory)チェック
+  def selective_mandatory(data, selective_mandatory_conf, field_group_conf)
+    invalid_list = []
+    selective_mandatory_conf.each do |selective_mandatory|
+      group = field_group_conf.find{|group| group["group_name"] == selective_mandatory["group_name"]} #当該Group情報を取得
+      next if group.nil?
+      exit_value = false # group fieldの中で一つでも値があればtrueとする
+      group["field_list"].each do |mandatory_field|
+        field_data = data.select{|row| row["key"] == mandatory_field}
+        if field_data.size > 0
+          field = field_data.first # 複数fieldを記載していた場合は前方の値を優先
+          value_count = 0
+          unless field["values"].nil?
+            field["values"].each do |value|
+              value_count += 1 unless (value.nil? || value.chomp.strip == "") # null相当を許容するか
+            end
+          end
+          if value_count > 0 #空白やnil以外の値が一つでもあればOK
+            exit_value = true
+          end
+        end
+      end
+      if exit_value == false
+        invalid_list.push({field_group_name: selective_mandatory["group_name"], field_list: group["field_list"]})
+      end
+    end
+    invalid_list
+  end
+
+  # Groupに対する記載があれば、Group内で必須になる項目のチェック
+  def mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf, field_group_conf)
+    invalid_list = []
+    mandatory_fields_in_a_group_conf.each do |check_group_conf|
+      group = field_group_conf.find{|group| group["group_name"] == check_group_conf["group_name"]} #当該Group情報を取得
+      next if group.nil?
+      exit_value = false # group fieldの中で一つでも値があればtrueとする
+      exit_value_field = []
+      group["field_list"].each do |group_field|
+        field_data = data.select{|row| row["key"] == group_field}
+        if field_data.size > 0
+          field = field_data.first # 複数fieldを記載していた場合は前方の値を優先
+          value_count = 0
+          unless field["values"].nil?
+            field["values"].each do |value|
+              value_count += 1 unless (value.nil? || value.chomp.strip == "") # null相当を許容するか
+            end
+          end # TODO 本来は同列の値をセットで比較した方がいい
+          if value_count > 0 #空白やnil以外の値が一つでもあればOK
+            exit_value = true
+            exit_value_field.push(group_field)
+          end
+        end
+      end
+      if exit_value == true # Group内で一つでも記載項目がある
+        missing_fields = check_group_conf["mandatory_field"] - exit_value_field # グループ内必須から記載済み項目の引く
+        if missing_fields.size > 0 # 未記載の必須項目があればNG
+          invalid_list.push({field_group_name: check_group_conf["group_name"], missing_fields: missing_fields})
+        end
+      end
+    end
+    invalid_list
+  end
+
   def is_ignore_line?(row)
     row["key"].nil? || row["key"].chomp.strip == "" || row["key"].chomp.strip.start_with?("#")
   end

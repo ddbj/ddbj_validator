@@ -83,10 +83,10 @@ class BioProjectTsvValidator < ValidatorBase
     multiple_values("BP_R0047", bp_data, field_settings["allow_multiple_values"])
     invalid_value_format("BP_R0049", bp_data, field_settings["format_check"], "error")
     invalid_value_format("BP_R0050", bp_data, field_settings["format_check"], "warning")
-    missing_at_least_one_required_fields_in_a_group("BP_R0051", bp_data, field_settings["selective_mandatory"], "error")
-    missing_at_least_one_required_fields_in_a_group("BP_R0052", bp_data, field_settings["selective_mandatory"], "warning")
-    missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], "error")
-    missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], "error")
+    missing_at_least_one_required_fields_in_a_group("BP_R0051", bp_data, field_settings["selective_mandatory"], field_settings["field_groups"], "error")
+    missing_at_least_one_required_fields_in_a_group("BP_R0052", bp_data, field_settings["selective_mandatory"], field_settings["field_groups"], "warning")
+    missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "error")
+    missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "warning")
 
   end
 
@@ -245,7 +245,32 @@ class BioProjectTsvValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def missing_at_least_one_required_fields_in_a_group(rule_code, data, selective_mandatory_conf, level)
+  def missing_at_least_one_required_fields_in_a_group(rule_code, data, selective_mandatory_conf, field_groups_conf, level)
+    result = true
+    invalid_list = {}
+    invalid_list[level] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf[level], field_groups_conf)
+    if level == "error" # errorの場合は、internal_ignore もチェック
+      invalid_list["error_internal_ignore"] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf["error_internal_ignore"], field_groups_conf)
+    end
+
+    invalid_list.each do |level, list|
+      unless list.size == 0
+        result = false
+        list.each do |invalid|
+          annotation = [
+            {key: "Group name", value: invalid[:field_group_name]},
+            {key: "Filed names", value: invalid[:field_list].to_s},
+            {key: "Meesage", value: "At least one of #{invalid[:field_list].to_s} is required for the '#{invalid[:field_group_name]}' field group."}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          if level == "error_internal_ignore"
+            error_hash[:external] = true
+          end
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
   end
 
   #
@@ -259,6 +284,31 @@ class BioProjectTsvValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def missing_required_fields_in_a_group(rule_code, data, mandatory_fields_in_a_group_conf, level)
+  def missing_required_fields_in_a_group(rule_code, data, mandatory_fields_in_a_group_conf, field_groups_conf, level)
+    result = true
+    invalid_list = {}
+    invalid_list[level] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf[level], field_groups_conf)
+    if level == "error" # errorの場合は、internal_ignore もチェック
+      invalid_list["error_internal_ignore"] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf["error_internal_ignore"], field_groups_conf)
+    end
+
+    invalid_list.each do |level, list|
+      unless list.size == 0
+        result = false
+        list.each do |invalid|
+          annotation = [
+            {key: "Group name", value: invalid[:field_group_name]},
+            {key: "Filed names", value: invalid[:missing_fields].to_s},
+            {key: "Meesage", value: "#{invalid[:missing_fields].to_s} is required for the '#{invalid[:field_group_name]}' field group."}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          if level == "error_internal_ignore"
+            error_hash[:external] = true
+          end
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
   end
 end
