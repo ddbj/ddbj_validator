@@ -50,5 +50,14 @@
   }, {
     "key": "taxonomy",
     "values": ["9606"]
+  }, {
+    "key": "grant_title",
+    "values": ["NA", "Unknown"]
+  }, {
+    "key": "grant_agency",
+    "values": ["Not applicable"]
+  }, {
+    "key": "label",
+    "values": ["N.A."]
   }
 ]

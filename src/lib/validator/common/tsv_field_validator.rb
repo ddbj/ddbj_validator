@@ -3,6 +3,70 @@ class TsvFieldValidator
   def initialize
   end
 
+  # 推奨されないNULL値表現の揺らぎを補正する。ただしmandatory fieldのみが対象
+  def invalid_value_for_null(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    invalid_list = []
+    data.each_with_index do |row, row_idx|
+      next unless mandatory_field_list.include?(row["key"]) # ここではmandatory fieldのみ置換する。optional fieldは空白に置換されるため
+      row["values"].each_with_index do |value, col_idx|
+        next if CommonUtils.null_value?(value) # 既に推奨NULL表現
+        replace_value = ""
+        #推奨されている NULL 値の表記を揃える(小文字表記へ)
+        null_accepted_list.each do |null_accepted|
+          next if value == null_accepted #完全一致なら置換対象外
+          if value =~ /#{null_accepted}/i
+            val_result = value.downcase
+            unless val_result == value
+              replace_value = val_result
+            end
+          end
+        end
+        null_not_recommended_list.each do |refexp|
+          if value =~ /^(#{refexp})$/i
+            replace_value = "missing"
+          end
+        end
+        if replace_value != "" #置換値がある
+          invalid_list.push({field_name: row["key"], value: value, replace_value: replace_value, row_idx: row_idx, col_idx: col_idx})
+        end
+      end
+    end
+    invalid_list
+  end
+
+  # NULL値相当が入力されたoptional fieldの値を空白に置換する
+  def null_value_in_optional_field(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    invalid_list = []
+    data.each_with_index do |row, row_idx|
+      next if mandatory_field_list.include?(row["key"]) # ここではoptional fieldのみ置換する
+      row["values"].each_with_index do |value, col_idx|
+        next if CommonUtils.blank?(value)
+        null_accepted_size = null_accepted_list.select{|refexp| value =~ /#{refexp}/i }.size
+        null_not_recomm_size = null_not_recommended_list.select {|refexp| value =~ /^(#{refexp})$/i }.size
+        if (null_accepted_size + null_not_recomm_size) > 0
+          invalid_list.push({field_name: row["key"], value: value, replace_value: "", row_idx: row_idx, col_idx: col_idx})
+        end
+      end
+    end
+    invalid_list
+  end
+
+  # NULL値の入力を許さない項目のチェック
+  def null_value_is_not_allowed(data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list)
+    invalid_list = []
+    data.each_with_index do |row, row_idx|
+      next unless not_allow_null_value_conf.include?(row["key"])
+      row["values"].each_with_index do |value, col_idx|
+        null_accepted_size = null_accepted_list.select{|refexp| value =~ /#{refexp}/i }.size
+        null_not_recomm_size = null_not_recommended_list.select {|refexp| value =~ /^(#{refexp})$/i }.size
+        if (null_accepted_size + null_not_recomm_size) > 0
+          invalid_list.push({field_name: row["key"], value: value})
+        end
+      end
+    end
+    invalid_list
+  end
+
   # 必須項目未記載のチェック
   def missing_mandatory_field(data, mandatory_conf)
     invalid_list = []

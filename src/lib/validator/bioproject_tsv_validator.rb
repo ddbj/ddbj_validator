@@ -24,6 +24,7 @@ class BioProjectTsvValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/bioproject")))
+    @conf[:null_accepted] = @conf[:field_settings]["null_value"]["value_list"]
     CommonUtils::set_config(@conf)
 
     @error_list = error_list = []
@@ -76,6 +77,17 @@ class BioProjectTsvValidator < ValidatorBase
 
     ## TSVかのチェック
 
+    ## 細かいデータの修正
+    #invalid_data_format("BP_R0059", bp_data)
+    # ここでauto-annotationの内容で現行データを置き換える？
+
+    mandatory_field_list = mandatory_field_list(field_settings)
+    invalid_value_for_null("BP_R0061", bp_data, mandatory_field_list, field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"])
+    null_value_in_optional_field("BP_R0063", bp_data, mandatory_field_list, field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"])
+    # ここでauto-annotationの内容で現行データを置き換える？
+    null_value_is_not_allowed("BP_R0055", bp_data, field_settings["not_allow_null_value"], field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"], "error")
+    null_value_is_not_allowed("BP_R0056", bp_data, field_settings["not_allow_null_value"], field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"], "warning")
+
     missing_mandatory_field("BP_R0043", bp_data, field_settings["mandatory_field"], "error")
     missing_mandatory_field("BP_R0044", bp_data, field_settings["mandatory_field"], "warning")
     invalid_value_for_controlled_terms("BP_R0045", bp_data, field_settings["cv_check"], "error")
@@ -88,6 +100,24 @@ class BioProjectTsvValidator < ValidatorBase
     missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "error")
     missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "warning")
 
+  end
+  def mandatory_field_list(field_conf)
+    mandatory_field_list = []
+    field_conf["mandatory_field"].each do |level, field_list|
+      mandatory_field_list.concat(field_list)
+    end
+    field_conf["mandatory_fields_in_a_group"].each do |level, group_list|
+      group_list.each do |group_field|
+        mandatory_field_list.concat(group_field["mandatory_field"])
+      end
+    end
+    field_conf["selective_mandatory"].each do |level, group_list|
+      group_list.each do |group_field|
+        group_conf = field_conf["field_groups"].find {|group| group["group_name"] == group_field["group_name"]}
+        mandatory_field_list.concat(group_conf["field_list"]) unless group_conf.nil?
+      end
+    end
+    mandatory_field_list
   end
 
   #
@@ -308,6 +338,114 @@ class BioProjectTsvValidator < ValidatorBase
           @error_list.push(error_hash)
         end
       end
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0055, BP_R0056
+  # Null相当の値を許容しないfieldのチェック
+  #
+  # ==== Args
+  # data: project data
+  # not_allow_null_value_conf: settings of not_allow_null_value
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def null_value_is_not_allowed(rule_code, data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, level)
+    result = true
+    invalid_list = {}
+    invalid_list[level] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf[level], null_accepted_list, null_not_recommended_list)
+    if level == "error" # errorの場合は、internal_ignore もチェック
+      invalid_list["error_internal_ignore"] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf["error_internal_ignore"], null_accepted_list, null_not_recommended_list)
+    end
+    invalid_list.each do |level, list|
+      unless list.size == 0
+        result = false
+        list.each do |invalid|
+          annotation = [
+            {key: "Field name", value: invalid[:field_name]},
+            {key: "Value", value: invalid[:value]}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          if level == "error_internal_ignore"
+            error_hash[:external] = true
+          end
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0059
+  # 不要な空白文字などの除去
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def invalid_data_format(rule_code, data)
+  end
+
+  #
+  # rule:BP_R0061
+  # Null相当の文字列の揺らぎを補正する。
+  # NA, N.A. → missing
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def invalid_value_for_null(rule_code, data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    result = true
+    invalid_list = @tsv_validator.invalid_value_for_null(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: "Field name", value: invalid[:field_name]},
+        {key: "Value", value: invalid[:value]}
+      ]
+      location = {row_idx: invalid[:row_idx], col_idx: invalid[:col_idx]}
+      annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0063
+  # 必須ではない項目のnull値を空白に置換。
+  # "必須ではない"の定義をどうするか。必須系を全て足す？mandatory_field + mandatory_fields_in_a_group + selective_mandatory
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def null_value_in_optional_field(rule_code, data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    result = true
+    invalid_list = @tsv_validator.null_value_in_optional_field(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: "Field name", value: invalid[:field_name]},
+        {key: "Value", value: invalid[:value]}
+      ]
+      location = {row_idx: invalid[:row_idx], col_idx: invalid[:col_idx]}
+      annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
     end
     result
   end
