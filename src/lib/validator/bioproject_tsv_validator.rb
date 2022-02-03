@@ -78,8 +78,9 @@ class BioProjectTsvValidator < ValidatorBase
     ## TSVかのチェック
 
     ## 細かいデータの修正
-    #invalid_data_format("BP_R0059", bp_data)
+    invalid_data_format("BP_R0059", bp_data)
     # ここでauto-annotationの内容で現行データを置き換える？
+    non_ascii_characters("BP_R0060", bp_data)
 
     mandatory_field_list = mandatory_field_list(field_settings)
     invalid_value_for_null("BP_R0061", bp_data, mandatory_field_list, field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"])
@@ -183,7 +184,7 @@ class BioProjectTsvValidator < ValidatorBase
           annotation = [
             {key: "Field_name", value: invalid[:field_name]},
             {key: "Value", value: invalid[:value]},
-            {key: "Position", value: invalid[:row_num]}
+            {key: "Position", value: invalid[:row_idx]}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
           if level == "error_internal_ignore"
@@ -216,7 +217,7 @@ class BioProjectTsvValidator < ValidatorBase
         annotation = [
           {key: "Field_name", value: invalid[:field_name]},
           {key: "Value", value: invalid[:value]},
-          {key: "Position", value: "#{invalid[:row_num]}"} # TSVだと++1?
+          {key: "Position", value: "#{invalid[:row_idx]}"} # TSVだと++1?
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -390,6 +391,52 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_data_format(rule_code, data)
+    result = true
+    invalid_list = @tsv_validator.invalid_data_format(data)
+
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [{key: "Field name", value: invalid[:field_name]}]
+      if invalid[:col_idx].nil? # field_nameの補正
+        location = {row_idx: invalid[:row_idx], key_name: "key"}
+        annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Field name", location, true))
+      else  # field_valueの補正
+        annotation.push({key: "Value", value: invalid[:value]})
+        location = {row_idx: invalid[:row_idx], key_name: "values", col_idx: invalid[:col_idx]}
+        annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0060
+  # 不要な空白文字などの除去
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def non_ascii_characters(rule_code, data)
+    result = true
+    invalid_list = @tsv_validator.non_ascii_characters(data)
+
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [{key: "Field name", value: invalid[:field_name]}]
+      if invalid[:col_idx].nil? # field_nameがNG
+      else  # field_valueがNG
+        annotation.push({key: "Value", value: invalid[:value]})
+      end
+      annotation.push({key: "Invalid Position", value: invalid[:disp_txt]})
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
   end
 
   #

@@ -67,6 +67,74 @@ class TsvFieldValidator
     invalid_list
   end
 
+  # 不要な空白文字などの除去
+  def invalid_data_format(data)
+    invalid_list = []
+    data.each_with_index do |row, row_idx|
+      replace_value = replace_invalid_data(row["key"])
+      if row["key"] != replace_value && !is_ignore_line?(row)
+        invalid_list.push({field_name: row["key"], replace_value: replace_value, row_idx: row_idx})
+      end
+      next if row["values"].nil?
+      row["values"].each_with_index do |value, col_idx|
+        replace_value = replace_invalid_data(value)
+        if value != replace_value
+          invalid_list.push({field_name: row["key"], value: value, replace_value: replace_value, row_idx: row_idx, col_idx: col_idx})
+        end
+      end
+    end
+    invalid_list
+  end
+
+  # non-ASCIIが含まれていないか
+  def non_ascii_characters (data, ignore_field_list=nil)
+    invalid_list = []
+    data.each_with_index do |row, row_idx|
+      next if !ignore_field_list.nil? && ignore_field_list.include?(row["key"]) #除外fieldはスキップ
+      unless row["key"].ascii_only? # Field名のチェック
+        disp_txt = "" #名前のどこにnon ascii文字があるか示すメッセージを作成
+        row["key"].each_char do |ch|
+          if ch.ascii_only?
+            disp_txt << ch.to_s
+          else
+            disp_txt << '[### Non-ASCII character ###]'
+          end
+        end
+        invalid_list.push({field_name: row["key"],  disp_txt: disp_txt, row_idx: row_idx})
+      end
+      next if row["values"].nil?
+      row["values"].each_with_index do |value, col_idx|  # Field値のチェック
+        next if value.ascii_only?
+        disp_txt = "" #値のどこにnon ascii文字があるか示すメッセージを作成
+        value.each_char do |ch|
+          if ch.ascii_only?
+            disp_txt << ch.to_s
+          else
+            disp_txt << '[### Non-ASCII character ###]'
+          end
+        end
+        invalid_list.push({field_name: row["key"], value: value, disp_txt: disp_txt, row_idx: row_idx, col_idx: col_idx})
+      end
+    end
+    invalid_list
+  end
+
+  # これはCOMMONでもよいかも
+  def replace_invalid_data(value)
+    return nil if value.nil?
+    replaced = value.dup
+    replaced.strip!  #セル内の前後の空白文字を除去
+    replaced.gsub!(/\t/, " ") #セル内部のタブを空白1個に
+    replaced.gsub!(/\s+/, " ") #二個以上の連続空白を１個に
+    replaced.gsub!(/(\r\n|\r|\n)/, " ") #セル内部の改行を空白1個に
+    #セル内の最初と最後が ' or " で囲われていたら削除
+    if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
+      replaced = replaced[1..-2]
+    end
+    replaced.strip!  #引用符を除いた後にセル内の前後の空白文字をもう一度除去
+    replaced
+  end
+
   # 必須項目未記載のチェック
   def missing_mandatory_field(data, mandatory_conf)
     invalid_list = []
@@ -95,12 +163,12 @@ class TsvFieldValidator
   def invalid_value_for_controlled_terms(data, cv_check_conf)
     invalid_list = []
     cv_check_field = cv_check_conf.group_by{|cv_conf| cv_conf["field_name"]}
-    data.each_with_index do |row, row_num|
+    data.each_with_index do |row, row_idx|
       next if cv_check_field[row["key"]].nil? || row["values"].nil?
-      row["values"].each_with_index do |value, col_num|
+      row["values"].each_with_index do |value, col_idx|
         next if CommonUtils.blank?(value) # is null val?
         unless cv_check_field[row["key"]].first["value_list"].include?(value)
-          invalid_list.push({field_name: row["key"], value: value, row_num: row_num})
+          invalid_list.push({field_name: row["key"], value: value, row_idx: row_idx})
         end
       end
     end
@@ -111,11 +179,11 @@ class TsvFieldValidator
   def multiple_values(data, allow_multiple_values_conf)
     invalid_list = []
     # 同じfieldに値が複数ある場合
-    data.each_with_index do |row, row_num|
+    data.each_with_index do |row, row_idx|
       next if is_ignore_line?(row) || row["values"].nil?
       if row["values"].size > 1 && !(row["values"][1..-1].uniq.compact == [] || row["values"][1..-1].uniq.compact == [""]) #2つ目以降に有効な値が入っている (空白文字除去？)
         unless allow_multiple_values_conf.include?(row["key"]) #許可されていない
-          invalid_list.push({field_name: row["key"], value: row["values"][0..-1].join(", "), row_num: row_num}) #row_numは0始まり。JSONではそのまま、TSVでは+1で表示
+          invalid_list.push({field_name: row["key"], value: row["values"][0..-1].join(", "), row_idx: row_idx}) #row_idxは0始まり。JSONではそのまま、TSVでは+1で表示
         end
       end
     end
@@ -126,7 +194,7 @@ class TsvFieldValidator
       duplicated_data = data.select{|row| row["key"] == dup_field}
       value_list = []
       duplicated_data.map{|row| value_list.concat(row["values"])}
-      invalid_list.push({field_name: dup_field, value: value_list, row_num: 0}) # TODO ここが取れない
+      invalid_list.push({field_name: dup_field, value: value_list, row_idx: 0}) # TODO ここが取れない
     end
     invalid_list
   end
@@ -135,9 +203,9 @@ class TsvFieldValidator
   def check_field_format(data, field_format_conf)
     invalid_list = []
     field_format = field_format_conf.group_by{|cv_conf| cv_conf["field_name"]}
-    data.each_with_index do |row, row_num|
+    data.each_with_index do |row, row_idx|
       next if field_format[row["key"]].nil? || row["values"].nil?
-      row["values"].each_with_index do |value, col_num|
+      row["values"].each_with_index do |value, col_idx|
         next if CommonUtils.blank?(value) # is null val?
         format_conf = field_format[row["key"]].first
         if !format_conf["regex"].nil? # 正規表現によるチェック
