@@ -51,19 +51,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0005"
   },
-  "ruleBP_R0006": {
-    "rule_class": "BioProject",
-    "code": "BP_R0006",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Short project description",
-    "method": "short_project_description",
-    "message": "Project description is too short. Description text must be more than 100 characters.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0006"
-  },
   "ruleBP_R0013": {
     "rule_class": "BioProject",
     "code": "BP_R0013",
@@ -89,19 +76,6 @@
       "BioProject"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0014"
-  },
-  "ruleBP_R0015": {
-    "rule_class": "BioProject",
-    "code": "BP_R0015",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty publication reference",
-    "method": "empty_publication_reference",
-    "message": "Publication reference is not provided. Please provide reference in free-text when id is not available.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0015"
   },
   "ruleBP_R0016": {
     "rule_class": "BioProject",
@@ -142,45 +116,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0020"
   },
-  "ruleBP_R0021": {
-    "rule_class": "BioProject",
-    "code": "BP_R0021",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Invalid locus tag prefix",
-    "method": "invalid_locus_tag_prefix",
-    "message": "Locus tag prefix and DDBJ BioSample accession pair is invalid.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0021"
-  },
-  "ruleBP_R0022": {
-    "rule_class": "BioProject",
-    "code": "BP_R0022",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Invalid BioSample accession",
-    "method": "invalid_biosample_accession",
-    "message": "Invalid BioSample accession. Please provide a valid BioSample accession with format SAMD\\d+",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0022"
-  },
-  "ruleBP_R0037": {
-    "rule_class": "BioProject",
-    "code": "BP_R0037",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Multiple projects",
-    "method": "multiple_projects",
-    "message": "Only one project is allowed in BioProject XML",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0037"
-  },
   "ruleBP_R0038": {
     "rule_class": "BioProject",
     "code": "BP_R0038",
@@ -207,45 +142,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0039"
   },
-  "ruleBP_R0040": {
-    "rule_class": "BioProject",
-    "code": "BP_R0040",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Invalid project type",
-    "method": "invalid_project_type",
-    "message": "ProjectTypeTopSingleOrganism is invalid project type",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0040"
-  },
-  "ruleBP_R0041": {
-    "rule_class": "BioProject",
-    "code": "BP_R0041",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Invalid locus tag prefix format",
-    "method": "invalid_locus_tag_prefix_format",
-    "message": "Locus tag prefix must be 3-12 alphanumeric characters and the first character may not be a digit.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0041"
-  },
-  "ruleBP_R0042": {
-    "rule_class": "BioProject",
-    "code": "BP_R0042",
-    "level": "error",
-    "internal_ignore": false,
-    "name": "Locus tag prefix in umbrella project",
-    "method": "locus_tag_prefix_in_umbrella_project",
-    "message": "Locus tag prefix must be described in primary project.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0042"
-  },
   "ruleBP_R0043": {
     "rule_class": "BioProject",
     "code": "BP_R0043",
@@ -253,7 +149,7 @@
     "internal_ignore": false,
     "name": "Missing mandatory field",
     "method": "missing_mandatory_field",
-    "message": "Project has missing mandatory field(s).",
+    "message": "Missing mandatory field(s).",
     "object": [
       "BioProject"
     ]
@@ -265,7 +161,7 @@
     "internal_ignore": false,
     "name": "Missing mandatory field",
     "method": "missing_mandatory_field",
-    "message": "Project has missing mandatory field(s).",
+    "message": "Missing mandatory field(s).",
     "object": [
       "BioProject"
     ]
@@ -337,7 +233,7 @@
     "internal_ignore": false,
     "name": "Missing at least one required fields in a group",
     "method": "missing_at_least_one_required_fields_in_a_group",
-    "message": "Project has missing field(s), at least one of <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "message": "Missing field(s) in at least one required field group.",
     "object": [
       "BioProject"
     ]
@@ -349,7 +245,7 @@
     "internal_ignore": false,
     "name": "Missing at least one required fields in a group",
     "method": "missing_at_least_one_required_fields_in_a_group",
-    "message": "Project has missing field(s), at least one of <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "message": "Missing field(s) in at least one required field group.",
     "object": [
       "BioProject"
     ]
@@ -361,7 +257,7 @@
     "internal_ignore": false,
     "name": "Missing required fields in a group",
     "method": "missing_required_fields_in_a_group",
-    "message": "Project has missing field(s), <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "message": "Missing field(s) in at least one required field group.",
     "object": [
       "BioProject"
     ]
@@ -373,7 +269,7 @@
     "internal_ignore": false,
     "name": "Missing required fields in a group",
     "method": "missing_required_fields_in_a_group",
-    "message": "Project has missing field(s), <%=GROUP_FIELDS%> is required for the <%=GROUP_NAME%> field group.",
+    "message": "Missing field(s) in at least one required field group.",
     "object": [
       "BioProject"
     ]
@@ -409,7 +305,7 @@
     "internal_ignore": false,
     "name": "Missing conditionally required field",
     "method": "missing_conditionally_required_field",
-    "message": "When <%=SOURCE_FIELD%> is '<%=VALUE=>', <%=TARGET_FIELD%> is required.",
+    "message": "Missing field(s) in conditionally required field.",
     "object": [
       "BioProject"
     ]
@@ -421,7 +317,7 @@
     "internal_ignore": false,
     "name": "Missing conditionally required field",
     "method": "missing_conditionally_required_field",
-    "message": "When <%=SOURCE_FIELD%> is '<%=VALUE=>', <%=TARGET_FIELD%> is required.",
+    "message": "Missing field(s) in conditionally required field.",
     "object": [
       "BioProject"
     ]
@@ -493,9 +389,57 @@
     "code": "BP_R0064",
     "level": "error",
     "internal_ignore": false,
-    "name": "Missing organism",
-    "method": "missing_organism",
-    "message": null,
+    "name": "Not predefined field name",
+    "method": "not_predefined_field_name",
+    "message": "Not predefined field name is used.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0065": {
+    "rule_class": "BioProject",
+    "code": "BP_R0065",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Duplicated field name",
+    "method": "duplicated_field_name",
+    "message": "Fileld names are duplicated. Only First one was used for validation.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0066": {
+    "rule_class": "BioProject",
+    "code": "BP_R0066",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Value in comment line",
+    "method": "value_in_comment_line",
+    "message": "Value in comment line is ignored.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0067": {
+    "rule_class": "BioProject",
+    "code": "BP_R0067",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid JSON structure",
+    "method": "invalid_json_structure",
+    "message": "JSON structure is invalid against schema.",
+    "object": [
+      "BioProject"
+    ]
+  },
+  "ruleBP_R0068": {
+    "rule_class": "BioProject",
+    "code": "BP_R0068",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid file format",
+    "method": "invalid_file_format",
+    "message": "Only JSON and TSV formats are supported.",
     "object": [
       "BioProject"
     ]

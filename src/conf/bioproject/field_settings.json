@@ -21,6 +21,38 @@
   "allow_char": {
 
   },
+  "predefined_field_name": [
+    "first_name",
+    "middle_name",
+    "last_name",
+    "email",
+    "organization",
+    "organization_url",
+    "consortium_name",
+    "consortium_url",
+    "title",
+    "description",
+    "project_data_type",
+    "sample_scope",
+    "organism",
+    "taxonomy_id",
+    "strain",
+    "breed",
+    "cultivar",
+    "isolate",
+    "label",
+    "pubmed_id",
+    "doi",
+    "umbrella_bioproject_accession",
+    "grant_agency",
+    "grant_agency_abbreviation",
+    "grant_id",
+    "grant_title",
+    "link_label",
+    "link_url",
+    "register_as_umbrella",
+    "private_comment_to_ddbj"
+  ],
   "field_groups": [
     {
       "group_name": "Consortium",

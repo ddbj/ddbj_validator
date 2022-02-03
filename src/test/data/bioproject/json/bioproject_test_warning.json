@@ -1,6 +1,6 @@
 [
   {
-    "key": "# Submission",
+    "key": "#  Submission",
     "values": []
   }, {
     "key": "first_name",
@@ -34,7 +34,7 @@
     "values": []
   }, {
     "key": "title",
-    "values" : ["My project title"]
+    "values" : ["\"My project   title\""]
   }, {
     "key": "description",
     "values" : ["My project description. This is a test project for new BioProject submission sysmtem. It should be at least 100 characters long."]
@@ -48,7 +48,7 @@
     "key": "organism",
     "values": ["Homo sapiens"]
   }, {
-    "key": "taxonomy",
+    "key": "taxonomy_id",
     "values": ["9606"]
   }, {
     "key": "grant_title",

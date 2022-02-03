@@ -48,7 +48,7 @@
     "key": "organism",
     "values": ["Homo sapiens"]
   }, {
-    "key": "taxonomy",
+    "key": "taxonomy_id",
     "values": ["9606"]
   }
 ]

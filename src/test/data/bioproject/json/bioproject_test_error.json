@@ -31,7 +31,7 @@
     "values": []
   }, {
     "key": "title",
-    "values" : ["My project title"]
+    "values" : ["My project の titleです"]
   }, {
     "key": "description",
     "values" : ["My project description. This is a test project for new BioProject submission sysmtem. (< 100)"]
@@ -45,8 +45,11 @@
     "key": "organism",
     "values": ["Homo sapiens"]
   }, {
-    "key": "taxonomy",
+    "key": "taxonomy_id",
     "values": ["9606"]
+  }, {
+    "key": "grant_agency",
+    "values": [""]
   }, {
     "key": "grant_agency",
     "values": [""]
@@ -60,10 +63,13 @@
     "key": "grant_title",
     "values": []
   }, {
-    "key": "link_label",
+    "key": "リンクラベル",
     "values": ["my_label"]
   }, {
     "key": "link_url",
     "values": []
+  }, {
+    "key": "my original field",
+    "values": ["original value"]
   }
 ]

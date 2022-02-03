@@ -48,7 +48,10 @@
     "key": "organism",
     "values": ["Homo sapiens"]
   }, {
-    "key": "taxonomy",
+    "key": "taxonomy_id",
     "values": ["9606"]
+  }, {
+    "key": "pubmed_id",
+    "values": ["1111"]
   }
 ]

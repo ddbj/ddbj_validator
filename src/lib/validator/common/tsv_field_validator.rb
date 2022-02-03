@@ -175,7 +175,7 @@ class TsvFieldValidator
     invalid_list
   end
 
-  # 複数値入力のチェック (同じFieldに複数の値が記載れている場合にエラー、同じfiele名チェックではない)
+  # 複数値入力のチェック (同じFieldに複数の値が記載れている場合にエラー、同じField名チェックではない)
   def multiple_values(data, allow_multiple_values_conf)
     invalid_list = []
     # 同じfieldに値が複数ある場合
@@ -187,14 +187,29 @@ class TsvFieldValidator
         end
       end
     end
-    # 同名fieldが複数ある場合(複数許可項目でもfield名の重複は許さない)
+    invalid_list
+  end
+
+  # 同じfield名が出現しないかのチェック。複数許可項目でもfield名の重複は許さない
+  def duplicated_field_name(data)
+    invalid_list = []
+
     field_name_list = data.select{|row| !is_ignore_line?(row)}.map{|row| row["key"]}
     duplicated_field_name_list = field_name_list.group_by{|f| f }.select { |k, v| v.size > 1 }.map(&:first)
     duplicated_field_name_list.each do |dup_field|
-      duplicated_data = data.select{|row| row["key"] == dup_field}
-      value_list = []
-      duplicated_data.map{|row| value_list.concat(row["values"])}
-      invalid_list.push({field_name: dup_field, value: value_list, row_idx: 0}) # TODO ここが取れない
+      invalid_list.push({field_name: dup_field})
+    end
+    invalid_list
+  end
+
+  # 規定のfield名以外の記述がないかのチェック
+  def not_predefined_field_name(data, predefined_field_name_conf)
+    invalid_list = []
+    data.each_with_index do |row, row_idx|
+      next if is_ignore_line?(row)
+      unless predefined_field_name_conf.include?(row["key"])
+        invalid_list.push({field_name: row["key"]})
+      end
     end
     invalid_list
   end

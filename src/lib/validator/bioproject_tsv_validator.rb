@@ -82,6 +82,10 @@ class BioProjectTsvValidator < ValidatorBase
     # ここでauto-annotationの内容で現行データを置き換える？
     non_ascii_characters("BP_R0060", bp_data)
 
+    # field名チェック
+    not_predefined_field_name("BP_R0064", bp_data, field_settings["predefined_field_name"])
+    duplicated_field_name("BP_R0065", bp_data)
+
     mandatory_field_list = mandatory_field_list(field_settings)
     invalid_value_for_null("BP_R0061", bp_data, mandatory_field_list, field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"])
     null_value_in_optional_field("BP_R0063", bp_data, mandatory_field_list, field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"])
@@ -491,6 +495,54 @@ class BioProjectTsvValidator < ValidatorBase
       ]
       location = {row_idx: invalid[:row_idx], col_idx: invalid[:col_idx]}
       annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0064
+  # 予約されたField名以外の記述がないかのチェック
+  #
+  # ==== Args
+  # data: project data
+  # predefined_field_name_conf: settings of predefined_field_name
+  # ==== Return
+  # true/false
+  #
+  def not_predefined_field_name(rule_code, data, predefined_field_name_conf)
+    result = true
+    invalid_list = @tsv_validator.not_predefined_field_name(data, predefined_field_name_conf)
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: "Field name", value: invalid[:field_name]}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0065
+  # 同じField名が複数回出現しないかのチェック
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def duplicated_field_name(rule_code, data)
+    result = true
+    invalid_list = @tsv_validator.duplicated_field_name(data)
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: "Field name", value: invalid[:field_name]}
+      ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
     end
