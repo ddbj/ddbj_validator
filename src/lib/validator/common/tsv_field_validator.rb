@@ -305,4 +305,28 @@ class TsvFieldValidator
   def is_ignore_line?(row)
     row["key"].nil? || row["key"].chomp.strip == "" || row["key"].chomp.strip.start_with?("#")
   end
+
+  # 指定されたfieledの最初の値を返す。なければnilを返す
+  def field_first_value(data, field_name)
+    value = nil
+    field_lines = data.select{|row| row["key"] == field_name}
+    if field_lines.size > 0
+      unless field_lines.first["values"].nil?
+        value = field_lines.first["values"].first #複数field名記載の場合は最初のFieldを優先
+      end
+    end
+    value
+  end
+
+  # 指定されたfieledの値をリストで返す。なければ空の配列を返す
+  def field_value_list(data, field_name)
+    value_list = []
+    field_lines = data.select{|row| row["key"] == field_name}
+    if field_lines.size > 0
+      unless field_lines.first["values"].nil?
+        value_list = field_lines.first["values"] #複数field名記載の場合は最初のFieldを優先
+      end
+    end
+    value_list
+  end
 end

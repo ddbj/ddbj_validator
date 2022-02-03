@@ -31,7 +31,7 @@
     "values": []
   }, {
     "key": "title",
-    "values" : ["My project の titleです"]
+    "values" : ["My project description. This is a test project for new BioProject submission sysmtem. (< 100)"]
   }, {
     "key": "description",
     "values" : ["My project description. This is a test project for new BioProject submission sysmtem. (< 100)"]
@@ -49,7 +49,7 @@
     "values": ["9606"]
   }, {
     "key": "grant_agency",
-    "values": [""]
+    "values": ["My grand の agency です"]
   }, {
     "key": "grant_agency",
     "values": [""]
@@ -71,5 +71,8 @@
   }, {
     "key": "my original field",
     "values": ["original value"]
+  }, {
+    "key": "umbrella_bioproject_accession",
+    "values": ["PSUB000000"]
   }
 ]

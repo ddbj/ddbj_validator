@@ -32,13 +32,13 @@ class BioProjectTsvValidator < ValidatorBase
     @validation_config = @conf[:validation_config] #need?
     @tsv_validator = TsvFieldValidator.new()
     #@org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
-    #unless @conf[:ddbj_db_config].nil?
-    #  @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-    #  @use_db = true
-    #else
-    #  @db_validator = nil
-    #  @use_db = false
-    #end
+    unless @conf[:ddbj_db_config].nil?
+      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @use_db = true
+    else
+      @db_validator = nil
+      @use_db = false
+    end
   end
 
     #
@@ -105,6 +105,10 @@ class BioProjectTsvValidator < ValidatorBase
     missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "error")
     missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "warning")
 
+    # 個別のfieldの値に対するチェック
+    identical_project_title_and_description("BP_R0005", bp_data)
+    invalid_publication_identifier("BP_R0014", bp_data)
+    invalid_umbrella_project("BP_R0016", bp_data)
   end
   def mandatory_field_list(field_conf)
     mandatory_field_list = []
@@ -123,6 +127,89 @@ class BioProjectTsvValidator < ValidatorBase
       end
     end
     mandatory_field_list
+  end
+
+  #
+  # rule:BP_R0005
+  # titleとdescriptionの完全一致でエラー
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def identical_project_title_and_description(rule_code, data)
+    result = true
+    title_value = @tsv_validator.field_first_value(data, "title")
+    description_value = @tsv_validator.field_first_value(data, "description")
+    if !(CommonUtils.blank?(title_value) || CommonUtils.blank?(description_value)) #どちらかが空白なら比較しない(他でエラーになる)
+      if title_value == description_value # 同値の場合にエラー
+        result = false
+        annotation = [
+          {key: "title value", value: title_value},
+          {key: "description value", value: description_value}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0014
+  # PubmedIDが実在するidかどうかのチェック
+  #
+  # ==== Args
+  # data: project data
+  # ==== Return
+  # true/false
+  #
+  def invalid_publication_identifier(rule_code, data)
+    result = true
+    pubmed_id_list = @tsv_validator.field_value_list(data, "pubmed_id")
+    common = CommonUtils.new
+    pubmed_id_list.each do |pubmed_id|
+      unless CommonUtils.blank?(pubmed_id)
+        unless common.exist_pubmed_id?(pubmed_id)
+          annotation = [
+           {key: "Field name", value: "pubmed_id"},
+           {key: "Value", value: pubmed_id}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result = false
+        end
+      end
+    end
+  end
+
+  #
+  # rule:BP_R0016
+  # 選択された Umbrella BioProject が実在しない、指定されている Umbrella が DDBJ DB に存在すれば OK
+  #
+  # ==== Args
+  # data: project data
+  # ==== Return
+  # true/false
+  #
+  def invalid_umbrella_project(rule_code, data)
+    result = true
+    bioproject_accession = @tsv_validator.field_first_value(data, "umbrella_bioproject_accession")
+    unless CommonUtils.blank?(bioproject_accession)
+      is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
+      if !is_umbrella
+        annotation = [
+         {key: "Project name", value: "None"},
+         {key: "BioProject accession", value: bioproject_accession}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
   end
 
   #

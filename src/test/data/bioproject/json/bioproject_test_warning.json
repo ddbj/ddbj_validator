@@ -59,5 +59,8 @@
   }, {
     "key": "label",
     "values": ["N.A."]
+  }, {
+    "key": "pubmed_id",
+    "values": ["1111", "99999999999"]
   }
 ]
