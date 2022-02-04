@@ -6,9 +6,9 @@ class TsvFieldValidator
   # 推奨されないNULL値表現の揺らぎを補正する。ただしmandatory fieldのみが対象
   def invalid_value_for_null(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
     invalid_list = []
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next unless mandatory_field_list.include?(row["key"]) # ここではmandatory fieldのみ置換する。optional fieldは空白に置換されるため
-      row["values"].each_with_index do |value, col_idx|
+      row["values"].each_with_index do |value, value_idx|
         next if CommonUtils.null_value?(value) # 既に推奨NULL表現
         replace_value = ""
         #推奨されている NULL 値の表記を揃える(小文字表記へ)
@@ -27,7 +27,7 @@ class TsvFieldValidator
           end
         end
         if replace_value != "" #置換値がある
-          invalid_list.push({field_name: row["key"], value: value, replace_value: replace_value, row_idx: row_idx, col_idx: col_idx})
+          invalid_list.push({field_name: row["key"], value: value, replace_value: replace_value, field_idx: field_idx, value_idx: value_idx})
         end
       end
     end
@@ -37,14 +37,14 @@ class TsvFieldValidator
   # NULL値相当が入力されたoptional fieldの値を空白に置換する
   def null_value_in_optional_field(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
     invalid_list = []
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next if mandatory_field_list.include?(row["key"]) # ここではoptional fieldのみ置換する
-      row["values"].each_with_index do |value, col_idx|
+      row["values"].each_with_index do |value, value_idx|
         next if CommonUtils.blank?(value)
         null_accepted_size = null_accepted_list.select{|refexp| value =~ /#{refexp}/i }.size
         null_not_recomm_size = null_not_recommended_list.select {|refexp| value =~ /^(#{refexp})$/i }.size
         if (null_accepted_size + null_not_recomm_size) > 0
-          invalid_list.push({field_name: row["key"], value: value, replace_value: "", row_idx: row_idx, col_idx: col_idx})
+          invalid_list.push({field_name: row["key"], value: value, replace_value: "", field_idx: field_idx, value_idx: value_idx})
         end
       end
     end
@@ -54,9 +54,9 @@ class TsvFieldValidator
   # NULL値の入力を許さない項目のチェック
   def null_value_is_not_allowed(data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list)
     invalid_list = []
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next unless not_allow_null_value_conf.include?(row["key"])
-      row["values"].each_with_index do |value, col_idx|
+      row["values"].each_with_index do |value, value_idx|
         null_accepted_size = null_accepted_list.select{|refexp| value =~ /#{refexp}/i }.size
         null_not_recomm_size = null_not_recommended_list.select {|refexp| value =~ /^(#{refexp})$/i }.size
         if (null_accepted_size + null_not_recomm_size) > 0
@@ -70,16 +70,16 @@ class TsvFieldValidator
   # 不要な空白文字などの除去
   def invalid_data_format(data)
     invalid_list = []
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       replace_value = replace_invalid_data(row["key"])
       if row["key"] != replace_value && !is_ignore_line?(row)
-        invalid_list.push({field_name: row["key"], replace_value: replace_value, row_idx: row_idx})
+        invalid_list.push({field_name: row["key"], replace_value: replace_value, field_idx: field_idx})
       end
       next if row["values"].nil?
-      row["values"].each_with_index do |value, col_idx|
+      row["values"].each_with_index do |value, value_idx|
         replace_value = replace_invalid_data(value)
         if value != replace_value
-          invalid_list.push({field_name: row["key"], value: value, replace_value: replace_value, row_idx: row_idx, col_idx: col_idx})
+          invalid_list.push({field_name: row["key"], value: value, replace_value: replace_value, field_idx: field_idx, value_idx: value_idx})
         end
       end
     end
@@ -89,7 +89,7 @@ class TsvFieldValidator
   # non-ASCIIが含まれていないか
   def non_ascii_characters (data, ignore_field_list=nil)
     invalid_list = []
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next if !ignore_field_list.nil? && ignore_field_list.include?(row["key"]) #除外fieldはスキップ
       unless row["key"].ascii_only? # Field名のチェック
         disp_txt = "" #名前のどこにnon ascii文字があるか示すメッセージを作成
@@ -100,10 +100,10 @@ class TsvFieldValidator
             disp_txt << '[### Non-ASCII character ###]'
           end
         end
-        invalid_list.push({field_name: row["key"],  disp_txt: disp_txt, row_idx: row_idx})
+        invalid_list.push({field_name: row["key"],  disp_txt: disp_txt, field_idx: field_idx})
       end
       next if row["values"].nil?
-      row["values"].each_with_index do |value, col_idx|  # Field値のチェック
+      row["values"].each_with_index do |value, value_idx|  # Field値のチェック
         next if value.ascii_only?
         disp_txt = "" #値のどこにnon ascii文字があるか示すメッセージを作成
         value.each_char do |ch|
@@ -113,7 +113,7 @@ class TsvFieldValidator
             disp_txt << '[### Non-ASCII character ###]'
           end
         end
-        invalid_list.push({field_name: row["key"], value: value, disp_txt: disp_txt, row_idx: row_idx, col_idx: col_idx})
+        invalid_list.push({field_name: row["key"], value: value, disp_txt: disp_txt, field_idx: field_idx, value_idx: value_idx})
       end
     end
     invalid_list
@@ -163,12 +163,12 @@ class TsvFieldValidator
   def invalid_value_for_controlled_terms(data, cv_check_conf)
     invalid_list = []
     cv_check_field = cv_check_conf.group_by{|cv_conf| cv_conf["field_name"]}
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next if cv_check_field[row["key"]].nil? || row["values"].nil?
-      row["values"].each_with_index do |value, col_idx|
+      row["values"].each_with_index do |value, value_idx|
         next if CommonUtils.blank?(value) # is null val?
         unless cv_check_field[row["key"]].first["value_list"].include?(value)
-          invalid_list.push({field_name: row["key"], value: value, row_idx: row_idx})
+          invalid_list.push({field_name: row["key"], value: value, field_idx: field_idx})
         end
       end
     end
@@ -179,11 +179,11 @@ class TsvFieldValidator
   def multiple_values(data, allow_multiple_values_conf)
     invalid_list = []
     # 同じfieldに値が複数ある場合
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next if is_ignore_line?(row) || row["values"].nil?
       if row["values"].size > 1 && !(row["values"][1..-1].uniq.compact == [] || row["values"][1..-1].uniq.compact == [""]) #2つ目以降に有効な値が入っている (空白文字除去？)
         unless allow_multiple_values_conf.include?(row["key"]) #許可されていない
-          invalid_list.push({field_name: row["key"], value: row["values"][0..-1].join(", "), row_idx: row_idx}) #row_idxは0始まり。JSONではそのまま、TSVでは+1で表示
+          invalid_list.push({field_name: row["key"], value: row["values"][0..-1].join(", "), field_idx: field_idx}) #field_idxは0始まり。JSONではそのまま、TSVでは+1で表示
         end
       end
     end
@@ -205,7 +205,7 @@ class TsvFieldValidator
   # 規定のfield名以外の記述がないかのチェック
   def not_predefined_field_name(data, predefined_field_name_conf)
     invalid_list = []
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next if is_ignore_line?(row)
       unless predefined_field_name_conf.include?(row["key"])
         invalid_list.push({field_name: row["key"]})
@@ -218,9 +218,9 @@ class TsvFieldValidator
   def check_field_format(data, field_format_conf)
     invalid_list = []
     field_format = field_format_conf.group_by{|cv_conf| cv_conf["field_name"]}
-    data.each_with_index do |row, row_idx|
+    data.each_with_index do |row, field_idx|
       next if field_format[row["key"]].nil? || row["values"].nil?
-      row["values"].each_with_index do |value, col_idx|
+      row["values"].each_with_index do |value, value_idx|
         next if CommonUtils.blank?(value) # is null val?
         format_conf = field_format[row["key"]].first
         if !format_conf["regex"].nil? # 正規表現によるチェック
@@ -341,13 +341,13 @@ class TsvFieldValidator
     field_lines = []
     data.each_with_index{|row, idx|
       if row["key"] == field_name
-        field_lines.push({row_idx: idx}.merge(row))
+        field_lines.push({field_idx: idx}.merge(row))
       end
     }
     if field_lines.size > 0
       # 常に最初に出てきたfield名が優先で、複数ある場合は無視
       row = field_lines.first
-      value = {row_idx: row[:row_idx], field_name: row["key"]}
+      value = {field_idx: row[:field_idx], field_name: row["key"]}
       if value_index.nil? # value indexの指定がない場合はvalue_listを返す
         if row["values"].nil?
           value[:value_list] = []
@@ -355,7 +355,7 @@ class TsvFieldValidator
           value[:value_list] = row["values"]
         end
       else # value indexの指定がある
-        value[:col_idx] = value_index
+        value[:value_idx] = value_index
         if row["values"].nil?
           value[:value] = nil
         else
@@ -364,5 +364,32 @@ class TsvFieldValidator
       end
     end
     value
+  end
+
+  # autocorrectの記述に沿ってデータの内容を置換する
+  def replace_by_autocorrect(data, error_list, rule_code=nil)
+    error_list = error_list.select{|error| error[:id] == rule_code} unless rule_code.nil?
+    error_list.each do |error|
+      auto_anno_list = error[:annotation].select{|ann| ann[:is_auto_annotation] == true }
+      auto_anno_list.each do |auto_anno|
+        location = auto_anno[:location]
+        suggest_list = auto_anno[:suggested_value]
+        next if suggest_list.nil?
+        suggest_value = suggest_list[0]
+        next if location.nil?
+        if location[:value_idx].nil? # valueの位置が不明なのでfield名の修正
+          if data.size > location[:field_idx]
+            data[location[:field_idx]]["key"] = suggest_value
+          end
+        else
+          if data.size > location[:field_idx]
+            value_list = data[location[:field_idx]]["values"]
+            if value_list.size > location[:value_idx]
+              value_list[location[:value_idx]] = suggest_value
+            end
+          end
+        end
+      end
+    end
   end
 end
