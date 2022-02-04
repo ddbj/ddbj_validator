@@ -31,7 +31,7 @@ class BioProjectTsvValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] #need?
     @tsv_validator = TsvFieldValidator.new()
-    #@org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -109,7 +109,33 @@ class BioProjectTsvValidator < ValidatorBase
     identical_project_title_and_description("BP_R0005", bp_data)
     invalid_publication_identifier("BP_R0014", bp_data)
     invalid_umbrella_project("BP_R0016", bp_data)
+
+    ### organismの検証とtaxonomy_idの確定
+    input_taxid_with_pos =  @tsv_validator.field_value_with_position(bp_data, "taxonomy_id", 0)
+    if input_taxid_with_pos.nil? || CommonUtils::blank?(input_taxid_with_pos[:value]) #taxonomy_idの記述がない
+      taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
+    else
+      taxonomy_id = input_taxid_with_pos[:value]
+    end
+    input_organism_with_pos = @tsv_validator.field_value_with_position(bp_data, "organism", 0)
+    input_organism = input_organism_with_pos.nil? ? nil : input_organism_with_pos[:value]
+    if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
+      taxonomy_name_and_id_not_match("BP_R0038", taxonomy_id, input_organism)
+    else
+      ret = taxonomy_error_warning("BP_R0039", input_organism, input_organism_with_pos, input_taxid_with_pos)
+      if ret == false
+        # organismとtaxonomy_idの補正値を取得
+      end
+    end
+    ### taxonomy_idの値を使う検証
+    if taxonomy_id != OrganismValidator::TAX_INVALID #無効なtax_idでなければ実行
+      sample_scope = @tsv_validator.field_value(bp_data, "sample_scope", 0)
+      taxonomy_at_species_or_infraspecific_rank("BP_R0018", taxonomy_id, input_organism, sample_scope)
+      metagenome_or_environmental("BP_R0020", taxonomy_id, input_organism, sample_scope)
+    end
   end
+
+  # 条件付きを含めて必須になる可能性のある項目リストを返す
   def mandatory_field_list(field_conf)
     mandatory_field_list = []
     field_conf["mandatory_field"].each do |level, field_list|
@@ -141,8 +167,8 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def identical_project_title_and_description(rule_code, data)
     result = true
-    title_value = @tsv_validator.field_first_value(data, "title")
-    description_value = @tsv_validator.field_first_value(data, "description")
+    title_value = @tsv_validator.field_value(data, "title", 0)
+    description_value = @tsv_validator.field_value(data, "description", 0)
     if !(CommonUtils.blank?(title_value) || CommonUtils.blank?(description_value)) #どちらかが空白なら比較しない(他でエラーになる)
       if title_value == description_value # 同値の場合にエラー
         result = false
@@ -196,7 +222,7 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def invalid_umbrella_project(rule_code, data)
     result = true
-    bioproject_accession = @tsv_validator.field_first_value(data, "umbrella_bioproject_accession")
+    bioproject_accession = @tsv_validator.field_value(data, "umbrella_bioproject_accession", 0)
     unless CommonUtils.blank?(bioproject_accession)
       is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
       if !is_umbrella
@@ -210,6 +236,163 @@ class BioProjectTsvValidator < ValidatorBase
       end
     end
     result
+  end
+
+  #
+  # rule:BP_R0018
+  # organismがspecies レベル以下の taxonomy が必須 (multi-species の場合、任意で species レベル以上を許容)
+  # Primary BioProjectの場合と、scope = "multi-species" 以外の場合に適用する
+  # biosample rule: BS_R0096相当
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # taxonomy_id: ex."103690"
+  # organism_name: ex."Nostoc sp. PCC 7120"
+  # sample_scope: sample scope value ex."Monoisolate"
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_at_species_or_infraspecific_rank (rule_code, taxonomy_id, organism_name, sample_scope)
+    return nil if CommonUtils::blank?(sample_scope)
+    result = true
+
+    unless sample_scope.downcase == "multiisolate" # multiの場合は無視
+      if CommonUtils::blank?(organism_name) || CommonUtils::null_value?(organism_name) # organismの記載がない
+        result = false
+        annotation = [
+          {key: "organism", value: organism_name},
+          {key: "sample_scope", value: sample_scope},
+          {key: "Message", value: "When sample_scope is '#{sample_scope}', organism is required."}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      elsif !(CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
+        result = @org_validator.is_infraspecific_rank(taxonomy_id)
+        if result == false
+          annotation = [
+            {key: "organism", value: organism_name},
+            {key: "taxonomy_id", value: taxonomy_id}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0020
+  # organism: sample scope = "environment" の場合は biosample と同様にmetagenome などのチェック
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # taxonomy_id: ex."103690"
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def metagenome_or_environmental (rule_code, taxonomy_id, organism_name, sample_scope)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if CommonUtils::blank?(sample_scope)
+
+    result = true
+    if sample_scope.downcase == "environment"
+      #tax_id がmetagenome配下かどうか
+      linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
+      unless @org_validator.has_linage(taxonomy_id, linages) && !organism_name.nil? && organism_name.end_with?("metagenome")
+        annotation = [
+          {key: "organism", value: organism_name},
+          {key: "taxonomy_id", value: taxonomy_id}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
+    end
+    result
+  end
+
+
+  #
+  # rule:BP_R0038
+  # 指定されたtaxonomy_idに対して生物種名が適切であるかの検証
+  # Taxonomy ontologyのScientific nameとの比較を行う
+  # 一致しなかった場合にはtaxonomy_idを元にorganism_nameの推奨情報をエラーリストに出力する
+  # biosample rule: BS_R0004 相当
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # taxonomy_id: ex."103690"
+  # organism_name: ex."Nostoc sp. PCC 7120"
+  # project_node: a bioproject node object
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_name_and_id_not_match (rule_code, taxonomy_id, organism_name)
+    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    result = true
+    organism_name = "" if CommonUtils::blank?(organism_name)
+    organism_name.chomp.strip!
+    scientific_name = @org_validator.get_organism_name(taxonomy_id)
+    if !scientific_name.nil? && scientific_name == organism_name
+      retuls = true
+    else
+      annotation = [
+        {key: "OrganismName", value: organism_name},
+        {key: "taxID", value: taxonomy_id}
+      ]
+      unless scientific_name.nil?
+        annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0039
+  # 指定された生物種名が、Taxonomy ontologyにScientific nameとして存在するかの検証
+  # biosample rule: BS_R0045 相当
+  #
+  # ==== Args
+  # project_label: project label for error displaying
+  # organism_name: ex."Nostoc sp. PCC 7120"
+  # project_set_node: a bioproject set node object
+  # ==== Return
+  # true/false
+  #
+  def taxonomy_error_warning (rule_code, organism_name, organism_pos, taxid_pos)
+    organism_name = "" if CommonUtils::blank?(organism_name)
+    result = false #このメソッドが呼び出されている時点でfalse
+
+    unless organism_name == ""
+      ret = @org_validator.suggest_taxid_from_name(organism_name)
+    end
+    annotation = [
+      {key: "organism", value: organism_name}
+    ]
+    if ret.nil? # organism name is blank
+      annotation.push({key: "Message", value: "organism is blank"})
+    elsif ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+      scientific_name = ret[:scientific_name]
+      #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+      if scientific_name != organism_name
+        location = {row_idx: organism_pos[:row_idx], col_idx: organism_pos[:col_idx], key_name: "value"}
+        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", location, true));
+      end
+      annotation.push({key: "taxonomy_id", value: ""})
+      location = {row_idx: taxid_pos[:row_idx], col_idx: taxid_pos[:col_idx], key_name: "value"}
+      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
+    elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+      msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
+      annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
+    end #該当するtaxonomy_idが無かった場合は単なるエラー
+    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
+    @error_list.push(error_hash)
+    false
   end
 
   #

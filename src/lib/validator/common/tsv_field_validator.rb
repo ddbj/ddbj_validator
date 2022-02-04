@@ -306,13 +306,25 @@ class TsvFieldValidator
     row["key"].nil? || row["key"].chomp.strip == "" || row["key"].chomp.strip.start_with?("#")
   end
 
-  # 指定されたfieledの最初の値を返す。なければnilを返す
-  def field_first_value(data, field_name)
+  # 指定されたfieledの値を返す。value_indexで指定したFieldの番号を指定できる。指定がなければvalueの配列を返す。fieldの該当がなければnilを返す
+  def field_value(data, field_name, value_index=nil)
     value = nil
     field_lines = data.select{|row| row["key"] == field_name}
     if field_lines.size > 0
-      unless field_lines.first["values"].nil?
-        value = field_lines.first["values"].first #複数field名記載の場合は最初のFieldを優先
+      # 常に最初に出てきたfield名が優先で、複数ある場合は無視
+      row = field_lines.first
+      if value_index.nil? # value indexの指定がない場合はvalue_listを返す
+        if row["values"].nil?
+          value = []
+        else
+          value = row["values"]
+        end
+      else # value indexの指定がある
+        if row["values"].nil?
+          value = nil
+        else
+          value = row["values"][value_index]
+        end
       end
     end
     value
@@ -320,13 +332,37 @@ class TsvFieldValidator
 
   # 指定されたfieledの値をリストで返す。なければ空の配列を返す
   def field_value_list(data, field_name)
-    value_list = []
-    field_lines = data.select{|row| row["key"] == field_name}
+    field_value(data, field_name, nil)
+  end
+
+  # 指定されたfieledの値をPositio付きで返す。value_indexで指定したFieldの番号を指定できる。指定がなければvalueの配列を返す。fieldの該当がなければnilを返す
+  def field_value_with_position(data, field_name, value_index=nil)
+    value = nil
+    field_lines = []
+    data.each_with_index{|row, idx|
+      if row["key"] == field_name
+        field_lines.push({row_idx: idx}.merge(row))
+      end
+    }
     if field_lines.size > 0
-      unless field_lines.first["values"].nil?
-        value_list = field_lines.first["values"] #複数field名記載の場合は最初のFieldを優先
+      # 常に最初に出てきたfield名が優先で、複数ある場合は無視
+      row = field_lines.first
+      value = {row_idx: row[:row_idx], field_name: row["key"]}
+      if value_index.nil? # value indexの指定がない場合はvalue_listを返す
+        if row["values"].nil?
+          value[:value_list] = []
+        else
+          value[:value_list] = row["values"]
+        end
+      else # value indexの指定がある
+        value[:col_idx] = value_index
+        if row["values"].nil?
+          value[:value] = nil
+        else
+          value[:value] = row["values"][value_index]
+        end
       end
     end
-    value_list
+    value
   end
 end
