@@ -3,8 +3,40 @@ class TsvFieldValidator
   def initialize
   end
 
-  def tsv2ojb(file_data)
-   # tsv_headers = CSV.parse_line(file_data, col_sep: "\t")
+  # TSVの配列データをkey-valuesの配列に変換して返す
+  def tsv2ojb(tsv_data)
+    data_list = []
+    # 末尾のnilのみの行は削除
+    row_delete_flag = true
+    tsv_data.reverse_each do |row|
+      if row.compact.uniq == [] && row_delete_flag == true
+        tsv_data.pop
+      else
+        row_delete_flag = false # 途中の空行は保持する
+        row.reverse_each do |cell| #行末尾のnilも削除する
+          if cell.nil?
+            row.pop
+          else #中間のnilは保持する
+            break
+          end
+        end
+      end
+    end
+    tsv_data.each do |row|
+      data = {"key" => nil, "values" => []}
+      if row.size == 0 || row[0].nil?
+        data["key"] = ""
+      else
+        data["key"] = row[0]
+      end
+      if row.size >= 2
+        data["values"] = row[1..-1]
+      else
+        data["values"] = []
+      end
+      data_list.push(data)
+    end
+    data_list
   end
 
   # keyがない場所にvalueが記載されている

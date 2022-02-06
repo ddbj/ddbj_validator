@@ -12,6 +12,7 @@ require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/common/organism_validator.rb"
 require File.dirname(__FILE__) + "/common/tsv_field_validator.rb"
+require File.dirname(__FILE__) + "/common/file_parser.rb"
 
 #
 # A class for BioProject validation
@@ -75,20 +76,17 @@ class BioProjectTsvValidator < ValidatorBase
     @data_file = File::basename(data_file)
     field_settings = @conf[:field_settings]
 
-    file_data = File.read(data_file) # 重いファイルの場合は方法を再検討する
-    @data_format = CommonUtils::get_file_format(file_data)
+    file_content = FileParser.new.get_file_data(data_file)
+    @data_format = file_content[:format]
     ret = invalid_file_format("BP_R0068", @data_format)
     return if ret == false #ファイルが読めなければvalidationは中止
 
     if @data_format == "json"
-      bp_data = JSON.parse(file_data)
+      bp_data = file_content[:data]
       ret = invalid_json_structure("BP_R0067", bp_data, @json_schema)
       return if ret == false #スキーマNGの場合はvalidationは中止
     elsif @data_format == "tsv"
-      bp_data = @tsv_validator.tsv2ojb(file_data)
-      return if bp_data.nil?
-      ret = invalid_json_structure("BP_R0067", bp_data, @json_schema) #必要？
-      return if ret == false #スキーマNGの場合はvalidationは中止
+      bp_data = @tsv_validator.tsv2ojb(file_content[:data])
     else
       invalid_file_format("BP_R0068", @data_format)
       return
