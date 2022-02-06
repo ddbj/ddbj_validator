@@ -31,7 +31,7 @@
     "values": []
   }, {
     "key": "# Project info",
-    "values": []
+    "values": ["has comment value"]
   }, {
     "key": "title",
     "values" : ["\"My project   title\""]
@@ -51,7 +51,7 @@
     "key": "taxonomy_id",
     "values": ["9606"]
   }, {
-    "key": "grant_title",
+    "key": "\"grant_title\"",
     "values": ["NA", "Unknown"]
   }, {
     "key": "grant_agency",

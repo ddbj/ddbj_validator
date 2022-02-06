@@ -3,6 +3,29 @@ class TsvFieldValidator
   def initialize
   end
 
+  def tsv2ojb(file_data)
+   # tsv_headers = CSV.parse_line(file_data, col_sep: "\t")
+  end
+
+  # keyがない場所にvalueが記載されている
+  def invalid_value_input(data, mode=nil)
+    invalid_list = []
+    data.each_with_index do |row, field_idx|
+      if CommonUtils.blank?(row["key"]) || row["key"].start_with?("#")
+        next if row["values"].nil?
+        value_list = row["values"].uniq.compact
+        unless (value_list == [] || value_list == [""])
+          if mode == "comment_line" && row["key"].start_with?("#")
+            invalid_list.push({field_name: row["key"], value: row["values"].to_s, field_idx: field_idx})
+          elsif (mode.nil? || mode == "") && CommonUtils.blank?(row["key"])
+            invalid_list.push({field_name: "", value: row["values"].to_s, field_idx: field_idx})
+          end
+        end
+      end
+    end
+    invalid_list
+  end
+
   # 推奨されないNULL値表現の揺らぎを補正する。ただしmandatory fieldのみが対象
   def invalid_value_for_null(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
     invalid_list = []

@@ -6,6 +6,7 @@ require 'geocoder'
 require 'date'
 require 'net/http'
 require 'nokogiri'
+require 'json-schema'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
@@ -30,6 +31,7 @@ class BioProjectTsvValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] #need?
+    @json_schema = JSON.parse(File.read(File.absolute_path(File.dirname(__FILE__) + "/../../conf/bioproject/schema.json")))
     @tsv_validator = TsvFieldValidator.new()
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     unless @conf[:ddbj_db_config].nil?
@@ -69,13 +71,33 @@ class BioProjectTsvValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data, submitter_id=nil)
-    @data_file = File::basename(data)
-    bp_data = JSON.parse(File.read(data))
+  def validate (data_file, submitter_id=nil)
+    @data_file = File::basename(data_file)
     field_settings = @conf[:field_settings]
-    ## JSONかのチェック
 
-    ## TSVかのチェック
+    file_data = File.read(data_file) # 重いファイルの場合は方法を再検討する
+    @data_format = CommonUtils::get_file_format(file_data)
+    ret = invalid_file_format("BP_R0068", @data_format)
+    return if ret == false #ファイルが読めなければvalidationは中止
+
+    if @data_format == "json"
+      bp_data = JSON.parse(file_data)
+      ret = invalid_json_structure("BP_R0067", bp_data, @json_schema)
+      return if ret == false #スキーマNGの場合はvalidationは中止
+    elsif @data_format == "tsv"
+      bp_data = @tsv_validator.tsv2ojb(file_data)
+      return if bp_data.nil?
+      ret = invalid_json_structure("BP_R0067", bp_data, @json_schema) #必要？
+      return if ret == false #スキーマNGの場合はvalidationは中止
+    else
+      invalid_file_format("BP_R0068", @data_format)
+      return
+    end
+
+
+    # 余分な記述のチェック
+    missing_field_name("BP_R0062", bp_data)
+    value_in_comment_line("BP_R0066", bp_data)
 
     ## 細かいデータの修正
     ret = invalid_data_format("BP_R0059", bp_data)
@@ -206,6 +228,7 @@ class BioProjectTsvValidator < ValidatorBase
   def invalid_publication_identifier(rule_code, data)
     result = true
     pubmed_id_list = @tsv_validator.field_value_list(data, "pubmed_id")
+    return true if pubmed_id_list.nil?
     common = CommonUtils.new
     pubmed_id_list.each do |pubmed_id|
       unless CommonUtils.blank?(pubmed_id)
@@ -754,6 +777,36 @@ class BioProjectTsvValidator < ValidatorBase
   end
 
   #
+  # rule:BP_R0062
+  # Field名はないがField値の記載がある行のチェック
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def missing_field_name(rule_code, data)
+    result = true
+    invalid_list = @tsv_validator.invalid_value_input(data)
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: "Field name", value: invalid[:field_name]},
+        {key: "Values", value: invalid[:value]},
+      ]
+      if @file_format == "tsv"
+        annotation.push( {key: "Potision", value: "Row number: [#{invalid[:field_idx]+1}]"})
+      elsif @file_format == "json"
+        annotation.push( {key: "Potision", value: invalid[:field_idx]})
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
   # rule:BP_R0063
   # 必須ではない項目のnull値を空白に置換。
   # "必須ではない"の定義をどうするか。必須系を全て足す？mandatory_field + mandatory_fields_in_a_group + selective_mandatory
@@ -829,4 +882,86 @@ class BioProjectTsvValidator < ValidatorBase
     end
     result
   end
+
+  #
+  # rule:BP_R0066
+  # コメント行にField値の記載がある行のチェック
+  #
+  # ==== Args
+  # data: project data
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def value_in_comment_line(rule_code, data)
+    result = true
+    invalid_list = @tsv_validator.invalid_value_input(data, "comment_line")
+    result = false unless invalid_list.size == 0
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: "Field name", value: invalid[:field_name]},
+        {key: "Values", value: invalid[:value]},
+      ]
+      if @file_format == "tsv"
+        annotation.push( {key: "Potision", value: "Row number: [#{invalid[:field_idx]+1}]"})
+      elsif @file_format == "json"
+        annotation.push( {key: "Potision", value: invalid[:field_idx]})
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0067
+  # JSON Schemaに合致するか
+  #
+  # ==== Args
+  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def invalid_json_structure(rule_code, json_data, schema_json_data)
+    result = true
+    begin
+      invalid_list = JSON::Validator.fully_validate(schema_json_data, json_data)
+      if invalid_list.size > 0
+        result = false
+        invalid_list.each do |invalid|
+          annotation = [
+            {key: "Message", value: invalid}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # rule:BP_R0068
+  # 取り扱えるデータフォーマットかどうか
+  #
+  # ==== Args
+  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
+  # level: error level (error or warning)
+  # ==== Return
+  # true/false
+  #
+  def invalid_file_format(rule_code, file_format)
+    result = true
+    if !(file_format == "json" || file_format == "tsv")
+      result = false
+      annotation = [
+        {key: "Message", value: "Failed to read the file as JSON or TSV"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
 end

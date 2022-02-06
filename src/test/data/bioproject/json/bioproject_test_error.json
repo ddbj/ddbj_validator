@@ -27,6 +27,9 @@
     "key": "",
     "values": []
   }, {
+    "key": "",
+    "values": ["missing header"]
+  }, {
     "key": "# Project info",
     "values": []
   }, {
