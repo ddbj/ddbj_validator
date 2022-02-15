@@ -161,10 +161,10 @@ class Package < SPARQLBase
           attr_list.each do |row|
             match = group_list.find{|group| group[:attribute_name] == row[:attribute_name]}
             unless match.nil?
-              row["require_type"] = "has_either_one_mandatory_attribute"
-              row["group_name"] = match[:group_name]
+              row[:require_type] = "has_either_one_mandatory_attribute"
+              row[:group_name] = match[:group_name]
             else
-              row["group_name"] = ""
+              row[:group_name] = ""
             end
           end
         end
