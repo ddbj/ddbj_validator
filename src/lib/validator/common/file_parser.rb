@@ -86,23 +86,23 @@ class FileParser
     message = nil
 
     begin
-      tsv_data = CSV.read(file_path, col_sep: col_sep)
+      tsv_data = CSV.read(file_path, encoding: "UTF-8:UTF-8", col_sep: col_sep)
     rescue => ex1
-      if ex1.message.include?("Invalid byte sequence") || ex1.message.include?("Unquoted fields do not allow") # encodeか改行文字関連のエラー
+      if ex1.message.downcase.include?("invalid byte sequence") || ex1.message.downcase.include?("unquoted fields do not allow") # encodeか改行文字関連のエラー
         encoding = "CP932:UTF-8"
         encoding = "UTF-16:UTF-8" if  NKF.guess(File.read(file_path)).to_s.downcase == "utf-16"
         begin
           tsv_data = CSV.read(file_path, encoding: encoding, col_sep: col_sep, row_sep: "\r\n")
         rescue => ex2
           @log.warn("Fail to parse a file as TSV file. Invalid encoding or newline char.")
-          @log.warn(ex.message)
-          trace = ex.backtrace.map {|row| row}.join("\n")
+          @log.warn(ex2.message)
+          trace = ex2.backtrace.map {|row| row}.join("\n")
           @log.warn(trace)
         end
       else #文字コードに関係ないエラー
         @log.warn("Fail to parse a file as TSV file.")
-        @log.warn(ex.message)
-        trace = ex.backtrace.map {|row| row}.join("\n")
+        @log.warn(ex1.message)
+        trace = ex1.backtrace.map {|row| row}.join("\n")
         @log.warn(trace)
         message = ex1.message
       end
