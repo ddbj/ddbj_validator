@@ -15,6 +15,10 @@
             $('input[id=trad_seq]').click();
         } else if (clicked === 'trad_agp_file_select') {
             $('input[id=trad_agp]').click();
+        } else if (clicked === 'metabobank_idf_file_select') {
+            $('input[id=metabobank_idf]').click();
+        } else if (clicked === 'metabobank_sdrf_file_select') {
+            $('input[id=metabobank_sdrf]').click();
         }
     });
 
@@ -33,6 +37,10 @@
                 $('#trad_seq_file_name').val(output_f);
             } else if (changed === 'trad_agp') {
                 $('#trad_agp_file_name').val(output_f);
+            } else if (changed === 'metabobank_idf') {
+                $('#metabobank_idf_file_name').val(output_f);
+            } else if (changed === 'metabobank_sdrf') {
+                $('#metabobank_sdrf_file_name').val(output_f);
             }
         }
     });

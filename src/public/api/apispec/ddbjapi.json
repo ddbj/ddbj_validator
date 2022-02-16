@@ -64,6 +64,12 @@
             "$ref": "#/parameters/trad_agp"
           },
           {
+            "$ref": "#/parameters/metabobank_idf"
+          },
+          {
+            "$ref": "#/parameters/metabobank_sdrf"
+          },
+          {
             "$ref": "#/parameters/submitter_id"
           }
         ],
@@ -421,6 +427,20 @@
       "required": false,
       "type": "file"
     },
+    "metabobank_idf": {
+      "name": "metabobank_idf",
+      "in": "formData",
+      "description": "Upload Metabobank IDF file.",
+      "required": false,
+      "type": "file"
+    },
+    "metabobank_sddf": {
+      "name": "metabobank_sdrf",
+      "in": "formData",
+      "description": "Upload Metabobank SDRF file.",
+      "required": false,
+      "type": "file"
+    },
     "submitter_id": {
       "name": "submitter_id",
       "in": "formData",
@@ -438,7 +458,7 @@
     "filetype": {
       "name": "filetype",
       "in": "path",
-      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf, trad_anno, trad_seq, trad_agp",
+      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf, trad_anno, trad_seq, trad_agp, metabobank_idf, metabobank_sdrf",
       "required": true,
       "type": "string"
     },
