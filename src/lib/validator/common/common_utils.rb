@@ -207,7 +207,7 @@ class CommonUtils
   # true/false
   #
   def self.blank?(value)
-    if value.nil? || value.strip.empty?
+    if value.nil? || value.to_s.strip.empty?
       true
     else
       false
@@ -224,7 +224,7 @@ class CommonUtils
   # true/false
   #
   def self.null_value?(value)
-    if value.nil? || value.strip.empty? || @@null_accepted.include?(value)
+    if value.nil? || value.to_s.strip.empty? || @@null_accepted.include?(value)
       true
     else
       false
@@ -511,8 +511,8 @@ class CommonUtils
   #
   def exist_pubmed_id? (pubmed_id)
     return nil if pubmed_id.nil?
-    return false unless pubmed_id.strip.chomp =~ /^[0-9]+$/
-    exist_in_medline?(pubmed_id.strip.chomp )
+    return false unless pubmed_id.to_s.strip.chomp =~ /^[0-9]+$/
+    exist_in_medline?(pubmed_id.to_s.strip.chomp )
   end
 
   #

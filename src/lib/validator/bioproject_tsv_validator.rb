@@ -230,7 +230,7 @@ class BioProjectTsvValidator < ValidatorBase
     common = CommonUtils.new
     pubmed_id_list.each do |pubmed_id|
       unless CommonUtils.blank?(pubmed_id)
-        unless common.exist_pubmed_id?(pubmed_id)
+        unless common.exist_pubmed_id?(pubmed_id.to_s)
           annotation = [
            {key: "Field name", value: "pubmed_id"},
            {key: "Value", value: pubmed_id}
@@ -241,6 +241,7 @@ class BioProjectTsvValidator < ValidatorBase
         end
       end
     end
+    result
   end
 
   #
