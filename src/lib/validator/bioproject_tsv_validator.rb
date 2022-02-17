@@ -293,7 +293,7 @@ class BioProjectTsvValidator < ValidatorBase
       if CommonUtils::blank?(organism_name) || CommonUtils::null_value?(organism_name) # organismの記載がない
         result = false
         annotation = [
-          {key: "organism", value: organism_name},
+          {key: "organism", value: ""},
           {key: "sample_scope", value: sample_scope},
           {key: "Message", value: "When sample_scope is '#{sample_scope}', organism is required."}
         ]
@@ -364,6 +364,7 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def taxonomy_name_and_id_not_match (rule_code, taxonomy_id, organism_name)
     return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if (CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID) && CommonUtils::blank?(organism_name) # BPの場合はorganism nameは必須でない(Multiisolateの場合)のでtax_id共にnilならチェックしない
     result = true
     organism_name = "" if CommonUtils::blank?(organism_name)
     organism_name.chomp.strip!

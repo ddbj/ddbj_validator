@@ -35,6 +35,30 @@ class TestBioProjectValidator < Minitest::Test
     {result: ret, error_list: error_list}
   end
 
+  #
+  # 指定されたエラーリストの最初のauto-annotationの値を返す
+  #
+  # ==== Args
+  # error_list
+  # anno_index index of annotation ex. 0
+  #
+  # ==== Return
+  # An array of all suggest values
+  #
+  def get_auto_annotation (error_list)
+    if error_list.size <= 0 || error_list[0][:annotation].nil?
+      nil
+    else
+      ret = nil
+      error_list[0][:annotation].each do |annotation|
+       if annotation[:is_auto_annotation] == true
+         ret = annotation[:suggested_value].first
+       end
+      end
+      ret
+    end
+  end
+
   # BP_R0004
   def test_duplicated_project_title_and_description
     # 未実装ルール
@@ -109,17 +133,88 @@ class TestBioProjectValidator < Minitest::Test
   # BP_R0018
   def test_taxonomy_at_species_or_infraspecific_rank
     #ok case
-    data = [{"key" => "sample_scope", "values" => []}]
-   # ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0016", data)
-    #assert_equal true, ret[:result]
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "562", "Escherichia coli", "Monoisolate")
+    assert_equal true, ret[:result]
+    #ok case (multiisolateはspecies rankでなくてもOK)
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "561", "Escherichia", "Multiisolate")
+    assert_equal true, ret[:result]
+    #ng case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "561", "Escherichia", "Monoisolate")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #ng case organism is blank
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", "562", "", "Monoisolate")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #ng case tax_id is blank
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0018", nil, "", "Monoisolate")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #nil case
+    ret = exec_validator("taxonomy_at_species_or_infraspecific_rank", "BP_R0016", "562", "Escherichia coli", nil)
+    assert_nil ret[:result]
   end
 
   # BP_R0020
   def test_metagenome_or_environmental
+    #ok case
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "410658", "soil metagenome", "Environment")
+    assert_equal true, ret[:result]
+    #ok case not environment sample scope
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "562", "Escherichia coli", "Monoisolate")
+    assert_equal true, ret[:result]
+    #ng case
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "562", "Escherichia coli", "Environment")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #nil case
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", "562", "Escherichia coli", nil)
+    assert_nil ret[:result]
+    ret = exec_validator("metagenome_or_environmental", "BP_R0020", OrganismValidator::TAX_INVALID, "hoge", "Environment")
+    assert_nil ret[:result]
   end
 
   # BP_R0038
   def test_taxonomy_name_and_id_not_match
+    #ok case
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "103690", "Nostoc sp. PCC 7120 = FACHB-418")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##tax_id=1
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "1", "root")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ##exist tax_id
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "103690", "Not exist taxonomy name")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil  get_auto_annotation(ret[:error_list])
+    ##not exist tax_id
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "999999999", "Not exist taxonomy name")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil  get_auto_annotation(ret[:error_list])
+    ##not exist tax_id
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "103690", "Escherichia coli")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list])
+    ##organism is nil
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "103690", nil)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #params are nil pattern
+    ##tax_id is nil
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", nil, "Escherichia coli")
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##organism and tax_id is null
+    ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", nil, nil)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   # BP_R0039
@@ -167,7 +262,6 @@ class TestBioProjectValidator < Minitest::Test
     #ng case
     data = [{"key" => "title", "values" => ["ノンアスキー文字"]}, {"key" => "ノンアスキー", "values" => ["key is non ascii char"]} ]
     ret = exec_validator("non_ascii_characters", "BP_R0060", data)
-    puts JSON.pretty_generate(ret)
     assert_equal 2, ret[:error_list].size
   end
 
