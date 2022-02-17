@@ -298,6 +298,8 @@ class BioSampleValidator < ValidatorBase
             specimen_voucher_for_bacteria_and_unclassified_sequences("BS_R0115", sample_name, attr["specimen_voucher"], taxonomy_id, line_num)
           end
         end
+      else # taxonomy_idが確定できなかった場合に行う検証
+        cov2_package_versus_organism("BS_R0048", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
       end
       invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
 
@@ -2853,6 +2855,45 @@ class BioSampleValidator < ValidatorBase
           location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_idx)
         end
         annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true))
+      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:120, 121
+  # 生物種(TaxonomyID)が判定できなかった場合に呼び出され、COVID関係のパッケージであればエラーとする。
+  # 他のパッケージと異なり新規生物種登録はないので確実にerrorを返す為のルール
+  #
+  # ==== Args
+  # rule_code
+  # package_name ex."SARS-CoV-2.cl"
+  # organism ex."Unknown message"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def cov2_package_versus_organism (rule_code, sample_name, package_name, organism, line_num)
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::blank?(organism)
+    ret = true
+    if package_name.downcase.start_with?("sars-cov-2.") # SARS-CoV-2.clとSARS-CoV-2.wwsurvの場合だけエラーにする
+      ret = false
+      #パッケージに適したルールのエラーメッセージを取得
+      message = ""
+      if package_name.downcase == ("sars-cov-2.cl")
+        message = CommonUtils::error_msg(@validation_config, "BS_R0120", nil)
+      elsif package_name.downcase == ("sars-cov-2.wwsurv")
+        message = CommonUtils::error_msg(@validation_config, "BS_R0121", nil)
+      end
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "organism", value: organism},
+        {key: "package", value: package_name},
+      ]
+      unless message == ""
+        annotation.push({key: "Message", value: message})
       end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)

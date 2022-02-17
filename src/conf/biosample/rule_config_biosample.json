@@ -344,7 +344,7 @@
     "internal_ignore": true,
     "name": "Package versus Organism",
     "method": "package_versus_organism",
-    "message": "Organism is inappropriate for package. Please either specify a different sample type package or edit the organism according to the 'Appropriate organism and package' rules described at ",
+    "message": "Organism is inappropriate for package. Please either specify a different sample type package or edit the organism according to the package_vs_organism rules.",
     "object": [
       "BioSample"
     ],

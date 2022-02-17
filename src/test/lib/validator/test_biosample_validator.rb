@@ -1816,4 +1816,25 @@ jkl\"  "
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "ANDES:T:aaa:CS22676", institution_list, 1) # 3 colons invalid format
     assert_nil ret[:result]
   end
+
+  def test_cov2_package_versus_organism
+    #ok case
+    ret = exec_validator("cov2_package_versus_organism", "BS_R0048", "SampleA", "MIGS.ba.microbial", "Nostoc sp. PCC 7120 = FACHB-418", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ret = exec_validator("cov2_package_versus_organism", "BS_R0048", "SampleA", "SARS-CoV-2.cl", "hoge", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ret = exec_validator("cov2_package_versus_organism", "BS_R0048", "SampleA", "SARS-CoV-2.wwsurv", "fuga", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #params are nil pattern
+    ret = exec_validator("cov2_package_versus_organism", "BS_R0048", "SampleA", "SARS-CoV-2.wwsurv", "", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("cov2_package_versus_organism", "BS_R0048", "SampleA", nil, "Severe acute respiratory syndrome coronavirus 2", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
 end
