@@ -54,7 +54,7 @@ class BioProjectTsvValidator < ValidatorBase
   def read_config (config_file_dir)
     config = {}
     begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_bioproject.json")) #TODO auto update when genereted
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_bioproject.json"))
       config[:field_settings] = JSON.parse(File.read(config_file_dir + "/field_settings.json"))
       config
     rescue => ex
@@ -869,7 +869,10 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def not_predefined_field_name(rule_code, data, predefined_field_name_conf)
     result = true
-    invalid_list = @tsv_validator.not_predefined_field_name(data, predefined_field_name_conf)
+    invalid_list = []
+    unless predefined_field_name_conf.nil?
+      invalid_list = @tsv_validator.not_predefined_field_name(data, predefined_field_name_conf)
+    end
     result = false unless invalid_list.size == 0
     invalid_list.each do |invalid|
       annotation = [

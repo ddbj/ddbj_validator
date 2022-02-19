@@ -630,6 +630,23 @@ class TestBioProjectValidator < Minitest::Test
 
   # BP_R0059
   def test_invalid_data_format
+    # ok case
+    data = [{"key" => "title", "values" => ["normal value"]}]
+    ret = exec_validator("invalid_data_format", "BP_R0059", data)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    data = [{"key" => "title", "values" => [" multi    space "]}]
+    ret = exec_validator("invalid_data_format", "BP_R0059", data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "multi space", get_auto_annotation(ret[:error_list])
+    ## quotation
+    data = [{"key" => "title", "values" => ["\" quotation \""]}]
+    ret = exec_validator("invalid_data_format", "BP_R0059", data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "quotation", get_auto_annotation(ret[:error_list])
   end
 
   # BP_R0060
@@ -639,6 +656,9 @@ class TestBioProjectValidator < Minitest::Test
     ret = exec_validator("non_ascii_characters", "BP_R0060", data)
     assert_equal true, ret[:result]
     #ng case
+    data = [{"key" => "title", "values" => ["℃"]} ]
+    ret = exec_validator("non_ascii_characters", "BP_R0060", data)
+    assert_equal 1, ret[:error_list].size
     data = [{"key" => "title", "values" => ["ノンアスキー文字"]}, {"key" => "ノンアスキー", "values" => ["key is non ascii char"]} ]
     ret = exec_validator("non_ascii_characters", "BP_R0060", data)
     assert_equal 2, ret[:error_list].size
@@ -646,34 +666,150 @@ class TestBioProjectValidator < Minitest::Test
 
   # BP_R0061
   def test_invalid_value_for_null
+    null_accepted_list = ["not applicable", "not collected", "not provided", "missing", "restricted access"]
+    null_not_recommended_list = ["NA", "N\/A", "N\\. ?A\\.?", "Unknown", "\\.", "\\-"]
+    mandatory_field_list = ["last_name", "title"]
+
+    #ok case
+    data = [{"key" => "last_name", "values" => ["my name"]}, {"key" => "title", "values" => ["my title"]}]
+    ret = exec_validator("invalid_value_for_null", "BP_R0061", data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##not mandatory field  optionalの項目は空白に置換するのでここでは無視する
+    data = [{"key" => "pubmed_id", "values" => ["NA"]}, {"key" => "link_url", "values" => ["."]}]
+    ret = exec_validator("invalid_value_for_null", "BP_R0061", data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    data = [{"key" => "last_name", "values" => ["na"]}, {"key" => "title", "values" => ["n/a", "-"]}]
+    ret = exec_validator("invalid_value_for_null", "BP_R0061", data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    assert_equal false, ret[:result]
+    assert_equal 3, ret[:error_list].size
+
   end
 
   # BP_R0062
   def test_missing_field_name
+    #ok case
+    data = [{"key" => "title", "values" => ["my title"]}]
+    ret = exec_validator("missing_field_name", "BP_R0062", data)
+    assert_equal true, ret[:result]
+    #ng case
+    data = [{"key" => "", "values" => ["non field name value"]}]
+    ret = exec_validator("missing_field_name", "BP_R0062", data)
+    assert_equal false, ret[:result]
+    data = [{"key" => nil, "values" => ["non field name value", "non field name value2"]}]
+    ret = exec_validator("missing_field_name", "BP_R0062", data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # BP_R0063
   def test_null_value_in_optional_field
+    null_accepted_list = ["not applicable", "not collected", "not provided", "missing", "restricted access"]
+    null_not_recommended_list = ["NA", "N\/A", "N\\. ?A\\.?", "Unknown", "\\.", "\\-"]
+    mandatory_field_list = ["last_name", "title"]
+
+    #ok case
+    data = [{"key" => "pubmed_id", "values" => ["11111"]}, {"key" => "link_url", "values" => ["http://example.com"]}]
+    ret = exec_validator("null_value_in_optional_field", "BP_R0063", data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## mandatory field  必須項目は無視する
+    data = [{"key" => "last_name", "values" => ["NA"]}, {"key" => "title", "values" => ["."]}]
+    ret = exec_validator("null_value_in_optional_field", "BP_R0063", data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    data = [{"key" => "pubmed_id", "values" => ["missing"]}, {"key" => "link_url", "values" => ["n/a", "-"]}]
+    ret = exec_validator("null_value_in_optional_field", "BP_R0063", data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    assert_equal false, ret[:result]
+    assert_equal 3, ret[:error_list].size
   end
 
   # BP_R0064
   def test_not_predefined_field_name
+    #ok case
+    predefined_field_name_conf = ["first_name", "middle_name", "last_name"]
+    data = [{"key" => "first_name", "values" => ["my Name"]}]
+    ret = exec_validator("not_predefined_field_name", "BP_R0064", data, predefined_field_name_conf)
+    assert_equal true, ret[:result]
+    ## ignore blank field value
+    data = [{"key" => "", "values" => ["my Name"]}]
+    ret = exec_validator("not_predefined_field_name", "BP_R0064", data, predefined_field_name_conf)
+    assert_equal true, ret[:result]
+    #ng case
+    data = [{"key" => "non_predef_name", "values" => ["my Name"]}]
+    ret = exec_validator("not_predefined_field_name", "BP_R0064", data, predefined_field_name_conf)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # BP_R0065
   def test_duplicated_field_name
+    #ok case
+    data = [{"key" => "first_name", "values" => ["my Name"]}]
+    ret = exec_validator("duplicated_field_name", "BP_R0065", data)
+    assert_equal true, ret[:result]
+    #ng case
+    data = [{"key" => "first_name", "values" => ["my Name"]}, {"key" => "first_name", "values" => ["my Name2"]}]
+    ret = exec_validator("duplicated_field_name", "BP_R0065", data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## Even if blank value
+    data = [{"key" => "first_name", "values" => [""]}, {"key" => "first_name", "values" => [nil]}]
+    ret = exec_validator("duplicated_field_name", "BP_R0065", data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multi duplicate
+    data = [{"key" => "first_name", "values" => ["my Name"]}, {"key" => "first_name", "values" => ["my Name2"]},
+            {"key" => "last_name", "values" => ["my Name"]}, {"key" => "last_name", "values" => ["my Name2"]}]
+    ret = exec_validator("duplicated_field_name", "BP_R0065", data)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
   end
 
   # BP_R0066
   def test_value_in_comment_line
+    #ok case
+    data = [{"key" => "#Comment", "values" => [nil]}]
+    ret = exec_validator("value_in_comment_line", "BP_R0065", data)
+    assert_equal true, ret[:result]
+    #blank value
+    data = [{"key" => "#Comment", "values" => [""]}]
+    ret = exec_validator("value_in_comment_line", "BP_R0065", data)
+    assert_equal true, ret[:result]
+    #ng case
+    data = [{"key" => "#Comment", "values" => ["comment"]}]
+    ret = exec_validator("value_in_comment_line", "BP_R0065", data)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # BP_R0067
   def test_invalid_json_structure
+    json_schema = JSON.parse(File.read(File.absolute_path(File.dirname(__FILE__) + "/../../../conf/bioproject/schema.json")))
+    #ok case
+    data = [{"key" => "first_name", "values" => ["my Name"]}]
+    ret = exec_validator("invalid_json_structure", "BP_R0067", data, json_schema)
+    assert_equal true, ret[:result]
+    #ng case
+    data = [{"key" => "first_name", "values" => "my Name"}] # value is not array
+    ret = exec_validator("invalid_json_structure", "BP_R0067", data, json_schema)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # BP_R0068
   def test_invalid_file_format
+    #ok case
+    ret = exec_validator("invalid_file_format", "BP_R0068", "tsv")
+    assert_equal true, ret[:result]
+    ret = exec_validator("invalid_file_format", "BP_R0068", "json")
+    assert_equal true, ret[:result]
+    #ng case
+    ret = exec_validator("invalid_file_format", "BP_R0068", "csv")
+    assert_equal false, ret[:result]
   end
 
 end
