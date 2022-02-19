@@ -149,7 +149,7 @@ class BioProjectTsvValidator < ValidatorBase
     if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
       taxonomy_name_and_id_not_match("BP_R0038", taxonomy_id, input_organism)
     else
-      ret = taxonomy_error_warning("BP_R0039", input_organism, input_organism_with_pos, input_taxid_with_pos)
+      ret = taxonomy_error_warning("BP_R0039", input_organism_with_pos, input_taxid_with_pos)
       if ret == false # autocorrectがあれば置換して、置換後のtaxidとorganismを取得する
         @tsv_validator.replace_by_autocorrect(bp_data, @error_list, "BP_R0039")
         input_taxid_with_pos =  @tsv_validator.field_value_with_position(bp_data, "taxonomy_id", 0)
@@ -393,32 +393,34 @@ class BioProjectTsvValidator < ValidatorBase
   #
   # ==== Args
   # project_label: project label for error displaying
-  # organism_name: ex."Nostoc sp. PCC 7120"
+  # organism_with_pos ex.{value: "Nostoc sp. PCC 7120", field_idx: 10, value_idx: 0}
+  # taxid_with_pos ex.{value: "103690", field_idx:11, value_idx: 0}
   # project_set_node: a bioproject set node object
   # ==== Return
   # true/false
   #
-  def taxonomy_error_warning (rule_code, organism_name, organism_pos, taxid_pos)
-    organism_name = "" if CommonUtils::blank?(organism_name)
+  def taxonomy_error_warning (rule_code, organism_with_pos, taxid_with_pos)
+    organism_with_pos = "" if CommonUtils::blank?(organism_with_pos[:value])
     result = false #このメソッドが呼び出されている時点でfalse
 
-    unless organism_name == ""
-      ret = @org_validator.suggest_taxid_from_name(organism_name)
+    unless organism_with_pos[:value] == ""
+      ret = @org_validator.suggest_taxid_from_name(organism_with_pos[:value])
     end
     annotation = [
-      {key: "organism", value: organism_name}
+      {key: "organism", value: organism_with_pos[:value]}
     ]
     if ret.nil? # organism name is blank
       annotation.push({key: "Message", value: "organism is blank"})
     elsif ret[:status] == "exist" #該当するtaxonomy_idがあった場合
       scientific_name = ret[:scientific_name]
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
-      if scientific_name != organism_name
-        location = {field_idx: organism_pos[:field_idx], value_idx: organism_pos[:value_idx], key_name: "value"}
+      if scientific_name != organism_with_pos[:value]
+        location = {field_idx: organism_with_pos[:field_idx], value_idx: organism_with_pos[:value_idx], key_name: "value"}
         annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", location, true));
       end
       annotation.push({key: "taxonomy_id", value: ""})
-      location = {field_idx: taxid_pos[:field_idx], value_idx: taxid_pos[:value_idx], key_name: "value"}
+      # TODO 項目がない場合は行追加になるから無理？ taxid_with_pos.nil?
+      location = {field_idx: taxid_with_pos[:field_idx], value_idx: taxid_with_pos[:value_idx], key_name: "value"}
       annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
@@ -443,8 +445,10 @@ class BioProjectTsvValidator < ValidatorBase
   def missing_mandatory_field(rule_code, data, mandatory_conf, level)
     result = true
     invalid_list = {}
-    invalid_list[level] = @tsv_validator.missing_mandatory_field(data, mandatory_conf[level])
-    if level == "error" # errorの場合は、internal_ignore もチェック
+    unless mandatory_conf[level].nil?
+      invalid_list[level] = @tsv_validator.missing_mandatory_field(data, mandatory_conf[level])
+    end
+    if level == "error" && !mandatory_conf["error_internal_ignore"].nil? # errorの場合は、internal_ignore もチェック
       invalid_list["error_internal_ignore"] = @tsv_validator.missing_mandatory_field(data, mandatory_conf["error_internal_ignore"])
     end
 
@@ -472,17 +476,19 @@ class BioProjectTsvValidator < ValidatorBase
   #
   # ==== Args
   # data: project data
-  # format_check_conf: settings of format_check
+  # cv_check_conf: settings of cv_check
   # level: error level (error or warning)
   # ==== Return
   # true/false
   #
-  def invalid_value_for_controlled_terms(rule_code, data, format_check_conf, level)
+  def invalid_value_for_controlled_terms(rule_code, data, cv_check_conf, level)
     result = true
     invalid_list = {}
-    invalid_list[level] = @tsv_validator.invalid_value_for_controlled_terms(data, format_check_conf[level])
-    if level == "error" # errorの場合は、internal_ignore もチェック
-      invalid_list["error_internal_ignore"] = @tsv_validator.invalid_value_for_controlled_terms(data, format_check_conf["error_internal_ignore"])
+    unless cv_check_conf[level].nil?
+      invalid_list[level] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf[level])
+    end
+    if level == "error" && !cv_check_conf["error_internal_ignore"].nil? # errorの場合は、internal_ignore もチェック
+      invalid_list["error_internal_ignore"] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf["error_internal_ignore"])
     end
 
     invalid_list.each do |level, list|
@@ -511,13 +517,16 @@ class BioProjectTsvValidator < ValidatorBase
   #
   # ==== Args
   # data: project data
-  # allow_multiple_values: settings of allow_multiple_values
+  # allow_multiple_values_conf: settings of allow_multiple_values
   # ==== Return
   # true/false
   #
-  def multiple_values(rule_code, data, allow_multiple_values)
+  def multiple_values(rule_code, data, allow_multiple_values_conf)
     result = true
-    invalid_list = @tsv_validator.multiple_values(data, allow_multiple_values)
+    invalid_list = []
+    unless allow_multiple_values_conf.nil?
+      invalid_list = @tsv_validator.multiple_values(data, allow_multiple_values_conf)
+    end
 
     unless invalid_list.size == 0
       result = false
@@ -548,8 +557,10 @@ class BioProjectTsvValidator < ValidatorBase
   def invalid_value_format(rule_code, data, format_check_conf, level)
     result = true
     invalid_list = {}
-    invalid_list[level] = @tsv_validator.check_field_format(data, format_check_conf[level])
-    if level == "error" # errorの場合は、internal_ignore もチェック
+    unless format_check_conf[level].nil?
+      invalid_list[level] = @tsv_validator.check_field_format(data, format_check_conf[level])
+    end
+    if level == "error" && !format_check_conf["error_internal_ignore"].nil? # errorの場合は、internal_ignore もチェック
       invalid_list["error_internal_ignore"] = @tsv_validator.check_field_format(data, format_check_conf["error_internal_ignore"])
     end
 
@@ -579,16 +590,20 @@ class BioProjectTsvValidator < ValidatorBase
   #
   # ==== Args
   # data: project data
-  # format_check_conf: settings of format_check
+  # selective_mandatory_conf: settings of selective_mandatory
+  # field_groups_conf: settings of groups
   # level: error level (error or warning)
   # ==== Return
   # true/false
   #
   def missing_at_least_one_required_fields_in_a_group(rule_code, data, selective_mandatory_conf, field_groups_conf, level)
+    return nil if field_groups_conf.nil?
     result = true
     invalid_list = {}
-    invalid_list[level] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf[level], field_groups_conf)
-    if level == "error" # errorの場合は、internal_ignore もチェック
+    unless selective_mandatory_conf[level].nil?
+      invalid_list[level] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf[level], field_groups_conf)
+    end
+    if level == "error" && !selective_mandatory_conf["error_internal_ignore"].nil? # errorの場合は、internal_ignore もチェック
       invalid_list["error_internal_ignore"] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf["error_internal_ignore"], field_groups_conf)
     end
 
@@ -624,10 +639,13 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def missing_required_fields_in_a_group(rule_code, data, mandatory_fields_in_a_group_conf, field_groups_conf, level)
+    return nil if field_groups_conf.nil?
     result = true
     invalid_list = {}
-    invalid_list[level] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf[level], field_groups_conf)
-    if level == "error" # errorの場合は、internal_ignore もチェック
+    unless mandatory_fields_in_a_group_conf[level].nil?
+      invalid_list[level] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf[level], field_groups_conf)
+    end
+    if level == "error" && !mandatory_fields_in_a_group_conf["error_internal_ignore"].nil? # errorの場合は、internal_ignore もチェック
       invalid_list["error_internal_ignore"] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf["error_internal_ignore"], field_groups_conf)
     end
 
@@ -658,6 +676,8 @@ class BioProjectTsvValidator < ValidatorBase
   # ==== Args
   # data: project data
   # not_allow_null_value_conf: settings of not_allow_null_value
+  # null_accepted_list
+  # null_not_recommended_list
   # level: error level (error or warning)
   # ==== Return
   # true/false
@@ -665,8 +685,10 @@ class BioProjectTsvValidator < ValidatorBase
   def null_value_is_not_allowed(rule_code, data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, level)
     result = true
     invalid_list = {}
-    invalid_list[level] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf[level], null_accepted_list, null_not_recommended_list)
-    if level == "error" # errorの場合は、internal_ignore もチェック
+    unless not_allow_null_value_conf[level].nil?
+      invalid_list[level] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf[level], null_accepted_list, null_not_recommended_list)
+    end
+    if level == "error" && not_allow_null_value_conf["error_internal_ignore"] # errorの場合は、internal_ignore もチェック
       invalid_list["error_internal_ignore"] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf["error_internal_ignore"], null_accepted_list, null_not_recommended_list)
     end
     invalid_list.each do |level, list|

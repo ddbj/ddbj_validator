@@ -219,34 +219,413 @@ class TestBioProjectValidator < Minitest::Test
 
   # BP_R0039
   def test_taxonomy_error_warning
+    #ok case
+    organism_with_pos = {value: "Escherichia coli", field_idx: 10, value_idx: 0}
+    taxid_with_pos = {value: "", field_idx: 10, value_idx: 0}
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", organism_with_pos, taxid_with_pos)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # TODO もっとNGケースを追加taxid nilなどのケースに対応するか
   end
 
   # BP_R0043, BP_R0044
   def test_missing_mandatory_field
+    # ok
+    ## error level check
+    mandatory_conf = { "error" => ["last_name"], "error_internal_ignore"=> [],"warning" => ["Person First Name"]}
+    data = [{"key" => "last_name", "values" => ["My name"]}]
+    ret = exec_validator("missing_mandatory_field", "BP_R0043", data, mandatory_conf, "error") #error
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## warning level check
+    mandatory_conf = { "error" => [], "error_internal_ignore"=> [],"warning" => ["first_name"]}
+    data = [{"key" => "first_name", "values" => ["My name"]}]
+    ret = exec_validator("missing_mandatory_field", "BP_R0044", data, mandatory_conf, "warning") # warning
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng error
+    ## field name無し
+    mandatory_conf = { "error" => ["last_name"], "error_internal_ignore" => [],"warning" => ["first_name"]}
+    data = [{"key" => "not_last_name", "values" => ["My name"]}] #last_name field無し
+    ret = exec_validator("missing_mandatory_field", "BP_R0043", data, mandatory_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal false, ret[:error_list].first[:external]
+    ## field の値がblank
+    mandatory_conf = { "error" => ["last_name"], "error_internal_ignore" => [],"warning" => ["first_name"]}
+    data = [{"key" => "last_name", "values" => [""]}]
+    ret = exec_validator("missing_mandatory_field", "BP_R0043", data, mandatory_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # internal_ignore
+    mandatory_conf = { "error" => [], "error_internal_ignore" => ["project_data_type"],"warning" => ["first_name"]}
+    data = [{"key" => "project_data_type", "values" => [""]}]
+    ret = exec_validator("missing_mandatory_field", "BP_R0043", data, mandatory_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:external] #internal_ignore
+    ## warningでfield name無し
+    mandatory_conf = { "error" => [], "error_internal_ignore" => [],"warning" => ["first_name"]}
+    ret = exec_validator("missing_mandatory_field", "BP_R0044", data, mandatory_conf, "warning") # warning
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "warning", ret[:error_list].first[:level] #internal_ignore
   end
 
   # BP_R0045, BP_R0046
   def test_invalid_value_for_controlled_terms
+    # ok
+    ## error level check
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["Exome"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check with blank
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => []}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check with blank
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => [""]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check with missing value
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["missing"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    # TODO これが通るようにするために書き換える
+    # assert_equal true, ret[:result]
+    # assert_equal 0, ret[:error_list].size
+    ## warning level check
+    cv_conf = { "warning" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["Exome"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0046", data, cv_conf, "warning")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng error
+    ## CVの値ではない error level check
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["Exome", "Not CV value"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error") #error
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## CVの値ではない 複数　error level check
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["Not CV value", "Not CV value2"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error") #error
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+    assert_equal false, ret[:error_list].first[:external] #not internal_ignore
+    ## CVの値ではない internal_ignore level check
+    cv_conf = { "error_internal_ignore" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["Not CV value"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error") #error
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:external] #internal_ignore
+    ## CVの値ではない warning level check
+    cv_conf = { "warning" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["Not CV value"]}]
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0046", data, cv_conf, "warning") #warning
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "warning", ret[:error_list].first[:level] #warning
   end
 
   # BP_R0047
   def test_multiple_values
+    # ok case
+    allow_multiple_values_conf = ["first_name"]
+    data = [{"key" => "first_name", "values" => ["My Name", "Your Name"]}]
+    ret = exec_validator("multiple_values", "BP_R0047", data, allow_multiple_values_conf)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## last value is blank in not allow field
+    allow_multiple_values_conf = ["first_name"]
+    data = [{"key" => "sample_scope", "values" => ["My Scope", ""]}]
+    ret = exec_validator("multiple_values", "BP_R0047", data, allow_multiple_values_conf)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## all values are blank in not allow field
+    allow_multiple_values_conf = ["first_name"]
+    data = [{"key" => "sample_scope", "values" => ["", nil]}]
+    ret = exec_validator("multiple_values", "BP_R0047", data, allow_multiple_values_conf)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## multi values in not allow field
+    allow_multiple_values_conf = ["first_name"]
+    data = [{"key" => "sample_scope", "values" => ["My Scope", "Your Scope"]}]
+    ret = exec_validator("multiple_values", "BP_R0047", data, allow_multiple_values_conf)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multi values in not allow field
+    allow_multiple_values_conf = ["first_name"]
+    data = [{"key" => "sample_scope", "values" => ["", "Your Scope"]}] #これもNG。常に先頭に値を書くべき
+    ret = exec_validator("multiple_values", "BP_R0047", data, allow_multiple_values_conf)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multi values in not allow field
+    allow_multiple_values_conf = ["first_name"]
+    data = [{"key" => "sample_scope", "values" => [nil, "Your Scope"]}] #これもNG。常に先頭に値を書くべき
+    ret = exec_validator("multiple_values", "BP_R0047", data, allow_multiple_values_conf)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # BP_R0049, BP_R0050
   def test_invalid_value_format
+    # ok case
+    ## error level check
+    format_conf = { "error" => [{"field_name" => "organization_url", "format" => "URI"}]}
+    data = [{"key" => "organization_url", "values" => ["http://example.com"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check regex
+    format_conf = { "error" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["over 10 characters"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check ignore blank
+    format_conf = { "error" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => [nil, "over 10 characters", ""]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error_internal_ignore level check
+    format_conf = { "error_internal_ignore" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["over 10 characters", "multiple values"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## warning level check
+    format_conf = { "warning" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["over 10 characters"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0050", data, format_conf, "warning")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## error level check
+    format_conf = { "error" => [{"field_name" => "organization_url", "format" => "URI"}]}
+    data = [{"key" => "organization_url", "values" => ["Not URI"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## error level check regex
+    format_conf = { "error" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["less 10"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## error level check multiple values
+    format_conf = { "error" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["less 10", "multi"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+    ## error_internal_ignore level check
+    format_conf = { "error_internal_ignore" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["less 10"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0049", data, format_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:external] #internal_ignore
+    ## warning level check
+    format_conf = { "warning" => [{"field_name" => "title", "regex" => "^.{10,}$"}]}
+    data = [{"key" => "title", "values" => ["less 10"]}]
+    ret = exec_validator("invalid_value_format", "BP_R0050", data, format_conf, "warning")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "warning", ret[:error_list].first[:level] #warning
   end
 
   # BP_R0051, BP_R0052
   def test_missing_at_least_one_required_fields_in_a_group
+    # ok case
+    ## error level check
+    selective_mandatory_conf = { "error" => [{"group_name" => "Publication"}]}
+    field_groups_conf = [{"group_name" => "Publication", "field_list" => ["pubmed_id", "doi"]}]
+    data = [{"key" => "doi", "values" => ["doi NO"]}] # group内の一つでも値があれば良い
+    ret = exec_validator("missing_at_least_one_required_fields_in_a_group", "BP_R0051", data, selective_mandatory_conf, field_groups_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error_internal_ignore level check
+    selective_mandatory_conf = { "error_internal_ignore" => [{"group_name" => "Publication"}]}
+    field_groups_conf = [{"group_name" => "Publication", "field_list" => ["pubmed_id", "doi"]}]
+    data = [{"key" => "pubmed_id", "values" => ["1111"]}]
+    ret = exec_validator("missing_at_least_one_required_fields_in_a_group", "BP_R0051", data, selective_mandatory_conf, field_groups_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## warning level check
+    selective_mandatory_conf = { "warning" => [{"group_name" => "Publication"}]}
+    field_groups_conf = [{"group_name" => "Publication", "field_list" => ["pubmed_id", "doi"]}]
+    data = [{"key" => "pubmed_id", "values" => ["1111", ""]}, {"key" => "doi", "values" => ["", "doi NO"]}] #記載列が異なってもOK
+    ret = exec_validator("missing_at_least_one_required_fields_in_a_group", "BP_R0052", data, selective_mandatory_conf, field_groups_conf, "warning")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## error level check
+    selective_mandatory_conf = { "error" => [{"group_name" => "Publication"}]}
+    field_groups_conf = [{"group_name" => "Publication", "field_list" => ["pubmed_id", "doi"]}]
+    data = [{"key" => "title", "values" => ["My Title"]}] # group内の一つもない
+    ret = exec_validator("missing_at_least_one_required_fields_in_a_group", "BP_R0051", data, selective_mandatory_conf, field_groups_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## error_internal_ignore level check
+    selective_mandatory_conf = { "error_internal_ignore" => [{"group_name" => "Publication"}]}
+    field_groups_conf = [{"group_name" => "Publication", "field_list" => ["pubmed_id", "doi"]}]
+    data = [{"key" => "title", "values" => ["My Title"]}]
+    ret = exec_validator("missing_at_least_one_required_fields_in_a_group", "BP_R0051", data, selective_mandatory_conf, field_groups_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:external] #internal_ignore
+    ## warning level check
+    selective_mandatory_conf = { "warning" => [{"group_name" => "Publication"}]}
+    field_groups_conf = [{"group_name" => "Publication", "field_list" => ["pubmed_id", "doi"]}]
+    data = [{"key" => "title", "values" => ["My Title"]}]
+    ret = exec_validator("missing_at_least_one_required_fields_in_a_group", "BP_R0052", data, selective_mandatory_conf, field_groups_conf, "warning")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "warning", ret[:error_list].first[:level] #warning
   end
 
   # BP_R0053, BP_R0054
   def test_missing_required_fields_in_a_group
+    # ok case
+    ## error level check
+    mandatory_fields_in_a_group_conf = {"error" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency", "values" => ["My grant agency"]}, {"key" => "grant_title", "values" => ["My grant title"]}] # 必須項目の全てを記載
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check without group desc
+    mandatory_fields_in_a_group_conf = {"error" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "title", "values" => ["My Title"]}] # groupに関する記述そのものがなくてもOK
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check with all blank value in group
+    mandatory_fields_in_a_group_conf = {"error" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_title", "values" => [""]}, {"key" => "grant_id", "values" => [""]}, {"key" => "grant_agency_abbreviation", "values" => [nil]}] # groupに関するが空値
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error_internal_ignore level check
+    mandatory_fields_in_a_group_conf = {"error_internal_ignore" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency", "values" => ["My grant agency"]}, {"key" => "grant_title", "values" => ["My grant title"]}] # 必須項目の全てを記載
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## warning level check
+    mandatory_fields_in_a_group_conf = {"warning" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency", "values" => ["My grant agency"]}, {"key" => "grant_title", "values" => ["My grant title"]}] # 必須項目の全てを記載
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0054", data, mandatory_fields_in_a_group_conf, field_groups_conf, "warning")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## error level check
+    mandatory_fields_in_a_group_conf = {"error" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency", "values" => ["My grant agency"]}] # grant_titleが不足
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## error_internal_ignore level check
+    mandatory_fields_in_a_group_conf = {"error_internal_ignore" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency_abbreviation", "values" => ["My grant agency abbr"]}] # grant_title, grant_agencyが不足
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:external] #internal_ignore
+    ## warning level check
+    mandatory_fields_in_a_group_conf = {"warning" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency_abbreviation", "values" => ["My grant agency abbr"]}] # grant_title, grant_agencyが不足
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0054", data, mandatory_fields_in_a_group_conf, field_groups_conf, "warning")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "warning", ret[:error_list].first[:level] #warning
+    ## error level check in difference column no
+    mandatory_fields_in_a_group_conf = {"error" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
+    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
+    data = [{"key" => "grant_agency", "values" => ["My grant agency", ""]}, {"key" => "grant_title", "values" => ["", "My grant title"]}] # grant agencyは1列目、 grant titleは2列目に記載
+    ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
+    # TODO 縦読みが必要でこれがエラーになるべき
+    #assert_equal false, ret[:result]
+    #assert_equal 2, ret[:error_list].size
   end
 
   # BP_R0055, BP_R0056
   def test_null_value_is_not_allowed
+    null_accepted_list = ["not applicable", "not collected", "not provided", "missing", "restricted access"]
+    null_not_recommended_list = ["NA", "N\/A", "N\\. ?A\\.?", "Unknown", "\\.", "\\-"]
+
+    # ok case
+    ## error level check
+    not_allow_null_value_conf = {"error" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => ["Not null value"]}, {"key" => "email", "values" => ["Not null value"]}]
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0055", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error level check with blank value
+    not_allow_null_value_conf = {"error" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => [nil]}]
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0055", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## error_internal_ignore level check
+    not_allow_null_value_conf = {"error_internal_ignore" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => ["Not null value"]}, {"key" => "email", "values" => ["Not null value"]}]
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0055", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## warning level check
+    not_allow_null_value_conf = {"warning" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => [""]}, {"key" => "email", "values" => ["Not null value"]}]
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0056", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "warning")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## error level check
+    not_allow_null_value_conf = {"error" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => ["missing"]}, {"key" => "email", "values" => ["MISSING"]}] # 大文字でもエラー
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0055", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "error")
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+    ## error_internal_ignore level check
+    not_allow_null_value_conf = {"error_internal_ignore" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => ["N\/A"]}, {"key" => "email", "values" => ["na"]}] # 非推奨null値でもエラー
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0055", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "error")
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+    assert_equal true, ret[:error_list].first[:external] #internal_ignore
+    ## warning level check
+    not_allow_null_value_conf = {"warning" => ["last_name", "email"]}
+    data = [{"key" => "last_name", "values" => ["Not applicable"]}, {"key" => "email", "values" => ["Unknown", "-", "."]}] # 非推奨null値でもエラー
+    ret = exec_validator("null_value_is_not_allowed", "BP_R0056", data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, "warning")
+    assert_equal false, ret[:result]
+    assert_equal 4, ret[:error_list].size
+    assert_equal "warning", ret[:error_list].first[:level] #warning
   end
 
   # BP_R0059

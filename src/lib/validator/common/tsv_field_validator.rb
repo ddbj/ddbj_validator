@@ -300,7 +300,7 @@ class TsvFieldValidator
     selective_mandatory_conf.each do |selective_mandatory|
       group = field_group_conf.find{|group| group["group_name"] == selective_mandatory["group_name"]} #当該Group情報を取得
       next if group.nil?
-      exit_value = false # group fieldの中で一つでも値があればtrueとする
+      exist_value = false # group fieldの中で一つでも値があればtrueとする
       group["field_list"].each do |mandatory_field|
         field_data = data.select{|row| row["key"] == mandatory_field}
         if field_data.size > 0
@@ -312,11 +312,11 @@ class TsvFieldValidator
             end
           end
           if value_count > 0 #空白やnil以外の値が一つでもあればOK
-            exit_value = true
+            exist_value = true
           end
         end
       end
-      if exit_value == false
+      if exist_value == false
         invalid_list.push({field_group_name: selective_mandatory["group_name"], field_list: group["field_list"]})
       end
     end
