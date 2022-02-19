@@ -120,10 +120,13 @@ class BioProjectTsvValidator < ValidatorBase
     null_value_is_not_allowed("BP_R0055", bp_data, field_settings["not_allow_null_value"], field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"], "error")
     null_value_is_not_allowed("BP_R0056", bp_data, field_settings["not_allow_null_value"], field_settings["null_value"]["value_list"], field_settings["not_recommended_null_value"]["value_list"], "warning")
 
+    not_allow_null_field_list = []
+    not_allow_null_field_list.concat(field_settings["not_allow_null_value"].map{|level, field_list| field_list})
+
     missing_mandatory_field("BP_R0043", bp_data, field_settings["mandatory_field"], "error")
     missing_mandatory_field("BP_R0044", bp_data, field_settings["mandatory_field"], "warning")
-    invalid_value_for_controlled_terms("BP_R0045", bp_data, field_settings["cv_check"], "error")
-    invalid_value_for_controlled_terms("BP_R0046", bp_data, field_settings["cv_check"], "warning")
+    invalid_value_for_controlled_terms("BP_R0045", bp_data, field_settings["cv_check"], not_allow_null_field_list, field_settings["null_value"]["value_list"], "error")
+    invalid_value_for_controlled_terms("BP_R0046", bp_data, field_settings["cv_check"], not_allow_null_field_list, field_settings["null_value"]["value_list"], "warning")
     multiple_values("BP_R0047", bp_data, field_settings["allow_multiple_values"])
     invalid_value_format("BP_R0049", bp_data, field_settings["format_check"], "error")
     invalid_value_format("BP_R0050", bp_data, field_settings["format_check"], "warning")
@@ -400,6 +403,7 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def taxonomy_error_warning (rule_code, organism_with_pos, taxid_with_pos)
+    return nil if CommonUtils::blank?(organism_with_pos) #organismの記載無し
     organism_with_pos = "" if CommonUtils::blank?(organism_with_pos[:value])
     result = false #このメソッドが呼び出されている時点でfalse
 
@@ -419,8 +423,11 @@ class BioProjectTsvValidator < ValidatorBase
         annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", location, true));
       end
       annotation.push({key: "taxonomy_id", value: ""})
-      # TODO 項目がない場合は行追加になるから無理？ taxid_with_pos.nil?
-      location = {field_idx: taxid_with_pos[:field_idx], value_idx: taxid_with_pos[:value_idx], key_name: "value"}
+      if taxid_with_pos.nil? # taxonomy_id fieldが存在しない場合は場所を示せない(追加するか？)
+        location = {field_idx: nil, value_idx: nil, key_name: "value"}
+      else
+        location = {field_idx: taxid_with_pos[:field_idx], value_idx: taxid_with_pos[:value_idx], key_name: "value"}
+      end
       annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
@@ -481,14 +488,14 @@ class BioProjectTsvValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_value_for_controlled_terms(rule_code, data, cv_check_conf, level)
+  def invalid_value_for_controlled_terms(rule_code, data, cv_check_conf, not_allow_null_field_list, null_accepted_list, level)
     result = true
     invalid_list = {}
     unless cv_check_conf[level].nil?
-      invalid_list[level] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf[level])
+      invalid_list[level] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf[level], not_allow_null_field_list, null_accepted_list)
     end
     if level == "error" && !cv_check_conf["error_internal_ignore"].nil? # errorの場合は、internal_ignore もチェック
-      invalid_list["error_internal_ignore"] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf["error_internal_ignore"])
+      invalid_list["error_internal_ignore"] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf["error_internal_ignore"], not_allow_null_field_list, null_accepted_list)
     end
 
     invalid_list.each do |level, list|

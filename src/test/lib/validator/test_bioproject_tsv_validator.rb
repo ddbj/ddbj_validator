@@ -219,14 +219,37 @@ class TestBioProjectValidator < Minitest::Test
 
   # BP_R0039
   def test_taxonomy_error_warning
-    #ok case
+    #このメソッドではok caseはない(tax_idがない場合に呼ばれる)
+    # tax_idの補完
     organism_with_pos = {value: "Escherichia coli", field_idx: 10, value_idx: 0}
     taxid_with_pos = {value: "", field_idx: 10, value_idx: 0}
     ret = exec_validator("taxonomy_error_warning", "BP_R0039", organism_with_pos, taxid_with_pos)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-
-    # TODO もっとNGケースを追加taxid nilなどのケースに対応するか
+    assert_equal "562", get_auto_annotation(ret[:error_list])
+    # tax_idとorganism名の補完
+    organism_with_pos = {value: "escherichia/Shigella coli", field_idx: 10, value_idx: 0} #Escherichia coliの別名
+    taxid_with_pos = {value: "", field_idx: 10, value_idx: 0}
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", organism_with_pos, taxid_with_pos)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "Escherichia coli", ret[:error_list].first[:annotation].select{|row| row[:is_auto_annotation]}.first[:suggested_value].first
+    assert_equal "562", get_auto_annotation(ret[:error_list])
+    # organism is null
+    organism_with_pos = nil
+    taxid_with_pos = {value: "", field_idx: 10, value_idx: 0}
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", organism_with_pos, taxid_with_pos)
+    assert_nil ret[:result]
+    # organism is null
+    organism_with_pos = {value: "Escherichia coli", field_idx: 10, value_idx: 0}
+    taxid_with_pos = nil
+    ret = exec_validator("taxonomy_error_warning", "BP_R0039", organism_with_pos, taxid_with_pos)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "562", get_auto_annotation(ret[:error_list])
+    auto_annotation_pos = ret[:error_list].first[:annotation].select{|row| row[:is_auto_annotation]}.last[:location]
+    assert_nil auto_annotation_pos[:field_idx]
+    assert_nil auto_annotation_pos[:value_idx]
   end
 
   # BP_R0043, BP_R0044
@@ -276,36 +299,38 @@ class TestBioProjectValidator < Minitest::Test
 
   # BP_R0045, BP_R0046
   def test_invalid_value_for_controlled_terms
+    null_accepted_list = ["not applicable", "not collected", "not provided", "missing", "restricted access"]
+    not_allow_null_field_list = ["project_data_type", "sample_scope"]
     # ok
     ## error level check
     cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["Exome"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error")
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## error level check with blank
     cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => []}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error")
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## error level check with blank
     cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => [""]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error")
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## error level check with missing value
     cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["missing"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error")
-    # TODO これが通るようにするために書き換える
-    # assert_equal true, ret[:result]
-    # assert_equal 0, ret[:error_list].size
+    not_allow_null_field_list = ["sample_scope"] # project_data_typeがmissingを許容する属性する
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error")
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     ## warning level check
     cv_conf = { "warning" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["Exome"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0046", data, cv_conf, "warning")
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0046", data, cv_conf, not_allow_null_field_list, null_accepted_list, "warning")
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -313,30 +338,37 @@ class TestBioProjectValidator < Minitest::Test
     ## CVの値ではない error level check
     cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["Exome", "Not CV value"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error") #error
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error") #error
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## CVの値ではない 複数　error level check
     cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["Not CV value", "Not CV value2"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error") #error
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error") #error
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
     assert_equal false, ret[:error_list].first[:external] #not internal_ignore
     ## CVの値ではない internal_ignore level check
     cv_conf = { "error_internal_ignore" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["Not CV value"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, "error") #error
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error") #error
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal true, ret[:error_list].first[:external] #internal_ignore
     ## CVの値ではない warning level check
     cv_conf = { "warning" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
     data = [{"key" => "project_data_type", "values" => ["Not CV value"]}]
-    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0046", data, cv_conf, "warning") #warning
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0046", data, cv_conf, not_allow_null_field_list, null_accepted_list, "warning") #warning
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "warning", ret[:error_list].first[:level] #warning
+    ## CVの値ではないし、missingを許容しない
+    cv_conf = { "error" => [{"field_name" => "project_data_type", "value_list" => ["Assembly", "Exome"]}]}
+    data = [{"key" => "project_data_type", "values" => ["missing"]}]
+    not_allow_null_field_list = ["project_data_type", "sample_scope"] # project_data_typeをmissingを許容しない属性する
+    ret = exec_validator("invalid_value_for_controlled_terms", "BP_R0045", data, cv_conf, not_allow_null_field_list, null_accepted_list, "error")
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
   end
 
   # BP_R0047

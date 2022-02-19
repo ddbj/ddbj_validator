@@ -215,15 +215,21 @@ class TsvFieldValidator
   end
 
   # CVチェック
-  def invalid_value_for_controlled_terms(data, cv_check_conf)
+  def invalid_value_for_controlled_terms(data, cv_check_conf, not_allow_null_field_list, null_accepted_list)
     invalid_list = []
     cv_check_field = cv_check_conf.group_by{|cv_conf| cv_conf["field_name"]}
     data.each_with_index do |row, field_idx|
       next if cv_check_field[row["key"]].nil? || row["values"].nil?
       row["values"].each_with_index do |value, value_idx|
-        next if CommonUtils.blank?(value) # is null val?
-        unless cv_check_field[row["key"]].first["value_list"].include?(value)
-          invalid_list.push({field_name: row["key"], value: value, field_idx: field_idx})
+        next if CommonUtils.blank?(value)
+        unless cv_check_field[row["key"]].first["value_list"].include?(value) #CVに含まれていない値
+          if null_accepted_list.include?(value) # null値での記載
+            if not_allow_null_field_list.include?(row["key"]) # null値の入力が許容されていなければNG
+              invalid_list.push({field_name: row["key"], value: value, field_idx: field_idx})
+            end
+          else
+            invalid_list.push({field_name: row["key"], value: value, field_idx: field_idx})
+          end
         end
       end
     end
@@ -272,7 +278,7 @@ class TsvFieldValidator
   # フォーマットチェック
   def check_field_format(data, field_format_conf)
     invalid_list = []
-    field_format = field_format_conf.group_by{|cv_conf| cv_conf["field_name"]}
+    field_format = field_format_conf.group_by{|format_conf| format_conf["field_name"]}
     data.each_with_index do |row, field_idx|
       next if field_format[row["key"]].nil? || row["values"].nil?
       row["values"].each_with_index do |value, value_idx|
