@@ -335,28 +335,29 @@ class TsvFieldValidator
     mandatory_fields_in_a_group_conf.each do |check_group_conf|
       group = field_group_conf.find{|group| group["group_name"] == check_group_conf["group_name"]} #当該Group情報を取得
       next if group.nil?
-      exit_value = false # group fieldの中で一つでも値があればtrueとする
-      exit_value_field = []
-      group["field_list"].each do |group_field|
-        field_data = data.select{|row| row["key"] == group_field}
-        if field_data.size > 0
-          field = field_data.first # 複数fieldを記載していた場合は前方の値を優先
-          value_count = 0
-          unless field["values"].nil?
-            field["values"].each do |value|
-              value_count += 1 unless (value.nil? || value.chomp.strip == "") # null相当を許容するか
-            end
-          end # TODO 本来は同列の値をセットで比較した方がいい
-          if value_count > 0 #空白やnil以外の値が一つでもあればOK
-            exit_value = true
-            exit_value_field.push(group_field)
+      # groupのfieldの値を縦方向にまとめ直してチェックする
+      # [{"key" => "grant_agency", "values" => ["My grant agency", ""]}, {"key" => "grant_title", "values" => ["", "My grant title"]}]
+      # の場合valueは2列に渡って記載されている。
+      # 1列目の記載 {"grant_agency": "My grant agency", "grant_title": ""}
+      # 2列目の記載 {"grant_agency": "",                "grant_title": "My grant title"}
+      # それぞれの列に対してGroup内必須項目が抜けている場合にNGを出す
+      value_size_list = group["field_list"].map do |group_field|
+        field_list = field_value_list(data, group_field)
+        field_list.nil? ? 0 : field_list.size
+      end
+      max_value_index = value_size_list.max - 1
+      (0..max_value_index).each do |value_idx|
+        group_field_values = {}
+        group["field_list"].each do |field_name|
+          unless CommonUtils.blank?(field_value(data, field_name, value_idx))
+            group_field_values[field_name] = field_value(data, field_name, value_idx)
           end
         end
-      end
-      if exit_value == true # Group内で一つでも記載項目がある
-        missing_fields = check_group_conf["mandatory_field"] - exit_value_field # グループ内必須から記載済み項目の引く
-        if missing_fields.size > 0 # 未記載の必須項目があればNG
-          invalid_list.push({field_group_name: check_group_conf["group_name"], missing_fields: missing_fields})
+        if group_field_values.keys.size > 0 # Groupに対する何らかの記載がある
+          missing_fields = check_group_conf["mandatory_field"] - group_field_values.keys
+          if missing_fields.size > 0 #mandatory_fieldの記載がない
+            invalid_list.push({field_group_name: check_group_conf["group_name"], missing_fields: missing_fields, value_idx: value_idx})
+          end
         end
       end
     end

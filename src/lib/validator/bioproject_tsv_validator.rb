@@ -663,6 +663,7 @@ class BioProjectTsvValidator < ValidatorBase
           annotation = [
             {key: "Group name", value: invalid[:field_group_name]},
             {key: "Filed names", value: invalid[:missing_fields].to_s},
+            {key: "Position(value)", value: invalid[:value_idx]},
             {key: "Meesage", value: "#{invalid[:missing_fields].to_s} is required for the '#{invalid[:field_group_name]}' field group."}
           ]
           error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
@@ -935,9 +936,9 @@ class BioProjectTsvValidator < ValidatorBase
         {key: "Values", value: invalid[:value]},
       ]
       if @file_format == "tsv"
-        annotation.push( {key: "Potision", value: "Row number: [#{invalid[:field_idx]+1}]"})
+        annotation.push( {key: "Position", value: "Row number: [#{invalid[:field_idx]+1}]"})
       elsif @file_format == "json"
-        annotation.push( {key: "Potision", value: invalid[:field_idx]})
+        annotation.push( {key: "Position", value: invalid[:field_idx]})
       end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)

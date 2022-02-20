@@ -101,6 +101,9 @@
 	"mandatory_fields_in_a_group": {
     "error": [
       {
+        "group_name": "Person",
+        "mandatory_field" : ["middle_name", "last_name", "email"]
+      }, {
         "group_name": "Consortium",
         "mandatory_field": ["consortium_name", "consortium_url"]
       }, {
@@ -112,7 +115,12 @@
       }
     ],
     "error_internal_ignore": [],
-    "warning": []
+    "warning": [
+      {
+        "group_name": "Person",
+        "mandatory_field" : ["first_name"]
+      }
+    ]
   },
   "selective_mandatory": {
     "error": [],

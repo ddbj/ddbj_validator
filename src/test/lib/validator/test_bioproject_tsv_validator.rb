@@ -589,9 +589,9 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     assert_equal true, ret[:error_list].first[:external] #internal_ignore
     ## warning level check
-    mandatory_fields_in_a_group_conf = {"warning" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
-    field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
-    data = [{"key" => "grant_agency_abbreviation", "values" => ["My grant agency abbr"]}] # grant_title, grant_agencyが不足
+    mandatory_fields_in_a_group_conf = {"warning" => [{"group_name" => "Person", "mandatory_field" => ["first_name"]}]}
+    field_groups_conf = [{"group_name" => "Person", "field_list" => ["first_name", "middle_name", "last_name", "email"]}]
+    data = [{"key" => "last_name", "values" => ["My name"]}] # warningとしてはfirst_namegが不足
     ret = exec_validator("missing_required_fields_in_a_group", "BP_R0054", data, mandatory_fields_in_a_group_conf, field_groups_conf, "warning")
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -599,11 +599,14 @@ class TestBioProjectValidator < Minitest::Test
     ## error level check in difference column no
     mandatory_fields_in_a_group_conf = {"error" => [{"group_name" => "Grant", "mandatory_field" => ["grant_agency", "grant_title"]}]}
     field_groups_conf = [{"group_name" => "Grant", "field_list" => ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]}]
-    data = [{"key" => "grant_agency", "values" => ["My grant agency", ""]}, {"key" => "grant_title", "values" => ["", "My grant title"]}] # grant agencyは1列目、 grant titleは2列目に記載
+    data = [{"key" => "grant_agency", "values" => ["My grant agency", ""]}, {"key" => "grant_title", "values" => ["", "My grant title"]}, {"key" => "grant_id", "values" => ["", nil, "123"]}]
+    # TSV記載イメージとエラー内容      1列目ではgrant_titleがない       2列目ではgrant_titleがない      3列目ではgrant_titleとgrant_agencyがない
+    # "grant_agency"               "My grant agency"
+    # "grant_title"                                　　           "My grant title"
+    # "grant_id"                                                       　　　　　　　             "123"
     ret = exec_validator("missing_required_fields_in_a_group", "BP_R0053", data, mandatory_fields_in_a_group_conf, field_groups_conf, "error")
-    # TODO 縦読みが必要でこれがエラーになるべき
-    #assert_equal false, ret[:result]
-    #assert_equal 2, ret[:error_list].size
+    assert_equal false, ret[:result]
+    assert_equal 3, ret[:error_list].size
   end
 
   # BP_R0055, BP_R0056
