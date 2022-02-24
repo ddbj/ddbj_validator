@@ -7,7 +7,7 @@ FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
   VALUES ?package_id { "<%= package_id %>" }
   ?package_uri rdfs:subClassOf ddbj_bs:DDBJ_Defined_Package ;
     dc:identifier ?package_id .
-  ?restriction owl:domain ?package ;
+  ?restriction owl:domain ?package_uri ;
     rdfs:label ?group_name ;
     rdfs:range ?range .
   ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .

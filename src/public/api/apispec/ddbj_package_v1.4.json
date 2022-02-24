@@ -5,7 +5,7 @@
     "description": "DDBJ Biosample Package & Attribute API",
     "version": "1.4.0"
   },
-  "host": "ddbj.nig.ac.jp",
+  "host": "ddbj-staging.nig.ac.jp",
   "schemes": [
     "https"
   ],
