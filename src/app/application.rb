@@ -8,7 +8,7 @@ require 'net/https'
 require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/biosample_validator.rb', __FILE__)
-require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
+require File.expand_path('../../lib/validator/auto_annotator/auto_annotator.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
 require File.expand_path('../../lib/package/package.rb', __FILE__)
 
@@ -179,13 +179,13 @@ module DDBJValidator
       result_file = "#{save_dir}/result.json"
       org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
       annotated_file_path = ""
-      if File.exist?(result_file) && org_file_list.size == 1
+      if File.exist?(result_file) && org_file_list.size == 1 #　TODO 一つとは限らない。content-typeファイルも保存する？
         org_file = org_file_list.first
         annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)
         annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
         FileUtils.mkdir_p(annotated_file_dir)
         annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
-        AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype)
+        result = AutoAnnotator.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype, get_accept_header(request))
       end
       if File.exist?(annotated_file_path)
         send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
@@ -467,6 +467,7 @@ module DDBJValidator
       def get_accept_header(request)
         accept = request.env.select { |k, v| k.start_with?('HTTP_ACCEPT') }
         if accept.size == 0
+          []
         else
           accept
         end

@@ -2,9 +2,9 @@ require 'json'
 require 'nokogiri'
 
 #
-# A class for Auto-annotation
+# A class for Auto-annotation. XML file base.
 #
-class AutoAnnotation
+class AutoAnnotatorXml
 
   #
   # 元ファイルのXMLとValidation結果のjsonファイルから
