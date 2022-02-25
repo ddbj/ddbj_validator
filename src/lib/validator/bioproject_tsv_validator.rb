@@ -419,14 +419,18 @@ class BioProjectTsvValidator < ValidatorBase
       scientific_name = ret[:scientific_name]
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_with_pos[:value]
-        location = {field_idx: organism_with_pos[:field_idx], value_idx: organism_with_pos[:value_idx], key_name: "value"}
+        location = @tsv_validator.auto_annotation_location(@data_format, organism_with_pos[:field_idx], organism_with_pos[:value_idx])
         annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", location, true));
       end
       annotation.push({key: "taxonomy_id", value: ""})
-      if taxid_with_pos.nil? # taxonomy_id fieldが存在しない場合は場所を示せない(追加するか？)
-        location = {field_idx: nil, value_idx: nil, key_name: "value"}
-      else
-        location = {field_idx: taxid_with_pos[:field_idx], value_idx: taxid_with_pos[:value_idx], key_name: "value"}
+      if taxid_with_pos.nil? # taxonomy_id fieldが存在しない場合は行を追加して記述する
+        if @data_format == 'json'
+          location = {mode: "add", type: "json", add_data: {"key" => "taxonomy_id", "values" => [ret[:tax_id]]} }
+        else # tsv
+          location = {mode: "add", type: "tsv", add_data: ["taxonomy_id", ret[:tax_id]]}
+        end
+      else # taxonomy_id fieldが存在する場合は値の更新
+        location = @tsv_validator.auto_annotation_location(@data_format, taxid_with_pos[:field_idx], taxid_with_pos[:value_idx])
       end
       annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
@@ -736,11 +740,11 @@ class BioProjectTsvValidator < ValidatorBase
     invalid_list.each do |invalid|
       annotation = [{key: "Field name", value: invalid[:field_name]}]
       if invalid[:value_idx].nil? # field_nameの補正
-        location = {field_idx: invalid[:field_idx], key_name: "key"}
+        location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx])
         annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Field name", location, true))
       else  # field_valueの補正
         annotation.push({key: "Value", value: invalid[:value]})
-        location = {field_idx: invalid[:field_idx], key_name: "values", value_idx: invalid[:value_idx]}
+        location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
         annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
       end
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
@@ -798,7 +802,7 @@ class BioProjectTsvValidator < ValidatorBase
         {key: "Field name", value: invalid[:field_name]},
         {key: "Value", value: invalid[:value]}
       ]
-      location = {field_idx: invalid[:field_idx], value_idx: invalid[:value_idx]}
+      location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
       annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
@@ -857,7 +861,7 @@ class BioProjectTsvValidator < ValidatorBase
         {key: "Field name", value: invalid[:field_name]},
         {key: "Value", value: invalid[:value]}
       ]
-      location = {field_idx: invalid[:field_idx], value_idx: invalid[:value_idx]}
+      location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
       annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)

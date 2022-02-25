@@ -428,6 +428,27 @@ class TsvFieldValidator
     value
   end
 
+  # auto_annotation用のlocationを返す。ファイル形式によってlocationの記述は異なる
+  # 元ファイルがJSONの場合 {position_list: [10, "values", 0]} # data[10]["values"][0]の値をcorrect
+  # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値をcorrect
+  def auto_annotation_location(data_format, field_index, value_index=nil)
+    location = nil
+    if data_format == 'json'
+      if value_index.nil?
+        location = {position_list: [field_index, "key"]}
+      else
+        location = {position_list: [field_index, "values", value_index]}
+      end
+    elsif data_format == 'tsv'
+      if value_index.nil?
+        location = {row_index: field_index, column_index: 0 }
+      else
+        location = {row_index: field_index, column_index: value_index + 1 }
+      end
+    end
+    location
+  end
+
   # autocorrectの記述に沿ってデータの内容を置換する
   def replace_by_autocorrect(data, error_list, rule_code=nil)
     error_list = error_list.select{|error| error[:id] == rule_code} unless rule_code.nil?
@@ -439,17 +460,23 @@ class TsvFieldValidator
         next if suggest_list.nil?
         suggest_value = suggest_list[0]
         next if location.nil?
-        if location[:value_idx].nil? # valueの位置が不明なのでfield名の修正
-          if data.size > location[:field_idx]
-            data[location[:field_idx]]["key"] = suggest_value
+
+        if (!location[:mode].nil?) && location[:mode] == "add" # 追加モードの場合は末尾に足す
+          if location[:type] == "json"
+            data.push(location[:add_data])
+          elsif location[:type] == "tsv"  # tsvモードはjson相当のlocationを組み立てて置換
+            row = {"key" => location[:add_data][0], "values" => location[:add_data][1]}
+            data.push(row)
           end
-        else
-          if data.size > location[:field_idx]
-            value_list = data[location[:field_idx]]["values"]
-            if value_list.size > location[:value_idx]
-              value_list[location[:value_idx]] = suggest_value
-            end
+        elsif location[:position_list] # 置換モード、json
+          AutoAnnotatorJson.new().replace_data(location, data, suggest_value)
+        elsif location[:row_index] # # 置換モード、tsvモードはjson相当のlocationを組み立てて置換
+          if location[:column_index].nil? # keyの変更
+            json_location = [location[:row_index], "key"]
+          else
+            json_location = [location[:row_index], "values", location[:column_index]]
           end
+          AutoAnnotatorJson.new().replace_data(location, data, suggest_value)
         end
       end
     end
