@@ -179,7 +179,8 @@ module DDBJValidator
       result_file = "#{save_dir}/result.json"
       org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
       annotated_file_path = ""
-      if File.exist?(result_file) && org_file_list.size == 1 #　TODO 一つとは限らない。content-typeファイルも保存する？
+      result = nil
+      if File.exist?(result_file) && org_file_list.size == 1
         org_file = org_file_list.first
         annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)
         annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
@@ -187,12 +188,22 @@ module DDBJValidator
         annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
         result = AutoAnnotator.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype, get_accept_header(request))
       end
-      if File.exist?(annotated_file_path)
-        send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
-      else
+      if (!File.exist?(result_file)) || (!File.exist?(org_file)) #元ファイルがない
         status 400
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
         { status: "error", "message": message}.to_json
+      elsif result.nil? || result[:status].nil? ||  result[:status] != "succeed" # 処理が成功しなかった
+        status 500
+        { status: "error", "message": result[:message]}.to_json
+      else #成功した場合、出力ファイルのContent-typeで返す
+        if result[:file_type] == "json"
+          type = "application/json"
+        elsif result[:file_type] == "tsv"
+          type = "text/tab-separated-values"
+        else
+          type = "application/xml"
+        end
+        send_file result[:file_path], :filename => File.basename(result[:file_path]), :type => type
       end
     end
 

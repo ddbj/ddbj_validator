@@ -19,41 +19,96 @@ class AutoAnnotator
   end
 
   # Executes auto annotation
-  # エラーが発生した場合はエラーメッセージを表示して終了する
+  # Validationした元データファイルとValidationの結果からAnnotationした結果ファイルを生成して返す
+  #
   # @param org_file 元ファイル(Validateしたファイル)
   # @param result_file Validator結果のJSON
   # @param annotated_file_path出力ファイルパス
-  # @accept_heder_list Accept headerのリスト.ユーザ希望の出力形式  e.g.[{"HTTP_ACCEPT"=>"*/*"}], [{"HTTP_ACCEPT"=>"application/json"}]
-  # @return [void]
-  def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_heder_list)
+  # @accept_heder Accept headerのリスト.ユーザ希望の出力形式  e.g.{"HTTP_ACCEPT"=>"text/html,text/tab-separated-values"}
+  # @return result  {status: "succeed", file: annotated_file_path} or {status: "error", message: message}
+  def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_heder)
     info = {orginal_file: org_file.to_s, output_file: annotated_file_path}
     @log.info("execute auto_annotation: #{info.to_s}")
-    result = {}
-    if filetype == "biosample"
-      annotator = AutoAnnotatorXml.new
-    elsif filetype == "bioproject"
-      # 元ファイルの形式がJSONかTSVかを調べる(content-type)
-      file_info = FileParser.new().get_file_data(org_file) # これはかなり無駄
-      unless file_info.nil?
-        if file_info[:format] == "tsv"
-          annotator = AutoAnnotatorTsv.new
-        elsif file_info[:format] == "json"
-          annotator = AutoAnnotatorJson.new
+    begin
+      accept_heder_list = []
+      unless accept_heder.nil? || accept_heder["HTTP_ACCEPT"].nil?
+        accept_heder_list = accept_heder["HTTP_ACCEPT"].split(",").map {|item| item.chomp.strip}
+      end
+      input_file_format = ""
+      return_file_format = ""
+      if filetype == "biosample"
+        input_file_format = "xml"
+        return_file_format = "xml"
+        annotator = AutoAnnotatorXml.new
+      elsif filetype == "bioproject"
+        file_info = FileParser.new().get_file_data(org_file) # 元ファイルの形式を調べる。これはかなり無駄
+        unless file_info.nil?
+          if file_info[:format] == "tsv"
+            input_file_format = "tsv"
+            annotator = AutoAnnotatorTsv.new
+          elsif file_info[:format] == "json"
+            input_file_format = "json"
+            annotator = AutoAnnotatorJson.new
+          end
+          return_file_format = "json" # 基本はJSONで返す
+          return_file_format = "tsv" if accept_heder_list.include?("text/tab-separated-values")
+        else
+          raise "Can't parse bioproject original file type."
         end
       end
-      # 変換の必要があればここで変換する？というか変換後のファイルパスを返す？
-      # accept_header_listで出力フォーマットを決定
-    end
-    begin
+
+      # 実行
       annotator.create_annotated_file(org_file, result_file, annotated_file_path, filetype)
+
+      if File.exist?(annotated_file_path)
+        @log.info('auto annotation result: ' + "success")
+        # 変換の必要があればここで変換する？というか変換後のファイルパスを返す？
+        if return_file_format != input_file_format # 元データと異なるファイル形式で返す必要がある
+          @log.info("convert output file format. from #{input_file_format} to #{return_file_format}.")
+          output_file_path = file_convert(filetype, annotated_file_path, input_file_format, return_file_format)
+        else
+          output_file_path = annotated_file_path
+        end
+        {status: "succeed", file_path: output_file_path, file_type: return_file_format}
+      else
+        @log.info('auto annotator result: ' + "error")
+        {status: "error", message: "Failed to output annotated file."}
+      end
     rescue => ex
       @log.info('auto annotator result: ' + "error")
       @log.error(ex.message)
       trace = ex.backtrace.map {|row| row}.join("\n")
       @log.error(trace)
-      ret = {status: "error", message: ex.message}
+      {status: "error", message: ex.message}
     end
-    # TODO fileがあれば
-    {status: "succeed", file: annotated_file_path}
+  end
+
+  # レスポンスのファイル形式に変換したファイルを出力する
+  def file_convert(file_type, annotated_file_path, input_file_format, output_file_format)
+    ret = nil
+    if file_type == 'bioproject'
+      if input_file_format == "tsv" && output_file_format == "json"
+        if m = annotated_file_path.end_with?(".tsv")
+          output_file = annotated_file_path.sub(/.csv$/,".json")
+        else
+          output_file = annotated_file_path + ".json"
+        end
+        unless output_file.nil?
+          TsvFieldValidator.new().convert_tsv2json(annotated_file_path, output_file)
+          ret = output_file
+        end
+      elsif input_file_format == "json" && output_file_format == "tsv"
+        if m = annotated_file_path.end_with?(".json")
+          output_file = annotated_file_path.sub(/.json$/,".tsv")
+        else
+          output_file = annotated_file_path + ".tsv"
+        end
+        unless output_file.nil?
+          TsvFieldValidator.new().convert_json2tsv(annotated_file_path, output_file)
+          ret = output_file
+        end
+      end
+    end
+    ret
   end
 end

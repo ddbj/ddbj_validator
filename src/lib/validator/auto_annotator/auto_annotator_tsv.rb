@@ -1,4 +1,4 @@
-require 'json'
+require 'fileutils'
 
 require File.dirname(__FILE__) + "/base.rb"
 
@@ -10,7 +10,7 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
   #
   # 元ファイルのTSVとValidation結果のjsonファイルから
   # Auto-annotation部分を置換したTSVファイルを作成する
-  # Auto-annotationするエラーがなければファイルは作成しない
+  # Auto-annotationするエラーがなければ元ファイルをそのままコピーする
   #
   # ==== Args
   # original_file: validationをかけた元ファイル(TSV)のパス
@@ -19,8 +19,12 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
   # filetype: ファイルの種類 e.g. biosample, bioproject...
   #
   def create_annotated_file (original_file, validate_result_file, output_file, filetype)
-    return nil unless File.exist?(original_file)
-    return nil unless File.exist?(validate_result_file)
+    unless File.exist?(original_file)
+      raise "original file is not found. #{original_file}"
+    end
+    unless File.exist?(validate_result_file)
+      raise "validation result file is not found. #{original_file}"
+    end
 
     #auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
@@ -29,12 +33,11 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
       begin
         tsv_data = FileParser.new().parse_csv(original_file, "\t")
         original_tsv_data = tsv_data[:data]
-        if original_tsv_data.nil? # TSV のparseに失敗
-          return nil
+        if original_tsv_data.nil? # TSV のparseがParseできない場合はエラー
+          raise "Failed parse original file as TSV. #{original_file}"
         end
-      rescue => ex
-        # 元ファイルのXMLがParseできない場合は中断する
-        return nil
+      rescue => ex # 元ファイルのTSVがParseできない場合はエラー
+        raise "Failed parse original file as TSV. #{original_file}"
       end
 
       annotation_list.each do |annotation|
@@ -45,31 +48,36 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
           csv << line
         end
       end
-
+    else # annotation項目がなければ元ファイルをコピーする
+      FileUtils.cp(original_file, output_file)
     end
   end
 
   # 元データに対してauto_anntationを実施
   def update_data(location, original_data, suggest_value)
-    if !(location["mode"].nil? && location[:mode].nil?)
-      if location["mode"] == "add" || location[:mode] == "add"
+    if !(location["mode"].nil? && location[:mode].nil?) # 置換以外のモード
+      if location["mode"] == "add" || location[:mode] == "add" # 追加モード
         original_data.push(location["add_data"])
       end
-    else #ノーマルの置換モード
+    else # 置換モード
       replace_data(location, original_data, suggest_value)
     end
   end
 
-  # 置換モード
+  # 値の置換を行う
   def replace_data(location, original_data, suggest_value)
-    row_index = location["row_index"]
-    column_index = location["column_index"]
+    if location["row_index"]
+      row_index = location["row_index"]
+      column_index = location["column_index"]
+    else
+      row_index = location[:row_index]
+      column_index = location[:column_index]
+    end
 
     if original_data.size >= row_index
       if column_index < original_data[column_index].size
         original_data[row_index][column_index] = suggest_value
       end
     end
-    # out of rangeはどーする？
   end
 end

@@ -1,3 +1,4 @@
+# BioProject/MetaboBank(IDF)のような最左列に項目名を記述するTSV(あるいはそれをJSONに変換した)形式を処理するクラス
 class TsvFieldValidator
 
   def initialize
@@ -429,18 +430,18 @@ class TsvFieldValidator
   end
 
   # auto_annotation用のlocationを返す。ファイル形式によってlocationの記述は異なる
-  # 元ファイルがJSONの場合 {position_list: [10, "values", 0]} # data[10]["values"][0]の値をcorrect
-  # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値をcorrect
+  # 元ファイルがJSONの場合 {position_list: [10, "values", 0]} # data[10]["values"][0]の値を修正
+  # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値を修正
   def auto_annotation_location(data_format, field_index, value_index=nil)
     location = nil
     if data_format == 'json'
-      if value_index.nil?
+      if value_index.nil? #value indexがないのでkeyの値の修正
         location = {position_list: [field_index, "key"]}
       else
         location = {position_list: [field_index, "values", value_index]}
       end
     elsif data_format == 'tsv'
-      if value_index.nil?
+      if value_index.nil? #value indexがないのでkeyの値の修正
         location = {row_index: field_index, column_index: 0 }
       else
         location = {row_index: field_index, column_index: value_index + 1 }
@@ -479,6 +480,28 @@ class TsvFieldValidator
           AutoAnnotatorJson.new().replace_data(location, data, suggest_value)
         end
       end
+    end
+  end
+
+  # ファイル形式の変換を行う JSON => TSV
+  def convert_json2tsv(input_file, output_file)
+    input_data = JSON.parse(File.read(input_file))
+    CSV.open(output_file, "w", col_sep: "\t") do |csv|
+      input_data.each do |row|
+        row_data = []
+        row_data.push(row["key"])
+        row_data.concat(row["values"])
+        csv << row_data
+      end
+    end
+  end
+
+  # ファイル形式の変換を行う TSV => JSON
+  def convert_tsv2json(input_file, output_file)
+    file_content = FileParser.new.get_file_data(input_file)
+    bp_data = tsv2ojb(file_content[:data])
+    File.open(output_file, "w") do |out|
+      out.puts JSON.generate(bp_data)
     end
   end
 end

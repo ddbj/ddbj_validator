@@ -1,5 +1,6 @@
 require 'json'
 require 'nokogiri'
+require 'fileutils'
 
 require File.dirname(__FILE__) + "/base.rb"
 
@@ -11,7 +12,7 @@ class AutoAnnotatorXml < AutoAnnotatorBase
   #
   # 元ファイルのXMLとValidation結果のjsonファイルから
   # Auto-annotation部分を置換したXMLファイルを作成する
-  # Auto-annotationするエラーがなければファイルは作成しない
+  # Auto-annotationするエラーがなければ元ファイルをそのままコピーする
   #
   # ==== Args
   # original_file: validationをかけた元ファイル(XML)のパス
@@ -20,17 +21,20 @@ class AutoAnnotatorXml < AutoAnnotatorBase
   # filetype: ファイルの種類 e.g. biosample, bioproject...
   #
   def create_annotated_file (original_file, validate_result_file, output_file, filetype)
-    return nil unless File.exist?(original_file)
-    return nil unless File.exist?(validate_result_file)
+    unless File.exist?(original_file)
+      raise "original file is not found. #{original_file}"
+    end
+    unless File.exist?(validate_result_file)
+      raise "validation result file is not found. #{original_file}"
+    end
 
     #auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
     if annotation_list.size > 0
       begin
         doc = Nokogiri::XML(File.read(original_file))
-      rescue => ex
-        # 元ファイルのXMLがParseできない場合は中断する
-        return nil
+      rescue => ex # 元ファイルのXMLがParseできない場合はエラー
+        raise "Failed parse original file as XML. #{original_file}"
       end
 
       annotation_list.each do |annotation|
@@ -61,6 +65,8 @@ class AutoAnnotatorXml < AutoAnnotatorBase
       File.open(output_file, 'w') do |file|
         file.puts Nokogiri::XML(doc.to_xml, nil, 'utf-8').to_xml
       end
+    else # annotation項目がなければ元ファイルをコピーする
+      FileUtils.cp(original_file, output_file)
     end
   end
 
