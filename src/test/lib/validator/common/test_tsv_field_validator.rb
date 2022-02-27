@@ -9,7 +9,7 @@ class TestTsvFieldValidator < Minitest::Test
   end
 
 ## COMMON method start
-  def test_tsv2ojb(tsv_data)
+  def test_tsv2ojb
   end
 
   def test_is_ignore_line
@@ -55,7 +55,217 @@ class TestTsvFieldValidator < Minitest::Test
     assert_nil ret
   end
 
+  def test_auto_annotation_location
+    # value pos on json
+    ret = @validator.auto_annotation_location("json", 10, 2)
+    assert_equal ret, {position_list: [10, "values", 2]}
+    # key pos on json
+    ret = @validator.auto_annotation_location("json", 10)
+    assert_equal ret, {position_list: [10, "key"]}
+    # value pos on tsv
+    ret = @validator.auto_annotation_location("tsv", 10, 2)
+    assert_equal ret, {row_index: 10, column_index: 3}
+    # key pos on json
+    ret = @validator.auto_annotation_location("tsv", 10)
+    assert_equal ret, {row_index: 10, column_index: 0}
+  end
+
   def test_replace_by_autocorrect
+    # original file is json
+    data = [{"key" => "title", "values" => ["\"My project   title\"", ""]}]
+    error_list = [
+      {
+        "id": "BP_R0059",
+        "message": "Invalid data format.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+        "level": "warning",
+        "external": false,
+        "method": "BioProject",
+        "object": [
+          "BioProject"
+        ],
+        "source": "bioproject_test_warning.json",
+        "annotation": [
+          {
+            "key": "Field name",
+            "value": "title"
+          },
+          {
+            "key": "Value",
+            "value": "\"My project   title\""
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "My project title"
+            ],
+            "target_key": "Value",
+            "location": {
+              "position_list": [
+                0,
+                "values",
+                0
+              ]
+            },
+            "is_auto_annotation": true
+          }
+        ]
+      }
+    ]
+    @validator.replace_by_autocorrect(data, error_list)
+    assert_equal "My project title", data[0]["values"][0]
+
+    ## with rule_id
+    data = [{"key" => "title", "values" => ["\"My project   title\"", ""]}]
+    @validator.replace_by_autocorrect(data, error_list, "BP_R0059")
+    assert_equal "My project title", data[0]["values"][0]
+
+    ## with other rule_id
+    data = [{"key" => "title", "values" => ["\"My project   title\"", ""]}]
+    @validator.replace_by_autocorrect(data, error_list, "BP_R0001")
+    assert_equal "\"My project   title\"", data[0]["values"][0] # not replace
+
+
+    # original file is tsv
+    data = [{"key" => "title", "values" => ["\"My project   title\"", ""]}]
+    error_list = [
+      {
+        "id": "BP_R0059",
+        "message": "Invalid data format.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+        "level": "warning",
+        "external": false,
+        "method": "BioProject",
+        "object": [
+          "BioProject"
+        ],
+        "source": "bioproject_test_warning.tsv",
+        "annotation": [
+          {
+            "key": "Field name",
+            "value": "title"
+          },
+          {
+            "key": "Value",
+            "value": "My project   title"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "My project title"
+            ],
+            "target_key": "Value",
+            "location": {
+              "row_index": 0,
+              "column_index": 1
+            },
+            "is_auto_annotation": true
+          }
+        ]
+      }
+    ]
+    @validator.replace_by_autocorrect(data, error_list)
+    assert_equal "My project title", data[0]["values"][0]
+
+    # add mode original file is json
+    data = [{"key" => "title", "values" => ["My project title", ""]}]
+    error_list = [
+      {
+        "id": "BP_R0039",
+        "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
+        "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0039",
+        "level": "warning",
+        "external": false,
+        "method": "BioProject",
+        "object": [
+          "BioProject"
+        ],
+        "source": "bioproject_test_warning.json",
+        "annotation": [
+          {
+            "key": "organism",
+            "value": "Homo sapiens"
+          },
+          {
+            "key": "taxonomy_id",
+            "value": ""
+          },
+          {
+            "key": "Suggested value (taxonomy_id)",
+            "suggested_value": [
+              "9606"
+            ],
+            "target_key": "taxonomy_id",
+            "location": {
+              "mode": "add",
+              "type": "json",
+              "add_data": {
+                "key" => "taxonomy_id",
+                "values" => [
+                  "9606"
+                ]
+              }
+            },
+            "is_auto_annotation": true
+          }
+        ]
+      }
+    ]
+    @validator.replace_by_autocorrect(data, error_list)
+    assert_equal "taxonomy_id", data.last["key"]
+    assert_equal "9606", data.last["values"].first
+
+    # add mode original file is tsv
+    data = [{"key" => "title", "values" => ["My project title", ""]}]
+    error_list = [
+      {
+        "id": "BP_R0039",
+        "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
+        "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0039",
+        "level": "warning",
+        "external": false,
+        "method": "BioProject",
+        "object": [
+          "BioProject"
+        ],
+        "source": "bioproject_test_warning.tsv",
+        "annotation": [
+          {
+            "key": "organism",
+            "value": "Homo sapiens"
+          },
+          {
+            "key": "taxonomy_id",
+            "value": ""
+          },
+          {
+            "key": "Suggested value (taxonomy_id)",
+            "suggested_value": [
+              "9606"
+            ],
+            "target_key": "taxonomy_id",
+            "location": {
+              "mode": "add",
+              "type": "tsv",
+              "add_data": [
+                "taxonomy_id",
+                "9606"
+              ]
+            },
+            "is_auto_annotation": true
+          }
+        ]
+      }
+    ]
+    @validator.replace_by_autocorrect(data, error_list)
+    assert_equal "taxonomy_id", data.last["key"]
+    assert_equal "9606", data.last["values"].first
+  end
+
+  def test_convert_json2tsv
+  end
+
+  def test_convert_tsv2json
   end
 
 ## COMMON method end
@@ -104,4 +314,4 @@ class TestTsvFieldValidator < Minitest::Test
 
   def test_mandatory_fields_in_a_group
   end
-end
+end#

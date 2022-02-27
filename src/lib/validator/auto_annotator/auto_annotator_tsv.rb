@@ -20,10 +20,10 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
   #
   def create_annotated_file (original_file, validate_result_file, output_file, filetype)
     unless File.exist?(original_file)
-      raise "original file is not found. #{original_file}"
+      raise "Original file is not found. #{original_file}"
     end
     unless File.exist?(validate_result_file)
-      raise "validation result file is not found. #{original_file}"
+      raise "Validation result file is not found. #{original_file}"
     end
 
     #auto-annotation出来るエラーのみを抽出
@@ -55,8 +55,8 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
 
   # 元データに対してauto_anntationを実施
   def update_data(location, original_data, suggest_value)
-    if !(location["mode"].nil? && location[:mode].nil?) # 置換以外のモード
-      if location["mode"] == "add" || location[:mode] == "add" # 追加モード
+    if !location["mode"].nil? # 置換以外のモード
+      if location["mode"] == "add" # 追加モード
         original_data.push(location["add_data"])
       end
     else # 置換モード
@@ -74,8 +74,8 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
       column_index = location[:column_index]
     end
 
-    if original_data.size >= row_index
-      if column_index < original_data[column_index].size
+    if row_index < original_data.size
+      if column_index < original_data[row_index].size
         original_data[row_index][column_index] = suggest_value
       end
     end

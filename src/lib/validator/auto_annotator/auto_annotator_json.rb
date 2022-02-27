@@ -20,10 +20,10 @@ class AutoAnnotatorJson < AutoAnnotatorBase
   #
   def create_annotated_file (original_file, validate_result_file, output_file, filetype)
     unless File.exist?(original_file)
-      raise "original file is not found. #{original_file}"
+      raise "Original file is not found. #{original_file}"
     end
     unless File.exist?(validate_result_file)
-      raise "validation result file is not found. #{original_file}"
+      raise "Validation result file is not found. #{original_file}"
     end
 
     #auto-annotation出来るエラーのみを抽出
@@ -50,7 +50,11 @@ class AutoAnnotatorJson < AutoAnnotatorBase
   def update_data(location, original_data, suggest_value)
     if location["mode"] || location[:mode] # 置換以外のモード
       if location["mode"] == "add" || location[:mode] == "add" # 追加モード
-        original_data.push(location["add_data"])
+        if location["add_data"]
+          original_data.push(location["add_data"])
+        else
+          original_data.push(location[:add_data])
+        end
       end
     else # 置換モード
       replace_data(location, original_data, suggest_value)
@@ -66,13 +70,21 @@ class AutoAnnotatorJson < AutoAnnotatorBase
       location_index_list = location[:position_list]
     end
     return nil if location_index_list.nil?
-
     current = original_data
+    exist_pos = true # positionでデータを辿れるかのフラグ
     location_index_list.each_with_index do |key, idx|
       if idx < (location_index_list.size - 1)
-        current = current[key]
+        if key.to_s =~ /^[0-9]+$/ && current.is_a?(Array) && current.size > key # 配列の添字の場合は範囲を超えないか
+          current = current[key]
+        elsif current.is_a?(Hash) && !current[key].nil? # ハッシュの場合はkeyがあるか
+          current = current[key]
+        else
+          exist_pos = false
+        end
       else #最後のstring型まで辿らずオブジェクトに渡すことによって参照する元データの値を置換
-        current[location_index_list.last] = suggest_value
+        if exist_pos == true
+          current[location_index_list.last] = suggest_value
+        end
       end
     end
   end

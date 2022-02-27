@@ -22,10 +22,10 @@ class AutoAnnotatorXml < AutoAnnotatorBase
   #
   def create_annotated_file (original_file, validate_result_file, output_file, filetype)
     unless File.exist?(original_file)
-      raise "original file is not found. #{original_file}"
+      raise "Original file is not found. #{original_file}"
     end
     unless File.exist?(validate_result_file)
-      raise "validation result file is not found. #{original_file}"
+      raise "Validation result file is not found. #{original_file}"
     end
 
     #auto-annotation出来るエラーのみを抽出

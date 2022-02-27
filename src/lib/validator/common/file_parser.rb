@@ -1,4 +1,8 @@
 require 'nkf'
+require 'erb'
+require 'logger'
+require 'yaml'
+require 'csv'
 
 class FileParser
   # constructor

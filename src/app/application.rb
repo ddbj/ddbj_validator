@@ -187,23 +187,23 @@ module DDBJValidator
         FileUtils.mkdir_p(annotated_file_dir)
         annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
         result = AutoAnnotator.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype, get_accept_header(request))
-      end
-      if (!File.exist?(result_file)) || (!File.exist?(org_file)) #元ファイルがない
+        if result.nil? || result[:status].nil? ||  result[:status] != "succeed" # 処理が成功しなかった
+          status 500
+          { status: "error", "message": result[:message]}.to_json
+        else #成功した場合、出力ファイルのContent-typeで返す
+          if result[:file_type] == "json"
+            type = "application/json"
+          elsif result[:file_type] == "tsv"
+            type = "text/tab-separated-values"
+          else
+            type = "application/xml"
+          end
+          send_file result[:file_path], :filename => File.basename(result[:file_path]), :type => type
+        end
+      else #元ファイルがない
         status 400
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
-        { status: "error", "message": message}.to_json
-      elsif result.nil? || result[:status].nil? ||  result[:status] != "succeed" # 処理が成功しなかった
-        status 500
-        { status: "error", "message": result[:message]}.to_json
-      else #成功した場合、出力ファイルのContent-typeで返す
-        if result[:file_type] == "json"
-          type = "application/json"
-        elsif result[:file_type] == "tsv"
-          type = "text/tab-separated-values"
-        else
-          type = "application/xml"
-        end
-        send_file result[:file_path], :filename => File.basename(result[:file_path]), :type => type
+        return { status: "error", "message": message}.to_json
       end
     end
 

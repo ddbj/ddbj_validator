@@ -1,3 +1,6 @@
+require 'json'
+require File.dirname(__FILE__) + "/../auto_annotator/auto_annotator_json.rb"
+
 # BioProject/MetaboBank(IDF)のような最左列に項目名を記述するTSV(あるいはそれをJSONに変換した)形式を処理するクラス
 class TsvFieldValidator
 
@@ -450,7 +453,7 @@ class TsvFieldValidator
     location
   end
 
-  # autocorrectの記述に沿ってデータの内容を置換する
+  # autocorrectの記述に沿ってデータ(rubyオブジェクト)の内容を置換する.
   def replace_by_autocorrect(data, error_list, rule_code=nil)
     error_list = error_list.select{|error| error[:id] == rule_code} unless rule_code.nil?
     error_list.each do |error|
@@ -466,18 +469,18 @@ class TsvFieldValidator
           if location[:type] == "json"
             data.push(location[:add_data])
           elsif location[:type] == "tsv"  # tsvモードはjson相当のlocationを組み立てて置換
-            row = {"key" => location[:add_data][0], "values" => location[:add_data][1]}
+            row = {"key" => location[:add_data][0], "values" => location[:add_data][1..-1]}
             data.push(row)
           end
         elsif location[:position_list] # 置換モード、json
           AutoAnnotatorJson.new().replace_data(location, data, suggest_value)
-        elsif location[:row_index] # # 置換モード、tsvモードはjson相当のlocationを組み立てて置換
+        elsif location[:row_index] # 置換モード、tsvモードはjson相当のlocationを組み立てて置換
           if location[:column_index].nil? # keyの変更
-            json_location = [location[:row_index], "key"]
+            json_location = {position_list:[location[:row_index], "key"]}
           else
-            json_location = [location[:row_index], "values", location[:column_index]]
+            json_location = {position_list: [location[:row_index], "values", location[:column_index] - 1]} #JSONのvaluesはTSV列数の -1
           end
-          AutoAnnotatorJson.new().replace_data(location, data, suggest_value)
+          AutoAnnotatorJson.new().replace_data(json_location, data, suggest_value)
         end
       end
     end

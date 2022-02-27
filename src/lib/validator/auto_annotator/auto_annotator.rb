@@ -1,12 +1,14 @@
 require 'optparse'
 require 'logger'
 require 'yaml'
-require 'mail'
+require 'erb'
 require 'fileutils'
 
 require File.expand_path('../auto_annotator_xml.rb', __FILE__)
 require File.expand_path('../auto_annotator_tsv.rb', __FILE__)
 require File.expand_path('../auto_annotator_json.rb', __FILE__)
+require File.expand_path('../../common/file_parser.rb', __FILE__)
+require File.expand_path('../../common/tsv_field_validator.rb', __FILE__)
 
 # 元ファイルからAuto annotateしたファイルを生成して返す
 class AutoAnnotator
@@ -49,11 +51,13 @@ class AutoAnnotator
           elsif file_info[:format] == "json"
             input_file_format = "json"
             annotator = AutoAnnotatorJson.new
+          elsif file_info[:format] == "unknown"
+            raise "Can't parse bioproject original file type. #{org_file}"
           end
           return_file_format = "json" # 基本はJSONで返す
           return_file_format = "tsv" if accept_heder_list.include?("text/tab-separated-values")
         else
-          raise "Can't parse bioproject original file type."
+          raise "Can't parse bioproject original file type. #{org_file}"
         end
       end
 
@@ -79,7 +83,8 @@ class AutoAnnotator
       @log.error(ex.message)
       trace = ex.backtrace.map {|row| row}.join("\n")
       @log.error(trace)
-      {status: "error", message: ex.message}
+      return_message = ex.message.size < 250 ? ex.message : ex.message.split(/\.|\n/).first #長過ぎる場合は最初の一行を返す
+      {status: "error", message: "Failed to output annotated file. #{return_message}"}
     end
   end
 
@@ -89,7 +94,7 @@ class AutoAnnotator
     if file_type == 'bioproject'
       if input_file_format == "tsv" && output_file_format == "json"
         if m = annotated_file_path.end_with?(".tsv")
-          output_file = annotated_file_path.sub(/.csv$/,".json")
+          output_file = annotated_file_path.sub(/.tsv$/,".json")
         else
           output_file = annotated_file_path + ".json"
         end
