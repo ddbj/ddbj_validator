@@ -475,7 +475,7 @@ class TsvFieldValidator
         elsif location[:position_list] # 置換モード、json
           AutoAnnotatorJson.new().replace_data(location, data, suggest_value)
         elsif location[:row_index] # 置換モード、tsvモードはjson相当のlocationを組み立てて置換
-          if location[:column_index].nil? # keyの変更
+          if location[:column_index].nil? || location[:column_index] == 0 # keyの変更
             json_location = {position_list:[location[:row_index], "key"]}
           else
             json_location = {position_list: [location[:row_index], "values", location[:column_index] - 1]} #JSONのvaluesはTSV列数の -1

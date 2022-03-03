@@ -55,7 +55,7 @@
     "values": ["NA", "Unknown"]
   }, {
     "key": "grant_agency",
-    "values": ["Not applicable"]
+    "values": ["Not applicable", "missing"]
   }, {
     "key": "label",
     "values": ["N.A."]
