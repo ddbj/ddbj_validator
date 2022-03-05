@@ -19,6 +19,8 @@
             $('input[id=metabobank_idf]').click();
         } else if (clicked === 'metabobank_sdrf_file_select') {
             $('input[id=metabobank_sdrf]').click();
+        } else if (clicked === 'all_db_file_select') {
+            $('input[id=all_db]').click();
         }
     });
 
@@ -41,6 +43,8 @@
                 $('#metabobank_idf_file_name').val(output_f);
             } else if (changed === 'metabobank_sdrf') {
                 $('#metabobank_sdrf_file_name').val(output_f);
+            } else if (changed === 'all_db') {
+                $('#all_db_file_name').val(output_f);
             }
         }
     });

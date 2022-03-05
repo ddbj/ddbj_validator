@@ -4,6 +4,7 @@ require 'yaml'
 require 'mail'
 require 'fileutils'
 
+require File.expand_path('../common/excel2tsv.rb', __FILE__)
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
 require File.expand_path('../bioproject_tsv_validator.rb', __FILE__)
@@ -14,7 +15,7 @@ require File.expand_path('../metabobank_idf_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
-    @@filetype = %w(biosample bioproject submission experiment run analysis jvar vcf trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
+    @@filetype = %w(all_db biosample bioproject submission experiment run analysis jvar vcf trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -41,49 +42,63 @@ class Validator
     # @param [Hash] params {biosample:"XXXX.xml", bioproject:"YYYY.xml", .., output:"ZZZZ.json"}
     # @return [void]
     def execute(params)
-      @log.info('execute validation:' + params.to_s)
-      running_file = @running_dir + "/" + Time.now.strftime("%Y%m%d%H%M%S%L.tmp")
-      FileUtils.touch(running_file)
+      begin
+        @log.info('execute validation:' + params.to_s)
+        running_file = @running_dir + "/" + Time.now.strftime("%Y%m%d%H%M%S%L.tmp")
+        FileUtils.touch(running_file)
 
-      #get absolute file path and check permission
-      permission_error_list = []
-      params.each do |k,v|
-        case k.to_s
-        when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_agp', 'vcf', 'metabobank_idf', 'metabobank_sdrf', 'output'
-          params[k] = File.expand_path(v)
-          #TODO check file exist and permission, need write permission to output file
-          if k.to_s == 'output'
-            dir_path = File.dirname(params[k])
-            unless File.writable? dir_path
-              permission_error_list.push(params[k])
+        #get absolute file path and check permission
+        permission_error_list = []
+
+        # excelファイルの場合は各シートをTSVに出力してからValidation実行
+        unless params[:all_db].nil?
+          filetypes = split_excel_sheet(params) # 分割されたfiletype(biosample/bioproject等)のリストを取得
+          if filetypes.nil? # ルール違反があった場合は結果JSONが出力されているのでそのまま返す
+            return
+          else # TSVに変換された場合はそのTSVファイルを validator 実行対象として加える(paramsにmerge)
+            filetypes.each do |filetype, path|
+              @log.info("splitted sheet validation: #{filetype} => #{path}")
             end
-          else
-            unless File.readable? params[k]
-              permission_error_list.push(params[k])
+            params.merge!(filetypes)
+          end
+        end
+
+        params.each do |k,v|
+          case k.to_s
+          when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_agp', 'vcf', 'metabobank_idf', 'metabobank_sdrf', 'output'
+            params[k] = File.expand_path(v)
+            #TODO check file exist and permission, need write permission to output file
+            if k.to_s == 'output'
+              dir_path = File.dirname(params[k])
+              unless File.writable? dir_path
+                permission_error_list.push(params[k])
+              end
+            else
+              unless File.readable? params[k]
+                permission_error_list.push(params[k])
+              end
             end
           end
         end
-      end
-      if permission_error_list.size > 0
-        @log.error("File not found or permision denied: #{permission_error_list.join(', ')}")
-        ret = {status: "error", format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
-        JSON.generate(ret)
-        FileUtils.rm(running_file)
-        return
-      end
-
-      # if exist user/password
-      unless params[:user].nil? and params[:password].nil?
-        if params[:user] == 'admin' and params[:password] == 'admin'
-          #TODO get xml with submission?
-        else
-          puts "Unauthorized" #return error
+        if permission_error_list.size > 0
+          @log.error("File not found or permision denied: #{permission_error_list.join(', ')}")
+          ret = {status: "error", format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
+          JSON.generate(ret)
+          FileUtils.rm(running_file)
           return
         end
-      end
 
-      # validate
-      begin
+        # if exist user/password
+        unless params[:user].nil? and params[:password].nil?
+          if params[:user] == 'admin' and params[:password] == 'admin'
+            #TODO get xml with submission?
+          else
+            puts "Unauthorized" #return error
+            return
+          end
+        end
+
+        # validate
         ret = {}
         error_list = []
         error_list.concat(validate("biosample", params)) if !params[:biosample].nil?
@@ -169,6 +184,46 @@ class Validator
         validator.validate(data);
         validator.error_list
       end
+    end
+
+    #
+    # Excelファイルをパースして、規定のシートをTSVファイルに変換して出力した結果を返す.
+    # 成功した場合は、filetypeと保存TSVファイルのパスを返す.
+    # TSV出力が出来なかった場合はnilを返す.
+    #
+    # ==== Args
+    # params: http request parameters
+    # ==== Return
+    # {bioproject: bioproject_tsv_path, biosample: biosample_tsv_path}
+    #
+    def split_excel_sheet(params)
+      result = nil
+      original_excel_path = params[:all_db]
+      base_dir = File.dirname(File.expand_path('../', original_excel_path))
+      mandatory_sheets = []
+      unless params[:params]["check_sheet"].nil?
+        if params[:params]["check_sheet"].is_a?(Array)
+          mandatory_sheets = params[:params]["check_sheet"]
+        else
+          mandatory_sheets = params[:params]["check_sheet"].split(",").map{|item| item.chomp.strip}
+        end
+      end
+      # ExcelからTSVへの変換の実行
+      split_result = Excel2Tsv.new().split_sheet(original_excel_path, base_dir, mandatory_sheets)
+      if split_result[:status] == "failed" # 変換時にルール違反があった場合はfailedとして結果する
+        ret = {version: @latest_version, validity: true}
+        stats = get_result_stats(split_result[:error_list])
+        ret[:validity] = false if stats[:error_count] > 0
+        ret["stats"] = stats
+        ret["messages"] = split_result[:error_list]
+        @log.info('validation result: ' + "fail")
+        File.open(params[:output], "w") do |file|
+          file.puts(JSON.generate(ret))
+        end
+      else # 正常に変換できた場合は、Excelに含まれていたfiletypeと出力TSVのファイルパスを返す
+        result = split_result[:filetypes]
+      end
+      result
     end
 
     # resultのmessageをRuleID毎にグルーピンングしたものを返す

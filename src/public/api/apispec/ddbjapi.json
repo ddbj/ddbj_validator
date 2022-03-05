@@ -70,6 +70,12 @@
             "$ref": "#/parameters/metabobank_sdrf"
           },
           {
+            "$ref": "#/parameters/all_db"
+          },
+          {
+            "$ref": "#/parameters/check_sheet"
+          },
+          {
             "$ref": "#/parameters/submitter_id"
           }
         ],
@@ -434,12 +440,26 @@
       "required": false,
       "type": "file"
     },
-    "metabobank_sddf": {
+    "metabobank_sdrf": {
       "name": "metabobank_sdrf",
       "in": "formData",
       "description": "Upload Metabobank SDRF file.",
       "required": false,
       "type": "file"
+    },
+    "all_db": {
+      "name": "all_db",
+      "in": "formData",
+      "description": "Upload Excel file with multiple DB data.",
+      "required": false,
+      "type": "file"
+    },
+    "check_sheet": {
+      "name": "check_sheet",
+      "in": "formData",
+      "description": "Specify required filetype names to be checked when uploading Excel. e.g. 'bioproject,biosample' or ['bioproject', 'biosample']",
+      "required": false,
+      "type": ["string", "array"]
     },
     "submitter_id": {
       "name": "submitter_id",

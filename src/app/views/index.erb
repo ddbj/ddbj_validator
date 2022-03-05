@@ -32,6 +32,12 @@
             <div id="myTabContent" class="tab-content">
                 <form action="./upload" id="submit_data" method="post" enctype="multipart/form-data">
                     <div class="input-group">
+                        <span class="input-group-label">
+                            <label for="submitter_id"><span>submitter_id:</span></label>
+                        </span>
+                        <input id="submitter_id" type="text" name="submitter_id">
+                    </div>
+                    <div class="input-group">
                         <input id="biosample" class="selected_file" name="biosample" type="file" style="display: none">
                         <span class="input-group-btn">
                             <button id="biosample_file_select" class="btn btn-default file_select" type="button" disabled>
@@ -95,12 +101,38 @@
                         <input id="metabobank_sdrf_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
                     </div>
                     <div class="input-group">
-                        <span class="input-group-label">
-                            <label for="submitter_id"><span>submitter_id:</span></label>
+                        <input id="all_db" class="selected_file" name="all_db" type="file" style="display: none">
+                        <span class="input-group-btn">
+                            <button id="all_db_file_select" class="btn btn-default file_select" type="button">
+                            <span>Excel file(*.xlsx)</span>
+                            <i class="glyphicon glyphicon-folder-open"></i></button>
                         </span>
-                        <input id="submitter_id" type="text" name="submitter_id">
+                        <input id="all_db_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
                     </div>
-
+                    <div class="col-sm-11 gutter-0">
+                        <span>Mandatory check sheet in Excel file:</span>
+                        <label>
+                            <input type="checkbox" id="bioproject" name="check_sheet[]"
+                                   value="bioproject"/>
+                            BioProjet
+                        </label>
+                        <label>
+                            <input type="checkbox" id="biosample" name="check_sheet[]"
+                                   value="biosample">
+                            BioSample
+                        </label>
+                        <label>
+                            <input type="checkbox" id="metabobank_idf" name="check_sheet[]"
+                                   value="metabobank_idf"/>
+                            MetaboBank_IDF
+                        </label>
+                        <label>
+                            <input type="checkbox" id="metabobank_sdrf" name="check_sheet[]"
+                                   value="metabobank_sdrf">
+                             MetaboBank_SDRF
+                        </label>
+                    </div>
+                    <hr/>
                     <div class="sbmt">
                         <div class="row options">
                             <div class="col-sm-1 gutter-0">
@@ -124,15 +156,15 @@
                 </form>
             </div>
         </div>
-    
+
         <div id="result"></div>
-        
+
         <footer id="footer">
             <div class="container">
                 <p>DDBJ Validation Service</p>
             </div>
         </footer>
-        
+
         <script src="../client/js/jquery-1.12.0.min.js"></script>
         <script src="../client/js/underscore-min.js"></script>
         <script src="../client/js/bootstrap.min.js"></script>
