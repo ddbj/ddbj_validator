@@ -163,6 +163,7 @@ class TsvFieldValidator
       end
       next if row["values"].nil?
       row["values"].each_with_index do |value, value_idx|  # Field値のチェック
+        next if value.nil?
         next if value.ascii_only?
         disp_txt = "" #値のどこにnon ascii文字があるか示すメッセージを作成
         value.each_char do |ch|

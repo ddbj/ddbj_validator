@@ -11,8 +11,8 @@ class Excel2Tsv
   @@sheet_settings = {
     "bioproject" => "BioProject",
     "biosample" => "BioSample",
-    "metabobank_idf" => "Study(IDF)",
-    "metabobank_sdrf" => "Assay(SDRF)"
+    "metabobank_idf" => "Study (IDF)",
+    "metabobank_sdrf" => "Assay (SDRF)"
   }
 
   def initialize
