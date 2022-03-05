@@ -11,7 +11,7 @@ require File.expand_path('../bioproject_tsv_validator.rb', __FILE__)
 require File.expand_path('../jvar_validator.rb', __FILE__)
 require File.expand_path('../trad_validator.rb', __FILE__)
 require File.expand_path('../metabobank_idf_validator.rb', __FILE__)
-#require File.expand_path('../metabobank_sdrf_validator.rb', __FILE__)
+require File.expand_path('../metabobank_sdrf_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
@@ -107,7 +107,7 @@ class Validator
         error_list.concat(validate("vcf", params))if !params[:vcf].nil?
         error_list.concat(validate("trad", params))if (params[:trad_anno] || params[:trad_seq] || params[:trad_agp])
         error_list.concat(validate("metabobank_idf", params))if !params[:metabobank_idf].nil?
-        #error_list.concat(validate("metabobank_sdrf", params))if !params[:metabobank_sdrf].nil?
+        error_list.concat(validate("metabobank_sdrf", params))if !params[:metabobank_sdrf].nil?
         #error_list.concat(validate("combination", params))
         #TODO dra validator
 
@@ -175,8 +175,8 @@ class Validator
           validator = MetaboBankIdfValidator.new
           data = params[:metabobank_idf]
         when "metabobank_sdrf"
-          #validator = MetaboBankSdrfValidator.new
-          #data = params[:metabobank_sdrf]
+          validator = MetaboBankSdrfValidator.new
+          data = params[:metabobank_sdrf]
         when "combination"
           validator = CombinationValidator.new
           data = params

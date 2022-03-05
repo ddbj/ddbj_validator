@@ -48,11 +48,11 @@ class TestExcel2Tsv < Minitest::Test
     sheet_settings = {
       "bioproject" => "BioProject",
       "biosample" => "BioSample",
-      "metabobank_idf" => "Study(IDF)",
-      "metabobank_sdrf" => "Assay(SDRF)"
+      "metabobank_idf" => "Study (IDF)",
+      "metabobank_sdrf" => "Assay (SDRF)"
     }
     mandatory_filetypes = ["biosample", "bioproject"]
-    exist_sheet_list = ["BioProject", "BioSample", "Study(IDF)"]
+    exist_sheet_list = ["BioProject", "BioSample", "Study (IDF)"]
     ret = @excel2tsv.mandatory_sheet_check(mandatory_filetypes, exist_sheet_list, sheet_settings)
     assert ret
 

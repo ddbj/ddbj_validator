@@ -1,0 +1,39 @@
+{
+  "ruleMB_SR0001": {
+    "rule_class": "MetaboBank",
+    "code": "MB_SR0001",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid JSON structure",
+    "method": "invalid_json_structure",
+    "message": "JSON structure is invalid against schema.",
+    "object": [
+      "SDRF"
+    ]
+  },
+  "ruleMB_SR0002": {
+    "rule_class": "MetaboBank",
+    "code": "MB_SR0002",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid file format",
+    "method": "invalid_file_format",
+    "message": "Only JSON and TSV formats are supported.",
+    "object": [
+      "SDRF"
+    ]
+  },
+  "ruleMB_SR0030": {
+    "rule_class": "MetaboBank",
+    "code": "MB_SR0030",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid characters",
+    "method": "invalid_characters",
+    "message": "Invalid characters detected. Please check for non-standard characters in your field values around [### Invalid character ###] and reformat as ASCII-only so that data can be properly consumed by dependent databases.",
+    "object": [
+      "SDRF"
+    ],
+    "reference": "BS_R0058"
+  }
+}

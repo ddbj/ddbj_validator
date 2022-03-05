@@ -1,7 +1,7 @@
 {
   "$id": "https://ddbj.nig.ac.jp/api/validator/bioproject/schema.json",
-  "title": "BioProject",
-  "description": "BioProject submission shema",
+  "title": "MetaboBank IDF",
+  "description": "MetaboBank IDF submission shema",
   "type": "array",
   "items": {
     "type": "object",

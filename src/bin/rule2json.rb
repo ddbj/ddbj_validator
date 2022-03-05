@@ -15,6 +15,7 @@ class CreateRuleJson
   # jvar: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=1910595238&format=csv"
   # trad: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/export?gid=1886458756&format=csv"
   # metabobank(idf): "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU//export?gid=831672616&format=csv"
+  # metabobank(sdrf): "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU//export?gid=904619035&format=csv"
   # all_db: "https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU//export?gid=858669050&format=csv"
 
   def create_rule_file (type, csv_file)
@@ -67,7 +68,7 @@ class CreateRuleJson
 end
 
 if ARGV.size < 2
-  puts "Usage: ruby rule2json.rb <biosample | bioproject | dra | jvar | trad | metabobankidf> rule_file.csv"
+  puts "Usage: ruby rule2json.rb <biosample | bioproject | dra | jvar | trad | metabobankidf | metabobanksdrf> rule_file.csv"
   exit(1);
 end
 creator = CreateRuleJson.new
