@@ -69,7 +69,11 @@ class Excel2Tsv
           sheet = xlsx.sheet(sheet_name)
           # 出力先ファイルの決定
           output_file_dir = "#{base_dir}/#{filetype}"
-          output_file_name = "#{File.basename(original_excel_path, ".xlsx")}_#{filetype}.tsv"
+          if original_excel_path.end_with?(".xlsm") # with macro
+            output_file_name = "#{File.basename(original_excel_path, ".xlsm")}_#{filetype}.tsv"
+          else
+            output_file_name = "#{File.basename(original_excel_path, ".xlsx")}_#{filetype}.tsv"
+          end
           FileUtils.mkdir_p(output_file_dir) unless File.exist?(output_file_dir)
           output_file_path = "#{output_file_dir}/#{output_file_name}"
           # TSVを出力
