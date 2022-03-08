@@ -1,9 +1,13 @@
 require 'yaml'
+require 'json'
+require 'json-schema'
+require File.dirname(__FILE__) + "/common/common_utils.rb"
 
 class ValidatorBase
 
   def initialize
     @conf = read_common_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
+    @validation_config = {}
   end
 
   #
@@ -183,6 +187,57 @@ class ValidatorBase
       end
     end
     text_value.strip.chomp
+  end
+
+  #
+  # JSON Schemaに合致するか
+  #
+  # ==== Args
+  # json_data: 検証するJSONデータ
+  # schema_json_data: Schema JSON
+  # ==== Return
+  # true/false
+  #
+  def invalid_json_structure(rule_code, json_data, schema_json_data)
+    result = true
+    begin
+      invalid_list = JSON::Validator.fully_validate(schema_json_data, json_data)
+      if invalid_list.size > 0
+        result = false
+        invalid_list.each do |invalid|
+          annotation = [
+            {key: "Message", value: invalid}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+      end
+    end
+    result
+  end
+
+  #
+  # 取り扱えるデータフォーマットかどうか
+  #
+  # ==== Args
+  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
+  # level: error level (error or warning)
+  # allow_format_list: 許容する形式を配列で記載 ["tsv", "json"]
+  # ==== Return
+  # true/false
+  #
+  def invalid_file_format(rule_code, file_format, allow_format_list)
+    result = true
+    unless allow_format_list.include?(file_format)
+      result = false
+      allow_text = allow_format_list.map{|format| format.upcase }.join(" or ")
+      annotation = [
+        {key: "Message", value: "Failed to read the file as #{allow_text}"}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
   end
 
 end

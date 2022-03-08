@@ -1022,5 +1022,29 @@
     "object": [
       "BioSample"
     ]
+  },
+  "ruleBS_R0123": {
+    "rule_class": "BioSample",
+    "code": "BS_R0123",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid JSON structure",
+    "method": "invalid_json structure",
+    "message": "JSON structure is invalid against schema.",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0124": {
+    "rule_class": "BioSample",
+    "code": "BS_R0124",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid file format",
+    "method": "invalid_file_format",
+    "message": "Only XML and JSON and TSV formats are supported.",
+    "object": [
+      "BioSample"
+    ]
   }
 }

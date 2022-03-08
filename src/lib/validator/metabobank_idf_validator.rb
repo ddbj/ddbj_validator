@@ -66,17 +66,17 @@ class MetaboBankIdfValidator < ValidatorBase
 
     file_content = FileParser.new.get_file_data(data_file)
     @data_format = file_content[:format]
-    ret = invalid_file_format("MB_IR0002", @data_format)
+    ret = invalid_file_format("MB_IR0002", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止
 
     if @data_format == "json"
       idf_data = file_content[:data]
-      ret = invalid_json_structure("MB_IR0001", bp_data, @json_schema)
+      ret = invalid_json_structure("MB_IR0001", bp_data, @json_schema) #baseのメソッドを呼び出し
       return if ret == false #スキーマNGの場合はvalidationは中止
     elsif @data_format == "tsv"
       idf_data = @tsv_validator.tsv2ojb(file_content[:data])
     else
-      invalid_file_format("MB_IR0002", @data_format)
+      invalid_file_format("MB_IR0002", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
       return
     end
 
@@ -149,57 +149,5 @@ class MetaboBankIdfValidator < ValidatorBase
     end
     invalid_list
   end
-
-  #
-  # rule:MB_IR0001
-  # JSON Schemaに合致するか
-  #
-  # ==== Args
-  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
-  # level: error level (error or warning)
-  # ==== Return
-  # true/false
-  #
-  def invalid_json_structure(rule_code, json_data, schema_json_data)
-    result = true
-    begin
-      invalid_list = JSON::Validator.fully_validate(schema_json_data, json_data)
-      if invalid_list.size > 0
-        result = false
-        invalid_list.each do |invalid|
-          annotation = [
-            {key: "Message", value: invalid}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      end
-    end
-    result
-  end
-
-  #
-  # rule:MB_IR0002
-  # 取り扱えるデータフォーマットかどうか
-  #
-  # ==== Args
-  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
-  # level: error level (error or warning)
-  # ==== Return
-  # true/false
-  #
-  def invalid_file_format(rule_code, file_format)
-    result = true
-    if !(file_format == "json" || file_format == "tsv")
-      result = false
-      annotation = [
-        {key: "Message", value: "Failed to read the file as JSON or TSV"}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-    end
-    result
-  end
-
 
 end

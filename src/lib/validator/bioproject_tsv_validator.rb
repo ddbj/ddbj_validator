@@ -6,7 +6,6 @@ require 'geocoder'
 require 'date'
 require 'net/http'
 require 'nokogiri'
-require 'json-schema'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
@@ -78,17 +77,17 @@ class BioProjectTsvValidator < ValidatorBase
 
     file_content = FileParser.new.get_file_data(data_file)
     @data_format = file_content[:format]
-    ret = invalid_file_format("BP_R0068", @data_format)
+    ret = invalid_file_format("BP_R0068", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止
 
     if @data_format == "json"
       bp_data = file_content[:data]
-      ret = invalid_json_structure("BP_R0067", bp_data, @json_schema)
+      ret = invalid_json_structure("BP_R0067", bp_data, @json_schema) #baseのメソッドを呼び出し
       return if ret == false #スキーマNGの場合はvalidationは中止
     elsif @data_format == "tsv"
       bp_data = @tsv_validator.tsv2ojb(file_content[:data])
     else
-      invalid_file_format("BP_R0068", @data_format)
+      invalid_file_format("BP_R0068", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
       return
     end
 
@@ -404,7 +403,7 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def taxonomy_error_warning (rule_code, organism_with_pos, taxid_with_pos)
     return nil if CommonUtils::blank?(organism_with_pos) #organismの記載無し
-    organism_with_pos = "" if CommonUtils::blank?(organism_with_pos[:value])
+    organism_with_pos[:value] = "" if CommonUtils::blank?(organism_with_pos[:value])
     result = false #このメソッドが呼び出されている時点でfalse
 
     unless organism_with_pos[:value] == ""
@@ -944,57 +943,6 @@ class BioProjectTsvValidator < ValidatorBase
       elsif @file_format == "json"
         annotation.push( {key: "Position", value: invalid[:field_idx]})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-    end
-    result
-  end
-
-  #
-  # rule:BP_R0067
-  # JSON Schemaに合致するか
-  #
-  # ==== Args
-  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
-  # level: error level (error or warning)
-  # ==== Return
-  # true/false
-  #
-  def invalid_json_structure(rule_code, json_data, schema_json_data)
-    result = true
-    begin
-      invalid_list = JSON::Validator.fully_validate(schema_json_data, json_data)
-      if invalid_list.size > 0
-        result = false
-        invalid_list.each do |invalid|
-          annotation = [
-            {key: "Message", value: invalid}
-          ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
-        end
-      end
-    end
-    result
-  end
-
-  #
-  # rule:BP_R0068
-  # 取り扱えるデータフォーマットかどうか
-  #
-  # ==== Args
-  # file_format: 自動で認識したファイル(json, tsv, xml, csv)
-  # level: error level (error or warning)
-  # ==== Return
-  # true/false
-  #
-  def invalid_file_format(rule_code, file_format)
-    result = true
-    if !(file_format == "json" || file_format == "tsv")
-      result = false
-      annotation = [
-        {key: "Message", value: "Failed to read the file as JSON or TSV"}
-      ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
     end

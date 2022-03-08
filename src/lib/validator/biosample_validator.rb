@@ -13,6 +13,8 @@ require File.dirname(__FILE__) + "/common/organism_validator.rb"
 require File.dirname(__FILE__) + "/common/sparql_base.rb"
 require File.dirname(__FILE__) + "/common/validator_cache.rb"
 require File.dirname(__FILE__) + "/common/xml_convertor.rb"
+require File.dirname(__FILE__) + "/common/file_parser.rb"
+require File.dirname(__FILE__) + "/common/tsv_column_validator.rb"
 
 #
 # A class for BioSample validation
@@ -35,6 +37,7 @@ class BioSampleValidator < ValidatorBase
     @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
     @institution_list = CommonUtils.new.parse_coll_dump(@conf[:institution_list_file])
+    @tsv_validator = TsvColumnValidator.new()
     if @conf[:biosample].nil? || @conf[:biosample]["package_version"].nil?
       @package_version = DEFAULT_PACKAGE_VERSION
     else
@@ -74,6 +77,7 @@ class BioSampleValidator < ValidatorBase
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
+      config[:json_schema] = JSON.parse(File.read(config_file_dir + "/schema.json"))
       config[:institution_list_file] = config_file_dir + "/coll_dump.txt"
       config[:google_api_key] = @conf[:google_api_key]
       config[:eutils_api_key] = @conf[:eutils_api_key]
@@ -90,30 +94,55 @@ class BioSampleValidator < ValidatorBase
   # Error/warning list is stored to @error_list
   #
   # ==== Args
-  # data_xml: xml file path
+  # data_file: input file path
   #
   #
-  def validate (data_xml, submitter_id=nil)
-    valid_xml = not_well_format_xml("BS_R0097", data_xml)
-    return unless valid_xml
-    #convert to object for validator
-    @data_file = File::basename(data_xml)
-    xml_document = File.read(data_xml)
-    valid_xml = xml_data_schema("BS_R0098", xml_document)
-    return unless valid_xml
+  def validate (data_file, submitter_id=nil)
 
-    # xml検証が通った場合のみ実行
-    @biosample_list = @xml_convertor.xml2obj(xml_document, 'biosample')
+    file_content = FileParser.new.get_file_data(data_file)
+    @data_format = file_content[:format]
 
-    if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
-    else
-      @submitter_id = submitter_id
+    ret = invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
+    return if ret == false #ファイルが読めなければvalidationは中止
+
+    if @data_format == "xml"
+      #valid_xml = not_well_format_xml("BS_R0097", data_file)
+      #return unless valid_xml
+      #convert to object for validator
+      @data_file = File::basename(data_file)
+      xml_document = File.read(data_file)
+      valid_xml = xml_data_schema("BS_R0098", xml_document)
+      return unless valid_xml
+      # xml検証が通った場合のみ実行
+      @biosample_list = @xml_convertor.xml2obj(xml_document, 'biosample')
+      if submitter_id.nil?
+        @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
+      else
+        @submitter_id = submitter_id
+      end
+      #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
+      @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
+    elsif @data_format == "json"
+      data_list = file_content[:data]
+      ret = invalid_json_structure("BS_R0123", data_list, @conf[:json_schema]) #baseのメソッドを呼び出し
+      return if ret == false #スキーマNGの場合はvalidationは中止
+      @biosample_list = biosample_obj(data_list)
+      unless submitter_id.nil?
+        @submitter_id = submitter_id
+      end
+      @submission_id = "" # TODO どこから取得する？
+    elsif @data_format == "tsv"
+      data_list = @tsv_validator.tsv2ojb(file_content[:data])
+      @biosample_list = biosample_obj(data_list)
+      unless submitter_id.nil?
+        @submitter_id = submitter_id
+      end
+      @submission_id = "" # TODO どこから取得する？
+    else #xml,json,tsvでパースができなければerrorを追加して修了
+      invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
+      return
     end
-    #TODO @submitter_id が取得できない場合はエラーにする?
 
-    #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
-    @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
 
     ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
@@ -423,6 +452,37 @@ class BioSampleValidator < ValidatorBase
       attr_group_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name)
       attr_group_list
     end
+  end
+
+  # TSV用のkey-valueオブジェクトからValidator用のBioSampleのリストに変換
+  def biosample_obj(data_list)
+    biosample_list = []
+    attr_no = 1
+    data_list.each do |row|
+      biosample = {"package" => "", "attributes" => {}, "attribute_list" => []}
+      row.each do |attribute|
+        if attribute["key"] == "_package"
+          biosample["package"] = attribute["value"]
+        else
+          if attribute["key"].start_with?("*")
+            attr_name = attribute["key"].sub!(/^(\*)+/, "")
+          else
+            attr_name = attribute["key"]
+          end
+          if biosample["attributes"][attr_name].nil? # 同一属性が出現する場合は、先の記述を優先
+            if !(attribute["value"].nil? || attribute["value"] == "")
+              biosample["attributes"][attr_name] = attribute["value"]
+            end
+          end
+          if !(attribute["value"].nil? || attribute["value"] == "")
+            biosample["attribute_list"].push({attr_name => attribute["value"], "attr_no" => attr_no})
+          end
+          attr_no += 1
+        end
+      end
+      biosample_list.push(biosample)
+    end
+    biosample_list
   end
 
 ### validate method ###

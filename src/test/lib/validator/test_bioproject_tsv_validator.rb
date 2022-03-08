@@ -838,12 +838,12 @@ class TestBioProjectValidator < Minitest::Test
   # BP_R0068
   def test_invalid_file_format
     #ok case
-    ret = exec_validator("invalid_file_format", "BP_R0068", "tsv")
+    ret = exec_validator("invalid_file_format", "BP_R0068", "tsv", ["tsv", "json"])
     assert_equal true, ret[:result]
-    ret = exec_validator("invalid_file_format", "BP_R0068", "json")
+    ret = exec_validator("invalid_file_format", "BP_R0068", "json", ["tsv", "json"])
     assert_equal true, ret[:result]
     #ng case
-    ret = exec_validator("invalid_file_format", "BP_R0068", "csv")
+    ret = exec_validator("invalid_file_format", "BP_R0068", "csv", ["tsv", "json"])
     assert_equal false, ret[:result]
   end
 

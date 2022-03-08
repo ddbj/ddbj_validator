@@ -155,6 +155,23 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 0, attr_group_list.size
   end
 
+  def test_biosample_obj
+    data_list = [[
+      {"key" => "_package", "value" => "MIGS.vi"},
+      {"key" => "*sample_name", "value" => "My Sample"},
+      {"key" => "**strain", "value" => "Strain Name"},
+      {"key" => "component_organism", "value" => "comp_organism_1"},
+      {"key" => "component_organism", "value" => "comp_organism_2"}
+    ]]
+    attribute_list = @validator.send("biosample_obj", data_list)
+    assert_equal 1, attribute_list.size
+    assert_equal "MIGS.vi", attribute_list.first["package"]
+    assert_equal "My Sample", attribute_list.first["attributes"]["sample_name"] # key先頭のアスタリスクは除去される
+    assert_equal "Strain Name", attribute_list.first["attributes"]["strain"] # key先頭のアスタリスクは除去される(複数個)
+    assert_equal "comp_organism_1", attribute_list.first["attributes"]["component_organism"] # 先出が優先
+    assert_equal 4, attribute_list.first["attribute_list"].size
+  end
+
 #### 各validationメソッドのユニットテスト ####
 
   def test_not_well_format_xml
@@ -1836,5 +1853,29 @@ jkl\"  "
     ret = exec_validator("cov2_package_versus_organism", "BS_R0048", "SampleA", nil, "Severe acute respiratory syndrome coronavirus 2", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
+  end
+
+  def test_invalid_json_structure
+    json_schema = JSON.parse(File.read(File.absolute_path(File.dirname(__FILE__) + "/../../../conf/biosample/schema.json")))
+    #ok case
+    data = [[{"key" => "sample_name", "value" => "My Sample"}]]
+    ret = exec_validator("invalid_json_structure", "BS_R0123", data, json_schema)
+    assert_equal true, ret[:result]
+    #ng case
+    data = [[{"key" => "sample_name", "value" => ["My sample"]}]] # value is not array
+    ret = exec_validator("invalid_json_structure", "BS_R0123", data, json_schema)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_invalid_file_format
+    #ok case
+    ret = exec_validator("invalid_file_format", "BS_R0124", "tsv", ["tsv", "json", "xml"])
+    assert_equal true, ret[:result]
+    ret = exec_validator("invalid_file_format", "BS_R0124", "xml", ["tsv", "json", "xml"])
+    assert_equal true, ret[:result]
+    #ng case
+    ret = exec_validator("invalid_file_format", "BS_R0124", "csv", ["tsv", "json", "xml"])
+    assert_equal false, ret[:result]
   end
 end
