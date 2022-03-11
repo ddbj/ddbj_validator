@@ -40,9 +40,22 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
         raise "Failed parse original file as TSV. #{original_file}"
       end
 
+      # 位置に変更がない置換モードから処理を行う
       annotation_list.each do |annotation|
-        update_data(annotation["location"], original_tsv_data, annotation["suggested_value"].first)
+        if annotation["location"]["mode"].nil?
+          update_data(annotation["location"], original_tsv_data, annotation["suggested_value"].first)
+        end
       end
+      # 追加モード (BioProject/IDF向け)
+      annotation_list.each do |annotation|
+        if annotation["location"]["mode"] == "add"
+          update_data(annotation["location"], original_tsv_data, annotation["suggested_value"].first)
+        end
+      end
+      # 全行に対して列を追加するモード (BioSample/SDRF向け)
+      add_column_annotation = annotation_list.select {|annotation| annotation["location"]["mode"] == "add_column"}
+      add_columns(add_column_annotation, original_tsv_data)
+
       CSV.open(output_file, "w", col_sep: "\t") do |csv|
         original_tsv_data.each do |line|
           csv << line
@@ -78,6 +91,33 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
       if column_index < original_data[row_index].size
         original_data[row_index][column_index] = suggest_value
       end
+    end
+  end
+
+  # 列を追加して、値を挿入する
+  def add_columns(add_annotation_list, original_data)
+    # header列の追加とそれ以降の行に空白を挿入
+    header_list = add_annotation_list.map {|annotation| annotation["location"]["header"]}.uniq # 列名が異なるがindexが分かれていたり、同じ列名が別indexであるという不整合はないものとする
+    header_hash = {} # {"taxonomy_id" => "5" # 挿入列名に対する挿入列の場所
+    header_row_idx = 0 # headerの場所
+    header_list.each do |add_header|
+      header_row_idx = add_header["header_idx"]
+      original_data.each_with_index do |row, row_idx|
+        if row_idx == header_row_idx
+          row.insert(add_header["column_idx"], add_header["name"])
+        elsif row_idx > header_row_idx # header以降の行には空白列を追加
+          row.insert(add_header["column_idx"], nil)
+        end
+      end
+      header_hash[add_header["name"]] = add_header["column_idx"]
+    end
+
+    # 追加した列に対して補正データを上書きする
+    add_annotation_list.each do |annotation|
+      location = {}
+      location["row_index"] = annotation["location"]["row_idx"]
+      location["column_index"] = header_hash[annotation["location"]["header"]["name"]] # 追加した列のindexを指定
+      update_data(location, original_data, annotation["suggested_value"].first)
     end
   end
 end

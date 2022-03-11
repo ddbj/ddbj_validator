@@ -39,9 +39,28 @@ class AutoAnnotator
       input_file_format = ""
       return_file_format = ""
       if filetype == "biosample"
-        input_file_format = "xml"
-        return_file_format = "xml"
-        annotator = AutoAnnotatorXml.new
+        file_info = FileParser.new().get_file_data(org_file) # 元ファイルの形式を調べる。これはかなり無駄
+        unless file_info.nil?
+          if file_info[:format] == "xml"
+            input_file_format = "xml"
+            return_file_format = "xml"
+            annotator = AutoAnnotatorTsv.new
+          elsif file_info[:format] == "tsv"
+            input_file_format = "tsv"
+            annotator = AutoAnnotatorTsv.new
+            return_file_format = "tsv" # 基本はTSVで返す
+            return_file_format = "json" if accept_heder_list.include?("application/json")
+          elsif file_info[:format] == "json"
+            input_file_format = "json"
+            annotator = AutoAnnotatorJson.new
+            return_file_format = "json" # 基本はJSONで返す
+            return_file_format = "tsv" if accept_heder_list.include?("text/tab-separated-values")
+          elsif file_info[:format] == "unknown"
+            raise "Can't parse bioproject original file type. #{org_file}"
+          end
+        else
+          raise "Can't parse bioproject original file type. #{org_file}"
+        end
       elsif filetype == "bioproject"
         file_info = FileParser.new().get_file_data(org_file) # 元ファイルの形式を調べる。これはかなり無駄
         unless file_info.nil?
@@ -92,7 +111,7 @@ class AutoAnnotator
   def file_convert(file_type, annotated_file_path, input_file_format, output_file_format)
     ret = nil
     if file_type == 'bioproject'
-      if input_file_format == "tsv" && output_file_format == "json"
+      if input_file_format == "tsv" && output_file_format == "json" # tsv => json
         if m = annotated_file_path.end_with?(".tsv")
           output_file = annotated_file_path.sub(/.tsv$/,".json")
         else
@@ -102,7 +121,7 @@ class AutoAnnotator
           TsvFieldValidator.new().convert_tsv2json(annotated_file_path, output_file)
           ret = output_file
         end
-      elsif input_file_format == "json" && output_file_format == "tsv"
+      elsif input_file_format == "json" && output_file_format == "tsv" # json => tsv
         if m = annotated_file_path.end_with?(".json")
           output_file = annotated_file_path.sub(/.json$/,".tsv")
         else
@@ -110,6 +129,28 @@ class AutoAnnotator
         end
         unless output_file.nil?
           TsvFieldValidator.new().convert_json2tsv(annotated_file_path, output_file)
+          ret = output_file
+        end
+      end
+    elsif file_type == 'biosample'
+      if input_file_format == "tsv" && output_file_format == "json" # tsv => json
+        if m = annotated_file_path.end_with?(".tsv")
+          output_file = annotated_file_path.sub(/.tsv$/,".json")
+        else
+          output_file = annotated_file_path + ".json"
+        end
+        unless output_file.nil?
+          TsvColumnValidator.new().convert_tsv2biosamplejson(annotated_file_path, output_file) # BioSampleに特化した形式(ヘッダーのアスタリスク除去と空値属性削除)に変換
+          ret = output_file
+        end
+      elsif input_file_format == "json" && output_file_format == "tsv" # json => tsv
+        if m = annotated_file_path.end_with?(".json")
+          output_file = annotated_file_path.sub(/.json$/,".tsv")
+        else
+          output_file = annotated_file_path + ".tsv"
+        end
+        unless output_file.nil?
+          TsvColumnValidator.new().convert_json2tsv(annotated_file_path, output_file)
           ret = output_file
         end
       end

@@ -35,9 +35,22 @@ class AutoAnnotatorJson < AutoAnnotatorBase
         raise "Failed parse original file as JSON. #{original_file}"
       end
 
+      # 位置に変更がない置換モードから処理を行う
       annotation_list.each do |annotation|
-        update_data(annotation["location"], json_data, annotation["suggested_value"].first)
+        if annotation["location"]["mode"].nil?
+          update_data(annotation["location"], json_data, annotation["suggested_value"].first)
+        end
       end
+      # 追加モード (BioProject/IDF向け)
+      annotation_list.each do |annotation|
+        if annotation["location"]["mode"] == "add"
+          update_data(annotation["location"], json_data, annotation["suggested_value"].first)
+        end
+      end
+      # 全行に対して列を追加するモード (BioSample/SDRF向け)
+      add_column_annotation = annotation_list.select {|annotation| annotation["location"]["mode"] == "add_column"}
+      add_columns(add_column_annotation, json_data)
+
       File.open(output_file, "w") do |out|
         out.puts JSON.generate(json_data)
       end
@@ -84,6 +97,25 @@ class AutoAnnotatorJson < AutoAnnotatorBase
       else #最後のstring型まで辿らずオブジェクトに渡すことによって参照する元データの値を置換
         if exist_pos == true
           current[location_index_list.last] = suggest_value
+        end
+      end
+    end
+  end
+
+  # 列を追加して、値を挿入する
+  def add_columns(add_annotation_list, original_data)
+    # header列の追加とそれ以降の行に空白を挿入
+    add_header_list = add_annotation_list.map {|annotation| annotation["location"]["header"]}.uniq # 列名が異なるがindexが分かれていたり、同じ列名が別indexであるという不整合はないものとする
+    add_header_list.each do |add_header| # 追加する項目ごとに処理。全行走査して、補足値を挿入するか空値で挿入するか、
+      original_data.each_with_index do |row, row_idx|
+        if row.select{|cell| cell["key"] == add_header["name"]}.size == 0 # 行に追加列名が存在しない
+          insert_value = nil
+          insert_annotation = add_annotation_list.find{|annotation| annotation["location"]["header"]["name"] == add_header["name"] && annotation["location"]["row_idx"] == row_idx}
+          unless insert_annotation.nil?
+            insert_value = insert_annotation["suggested_value"].first
+          end
+          insert_data = {"key" => add_header["name"], "value" => insert_value} # 補正(追加)する値がない場合にも空値で追加
+          row.insert(add_header["column_idx"], insert_data)
         end
       end
     end

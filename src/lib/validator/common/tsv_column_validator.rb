@@ -57,6 +57,45 @@ class TsvColumnValidator
     data_list
   end
 
+  #
+  # 入力ファイル形式に応じたAuto-annotationの補正位置を返す。
+  # TSVファイルではヘッダーより前のコメント行数も加味した位置を計算して返す。
+  #
+  # ==== Args
+  # data_format : 元ファイルのフォーマット 'tsv' or 'json'
+  # line_num: sample_list中のサンプルのindex. 1始まりの値
+  # attr_no: 属性リスト中の属性のindex. 1始まりの値
+  # key_or_value: 'key' or 'value'.　修正対象が'key'(属性名:TSVではヘッダー部)か'value'(属性値)か
+  # line_offset: TSV形式での先頭行からヘッダー行までのオフセット値。ヘッダーより前のコメント行数
+  # column_offset: TSV形式での先頭列(JSONでは配列の先頭)から属性値として扱う列までのオフセット値。制御列
+  # ==== Return
+  # 元ファイルがJSONの場合 {position_list: [10, "values", 0]} # data[10]["values"][0]の値を修正
+  # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値を修正
+  #
+  def auto_annotation_location_with_index(data_format, line_num, attr_no, key_or_value, line_offset=0, column_offset=0)
+    location = nil
+    line_idx = line_num -  1 #line_numは1始まりなので -1 する
+    attr_idx = attr_no - 1 # attr_noも1始まりなので -1 する
+    attr_idx += column_offset #属性ではない制御用の列("_package"等)の分のindexをズラす
+    if data_format == 'json'
+      location = {position_list: [line_idx, attr_idx, key_or_value]}
+    elsif data_format == 'tsv'
+      if key_or_value == "key" # ヘッダーの修正
+        location = {row_index: line_offset, column_index: attr_idx }
+      else # 値の修正
+        location = {row_index: row_index_on_tsv(line_num), column_index: attr_idx} #コメント行 + ヘッダーの1行をオフセット
+      end
+    end
+    location
+  end
+
+  def row_index_on_tsv(line_num)
+    line_offset = row_count_offset #ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
+    line_idx = line_num -  1 #line_numは1始まりなので -1
+    row_idx = line_idx + line_offset + 1 #コメント行 + ヘッダーの1行をオフセット
+    row_idx
+  end
+
   # non-ASCIIが含まれていないか
   def non_ascii_characters (data, ignore_field_list=nil)
     invalid_list = []
@@ -94,4 +133,96 @@ class TsvColumnValidator
     disp_txt
   end
 
+  # ファイル形式の変換を行う JSON => TSV
+  def convert_json2tsv(input_file, output_file)
+    input_data = JSON.parse(File.read(input_file))
+
+    # 各行のkey名(並び順含めて)が揃っているかのチェック
+    all_header_list = []
+    input_data.each do |row|
+      header_list = []
+      row.each do |cell|
+        header_list.push(cell["key"])
+      end
+      all_header_list.push(header_list)
+    end
+    if all_header_list.uniq.size > 1
+      return nil # TODO keyが揃っていなければTSV変換しない。正しく出来ないケースがある
+    else
+      header_list = all_header_list.first
+      CSV.open(output_file, "w", col_sep: "\t") do |csv|
+        csv << header_list
+        input_data.each do |row|
+          row_data = []
+          row.each do |cell|
+            if cell["value"].nil? || cell["value"] == ""
+              value = nil
+            else
+              value = cell["value"]
+            end
+            row_data.push(value)
+          end
+          csv << row_data
+        end
+      end
+    end
+  end
+
+  # ファイル形式の変換を行う TSV => JSON
+  def convert_tsv2json(input_file, output_file)
+    file_content = FileParser.new.get_file_data(input_file)
+    data = tsv2ojb(file_content[:data])
+    File.open(output_file, "w") do |out|
+      out.puts JSON.generate(data)
+    end
+  end
+
+  # ファイル形式の変換を行う TSV => JSON (BioProject固有の形式)
+  # ヘッダーカラムの"*"は除去、全行に渡って値の入力がない列は削除、ただし重要行は残すなど
+  def convert_tsv2biosamplejson(input_file, output_file)
+    file_content = FileParser.new.parse_csv(input_file, "\t")
+    data = tsv2ojb(file_content[:data])
+
+    # ヘッダーカラムの"*"を除去。非効率だが全行に対して行う
+    data.each do |row|
+      row.each_with_index do |cell, column_idx|
+        unless (cell["key"].nil? || cell["key"] == "")
+          cell["key"] = cell["key"]
+          if cell["key"].start_with?("*")
+            cell["key"] = cell["key"].sub!(/^(\*)+/, "")
+          end
+        end
+      end
+    end
+    # 全行に渡って値が入っていない列を削除する。
+    column_data = {}
+    data.each do |row|
+      row.each_with_index do |cell, column_idx|
+        column_data[column_idx] = [] if column_data[column_idx].nil?
+        if cell["value"].nil? || cell["value"] == ""
+          value = nil
+        else
+          value = cell["value"]
+        end
+        column_data[column_idx].push(value)
+      end
+    end
+
+    delete_column_idx = [] #削除する列のindex
+    column_data.each do |cell_idx, value_list|
+      if value_list.uniq.compact == [] # 全行中身のない列のindexを保存
+        delete_column_idx.push(cell_idx)
+      end
+    end
+    r_delete_column_idx = delete_column_idx.reverse #要素がズレないように末尾の列から削除
+    data.each do |row|
+      r_delete_column_idx.each do |delete_index|
+        row.delete_at(delete_index)
+      end
+    end
+
+    File.open(output_file, "w") do |out|
+      out.puts JSON.generate(data)
+    end
+  end
 end
