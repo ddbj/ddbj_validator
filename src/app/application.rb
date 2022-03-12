@@ -369,6 +369,40 @@ module DDBJValidator
       end
     end
 
+    get '/api/attribute_template_file' do
+      if params["package"].nil? || params["package"].strip == ""
+        status 400
+        message = "'package' parameter is required"
+        ret = { status: "error", "message": message}.to_json
+        return ret
+      end
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_package_version
+      end
+      only_biosample_sheet = false
+      if params["only_biosample_sheet"]
+        only_biosample_sheet = true
+      end
+      ret = Package.new(nil).attribute_template_file(version, params["package"], only_biosample_sheet, get_accept_header(request))
+      if ret[:status] == "success"
+        if ret[:file_type] == "tsv"
+          type = "text/tab-separated-values"
+          file_name = "template.tsv"
+        else
+          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          file_name = "template.xlsx"
+        end
+        send_file ret[:file_path], :filename => file_name, :type => type
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "error", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "error", "message": ret[:message]}.to_json
+      end
+    end
+
     get '/api/package_info' do
       if params["package"].nil? || params["package"].strip == ""
         status 400
