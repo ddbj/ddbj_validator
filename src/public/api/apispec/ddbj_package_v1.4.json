@@ -119,6 +119,57 @@
         }
       }
     },
+    "/attribute_template_file": {
+      "get": {
+        "tags": [
+          "Package"
+        ],
+        "summary": "template file with attribute list of specific package",
+        "description": "Returns a template file with attribute list of specific package. File format is TSV or Excel; for Excel, select BioSample sheet only or BioProject sheet included.",
+        "produces": [
+          "text/tab-separated-values",
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        ],
+        "consumes": [
+          "text/plain"
+        ],
+        "parameters": [
+          {
+            "$ref": "#/parameters/version"
+          },
+          {
+            "$ref": "#/parameters/package"
+          },
+          {
+            "name": "only_biosample_sheet",
+            "in": "query",
+            "description": "Specify when you want Excel only for BioSample sheets when downloading template files.",
+            "required": false,
+            "type": "string"
+          }, {
+            "name": "Accept",
+            "in": "header",
+            "description": "Specify the file format to download. 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' or 'text/tab-separated-values'",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Operation",
+            "schema": {
+              "type": "file"
+            }
+          },
+          "400": {
+            "description": "Invalid package version or package.",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/package_info": {
       "get": {
         "tags": [
@@ -161,7 +212,7 @@
     "version": {
       "name": "version",
       "in": "query",
-      "description": "Version of biosample package set. \"1.4.0\", \"1.5.0\"",
+      "description": "Version of biosample package set. \"1.4.0\"",
       "required": true,
       "type": "string"
     },
