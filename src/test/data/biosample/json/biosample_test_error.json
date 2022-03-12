@@ -1,0 +1,89 @@
+[
+  [
+    {
+      "key": "_package",
+      "value": "MIGS.ba.microbial"
+    }, {
+      "key": "sample_name",
+      "value": "MTB313"
+    }, {
+      "key": "sample_title",
+      "value": "MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes"
+    }, {
+      "key": "description",
+      "value": ""
+    }, {
+      "key": "organism",
+      "value": "streptococcus pyogenes"
+    }, {
+      "key": "taxonomy_id",
+      "value": "1314"
+    }, {
+      "key": "bioproject_id",
+      "value": "PRJDB1654"
+    }, {
+      "key": "locus_tag_prefix",
+      "value": ""
+    }, {
+      "key": "collection_date",
+      "value": "2011-12-1T1:2:3"
+    }, {
+      "key": "depth",
+      "value": "0m"
+    }, {
+      "key": "elev",
+      "value": "missing"
+    }, {
+      "key": "env_broad_scale",
+      "value": "urban biome"
+    }, {
+      "key": "env_local_scale",
+      "value": "town"
+    }, {
+      "key": "env_medium",
+      "value": "interstitial fluid"
+    }, {
+      "key": "geo_loc_name",
+      "value": "japan: Hikone-shi"
+    }, {
+      "key": "isol_growth_condt",
+      "value": "PMID:123"
+    }, {
+      "key": "lat_lon",
+      "value": "N37.443501234 W6.25401234"
+    }, {
+      "key": "num_replicons",
+      "value": "aaaa   bbb"
+    }, {
+      "key": "ref_biomaterial",
+      "value": "\"16088826\""
+    }, {
+      "key": "strain",
+      "value": "N.A."
+    }, {
+      "key": "project_name",
+      "value": "Streptococcus pyogenes MTB313 genome sequencing"
+    }, {
+      "key": "host",
+      "value": "human"
+    }, {
+      "key": "component_organism",
+      "value": "Enterococcus coli"
+    }, {
+      "key": "culture_collection",
+      "value": "atcc : number"
+    }, {
+      "key": "specimen_voucher",
+      "value": "aamu : number"
+    }, {
+      "key": "bio_material",
+      "value": "abrc : number"
+    }, {
+      "key": "my   attribute",
+      "value": "missing"
+    }, {
+      "key": "oxy_stat_samp",
+      "value": "Anaerobic"
+    }
+  ]
+]
