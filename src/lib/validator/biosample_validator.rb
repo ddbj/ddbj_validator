@@ -97,13 +97,20 @@ class BioSampleValidator < ValidatorBase
   # data_file: input file path
   #
   #
-  def validate (data_file, submitter_id=nil)
+  def validate (data_file, params={})
 
     file_content = FileParser.new.get_file_data(data_file)
     @data_format = file_content[:format]
 
     ret = invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止
+
+    unless (params["submitter_id"].nil? || params["submitter_id"].strip == "")
+      @submitter_id = params["submitter_id"]
+    end
+    unless (params["biosample_submission_id"].nil? || params["biosample_submission_id"].strip == "")
+      @submission_id = params["biosample_submission_id"]
+    end
 
     if @data_format == "xml"
       #valid_xml = not_well_format_xml("BS_R0097", data_file)
@@ -115,29 +122,21 @@ class BioSampleValidator < ValidatorBase
       return unless valid_xml
       # xml検証が通った場合のみ実行
       @biosample_list = @xml_convertor.xml2obj(xml_document, 'biosample')
-      if submitter_id.nil?
+      if @submitter_id.nil?
         @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
-      else
-        @submitter_id = submitter_id
       end
       #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
-      @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
+      if @submission_id.nil?
+        @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
+      end
     elsif @data_format == "json"
       data_list = file_content[:data]
       ret = invalid_json_structure("BS_R0123", data_list, @conf[:json_schema]) #baseのメソッドを呼び出し
       return if ret == false #スキーマNGの場合はvalidationは中止
       @biosample_list = biosample_obj(data_list)
-      unless submitter_id.nil?
-        @submitter_id = submitter_id
-      end
-      @submission_id = "" # TODO どこから取得する？
     elsif @data_format == "tsv"
       data_list = @tsv_validator.tsv2ojb(file_content[:data])
       @biosample_list = biosample_obj(data_list)
-      unless submitter_id.nil?
-        @submitter_id = submitter_id
-      end
-      @submission_id = "" # TODO どこから取得する？
     else #xml,json,tsvでパースができなければerrorを追加して修了
       invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
       return

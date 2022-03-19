@@ -33,7 +33,7 @@
                 <form action="./upload" id="submit_data" method="post" enctype="multipart/form-data">
                     <div class="input-group">
                         <span class="input-group-label">
-                            <label for="submitter_id"><span>submitter_id:</span></label>
+                            <label for="submitter_id"><span>submitter id:</span></label>
                         </span>
                         <input id="submitter_id" type="text" name="submitter_id">
                     </div>
@@ -47,6 +47,12 @@
                         <input id="biosample_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
                     </div>
                     <div class="input-group">
+                        <span class="input-group-label">
+                            <label for="biosample_submission_id"><span>biosample submission id:</span></label>
+                        </span>
+                        <input id="biosample_submission_id" type="text" name="biosample_submission_id">
+                    </div>
+                    <div class="input-group">
                         <input id="bioproject" class="selected_file" name="bioproject" type="file" style="display: none">
                         <span class="input-group-btn">
                             <button id="bioproject_file_select" class="btn btn-default file_select" type="button">
@@ -54,6 +60,12 @@
                             <i class="glyphicon glyphicon-folder-open"></i></button>
                         </span>
                         <input id="bioproject_file_name" type="text" class="form-control file_name" placeholder="select file ..." disabled>
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-label">
+                            <label for="bioproject_submission_id"><span>bioproject submission id:</span></label>
+                        </span>
+                        <input id="bioproject_submission_id" type="text" name="bioproject_submission_id">
                     </div>
                     <div class="input-group">
                         <input id="trad_anno" class="selected_file" name="trad_anno" type="file" style="display: none">

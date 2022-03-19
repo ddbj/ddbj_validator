@@ -181,7 +181,7 @@ class Validator
           validator = CombinationValidator.new
           data = params
         end
-        validator.validate(data);
+        validator.validate(data, params[:params]);
         validator.error_list
       end
     end

@@ -58,7 +58,7 @@ class MetaboBankSdrfValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_file, submitter_id=nil)
+  def validate (data_file, params={})
     @data_file = File::basename(data_file)
     #field_settings = @conf[:field_settings]
 

@@ -71,9 +71,16 @@ class BioProjectTsvValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_file, submitter_id=nil)
+  def validate (data_file, params={})
     @data_file = File::basename(data_file)
     field_settings = @conf[:field_settings]
+
+    unless (params["submitter_id"].nil? || params["submitter_id"].strip == "")
+      @submitter_id = params["submitter_id"]
+    end
+    unless (params["bioproject_submission_id"].nil? || params["bioproject_submission_id"].strip == "")
+      @submission_id = params["bioproject_submission_id"]
+    end
 
     file_content = FileParser.new.get_file_data(data_file)
     @data_format = file_content[:format]
