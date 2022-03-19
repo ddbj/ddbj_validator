@@ -53,18 +53,24 @@ module DDBJValidator
       #組み合わせが成功したものだけ保存しチェック
       if valid_file_combination?
 
+        validation_params = {}
+        validation_params[:params] = {"file_format" => {}}
+
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        validation_params = {}
+
         input_file_list = %w(all_db biosample bioproject submission experiment run analysisx jvar vcf trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)
             validation_params[file_category.to_sym] = save_path
+            file_format = file_format(file_category, params)
+            if file_format
+              validation_params[:params]["file_format"][file_category] = file_format
+            end
           end
         end
         allow_params = %w(submitter_id biosample_submission_id bioproject_submission_id google_api_key check_sheet check_sheet[])
-        validation_params[:params] = {}
         allow_params.each do |param_name|
           if params[param_name.to_sym]
             validation_params[:params][param_name] = params[param_name.to_sym]
@@ -506,6 +512,38 @@ module DDBJValidator
           end
         end
         save_path
+      end
+
+      #file typeを推測して返す
+      def file_format (validator_type, params)
+        filetype = nil
+        unless params[validator_type.to_sym].is_a?(String) #fileで送られた場合
+          content_type = params[validator_type.to_sym][:type]
+          if content_type
+            content_type.chomp.strip!
+            if content_type == "text/xml" || content_type == "application/xml"
+              filetype = "xml"
+            elsif content_type == "application/json"
+              filetype = "json"
+            elsif content_type == "text/tab-separated-values" || content_type == "text/plain"
+              filetype = "tsv"
+            elsif content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              filetype = "excel"
+            end
+          end
+        end
+        if filetype.nil?
+          filename = params[validator_type.to_sym][:filename].chomp.strip.downcase
+          if filename.end_with?(".xml")
+            filetype = "xml"
+          elsif filename.end_with?(".json")
+            filetype = "json"
+          elsif filename.end_with?(".tsv") || filename.end_with?(".txt")
+            filetype = "tsv"
+          elsif filename.end_with?(".xlsx") || filename.end_with?(".xlmx")
+          end
+        end
+        filetype
       end
 
       # Acceptヘッダーをリストで返す

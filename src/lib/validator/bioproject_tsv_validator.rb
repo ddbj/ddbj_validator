@@ -82,16 +82,24 @@ class BioProjectTsvValidator < ValidatorBase
       @submission_id = params["bioproject_submission_id"]
     end
 
-    file_content = FileParser.new.get_file_data(data_file)
-    @data_format = file_content[:format]
+    # file typeのチェック
+    file_content = nil
+    unless (params["file_format"]["bioproject"].nil? || params["file_format"]["bioproject"].strip.chomp == "")
+      @data_format = params["file_format"]["bioproject"]
+    else #推測されたtypeがなければ中身をパースして推測
+      file_content = FileParser.new.get_file_data(data_file)
+      @data_format = file_content[:format]
+    end
     ret = invalid_file_format("BP_R0068", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止
 
     if @data_format == "json"
+      file_content = FileParser.new.get_file_data(data_file, "json") if file_content.nil?
       bp_data = file_content[:data]
       ret = invalid_json_structure("BP_R0067", bp_data, @json_schema) #baseのメソッドを呼び出し
       return if ret == false #スキーマNGの場合はvalidationは中止
     elsif @data_format == "tsv"
+      file_content = FileParser.new.get_file_data(data_file, "tsv") if file_content.nil?
       bp_data = @tsv_validator.tsv2ojb(file_content[:data])
     else
       invalid_file_format("BP_R0068", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し

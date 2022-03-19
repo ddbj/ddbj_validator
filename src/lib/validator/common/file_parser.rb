@@ -21,17 +21,17 @@ class FileParser
   # ==== Return
   # "json", "xml", "tsv", "csv"のいずれか
   #
-  def get_file_data(file_path)
+  def get_file_data(file_path, filetype=nil)
     ext = File.extname(file_path)
     format = nil
-    if ext.downcase == "json"
+    if filetype == "json" || ext.downcase == "json"
       begin
         ret = JSON.parse(File.read(file_path))
         return {format: "json", data: ret}
       rescue # 拡張子と中身があっていなければnil
         return {format: "invalid:json", data: nil}
       end
-    elsif ext.downcase == "xml"
+    elsif filetype == "xml" || ext.downcase == "xml"
       begin
         document = Nokogiri::XML(File.read(file_path))
         if document.errors.empty?
@@ -42,41 +42,43 @@ class FileParser
       rescue # 拡張子と中身があっていなければnil
         return {format: "invalid:xml", data: nil}
       end
-    elsif ext.downcase == "xls" || ext.downcase == "xlsx"
-      return {format: "excel", data: nil}  #扱わないのでパースしない
-    elsif ext.downcase == "tsv"
+    elsif filetype == "tsv" || ext.downcase == "tsv"
       ret = parse_csv(file_path, "\t")
       if ret[:data].nil?
         return {format: "invalid:tsv", message: ret[:message], data: nil}
       else
         return {format: "tsv", data: ret[:data]}
       end
+    elsif ext.downcase == "xlsx" || ext.downcase == "xlmx"
+      return {format: "excel", data: nil}  #扱わないのでパースしない
     elsif ext.downcase == "csv"
       return {format: "csv", data: nil}  #扱わないのでパースしない
     else # 拡張子が明示的でなければ中身で判定
       begin
-        ret = JSON.parse(File.read(file_path))
-        return {format: "json", data: ret}
+        document = Nokogiri::XML(File.read(file_path))
+        if document.errors.empty?
+          return {format: "xml", data: document}
+        else
+          raise
+        end
       rescue
         begin
-          document = Nokogiri::XML(File.read(file_path))
-          if document.errors.empty?
-            return {format: "xml", data: document}
-          else
-            begin
-              ret = parse_csv(file_path, "\t")
-              if ret[:data].nil?
-                return {format: "unknown", message: ret[:message], data: nil}
-              else
-                return {format: "tsv", data: ret[:data]}
-              end
-            rescue => ex
-              @log.warn("Fail to parse a file as JSON/XML/TSV.")
-              @log.warn(ex.message)
-              trace = ex.backtrace.map {|row| row}.join("\n")
-              @log.warn(trace)
-              return {format: "unknown", message: ex.message, data: nil}
+          ret = JSON.parse(File.read(file_path))
+          return {format: "json", data: ret}
+        rescue
+          begin
+            ret = parse_csv(file_path, "\t")
+            if ret[:data].nil?
+              return {format: "unknown", message: ret[:message], data: nil}
+            else
+              return {format: "tsv", data: ret[:data]}
             end
+          rescue => ex
+            @log.warn("Fail to parse a file as JSON/XML/TSV.")
+            @log.warn(ex.message)
+            trace = ex.backtrace.map {|row| row}.join("\n")
+            @log.warn(trace)
+            return {format: "unknown", message: ex.message, data: nil}
           end
         end
       end

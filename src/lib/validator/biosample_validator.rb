@@ -98,12 +98,7 @@ class BioSampleValidator < ValidatorBase
   #
   #
   def validate (data_file, params={})
-
-    file_content = FileParser.new.get_file_data(data_file)
-    @data_format = file_content[:format]
-
-    ret = invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
-    return if ret == false #ファイルが読めなければvalidationは中止
+    @data_file = File::basename(data_file)
 
     unless (params["submitter_id"].nil? || params["submitter_id"].strip == "")
       @submitter_id = params["submitter_id"]
@@ -111,16 +106,25 @@ class BioSampleValidator < ValidatorBase
     unless (params["biosample_submission_id"].nil? || params["biosample_submission_id"].strip == "")
       @submission_id = params["biosample_submission_id"]
     end
-
     unless (params["google_api_key"].nil? || params["google_api_key"].strip == "")
       @google_api_key = params["google_api_key"]
     end
+
+    # file typeのチェック
+    file_content = nil
+    unless (params["file_format"]["biosample"].nil? || params["file_format"]["biosample"].strip.chomp == "")
+      @data_format = params["file_format"]["biosample"]
+    else #推測されたtypeがなければ中身をパースして推測
+      file_content = FileParser.new.get_file_data(data_file)
+      @data_format = file_content[:format]
+    end
+    ret = invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
+    return if ret == false #ファイルが読めなければvalidationは中止
 
     if @data_format == "xml"
       #valid_xml = not_well_format_xml("BS_R0097", data_file)
       #return unless valid_xml
       #convert to object for validator
-      @data_file = File::basename(data_file)
       xml_document = File.read(data_file)
       valid_xml = xml_data_schema("BS_R0098", xml_document)
       return unless valid_xml
@@ -134,11 +138,13 @@ class BioSampleValidator < ValidatorBase
         @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
       end
     elsif @data_format == "json"
+      file_content = FileParser.new.get_file_data(data_file, "json") if file_content.nil?
       data_list = file_content[:data]
       ret = invalid_json_structure("BS_R0123", data_list, @conf[:json_schema]) #baseのメソッドを呼び出し
       return if ret == false #スキーマNGの場合はvalidationは中止
       @biosample_list = biosample_obj(data_list)
     elsif @data_format == "tsv"
+      file_content = FileParser.new.get_file_data(data_file, "tsv") if file_content.nil?
       data_list = @tsv_validator.tsv2ojb(file_content[:data])
       @biosample_list = biosample_obj(data_list)
     else #xml,json,tsvでパースができなければerrorを追加して修了

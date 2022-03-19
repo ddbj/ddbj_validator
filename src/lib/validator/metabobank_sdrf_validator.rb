@@ -62,16 +62,24 @@ class MetaboBankSdrfValidator < ValidatorBase
     @data_file = File::basename(data_file)
     #field_settings = @conf[:field_settings]
 
-    file_content = FileParser.new.get_file_data(data_file)
-    @data_format = file_content[:format]
+    # file typeのチェック
+    file_content = nil
+    unless (params["file_format"]["metabobank_sdrf"].nil? || params["file_format"]["metabobank_sdrf"].strip.chomp == "")
+      @data_format = params["file_format"]["metabobank_sdrf"]
+    else #推測されたtypeがなければ中身をパースして推測
+      file_content = FileParser.new.get_file_data(data_file)
+      @data_format = file_content[:format]
+    end
     ret = invalid_file_format("MB_SR0002", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止
 
     if @data_format == "json"
+      ile_content = FileParser.new.get_file_data(data_file, "json") if file_content.nil?
       sdrf_data = file_content[:data]
       ret = invalid_json_structure("MB_SR0001", bp_data, @json_schema) #baseのメソッドを呼び出し
       return if ret == false #スキーマNGの場合はvalidationは中止
     elsif @data_format == "tsv"
+      file_content = FileParser.new.get_file_data(data_file, "tsv") if file_content.nil?
       sdrf_data = @tsv_validator.tsv2ojb(file_content[:data])
     else
       invalid_file_format("MB_SR0002", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
