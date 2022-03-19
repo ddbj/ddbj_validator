@@ -338,7 +338,7 @@
   "ruleBP_R0060": {
     "rule_class": "BioProject",
     "code": "BP_R0060",
-    "level": "warning",
+    "level": "error",
     "internal_ignore": false,
     "name": "Non-ASCII characters",
     "method": "non_ascii_characters",
