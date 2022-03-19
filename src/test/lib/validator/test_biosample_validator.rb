@@ -771,19 +771,19 @@ class TestBioSampleValidator < Minitest::Test
 
   def test_latlon_versus_country
     #ok case
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "35.2399 N, 139.0306 E", 1)
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "35.2399 N, 139.0306 E", nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## exchange google country to insdc country case
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Svalbard", "78.92268 N 11.98147 E", 1)
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Svalbard", "78.92268 N 11.98147 E", nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## not valid latlon format
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "not description", 1)
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "not description", nil, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Norway:Svalbard", "78.92267 N 11.98147 E", 1)
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Norway:Svalbard", "78.92267 N 11.98147 E", nil, 1)
     expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway'"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -949,43 +949,43 @@ class TestBioSampleValidator < Minitest::Test
     null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
     package_attr_list = @validator.get_attributes_of_package("MIMS.me.microbial", @package_version)
     # ok case
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "10m", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "10m", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## optional attribute(ignore)
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     ## uppercase
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "not applicable", get_auto_annotation(ret[:error_list])
     ## not recommended
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "n. a.", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "n. a.", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", ".", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", ".", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "-", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "-", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing", get_auto_annotation(ret[:error_list])
     ## optional attribute & not provide package_attr_list
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, nil, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, nil, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "not applicable", get_auto_annotation(ret[:error_list])
     # params are nil pattern
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ## null like value
-    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "not applicable", null_accepted, null_not_recommended, package_attr_list, 1)
+    ret = exec_validator("invalid_attribute_value_for_null", "BS_R0001", "sampleA", "depth", "not applicable", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -1196,41 +1196,41 @@ class TestBioSampleValidator < Minitest::Test
   def test_invalid_data_format
     ### attribute name
     # ok case
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "MTB313", "attr_name", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "MTB313", "attr_name", 1, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample    comment", "MTB313", "attr_name", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample    comment", "MTB313", "attr_name", 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "sample comment", get_auto_annotation(ret[:error_list])
     # nil case
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "", "MTB313", "attr_name", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "", "MTB313", "attr_name", 1, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
 
     ### attribute value
     # ok case
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "MTB313", "attr_value", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "MTB313", "attr_value", 1, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     # 前後に空白があり、引用符で囲まれ、タブと改行と繰り返し空白が含まれる文字列
     ng_value = "    \"abc     def		ghi
 jkl\"  "
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", ng_value, "attr_value", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", ng_value, "attr_value", 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "abc def ghi jkl", get_auto_annotation(ret[:error_list])
     # 前後が引用符で囲われていてその中のテキストの前後に空白がある
     ng_value = "'-69.23935, 39.76112 '"
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", ng_value, "attr_value", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", ng_value, "attr_value", 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "-69.23935, 39.76112", get_auto_annotation(ret[:error_list])
 
     # params are nil pattern
-    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "", "attr_value", 1)
+    ret = exec_validator("invalid_data_format", "BS_R0013", "SampleA", "sample_name", "", "attr_value", 1, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end

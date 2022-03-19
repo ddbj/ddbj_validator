@@ -330,18 +330,25 @@ class CommonUtils
   #
   # ==== Args
   # iso_latlon: ISO lat_lon format ex. "35.2095, 139.0034"
+  # google_api_key: google api key. If not specified, set environment variables: 'DDBJ_VALIDATOR_APP_GOOGLE_API_KEY'.
   # ==== Return
   # returns list of country name ex. ["Japan"]
   # returns nil if the geocoding hasn't hit(include not valid latlon format case).
   #
-  def geocode_country_from_latlon (iso_latlon)
+  def geocode_country_from_latlon (iso_latlon, google_api_key=nil)
     return nil if iso_latlon.nil?
     # 200ms 間隔を空ける
     # APIのper second制約がある為. 50/sだが早過ぎるとエラーになるという報告がみられる
     # https://developers.google.com/maps/documentation/geocoding/intro?hl=ja#Limits
     sleep(0.2)
+
+    # google API key. 指定がなければ環境変数の値を使用
+    if google_api_key.nil? || google_api_key.strip == ""
+      google_api_key = @@google_api_key['key']
+    end
+
     url = "https://maps.googleapis.com/maps/api/geocode/json?language=en"
-    url += "&key=#{@@google_api_key['key']}"
+    url += "&key=#{google_api_key}"
     url += "&latlng=#{iso_latlon}"
     begin
       res = http_get_response(url)

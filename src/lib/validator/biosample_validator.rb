@@ -112,6 +112,10 @@ class BioSampleValidator < ValidatorBase
       @submission_id = params["biosample_submission_id"]
     end
 
+    unless (params["google_api_key"].nil? || params["google_api_key"].strip == "")
+      @google_api_key = params["google_api_key"]
+    end
+
     if @data_format == "xml"
       #valid_xml = not_well_format_xml("BS_R0097", data_file)
       #return unless valid_xml
@@ -309,7 +313,7 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 複数属性の組合せの検証
-      latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
+      latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], @google_api_key, line_num)
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
@@ -1470,7 +1474,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, line_num)
+  def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, google_api_key, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
 
     country_name = geo_loc_name.split(":").first.strip
@@ -1486,7 +1490,7 @@ class BioSampleValidator < ValidatorBase
         latlon_for_google = "#{iso_latlon[:latitude].to_s},#{iso_latlon[:longitude].to_s}"
       end
       begin
-        latlon_country_name = common.geocode_country_from_latlon(latlon_for_google)
+        latlon_country_name = common.geocode_country_from_latlon(latlon_for_google, google_api_key)
         @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon, latlon_country_name) unless @cache.nil?
       rescue
         #failed geocoding response 500. not save cache.
@@ -1820,7 +1824,7 @@ class BioSampleValidator < ValidatorBase
       if @data_format == "json" || @data_format == "tsv"
         location = auto_annotation_location_with_index(@data_format, line_num, attr_no, "value")
       else
-        location = @xml_convertor..xpath_from_attrname_with_index(attr_name, line_num, attr_no)
+        location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
       annotation.push(CommonUtils::create_suggested_annotation([attr_val_result], "Attribute value", location, true));
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)

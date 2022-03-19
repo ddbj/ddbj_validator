@@ -77,6 +77,15 @@
           },
           {
             "$ref": "#/parameters/submitter_id"
+          },
+          {
+            "$ref": "#/parameters/biosample_submission_id"
+          },
+          {
+            "$ref": "#/parameters/bioproject_submission_id"
+          },
+          {
+            "$ref": "#/parameters/google_api_key"
           }
         ],
         "responses": {
@@ -465,6 +474,27 @@
       "name": "submitter_id",
       "in": "formData",
       "description": "submitter_id",
+      "required": false,
+      "type": "string"
+    },
+    "biosample_submission_id": {
+      "name": "biosample_submission_id",
+      "in": "formData",
+      "description": "Submission ID of BioSample file to be validated. e.g., SSUB00xxxx",
+      "required": false,
+      "type": "string"
+    },
+    "bioproject_submission_id": {
+      "name": "bioproject_submission_id",
+      "in": "formData",
+      "description": "Submission ID of BioProject file to be validated. e.g., PSUB00xxxx",
+      "required": false,
+      "type": "string"
+    },
+    "google_api_key": {
+      "name": "google_api_key",
+      "in": "formData",
+      "description": "39 characters of Google API key for validation with geocoding.",
       "required": false,
       "type": "string"
     },
