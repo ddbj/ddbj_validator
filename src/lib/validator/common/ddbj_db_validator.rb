@@ -988,14 +988,14 @@ class DDBJDbValidator
   end
 
   #
-  # 指定されたBioSample の smp_id に対する BioProject Accession ID のリストを付与して配列で返す。DRA登録を通して検索する。
+  # 指定されたBioSample の smp_id に対する DRR Accession ID のリストを付与して配列で返す。DRA登録を通して検索する。
   # IDがDBにない場合や、statusが無効な場合にはsmp_idを付与しない
   #
   # ==== Args
   # biosample_smp_id_list ex. ["64274", "00000"]
   # ==== Return
   # smp_idとBioProject Accession IDの配列
-  # [ {smp_id: "64274", bioproject_accession_id_list: ["64274"]}, {smp_id: "00000"}]
+  # [ {smp_id: "64274", drr_accession_id_list: ["64274"]}, {smp_id: "00000"}]
   #
   def get_run_id_via_dra(biosample_smp_id_list)
     return nil if biosample_smp_id_list.nil?
