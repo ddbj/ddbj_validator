@@ -148,6 +148,7 @@ class BioProjectTsvValidator < ValidatorBase
     missing_at_least_one_required_fields_in_a_group("BP_R0052", bp_data, field_settings["selective_mandatory"], field_settings["field_groups"], "warning")
     missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "error")
     missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "warning")
+    missing_mandatory_field_names("BP_R0069", bp_data, field_settings["mandatory_field_names"])
 
     # 個別のfieldの値に対するチェック
     identical_project_title_and_description("BP_R0005", bp_data)
@@ -964,4 +965,33 @@ class BioProjectTsvValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:BP_R0069
+  # 必須Field名の記述が抜けていないかチェック
+  #
+  # ==== Args
+  # data: project data
+  # mandatory_field_names_conf: settings of mandatory_field_names
+  # ==== Return
+  # true/false
+  #
+  def missing_mandatory_field_names(rule_code, data, mandatory_field_names_conf)
+    result = true
+    invalid_list = []
+    unless mandatory_field_names_conf.nil?
+      invalid_list = @tsv_validator.missing_mandatory_field_names(data, mandatory_field_names_conf)
+    end
+
+    unless invalid_list.size == 0
+      result = false
+      invalid_list.each do |invalid|
+        annotation = [
+          {key: "Missing field names", value: invalid[:field_names]}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
 end

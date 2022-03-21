@@ -847,4 +847,29 @@ class TestBioProjectValidator < Minitest::Test
     assert_equal false, ret[:result]
   end
 
+  # BP_R0069
+  def test_missing_mandatory_field_names
+    #ok case
+    mandatory_field_names_conf = ["title", "description", "organism", "taxonomy_id"]
+    data = [
+      {"key" => "title", "values" => []}, {"key" => "description", "values" => []},
+      {"key" => "organism", "values" => []}, {"key" => "taxonomy_id", "values" => []}]
+    ret = exec_validator("missing_mandatory_field_names", "BP_R0069", data, mandatory_field_names_conf)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ## missing taxonomy_id
+    data = [
+      {"key" => "title", "values" => []}, {"key" => "description", "values" => []},
+      {"key" => "organism", "values" => []}]
+    ret = exec_validator("missing_mandatory_field_names", "BP_R0069", data, mandatory_field_names_conf)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## missing title and taxonomy_id
+    data = [{"key" => "description", "values" => []}, {"key" => "organism", "values" => []}]
+    ret = exec_validator("missing_mandatory_field_names", "BP_R0069", data, mandatory_field_names_conf)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size #複数の欠損でも1つにまとめてエラー
+  end
 end

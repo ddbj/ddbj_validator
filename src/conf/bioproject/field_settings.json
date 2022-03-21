@@ -53,6 +53,14 @@
     "register_as_umbrella",
     "private_comment_to_ddbj"
   ],
+  "mandatory_field_names": [
+    "title",
+    "description",
+    "project_data_type",
+    "sample_scope",
+    "organism",
+    "taxonomy_id"
+  ],
   "field_groups": [
     {
       "group_name": "Consortium",

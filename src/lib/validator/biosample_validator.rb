@@ -196,6 +196,9 @@ class BioSampleValidator < ValidatorBase
       missing_attribute_name("BS_R0034", sample_name, biosample_data["attribute_list"], line_num)
       package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
       multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], package_attr_list, line_num)
+      if @data_format == "json" || @data_format == "tsv"
+        missing_mandatory_attribute_names("BS_R0127", sample_name, biosample_data["attribute_list"], line_num)
+      end
     end
 
     ### 複数のサンプル間の関係(一意性など)の検証
@@ -207,6 +210,10 @@ class BioSampleValidator < ValidatorBase
       sample_title = biosample_data["attributes"]["sample_title"]
       duplicated_sample_title_in_this_submission("BS_R0003", sample_name, sample_title, @biosample_list, line_num)
       duplicate_sample_names("BS_R0028", sample_name, sample_title, @biosample_list, line_num)
+    end
+    if @data_format == "json"
+      uneven_attribute_names("BS_R0125", @biosample_list)
+      multiple_package_names("BS_R0126", @biosample_list)
     end
 
     ### それ以外
@@ -497,9 +504,9 @@ class BioSampleValidator < ValidatorBase
   #
   def biosample_obj(data_list)
     biosample_list = []
-    attr_no = 1
     @attr_index_offset = 0 #属性には含めない列数をカウント
     data_list.each do |row|
+      attr_no = 1
       biosample = {"package" => "", "attributes" => {}, "attribute_list" => []}
       row.each do |attribute|
         if attribute["key"] == "_package"
@@ -511,19 +518,12 @@ class BioSampleValidator < ValidatorBase
           else
             attr_name = attribute["key"]
           end
+          #if !(CommonUtils::blank?(attribute["key"]) && CommonUtils::blank?(attribute["value"]))
           # 値が空でない属性だけの属性ハッシュ&リストを生成。taxonomy_idは値追加の機会が多いので空値でも属性として保持する
           if biosample["attributes"][attr_name].nil? # 同一属性が出現する場合は、先の記述を優先
-            if !(attribute["value"].nil? || attribute["value"] == "")
-              biosample["attributes"][attr_name] = attribute["value"]
-            elsif attr_name == "taxonomy_id"
-              biosample["attributes"][attr_name] = ""
-            end
+            biosample["attributes"][attr_name] = attribute["value"]
           end
-          if !(attribute["value"].nil? || attribute["value"] == "")
-            biosample["attribute_list"].push({attr_name => attribute["value"], "attr_no" => attr_no})
-          elsif attr_name == "taxonomy_id"
-            biosample["attribute_list"].push({attr_name => "", "attr_no" => attr_no})
-          end
+          biosample["attribute_list"].push({attr_name => attribute["value"], "attr_no" => attr_no})
           attr_no += 1
         end
       end
@@ -621,7 +621,7 @@ class BioSampleValidator < ValidatorBase
     return if attribute_list.nil?
     missing_attr_list = []
     attribute_list.each do |attr|
-      if attr.keys.first.nil? || attr.keys.first == ""
+      if CommonUtils::blank?(attr.keys.first) && !CommonUtils::blank?(attr[attr.keys.first]) # keyがなくvalueだけあるもの
         missing_attr_list.push(attr)
       end
     end
@@ -665,7 +665,7 @@ class BioSampleValidator < ValidatorBase
       if attr_values.size >= 2 && !(allow_multiple_attr_list.include?(attr_name)) #複数記述され、かつ複数許可許されていない属性
         all_attr_value = [] #属性値を列挙するためのリスト ex. ["1m", "2m"]
         attr_values.each{|attr|
-          attr.each{|k,v| all_attr_value.push(v) }
+          attr.each{|k,v| all_attr_value.push(v) if k == attr_name }
         }
         annotation = [
           {key: "Sample name", value: sample_name},
@@ -3126,6 +3126,103 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
     end
     ret
+  end
+
+  #
+  # rule:125
+  # 記述されている属性名と順序が異なる場合にエラーとする。
+  # JSON形式の場合にTSVへ変換できる構造を保つための検証
+  #
+  # ==== Args
+  # rule_code
+  # biosample_list biosampleのリスト
+  # ==== Return
+  # true/false
+  #
+  def uneven_attribute_names(rule_code, biosample_list)
+    return nil if biosample_list.nil? || biosample_list.size == 0
+    result = true
+
+    first_attr_name_list = [] #最初のサンプルの属性名リスト
+    biosample_list.first["attribute_list"].each_with_index do |attr, attr_idx|
+      first_attr_name_list.push(attr.keys.first)
+    end
+    biosample_list.each_with_index do |biosample_data, sample_idx|
+      attr_name_list = []
+      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
+        attr_name_list.push(attr.keys.first)
+      end
+      unless first_attr_name_list == attr_name_list #最初のサンプルの属性名リストと異なる
+        result = false
+        annotation = [
+          {key: "Sample index", value: sample_idx},
+          {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
+          {key: "Message", value: "Difference from the attribute names and order in the first sample."}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+      end
+    end
+    result
+  end
+
+  #
+  # rule:126
+  # 登録サンプル間で異なるpackage名が記載されている場合にエラーとする。
+  # 単一Submissionで登録できるのは同じPackageのサンプルに限定する
+  #
+  # ==== Args
+  # rule_code
+  # biosample_list biosampleのリスト
+  # ==== Return
+  # true/false
+  #
+  def multiple_package_names(rule_code, biosample_list)
+    return nil if biosample_list.nil? || biosample_list.size == 0
+    result = true
+
+    package_list = biosample_list.map {|biosample_data| biosample_data["package"]}
+    if package_list.uniq.compact.size > 1 # 複数のPackage記載があればNG(記載なしも含む)
+      result = false
+      annotation = [
+        {key: "Package names", value: package_list.uniq.to_s}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:127
+  # 基本的な属性名が抜けていないかチェック
+  #
+  # ==== Args
+  # rule_code
+  # biosample_list biosampleのリスト
+  # ==== Return
+  # true/false
+  #
+  def missing_mandatory_attribute_names(rule_code, sample_name, attribute_list, line_num)
+    return if attribute_list.nil?
+    result = true
+
+    attr_name_list = []
+    attribute_list.each do |attr|
+      attr_name_list.push(attr.keys.first)
+    end
+    mandatory_attr_name_list = ["sample_name", "sample_title", "description", "organism", "taxonomy_id", "bioproject_id"]
+    missing_attr_list = mandatory_attr_name_list - attr_name_list
+    if missing_attr_list.size > 0
+      result = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Missing attribute names", value: missing_attr_list.join(", ")}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    result
   end
 
 end

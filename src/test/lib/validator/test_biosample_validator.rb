@@ -1878,4 +1878,73 @@ jkl\"  "
     ret = exec_validator("invalid_file_format", "BS_R0124", "csv", ["tsv", "json", "xml"])
     assert_equal false, ret[:result]
   end
+
+  def test_uneven_attribute_names
+    # ok case
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_uneven_attribute_names_ok.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("uneven_attribute_names", "BS_R0125", biosample_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    # 不足属性がある
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_uneven_attribute_names_ng1.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("uneven_attribute_names", "BS_R0125", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+    ## 追加属性がある
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_uneven_attribute_names_ng2.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("uneven_attribute_names", "BS_R0125", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
+    ## 属性名は一致するが順序が異なる
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_uneven_attribute_names_ng3.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("uneven_attribute_names", "BS_R0125", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_multiple_package_names
+    # ok case
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_package_names_ok.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("multiple_package_names", "BS_R0126", biosample_list)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    # 複数のPackage名の記載
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_package_names_ng.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("multiple_package_names", "BS_R0126", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # null case
+    # Packageの記載がないサンプルがある(これも記載揺らぎとしてNG)
+    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_package_names_null.json", "json")
+    biosample_list = @validator.biosample_obj(file_content[:data])
+    ret = exec_validator("multiple_package_names", "BS_R0126", biosample_list)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_missing_mandatory_attribute_names
+    #ok case
+    ["sample_name", "sample_title", "description", "organism", "taxonomy_id"]
+    attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"description" => "c"}, {"organism" => "d"}, {"taxonomy_id" => ""} , {"bioproject_id" => ""}]
+    ret = exec_validator("missing_mandatory_attribute_names", "BS_R0127", "sampleA", attribute_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    ##missing taxonomy_id and bioproject_id
+    attribute_list = [{"sample_name" => "a"}, {"sample_title" => "b"}, {"description" => "c"}, {"organism" => "d"}]
+    ret = exec_validator("missing_mandatory_attribute_names", "BS_R0127", "sampleA", attribute_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size #複数の属性が欠落していてもまとめてエラー
+  end
 end

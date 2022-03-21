@@ -369,6 +369,18 @@ class TsvFieldValidator
     invalid_list
   end
 
+  # 必須のfield名が不足していないかチェック
+  def missing_mandatory_field_names(data, mandatory_field_names_conf)
+    invalid_list = []
+    # 同じfieldに値が複数ある場合
+    field_name_list = data.map {|row| row["key"]}
+    missing_field_name_list = mandatory_field_names_conf - field_name_list
+    if missing_field_name_list.size > 0
+      invalid_list.push({field_names: missing_field_name_list.join(", ")})
+    end
+    invalid_list
+  end
+
   def is_ignore_line?(row)
     row["key"].nil? || row["key"].chomp.strip == "" || row["key"].chomp.strip.start_with?("#")
   end

@@ -1029,7 +1029,7 @@
     "level": "error",
     "internal_ignore": false,
     "name": "Invalid JSON structure",
-    "method": "invalid_json structure",
+    "method": "invalid_json_structure",
     "message": "JSON structure is invalid against schema.",
     "object": [
       "BioSample"
@@ -1043,6 +1043,42 @@
     "name": "Invalid file format",
     "method": "invalid_file_format",
     "message": "Only XML and JSON and TSV formats are supported.",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0125": {
+    "rule_class": "BioSample",
+    "code": "BS_R0125",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Uneven attribute names",
+    "method": "uneven_attribute_names",
+    "message": "In JSON format, the names and order of all sample attributes must be aligned",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0126": {
+    "rule_class": "BioSample",
+    "code": "BS_R0126",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Multiple package names",
+    "method": "multiple_package_names",
+    "message": "Only one package can be described in a submission",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0127": {
+    "rule_class": "BioSample",
+    "code": "BS_R0127",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing mandatory attribute names",
+    "method": "missing_mandatory_attribute_names",
+    "message": "Mandatory attribute name is missing. Even if there is no value to be described, the attribute name must be described.",
     "object": [
       "BioSample"
     ]

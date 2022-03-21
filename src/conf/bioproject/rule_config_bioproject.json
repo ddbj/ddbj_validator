@@ -51,19 +51,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0005"
   },
-  "ruleBP_R0013": {
-    "rule_class": "BioProject",
-    "code": "BP_R0013",
-    "level": "error",
-    "internal_ignore": true,
-    "name": "Empty data description for other data_type",
-    "method": "empty_data_description_for_other_data_type",
-    "message": "Text description for the data_type 'Other' is not provided. Please provide description of data.",
-    "object": [
-      "BioProject"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0013"
-  },
   "ruleBP_R0014": {
     "rule_class": "BioProject",
     "code": "BP_R0014",
@@ -442,6 +429,18 @@
     "message": "Only JSON and TSV formats are supported.",
     "object": [
       "BioProject"
+    ]
+  },
+  "ruleBP_R0069": {
+    "rule_class": "BioProject",
+    "code": "BS_R0069",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing mandatory field names",
+    "method": "missing_mandatory_field_names",
+    "message": "Mandatory field name is missing. Even if there is no value to be described, the field name must be described.",
+    "object": [
+      "BioSample"
     ]
   }
 }
