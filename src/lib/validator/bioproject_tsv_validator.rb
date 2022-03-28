@@ -148,7 +148,7 @@ class BioProjectTsvValidator < ValidatorBase
     missing_at_least_one_required_fields_in_a_group("BP_R0052", bp_data, field_settings["selective_mandatory"], field_settings["field_groups"], "warning")
     missing_required_fields_in_a_group("BP_R0053", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "error")
     missing_required_fields_in_a_group("BP_R0054", bp_data, field_settings["mandatory_fields_in_a_group"], field_settings["field_groups"], "warning")
-    missing_mandatory_field_names("BP_R0069", bp_data, field_settings["mandatory_field_names"])
+    missing_mandatory_field_name("BP_R0069", bp_data, field_settings["mandatory_field_names"])
 
     # 個別のfieldの値に対するチェック
     identical_project_title_and_description("BP_R0005", bp_data)
@@ -975,11 +975,11 @@ class BioProjectTsvValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def missing_mandatory_field_names(rule_code, data, mandatory_field_names_conf)
+  def missing_mandatory_field_name(rule_code, data, mandatory_field_names_conf)
     result = true
     invalid_list = []
     unless mandatory_field_names_conf.nil?
-      invalid_list = @tsv_validator.missing_mandatory_field_names(data, mandatory_field_names_conf)
+      invalid_list = @tsv_validator.missing_mandatory_field_name(data, mandatory_field_names_conf)
     end
 
     unless invalid_list.size == 0

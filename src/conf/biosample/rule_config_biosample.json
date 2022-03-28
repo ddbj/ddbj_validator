@@ -1052,9 +1052,9 @@
     "code": "BS_R0125",
     "level": "error",
     "internal_ignore": false,
-    "name": "Uneven attribute names",
-    "method": "uneven_attribute_names",
-    "message": "In JSON format, the names and order of all sample attributes must be aligned",
+    "name": "Unaligned sample attributes",
+    "method": "unaligned_sample_attributes",
+    "message": "Order of sample attributes must be aligned in a json file.",
     "object": [
       "BioSample"
     ]
@@ -1064,9 +1064,9 @@
     "code": "BS_R0126",
     "level": "error",
     "internal_ignore": false,
-    "name": "Multiple package names",
-    "method": "multiple_package_names",
-    "message": "Only one package can be described in a submission",
+    "name": "Multiple packages",
+    "method": "multiple_packages",
+    "message": "Single package is allowed in a submission.",
     "object": [
       "BioSample"
     ]
@@ -1076,9 +1076,9 @@
     "code": "BS_R0127",
     "level": "error",
     "internal_ignore": false,
-    "name": "Missing mandatory attribute names",
-    "method": "missing_mandatory_attribute_names",
-    "message": "Mandatory attribute name is missing. Even if there is no value to be described, the attribute name must be described.",
+    "name": "Missing mandatory attribute name",
+    "method": "missing_mandatory_attribute_name",
+    "message": "Mandatory attribute must have a name even if there is no value.",
     "object": [
       "BioSample"
     ]

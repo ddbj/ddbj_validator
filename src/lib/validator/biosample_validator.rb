@@ -212,8 +212,8 @@ class BioSampleValidator < ValidatorBase
       duplicate_sample_names("BS_R0028", sample_name, sample_title, @biosample_list, line_num)
     end
     if @data_format == "json"
-      uneven_attribute_names("BS_R0125", @biosample_list)
-      multiple_package_names("BS_R0126", @biosample_list)
+      unaligned_sample_attributes("BS_R0125", @biosample_list)
+      multiple_packages("BS_R0126", @biosample_list)
     end
 
     ### それ以外
@@ -3139,7 +3139,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def uneven_attribute_names(rule_code, biosample_list)
+  def unaligned_sample_attributes(rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.size == 0
     result = true
 
@@ -3177,7 +3177,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def multiple_package_names(rule_code, biosample_list)
+  def multiple_packages(rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.size == 0
     result = true
 
@@ -3203,7 +3203,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def missing_mandatory_attribute_names(rule_code, sample_name, attribute_list, line_num)
+  def missing_mandatory_attribute_name(rule_code, sample_name, attribute_list, line_num)
     return if attribute_list.nil?
     result = true
 

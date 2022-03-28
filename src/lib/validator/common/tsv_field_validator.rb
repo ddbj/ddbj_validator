@@ -370,7 +370,7 @@ class TsvFieldValidator
   end
 
   # 必須のfield名が不足していないかチェック
-  def missing_mandatory_field_names(data, mandatory_field_names_conf)
+  def missing_mandatory_field_name(data, mandatory_field_names_conf)
     invalid_list = []
     # 同じfieldに値が複数ある場合
     field_name_list = data.map {|row| row["key"]}

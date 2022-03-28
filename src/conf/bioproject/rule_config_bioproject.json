@@ -436,9 +436,9 @@
     "code": "BS_R0069",
     "level": "error",
     "internal_ignore": false,
-    "name": "Missing mandatory field names",
-    "method": "missing_mandatory_field_names",
-    "message": "Mandatory field name is missing. Even if there is no value to be described, the field name must be described.",
+    "name": "Missing mandatory field name",
+    "method": "missing_mandatory_field_name",
+    "message": "Mandatory field must have a name even if there is no value.",
     "object": [
       "BioSample"
     ]
