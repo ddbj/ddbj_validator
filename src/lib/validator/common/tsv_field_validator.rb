@@ -505,8 +505,12 @@ class TsvFieldValidator
     CSV.open(output_file, "w", col_sep: "\t") do |csv|
       input_data.each do |row|
         row_data = []
-        row_data.push(row["key"])
-        row_data.concat(row["values"])
+        if CommonUtils.blank?(row["key"]) && (CommonUtils.blank?(row["values"]) || row["values"] == [])
+          row_data = [nil]
+        else
+          row_data.push(row["key"])
+          row_data.concat(row["values"])
+        end
         csv << row_data
       end
     end

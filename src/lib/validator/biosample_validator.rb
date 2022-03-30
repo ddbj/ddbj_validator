@@ -100,6 +100,7 @@ class BioSampleValidator < ValidatorBase
   def validate (data_file, params={})
     @data_file = File::basename(data_file)
 
+    params = {} if params.nil? # nil エラー回避
     unless (params["submitter_id"].nil? || params["submitter_id"].strip == "")
       @submitter_id = params["submitter_id"]
     end
@@ -112,11 +113,12 @@ class BioSampleValidator < ValidatorBase
 
     # file typeのチェック
     file_content = nil
-    unless (params["file_format"]["biosample"].nil? || params["file_format"]["biosample"].strip.chomp == "")
-      @data_format = params["file_format"]["biosample"]
-    else #推測されたtypeがなければ中身をパースして推測
+    if (params["file_format"].nil? || params["file_format"]["biosample"].nil? || params["file_format"]["biosample"].strip.chomp == "")
+       #推測されたtypeがなければ中身をパースして推測
       file_content = FileParser.new.get_file_data(data_file)
       @data_format = file_content[:format]
+    else
+      @data_format = params["file_format"]["biosample"]
     end
     ret = invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止
@@ -145,8 +147,10 @@ class BioSampleValidator < ValidatorBase
       @biosample_list = biosample_obj(data_list)
     elsif @data_format == "tsv"
       file_content = FileParser.new.get_file_data(data_file, "tsv") if file_content.nil?
-      data_list = @tsv_validator.tsv2ojb(file_content[:data])
-      @biosample_list = biosample_obj(data_list)
+      data = @tsv_validator.tsv2ojb_with_package(file_content[:data])
+      package_id = data[:package_id]
+      data_list = data[:data_list]
+      @biosample_list = biosample_obj(data_list, package_id)
     else #xml,json,tsvでパースができなければerrorを追加して修了
       invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
       return
@@ -197,7 +201,7 @@ class BioSampleValidator < ValidatorBase
       package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
       multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], package_attr_list, line_num)
       if @data_format == "json" || @data_format == "tsv"
-        missing_mandatory_attribute_names("BS_R0127", sample_name, biosample_data["attribute_list"], line_num)
+        missing_mandatory_attribute_name("BS_R0127", sample_name, biosample_data["attribute_list"], line_num)
       end
     end
 
@@ -502,14 +506,17 @@ class BioSampleValidator < ValidatorBase
   #   {.....}, ....
   # ]
   #
-  def biosample_obj(data_list)
+  def biosample_obj(data_list, package_id=nil)
     biosample_list = []
     @attr_index_offset = 0 #属性には含めない列数をカウント
     data_list.each do |row|
       attr_no = 1
       biosample = {"package" => "", "attributes" => {}, "attribute_list" => []}
+      if !package_id.nil? # TSVやExcelで全体のpackage_idが取得できた場合
+        biosample["package"] = package_id
+      end
       row.each do |attribute|
-        if attribute["key"] == "_package"
+        if attribute["key"] == "_package" # JSONで"_package"が記載されていた場合
           biosample["package"] = attribute["value"]
           @attr_index_offset += 1
         else
@@ -1400,7 +1407,7 @@ class BioSampleValidator < ValidatorBase
       end
       annotation.push({key: "taxonomy_id", value: ""})
       if @data_format == "json" || @data_format == "tsv"
-        unless @biosample_list[line_num -1]["attributes"]["taxonomy_id"].nil?
+        if @biosample_list[line_num -1]["attributes"].keys.include?("taxonomy_id") # taxonomy_idの列(属性名)はある
           location = auto_annotation_location(@data_format, line_num, "taxonomy_id", "value")
         else # taxonomy_idの列がなければ列追加モード
           if @data_format == 'json'

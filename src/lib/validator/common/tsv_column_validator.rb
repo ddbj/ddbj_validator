@@ -18,7 +18,17 @@ class TsvColumnValidator
     # 配列の要素は 0 始まりなので +1、ヘッダー行のカウントで +1、先頭のコメント行数を加えた値を返す
   end
 
-  # TSVの配列データをkey-valuesの配列に変換して返す
+  #
+  # TSVの行データをkey-valuesの配列に変換して返す
+  #
+  # ==== Return
+  # [
+  #    [
+  #      { "key" => "*sample_name",  "value" => "My sample" },
+  #      { "key" => "*sample_title",  "value" => "My title"},
+  #      ....
+  #    ]
+  #  ]
   def tsv2ojb(tsv_data)
     data_list = []
     # 末尾のnilのみの行は削除
@@ -55,6 +65,35 @@ class TsvColumnValidator
       end
     end
     data_list
+  end
+
+  #
+  # TSVの行データをkey-valuesの配列に、BioSampleのPackageIDの記述を検索して加えて返す
+  #
+  # ==== Return
+  #  {
+  #    package_id: "MIGS.ba.microbial",
+  #    sample_data_list: [
+  #      [
+  #        { "key" => "*sample_name",  "value" => "My sample" },
+  #        { "key" => "*sample_title",  "value" => "My title"},
+  #        ....
+  #      ]
+  #    ]
+  #  }
+  #
+  def tsv2ojb_with_package(tsv_data)
+    data_list = tsv2ojb(tsv_data)
+    package_id = nil
+    tsv_data.each do |row|
+      if !row[0].nil? && row[0].to_s.chomp.strip.start_with?("# Package") #package名を取得
+        if m = row[0].match(/^# Package:(\s)?(?<package_id> [^,]+).*/)
+          package_id = m[:package_id].strip
+          break
+        end
+      end
+    end
+    {package_id: package_id, data_list: data_list}
   end
 
   #
@@ -138,15 +177,24 @@ class TsvColumnValidator
     input_data = JSON.parse(File.read(input_file))
 
     # 各行のkey名(並び順含めて)が揃っているかのチェック
+    first_key_list = []
+    input_data[0].each do |cell|
+      row.each do |cell|
+        first_key_list.push(cell["key"])
+      end
+    end
+    aligned_keys = true
     all_header_list = []
     input_data.each do |row|
-      header_list = []
+      key_list = []
       row.each do |cell|
-        header_list.push(cell["key"])
+        key_list.push(cell["key"])
       end
-      all_header_list.push(header_list)
+      unless first_key_list == key_list
+        aligned_keys = false
+      end
     end
-    if all_header_list.uniq.size > 1
+    if aligned_keys == true
       return nil # TODO keyが揃っていなければTSV変換しない。正しく出来ないケースがある
     else
       header_list = all_header_list.first
@@ -174,6 +222,23 @@ class TsvColumnValidator
     data = tsv2ojb(file_content[:data])
     File.open(output_file, "w") do |out|
       out.puts JSON.generate(data)
+    end
+  end
+
+  # ファイル形式の変換を行う TSV => JSON
+  def convert_tsv2biosample_json(input_file, output_file)
+    file_content = FileParser.new.get_file_data(input_file)
+    data = tsv2ojb_with_package(file_content[:data])
+    if data[:package_id].nil?
+      sample_list = data[:data_list]
+    else # package_idがヘッダーから取得できる場合には各サンプルに"_package"という属性で追加する
+      data[:data_list].each do |sample|
+        sample.unshift({key: "_package", value: data[:package_id]})
+      end
+      sample_list = data[:data_list]
+    end
+    File.open(output_file, "w") do |out|
+      out.puts JSON.generate(sample_list)
     end
   end
 

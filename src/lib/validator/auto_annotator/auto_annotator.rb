@@ -140,7 +140,7 @@ class AutoAnnotator
           output_file = annotated_file_path + ".json"
         end
         unless output_file.nil?
-          TsvColumnValidator.new().convert_tsv2json(annotated_file_path, output_file) # ヘッダーの*もつけたままのそのままの変換
+          TsvColumnValidator.new().convert_tsv2biosample_json(annotated_file_path, output_file) # ヘッダーの*もつけたままのそのままの変換
           ret = output_file
         end
       elsif input_file_format == "json" && output_file_format == "tsv" # json => tsv

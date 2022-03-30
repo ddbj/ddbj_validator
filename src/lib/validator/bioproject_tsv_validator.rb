@@ -72,6 +72,7 @@ class BioProjectTsvValidator < ValidatorBase
   #
   #
   def validate (data_file, params={})
+    params = {} if params.nil?  # nil エラー回避
     @data_file = File::basename(data_file)
     field_settings = @conf[:field_settings]
 
@@ -84,11 +85,12 @@ class BioProjectTsvValidator < ValidatorBase
 
     # file typeのチェック
     file_content = nil
-    unless (params["file_format"]["bioproject"].nil? || params["file_format"]["bioproject"].strip.chomp == "")
-      @data_format = params["file_format"]["bioproject"]
-    else #推測されたtypeがなければ中身をパースして推測
+    if (params["file_format"].nil? || params["file_format"]["bioproject"].nil? || params["file_format"]["bioproject"].strip.chomp == "")
+      #推測されたtypeがなければ中身をパースして推測
       file_content = FileParser.new.get_file_data(data_file)
       @data_format = file_content[:format]
+    else
+      @data_format = params["file_format"]["bioproject"]
     end
     ret = invalid_file_format("BP_R0068", @data_format, ["tsv", "json"]) #baseのメソッドを呼び出し
     return if ret == false #ファイルが読めなければvalidationは中止

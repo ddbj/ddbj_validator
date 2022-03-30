@@ -12,7 +12,7 @@ class TestExcel2Tsv < Minitest::Test
 
   def test_split_sheet
     # ok case
-    excel_file = "#{@test_file_dir}/bioproject_test_warning.xlsx"
+    excel_file = "#{@test_file_dir}/bpbs_test_warning.xlsx"
     base_dir = "#{@test_file_dir}/output"
     # 出力ディレクトの初期化
     if File.exist?(base_dir)
@@ -21,10 +21,10 @@ class TestExcel2Tsv < Minitest::Test
     FileUtils.mkdir_p(base_dir)
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
-    assert File.exist?("#{base_dir}/bioproject/bioproject_test_warning_bioproject.tsv")
-    assert File.exist?("#{base_dir}/biosample/bioproject_test_warning_biosample.tsv")
-    assert_equal "bioproject_test_warning_bioproject.tsv", ret[:filetypes][:bioproject].split("/").last
-    assert_equal "bioproject_test_warning_biosample.tsv", ret[:filetypes][:biosample].split("/").last
+    assert File.exist?("#{base_dir}/bioproject/bpbs_test_warning_bioproject.tsv")
+    assert File.exist?("#{base_dir}/biosample/bpbs_test_warning_biosample.tsv")
+    assert_equal "bpbs_test_warning_bioproject.tsv", ret[:filetypes][:bioproject].split("/").last
+    assert_equal "bpbs_test_warning_biosample.tsv", ret[:filetypes][:biosample].split("/").last
 
     # ng base
     excel_file = "#{@test_file_dir}/invalid_excel.xlsx" # 中身はただのTextファイル

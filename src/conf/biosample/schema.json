@@ -5,19 +5,36 @@
   "type": "array",
   "items": {
     "type": "array",
-    "items": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "description": "The unique identifier for a product",
-          "type": "string"
+    "items": [
+      {
+        "type": "object",
+        "properties": {
+          "key": {
+            "description": "First item is package_id",
+            "type": "string",
+            "pattern": "_package"
+          },
+          "value": {
+            "description": "package id",
+            "type": "string"
+          }
         },
-        "value": {
-          "description": "The unique identifier for a product",
-          "type": "string"
-        }
+        "required": [ "key", "value" ]
       },
-      "required": [ "key", "value" ]
-    }
+      {
+        "type": "object",
+        "properties": {
+          "key": {
+            "description": "The unique identifier for a product",
+            "type": "string"
+          },
+          "value": {
+            "description": "The unique identifier for a product",
+            "type": [ "string", "null" ]
+          }
+        },
+        "required": [ "key", "value" ]
+      }
+    ]
   }
 }

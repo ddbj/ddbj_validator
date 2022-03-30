@@ -14,7 +14,7 @@
         },
         "value": {
           "description": "The unique identifier for a product",
-          "type": "string"
+          "type": [ "string", "null" ]
         }
       },
       "required": [ "key", "value" ]
