@@ -1008,7 +1008,7 @@ class DDBJDbValidator
         connection = get_connection(DRA_DB_NAME)
         id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
 
-        q = "SELECT ext_ent.ref_name, drr_ent.acc_type, drr_ent.acc_no, drx_drr_rel.grp_id
+        q = "SELECT ext_ent.ref_name, drr_ent.acc_type, drr_ent.acc_no, drx_drr_rel.grp_id, g_view.status
               FROM mass.ext_entity ext_ent
               JOIN mass.ext_relation ext_rel USING(ext_id)
               JOIN mass.accession_entity drx_ent ON(ext_rel.acc_id = drx_ent.acc_id)
@@ -1017,11 +1017,14 @@ class DDBJDbValidator
               JOIN mass.current_dra_submission_group_view g_view ON(drx_drr_rel.grp_id = g_view.grp_id)
              WHERE ext_ent.ref_name IN (#{id_place_holder})
               AND drx_drr_rel.grp_id = ext_rel.grp_id
-              AND drr_ent.is_delete != TRUE
-              AND g_view.status NOT IN (900, 1000, 1100)"
+              AND drr_ent.is_delete != TRUE"
         connection.prepare("pre_query", q)
         res = connection.exec_prepared("pre_query", biosample_smp_id_list)
         res.each do |row|
+          if row["status"].to_s == "900" || row["status"].to_s == "1000" || row["status"].to_s == "1100"
+            # SQLが返ってこない為プログラムで無効なstatus分をfilter
+            next
+          end
           # 結果が返ってきたBioSampleがあればsmp_id情報を足す
           selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
           selected.each do |ret|
