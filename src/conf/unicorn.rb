@@ -13,7 +13,7 @@ unless File.exist?("#{SHARED_PATH}/log")
 end
 
 listen  ENV.fetch("DDBJ_VALIDATOR_APP_UNICORN_PORT") { 3000 }
-timeout 300
+timeout 900
 working_directory "#{APP_PATH}"
 pid "#{SHARED_PATH}/tmp/pids/unicorn.pid"
 
