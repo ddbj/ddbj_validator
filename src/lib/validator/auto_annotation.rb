@@ -33,10 +33,11 @@ class AutoAnnotation
 
       annotation_list.each do |annotation|
         annotation["location"].each do |location| #XPathを取得
-          if doc.xpath(location).size == 0 #XPathで要素/属性がヒットしないなら作成する
+          nodes = doc.xpath(location)
+          if nodes.size == 0 #XPathで要素/属性がヒットしないなら作成する
             create_node_from_xapth(doc, location)
           end
-          doc.xpath(location).each do |node|
+          nodes.each do |node|
             if node.class == Nokogiri::XML::Element
               #Elementの場合、子nodeのうち直下のText nodeの値を置き換える
               has_text = false
