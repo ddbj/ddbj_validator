@@ -16,10 +16,10 @@ LOG "copy dbfile"
 cp /data1/ddbj/DDBJValidator/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso.db.new
 
 cd $BASE_DIR
-active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
+active_container="$(docker-compose ps | grep virtuoso | grep running |  wc -l)"
 if [[ $active_container -gt 0 ]]; then
-  LOG "shutdown virtuoso"
-  docker-compose exec -T virtuoso /opt/virtuoso-opensource/bin/isql 1111 dba dba exec="shutdown();"
+  LOG "stop virtuoso"
+  docker-compose stop virtuoso
 fi
 
 
@@ -40,7 +40,7 @@ mv $VIRT_HOME/virtuoso.db.new $VIRT_HOME/virtuoso.db
 
 LOG "restart virtuoso"
 cd $BASE_DIR
-docker-compose up -d virtuoso
+docker-compose start virtuoso
 
 while :
 do
