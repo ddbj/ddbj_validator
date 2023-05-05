@@ -9,7 +9,6 @@
   "drainage_class": ["", "very poorly", "poorly", "somewhat poorly", "moderately well", "well", "excessively drained"],
   "edta_inhibitor_tested": ["", "yes", "no", "missing", "not applicable", "not collected"],
   "filter_type": ["", "particulate air filter", "chemical air filter", "low-MERV pleated media", "HEPA", "electrostatic", "gas-phase or ultraviolet air treatments", "missing", "not applicable", "not collected"],
-  "growth_med": ["", "soil", "liquid"],
   "heat_cool_type": ["", "radiant system", "heat pump", "forced air system", "steam forced heat", "wood stove", "missing", "not applicable", "not collected"],
   "horizon": ["", "O horizon", "A horizon", "E horizon", "B horizon", "C horizon", "R layer", "Permafrost"],
   "host_sex": ["", "male", "female", "pooled male and female", "neuter", "hermaphrodite", "intersex", "not determined", "missing", "not applicable", "not collected"],
