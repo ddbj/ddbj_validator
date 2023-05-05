@@ -4,9 +4,9 @@
     "code": "BS_R0001",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Invalid Attribute value for null",
-    "method": "invalid_attribute_value_for_null",
-    "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory attribute.",
+    "name": "Invalid missing value",
+    "method": "invalid_missing_value",
+    "message": "Invalid missing value. Please provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason.",
     "object": [
       "BioSample"
     ],
@@ -240,7 +240,7 @@
     "internal_ignore": true,
     "name": "Missing mandatory attribute",
     "method": "missing_mandatory_attribute",
-    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide value as either 'not collected', 'not applicable' or 'missing'.",
+    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason.",
     "object": [
       "BioSample"
     ],
@@ -292,7 +292,7 @@
     "internal_ignore": true,
     "name": "Missing group of at least one required Attributes",
     "method": "missing_group_of_at_least_one_required_attributes",
-    "message": "Sample has missing attribute(s), at least one of the following attributes is required. If you do not have information for the required field(s), please provide value as either 'not collected', 'not applicable' or 'missing'.",
+    "message": "Sample has missing attribute(s), at least one of the following attributes is required. If you do not have information for the required field(s), please provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason.",
     "object": [
       "BioSample"
     ],
@@ -745,9 +745,9 @@
     "code": "BS_R0100",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Null values provided for optional attributes",
-    "method": "null_values_provided_for_optional_attributes",
-    "message": "Null values are not neccesary for optional attributes. Leave values empty when there is no information.",
+    "name": "Missing values provided for optional attributes",
+    "method": "missing_values_provided_for_optional_attributes",
+    "message": "Missing values are not neccesary for optional attributes. Leave values empty when there is no information.",
     "object": [
       "BioSample"
     ],
@@ -997,7 +997,8 @@
     "message": "Must be Severe acute respiratory syndrome coronavirus 2",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0120"
   },
   "ruleBS_R0121": {
     "rule_class": "BioSample",
@@ -1009,7 +1010,8 @@
     "message": "Must be wastewater metagenome",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0121"
   },
   "ruleBS_R0122": {
     "rule_class": "BioSample",

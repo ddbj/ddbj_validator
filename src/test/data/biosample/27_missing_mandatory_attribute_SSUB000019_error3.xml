@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<BioSample access="public" publication_date="2015-02-25T09:59:23+09:00" last_update="2015-02-25T09:59:23+09:00">
+    <Ids>
+        <Id is_primary="1" namespace="BioSample">SAMD00000328</Id>
+    </Ids>
+    <Description>
+        <SampleName>MTB313</SampleName>
+        <Title>MIGS Cultured Bacterial/Archaeal sample from Streptococcus pyogenes</Title>
+        <Organism taxonomy_id="1314">
+            <OrganismName>Streptococcus pyogenes</OrganismName>
+        </Organism>
+    </Description>
+    <Owner>
+        <Name url="https://www.kitasato-u.ac.jp/lisci/">Kitasato Institute of Life Sciences</Name>
+        <Contacts>
+            <Contact email="harunoy@lisci.kitasato-u.ac.jp">
+                <Name>
+                    <First>Haruno</First>
+                    <Last>Yoshida</Last>
+                </Name>
+            </Contact>
+        </Contacts>
+    </Owner>
+    <Models>
+        <Model>MIGS.ba.microbial</Model>
+    </Models>
+    <Attributes>
+        <Attribute attribute_name="sample_name">MTB313</Attribute>
+        <Attribute attribute_name="strain">missing</Attribute>
+        <Attribute attribute_name="env_broad_scale">Not Applicable</Attribute>
+        <Attribute attribute_name="collection_date">n.a.</Attribute>
+        <Attribute attribute_name="env_local_scale"></Attribute>
+        <Attribute attribute_name="geo_loc_name">-</Attribute>
+        <Attribute attribute_name="lat_lon"></Attribute>
+        <Attribute attribute_name="env_medium"></Attribute>
+        <Attribute attribute_name="project_name">Streptococcus pyogenes MTB313 genome sequencing</Attribute>
+        <Attribute attribute_name="isol_growth_condt">missing: data agreement established pre-2023</Attribute>
+        <Attribute attribute_name="num_replicons">1</Attribute>
+        <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
+        <Attribute attribute_name="elev">NA</Attribute>
+        <Attribute attribute_name="depth">unknown</Attribute>
+        <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
+    </Attributes>
+</BioSample>

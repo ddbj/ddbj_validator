@@ -143,7 +143,7 @@ class BioSampleValidator < ValidatorBase
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
         package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-        ret = invalid_attribute_value_for_null("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, line_num)
+        ret = invalid_missing_value("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], package_attr_list, line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
@@ -311,8 +311,8 @@ class BioSampleValidator < ValidatorBase
       # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list , line_num)
-      null_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, @conf[:null_not_recommended], line_num)
+      missing_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
       attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
       missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
     end
@@ -690,30 +690,37 @@ class BioSampleValidator < ValidatorBase
   #
   # rule:27
   # 必須属性名の値の記載がないものを検証
+  # また推奨されないmissing相当の文字列での入力も禁止する
   #
   # ==== Args
   # rule_code
   # sample_attr ユーザ入力の属性リスト
   # package_attr_list パッケージに対する属性リスト
+  # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
   # line_num
   # ==== Return
   # true/false
   #
-  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list , line_num)
+  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, null_not_recommended_list, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
-    missing_attr_names = mandatory_attr_list - sample_attr.keys #必須項目が
+    missing_attr_names = mandatory_attr_list - sample_attr.keys # 必須項目名が欠けている
 
     sample_attr.each do |attr_name, attr_value|
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
           missing_attr_names.push(attr_name)
+        else  # 記述があっても推奨されないnull値だとerrorとする
+          if null_not_recommended_list.select {|refexp| attr_value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
+            missing_attr_names.push(attr_name)
+          end
         end
       end
     end
+   
     if missing_attr_names.size <= 0
       true
     else
@@ -1582,8 +1589,7 @@ class BioSampleValidator < ValidatorBase
 
   #
   # rule:1
-  # "not applicable"のようなNULL値相当の値の表記ゆれ(大文字小文字)を補正
-  # "N.A."のような非推奨値を規定の値(missing)に補正
+  # "Missing; ControlSample"のようなmissing valueの軽微な表記揺れを修正 "missing: control sample"
   # package_attr_listの指定がある場合、optional項目については無視される
   #
   # ==== Args
@@ -1591,12 +1597,11 @@ class BioSampleValidator < ValidatorBase
   # attr_name 属性名
   # attr_val 属性値
   # null_accepted_list NULL値として推奨される値(正規表現)のリスト
-  # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
   # package_attr_list パッケージに対する属性一覧(必須/任意の区分)
   # line_num
   # ==== Return
   # true/false
-  def invalid_attribute_value_for_null (rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, package_attr_list, line_num)
+  def invalid_missing_value(rule_code, sample_name, attr_name, attr_val, null_accepted_list, package_attr_list, line_num)
     return nil if CommonUtils::null_value?(attr_val)
     result = true
 
@@ -1610,23 +1615,16 @@ class BioSampleValidator < ValidatorBase
     end
 
     attr_val_result = ""
-    #推奨されている NULL 値の表記を揃える(小文字表記へ)
-    if null_accepted_list.include?attr_val.downcase
-      null_accepted_list.each do |null_accepted|
-        if attr_val =~ /#{null_accepted}/i
-          attr_val_result = attr_val.downcase
-          unless attr_val_result == attr_val
-            result = false
-          end
+    #推奨されている NULL 値("missing: control sample"等)の表記を揃える(大文字小文字、多少の表記揺れを正す)
+    # "Missing; hoge ControlSample" => "missing: control sample"
+    null_accepted_list.each do |null_accepted|
+      prefix = null_accepted.split(":").first.downcase # "missing"
+      sufix = null_accepted.split(":")[1..-1].join().gsub(" ", "").downcase # "controlsample" 空白の個数違いも吸収
+      if attr_val.downcase.start_with?(prefix) && attr_val.downcase.gsub(" ", "").end_with?(sufix)
+        attr_val_result = null_accepted
+        unless attr_val_result == attr_val
+          result = false
         end
-      end
-    end
-
-    # NULL 値を推奨値に変換
-    null_not_recommended_list.each do |refexp|
-      if attr_val =~ /^(#{refexp})$/i
-        attr_val_result = "missing"
-        result = false
       end
     end
 
@@ -2411,7 +2409,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def null_values_provided_for_optional_attributes (rule_code, sample_name, sample_attr, null_accepted_list, null_not_recommended_list, package_attr_list , line_num)
+  def missing_values_provided_for_optional_attributes (rule_code, sample_name, sample_attr, null_accepted_list, null_not_recommended_list, package_attr_list , line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
     result = true
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
