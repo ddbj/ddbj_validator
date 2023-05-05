@@ -19,7 +19,7 @@ require File.dirname(__FILE__) + "/common/xml_convertor.rb"
 #
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
-  DEFAULT_PACKAGE_VERSION = "1.4.0"
+  DEFAULT_PACKAGE_VERSION = "1.4.1"
   #
   # Initializer
   #
