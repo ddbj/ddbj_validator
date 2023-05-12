@@ -37,7 +37,7 @@
         <Attribute attribute_name="isol_growth_condt">missing: data agreement established pre-2023</Attribute>
         <Attribute attribute_name="num_replicons">1</Attribute>
         <Attribute attribute_name="ref_biomaterial">16088826</Attribute>
-        <Attribute attribute_name="elev">NA</Attribute>
+        <Attribute attribute_name="elev">missing: xxx</Attribute>
         <Attribute attribute_name="depth">unknown</Attribute>
         <Attribute attribute_name="bioproject_id">PRJDB1654</Attribute>
     </Attributes>

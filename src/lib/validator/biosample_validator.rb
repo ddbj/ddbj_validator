@@ -709,24 +709,30 @@ class BioSampleValidator < ValidatorBase
     }.compact
     missing_attr_names = mandatory_attr_list - sample_attr.keys # 必須項目名が欠けている
 
+    missing_attrs = missing_attr_names.map{|attr_name| {attr_name: attr_name, attr_value: ""}} # 属性名がないケースは属性値は空で扱う
     sample_attr.each do |attr_name, attr_value|
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
-          missing_attr_names.push(attr_name)
-        else  # 記述があっても推奨されないnull値だとerrorとする
-          if null_not_recommended_list.select {|refexp| attr_value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
-            missing_attr_names.push(attr_name)
-          end
+          missing_attrs.push({attr_name: attr_name, attr_value: attr_value})
+        elsif CommonUtils::null_not_recommended_value?(attr_value) # 推奨されないnull値やnullと疑われる値
+          missing_attrs.push({attr_name: attr_name, attr_value: attr_value})
         end
       end
     end
    
-    if missing_attr_names.size <= 0
+    if missing_attrs.size <= 0
       true
     else
+      missing_attrs_message = missing_attrs.map {|missing| 
+        if CommonUtils::blank?(missing[:attr_value])
+          missing[:attr_name]
+        else
+          "#{missing[:attr_name]}(\"#{missing[:attr_value]}\")"
+        end
+      }.join(", ")
       annotation = [
         {key: "Sample name", value: sample_name},
-        {key: "Attribute names", value: missing_attr_names.join(", ")}
+        {key: "Attribute names", value: missing_attrs_message} # strain("missing"), env_broad_scale("Not Applicable") 等とNGな値も併記する
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
