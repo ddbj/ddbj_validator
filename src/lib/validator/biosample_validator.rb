@@ -760,7 +760,7 @@ class BioSampleValidator < ValidatorBase
       exist_attr_list = []
       attr_set.each do |mandatory_attr_name|
         sample_attr.each do |attr_name, attr_value|
-          if mandatory_attr_name == attr_name && !(attr_value.nil? || attr_value.strip == "")
+          if mandatory_attr_name == attr_name && !(CommonUtils::blank?(attr_value) || CommonUtils::null_not_recommended_value?(attr_value)) # nullではない値が入っている
             exist_attr_list.push(attr_name)
           end
         end

@@ -409,6 +409,13 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ## not recommended null value
+    xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_error3.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"], @package_version)
+    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size
   end
 
   def test_invalid_attribute_value_for_controlled_terms
