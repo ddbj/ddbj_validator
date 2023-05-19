@@ -15,7 +15,7 @@ ddbj_parser:
   parser_api_url: <%= ENV.fetch("DDBJ_PARSER_APP_URL") { "" } %>
 
 biosample:
-  package_version: <%= ENV.fetch("DDBJ_VALIDATOR_APP_BIOSAMPLE_PACKAGE_VERSION") { "1.4.0" } %>
+  package_version: <%= ENV.fetch("DDBJ_VALIDATOR_APP_BIOSAMPLE_PACKAGE_VERSION") { "1.4.1" } %>
 
 google_api_key:
   key: <%= ENV.fetch("DDBJ_VALIDATOR_APP_GOOGLE_API_KEY") { "your_api_key" } %>

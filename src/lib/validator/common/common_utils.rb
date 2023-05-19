@@ -11,6 +11,7 @@ class CommonUtils
 
   def self.set_config (config_obj)
     @@null_accepted = config_obj[:null_accepted]
+    @@null_not_recommended = config_obj[:null_not_recommended]
     @@exchange_country_list = config_obj[:exchange_country_list]
     @@google_api_key = config_obj[:google_api_key]
     @@eutils_api_key = config_obj[:eutils_api_key]
@@ -216,7 +217,7 @@ class CommonUtils
 
   #
   # 引数がValidatorで値なしとみなされる値であればtrueを返す。
-  # nil, 空白文字, 値なしを意味する"not applicable"や"missing"であればtrueを返す
+  # nil, 空白文字, 値なしを意味するや"missing: control sample"であればtrueを返す
   #
   # ==== Args
   # value: 検査する値
@@ -229,6 +230,29 @@ class CommonUtils
     else
       false
     end
+  end
+
+  #
+  # 引数がValidatorで推奨されないnull値とみなされる値であればtrueを返す。
+  # 値なしを意味する"not applicable"や"missing", "na"(大文字小文字区別せず), "missing: xx"(特定の設定値は前方一致) であればtrueを返す
+  # 前方一致でも認められるnull値("missing: control sample")であればfalse
+  #
+  # ==== Args
+  # value: 検査する値
+  # ==== Return
+  # true/false
+  #
+  def self.null_not_recommended_value?(value)
+    ret = false
+    if !(value.nil? || value.strip.empty?)
+      null_not_recommended_long_term_list = @@null_not_recommended[0..4] # "not applicable","not collected", "not provided", "missing", "restricted access" から始まるものをNGとしたい
+      if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
+        ret = true
+      elsif !@@null_accepted.include?(value) && null_not_recommended_long_term_list.select {|refexp| value =~ /^(#{refexp})/i }.size > 0 # 文字数が多い null_not_recommendedの正規表現リストで前方一致すればNG
+        ret = true
+      end
+    end
+    ret
   end
 
   #

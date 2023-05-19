@@ -3,7 +3,7 @@
   "info": {
     "title": "DDBJ Biosample Package & Attribute API",
     "description": "DDBJ Biosample Package & Attribute API",
-    "version": "1.4.0"
+    "version": "1.4.1"
   },
   "host": "ddbj-staging.nig.ac.jp",
   "schemes": [
