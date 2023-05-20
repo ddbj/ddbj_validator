@@ -1132,7 +1132,45 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2015-04-16T12:00:00", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal "2015-04-16", get_auto_annotation(ret[:error_list])
+    assert_equal "2015-04-16T12:00:00Z", get_auto_annotation(ret[:error_list])
+    ### 時差表記がある場合のUTCへの置換
+    ### https://ddbj-dev.atlassian.net/browse/VALIDATOR-86
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43+0900", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43+09:00", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43+09", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43+00:00", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T11:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43Z+0900", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43Z+09:00", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43Z+09", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43Z+00:00", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T11:43Z", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "2016-07-10T11:43+09:00 / 2016-07-10T13:43+09:00", ts_attr,  1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "2016-07-10T02:43Z/2016-07-10T04:43Z", get_auto_annotation(ret[:error_list])
     #月名のスペルミス
     ret = exec_validator("invalid_date_format", "BS_R0007", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
     assert_equal false, ret[:result]

@@ -22,8 +22,8 @@ class TestDateFormat < Minitest::Test
     assert_equal "2016-07", ret
     ret = @df.format_date2ddbj("2016-07-01")
     assert_equal "2016-07-01", ret
-    ret = @df.format_date2ddbj("2016-07-01T11:43")
-    assert_equal "2016-07-01", ret
+    ret = @df.format_date2ddbj("2016-07-01T11:43") # add "Z"(UTC) if without timezone
+    assert_equal "2016-07-01T11:43Z", ret
     ret = @df.format_date2ddbj("2016-07-01T11:43Z")
     assert_equal "2016-07-01T11:43Z", ret
     ret = @df.format_date2ddbj("2016-07-01T11:43+09")
@@ -59,8 +59,8 @@ class TestDateFormat < Minitest::Test
     assert_equal "2016-07-01", ret
     ret = @df.format_date2ddbj("2016, july 1") # delimiter + month name
     assert_equal "2016-07-01", ret
-    ret = @df.format_date2ddbj("2016/07/01T11:43") # trim time if without timezone
-    assert_equal "2016-07-01", ret
+    ret = @df.format_date2ddbj("2016/07/01T11:43") # add "Z"(UTC) if without timezone
+    assert_equal "2016-07-01T11:43Z", ret
     ret = @df.format_date2ddbj("2016-07-01T11:43Z+0900") # trim Z
     assert_equal "2016-07-01T11:43+0900", ret
     ret = @df.format_date2ddbj("2016/07/01 T11:43+09:00") # space before T
@@ -174,8 +174,8 @@ class TestDateFormat < Minitest::Test
     assert_equal "T01:02:03Z", ret
     ret = @df.format_time("T01:23:45+900") # format timezone
     assert_equal "T01:23:45+0900", ret
-    ret = @df.format_time("T01:23:45") #without timezone
-    assert_equal "", ret
+    ret = @df.format_time("T01:23:45") # without timezone add "Z"(UTC)
+    assert_equal "T01:23:45Z", ret
 
     # cannot convert
     ret = @df.format_time("T25:2:3z") # over 24 hour
@@ -192,6 +192,15 @@ class TestDateFormat < Minitest::Test
     #nil
     ret = @df.format_time(nil) #missspelling
     assert_nil ret
+  end
+
+  def test_find_time_format
+    ret = @df.find_time_format("T12:00:00")
+    assert_equal "T%H:%M:%S", ret
+    ret = @df.find_time_format("T11:43")
+    assert_equal "T%H:%M", ret
+    ret = @df.find_time_format("T9")
+    assert_equal "T%H", ret
   end
 
   def test_format_timezone
@@ -236,6 +245,16 @@ class TestDateFormat < Minitest::Test
     #nil
     ret = @df.format_timezone(nil) #missspelling
     assert_nil ret
+  end
+
+  def test_find_timezone_format
+    ret = @df.find_timezone_format("+09:00")
+    assert_equal "+%H:%M", ret[:format]
+    ret = @df.find_timezone_format("-09:00")
+    assert_equal "-%H:%M", ret[:format]
+    ret = @df.find_timezone_format("+900")
+    assert_equal "+%H%M", ret[:format]
+    assert_equal "+0900", ret[:text]
   end
 
   def test_format_delimiter_single_date
@@ -395,4 +414,32 @@ class TestDateFormat < Minitest::Test
     ret = @df.ddbj_date_format?(nil)
     assert_nil ret
   end
+
+  def test_datetime2utc
+    ret = @df.datetime2utc("2016-07-10T18:00:01+09:00", "%Y-%m-%dT%H")
+    assert_equal "2016-07-10T09:00:01Z", ret
+  end
+
+  def test_convert2utc
+    ret = @df.convert2utc("2016-07-10T18:00:01+09:00")
+    assert_equal "2016-07-10T09:00:01Z", ret
+    ret = @df.convert2utc("2016-07-10T18:00:01+0845")
+    assert_equal "2016-07-10T09:15:01Z", ret
+    ret = @df.convert2utc("2016-07-10T18:00:01+08")
+    assert_equal "2016-07-10T10:00:01Z", ret
+    ret = @df.convert2utc("2016-07-10T18:00:01Z")
+    assert_equal "2016-07-10T18:00:01Z", ret
+    ret = @df.convert2utc("2016-07-10T18:00:01+09:00 / 2016-07-10T19:00:01+09:00")
+    assert_equal "2016-07-10T09:00:01Z/2016-07-10T10:00:01Z", ret
+    # without timezone no convert
+    ret = @df.convert2utc("2016-07-10")
+    assert_equal "2016-07-10", ret
+    # without timezone, can't convert
+    ret = @df.convert2utc("2016-07-10T18:00:01")
+    assert_equal "2016-07-10T18:00:01", ret
+    # not invalid date
+    ret = @df.convert2utc("Not date")
+    assert_equal "Not date", ret
+  end
+
 end

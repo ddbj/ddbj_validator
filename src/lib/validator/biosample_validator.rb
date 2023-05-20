@@ -1681,6 +1681,8 @@ class BioSampleValidator < ValidatorBase
 
     if !is_ddbj_format || !parsable_date #無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
       attr_val = attr_val_org
+    else # timezoneをUTC時間に変更
+      attr_val = df.convert2utc(attr_val)
     end
 
     if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
