@@ -296,10 +296,22 @@ class CommonUtils
       insdc_latlon = "#{lat_dec} #{lng_dec}"
     end
     if insdc_latlon.nil?
-      nil
-    else
-      insdc_latlon
+      return nil
     end
+    # 小数点8桁までに切り捨て
+    dec_insdc_latlon_detail_reg = %r{^(?<lat_dec>\d{1,2}\.)(?<lat_dec_point>\d+)\s*(?<lat_dec_hemi>[NS])[ ,_;]+(?<lng_dec>\d{1,3}\.)(?<lng_dec_point>\d+)\s*(?<lng_dec_hemi>[EW])$}
+    if dec_insdc_latlon_detail_reg.match(insdc_latlon)
+      d = dec_insdc_latlon_detail_reg.match(insdc_latlon)
+      if d['lat_dec_point'].size > 8
+        fixed = d['lat_dec_point'][0..7]
+        insdc_latlon.gsub!(d['lat_dec_point'], fixed)
+      end
+      if d['lng_dec_point'].size > 8
+        fixed = d['lng_dec_point'][0..7]
+        insdc_latlon.gsub!(d['lng_dec_point'], fixed)
+      end
+    end
+    insdc_latlon
   end
 
   #

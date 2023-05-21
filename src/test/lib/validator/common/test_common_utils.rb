@@ -80,17 +80,24 @@ class TestCommonUtils < Minitest::Test
     ret = @common.format_insdc_latlon("37°26′36.42″N 06°15′14.28″W")
     assert_equal "37.4435 N 6.254 W", ret
 
-    ret = @common.format_insdc_latlon("37.443501234 N 6.25401234 W")
-    assert_equal "37.443501234 N 6.25401234 W", ret
-
-    ret = @common.format_insdc_latlon("N 37.443501234   W 6.25401234")
-    assert_equal "37.443501234 N 6.25401234 W", ret
+    ret = @common.format_insdc_latlon("N 37.44350123   W 6.25401234")
+    assert_equal "37.44350123 N 6.25401234 W", ret
 
     ret = @common.format_insdc_latlon("23.00279,120.21840")
     assert_equal "23.00279 N 120.21840 E", ret
 
     ret = @common.format_insdc_latlon("-23.00279,-120.21840")
     assert_equal "23.00279 S 120.21840 W", ret
+
+    # 小数点8桁以上は切り捨て
+    ret = @common.format_insdc_latlon("5.385667527 N 150.334778119 W")
+    assert_equal "5.38566752 N 150.33477811 W", ret
+
+    ret = @common.format_insdc_latlon("37.443501234 N 6.25401234 W")
+    assert_equal "37.44350123 N 6.25401234 W", ret
+
+    ret = @common.format_insdc_latlon("23.002796789,120.218406789")
+    assert_equal "23.00279678 N 120.21840678 E", ret
 
     #ng case
     ret = @common.format_insdc_latlon("missing")

@@ -580,6 +580,12 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    ## too detail lat lon(auto annotation)
+    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "5.385667527 N 150.334778119 W", 1)
+    expect_annotation = "5.38566752 N 150.33477811 W"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ##can't parse format as lat lon
     ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "invalid latlon format", 1)
     assert_equal false, ret[:result]

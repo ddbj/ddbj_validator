@@ -84,7 +84,7 @@
     "internal_ignore": false,
     "name": "Invalid date format",
     "method": "invalid_date_format",
-    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\", \"YYYY-mm-ddThh:mm:ss+hh:mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (eg., 1990-10-30, 1990-10, 1990-10-30T14:41:36+09:00 or 1990-10-30T14:41:36Z).",
+    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
     "object": [
       "BioSample"
     ],
@@ -110,7 +110,7 @@
     "internal_ignore": false,
     "name": "Invalid lat_lon format",
     "method": "invalid_lat_lon_format",
-    "message": "Invalid lat_lon format.",
+    "message": "Invalid lat_lon format. Specify as degrees latitude and longitude in format \"d[d.dddddddd] N|S d[dd.dddddddd] W|E\".",
     "object": [
       "BioSample"
     ],
@@ -1023,6 +1023,7 @@
     "message": "Invalid GISAID accession number",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0122"
   }
 }
