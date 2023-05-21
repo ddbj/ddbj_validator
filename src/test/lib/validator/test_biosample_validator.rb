@@ -1884,4 +1884,29 @@ jkl\"  "
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+
+  def test_invalid_gisaid_accession
+    # ok case
+    ret = exec_validator("invalid_gisaid_accession", "BS_R0122", "Sample A", "EPI_ISL_581860", 1 )
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    ## invalid format
+    ret = exec_validator("invalid_gisaid_accession", "BS_R0122", "Sample A", "epi_isl_581860", 1 )
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil case
+    ret = exec_validator("invalid_gisaid_accession", "BS_R0122", "Sample A", nil, 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_gisaid_accession", "BS_R0122", "Sample A", "", 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_gisaid_accession", "BS_R0122", "Sample A", "missing: control sample", 1 )
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+  end
 end

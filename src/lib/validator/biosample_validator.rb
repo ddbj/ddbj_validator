@@ -256,6 +256,8 @@ class BioSampleValidator < ValidatorBase
       future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
       invalid_sample_name_format("BS_R0101", sample_name, line_num)
 
+      invalid_gisaid_accession("BS_R0122", sample_name, biosample_data["attributes"]["gisaid_accession"], line_num)
+
       ### 値が複数記述される可能性がある項目の検証
       biosample_data["attribute_list"].each do |attr|
         unless attr["metagenome_source"].nil?
@@ -2905,6 +2907,34 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
     end
     ret
+  end
+
+  #
+  # rule:122
+  # gisaid_accessionのフォーマットチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # gisaid_accession GISAID accession
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_gisaid_accession (rule_code, sample_name, gisaid_accession, line_num)
+    return nil if CommonUtils::null_value?(gisaid_accession)
+    result = true
+    if gisaid_accession !~ /^EPI_[A-Z]+_[0-9]+$/
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: "gisaid_accession"},
+          {key: "Attribute value", value: gisaid_accession}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
   end
 
 end
