@@ -1915,4 +1915,47 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
 
   end
+
+  def test_missing_bioproject_id_for_locus_tag_prefix
+    #ok case
+    # 両方記載あり
+    attr_list = [{"locus_tag_prefix" => "ABCDEF", "attr_no" => 5}, { "bioproject_id" => "SSUBXXXXXXX", "attr_no" => 13}]
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # 複数のlocus_tag_prefixのうち、1つだけが有効、bioproject_idも記載あり
+    attr_list = [{"locus_tag_prefix" => "ABCDEF", "attr_no" => 5}, {"locus_tag_prefix" => "missing", "attr_no" => 6}, { "bioproject_id" => "SSUBXXXXXXX", "attr_no" => 13}]
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # locus_tag_prefixの有効な値が記載されているが、bioproject_idの値がnull値
+    attr_list = [{"locus_tag_prefix" => "ABCDEF", "attr_no" => 5}, { "bioproject_id" => "missing", "attr_no" => 13}]
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # 複数のlocus_tag_prefixのうち、1つだけが有効、bioproject_idの項目がない
+    attr_list = [{"locus_tag_prefix" => "ABCDEF", "attr_no" => 5}, {"locus_tag_prefix" => "missing", "attr_no" => 6}]
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil or null value case
+    # locus_tag_prefixの記述がない、bioproject_idも無い
+    attr_list = []
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # locus_tag_prefixが全てnull値、bioproject_idもnull値
+    attr_list = [{"locus_tag_prefix" => "missing", "attr_no" => 5}, {"locus_tag_prefix" => "missing", "attr_no" => 6}, { "bioproject_id" => "missing", "attr_no" => 13}]
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # locus_tag_prefixが全てnull値、bioproject_idもnull値(reporting term)
+    attr_list = [{"locus_tag_prefix" => "missing", "attr_no" => 5}, {"locus_tag_prefix" => "missing", "attr_no" => 6}, { "bioproject_id" => "missing: control sample", "attr_no" => 13}]
+    ret = exec_validator("missing_bioproject_id_for_locus_tag_prefix", "BS_R0128", "SampleA", attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
 end

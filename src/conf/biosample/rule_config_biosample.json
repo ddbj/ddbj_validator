@@ -1025,5 +1025,18 @@
       "BioSample"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0122"
+  },
+  "ruleBS_R0128": {
+    "rule_class": "BioSample",
+    "code": "BS_R0128",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing BioProject ID for locus tag prefix",
+    "method": "missing_bioproject_id_for_locus_tag_prefix",
+    "message": "Provide a BioProject ID for a locus tag prefix.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0128"
   }
 }

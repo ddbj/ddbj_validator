@@ -288,6 +288,7 @@ class BioSampleValidator < ValidatorBase
 
       ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
       multiple_vouchers("BS_R0062", sample_name, biosample_data["attribute_list"], line_num) # 引数が可変なので属性リストを渡す
+      missing_bioproject_id_for_locus_tag_prefix("BS_R0128", sample_name, biosample_data["attribute_list"], line_num)
 
       ### taxonomy_idの値を使う検証
       if taxonomy_id != OrganismValidator::TAX_INVALID #無効なtax_idでなければ実行
@@ -2929,6 +2930,55 @@ class BioSampleValidator < ValidatorBase
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "gisaid_accession"},
           {key: "Attribute value", value: gisaid_accession}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+
+  #
+  # rule:128
+  # locus_tag_prefixの記述がある場合に、bioproject_idの有効な記載(空値ではない)があるかのチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # attr_list 属性のリスト(複数記述可能項目を含むためhashではない)
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_bioproject_id_for_locus_tag_prefix (rule_code, sample_name, attr_list, line_num)
+    return nil if attr_list.nil?
+
+    result = true
+    edit_locus_tag_prefix = false
+    locus_tag_prefix_values = []
+    edit_bioproject_id = false
+    bioproject_id_values = [] # 実質1回しか記述されない
+    # 有効な値のlocus_tag_prefixとbioproject_idの記述があるか
+    attr_list.each do |attr|
+      unless attr["locus_tag_prefix"].nil?
+        if !CommonUtils::null_value?(attr["locus_tag_prefix"]) && !CommonUtils::null_not_recommended_value?(attr["locus_tag_prefix"])
+          edit_locus_tag_prefix = true
+        end
+        locus_tag_prefix_values.push(attr["locus_tag_prefix"])
+      end
+      unless attr["bioproject_id"].nil?
+        if !CommonUtils::null_value?(attr["bioproject_id"]) &&  !CommonUtils::null_not_recommended_value?(attr["bioproject_id"])
+          edit_bioproject_id = true
+        end
+        bioproject_id_values.push(attr["bioproject_id"])
+      end
+    end
+    if edit_locus_tag_prefix == true && edit_bioproject_id == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "locus_tag_prefix, bioproject_id"},
+        {key: "Attribute value(locus_tag_prefix)", value: locus_tag_prefix_values.join(", ")},
+        {key: "Attribute value(bioproject_id)", value: bioproject_id_values.join(", ")}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
