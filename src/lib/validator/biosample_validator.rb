@@ -229,7 +229,7 @@ class BioSampleValidator < ValidatorBase
 
       ### 特定の属性値に対する検証
       invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
-      bioproject_not_found("BS_R0006", sample_name,  biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num) if @use_db
+      bioproject_not_found("BS_R0006", sample_name, biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num) if @use_db
       invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
       invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
       duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num) if @use_db
@@ -257,6 +257,7 @@ class BioSampleValidator < ValidatorBase
       invalid_sample_name_format("BS_R0101", sample_name, line_num)
 
       invalid_gisaid_accession("BS_R0122", sample_name, biosample_data["attributes"]["gisaid_accession"], line_num)
+      biosample_not_found("BS_R0129", sample_name, biosample_data["attributes"]["derived_from"], @submitter_id, line_num) if @use_db
 
       ### 値が複数記述される可能性がある項目の検証
       biosample_data["attribute_list"].each do |attr|
@@ -2983,6 +2984,53 @@ class BioSampleValidator < ValidatorBase
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+  #
+  # rule:129
+  # derived_fromに記載されたBioSample accession idのうち、sumitterのものではないIDや無効なIDが含まれていないかのチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # derived_from BioSample accession idが記載されたテキスト。範囲表記含む e.g. "SAMD00000001,SAMD00000002,SAMD00000005-SAMD00000010"
+  # submitter_id submitter_id
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def biosample_not_found (rule_code, sample_name, derived_from, submitter_id, line_num)
+    return nil if CommonUtils::null_value?(derived_from)
+    return nil if submitter_id.nil?
+
+    result = true
+    # derived_fromに記載された accession_id(SAMDXXXX) を抽出する
+    submission_id_list = derived_from.scan(/SAMD[0-9]+/)
+    range_matches = derived_from.scan(/SAMD[0-9]+\s?-\s?SAMD[0-9]+/) # 範囲記述のID抽出 SAMDXXXX-SAMDXXXX
+    range_matches.each do |range|
+      range_ids = range.scan(/[0-9]+/)
+      length = range_ids.first.size #0埋めの桁数は最初のIDに合わせる
+      range_ids = range_ids.map {|range_id| range_id.to_i}
+      (range_ids.min..range_ids.max).each do |id|
+        submission_id_list.push("SAMD%0#{length}d" % id)
+      end 
+    end
+    
+    if submission_id_list.size > 0
+      valid_id_list = @db_validator.get_valid_sample_id_list(submission_id_list, submitter_id)
+      invalid_id_list = submission_id_list - valid_id_list # 指定IDから有効なIDを差し引いてinvalidなリストを取得
+      if invalid_id_list.size > 0
+        annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: "derived_from"},
+          {key: "Invalid Accession IDs", value: invalid_id_list.join(", ")}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+        result = false
+      end
     end
     result
   end

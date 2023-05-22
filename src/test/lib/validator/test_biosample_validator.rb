@@ -310,48 +310,6 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
-=begin (suppressed)
-  def test_not_predefined_attribute_name
-    #ok case
-    xml_data = File.read("#{@test_file_dir}/14_not_predefined_attribute_name_SSUB000019_ok.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
-    ret = exec_validator("not_predefined_attribute_name", "BS_R0014", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    xml_data = File.read("#{@test_file_dir}/14_not_predefined_attribute_name_SSUB000019_error.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
-    ret = exec_validator("not_predefined_attribute_name", "BS_R0014", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
-    expect_msg = "user_attr1, user_attr2"
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
-  end
-=end
-
-=begin (suppressed)
-  def test_missing_required_attribute_name
-    #ok case
-    xml_data = File.read("#{@test_file_dir}/92_missing_required_attribute_name_SSUB000019_ok.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
-    ret = exec_validator("missing_required_attribute_name", "BS_R0092", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    xml_data = File.read("#{@test_file_dir}/92_missing_required_attribute_name_SSUB000019_error.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
-    ret = exec_validator("missing_required_attribute_name", "BS_R0092", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
-    expect_msg = "env_local_scale, isol_growth_condt"
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
-  end
-=end
-
   def test_missing_mandatory_attribute
     null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
     #ok case
@@ -1958,4 +1916,66 @@ jkl\"  "
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
   end
+
+  def test_biosample_not_found
+    #ok case
+    ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "SAMD00032107, SAMD00032108-SAMD00032156, SAMD00032157", "hirotoju", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "SAMD00032107, SAMD00032108-SAMD00032156, SAMD00032157, SAMD00099999", "hirotoju", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    p ret[:error_list]
+
+    # not include accession_id text
+    ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "not exist biosample id text", "hirotoju", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not include accession_id text
+    ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "missing", "hirotoju", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].sizeå
+  end
+
+=begin (suppressed)
+  def test_not_predefined_attribute_name
+    #ok case
+    xml_data = File.read("#{@test_file_dir}/14_not_predefined_attribute_name_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("not_predefined_attribute_name", "BS_R0014", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_data = File.read("#{@test_file_dir}/14_not_predefined_attribute_name_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("not_predefined_attribute_name", "BS_R0014", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    expect_msg = "user_attr1, user_attr2"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
+  end
+
+  def test_missing_required_attribute_name
+    #ok case
+    xml_data = File.read("#{@test_file_dir}/92_missing_required_attribute_name_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_required_attribute_name", "BS_R0092", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #ng case
+    xml_data = File.read("#{@test_file_dir}/92_missing_required_attribute_name_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"])
+    ret = exec_validator("missing_required_attribute_name", "BS_R0092", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
+    expect_msg = "env_local_scale, isol_growth_condt"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
+  end
+=end
 end

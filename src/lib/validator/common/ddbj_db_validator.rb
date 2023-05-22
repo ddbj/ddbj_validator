@@ -1079,4 +1079,58 @@ class DDBJDbValidator
     end
     biosample_list_with_smp_id
   end
+
+  #
+  # 指定されたBioSample Accession IDのうち、submitter_id に紐付く有効なサンプルのリストを返す
+  # 紐付くサンプルがなければ空リストを返す
+  #
+  # ==== Args
+  # biosample_accession_list ex. ["SAMD00052344", "SAMD00000000"]
+  # submitter_id ""
+  # ==== Return
+  # 有効なBioProject Accession IDの配列
+  # [
+  #   { "SAMD00052344", smp_id: "64274", bioproject_accession_id_list: ["PRJDB4841"], drr_accession_id_list: ["DRR060518"] },
+  #   { biosample_id: "SAMD00052344", bioproject_accession_id_list: [], drr_accession_id_list: [] }
+  # ]
+  #
+  def get_valid_sample_id_list(biosample_accession_list, submitter_id)
+    return [] if biosample_accession_list.nil?
+    return [] if submitter_id.nil?
+
+    result = []
+    biosample_id_list = []
+    biosample_accession_list.each do |biosample_accession|
+      if biosample_accession =~ /^SAMD\d+/
+        biosample_id_list.push(biosample_accession)
+      end
+    end
+    if biosample_id_list.size > 0
+      param_list = [submitter_id].concat(biosample_id_list)
+      begin
+        connection = get_connection(BIOSAMPLE_DB_NAME)
+        id_place_holder = (2..(biosample_id_list.size + 1) ).map{|idx| "$" + idx.to_s}.join(",") # submitter_idが $1 なので $2から
+        q = "SELECT accession_id
+            FROM mass.sample smp
+              JOIN mass.accession acc USING(smp_id)
+              JOIN mass.submission USING(submission_id)
+            WHERE submitter_id = $1
+              AND accession_id IN (#{id_place_holder})
+              AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", param_list)
+        res.each do |row|
+          result.push(row["accession_id"])
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+    
+  end
 end

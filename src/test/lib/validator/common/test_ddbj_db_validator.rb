@@ -86,25 +86,14 @@ class TestDDBJDbValidator < Minitest::Test
 
   end
 
-  #TODO get_bioproject_names_list に修正
-  def test_get_bioproject_names
+  def test_get_bioproject_names_list
     # exist case
-    ret = @db_validator.get_bioproject_names("ddbj_ffpri")
+    ret = @db_validator.get_bioproject_names_list("ddbj_ffpri")
     assert_equal 1, ret.size
+    expected_text = "Diurnal transcriptome dynamics of Japanese cedar (Cryptomeria japonica) in summer and winter"
+    assert_equal expected_text, ret.first[:project_name]
     # not exist case
-    ret = @db_validator.get_bioproject_names("not_exist_submitter")
-    assert_equal 0, ret.size
-  end
-
-  #TODO get_bioproject_names_list に修正
-  def test_get_bioproject_title_descs
-    # exist case
-    ret = @db_validator.get_bioproject_title_descs("ddbj_ffpri")
-    assert_equal 1, ret.size
-    expected_text = "Diurnal transcriptome dynamics of Japanese cedar (Cryptomeria japonica) in summer and winter,We constracted cDNA library form the RNA mixture which were isolated from Japanese cedar shoots sampled throughout the day and year, and analyzed by Roche 454 GS FLX.  The sequence data was used to design microarray probes. The seasonal and diurnal transcriptome dynamics were investigated by this new designed microarray."
-    assert_equal expected_text, ret.first
-    # not exist case
-    ret = @db_validator.get_bioproject_title_descs("not_exist_submitter")
+    ret = @db_validator.get_bioproject_names_list("not_exist_submitter")
     assert_equal 0, ret.size
   end
 
@@ -350,5 +339,25 @@ class TestDDBJDbValidator < Minitest::Test
     assert_equal ret.first[:bioproject_accession_id_list], []
     assert_equal ret.first[:drr_accession_id_list], []
     ret = @db_validator.get_biosample_related_id(["SAMD00052344", "SAMD00000000"])
+  end
+
+  def test_get_valid_sample_id_list
+    "SAMD00032107-SAMD00032156, hirotoju"
+    # all valid id
+    ret = @db_validator.get_valid_sample_id_list(["SAMD00032107", "SAMD00032108", "SAMD00032109", "SAMD00032110"], "hirotoju")
+    assert_equal true, ret.include?("SAMD00032107")
+    assert_equal 4, ret.size
+    # invalid id
+    ret = @db_validator.get_valid_sample_id_list(["SAMD00032107", "SAMD00032108", "SAMD00032109", "SAMD00032110", "SAMD99999999"], "hirotoju")
+    assert_equal false, ret.include?("SAMD10099999")
+    assert_equal 4, ret.size
+    # all invalid id
+    ret = @db_validator.get_valid_sample_id_list(["SAMD99999999", "SAMD99999998", "SAMD99999997", "SAMD99999996", "SAMD99999995"], "hirotoju")
+    assert_equal [], ret
+    assert_equal 0, ret.size
+    # invalid submitter_id
+    ret = @db_validator.get_valid_sample_id_list(["SAMD00032107", "SAMD00032108", "SAMD00032109", "SAMD00032110", "SAMD99999999"], "not_exist_user")
+    assert_equal false, ret.include?("SAMD00032107")
+    assert_equal 0, ret.size
   end
 end
