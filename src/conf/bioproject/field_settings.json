@@ -1,0 +1,219 @@
+{
+  "not_recommended_null_value": {
+    "value_list" : [
+      "NA",
+      "N\/A",
+      "N\\. ?A\\.?",
+      "Unknown",
+      "\\.",
+      "\\-"
+    ]
+  },
+  "null_value": {
+    "value_list" : [
+      "not applicable",
+      "not collected",
+      "not provided",
+      "missing",
+      "restricted access"
+    ]
+  },
+  "allow_char": {
+
+  },
+  "predefined_field_name": [
+    "first_name",
+    "middle_name",
+    "last_name",
+    "email",
+    "organization",
+    "organization_url",
+    "consortium_name",
+    "consortium_url",
+    "title",
+    "description",
+    "project_data_type",
+    "sample_scope",
+    "organism",
+    "taxonomy_id",
+    "strain",
+    "breed",
+    "cultivar",
+    "isolate",
+    "label",
+    "pubmed_id",
+    "doi",
+    "umbrella_bioproject_accession",
+    "grant_agency",
+    "grant_agency_abbreviation",
+    "grant_id",
+    "grant_title",
+    "link_label",
+    "link_url",
+    "register_as_umbrella",
+    "private_comment_to_ddbj"
+  ],
+  "mandatory_field_names": [
+    "title",
+    "description",
+    "project_data_type",
+    "sample_scope",
+    "organism",
+    "taxonomy_id"
+  ],
+  "field_groups": [
+    {
+      "group_name": "Consortium",
+      "field_list" : ["consortium_name", "consortium_url"]
+    },
+    {
+      "group_name": "Publication",
+      "field_list" : ["pubmed_id", "doi"]
+    },
+    {
+      "group_name": "Grant",
+      "field_list" : ["grant_agency", "grant_agency_abbreviation", "grant_id", "grant_title"]
+    },
+    {
+      "group_name": "Link",
+      "field_list" : ["link_label", "link_url"]
+    }
+  ],
+  "allow_multiple_values": [
+    "first_name",
+    "middle_name",
+    "last_name",
+    "email",
+    "consortium_name",
+    "consortium_url",
+    "project_data_type",
+    "pubmed_id",
+    "doi",
+    "grant_agency",
+    "grant_agency_abbreviation",
+    "grant_id",
+    "grant_title",
+    "link_label",
+    "link_url"
+  ],
+	"mandatory_field": {
+		"error": ["last_name", "email", "organization", "title", "description", "project_data_type", "sample_scope"],
+    "error_internal_ignore": [],
+		"warning": ["first_name"]
+	},
+  "not_allow_null_value": {
+    "error": ["last_name", "email", "organization", "title", "description", "project_data_type", "sample_scope"],
+    "error_internal_ignore": [],
+		"warning": ["register_as_umbrella"]
+  },
+	"mandatory_fields_in_a_group": {
+    "error": [
+      {
+        "group_name": "Person",
+        "mandatory_field" : ["middle_name", "last_name", "email"]
+      }, {
+        "group_name": "Consortium",
+        "mandatory_field": ["consortium_name", "consortium_url"]
+      }, {
+        "group_name": "Grant",
+        "mandatory_field": ["grant_agency", "grant_title"]
+      }, {
+        "group_name": "Link",
+        "mandatory_field" : ["link_label", "link_url"]
+      }
+    ],
+    "error_internal_ignore": [],
+    "warning": [
+      {
+        "group_name": "Person",
+        "mandatory_field" : ["first_name"]
+      }
+    ]
+  },
+  "selective_mandatory": {
+    "error": [],
+    "error_internal_ignore": [],
+    "warning": [
+      {
+        "group_name": "Publication"
+      }
+    ]
+  },
+  "format_check": {
+    "error": [
+      {
+        "field_name": "umbrella_bioproject_accession",
+        "regex": "^PRJ(DA|DB|EA|EB|NA)\\d{1,}$"
+      }
+    ],
+    "error_internal_ignore": [
+      {
+        "field_name": "title",
+        "regex": "^.{10,}$"
+      }, {
+        "field_name": "description",
+        "regex": "^.{100,}$"
+      }
+    ],
+    "warning": [
+      {
+        "field_name": "organization_url",
+        "format": "URI"
+      }, {
+        "field_name": "consortium_url",
+        "format": "URI"
+      }, {
+        "field_name": "taxonomy_id",
+        "regex": "^[0-9]+$"
+      }, {
+        "field_name": "pubmed_id",
+        "regex": "^[0-9]+$"
+      }, {
+        "field_name": "link_url",
+        "format": "URI"
+      }
+    ]
+  },
+  "cv_check": {
+    "error": [
+      {
+        "field_name": "project_data_type",
+        "value_list": [
+          "Genome sequencing and assembly",
+          "Raw sequence reads",
+          "Genome sequencing",
+          "Assembly",
+          "Clone ends",
+          "Epigenomics",
+          "Exome",
+          "Map",
+          "Metabolome",
+          "Metagenome",
+          "Metagenomic assembly",
+          "Phenotype or Genotype",
+          "Proteome",
+          "Random survey",
+          "Targeted loci cultured",
+          "Targeted loci environmental",
+          "Targeted Locus (Loci)",
+          "Transcriptome or Gene expression",
+          "Variation"
+        ]
+      },
+      {
+        "field_name": "sample_scope",
+        "value_list": [
+          "Monoisolate",
+          "Multiisolate",
+          "Multi-species",
+          "Envinronment",
+          "Single-cell",
+          "Synthetic",
+          "Other"
+        ]
+      }
+    ],
+    "error_internal_ignore": [],
+    "warning": []
+  }
+}

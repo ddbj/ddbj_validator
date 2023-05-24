@@ -1,0 +1,7 @@
+#Study (IDF) fields
+##MB-IDF-version=2021-12-17
+# Fields without line boxes can have multiple values in corresponding columns.
+MAGE-TAB Version	1.1
+Comment[MetaboBank accession]
+Study Title	My Metabo Project title
+Study Description	My Metabo Project description

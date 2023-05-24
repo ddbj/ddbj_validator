@@ -1,0 +1,20 @@
+{
+  "$id": "https://ddbj.nig.ac.jp/api/validator/bioproject/schema.json",
+  "title": "MetaboBank IDF",
+  "description": "MetaboBank IDF submission shema",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "properties": {
+      "key": {
+        "description": "The unique identifier for a product",
+        "type": "string"
+      },
+      "values": {
+        "description": "The unique identifier for a product",
+        "type": "array"
+      }
+    },
+    "required": [ "key", "values" ]
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$id": "https://ddbj.nig.ac.jp/api/validator/bioproject/schema.json",
+  "title": "MetaboBank SDRF",
+  "description": "MetaboBank SDRF submission shema",
+  "type": "array",
+  "items": {
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "description": "The unique identifier for a product",
+          "type": "string"
+        },
+        "value": {
+          "description": "The unique identifier for a product",
+          "type": [ "string", "null" ]
+        }
+      },
+      "required": [ "key", "value" ]
+    }
+  }
+}

@@ -184,6 +184,45 @@ class Package < SPARQLBase
     end
   end
 
+  def attribute_template_file (version, package_id, only_biosample_sheet, accept_heder)
+    begin
+      params = {version: version, package_id: package_id}
+      unless version.start_with?("1.4")
+        return {status: "fail", message: "Invalid package version. Expected version is 1.4x"}
+      end
+
+      # accept header から希望ファイル形式を決める
+      unless accept_heder.nil? || accept_heder["HTTP_ACCEPT"].nil?
+        accept_heder_list = accept_heder["HTTP_ACCEPT"].split(",").map {|item| item.chomp.strip}
+      end
+      return_file_format = "excel" # default format
+      if accept_heder_list.include?("text/tab-separated-values")
+        return_file_format = "tsv"
+      end
+      template_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../public/template")
+      puts template_file_dir
+      file_path = ""
+      if return_file_format == "tsv"
+        file_path = "#{template_file_dir}/#{version}/bs/tsv/#{package_id}.tsv"
+      else
+        if only_biosample_sheet == true # BioSampleシートのみ
+          file_path = "#{template_file_dir}/#{version}/bs/excel/#{package_id}.xlsx"
+        else
+          file_path = "#{template_file_dir}/#{version}/bpbs/excel/#{package_id}.xlsx"
+        end
+      end
+      if File.exist?(file_path)
+        return {status: "success", file_path: file_path, file_type: return_file_format}
+      else
+        puts "Not exist package template file: #{file_path}"
+        return {status: "fail", message: "Invalid package_id"}
+      end
+    rescue => ex
+      output_log(ex)
+      {status: "error", message: "Attribute templete file processing finished with error. Please check the validation service."}
+    end
+  end
+
   def package_info (version, package_id)
     begin
       params = {version: version, package_id: package_id}

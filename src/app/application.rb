@@ -8,7 +8,7 @@ require 'net/https'
 require 'fileutils'
 require File.expand_path('../../lib/validator/validator.rb', __FILE__)
 require File.expand_path('../../lib/validator/biosample_validator.rb', __FILE__)
-require File.expand_path('../../lib/validator/auto_annotation.rb', __FILE__)
+require File.expand_path('../../lib/validator/auto_annotator/auto_annotator.rb', __FILE__)
 require File.expand_path('../../lib/submitter/submitter.rb', __FILE__)
 require File.expand_path('../../lib/package/package.rb', __FILE__)
 
@@ -53,18 +53,24 @@ module DDBJValidator
       #組み合わせが成功したものだけ保存しチェック
       if valid_file_combination?
 
+        validation_params = {}
+        validation_params[:params] = {"file_format" => {}}
+
         uuid = SecureRandom.uuid
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
-        validation_params = {}
-        input_file_list = %w(biosample bioproject submission experiment run analysisx jvar vcf trad_anno trad_seq trad_agp)
+
+        input_file_list = %w(all_db biosample bioproject submission experiment run analysisx jvar vcf trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)
             validation_params[file_category.to_sym] = save_path
+            file_format = file_format(file_category, params)
+            if file_format
+              validation_params[:params]["file_format"][file_category] = file_format
+            end
           end
         end
-        allow_params = %w(submitter_id)
-        validation_params[:params] = {}
+        allow_params = %w(submitter_id biosample_submission_id bioproject_submission_id google_api_key check_sheet check_sheet[])
         allow_params.each do |param_name|
           if params[param_name.to_sym]
             validation_params[:params][param_name] = params[param_name.to_sym]
@@ -179,20 +185,31 @@ module DDBJValidator
       result_file = "#{save_dir}/result.json"
       org_file_list = Dir.glob("#{save_dir}/#{filetype}/*")
       annotated_file_path = ""
+      result = nil
       if File.exist?(result_file) && org_file_list.size == 1
         org_file = org_file_list.first
         annotated_file_name = File.basename(org_file, ".*") + "_annotated" + File.extname(org_file)
         annotated_file_dir = "#{save_dir}/autoannotated/#{filetype}"
         FileUtils.mkdir_p(annotated_file_dir)
         annotated_file_path = "#{annotated_file_dir}/#{annotated_file_name}"
-        AutoAnnotation.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype)
-      end
-      if File.exist?(annotated_file_path)
-        send_file annotated_file_path, :filename => annotated_file_name, :type => 'application/xml'
-      else
+        result = AutoAnnotator.new().create_annotated_file(org_file, result_file, annotated_file_path, filetype, get_accept_header(request))
+        if result.nil? || result[:status].nil? ||  result[:status] != "succeed" # 処理が成功しなかった
+          status 500
+          { status: "error", "message": result[:message]}.to_json
+        else #成功した場合、出力ファイルのContent-typeで返す
+          if result[:file_type] == "json"
+            type = "application/json"
+          elsif result[:file_type] == "tsv"
+            type = "text/tab-separated-values"
+          else
+            type = "application/xml"
+          end
+          send_file result[:file_path], :filename => File.basename(result[:file_path]), :type => type
+        end
+      else #元ファイルがない
         status 400
         message = "Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified"
-        { status: "error", "message": message}.to_json
+        return { status: "error", "message": message}.to_json
       end
     end
 
@@ -358,6 +375,40 @@ module DDBJValidator
       end
     end
 
+    get '/api/attribute_template_file' do
+      if params["package"].nil? || params["package"].strip == ""
+        status 400
+        message = "'package' parameter is required"
+        ret = { status: "error", "message": message}.to_json
+        return ret
+      end
+      version = params["version"]
+      if params["version"].nil? || params["version"].strip == ""
+        version = @@biosample_package_version
+      end
+      only_biosample_sheet = false
+      if params["only_biosample_sheet"]
+        only_biosample_sheet = true
+      end
+      ret = Package.new(nil).attribute_template_file(version, params["package"], only_biosample_sheet, get_accept_header(request))
+      if ret[:status] == "success"
+        if ret[:file_type] == "tsv"
+          type = "text/tab-separated-values"
+          file_name = "template.tsv"
+        else
+          type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          file_name = "template.xlsx"
+        end
+        send_file ret[:file_path], :filename => file_name, :type => type
+      elsif ret[:status] == "fail"
+        status 400
+        {"status": "error", "message": ret[:message]}.to_json
+      else # error
+        status 500
+        {"status": "error", "message": ret[:message]}.to_json
+      end
+    end
+
     get '/api/package_info' do
       if params["package"].nil? || params["package"].strip == ""
         status 400
@@ -463,10 +514,43 @@ module DDBJValidator
         save_path
       end
 
+      #file typeを推測して返す
+      def file_format (validator_type, params)
+        filetype = nil
+        unless params[validator_type.to_sym].is_a?(String) #fileで送られた場合
+          content_type = params[validator_type.to_sym][:type]
+          if content_type
+            content_type.chomp.strip!
+            if content_type == "text/xml" || content_type == "application/xml"
+              filetype = "xml"
+            elsif content_type == "application/json"
+              filetype = "json"
+            elsif content_type == "text/tab-separated-values" || content_type == "text/plain"
+              filetype = "tsv"
+            elsif content_type == "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              filetype = "excel"
+            end
+          end
+        end
+        if filetype.nil?
+          filename = params[validator_type.to_sym][:filename].chomp.strip.downcase
+          if filename.end_with?(".xml")
+            filetype = "xml"
+          elsif filename.end_with?(".json")
+            filetype = "json"
+          elsif filename.end_with?(".tsv") || filename.end_with?(".txt")
+            filetype = "tsv"
+          elsif filename.end_with?(".xlsx") || filename.end_with?(".xlmx")
+          end
+        end
+        filetype
+      end
+
       # Acceptヘッダーをリストで返す
       def get_accept_header(request)
         accept = request.env.select { |k, v| k.start_with?('HTTP_ACCEPT') }
         if accept.size == 0
+          []
         else
           accept
         end

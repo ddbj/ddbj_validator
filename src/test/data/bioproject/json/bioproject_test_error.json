@@ -1,0 +1,81 @@
+[
+  {
+    "key": "# Submission",
+    "values": []
+  }, {
+    "key": "first_name",
+    "values": []
+  }, {
+    "key": "middle_name",
+    "values": ["missing"]
+  }, {
+    "key": "last_name",
+    "values": []
+  }, {
+    "key": "organization",
+    "values": ["missing"]
+  }, {
+    "key": "organization_url",
+    "values": ["https://www.ddbj.nig.ac.jp/index.html"]
+  }, {
+    "key": "consortium_name",
+    "values": ["my consortium"]
+  }, {
+    "key": "consortium_url",
+    "values": ["https://www.ddbj.nig.ac.jp/index.html"]
+  }, {
+    "key": "",
+    "values": []
+  }, {
+    "key": "",
+    "values": ["missing header"]
+  }, {
+    "key": "# Project info",
+    "values": []
+  }, {
+    "key": "title",
+    "values" : ["My project description. This is a test project for new BioProject submission sysmtem. (< 100)"]
+  }, {
+    "key": "description",
+    "values" : ["My project description. This is a test project for new BioProject submission sysmtem. (< 100)"]
+  }, {
+    "key": "project_data_type",
+    "values": ["Metabolome", "Assembly"]
+  }, {
+    "key": "sample_scope",
+    "values": ["Monoisolate"]
+  }, {
+    "key": "organism",
+    "values": ["Homo sapiens"]
+  }, {
+    "key": "taxonomy_id",
+    "values": ["9606"]
+  }, {
+    "key": "grant_agency",
+    "values": ["My grand の agency です"]
+  }, {
+    "key": "grant_agency",
+    "values": [""]
+  }, {
+    "key": "grant_agency_abbreviation",
+    "values": ["AAA"]
+  }, {
+    "key": "grant_id",
+    "values": [""]
+  }, {
+    "key": "grant_title",
+    "values": []
+  }, {
+    "key": "リンクラベル",
+    "values": ["my_label"]
+  }, {
+    "key": "link_url",
+    "values": []
+  }, {
+    "key": "my original field",
+    "values": ["original value"]
+  }, {
+    "key": "umbrella_bioproject_accession",
+    "values": ["PSUB000000"]
+  }
+]

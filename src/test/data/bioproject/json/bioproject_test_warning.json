@@ -1,0 +1,66 @@
+[
+  {
+    "key": "#  Submission",
+    "values": []
+  }, {
+    "key": "first_name",
+    "values": []
+  }, {
+    "key": "middle_name",
+    "values": []
+  }, {
+    "key": "last_name",
+    "values": ["YAMADA", "IDEN"]
+  }, {
+    "key": "email",
+    "values": ["hanako.yamada@example.com", "taro.iden@example.com"]
+  }, {
+    "key": "organization",
+    "values": ["DDBJ"]
+  }, {
+    "key": "organization_url",
+    "values": ["https://www.ddbj.nig.ac.jp/index.html"]
+  }, {
+    "key": "consortium_name",
+    "values": ["my consortium"]
+  }, {
+    "key": "consortium_url",
+    "values": ["https://www.ddbj.nig.ac.jp/index.html"]
+  }, {
+    "key": "",
+    "values": []
+  }, {
+    "key": "# Project info",
+    "values": ["has comment value"]
+  }, {
+    "key": "title",
+    "values" : ["\"My project   title\""]
+  }, {
+    "key": "description",
+    "values" : ["My project description. This is a test project for new BioProject submission sysmtem. It should be at least 100 characters long."]
+  }, {
+    "key": "project_data_type",
+    "values": ["Metabolome", "Assembly"]
+  }, {
+    "key": "sample_scope",
+    "values": ["Monoisolate"]
+  }, {
+    "key": "organism",
+    "values": ["Homo sapiens"]
+  }, {
+    "key": "taxonomy_id",
+    "values": ["9606"]
+  }, {
+    "key": "\"grant_title\"",
+    "values": ["NA", "Unknown"]
+  }, {
+    "key": "grant_agency",
+    "values": ["Not applicable", "missing"]
+  }, {
+    "key": "label",
+    "values": ["N.A."]
+  }, {
+    "key": "pubmed_id",
+    "values": ["1111", "99999999999"]
+  }
+]

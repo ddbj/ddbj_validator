@@ -1,0 +1,380 @@
+{
+  "version": "1.0.12",
+  "validity": false,
+  "stats": {
+    "error_count": 1,
+    "warning_count": 10,
+    "error_type_count": {
+      "common_error": 1,
+      "common_warning": 10,
+      "external_error": 0,
+      "external_warning": 0
+    },
+    "autocorrect": {
+      "biosample": false,
+      "bioproject": true,
+      "submission": false,
+      "experiment": false,
+      "run": false,
+      "analysis": false,
+      "jvar": false,
+      "vcf": false,
+      "trad_anno": false,
+      "trad_seq": false,
+      "trad_agp": false,
+      "metabobank_idf": false,
+      "metabobank_sdrf": false
+    }
+  },
+  "messages": [
+    {
+      "id": "BP_R0066",
+      "message": "Value in comment line is ignored.",
+      "reference": null,
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "# Project info"
+        },
+        {
+          "key": "Values",
+          "value": "[\"has comment value\"]"
+        }
+      ]
+    },
+    {
+      "id": "BP_R0059",
+      "message": "Invalid data format.",
+      "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "title"
+        },
+        {
+          "key": "Value",
+          "value": "\"My project   title\""
+        },
+        {
+          "key": "Suggested value",
+          "suggested_value": [
+            "My project title"
+          ],
+          "target_key": "Value",
+          "location": {
+            "position_list": [
+              11,
+              "values",
+              0
+            ]
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    },
+    {
+      "id": "BP_R0059",
+      "message": "Invalid data format.",
+      "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "\"grant_title\""
+        },
+        {
+          "key": "Suggested value",
+          "suggested_value": [
+            "grant_title"
+          ],
+          "target_key": "Field name",
+          "location": {
+            "position_list": [
+              16,
+              "key"
+            ]
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    },
+    {
+      "id": "BP_R0061",
+      "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory field.",
+      "reference": null,
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "grant_title"
+        },
+        {
+          "key": "Value",
+          "value": "NA"
+        },
+        {
+          "key": "Suggested value",
+          "suggested_value": [
+            "missing"
+          ],
+          "target_key": "Value",
+          "location": {
+            "position_list": [
+              16,
+              "values",
+              0
+            ]
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    },
+    {
+      "id": "BP_R0061",
+      "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory field.",
+      "reference": null,
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "grant_title"
+        },
+        {
+          "key": "Value",
+          "value": "Unknown"
+        },
+        {
+          "key": "Suggested value",
+          "suggested_value": [
+            "missing"
+          ],
+          "target_key": "Value",
+          "location": {
+            "position_list": [
+              16,
+              "values",
+              1
+            ]
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    },
+    {
+      "id": "BP_R0061",
+      "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory field.",
+      "reference": null,
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "grant_agency"
+        },
+        {
+          "key": "Value",
+          "value": "Not applicable"
+        },
+        {
+          "key": "Suggested value",
+          "suggested_value": [
+            "not applicable"
+          ],
+          "target_key": "Value",
+          "location": {
+            "position_list": [
+              17,
+              "values",
+              0
+            ]
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    },
+    {
+      "id": "BP_R0063",
+      "message": "Null values are not neccesary in optional fields. Leave values empty when there is no information.",
+      "reference": null,
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "label"
+        },
+        {
+          "key": "Value",
+          "value": "N.A."
+        },
+        {
+          "key": "Suggested value",
+          "suggested_value": [
+            ""
+          ],
+          "target_key": "Value",
+          "location": {
+            "position_list": [
+              18,
+              "values",
+              0
+            ]
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    },
+    {
+      "id": "BP_R0044",
+      "message": "Missing mandatory field(s).",
+      "reference": null,
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "first_name"
+        }
+      ]
+    },
+    {
+      "id": "BP_R0053",
+      "message": "Missing field(s) in at least one required field group.",
+      "reference": null,
+      "level": "error",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Group name",
+          "value": "Grant"
+        },
+        {
+          "key": "Filed names",
+          "value": "[\"grant_agency\"]"
+        },
+        {
+          "key": "Position(value)",
+          "value": 1
+        },
+        {
+          "key": "Meesage",
+          "value": "[\"grant_agency\"] is required for the 'Grant' field group."
+        }
+      ]
+    },
+    {
+      "id": "BP_R0014",
+      "message": "Invalid publication identifier, enter valid pubmed id, pmc id or DOI.",
+      "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0014",
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "Field name",
+          "value": "pubmed_id"
+        },
+        {
+          "key": "Value",
+          "value": "99999999999"
+        }
+      ]
+    },
+    {
+      "id": "BP_R0039",
+      "message": "Submission processing may be delayed due to necessary curator review. Please check spelling of organism, current information generated the following error message and will require a taxonomy consult.",
+      "reference": "https://www.ddbj.nig.ac.jp/bioproject/validation-e.html#BP_R0039",
+      "level": "warning",
+      "external": false,
+      "method": "BioProject",
+      "object": [
+        "BioProject"
+      ],
+      "source": "bioproject_test_warning.json",
+      "annotation": [
+        {
+          "key": "organism",
+          "value": "Homo sapiens"
+        },
+        {
+          "key": "taxonomy_id",
+          "value": ""
+        },
+        {
+          "key": "Suggested value (taxonomy_id)",
+          "suggested_value": [
+            "9606"
+          ],
+          "target_key": "taxonomy_id",
+          "location": {
+            "mode": "add",
+            "type": "json",
+            "add_data": {
+              "key": "taxonomy_id",
+              "values": [
+                "9606"
+              ]
+            }
+          },
+          "is_auto_annotation": true
+        }
+      ]
+    }
+  ]
+}

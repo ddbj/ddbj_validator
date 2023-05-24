@@ -64,7 +64,28 @@
             "$ref": "#/parameters/trad_agp"
           },
           {
+            "$ref": "#/parameters/metabobank_idf"
+          },
+          {
+            "$ref": "#/parameters/metabobank_sdrf"
+          },
+          {
+            "$ref": "#/parameters/all_db"
+          },
+          {
+            "$ref": "#/parameters/check_sheet"
+          },
+          {
             "$ref": "#/parameters/submitter_id"
+          },
+          {
+            "$ref": "#/parameters/biosample_submission_id"
+          },
+          {
+            "$ref": "#/parameters/bioproject_submission_id"
+          },
+          {
+            "$ref": "#/parameters/google_api_key"
           }
         ],
         "responses": {
@@ -421,10 +442,59 @@
       "required": false,
       "type": "file"
     },
+    "metabobank_idf": {
+      "name": "metabobank_idf",
+      "in": "formData",
+      "description": "Upload Metabobank IDF file.",
+      "required": false,
+      "type": "file"
+    },
+    "metabobank_sdrf": {
+      "name": "metabobank_sdrf",
+      "in": "formData",
+      "description": "Upload Metabobank SDRF file.",
+      "required": false,
+      "type": "file"
+    },
+    "all_db": {
+      "name": "all_db",
+      "in": "formData",
+      "description": "Upload Excel file with multiple DB data.",
+      "required": false,
+      "type": "file"
+    },
+    "check_sheet": {
+      "name": "check_sheet",
+      "in": "formData",
+      "description": "Specify required filetype names to be checked when uploading Excel. e.g. 'bioproject,biosample' or ['bioproject', 'biosample']",
+      "required": false,
+      "type": ["string", "array"]
+    },
     "submitter_id": {
       "name": "submitter_id",
       "in": "formData",
       "description": "submitter_id",
+      "required": false,
+      "type": "string"
+    },
+    "biosample_submission_id": {
+      "name": "biosample_submission_id",
+      "in": "formData",
+      "description": "Submission ID of BioSample file to be validated. e.g., SSUB00xxxx",
+      "required": false,
+      "type": "string"
+    },
+    "bioproject_submission_id": {
+      "name": "bioproject_submission_id",
+      "in": "formData",
+      "description": "Submission ID of BioProject file to be validated. e.g., PSUB00xxxx",
+      "required": false,
+      "type": "string"
+    },
+    "google_api_key": {
+      "name": "google_api_key",
+      "in": "formData",
+      "description": "39 characters of Google API key for validation with geocoding.",
       "required": false,
       "type": "string"
     },
@@ -438,7 +508,7 @@
     "filetype": {
       "name": "filetype",
       "in": "path",
-      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf, trad_anno, trad_seq, trad_agp",
+      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf, trad_anno, trad_seq, trad_agp, metabobank_idf, metabobank_sdrf",
       "required": true,
       "type": "string"
     },
