@@ -114,7 +114,7 @@ class BioSampleValidator < ValidatorBase
     # file typeのチェック
     file_content = nil
     if (params["file_format"].nil? || params["file_format"]["biosample"].nil? || params["file_format"]["biosample"].strip.chomp == "")
-       #推測されたtypeがなければ中身をパースして推測
+      #推測されたtypeがなければ中身をパースして推測
       file_content = FileParser.new.get_file_data(data_file)
       @data_format = file_content[:format]
     else

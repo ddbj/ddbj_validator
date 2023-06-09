@@ -2041,7 +2041,6 @@ jkl\"  "
     ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "SAMD00032107, SAMD00032108-SAMD00032156, SAMD00032157, SAMD00099999", "hirotoju", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    p ret[:error_list]
 
     # not include accession_id text
     ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "not exist biosample id text", "hirotoju", 1)

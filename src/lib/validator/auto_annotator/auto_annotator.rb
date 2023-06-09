@@ -44,7 +44,7 @@ class AutoAnnotator
           if file_info[:format] == "xml"
             input_file_format = "xml"
             return_file_format = "xml"
-            annotator = AutoAnnotatorTsv.new
+            annotator = AutoAnnotatorXml.new
           elsif file_info[:format] == "tsv"
             input_file_format = "tsv"
             annotator = AutoAnnotatorTsv.new
