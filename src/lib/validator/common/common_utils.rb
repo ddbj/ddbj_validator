@@ -245,11 +245,11 @@ class CommonUtils
   def self.null_not_recommended_value?(value)
     ret = false
     if !(value.nil? || value.strip.empty?)
-      null_not_recommended_long_term_list = @@null_not_recommended[0..4] # "not applicable","not collected", "not provided", "missing", "restricted access" から始まるものをNGとしたい
+      #null_not_recommended_long_term_list = @@null_not_recommended[0..4] # "not applicable","not collected", "not provided", "missing", "restricted access" から始まるものをNGとしたい
       if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
         ret = true
-      elsif !@@null_accepted.include?(value) && null_not_recommended_long_term_list.select {|refexp| value =~ /^(#{refexp})/i }.size > 0 # 文字数が多い null_not_recommendedの正規表現リストで前方一致すればNG
-        ret = true
+      #esif !@@null_accepted.include?(value) && null_not_recommended_long_term_list.select {|refexp| value =~ /^(#{refexp})/i }.size > 0 # 文字数が多い null_not_recommendedの正規表現リストで前方一致すればNG
+        #ret = true
       end
     end
     ret

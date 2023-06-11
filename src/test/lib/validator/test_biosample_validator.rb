@@ -328,12 +328,11 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_missing_mandatory_attribute
-    null_not_recommended= JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
     #ok case
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
@@ -341,14 +340,14 @@ class TestBioSampleValidator < Minitest::Test
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error1.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## brank required attr
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not recommended null value
@@ -356,7 +355,7 @@ class TestBioSampleValidator < Minitest::Test
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error3.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
@@ -384,13 +383,6 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    ## not recommended null value
-    xml_data = File.read("#{@test_file_dir}/36_missing_group_of_at_least_one_required_attributes_SSUB000019_error3.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_group = @validator.get_attribute_groups_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_group_of_at_least_one_required_attributes", "BS_R0036", "SampleA", biosample_data[0]["attributes"], attr_group, 1)
-    assert_equal false, ret[:result]
-    assert_equal 2, ret[:error_list].size
   end
 
   def test_invalid_attribute_value_for_controlled_terms
@@ -426,6 +418,9 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
     ##attr value is coequal null
     ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "missing: data agreement established pre-2023", cv_attr, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "missing", cv_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ##attr name is blank
@@ -594,6 +589,9 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("bioproject_submission_id_replacement", "BS_R0095", "", "missing: data agreement established pre-2023", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("bioproject_submission_id_replacement", "BS_R0095", "", "not applicable", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   def test_invalid_bioproject_accession
@@ -626,6 +624,9 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
     ret = exec_validator("invalid_bioproject_accession", "BS_R0005","", "missing: data agreement established pre-2023", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_bioproject_accession", "BS_R0005","", "missing", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -866,6 +867,10 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
+    attr_list = [{ "specimen_voucher" => "missing: data agreement established pre-2023", "attr_no" => 5}, {"bio_material" => "missing", "attr_no" => 7}]
+    ret = exec_validator("multiple_vouchers", "BS_R0062", "SampleA", attr_list, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   def test_redundant_taxonomy_attributes
@@ -926,39 +931,66 @@ class TestBioSampleValidator < Minitest::Test
 
   def test_invalid_missing_value
     null_accepted = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_accepted.json"))
+    null_not_recommended = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/null_not_recommended.json"))
     package_attr_list = @validator.get_attributes_of_package("MIMS.me.microbial", @package_version)
     # ok case
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "10m", null_accepted, package_attr_list, 1, 1)
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "10m", null_accepted, null_not_recommended, package_attr_list, 1, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## null like value
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "missing: data agreement established pre-2023", null_accepted, null_not_recommended, package_attr_list, 1, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "missing", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     ## optional attribute(ignore)
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "strain", "Missing: Control Sample", null_accepted, package_attr_list, 1, 1)
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "strain", "Missing: Control Sample", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # ng case
     ## uppercase
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Missing: Control Sample", null_accepted, package_attr_list, 1, 1)
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Missing: Control Sample", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing: control sample", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Not Applicable", null_accepted, null_not_recommended, package_attr_list, 1, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "not applicable", get_auto_annotation(ret[:error_list])
     ## emit space
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Missing:ControlSample", null_accepted, package_attr_list, 1, 1)
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Missing:ControlSample", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing: control sample", get_auto_annotation(ret[:error_list])
-    ## 
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Missing:HogeControlSample", null_accepted, package_attr_list, 1, 1)
+    ## Illegal string in between
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "Missing:HogeControlSample", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "missing: control sample", get_auto_annotation(ret[:error_list])
 
+    ## not recommended
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "n. a.", null_accepted, null_not_recommended, package_attr_list, 1, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", ".", null_accepted, null_not_recommended, package_attr_list, 1, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "-", null_accepted, null_not_recommended, package_attr_list, 1, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "missing", get_auto_annotation(ret[:error_list])
+    ## optional attribute & not provide package_attr_list
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "strain", "Not Applicable", null_accepted, null_not_recommended, nil, 1, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal "not applicable", get_auto_annotation(ret[:error_list])
+
     # params are nil pattern
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "", null_accepted, package_attr_list, 1, 1)
-    assert_nil ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## null like value "null_value?メソッドで無視される"
-    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "missing: data agreement established pre-2023", null_accepted, package_attr_list, 1, 1)
+    ret = exec_validator("invalid_missing_value", "BS_R0001", "sampleA", "depth", "", null_accepted, null_not_recommended, package_attr_list, 1, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -1306,6 +1338,9 @@ jkl\"  "
     ret = exec_validator("bioproject_not_found","BS_R0006", "Sample A", "missing: data agreement established pre-2023", "test04", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("bioproject_not_found","BS_R0006", "Sample A", "missing", "test04", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
     ret = exec_validator("bioproject_not_found","BS_R0006", "Sample A", "PSUB990080", nil, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
@@ -1360,6 +1395,9 @@ jkl\"  "
     ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "missing: data agreement established pre-2023", int_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
+    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "missing", int_attr, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
   end
 
   def test_invalid_bioproject_type
@@ -1384,6 +1422,9 @@ jkl\"  "
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
     ret = exec_validator("invalid_bioproject_type", "BS_R0070", "Sample A", "missing: data agreement established pre-2023", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_bioproject_type", "BS_R0070", "Sample A", "missing", 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -1450,6 +1491,9 @@ jkl\"  "
     assert_equal 1, ret[:error_list].size
     ## nil相当
     ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "missing: data agreement established pre-2023", biosample_data, nil, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("duplicated_locus_tag_prefix", "BS_R0091", "Sample A", "missing", biosample_data, nil, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -1754,7 +1798,11 @@ jkl\"  "
     assert_nil ret[:result]
     ret = exec_validator("specimen_voucher_for_bacteria_and_unclassified_sequences", "BS_R0115", "SampleA", "missing: data agreement established pre-2023", "103690", 1)
     assert_nil ret[:result]
+    ret = exec_validator("specimen_voucher_for_bacteria_and_unclassified_sequences", "BS_R0115", "SampleA", "missing", "103690", 1)
+    assert_nil ret[:result]
     ret = exec_validator("specimen_voucher_for_bacteria_and_unclassified_sequences", "BS_R0115", "SampleA", "UAM:12345", "missing: data agreement established pre-2023", 1)
+    assert_nil ret[:result]
+    ret = exec_validator("specimen_voucher_for_bacteria_and_unclassified_sequences", "BS_R0115", "SampleA", "UAM:12345", "missing", 1)
     assert_nil ret[:result]
   end
 
@@ -1799,6 +1847,8 @@ jkl\"  "
     assert_nil ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "missing: data agreement established pre-2023", institution_list, 5, 1)
     assert_nil ret[:result]
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "missing", institution_list, 5, 1)
+    assert_nil ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "CIAT:Bean:aaa:12345", institution_list, 5, 1) # 3 colons invalid format
     assert_nil ret[:result]
   end
@@ -1840,6 +1890,8 @@ jkl\"  "
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "", institution_list, 1)
     assert_nil ret[:result]
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "missing: data agreement established pre-2023", institution_list, 1)
+    assert_nil ret[:result]
+    ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "missing", institution_list, 1)
     assert_nil ret[:result]
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "ANDES:T:aaa:CS22676", institution_list, 1) # 3 colons invalid format
     assert_nil ret[:result]
@@ -2048,8 +2100,7 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
     # not include accession_id text
     ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "missing", "hirotoju", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
+    assert_nil ret[:result]
   end
 
 =begin (suppressed)

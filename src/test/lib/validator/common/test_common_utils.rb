@@ -30,35 +30,25 @@ class TestCommonUtils < Minitest::Test
     assert_equal true, ret
     ret = CommonUtils.null_value?("missing: data agreement established pre-2023")
     assert_equal true, ret
+    ret = CommonUtils.null_value?("not applicable")
+    assert_equal true, ret
+    ret = CommonUtils.null_value?("missing")
+    assert_equal true, ret
     ret = CommonUtils.null_value?("aaa")
     assert_equal false, ret
   end
 
   def test_null_not_recommended_value?    
     # 設定値の完全一致は not recommended
-    ret = CommonUtils.null_not_recommended_value?("not collected")
-    assert_equal true, ret
-    ret = CommonUtils.null_not_recommended_value?("not provided")
-    assert_equal true, ret
-    ret = CommonUtils.null_not_recommended_value?("missing")
-    assert_equal true, ret
-    ret = CommonUtils.null_not_recommended_value?("restricted access")
-    assert_equal true, ret
     ret = CommonUtils.null_not_recommended_value?("NA")
-    assert_equal true, ret
-    # 設定値のcase insensitive も not recommended
-    ret = CommonUtils.null_not_recommended_value?("Missing")
     assert_equal true, ret
     ret = CommonUtils.null_not_recommended_value?("na")
     assert_equal true, ret
-    # 一部設定値の前方一致も not recommended
-    ret = CommonUtils.null_not_recommended_value?("Missing: xx")
-    assert_equal true, ret
-    # 一部設定では前方一致だと感知しない(記述可能)
-    ret = CommonUtils.null_not_recommended_value?("unknown value")
-    assert_equal false, ret
     # 許容されたnull値
     ret = CommonUtils.null_not_recommended_value?("missing: control sample")
+    assert_equal false, ret
+    # 許容されたnull値のcase insensitive
+    ret = CommonUtils.null_not_recommended_value?("Missing")
     assert_equal false, ret
     # 空白も感知しない(他でチェック)
     ret = CommonUtils.null_not_recommended_value?("")
