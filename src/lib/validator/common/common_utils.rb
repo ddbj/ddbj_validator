@@ -208,7 +208,7 @@ class CommonUtils
   # true/false
   #
   def self.blank?(value)
-    if value.nil? || value.strip.empty?
+    if value.nil? || value.to_s.strip.empty?
       true
     else
       false
@@ -225,7 +225,7 @@ class CommonUtils
   # true/false
   #
   def self.null_value?(value)
-    if value.nil? || value.strip.empty? || @@null_accepted.include?(value)
+    if value.nil? || value.to_s.strip.empty? || @@null_accepted.include?(value)
       true
     else
       false
@@ -245,12 +245,31 @@ class CommonUtils
   def self.null_not_recommended_value?(value)
     ret = false
     if !(value.nil? || value.strip.empty?)
-      null_not_recommended_long_term_list = @@null_not_recommended[0..4] # "not applicable","not collected", "not provided", "missing", "restricted access" から始まるものをNGとしたい
+      #null_not_recommended_long_term_list = @@null_not_recommended[0..4] # "not applicable","not collected", "not provided", "missing", "restricted access" から始まるものをNGとしたい
       if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
         ret = true
-      elsif !@@null_accepted.include?(value) && null_not_recommended_long_term_list.select {|refexp| value =~ /^(#{refexp})/i }.size > 0 # 文字数が多い null_not_recommendedの正規表現リストで前方一致すればNG
-        ret = true
+      #esif !@@null_accepted.include?(value) && null_not_recommended_long_term_list.select {|refexp| value =~ /^(#{refexp})/i }.size > 0 # 文字数が多い null_not_recommendedの正規表現リストで前方一致すればNG
+        #ret = true
       end
+    end
+    ret
+  end
+
+  #
+  # テキストが正規表現に沿っているかチェックする
+  #
+  # ==== Args
+  # value: 検査する値
+  # regex: 正規表現のテキスト "^.{100,}$"
+  # ==== Return
+  # true/false
+  #
+  def self.format_check_with_regexp(value, regex)
+    value = value.to_s
+    regex = Regexp.new(regex)
+    ret = false
+    if value =~ regex
+      ret = true
     end
     ret
   end
@@ -296,10 +315,22 @@ class CommonUtils
       insdc_latlon = "#{lat_dec} #{lng_dec}"
     end
     if insdc_latlon.nil?
-      nil
-    else
-      insdc_latlon
+      return nil
     end
+    # 小数点8桁までに切り捨て
+    dec_insdc_latlon_detail_reg = %r{^(?<lat_dec>\d{1,2}\.)(?<lat_dec_point>\d+)\s*(?<lat_dec_hemi>[NS])[ ,_;]+(?<lng_dec>\d{1,3}\.)(?<lng_dec_point>\d+)\s*(?<lng_dec_hemi>[EW])$}
+    if dec_insdc_latlon_detail_reg.match(insdc_latlon)
+      d = dec_insdc_latlon_detail_reg.match(insdc_latlon)
+      if d['lat_dec_point'].size > 8
+        fixed = d['lat_dec_point'][0..7]
+        insdc_latlon.gsub!(d['lat_dec_point'], fixed)
+      end
+      if d['lng_dec_point'].size > 8
+        fixed = d['lng_dec_point'][0..7]
+        insdc_latlon.gsub!(d['lng_dec_point'], fixed)
+      end
+    end
+    insdc_latlon
   end
 
   #
@@ -335,18 +366,25 @@ class CommonUtils
   #
   # ==== Args
   # iso_latlon: ISO lat_lon format ex. "35.2095, 139.0034"
+  # google_api_key: google api key. If not specified, set environment variables: 'DDBJ_VALIDATOR_APP_GOOGLE_API_KEY'.
   # ==== Return
   # returns list of country name ex. ["Japan"]
   # returns nil if the geocoding hasn't hit(include not valid latlon format case).
   #
-  def geocode_country_from_latlon (iso_latlon)
+  def geocode_country_from_latlon (iso_latlon, google_api_key=nil)
     return nil if iso_latlon.nil?
     # 200ms 間隔を空ける
     # APIのper second制約がある為. 50/sだが早過ぎるとエラーになるという報告がみられる
     # https://developers.google.com/maps/documentation/geocoding/intro?hl=ja#Limits
     sleep(0.2)
+
+    # google API key. 指定がなければ環境変数の値を使用
+    if google_api_key.nil? || google_api_key.strip == ""
+      google_api_key = @@google_api_key['key']
+    end
+
     url = "https://maps.googleapis.com/maps/api/geocode/json?language=en"
-    url += "&key=#{@@google_api_key['key']}"
+    url += "&key=#{google_api_key}"
     url += "&latlng=#{iso_latlon}"
     begin
       res = http_get_response(url)
@@ -516,8 +554,8 @@ class CommonUtils
   #
   def exist_pubmed_id? (pubmed_id)
     return nil if pubmed_id.nil?
-    return false unless pubmed_id.strip.chomp =~ /^[0-9]+$/
-    exist_in_medline?(pubmed_id.strip.chomp )
+    return false unless pubmed_id.to_s.strip.chomp =~ /^[0-9]+$/
+    exist_in_medline?(pubmed_id.to_s.strip.chomp )
   end
 
   #

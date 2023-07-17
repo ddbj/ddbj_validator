@@ -1,6 +1,14 @@
 (function(){
     var api_url = "../";
 
+    //画面load時
+    $(window).on('load', function() {
+        let google_api_key_text = localStorage.getItem('google_api_key');
+        if (google_api_key_text) {
+            $("#google_api_key").val(google_api_key_text)
+        }
+    });
+
     //ファイル選択ボタン押下時に選択ウィンドウを表示
     var output_f = "";
     $('.btn.file_select').click(function(){
@@ -15,6 +23,12 @@
             $('input[id=trad_seq]').click();
         } else if (clicked === 'trad_agp_file_select') {
             $('input[id=trad_agp]').click();
+        } else if (clicked === 'metabobank_idf_file_select') {
+            $('input[id=metabobank_idf]').click();
+        } else if (clicked === 'metabobank_sdrf_file_select') {
+            $('input[id=metabobank_sdrf]').click();
+        } else if (clicked === 'all_db_file_select') {
+            $('input[id=all_db]').click();
         }
     });
 
@@ -33,6 +47,12 @@
                 $('#trad_seq_file_name').val(output_f);
             } else if (changed === 'trad_agp') {
                 $('#trad_agp_file_name').val(output_f);
+            } else if (changed === 'metabobank_idf') {
+                $('#metabobank_idf_file_name').val(output_f);
+            } else if (changed === 'metabobank_sdrf') {
+                $('#metabobank_sdrf_file_name').val(output_f);
+            } else if (changed === 'all_db') {
+                $('#all_db_file_name').val(output_f);
             }
         }
     });
@@ -59,6 +79,17 @@
 
         //validationボタン押下時
         $("#check_data").click(function () {
+            // Google API keywが記入されていればlocalstorageに保存
+            let google_api_key_text = $("#google_api_key").val();
+            try {
+                if (!google_api_key_text) {
+                    localStorage.removeItem('google_api_key');
+                } else if (google_api_key_text && google_api_key_text.length == 39) {
+                    localStorage.setItem('google_api_key', google_api_key_text);
+                }
+            } catch(e) {
+                console.log('Failed to save/remove the google api key to localstrage.');
+            }
             //ユーザが選択したファイル名をformから取得
             var file_list = {};
             $('.selected_file').each(function() {

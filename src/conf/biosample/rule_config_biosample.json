@@ -6,7 +6,7 @@
     "internal_ignore": false,
     "name": "Invalid missing value",
     "method": "invalid_missing_value",
-    "message": "Invalid missing value. Please provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason.",
+    "message": "Invalid missing value. Please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible).",
     "object": [
       "BioSample"
     ],
@@ -84,7 +84,7 @@
     "internal_ignore": false,
     "name": "Invalid date format",
     "method": "invalid_date_format",
-    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\", \"YYYY-mm-ddThh:mm:ss+hh:mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (eg., 1990-10-30, 1990-10, 1990-10-30T14:41:36+09:00 or 1990-10-30T14:41:36Z).",
+    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
     "object": [
       "BioSample"
     ],
@@ -110,7 +110,7 @@
     "internal_ignore": false,
     "name": "Invalid lat_lon format",
     "method": "invalid_lat_lon_format",
-    "message": "Invalid lat_lon format.",
+    "message": "Invalid lat_lon format. Specify as degrees latitude and longitude in format \"d[d.dddddddd] N|S d[dd.dddddddd] W|E\".",
     "object": [
       "BioSample"
     ],
@@ -240,7 +240,7 @@
     "internal_ignore": true,
     "name": "Missing mandatory attribute",
     "method": "missing_mandatory_attribute",
-    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason.",
+    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible).",
     "object": [
       "BioSample"
     ],
@@ -292,7 +292,7 @@
     "internal_ignore": true,
     "name": "Missing group of at least one required Attributes",
     "method": "missing_group_of_at_least_one_required_attributes",
-    "message": "Sample has missing attribute(s), at least one of the following attributes is required. If you do not have information for the required field(s), please provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason.",
+    "message": "Sample has missing attribute(s), at least one of the following attributes is required. If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible).",
     "object": [
       "BioSample"
     ],
@@ -1023,6 +1023,98 @@
     "message": "Invalid GISAID accession number",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0122"
+  },
+  "ruleBS_R0123": {
+    "rule_class": "BioSample",
+    "code": "BS_R0123",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid JSON structure",
+    "method": "invalid_json_structure",
+    "message": "JSON structure is invalid against schema.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0123"
+  },
+  "ruleBS_R0124": {
+    "rule_class": "BioSample",
+    "code": "BS_R0124",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Invalid file format",
+    "method": "invalid_file_format",
+    "message": "Only XML and JSON and TSV formats are supported.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0124"
+  },
+  "ruleBS_R0125": {
+    "rule_class": "BioSample",
+    "code": "BS_R0125",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Unaligned sample attributes",
+    "method": "unaligned_sample_attributes",
+    "message": "Order of sample attributes must be aligned in a json file.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0125"
+  },
+  "ruleBS_R0126": {
+    "rule_class": "BioSample",
+    "code": "BS_R0126",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Multiple packages",
+    "method": "multiple_packages",
+    "message": "Single package is allowed in a submission.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0126"
+  },
+  "ruleBS_R0127": {
+    "rule_class": "BioSample",
+    "code": "BS_R0127",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing mandatory attribute name",
+    "method": "missing_mandatory_attribute_name",
+    "message": "Mandatory attribute must have a name even if there is no value.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0127"
+  },
+  "ruleBS_R0128": {
+    "rule_class": "BioSample",
+    "code": "BS_R0128",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Missing BioProject ID for locus tag prefix",
+    "method": "missing_bioproject_id_for_locus_tag_prefix",
+    "message": "Provide a BioProject ID for a locus tag prefix.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0128"
+  },
+  "ruleBS_R0129": {
+    "rule_class": "BioSample",
+    "code": "BS_R0129",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "BioSample not found",
+    "method": "biosample_not_found",
+    "message": "BioSample accession(s) is not registered in your account. Please provide a valid BioSample accession(s).",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0129"
   }
 }

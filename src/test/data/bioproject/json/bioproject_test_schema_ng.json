@@ -1,0 +1,16 @@
+[
+  {
+    "key": "first_name",
+    "value": "Hanako"
+  }, {
+    "key": "last_name",
+    "values": ["Hanako", 123]
+  }, {
+    "key": "last_name",
+    "values": ["Hanako", 123],
+    "not prereserved": "hoge"
+  }, {
+    "key": 35,
+    "values": []
+  }
+]

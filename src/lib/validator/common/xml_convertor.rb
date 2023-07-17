@@ -61,8 +61,8 @@ class XmlConvertor < ValidatorBase
   #       }
   #     "attribute_list" =>
   #       [
-  #         { "sample_name" => "XXXXXX" },
-  #         { "sample_title" => "XXXXXX" },
+  #         { "sample_name" => "XXXXXX", "attr_no" => 1},
+  #         { "sample_title" => "XXXXXX", "attr_no" => 1 },
   #       ]
   #   },
   #   {.....}, ....

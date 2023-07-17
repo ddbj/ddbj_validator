@@ -137,35 +137,27 @@ class DateFormat
   #
   # 日付のtime部分の表記を整形して返す
   # 整形する部分がなければ、元の値をそのまま返す
-  # timezoneの明記がなければ無効な時刻として空文字を返す
+  # timezoneの明記がなければUTCと解釈するため"Z"を返す
   #
   # ==== Args
-  # date_text: 日付表現のTimezone "z", "+9:00", "Z+09:00"
+  # time_text: 日付表現のTimezone "T3:8:2Z", "T12:00:00"
   # ==== Return
-  # returns: 置換後の文字列 "Z", "+09:00", "+09:00"
+  # returns: 置換後の文字列 "T03:08:02Z", "T12:00:00Z"
   #
   def format_time(time_text)
     return nil if time_text.nil?
 
-    if ["+", "-", "Z", "z"].any? {|c| time_text.include?(c)} #timezoneの記載あり
+    if ["+", "-", "Z", "z"].any? {|c| time_text.include?(c)} #timezoneの記載ありと判断
       time_text_org = time_text
       timezone_pos = [time_text.index("+"), time_text.index("-"), time_text.index("Z"), time_text.index("z")].compact.min
       time_text = time_text_org.slice(0..(timezone_pos -1))
       timezone_text = time_text_org.slice((timezone_pos)..-1)
-    else
-      return "" # timezoneの記載がなければtimeごと消してしまう
+    elsif !find_time_format(time_text).nil? # 時刻が書かれていてTimezoneがない場合には"Z"を付与する
+      timezone_text = "Z" # timezoneの記載がなければ"Z"を付与する
+    else # 解釈できない場合は時刻ごと値を削除する
+      return ""
     end
-    time_regex_hour = Regexp.new("^T(2[0-3]|[01]?[0-9])$")     # https://regexper.com/#%5ET%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%24
-    time_regex_minute = Regexp.new("^T(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$")  # https://regexper.com/#%5ET%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%3A%28%5B0-5%5D%3F%5B0-9%5D%29%24
-    time_regex_second = Regexp.new("^T(2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$") # https://regexper.com/#%5ET%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%28%3A%5B0-5%5D%3F%5B0-9%5D%29%7B2%7D%24
-
-    if time_regex_hour.match(time_text)
-      parse_format = "T%H"
-    elsif time_regex_minute.match(time_text)
-      parse_format = "T%H:%M"
-    elsif time_regex_second.match(time_text)
-      parse_format = "T%H:%M:%S"
-    end
+    parse_format = find_time_format(time_text)
     unless parse_format.nil?
       # パースして桁を正しく変換
       formated_time = DateTime.strptime(time_text, parse_format)
@@ -175,44 +167,93 @@ class DateFormat
   end
 
   #
-  # 日付のtimezone部分の表記を整形して返す
-  # 整形する部分がなければ、元の値をそのまま返す
+  # 記述されている時刻表現(Timezone部分は含まない)の形式を解釈して、parse用フォーマットを返す
+  # フォーマットが確定できない想定外の形式の場合にはnilを返す
   #
   # ==== Args
-  # date_text: 日付表現のTimezone "z", "+9:00", "Z+09:00"
+  # time_text: 日付表現のTimezone "T12:00:00", "T11:43"
   # ==== Return
-  # returns: 置換後の文字列 "Z", "+09:00", "+09:00"
+  # returns: パース用フォーマット "T%H:%M:%S", "T%H:%M"
+  #
+  def find_time_format(time_text)
+    time_parse_format = nil
+    
+    time_regex_hour = Regexp.new("^T(2[0-3]|[01]?[0-9])$")     # https://regexper.com/#%5ET%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%24
+    time_regex_minute = Regexp.new("^T(2[0-3]|[01]?[0-9]):([0-5]?[0-9])$")  # https://regexper.com/#%5ET%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%3A%28%5B0-5%5D%3F%5B0-9%5D%29%24
+    time_regex_second = Regexp.new("^T(2[0-3]|[01]?[0-9])(:[0-5]?[0-9]){2}$") # https://regexper.com/#%5ET%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%28%3A%5B0-5%5D%3F%5B0-9%5D%29%7B2%7D%24
+  
+    if time_regex_hour.match(time_text)
+      time_parse_format = "T%H"
+    elsif time_regex_minute.match(time_text)
+      time_parse_format = "T%H:%M"
+    elsif time_regex_second.match(time_text)
+      time_parse_format = "T%H:%M:%S"
+    end
+    return time_parse_format
+  end
+
+  #
+  # 日付のtimezone部分の表記を整形して返す
+  # 整形する部分がなければ、元の値をそのまま返す
+  # "Z+09:00"だとUTC(Z)かJST(+09:00)か分からない不正な記述なので、一旦"Z"を除去する
+  #
+  # ==== Args
+  # timezone_text: 日付表現のTimezone "Z+09:00", "+900"
+  # ==== Return
+  # returns: 置換後の文字列 "+09:00", "+0900"
   #
   def format_timezone(timezone_text)
     return nil if timezone_text.nil?
 
     #timezone識別が2つ以上あるのは誤り(T00Z+09:00 => T00+09:00)
     # https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html#I_programlisting4_d1e23455
+    # ここでは一旦Zを消して、UTC変換メソッドで時差調整した上でZを再付与する
     if timezone_text.include?("Z") && ["+", "-"].any? {|c| timezone_text.include?(c)}
       timezone_text.gsub!("Z", "")
     end
+    if timezone_text.chomp.strip.upcase == "Z" # "z(local time)"や"Z"は"Z"で返す
+      return "Z"
+    end
+    # パースして桁を正しく変換
+    format = find_timezone_format(timezone_text)
+    parse_format = format[:format]
+    timezone_text = format[:text]
+    if parse_format.nil?
+      timezone_text
+    else
+      formated_timezone = DateTime.strptime(timezone_text, parse_format)
+      formated_timezone.strftime(parse_format)
+    end
+  end
 
+  #
+  # 記述されているTimezone表現の形式を解釈して、parse用フォーマットを返す
+  # フォーマットが確定できない想定外の形式の場合にはnilを返す
+  #
+  # ==== Args
+  # timezone_text: 日付表現のTimezone "+09:00", "+900"
+  # ==== Return
+  # returns: パース用フォーマットと必要なら修正したtimezone_text {format: "+%H:%M", timezone_text: "+09:00"} , {format: "+%H%M", timezone_text: "+0900"}
+  #
+  def find_timezone_format(timezone_text)
+    timezone_parse_format = nil
     timezone_regex_hour = Regexp.new("^(?<sign>[+-])(?<hour>2[0-3]|[01]?[0-9])$")     # https://regexper.com/#%5E%28%5B%2B-%5D%29%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%24
     timezone_regex_with_minute = Regexp.new("^(?<sign>[+-])(?<hour>2[0-3]|[01]?[0-9]):(?<minute>[0-5]?[0-9])$")  # https://regexper.com/#%5E%28%5B%2B-%5D%29%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%3A%28%5B0-5%5D%3F%5B0-9%5D%29%24
     timezone_regex_with_minute_no_delimiter = Regexp.new("^(?<sign>[+-])(?<hour>2[0-3]|[01]?[0-9])(?<minute>[0-5][0-9])$") #区切りがないため分の文字数は明確に2桁指定 https://regexper.com/#%5E%28%5B%2B-%5D%29%282%5B0-3%5D%7C%5B01%5D%3F%5B0-9%5D%29%28%5B0-5%5D%5B0-9%5D%29%24
-    if timezone_text.upcase == "Z"
-      return "Z"
+    if timezone_text.upcase == "Z" #小文字のzはlocaltimeの意味だが、どこのlocalか分からないので"Z”のUTC扱いにする
+      timezone_parse_format = "%Z" # これだけではparseエラーになるので実際には使用されない
     elsif !(m = timezone_regex_hour.match(timezone_text)).nil?
-      parse_format = m["sign"] + "%H"
+      timezone_parse_format = m["sign"] + "%H"
     elsif !(m = timezone_regex_with_minute.match(timezone_text)).nil?
-      parse_format = m["sign"] + "%H:%M"
+      timezone_parse_format = m["sign"] + "%H:%M"
     elsif !(m = timezone_regex_with_minute_no_delimiter.match(timezone_text)).nil?
       if m["hour"].length == 1 #時間が1桁のケースでは0で埋めないとパースエラーになる e.g."+900"
         timezone_text = "#{m['sign']}0#{m['hour']}#{m['minute']}"
       end
-      parse_format = m["sign"] + "%H%M"
-    else
-      return timezone_text
+      timezone_parse_format = m["sign"] + "%H%M"
     end
-    # パースして桁を正しく変換
-    formated_timezone = DateTime.strptime(timezone_text, parse_format)
-    formated_timezone_text = formated_timezone.strftime(parse_format)
-    formated_timezone_text
+
+    return {format: timezone_parse_format, text: timezone_text}
   end
 
   #
@@ -361,6 +402,78 @@ class DateFormat
       end
     end
     result
+  end
+
+  # 
+  # datetimeのテキストにTimezoneを確定させてUTCに修正したdateのテキストを返す
+  #  
+  # ==== Args
+  # datetime_text: 時間付き日付表現 "2016-07-10T18:00:01+09:00"
+  # parse_format: パースするフォーマット(分時までの形式は含まない) "%Y-%m-%dT%H"
+  # ==== Return
+  # returns UTCに直した日付表現 "2016-07-10T09:00:01Z"
+  #
+  def datetime2utc(datetime_text, parse_format)
+    return datetime_text unless datetime_text.include?("T")
+    formatted_time = datetime_text.dup
+    begin
+      parse_date_format = parse_format.split("T").first # 時間以降は無視した日付部分だけのparseformatに修正
+      time_text = datetime_text.slice((datetime_text.index("T"))..-1).strip #時間とtimezoneの記述箇所を抜き取り
+      if ["+", "-", "Z", "z"].any? {|c| time_text.include?(c)} #timezoneの記載あり
+        time_text_org = time_text
+        timezone_pos = [time_text.index("+"), time_text.index("-"), time_text.index("Z"), time_text.index("z")].compact.min
+        time_text = time_text_org.slice(0..(timezone_pos -1))
+        timezone_text = time_text_org.slice((timezone_pos)..-1)
+  
+        parse_time_format = find_time_format(time_text) # time部分のparse用のformatを見つける
+        parse_timezone_format = find_timezone_format(timezone_text)  # timezone部分のparse用のformatを見つける
+  
+        if (!parse_time_format.nil? && !parse_timezone_format.nil?) # time & timezoneの formatが解釈可能な場合
+          parse_datetime_format = parse_date_format + parse_time_format + "%z" # "+09:00"のままではparse出来ない。%zでtimezone表記を読み取ってparseしてくれる
+          datetime = DateTime.strptime(datetime_text, parse_datetime_format) # 一旦datetimeにしてからtimeオブジェクトを作成
+          time = Time.new(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.minute, datetime.second, datetime.zone)
+          utc_datetime = time.getutc # UTC時間に読み変える
+          output_format = parse_datetime_format.gsub("%z", "") # timezone(+09:00等)の表記は落として元の文字列を組み立てる
+          formatted_time = utc_datetime.strftime(output_format) + "Z" # 末尾に"Z"を付与してUTCを明示とする
+        end
+      end
+    rescue # 何らかのエラーが発生した場合は入力値を値を返す
+      return formatted_time
+    end
+    return formatted_time
+  end
+  
+  #
+  # dateのテキストに時間表現が含まれていた場合に、Timezoneを確定させてUTCに修正したdateのテキストを返す
+  #
+  # ==== Args
+  # date_text: 日付表現 "2016-07-10T18:00:01+09:00", "2016-07-10T18:00:01+09:00 / 2016-07-10T19:00:01+09:00"
+  # ==== Return
+  # returns UTCに直した日付表現 "2016-07-10T09:00:01Z", "2016-07-10T09:00:01+09:00/2016-07-10T10:00:01+09:00"
+  #
+  def convert2utc(date_text)
+    @@ddbj_date_format.each do |format|
+      regex_simple = Regexp.new(format["regex"]) #範囲ではない
+      regex_range = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") #範囲での記述
+      if date_text =~ regex_simple
+        if date_text.include?("T")
+          return datetime2utc(date_text, format["parse_date_format"])
+        else #時間表現が含まれていなければそのまま返す
+          return date_text
+        end
+      elsif date_text =~ regex_range
+        range_start =  Regexp.last_match[:start]
+        if range_start.include?("T")
+          range_start = datetime2utc(range_start, format["parse_date_format"])
+        end
+        range_end =  Regexp.last_match[:end]
+        if range_end.include?("T")
+          range_end = datetime2utc(range_end, format["parse_date_format"])
+        end
+        return "#{range_start}/#{range_end}"
+      end
+    end
+    return date_text
   end
 
 end

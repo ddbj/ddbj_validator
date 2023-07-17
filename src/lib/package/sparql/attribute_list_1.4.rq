@@ -1,7 +1,7 @@
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 
-SELECT DISTINCT ?attribute_name (REPLACE(STR(?attr_type), "http://ddbj.nig.ac.jp/ontologies/biosample/","") AS ?require_type) ?attribute_no
+SELECT DISTINCT ?attribute_name (REPLACE(STR(?attr_type), "http://ddbj.nig.ac.jp/ontologies/biosample/","") AS ?require_type) ?attribute_no ?attribute_comment
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 {
   VALUES ?package_id { "<%= package_id %>" }
@@ -15,4 +15,8 @@ FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
   ?restrict owl:onProperty ?attr_type .
   ?attr rdfs:subClassOf ddbj_bs:Attribute ;
     dc:identifier ?attribute_name .
+  OPTIONAL {
+   ?attr rdfs:comment ?attribute_comment .
+    FILTER (lang(?attribute_comment) = 'en')
+  }
 } ORDER BY ?label ?attribute_no

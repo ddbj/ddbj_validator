@@ -1,0 +1,26 @@
+{
+  "ruleALL_R0001": {
+    "rule_class": "All_DB",
+    "code": "ALL_R0001",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Not well-formed Excel file",
+    "method": "not_well_formed_excel_file",
+    "message": "Excel file is not well-formed.",
+    "object": [
+      "All_DB"
+    ]
+  },
+  "ruleALL_R0002": {
+    "rule_class": "All_DB",
+    "code": "ALL_R0002",
+    "level": "error",
+    "internal_ignore": false,
+    "name": "Missing mandatory sheet",
+    "method": "missing_mandatory_sheet",
+    "message": "Missing mandatory sheet(s).",
+    "object": [
+      "All_DB"
+    ]
+  }
+}

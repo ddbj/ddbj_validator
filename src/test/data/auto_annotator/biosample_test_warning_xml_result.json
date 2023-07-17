@@ -1,0 +1,619 @@
+{
+    "version": "1.0.12",
+    "validity": false,
+    "stats": {
+      "error_count": 2,
+      "warning_count": 15,
+      "error_type_count": {
+        "common_error": 0,
+        "common_warning": 15,
+        "external_error": 2,
+        "external_warning": 0
+      },
+      "autocorrect": {
+        "biosample": true,
+        "bioproject": false,
+        "submission": false,
+        "experiment": false,
+        "run": false,
+        "analysis": false,
+        "jvar": false,
+        "vcf": false,
+        "trad_anno": false,
+        "trad_seq": false,
+        "trad_agp": false,
+        "metabobank_idf": false,
+        "metabobank_sdrf": false
+      }
+    },
+    "messages": [
+      {
+        "id": "BS_R0001",
+        "message": "Invalid 'null' value, please provide value as either 'not collected', 'not applicable' or 'missing' for mandatory attribute. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0001",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "strain"
+          },
+          {
+            "key": "Attribute value",
+            "value": "N.A."
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "missing"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"strain\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0013",
+        "message": "Invalid data format. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "num_replicons"
+          },
+          {
+            "key": "Attribute value",
+            "value": "aaaa   bbb"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "aaaa bbb"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"num_replicons\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0013",
+        "message": "Invalid data format. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0013",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute name",
+            "value": "my   attribute"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "my attribute"
+            ],
+            "target_key": "Attribute name",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"my   attribute\"]/@attribute_name"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0007",
+        "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\", \"YYYY-mm-ddThh:mm:ss+hh:mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (eg., 1990-10-30, 1990-10, 1990-10-30T14:41:36+09:00 or 1990-10-30T14:41:36Z). An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0007",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "collection_date"
+          },
+          {
+            "key": "Attribute value",
+            "value": "2011-12-1T1:2:3"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "2011-12-01"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"collection_date\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0011",
+        "message": "Invalid publication identifier, enter pubmed id, DOI or URL. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0011",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "isol_growth_condt"
+          },
+          {
+            "key": "Attribute value",
+            "value": "PMID:123"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "123"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"isol_growth_condt\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0093",
+        "message": "Attribute value must be integer.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0093",
+        "level": "error",
+        "external": true,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "num_replicons"
+          },
+          {
+            "key": "Attribute value",
+            "value": "aaaa bbb"
+          }
+        ]
+      },
+      {
+        "id": "BS_R0011",
+        "message": "Invalid publication identifier, enter pubmed id, DOI or URL.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0011",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "ref_biomaterial"
+          },
+          {
+            "key": "Attribute value",
+            "value": "\\\"16088826\\\""
+          }
+        ]
+      },
+      {
+        "id": "BS_R0045",
+        "message": "If applicable, the taxonomy id will be automatically filled and the organism will be corrected to the scientific name. When the organism(s) is novel, please enter proposed name(s) in the organism, leave the taxonomy id empty and submit the BioSample.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0045",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "organism",
+            "value": "streptococcus pyogenes"
+          },
+          {
+            "key": "Suggested value (organism)",
+            "suggested_value": [
+              "Streptococcus pyogenes"
+            ],
+            "target_key": "organism",
+            "location": [
+              "//BioSample[1]/Description/Organism/OrganismName"
+            ],
+            "is_auto_annotation": true
+          },
+          {
+            "key": "taxonomy_id",
+            "value": ""
+          },
+          {
+            "key": "Suggested value (taxonomy_id)",
+            "suggested_value": [
+              "1314"
+            ],
+            "target_key": "taxonomy_id",
+            "location": [
+              "//BioSample[1]/Description/Organism/@taxonomy_id"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0094",
+        "message": "Format of geo_loc_name is invalid. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0094",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "geo_loc_name"
+          },
+          {
+            "key": "Attribute value",
+            "value": "Japan: Hikone-shi"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "Japan:Hikone-shi"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"geo_loc_name\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0119",
+        "message": "The institution-code and/or collection-code must be registered in the NCBI BioCollections. Valid bio_material format is \"[<institution-code>:[<collection-code>:]]<material_id>\"",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0119",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "bio_material"
+          },
+          {
+            "key": "Attribute value",
+            "value": "abrc : number"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "ABRC:number"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"bio_material\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0009",
+        "message": "Invalid lat_lon format. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0009",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "lat_lon"
+          },
+          {
+            "key": "Attribute value",
+            "value": "N37.443501234 W6.25401234"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "37.443501234 N 6.25401234 W"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"lat_lon\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0015",
+        "message": "Invalid host organism name. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0015",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "host",
+            "value": "human"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "Homo sapiens"
+            ],
+            "target_key": "host",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"host\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0105",
+        "message": "An organism name in the taxonomy database should be used. If applicable, the organism will be corrected to the scientific name. When the organism is novel, please enter a proposed name in the component_organism. An automatically-generated correction will be applied.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0105",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "component_organism",
+            "value": "Enterococcus coli"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "Escherichia coli"
+            ],
+            "target_key": "component_organism",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[position()=17 and @attribute_name=\"component_organism\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0117",
+        "message": "The institution-code and/or collection-code must be registered in the NCBI BioCollections. Valid specimen voucher format is \"[<institution-code>:[<collection-code>:]]<specimen_id>\"",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0117",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "specimen_voucher"
+          },
+          {
+            "key": "Attribute value",
+            "value": "aamu : number"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              "AAMU:number"
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[position()=19 and @attribute_name=\"specimen_voucher\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      },
+      {
+        "id": "BS_R0041",
+        "message": "Values provided for 'latitude and longitude' and 'geographic location' contradict each other.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0041",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "geo_loc_name",
+            "value": "Japan:Hikone-shi"
+          },
+          {
+            "key": "lat_lon",
+            "value": "37.443501234 N 6.25401234 W"
+          },
+          {
+            "key": "Message",
+            "value": "Lat_lon '37.443501234 N 6.25401234 W' maps to 'Spain' instead of 'Japan'"
+          }
+        ]
+      },
+      {
+        "id": "BS_R0115",
+        "message": "Attribute 'specimen_voucher' is not appropriate for bacteria and unclassified sequences.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0115",
+        "level": "error",
+        "external": true,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute",
+            "value": "specimen_voucher"
+          },
+          {
+            "key": "Attribute value",
+            "value": "AAMU:number"
+          }
+        ]
+      },
+      {
+        "id": "BS_R0100",
+        "message": "Null values are not neccesary for optional attributes. Leave values empty when there is no information.",
+        "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0100",
+        "level": "warning",
+        "external": false,
+        "method": "BioSample",
+        "object": [
+          "BioSample"
+        ],
+        "source": "biosample_test_warning.xml",
+        "annotation": [
+          {
+            "key": "Sample name",
+            "value": "MTB313"
+          },
+          {
+            "key": "Attribute name",
+            "value": "my attribute"
+          },
+          {
+            "key": "Attribute value",
+            "value": "missing"
+          },
+          {
+            "key": "Suggested value",
+            "suggested_value": [
+              ""
+            ],
+            "target_key": "Attribute value",
+            "location": [
+              "//BioSample[1]/Attributes/Attribute[@attribute_name=\"my attribute\"]"
+            ],
+            "is_auto_annotation": true
+          }
+        ]
+      }
+    ]
+}

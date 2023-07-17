@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    addressable (2.8.0)
+      public_suffix (>= 2.0.2, < 5.0)
     backports (3.8.0)
     crass (1.0.6)
     dotenv (2.7.5)
@@ -10,6 +12,8 @@ GEM
     haml (5.0.1)
       temple (>= 0.8.0)
       tilt
+    json-schema (2.8.1)
+      addressable (>= 2.4)
     kgio (2.11.0)
     mail (2.6.6)
       mime-types (>= 1.16, < 4)
@@ -25,6 +29,7 @@ GEM
     nokogumbo (1.5.0)
       nokogiri
     pg (0.21.0)
+    public_suffix (4.0.6)
     rack (2.0.3)
     rack-protection (2.0.0)
       rack
@@ -68,6 +73,7 @@ DEPENDENCIES
   erubis
   geocoder
   haml
+  json-schema
   mail
   minitest
   nokogiri
@@ -82,4 +88,4 @@ DEPENDENCIES
   unicorn-worker-killer
 
 BUNDLED WITH
-   1.13.1
+   1.17.3

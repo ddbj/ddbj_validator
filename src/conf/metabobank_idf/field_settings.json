@@ -1,0 +1,285 @@
+{
+  "not_recommended_null_value": {
+    "value_list" : [
+      "NA",
+      "N\/A",
+      "N\\. ?A\\.?",
+      "Unknown",
+      "\\.",
+      "\\-"
+    ]
+  },
+  "null_value": {
+    "value_list" : [
+      "not applicable",
+      "not collected",
+      "not provided",
+      "missing",
+      "restricted access"
+    ]
+  },
+  "predefined_field_name": [
+    "MAGE-TAB Version",
+    "Comment[MetaboBank accession]",
+    "Study Title",
+    "Study Description",
+    "Experimental Design",
+    "Experimental Factor Name",
+    "Experimental Factor Type",
+    "Person Last Name",
+    "Person First Name",
+    "Person Mid Initials",
+    "Person Email",
+    "Person Affiliation",
+    "Person Roles",
+    "PubMed ID",
+    "Publication DOI",
+    "Protocol Name",
+    "Protocol Type",
+    "Protocol Description",
+    "Protocol Parameters",
+    "Protocol Hardware",
+    "Protocol Software",
+    "Public Release Date",
+    "Term Source Name",
+    "Term Source File",
+    "Term Source Version",
+    "SDRF File",
+    "Comment[Study type]",
+    "Comment[Experiment type]",
+    "Comment[Submission type]",
+    "Comment[BioProject]",
+    "Comment[Related study]",
+    "Comment[Submission Date]",
+    "Comment[Last Update Date]"
+  ],
+  "field_groups": [
+    {
+      "group_name": "Experiment",
+      "field_list" : ["Experimental Design", "Experimental Factor Name", "Experimental Factor Type"]
+    },
+    {
+      "group_name": "Person",
+      "field_list" : ["Person Last Name", "Person First Name", "Person Mid Initials", "Person Email", "Person Affiliation", "Person Roles"]
+    },
+    {
+      "group_name": "Reference",
+      "field_list" : ["PubMed ID", "Publication DOI"]
+    },
+    {
+      "group_name": "Protocol",
+      "field_list" : ["Protocol Name", "Protocol Type", "Protocol Description", "Protocol Parameters", "Protocol Hardware", "Protocol Software"]
+    }
+  ],
+  "allow_multiple_values": [
+    "Experimental Design",
+    "Experimental Factor Name",
+    "Experimental Factor Type",
+    "Person Last Name",
+    "Person First Name",
+    "Person Mid Initials",
+    "Person Email",
+    "Person Affiliation",
+    "Person Roles",
+    "PubMed ID",
+    "Publication DOI",
+    "Protocol Name",
+    "Protocol Type",
+    "Protocol Description",
+    "Protocol Parameters",
+    "Protocol Hardware",
+    "Protocol Software",
+    "Comment[Study type]",
+    "Comment[Experiment type]",
+    "Comment[Related study]"
+  ],
+	"mandatory_field": {
+		"error": ["Study Title", "Study Description", "Experimental Design", "Experimental Factor Name", "Experimental Factor Type", "Person Last Name", "Person Email", "Person Affiliation", "Person Affiliation", "Person Roles", "Protocol Name", "Protocol Type", "Protocol Description", "Comment[Study type]", "Comment[Experiment type]", "Comment[Submission type]"],
+    "error_internal_ignore": [],
+		"warning": ["Person First Name"]
+	},
+  "not_allow_null_value": {
+    "error": ["Person Last Name", "Person Email", "Person Affiliation", "Protocol Name", "Protocol Type", "Comment[Submission type]"],
+    "error_internal_ignore": [],
+		"warning": ["register_as_umbrella"]
+  },
+	"mandatory_fields_in_a_group": {
+    "error": [],
+    "error_internal_ignore": [],
+    "warning": []
+  },
+  "selective_mandatory": {
+    "error": [],
+    "error_internal_ignore": [],
+    "warning": []
+  },
+  "format_check": {
+    "error": [
+      {
+        "field_name": "MAGE-TAB Version",
+        "regex": "^1\\.1$"
+      }, {
+        "field_name": "Protocol Name",
+        "regex": "^.{8,}$"
+      }, {
+        "field_name": "Protocol Type",
+        "regex": "^.{8,}$"
+      }, {
+        "field_name": "SDRF File",
+        "regex": "^MTBKS\\d{1,}\\.sdrf\\.txt$"
+      }
+    ],
+    "error_internal_ignore": [
+      {
+        "field_name": "Comment[MetaboBank accession]",
+        "regex": "^MTBKS\\d{1,}$"
+      }, {
+        "field_name": "PubMed ID",
+        "regex": "^[0-9]+$"
+      }, {
+        "field_name": "Protocol Description",
+        "regex": "^.{40,}$"
+      }
+    ],
+    "warning": [
+      {
+        "field_name": "Study Description",
+        "regex": "^.{100,}$"
+      }
+    ]
+  },
+  "cv_check": {
+    "error": [],
+    "error_internal_ignore": [
+      {
+        "field_name": "Experimental Design",
+        "value_list": [
+          "cell type comparison design",
+          "disease state design",
+          "cross sectional design",
+          "growth condition design",
+          "family based design",
+          "twin design",
+          "cell cycle design",
+          "genetic modification design",
+          "clinical history design",
+          "compound treatment design",
+          "genotype design",
+          "development or differentiation design",
+          "dose response design",
+          "case control design",
+          "cell component comparison design",
+          "cellular modification design",
+          "imprinting design",
+          "injury design",
+          "innate behavior design",
+          "observational design",
+          "organism part comparison design",
+          "organism status design",
+          "pathogenicity design",
+          "population based design",
+          "RNA stability design",
+          "sex design",
+          "species design",
+          "stimulus or stress design",
+          "strain or line design",
+          "time series design",
+          "hardware variation design",
+          "normalization testing design",
+          "operator variation design",
+          "optimization design",
+          "quality control testing design",
+          "reference design",
+          "replicate design",
+          "software variation design"
+        ]
+      }, {
+        "field_name": "Person Roles",
+        "value_list": [
+          "submitter"
+        ]
+      }
+    ],
+    "warning": [
+      {
+        "field_name": "Protocol Name",
+        "value_list": [
+          "Sample collection",
+          "Extraction",
+          "NMR sample",
+          "NMR spectroscopy",
+          "NMR assay",
+          "Data processing",
+          "Metabolite identification"
+        ]
+      }, {
+        "field_name": "Protocol Type",
+        "value_list": [
+          "Sample collection",
+          "Extraction",
+          "NMR sample",
+          "NMR spectroscopy",
+          "NMR assay",
+          "Data processing",
+          "Metabolite identification"
+        ]
+      }, {
+        "field_name": "Comment[Study type]",
+        "value_list": [
+          "biomarker",
+          "blood metabolite profiling",
+          "cancer",
+          "chemical library",
+          "COVID-19",
+          "drug metabolism",
+          "lipid profiling",
+          "metabolic fingerprinting",
+          "method development",
+          "microbiome",
+          "MicroRNA profiling",
+          "reference compound",
+          "secondary metabolite profiling",
+          "targeted metabolite profiling",
+          "untargeted metabolite profiling",
+          "volatile organic compound"
+        ]
+      }, {
+        "field_name": "Comment[Experiment type]",
+        "value_list": [
+          "direct infusion-mass spectrometry",
+          "ion trap mass spectrometry",
+          "ion mobility spectrometry-mass spectrometry",
+          "matrix-assisted laser desorption-ionisation time-of-flight mass spectrometry",
+          "laser mass spectrometry",
+          "liquid chromatography-mass spectrometry",
+          "data independent acquisition",
+          "mass spectrometry imaging",
+          "fourier transform ion cyclotron resonance mass spectrometry",
+          "gas chromatography-mass spectrometry",
+          "matrix-assisted laser desorption-ionisation imaging mass spectrometry",
+          "ion mobility spectrometry-mass spectrometry",
+          "isotope ratio mass spectrometry",
+          "capillary electrophoresis-mass spectrometry",
+          "data dependent acquisition",
+          "flow injection analysis-mass spectrometry",
+          "orbitrap",
+          "quadrupole mass spectrometer",
+          "selected reaction monitoring",
+          "selective ion monitoring",
+          "SWATH",
+          "tandem mass spectrometry",
+          "time-of-flight mass spectrometry",
+          "two-dimensional gas chromatography",
+          "high-resolution mass spectrometry",
+          "13C nuclear magnetic resonance spectroscopy",
+          "1H nuclear magnetic resonance spectroscopy",
+          "four-dimensional nuclear magnetic resonance spectroscopy",
+          "nuclear magnetic resonance spectroscopy",
+          "one-dimensional nuclear magnetic resonance spectroscopy",
+          "three-dimensional nuclear magnetic resonance spectroscopy",
+          "two-dimensional nuclear magnetic resonance spectroscopy"
+        ]
+      }
+    ]
+  }
+}

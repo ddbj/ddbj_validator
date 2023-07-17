@@ -988,14 +988,14 @@ class DDBJDbValidator
   end
 
   #
-  # 指定されたBioSample の smp_id に対する BioProject Accession ID のリストを付与して配列で返す。DRA登録を通して検索する。
+  # 指定されたBioSample の smp_id に対する DRR Accession ID のリストを付与して配列で返す。DRA登録を通して検索する。
   # IDがDBにない場合や、statusが無効な場合にはsmp_idを付与しない
   #
   # ==== Args
   # biosample_smp_id_list ex. ["64274", "00000"]
   # ==== Return
   # smp_idとBioProject Accession IDの配列
-  # [ {smp_id: "64274", bioproject_accession_id_list: ["64274"]}, {smp_id: "00000"}]
+  # [ {smp_id: "64274", drr_accession_id_list: ["64274"]}, {smp_id: "00000"}]
   #
   def get_run_id_via_dra(biosample_smp_id_list)
     return nil if biosample_smp_id_list.nil?
@@ -1008,7 +1008,7 @@ class DDBJDbValidator
         connection = get_connection(DRA_DB_NAME)
         id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
 
-        q = "SELECT ext_ent.ref_name, drr_ent.acc_type, drr_ent.acc_no, drx_drr_rel.grp_id
+        q = "SELECT ext_ent.ref_name, drr_ent.acc_type, drr_ent.acc_no, drx_drr_rel.grp_id, g_view.status
               FROM mass.ext_entity ext_ent
               JOIN mass.ext_relation ext_rel USING(ext_id)
               JOIN mass.accession_entity drx_ent ON(ext_rel.acc_id = drx_ent.acc_id)
@@ -1017,11 +1017,14 @@ class DDBJDbValidator
               JOIN mass.current_dra_submission_group_view g_view ON(drx_drr_rel.grp_id = g_view.grp_id)
              WHERE ext_ent.ref_name IN (#{id_place_holder})
               AND drx_drr_rel.grp_id = ext_rel.grp_id
-              AND drr_ent.is_delete != TRUE
-              AND g_view.status NOT IN (900, 1000, 1100)"
+              AND drr_ent.is_delete != TRUE"
         connection.prepare("pre_query", q)
         res = connection.exec_prepared("pre_query", biosample_smp_id_list)
         res.each do |row|
+          if row["status"].to_s == "900" || row["status"].to_s == "1000" || row["status"].to_s == "1100"
+            # SQLが返ってこない為プログラムで無効なstatus分をfilter
+            next
+          end
           # 結果が返ってきたBioSampleがあればsmp_id情報を足す
           selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
           selected.each do |ret|
@@ -1078,5 +1081,59 @@ class DDBJDbValidator
       end
     end
     biosample_list_with_smp_id
+  end
+
+  #
+  # 指定されたBioSample Accession IDのうち、submitter_id に紐付く有効なサンプルのリストを返す
+  # 紐付くサンプルがなければ空リストを返す
+  #
+  # ==== Args
+  # biosample_accession_list ex. ["SAMD00052344", "SAMD00000000"]
+  # submitter_id ""
+  # ==== Return
+  # 有効なBioProject Accession IDの配列
+  # [
+  #   { "SAMD00052344", smp_id: "64274", bioproject_accession_id_list: ["PRJDB4841"], drr_accession_id_list: ["DRR060518"] },
+  #   { biosample_id: "SAMD00052344", bioproject_accession_id_list: [], drr_accession_id_list: [] }
+  # ]
+  #
+  def get_valid_sample_id_list(biosample_accession_list, submitter_id)
+    return [] if biosample_accession_list.nil?
+    return [] if submitter_id.nil?
+
+    result = []
+    biosample_id_list = []
+    biosample_accession_list.each do |biosample_accession|
+      if biosample_accession =~ /^SAMD\d+/
+        biosample_id_list.push(biosample_accession)
+      end
+    end
+    if biosample_id_list.size > 0
+      param_list = [submitter_id].concat(biosample_id_list)
+      begin
+        connection = get_connection(BIOSAMPLE_DB_NAME)
+        id_place_holder = (2..(biosample_id_list.size + 1) ).map{|idx| "$" + idx.to_s}.join(",") # submitter_idが $1 なので $2から
+        q = "SELECT accession_id
+            FROM mass.sample smp
+              JOIN mass.accession acc USING(smp_id)
+              JOIN mass.submission USING(submission_id)
+            WHERE submitter_id = $1
+              AND accession_id IN (#{id_place_holder})
+              AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
+        connection.prepare("pre_query", q)
+        res = connection.exec_prepared("pre_query", param_list)
+        res.each do |row|
+          result.push(row["accession_id"])
+        end
+      rescue => ex
+        message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
+        message += "#{ex.message} (#{ex.class})"
+        raise StandardError, message, ex.backtrace
+      ensure
+        connection.close if connection
+      end
+    end
+    result
+    
   end
 end

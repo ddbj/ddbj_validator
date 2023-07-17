@@ -1,0 +1,40 @@
+{
+  "$id": "https://ddbj.nig.ac.jp/api/validator/bioproject/schema.json",
+  "title": "BioSample JSON Schema",
+  "description": "BioSample submission schema",
+  "type": "array",
+  "items": {
+    "type": "array",
+    "items": [
+      {
+        "type": "object",
+        "properties": {
+          "key": {
+            "description": "First item is package_id",
+            "type": "string",
+            "pattern": "_package"
+          },
+          "value": {
+            "description": "package id",
+            "type": "string"
+          }
+        },
+        "required": [ "key", "value" ]
+      },
+      {
+        "type": "object",
+        "properties": {
+          "key": {
+            "description": "The unique identifier for a product",
+            "type": "string"
+          },
+          "value": {
+            "description": "The unique identifier for a product",
+            "type": [ "string", "null" ]
+          }
+        },
+        "required": [ "key", "value" ]
+      }
+    ]
+  }
+}

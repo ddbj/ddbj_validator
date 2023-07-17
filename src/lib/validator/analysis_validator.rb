@@ -61,11 +61,11 @@ class AnalysisValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml, submitter_id=nil)
-    if submitter_id.nil?
+  def validate (data_xml, params={})
+    if (params["submitter_id"].nil? || params["submitter_id"].strip == "")
       @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
     else
-      @submitter_id = submitter_id
+      @submitter_id = params["submitter_id"]
     end
     #TODO @submitter_id が取得できない場合はエラーにする?
     @data_file = File::basename(data_xml)

@@ -1,0 +1,47 @@
+[
+  [
+    {
+      "key": "_package",
+      "value": "Generic"
+    }, {
+      "key": "sample_name",
+      "value": "Sample name1"
+    }, {
+      "key": "sample_title",
+      "value": "Sample title1"
+    }, {
+      "key": "description",
+      "value": ""
+    }, {
+      "key": "organism",
+      "value": "Streptococcus pyogenes"
+    }, {
+      "key": "taxonomy_id",
+      "value": "1314"
+    }, {
+      "key": "bioproject_id",
+      "value": ""
+    }
+  ],
+  [
+    {
+      "key": "sample_name",
+      "value": "Sample name2"
+    }, {
+      "key": "sample_title",
+      "value": "Sample title2"
+    }, {
+      "key": "description",
+      "value": ""
+    }, {
+      "key": "organism",
+      "value": "Streptococcus pyogenes"
+    }, {
+      "key": "taxonomy_id",
+      "value": "1314"
+    }, {
+      "key": "bioproject_id",
+      "value": ""
+    }
+  ]
+]
