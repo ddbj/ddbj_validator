@@ -45,7 +45,7 @@ See also API Spec
 * https://localhost:18840/api/apispec/index.html
 * https://github.com/ddbj/ddbj_validator/wiki/ValidationAPI%E4%BB%95%E6%A7%98
 
-### Execcute from command line
+### Execute from command line
 When running the Validator from the command line, need to start the container with the environment variables by `.env` file first.  
 
 Copy the files your file to validation into `src/data` directory that is volume mounted from the container.
