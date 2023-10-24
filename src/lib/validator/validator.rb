@@ -162,8 +162,8 @@ class Validator
           validator = BioSampleValidator.new
           data = params[:biosample]
         when "bioproject"
-          #validator = BioProjectValidator.new #TODO delete or switch
-          validator = BioProjectTsvValidator.new
+          validator = BioProjectValidator.new
+          # validator = BioProjectTsvValidator.new #TODO delete or switch
           data = params[:bioproject]
         when "jvar"
           validator = JVarValidator.new
