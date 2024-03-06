@@ -5,6 +5,7 @@ require 'mail'
 require 'fileutils'
 
 require File.expand_path('../common/excel2tsv.rb', __FILE__)
+require File.expand_path('../common/file_parser.rb', __FILE__)
 require File.expand_path('../biosample_validator.rb', __FILE__)
 require File.expand_path('../bioproject_validator.rb', __FILE__)
 require File.expand_path('../bioproject_tsv_validator.rb', __FILE__)
@@ -161,10 +162,13 @@ class Validator
         when "biosample"
           validator = BioSampleValidator.new
           data = params[:biosample]
-        when "bioproject"
-          #validator = BioProjectValidator.new #TODO delete or switch
-          validator = BioProjectTsvValidator.new
+        when "bioproject" # file formatを検知して振り分ける
           data = params[:bioproject]
+          if FileParser.new.get_file_data(data)[:format] == "xml"
+            validator = BioProjectValidator.new
+          else # json or tsv
+            validator = BioProjectTsvValidator.new
+          end
         when "jvar"
           validator = JVarValidator.new
           data = params[:jvar]

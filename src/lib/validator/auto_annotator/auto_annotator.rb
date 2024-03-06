@@ -64,17 +64,23 @@ class AutoAnnotator
       elsif filetype == "bioproject"
         file_info = FileParser.new().get_file_data(org_file) # 元ファイルの形式を調べる。これはかなり無駄
         unless file_info.nil?
-          if file_info[:format] == "tsv"
+          if file_info[:format] == "xml"
+            input_file_format = "xml"
+            return_file_format = "xml"
+            annotator = AutoAnnotatorXml.new
+          elsif file_info[:format] == "tsv"
             input_file_format = "tsv"
             annotator = AutoAnnotatorTsv.new
+            return_file_format = "tsv" # 基本はTSVで返す
+            return_file_format = "json" if accept_heder_list.include?("application/json")
           elsif file_info[:format] == "json"
             input_file_format = "json"
             annotator = AutoAnnotatorJson.new
+            return_file_format = "json" # 基本はJSONで返す
+            return_file_format = "tsv" if accept_heder_list.include?("text/tab-separated-values")
           elsif file_info[:format] == "unknown"
             raise "Can't parse bioproject original file type. #{org_file}"
           end
-          return_file_format = "json" # 基本はJSONで返す
-          return_file_format = "tsv" if accept_heder_list.include?("text/tab-separated-values")
         else
           raise "Can't parse bioproject original file type. #{org_file}"
         end
