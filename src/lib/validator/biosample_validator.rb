@@ -209,13 +209,8 @@ class BioSampleValidator < ValidatorBase
     ### 複数のサンプル間の関係(一意性など)の検証
     identical_attributes("BS_R0024", @biosample_list)
     warning_about_bioproject_increment("BS_R0069", @biosample_list)
-    @biosample_list.each_with_index do |biosample_data, idx|
-      line_num = idx + 1
-      sample_name = biosample_data["attributes"]["sample_name"]
-      sample_title = biosample_data["attributes"]["sample_title"]
-      duplicated_sample_title_in_this_submission("BS_R0003", sample_name, sample_title, @biosample_list, line_num)
-      duplicate_sample_names("BS_R0028", sample_name, sample_title, @biosample_list, line_num)
-    end
+    duplicated_sample_title_in_this_submission("BS_R0003", @biosample_list)
+    duplicate_sample_names("BS_R0028", @biosample_list)
     if @data_format == "json"
       unaligned_sample_attributes("BS_R0125", @biosample_list)
       multiple_packages("BS_R0126", @biosample_list)
@@ -2138,28 +2133,35 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # rule_code
-  # sample_name サンプル名
-  # sample_title サンプルのタイトル
   # biosample_list サブミッション内の全biosampleオブジェクトのリスト
   # ==== Return
   # true/false
   #
-  def duplicated_sample_title_in_this_submission (rule_code, sample_name, sample_title, biosample_list, line_num)
-    return nil if CommonUtils::blank?(sample_title)
+  def duplicated_sample_title_in_this_submission (rule_code, biosample_list)
+    return nil if CommonUtils::blank?(biosample_list)
 
     result = true
-    duplicated = biosample_list.select do |biosample_data|
-      sample_title == biosample_data["attributes"]["sample_title"]
+    biosample_list_lite = []
+    biosample_list.each_with_index do |biosample_data, index|
+      index += 1
+      biosample_list_lite.push({
+        sample_name: biosample_data["attributes"]["sample_name"],
+        sample_title: biosample_data["attributes"]["sample_title"],
+        index: index
+      })
     end
-
-    if duplicated.length > 1 #自身以外に同一タイトルもつサンプルがある
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Title", value: sample_title}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-      result= false
+    biosample_list_lite.group_by{|row| row[:sample_title]}.each do |sample_title, list|
+      if list.size > 1 # 重複あり
+        list.each do |sample_data|
+          annotation = [
+            {key: "Sample name", value: sample_data[:sample_name]},
+            {key: "Title", value: sample_title}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result= false
+        end
+      end
     end
     result
   end
@@ -2222,53 +2224,45 @@ class BioSampleValidator < ValidatorBase
     result = true
     # 同値比較しない基本属性
     keys_excluding = ["sample_name", "sample_title", "bioproject_id", "description"]
-
-    duplicate_sample_error_list = [] #エラー出力用データ
-    duplicate_groups = {} #同値データのグループ情報
-
-    biosample_list.each_with_index do |current_biosample_data, current_idx|
-      has_dup_data = false #他のサンプルと重複しているかのフラグ
-      current_sample = current_biosample_data["attributes"].dup #オブジェクトclone
-      biosample_list.each_with_index do |target_biosample_data, target_index|
-        if current_idx != target_index
-          target_sample = target_biosample_data["attributes"].dup #オブジェクトclone
-          keys_excluding.each do |ex_key| #基本属性を除去
-            current_sample.delete(ex_key)
-            target_sample.delete(ex_key)
-          end
-          if current_sample == target_sample #基本属性を除去した上で同一の内容
-            has_dup_data = true
-          end
-        end
-      end
-      if has_dup_data == true #重複していれば
-        hash = { sample_name: current_biosample_data["attributes"]["sample_name"] }
-        exist_group = duplicate_groups.select do |key, dup_data| #同値を持ったグループが既にあるか検索
-          dup_data == current_sample
-        end
-        if exist_group.size > 0 #同値を持ったグループがある
-          hash[:group] = exist_group.keys.first
-        else #なければ新しいグループIDを振って追加する
-          # グループID は"1", "2",...
-          max_group_id = duplicate_groups.size == 0 ? 0 : duplicate_groups.keys.max {|a, b| a.to_i <=> b.to_i }
-          new_group_id = (max_group_id.to_i + 1).to_s
-          duplicate_groups[new_group_id] = current_sample #グループリストに追加
-          hash[:group] = new_group_id
-        end
-        duplicate_sample_error_list.push(hash)
-      end
+    attribute_list = []
+    biosample_list.each do |biosample_data|
+      attribute_list.concat(biosample_data["attributes"].keys).uniq!
     end
-    if duplicate_sample_error_list.size > 0
-      # ユニークではない場合にsample毎にエラーを出す
-      duplicate_sample_error_list.each do |error_list|
-        annotation = [
-          {key: "Sample name", value: error_list[:sample_name]},
-          {key: "Sample group without distinguishing attribute", value: error_list[:group]}
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+    check_attribute_list = attribute_list - keys_excluding
+    bs_list = []
+    biosample_list.each_with_index do |biosample_data, current_idx|
+      bs_data = {}
+      check_attr_value_text = check_attribute_list.map {|attr_name|
+        val = biosample_data["attributes"][attr_name]
+        if val.nil?
+          ""
+        else
+          val
+        end
+      }.join(" ")
+      keys_excluding.each do |attr_name|
+        bs_data[attr_name] = biosample_data["attributes"][attr_name]
       end
-      result = false
+      bs_data["check_attr_value_text"] = check_attr_value_text
+      bs_list.push(bs_data)
+    end
+
+    group_by = bs_list.group_by{|row| row["check_attr_value_text"]}
+    group_idx = 1
+    group_by.each do |value_text, sample_list|
+      if sample_list.size > 1 # 重複がある
+        sample_list.each do |sample|
+          
+          annotation = [
+            {key: "Sample name", value: sample["sample_name"]},
+            {key: "Sample group without distinguishing attribute", value: group_idx.to_s}
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+        end
+        group_idx += 1
+        result = false
+      end
     end
     result
   end
@@ -2350,30 +2344,36 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # rule_code
-  # sample_name サンプル名
-  # sample_title サンプルタイトル
   # biosample_list サブミッション内の全biosampleオブジェクトのリスト
-  # submission_id
-  # line_num
   # ==== Return
   # true/false
   #
-  def duplicate_sample_names(rule_code, sample_name, sample_title, biosample_list, line_num)
-    return nil if CommonUtils::blank?(sample_name)
+  def duplicate_sample_names(rule_code, biosample_list)
+    return nil if CommonUtils::blank?(biosample_list)
     result = true
 
     # 同一ファイル内での重複チェック. 同じsubmissionは1ファイル内に列挙されていることを前提とする
-    duplicated = biosample_list.select do |biosample_data|
-      sample_name == biosample_data["attributes"]["sample_name"]
+    biosample_list_lite = []
+    biosample_list.each_with_index do |biosample_data, index|
+      index += 1
+      biosample_list_lite.push({
+        sample_name: biosample_data["attributes"]["sample_name"],
+        sample_title: biosample_data["attributes"]["sample_title"],
+        index: index
+      })
     end
-    result = false if duplicated.length > 1 #自身以外に同一のsample_nameをもつサンプルがある
-    if result == false
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Sample title", value: sample_title} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+    biosample_list_lite.group_by{|row| row[:sample_name]}.each do |sample_name, list|
+      if list.size > 1 # 重複あり
+        list.each do |sample_data|
+          annotation = [
+            {key: "Sample name", value: sample_name},
+            {key: "Sample title", value: sample_data[:sample_title]} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
+          ]
+          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+          @error_list.push(error_hash)
+          result= false
+        end
+      end
     end
     result
   end

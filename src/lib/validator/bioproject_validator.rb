@@ -86,7 +86,7 @@ class BioProjectValidator < ValidatorBase
     #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
     @submission_id = @xml_convertor.get_bioproject_submission_id(File.read(data_xml))
 
-    multiple_projects("BP_R0037", project_set)
+    #multiple_projects("BP_R0037", project_set)
     project_names_list = @db_validator.get_bioproject_names_list(@submitter_id) if @use_db
 
     #各プロジェクト毎の検証
@@ -95,22 +95,22 @@ class BioProjectValidator < ValidatorBase
       project_name = get_bioporject_label(project_node, idx)
       duplicated_project_title_and_description("BP_R0004", project_name, project_node, project_names_list, @submission_id, idx) if @use_db
       identical_project_title_and_description("BP_R0005", project_name, project_node, idx)
-      short_project_description("BP_R0006", project_name, project_node, idx)
-      empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
-      empty_description_for_other_subtype("BP_R0008", project_name, project_node, idx)
-      empty_target_description_for_other_sample_scope("BP_R0009", project_name, project_node, idx)
-      empty_target_description_for_other_material("BP_R0010", project_name, project_node, idx)
-      empty_target_description_for_other_capture("BP_R0011", project_name, project_node, idx)
-      empty_method_description_for_other_method_type("BP_R0012", project_name, project_node, idx)
-      empty_data_description_for_other_data_type("BP_R0013", project_name, project_node, idx)
+      #short_project_description("BP_R0006", project_name, project_node, idx)
+      #empty_description_for_other_relevance("BP_R0007", project_name, project_node, idx)
+      #empty_description_for_other_subtype("BP_R0008", project_name, project_node, idx)
+      #empty_target_description_for_other_sample_scope("BP_R0009", project_name, project_node, idx)
+      #empty_target_description_for_other_material("BP_R0010", project_name, project_node, idx)
+      #empty_target_description_for_other_capture("BP_R0011", project_name, project_node, idx)
+      #empty_method_description_for_other_method_type("BP_R0012", project_name, project_node, idx)
+      #empty_data_description_for_other_data_type("BP_R0013", project_name, project_node, idx)
       invalid_publication_identifier("BP_R0014", project_name, project_node, idx)
-      empty_publication_reference("BP_R0015", project_name, project_node, idx)
-      empty_organism_description_for_multi_species("BP_R0019", project_name, project_node, idx)
-      invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx) if @use_db
-      invalid_biosample_accession("BP_R0022", project_name, project_node, idx) if @use_db
-      invalid_project_type("BP_R0040", project_name, project_node, idx)
-      invalid_locus_tag_prefix_format("BP_R0041", project_name, project_node, idx)
-      locus_tag_prefix_in_umbrella_project("BP_R0042", project_name, project_node, idx)
+      #empty_publication_reference("BP_R0015", project_name, project_node, idx)
+      #empty_organism_description_for_multi_species("BP_R0019", project_name, project_node, idx)
+      #invalid_locus_tag_prefix("BP_R0021", project_name, project_node, idx) if @use_db
+      #invalid_biosample_accession("BP_R0022", project_name, project_node, idx) if @use_db
+      #invalid_project_type("BP_R0040", project_name, project_node, idx)
+      #invalid_locus_tag_prefix_format("BP_R0041", project_name, project_node, idx)
+      #locus_tag_prefix_in_umbrella_project("BP_R0042", project_name, project_node, idx)
 
       ### organismの検証とtaxonomy_idの確定
       @taxid_path = "//Organism/@taxID"
@@ -123,8 +123,7 @@ class BioProjectValidator < ValidatorBase
       end
 
       input_organism = get_node_text(project_node, @orgname_path)
-      p input_organism
-      p input_organism.strip
+
       if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
         ret = taxonomy_name_and_id_not_match("BP_R0038", project_name, taxonomy_id, input_organism, project_node, idx)
       else
