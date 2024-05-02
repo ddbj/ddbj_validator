@@ -225,7 +225,9 @@ class CommonUtils
   # true/false
   #
   def self.null_value?(value)
-    if value.nil? || value.to_s.strip.empty? || @@null_accepted.include?(value)
+    if value.nil? || value.to_s.strip.empty?
+      true
+    elsif @@null_accepted.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0
       true
     else
       false
