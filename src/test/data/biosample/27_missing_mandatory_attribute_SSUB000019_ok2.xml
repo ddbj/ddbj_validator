@@ -28,10 +28,10 @@
         <Attribute attribute_name="sample_name">MTB313</Attribute>
         <Attribute attribute_name="strain">missing</Attribute>
         <Attribute attribute_name="env_broad_scale">urban biome</Attribute>
-        <Attribute attribute_name="collection_date">2011</Attribute>
+        <Attribute attribute_name="collection_date">missing: control sample</Attribute>
         <Attribute attribute_name="env_local_scale">town</Attribute>
         <Attribute attribute_name="geo_loc_name">Japan: Hikone-shi</Attribute>
-        <Attribute attribute_name="lat_lon">n.a.</Attribute>
+        <Attribute attribute_name="lat_lon">missing: data agreement established pre-2023</Attribute>
         <Attribute attribute_name="env_medium">interstitial fluid</Attribute>
         <Attribute attribute_name="project_name">Streptococcus pyogenes MTB313 genome sequencing</Attribute>
         <Attribute attribute_name="isol_growth_condt">24464696</Attribute>

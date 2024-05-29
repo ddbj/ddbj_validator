@@ -240,7 +240,7 @@
     "internal_ignore": true,
     "name": "Missing mandatory attribute",
     "method": "missing_mandatory_attribute",
-    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible).",
+    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible). Note that the reporting level term is required for \r\n\"collection_date\" and \"geo_loc_name\".",
     "object": [
       "BioSample"
     ],
@@ -602,8 +602,8 @@
     "code": "BS_R0088",
     "level": "error",
     "internal_ignore": true,
-    "name": "package_vs_organism > MIMARKS Survey related",
-    "method": "package_vs_organism___mimarks_survey_related",
+    "name": "package_vs_organism > MIMARKS Survey",
+    "method": "package_vs_organism___mimarks_survey",
     "message": "Must be a metagenome, where lineage starts with unclassified sequences and scientific name ends with 'metagenome'",
     "object": [
       "BioSample"
@@ -1116,5 +1116,67 @@
       "BioSample"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0129"
+  },
+  "ruleBS_R0130": {
+    "rule_class": "BioSample",
+    "code": "BS_R0130",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "package_vs_organism > MIMARKS.specimen",
+    "method": "package_vs_organism___mimarks.specimen",
+    "message": "Must NOT be a metagenome. Scientific name must NOT end with 'metagenome'",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0130"
+  },
+  "ruleBS_R0131": {
+    "rule_class": "BioSample",
+    "code": "BS_R0131",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Culture/material/specimen id not found",
+    "method": "culture_material_specimen_id_not_found",
+    "message": "Culture/material/specimen id is not found in the institution. Please submit the sample if the culture/material/specimen has been registered to the institution.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0131"
+  },
+  "ruleBS_R0132": {
+    "rule_class": "BioSample",
+    "code": "BS_R0132",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Null value for infraspecific identifier",
+    "method": "null_value_for_infraspecific_identifier",
+    "message": "Enter non-null value (other than missing etc) for infraspecific identifiers (strain, isolate, cultivar and ecotype) for samples of assembled genome sequences and clinical isolates.",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0133": {
+    "rule_class": "BioSample",
+    "code": "BS_R0133",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Null value for infraspecific identifier",
+    "method": "null_value_for_infraspecific_identifier",
+    "message": "If the sample is for an assembled genome sequence, enter non-null value (other than missing etc) for infraspecific identifiers (strain, isolate, cultivar and ecotype).",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0134": {
+    "rule_class": "BioSample",
+    "code": "BS_R0134",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Non-identical identifiers among organism/strain/isolate",
+    "method": "non_identical_identifiers_among_organism_strain_isolate",
+    "message": "The identifier in the organism name after 'sp./bacterium/archeon' differs from strain/isolate. Use strain/isolate as the identifier for the organism not registered in the NCBI Taxonomy.",
+    "object": [
+      "BioSample"
+    ]
   }
 }

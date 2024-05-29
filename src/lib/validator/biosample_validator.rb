@@ -21,6 +21,7 @@ require File.dirname(__FILE__) + "/common/tsv_column_validator.rb"
 #
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
+  attr_reader :conf
   DEFAULT_PACKAGE_VERSION = "1.4.1"
   #
   # Initializer
@@ -66,6 +67,8 @@ class BioSampleValidator < ValidatorBase
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_biosample.json")) #TODO auto update when genereted
       config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
       config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
+      # reporting level termが必要な属性において許可しないnull相当値のリスト
+      config[:null_not_recommended_at_reporting_level_term] = (config[:null_accepted] + config[:null_not_recommended]).delete_if{|row| row.start_with?("missing:")}
       config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
       config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
       config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
@@ -360,7 +363,7 @@ class BioSampleValidator < ValidatorBase
       # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, line_num)
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, @conf[:null_not_recommended_at_reporting_level_term], line_num)
       missing_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
       attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
       missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
@@ -852,12 +855,12 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # sample_attr ユーザ入力の属性リスト
   # package_attr_list パッケージに対する属性リスト
-  # null_not_recommended_list NULL値として推奨されない値(正規表現)のリスト
+  # null_not_recommended_at_reporting_level_term reporting level term 属性においてNULL値として推奨されない値(正規表現)のリスト
   # line_num
   # ==== Return
   # true/false
   #
-  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, line_num)
+  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, null_not_recommended_at_reporting_level_term, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
@@ -869,6 +872,10 @@ class BioSampleValidator < ValidatorBase
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
           missing_attr_names.push(attr_name)
+        elsif attr_name == "collection_date" || attr_name == "geo_loc_name" # 記述があっても推奨されないnull値だとerrorとする。この2属性は"missing: xxxx"のreporting level termsで記述されている必要がある為
+          if null_not_recommended_at_reporting_level_term.select {|refexp| attr_value =~ /^(#{refexp})$/i }.size > 0 # 正規表現リストにマッチすればNG
+            missing_attr_names.push(attr_name)
+          end
         end
       end
     end
@@ -1152,7 +1159,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def format_of_geo_loc_name_is_invalid (rule_code, sample_name, geo_loc_name, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name)
+    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
 
     annotated_name = geo_loc_name.sub(/\s*:\s*/, ":") #最初のコロンの前後の空白を詰める
     # 2つ目以降の":"は", "に置換する
@@ -1199,7 +1206,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name)
+    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
     country_name = geo_loc_name.split(":").first.strip
     matched_country = country_list.find do |define_country|
       if define_country == "Viet Nam" #間違いが多いためadhocに対応
@@ -1491,7 +1498,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, google_api_key, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
+    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
 
     country_name = geo_loc_name.split(":").first.strip
 
@@ -1733,7 +1740,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
-    return nil if CommonUtils::null_value?(collection_date)
+    return nil if CommonUtils::null_value?(collection_date) || CommonUtils::null_not_recommended_value?(collection_date)
     result = nil
     # DDBJ 日付型へのフォーマットを試みる
     df = DateFormat.new
@@ -1816,19 +1823,23 @@ class BioSampleValidator < ValidatorBase
       prefix = null_accepted.split(":").first.downcase # "missing"
       sufix = null_accepted.split(":")[1..-1].join().gsub(" ", "").downcase # "controlsample" 空白の個数違いも吸収
       if attr_val.downcase.start_with?(prefix) && attr_val.downcase.gsub(" ", "").end_with?(sufix)
-        attr_val_result = null_accepted
-        unless attr_val_result == attr_val
-          result = false
+        unless (attr_name == "collection_date" || attr_name == "geo_loc_name") && !null_accepted.start_with?("missing:") # "collection_date", "geo_loc_name" の場合は"Missing" => "missing"等と無用な置換はしない
+          attr_val_result = null_accepted
+          unless attr_val_result == attr_val
+            result = false
+          end
         end
       end
     end
     #推奨されている NULL 値の表記を揃える(小文字表記へ)
     # NULL 値を推奨値に変換
-    null_not_recommended_list.each do |refexp|
-      if attr_val =~ /^(#{refexp})$/i
-        attr_val_result = "missing"
-        result = false
-       end
+    unless attr_name == "collection_date" || attr_name == "geo_loc_name" # この2属性は "N.A." => "missing"への置換は行わない("missing: xxxx"のreporting level termsで記述されている必要がある為)
+      null_not_recommended_list.each do |refexp|
+        if attr_val =~ /^(#{refexp})$/i
+          attr_val_result = "missing"
+          result = false
+         end
+      end
     end
 
     if result == false &&  attr_val_result != attr_val
@@ -1870,6 +1881,8 @@ class BioSampleValidator < ValidatorBase
   def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
     return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
+    # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
+    return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
 
     attr_val_org = attr_val
     result = true
