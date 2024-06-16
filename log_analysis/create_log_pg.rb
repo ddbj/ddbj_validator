@@ -5,7 +5,7 @@ require "json"
 require "net/http"
 require 'csv'
 require 'pg'
-require File.expand_path('/usr/src/ddbj_validator/src/lib/validator/common/xml_convertor.rb', __FILE__)
+require File.expand_path('/usr/src/ddbj_validator/lib/validator/common/xml_convertor.rb', __FILE__)
 
 class CreateLogIndex
   ACCESS_LOG_DIR = "/usr/src/ddbj_validator/shared/log"

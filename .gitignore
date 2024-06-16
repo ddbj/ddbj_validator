@@ -18,11 +18,9 @@ logs
 
 shared/log
 shared/tmp
-src/shared/log/
-src/shared/tmp/
 deploy_tools/log
-src/conf/biosample/coll_dump.txt
-src/data/
+conf/biosample/coll_dump.txt
+data/
 
 log_analysis/data/
 

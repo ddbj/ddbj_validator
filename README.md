@@ -34,7 +34,7 @@ $ docker-compose up -d
 ## How to use
 Specify a file to validate and request to the port specified by `DDBJ_VALIDATOR_APP_PORT` (default: 18840). Then the uuid will be returned.
 ```
-$ curl -F "biosample=@src/test/data/biosample/105_taxonomy_warning_ng.xml" "http://localhost:18840/api/validation"
+$ curl -F "biosample=@test/data/biosample/105_taxonomy_warning_ng.xml" "http://localhost:18840/api/validation"
 {"uuid":"17521682-5890-4acc-ad5d-15891ea3c46e","status":"accepted","start_time":"2021-06-08 20:40:58 +0900"}
 ```
 Request with the returned uuid as a parameter.
@@ -48,26 +48,26 @@ See also API Spec
 ### Execute from command line
 When running the Validator from the command line, need to start the container with the environment variables by `.env` file first.  
 
-Copy the files your file to validation into `src/data` directory that is volume mounted from the container.
+Copy the files your file to validation into `data` directory that is volume mounted from the container.
 ```
-$ cp your_biosample.xml src/data/
+$ cp your_biosample.xml data/
 ```
 Execute with the filepath in the container.
 ```
-$ docker-compose exec app bundle exec ruby /usr/src/ddbj_validator/src/bin/ddbj_validator -s /usr/src/ddbj_validator/src/data/your_biosample.xml -o /usr/src/ddbj_validator/src/data/result.json
+$ docker-compose exec app bundle exec ruby /usr/src/ddbj_validator/bin/ddbj_validator -s /usr/src/ddbj_validator/data/your_biosample.xml -o /usr/src/ddbj_validator/data/result.json
 ```
 Since the directory in the container is fixed, the command can be shortened by a variable. The following command returns the same result as above.
 ```
-$ APP_ROOT=/usr/src/ddbj_validator/src && docker-compose exec app bundle exec ruby $APP_ROOT/bin/ddbj_validator -s $APP_ROOT/data/your_biosample.xml -o $APP_ROOT/data/result.json
+$ APP_ROOT=/usr/src/ddbj_validator && docker-compose exec app bundle exec ruby $APP_ROOT/bin/ddbj_validator -s $APP_ROOT/data/your_biosample.xml -o $APP_ROOT/data/result.json
 ```
-The results of the validator will be output to `src/data` directory.  
+The results of the validator will be output to `data` directory.
 ```
-$ cat src/data/result.json
+$ cat data/result.json
 ```
 If the result file is not found, check the log file set in `DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR`.  
 See help for parameters as below.
 ```
-$ docker-compose exec app bundle exec ruby /usr/src/ddbj_validator/src/bin/ddbj_validator -h
+$ docker-compose exec app bundle exec ruby /usr/src/ddbj_validator/bin/ddbj_validator -h
 ```
 
 ## Environment Variables

@@ -1,4 +1,4 @@
-APP_PATH = ENV.fetch("DDBJ_VALIDATOR_APP_ROOT_PATH") { "/usr/src/ddbj_validator/src" }
+APP_PATH = ENV.fetch("DDBJ_VALIDATOR_APP_ROOT_PATH") { "/usr/src/ddbj_validator" }
 
 listen  ENV.fetch("DDBJ_VALIDATOR_APP_UNICORN_PORT") { 3000 }
 timeout 900

@@ -24,7 +24,7 @@ eutils_api_key:
   key: <%= ENV.fetch("DDBJ_VALIDATOR_APP_EUTILS_API_KEY") { "your_api_key" } %>
 
 api_log:
-  path: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR") { "../shared/log/validator/" } %>
+  path: <%= ENV.fetch("DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR") { "../logs/validator/" } %>
 
 monitoring:
   ssub_id: <%= ENV.fetch("DDBJ_VALIDATOR_APP_MONITORING_SSUB_ID") { "SSUB009526" } %>

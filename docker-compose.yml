@@ -14,7 +14,7 @@ services:
       - ${DDBJ_VALIDATOR_APP_PORT:-18840}:3000
     environment:
       TZ: Asia/Tokyo
-      DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator/src}
+      DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator}
       DDBJ_VALIDATOR_SHARED_PATH: ${DDBJ_ONTOLOGIES_SHARED_DIR:-/usr/src/ddbj_validator/shared}
       DDBJ_VALIDATOR_APP_UNICORN_PORT: 3000
       DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: ${DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER:-http://virtuoso:8890/sparql}
@@ -32,7 +32,7 @@ services:
       DDBJ_PARSER_APP_URL: ${DDBJ_PARSER_APP_URL}
     user: ${UID:-0}:${GID:-0}
     volumes:
-      - ${PWD}/src:/usr/src/ddbj_validator/src
+      - ${PWD}:/usr/src/ddbj_validator
       - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/usr/src/ddbj_validator/shared
       - ${DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR:-./logs}:/usr/src/ddbj_validator/logs
 
