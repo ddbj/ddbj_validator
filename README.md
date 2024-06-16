@@ -45,31 +45,10 @@ See also API Spec
 * https://localhost:18840/api/apispec/index.html
 * https://github.com/ddbj/ddbj_validator/wiki/ValidationAPI%E4%BB%95%E6%A7%98
 
-### Execute from command line
-When running the Validator from the command line, need to start the container with the environment variables by `.env` file first.  
-
-Copy the files your file to validation into `data` directory that is volume mounted from the container.
+### From Web app
 ```
-$ cp your_biosample.xml data/
+http://localhost:18800/api/client/index
 ```
-Execute with the filepath in the container.
-```
-$ docker-compose exec app bundle exec ruby /usr/src/ddbj_validator/bin/ddbj_validator -s /usr/src/ddbj_validator/data/your_biosample.xml -o /usr/src/ddbj_validator/data/result.json
-```
-Since the directory in the container is fixed, the command can be shortened by a variable. The following command returns the same result as above.
-```
-$ APP_ROOT=/usr/src/ddbj_validator && docker-compose exec app bundle exec ruby $APP_ROOT/bin/ddbj_validator -s $APP_ROOT/data/your_biosample.xml -o $APP_ROOT/data/result.json
-```
-The results of the validator will be output to `data` directory.
-```
-$ cat data/result.json
-```
-If the result file is not found, check the log file set in `DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR`.  
-See help for parameters as below.
-```
-$ docker-compose exec app bundle exec ruby /usr/src/ddbj_validator/bin/ddbj_validator -h
-```
-
 ## Environment Variables
 Environment variables to be written in `.env` files
 

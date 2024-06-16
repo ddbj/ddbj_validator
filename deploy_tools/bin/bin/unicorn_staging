@@ -1,6 +1,0 @@
-#!/bin/sh
-
-APP_ENV="staging"
-UNICORN_RACK_ENV="development"
-
-source './unicornrc'
