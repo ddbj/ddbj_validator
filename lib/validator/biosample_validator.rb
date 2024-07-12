@@ -2626,7 +2626,7 @@ class BioSampleValidator < ValidatorBase
   def invalid_locus_tag_prefix_format (rule_code, sample_name, locus_tag, line_num)
     return nil if CommonUtils::null_value?(locus_tag)
     result = true
-    if locus_tag.size < 3 || locus_tag.size > 12 || !locus_tag =~ /^[0-9a-zA-Z]+$/ || locus_tag =~ /^[0-9]+/
+    if locus_tag.size < 3 || locus_tag.size > 12 || !(locus_tag =~ /^[0-9a-zA-Z]+$/) || locus_tag =~ /^[0-9]+/
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "locus_tag_prefix"},
