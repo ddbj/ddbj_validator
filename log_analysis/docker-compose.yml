@@ -22,7 +22,7 @@ services:
       - ${PWD}:/usr/src/log_analysis
       - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_LOGS_DIR}:/usr/src/ddbj_validator/logs
       - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_SHARED_DIR}:/usr/src/ddbj_validator/shared
-      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}:/usr/src/ddbj_validator/src
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}:/usr/src/ddbj_validator
 
   postgres:
     image: postgres:9.4
