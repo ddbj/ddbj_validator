@@ -80,6 +80,7 @@ class BioSampleValidator < ValidatorBase
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
+      config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + "/invalid_strain_value.json"))
       config[:json_schema] = JSON.parse(File.read(config_file_dir + "/schema.json"))
       config[:institution_list_file] = config_file_dir + "/coll_dump.txt"
       config[:google_api_key] = @conf[:google_api_key]
@@ -306,6 +307,7 @@ class BioSampleValidator < ValidatorBase
 
       invalid_gisaid_accession("BS_R0122", sample_name, biosample_data["attributes"]["gisaid_accession"], line_num)
       biosample_not_found("BS_R0129", sample_name, biosample_data["attributes"]["derived_from"], @submitter_id, line_num) if @use_db
+      invalid_strain_value("BS_R0135", sample_name, biosample_data["attributes"]["strain"], biosample_data["attributes"]["organism"], @conf[:invalid_strain_value], line_num)
 
       ### 値が複数記述される可能性がある項目の検証
       biosample_data["attribute_list"].each do |attr|
@@ -3378,6 +3380,48 @@ class BioSampleValidator < ValidatorBase
         @error_list.push(error_hash)
         result = false
       end
+    end
+    result
+  end
+
+  # rule:135
+  # 無効な straiin の値チェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # strain strainの値
+  # organism organismの値
+  # invalid_value_settings 無効な値の設定値
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_strain_value (rule_code, sample_name, strain, orgainsm, invalid_value_settings, line_num)
+    return nil if CommonUtils::null_value?(strain)
+    result = true
+
+    if invalid_value_settings["exact_match"].include?(strain.downcase)
+      result = false
+    else
+      invalid_value_settings["prefix_match"].each do |invalid_prefix|
+        if strain.downcase.start_with?(invalid_prefix.downcase)
+          result = false
+        end
+      end
+    end
+    if !CommonUtils::null_value?(orgainsm) && orgainsm.downcase == strain.downcase
+      result = false
+    end
+    if result == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: "strain"},
+          {key: "Attribute value", value: strain}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
     end
     result
   end

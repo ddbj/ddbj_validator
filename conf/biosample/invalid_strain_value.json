@@ -1,0 +1,19 @@
+{
+  "exact_match": [
+    "bacteria",
+    "clinical isolate",
+    "environmental",
+    "microbial",
+    "no",
+    "soil",
+    "sp",
+    "sp.",
+    "strain",
+    "whole organism",
+    "yes"
+  ],
+  "prefix_match": [
+    "subsp.",
+    "serovar"
+  ]
+}

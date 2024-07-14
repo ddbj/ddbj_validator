@@ -1178,5 +1178,17 @@
     "object": [
       "BioSample"
     ]
+  },
+  "ruleBS_R0135": {
+    "rule_class": "BioSample",
+    "code": "BS_R0135",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid strain value",
+    "method": "invalid_strain_value",
+    "message": "The following values are not allowed: 'bacteria', 'clinical isolate', 'environmental', 'microbial', 'no', 'soil', 'sp', 'sp.', strain', 'whole organism', 'yes'. Additionally, strain name should not start with 'subsp.', 'serovar' or the organism name. All checks are case-insensitive. Provide a valid strain name rather than a descriptive term. This is generally the identifier that you use in your lab work for this sample.",
+    "object": [
+      "BioSample"
+    ]
   }
 }

@@ -1646,7 +1646,7 @@ jkl\"  "
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not alpha numeric
-    ret = exec_validator("invalid_locus_tag_prefix_format", "BS_R0099", "Sample A", "LOCUS_TAG_123", 1 )
+    ret = exec_validator("invalid_locus_tag_prefix_format", "BS_R0099", "Sample A", "AB_333", 1 )
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## start numeric
@@ -2177,6 +2177,36 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
     # not include accession_id text
     ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "missing", "hirotoju", 1)
+    assert_nil ret[:result]
+  end
+
+  def test_invalid_strain_value
+    conf = @validator.instance_variable_get (:@conf)
+    invalid_strain_value_settings = conf[:invalid_strain_value]
+    #ok case
+    ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "YS-1", "Escherichia coli", invalid_strain_value_settings, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # nil value (organism)
+    ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "YS-1", nil, invalid_strain_value_settings, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case(exact match)
+    ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "Clinical isolate", "Escherichia coli", invalid_strain_value_settings, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #ng case(prefix match)
+    ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "subSP. YS-1", "Escherichia coli", invalid_strain_value_settings, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    #ng case(same as organism)
+    ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "escherichia coli", "Escherichia coli", invalid_strain_value_settings, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil value (strain)
+    ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "", "Escherichia coli", invalid_strain_value_settings, 1)
     assert_nil ret[:result]
   end
 
