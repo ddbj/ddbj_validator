@@ -236,8 +236,7 @@ class CommonUtils
 
   #
   # 引数がValidatorで推奨されないnull値とみなされる値であればtrueを返す。
-  # 値なしを意味する"not applicable"や"missing", "na"(大文字小文字区別せず), "missing: xx"(特定の設定値は前方一致) であればtrueを返す
-  # 前方一致でも認められるnull値("missing: control sample")であればfalse
+  # "na"や(大文字小文字区別せず)であればtrueを返す
   #
   # ==== Args
   # value: 検査する値
@@ -247,11 +246,53 @@ class CommonUtils
   def self.null_not_recommended_value?(value)
     ret = false
     if !(value.nil? || value.strip.empty?)
-      #null_not_recommended_long_term_list = @@null_not_recommended[0..4] # "not applicable","not collected", "not provided", "missing", "restricted access" から始まるものをNGとしたい
       if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
         ret = true
-      #esif !@@null_accepted.include?(value) && null_not_recommended_long_term_list.select {|refexp| value =~ /^(#{refexp})/i }.size > 0 # 文字数が多い null_not_recommendedの正規表現リストで前方一致すればNG
-        #ret = true
+      end
+    end
+    ret
+  end
+
+  #
+  # 引数が意味のない値であるとみなした場合にtrueを返す。
+  # "NA"や"not applicable", "missing"といったnull値定義の値である場合はtrueとする。
+  # また、それらの単語を除いた後に残る文字列に英数字が2文字以上ある単語が含まれていなければtrueとする("missing:", "missing: not collected")
+  #
+  # ==== Args
+  # value: 検査する値
+  # allow_reporting_term "missing: control sample"のような
+  # ==== Return
+  # true/false
+  #
+  def self.meaningless_value?(value, allow_reporting_term=false)
+    ret = false
+    if !(value.nil? || value.strip.empty?)
+      if allow_reporting_term == false
+        null_accepted = @@null_accepted.dup
+      else  # reporting termを許容するなら null定義値から削除する
+        null_accepted = @@null_accepted.dup.delete_if{|null_value| null_value.start_with?("missing:")}
+      end
+      if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
+        ret = true
+      elsif null_accepted.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0
+        ret = true
+      else
+        # 入力値からnull値を削除する
+        null_value_list = null_accepted +  @@null_not_recommended
+        null_value_list.each do |null_value|
+          value.gsub!(/#{null_value}/i, "")
+        end
+        # 値を単語単位に区切り、英数字が2文字以上含まれている単語が一つでもあれば意味のある値とみなす。
+        meaningful_word = false
+        value.split(" ").each do |word|
+          if word.scan(/[0-9a-zA-Z]/).length >= 2
+            meaningful_word = true
+          end
+        end
+        # 意味のある単語が一つも含まれなければ、null相当値とみなす
+        if meaningful_word == false
+          ret = true
+        end
       end
     end
     ret

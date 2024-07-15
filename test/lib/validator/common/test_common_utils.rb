@@ -2,7 +2,7 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'yaml'
 require 'dotenv'
-require '../../../../lib/validator/common/common_utils.rb'
+require File.expand_path('../../../../../lib/validator/common/common_utils.rb', __FILE__)
 
 class TestCommonUtils < Minitest::Test
   def setup
@@ -38,7 +38,7 @@ class TestCommonUtils < Minitest::Test
     assert_equal false, ret
   end
 
-  def test_null_not_recommended_value?    
+  def test_null_not_recommended_value?
     # 設定値の完全一致は not recommended
     ret = CommonUtils.null_not_recommended_value?("NA")
     assert_equal true, ret
@@ -51,6 +51,38 @@ class TestCommonUtils < Minitest::Test
     ret = CommonUtils.null_not_recommended_value?("Missing")
     assert_equal false, ret
     # 空白も感知しない(他でチェック)
+    ret = CommonUtils.null_not_recommended_value?("")
+    assert_equal false, ret
+  end
+
+  def test_meaningless_value?
+    # 許容されないnull値
+    ret = CommonUtils.meaningless_value?("NA")
+    assert_equal true, ret
+    # 許容されたnull値もnull相当値とみなす
+    ret = CommonUtils.meaningless_value?("Missing")
+    assert_equal true, ret
+    # reporting_termを許容しない(第二引数をfalse または指定しない)
+    ret = CommonUtils.meaningless_value?("missing: control sample")
+    assert_equal true, ret
+    # null相当値を除去すると意味のない値になるとみなす値
+    # "missing: Not collected" は "missing"と"not collected"が除去されて": "になり、意味のないものと判定される
+    ret = CommonUtils.meaningless_value?("missing: Not collected")
+    assert_equal true, ret
+    ret = CommonUtils.meaningless_value?("missing:")
+    assert_equal true, ret
+
+    # 意味のあるとみなされる値
+    ret = CommonUtils.meaningless_value?("B1")
+    assert_equal false, ret
+    ret = CommonUtils.meaningless_value?("B-1")
+    assert_equal false, ret
+    ret = CommonUtils.meaningless_value?("missing: YP")
+    assert_equal false, ret
+    # reporting_termを許容するように第二引数をtrueにする
+    ret = CommonUtils.meaningless_value?("missing: control sample", true)
+    assert_equal false, ret
+    # 空白は感知しない(他でチェック)
     ret = CommonUtils.null_not_recommended_value?("")
     assert_equal false, ret
   end
