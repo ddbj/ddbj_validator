@@ -356,6 +356,7 @@ class BioSampleValidator < ValidatorBase
         cov2_package_versus_organism("BS_R0048", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
       end
       invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+      non_identical_identifiers_among_organism_strain_isolate("BS_R0134", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], biosample_data["attributes"]["strain"], biosample_data["attributes"]["isolate"], line_num)
 
       ### 重要属性の欠損検証
       missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
@@ -3384,6 +3385,62 @@ class BioSampleValidator < ValidatorBase
     result
   end
 
+  #
+  # rule:134
+  # MIGS.ba.* パッケージでorganism名の sp./bacterium/archaeon の後の名称が strain と isolate のいずれかの値に一致するかチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # organism "Faecalibacterium sp. I4-3-84"
+  # strain "i21-0019-B1"
+  # isolate "missing"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def non_identical_identifiers_among_organism_strain_isolate (rule_code, sample_name, package_name, organism, strain, isolate, line_num)
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
+    result = true
+    if package_name.start_with?("MIGS.ba")
+      keywords = ["sp.", "bacterium", "archaeon"]
+      organism_sufix = ""
+      keywords.each do |keyword|
+        regex = /#{Regexp.escape(keyword)}/i # escapeで正規表現のメタ文字に対応
+        match = regex.match(organism)
+        if match # マッチした部分の終了位置以降の文字列を取得
+          organism_sufix = organism[match.end(0)..-1].chomp.strip
+          break
+        end
+      end
+      # organism名に sp./bacterium/archaeon が含まれている場合、その後の文字列でチェック
+      unless organism_sufix == "" 
+        match_sufix = false # strain or isolate に一致するか
+        if !CommonUtils::null_value?(strain) && organism_sufix == strain
+          match_sufix = true
+        elsif !CommonUtils::null_value?(isolate) && organism_sufix == isolate
+          match_sufix = true
+        end
+        if match_sufix == false # strain or isolate のいずれにも一致しなければfalse
+          result = false
+        end
+      end
+    end
+    if result == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "organism", value: organism},
+          {key: "strain", value: strain},
+          {key: "isolate", value: isolate}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
   # rule:135
   # 無効な straiin の値チェック
   #

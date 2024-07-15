@@ -2180,6 +2180,50 @@ jkl\"  "
     assert_nil ret[:result]
   end
 
+  def test_non_identical_identifiers_among_organism_strain_isolate
+    # ok case
+    # match with strain
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Caryophanon sp. AS70", "AS70", nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # match with isolate
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Caryophanon sp. AS70", nil, "AS70", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # archaeon
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "anaerobic methanogenic archaeon E15-1", "E15-1", "E15-1", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # bacterium
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "marine Bacterium CS-89", nil, "CS-89", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not MIGS.ba
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.me", "Caryophanon sp. AS70", "aaaa", "bbb", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not include sp./archaeon/bacterium
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Escherichia coli", "aaaa", "bbb", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    # unmatch with strain
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Faecalibacterium Sp. I4-3-84", "i21-0019-B1", "missing", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # nil (strain and isolate)
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Faecalibacterium Sp. I4-3-84", nil, nil, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # nil (organism or package)
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", nil, "Faecalibacterium Sp. I4-3-84", "i21-0019-B1", "missing", 1)
+    assert_nil ret[:result]
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", nil, "i21-0019-B1", "missing", 1)
+    assert_nil ret[:result]
+  end
+
   def test_invalid_strain_value
     conf = @validator.instance_variable_get (:@conf)
     invalid_strain_value_settings = conf[:invalid_strain_value]
