@@ -326,8 +326,12 @@ class OrganismValidator < SPARQLBase
       rule_id = "BS_R0086"
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIMARKS.specimen") #rule BS_R0087
-      #no check
+    elsif package_name.start_with?("MIMARKS.specimen") #rule BS_R0130
+      rule_id = "BS_R0130"
+      organism_name = get_organism_name(tax_id)
+      if organism_name.nil? || organism_name.downcase.end_with?("metagenome")
+        result = false
+      end
     elsif package_name.start_with?("MIMARKS.survey") #rule BS_R0088
       rule_id = "BS_R0088"
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
