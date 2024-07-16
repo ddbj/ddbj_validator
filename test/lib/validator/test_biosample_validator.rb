@@ -2180,6 +2180,41 @@ jkl\"  "
     assert_nil ret[:result]
   end
 
+  def test_null_value_for_infraspecific_identifier_error
+    # ok case
+    # exist attr value
+    attr_list = {"strain" => "any value"}
+    ret = exec_validator("null_value_for_infraspecific_identifier_error", "BS_R0132", "SampleA", attr_list, "MIGS.ba.microbial", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # either one
+    attr_list = {"isolate" => "any value"}
+    ret = exec_validator("null_value_for_infraspecific_identifier_error", "BS_R0132", "SampleA", attr_list, "MIGS.eu", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    attr_list = {"strain" => "missing"}
+    ret = exec_validator("null_value_for_infraspecific_identifier_error", "BS_R0132", "SampleA", attr_list, "MIGS.ba.microbial", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_null_value_for_infraspecific_identifier_warning
+    # ok case
+    # exist attr value
+    attr_list = {"strain" => "any value"}
+    ret = exec_validator("null_value_for_infraspecific_identifier_warning", "BS_R0133", "SampleA", attr_list, "Microbe", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    attr_list = {"strain" => "missing"}
+    ret = exec_validator("null_value_for_infraspecific_identifier_warning", "BS_R0133", "SampleA", attr_list, "Microbe", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
   def test_non_identical_identifiers_among_organism_strain_isolate
     # ok case
     # match with strain

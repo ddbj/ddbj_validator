@@ -370,6 +370,8 @@ class BioSampleValidator < ValidatorBase
       missing_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
       attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
       missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
+      null_value_for_infraspecific_identifier_error("BS_R0132", sample_name, biosample_data["attributes"], biosample_data["package"], line_num)
+      null_value_for_infraspecific_identifier_warning("BS_R0133", sample_name, biosample_data["attributes"], biosample_data["package"], line_num)
     end
   end
 
@@ -3383,6 +3385,103 @@ class BioSampleValidator < ValidatorBase
       end
     end
     result
+  end
+
+  #
+  # rule:132
+  # 種レベル以下の識別子 strain/isolate/cultivar/ecotype で missing不許可(mandatory)の項目でnull相当値ではないかチェック
+  # Errorレベル
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # sample_attr {"strain": "HB-1", "organism": "xxxx"}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_value_for_infraspecific_identifier_error (rule_code, sample_name, sample_attr, package_name, line_num)
+    return nil if CommonUtils::blank?(package_name)
+    # 設定ファイルに書くか？
+    package_vs_attr_settings = {
+      "MIGS.ba" => ["strain"],
+      "MIGS.eu" => ["strain", "isolate", "cultivar", "ecotype"],
+      "MIGS.vi" => ["strain", "isolate"],
+      "MIMAG" => ["isolate"],
+      "MISAG" => ["isolate"],
+      "MIUVIG" => ["isolate"],
+      "SARS-CoV-2.cl" => ["isolate"],
+      "Pathogen.cl" => ["strain", "isolate"]
+    }
+    null_value_for_infraspecific_identifier(rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
+  end
+
+  #
+  # rule:133
+  # 種レベル以下の識別子 strain/isolate/cultivar/ecotype で missing不許可(mandatory)の項目でnull相当値ではないかチェック
+  # Errorレベル
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # sample_attr {"strain": "HB-1", "organism": "xxxx"}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_value_for_infraspecific_identifier_warning (rule_code, sample_name, sample_attr, package_name, line_num)
+    return nil if CommonUtils::blank?(package_name)
+    # 設定ファイルに書くか？
+    package_vs_attr_settings = {
+      "Microbe" => ["strain", "isolate"]
+    }
+    null_value_for_infraspecific_identifier(rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
+  end
+
+  #
+  # rule:132,133 用の共通メソッド
+  # 種レベル以下の識別子 strain/isolate/cultivar/ecotype で missing不許可(mandatory)の項目でnull相当値ではないかチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # sample_attr {"strain": "HB-1", "organism": "xxxx"}
+  # package_vs_attr_settings パッケージと記述必須属性の関係の設定値 {"MIGS.vi" => ["strain", "isolate"], ...}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_value_for_infraspecific_identifier (rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
+    return nil if CommonUtils::blank?(package_name)
+    ret = true
+    mandatory_attr_list_to_message = nil
+    package_vs_attr_settings.each do |package_prefix, mandatory_attr_list|
+      if package_name.start_with?(package_prefix) # package名は前方一致でチェック。MIGS.ba"だと"MIGS.ba.human-gut"でもチェック対象
+        exist_value = false # 意味のある値が入っているか
+        mandatory_attr_list.each do |mandatory_attr|
+          if !CommonUtils::null_value?(sample_attr[mandatory_attr]) # null相当値(nil, 空白, null_accepted)ではないか
+            exist_value = true
+          end
+        end
+        if exist_value == false # どの属性にも意味のある値がなければ
+          ret = false
+          mandatory_attr_list_to_message = mandatory_attr_list
+        end
+      end
+    end
+    if ret == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "package", value: package_name},
+        {key: "attibutes", value: mandatory_attr_list_to_message.join("/")}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
   end
 
   #
