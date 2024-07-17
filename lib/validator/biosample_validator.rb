@@ -3530,8 +3530,8 @@ class BioSampleValidator < ValidatorBase
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "organism", value: organism},
-          {key: "strain", value: strain},
-          {key: "isolate", value: isolate}
+          {key: "strain", value: strain.to_s},
+          {key: "isolate", value: isolate.to_s}
         ]
         error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
         @error_list.push(error_hash)
@@ -3566,7 +3566,7 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
-    if !CommonUtils::null_value?(orgainsm) && orgainsm.downcase == strain.downcase
+    if !CommonUtils::null_value?(orgainsm) && strain.downcase.start_with?(orgainsm.downcase)
       result = false
     end
     if result == false
