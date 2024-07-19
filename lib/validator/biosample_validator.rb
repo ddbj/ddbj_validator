@@ -242,7 +242,7 @@ class BioSampleValidator < ValidatorBase
         end
         # 日付属性がDDBJフォーマットであるか(補正後)にチェック
         ret = invalid_datetime("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
-        attribute_value_is_not_integer("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
+        non_integer_attribute_value("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
         if @use_db
           ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
           if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
@@ -2363,7 +2363,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def attribute_value_is_not_integer (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
+  def non_integer_attribute_value (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
     return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
     result =  true

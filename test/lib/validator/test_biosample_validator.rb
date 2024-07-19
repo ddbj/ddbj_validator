@@ -1494,33 +1494,33 @@ jkl\"  "
     assert_equal 131, ret[:error_list].size
   end
 
-  def test_attribute_value_is_not_integer
+  def test_non_integer_attribute_value
     int_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/integer_attributes.json"))
     #ok case
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "9606", int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "host_taxid", "9606", int_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## not integer attr
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "organism", "human", int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "organism", "human", int_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "9606.6", int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "host_taxid", "9606.6", int_attr, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     #params are nil pattern
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", nil, int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "host_taxid", nil, int_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ##null like value
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "", int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "host_taxid", "", int_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "missing: data agreement established pre-2023", int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "host_taxid", "missing: data agreement established pre-2023", int_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("attribute_value_is_not_integer", "BS_R0093", "sampleA", "host_taxid", "missing", int_attr, 1)
+    ret = exec_validator("non_integer_attribute_value", "BS_R0093", "sampleA", "host_taxid", "missing", int_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end

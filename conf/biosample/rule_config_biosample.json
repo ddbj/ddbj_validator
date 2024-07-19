@@ -654,8 +654,8 @@
     "code": "BS_R0093",
     "level": "error",
     "internal_ignore": true,
-    "name": "Attribute value is not integer",
-    "method": "attribute_value_is_not_integer",
+    "name": "Non-integer attribute value",
+    "method": "non_integer_attribute_value",
     "message": "Attribute value must be integer.",
     "object": [
       "BioSample"
@@ -1094,8 +1094,8 @@
   "ruleBS_R0128": {
     "rule_class": "BioSample",
     "code": "BS_R0128",
-    "level": "warning",
-    "internal_ignore": false,
+    "level": "error",
+    "internal_ignore": true,
     "name": "Missing BioProject ID for locus tag prefix",
     "method": "missing_bioproject_id_for_locus_tag_prefix",
     "message": "Provide a BioProject ID for a locus tag prefix.",
