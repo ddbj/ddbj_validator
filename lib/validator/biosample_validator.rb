@@ -67,8 +67,6 @@ class BioSampleValidator < ValidatorBase
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_biosample.json")) #TODO auto update when genereted
       config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
       config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
-      # reporting level termが必要な属性において許可しないnull相当値のリスト
-      config[:null_not_recommended_at_reporting_level_term] = (config[:null_accepted] + config[:null_not_recommended]).delete_if{|row| row.start_with?("missing:")}
       config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
       config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
       config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
@@ -282,7 +280,7 @@ class BioSampleValidator < ValidatorBase
       invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
       invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
       duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num) if @use_db
-      ret = format_of_geo_loc_name_is_invalid("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
+      ret = invalid_geo_loc_name_format("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
@@ -366,7 +364,8 @@ class BioSampleValidator < ValidatorBase
       # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, @conf[:null_not_recommended_at_reporting_level_term], line_num)
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, line_num)
+      missing_reporting_level_term("BS_R0137", sample_name, biosample_data["attributes"], @conf[:null_accepted], line_num)
       missing_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
       attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
       missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
@@ -860,12 +859,11 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # sample_attr ユーザ入力の属性リスト
   # package_attr_list パッケージに対する属性リスト
-  # null_not_recommended_at_reporting_level_term reporting level term 属性においてNULL値として推奨されない値(正規表現)のリスト
   # line_num
   # ==== Return
   # true/false
   #
-  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, null_not_recommended_at_reporting_level_term, line_num)
+  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
@@ -877,10 +875,6 @@ class BioSampleValidator < ValidatorBase
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
           missing_attr_names.push(attr_name)
-        elsif attr_name == "collection_date" || attr_name == "geo_loc_name" # 記述があっても推奨されないnull値だとerrorとする。この2属性は"missing: xxxx"のreporting level termsで記述されている必要がある為
-          if null_not_recommended_at_reporting_level_term.select {|refexp| attr_value =~ /^(#{refexp})$/i }.size > 0 # 正規表現リストにマッチすればNG
-            missing_attr_names.push(attr_name)
-          end
         end
       end
     end
@@ -1154,16 +1148,17 @@ class BioSampleValidator < ValidatorBase
 
   #
   # rule:94
-  # geo_loc_name属性のフォーマットの空白除去等の補正
+  # geo_loc_name属性のフォーマットの空白除去等の補正. Countty nameも大文字/小文字等の修正を行う
   #
   # ==== Args
   # rule_code
   # geo_loc_name ex."Japan:Kanagawa, Hakone, Lake Ashi"
+  # country_list json of ISNDC country_list
   # line_num
   # ==== Return
   # true/false
   #
-  def format_of_geo_loc_name_is_invalid (rule_code, sample_name, geo_loc_name, line_num)
+  def invalid_geo_loc_name_format (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
 
     annotated_name = geo_loc_name.sub(/\s*:\s*/, ":") #最初のコロンの前後の空白を詰める
@@ -1176,6 +1171,19 @@ class BioSampleValidator < ValidatorBase
     end
     annotated_name = annotated_name.gsub(/,\s+/, ', ')
     annotated_name = annotated_name.gsub(/,(?![ ])/, ', ')
+    # 国名の補正
+    country_name = annotated_name.split(":").first.strip
+    matched_country = country_list.find do |define_country|
+      if define_country == "Viet Nam" #間違いが多いためadhocに対応
+        define_country.gsub(" ", "").downcase == country_name.gsub(" ", "").downcase
+      else
+        define_country =~ /^#{country_name}$/i # case-insensitive
+      end
+    end
+    # 規定国名から補正できるものがあれば修正
+    if (!matched_country.nil?) && !(matched_country == country_name)
+      annotated_name.sub!(country_name, matched_country)
+    end
 
     if geo_loc_name == annotated_name
       true
@@ -1200,7 +1208,8 @@ class BioSampleValidator < ValidatorBase
 
   #
   # rule:8
-  # geo_loc_name属性に記載された国名が妥当であるかの検証
+  # geo_loc_name属性に記載された国名が規定された国名であるかの検証
+  # 可能な補正は invalid_geo_loc_name_format(R0094) で行われていることを前提に、規定された国名に完全一致する値でなければエラーとする
   #
   # ==== Args
   # rule_code
@@ -1213,14 +1222,8 @@ class BioSampleValidator < ValidatorBase
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
     country_name = geo_loc_name.split(":").first.strip
-    matched_country = country_list.find do |define_country|
-      if define_country == "Viet Nam" #間違いが多いためadhocに対応
-        define_country.gsub(" ", "").downcase == country_name.gsub(" ", "").downcase
-      else
-        define_country =~ /^#{country_name}$/i # case-insensitive
-      end
-    end
-    if (!matched_country.nil?) && (matched_country == country_name)
+    matched_country = country_list.select{|country| country == country_name}
+    if matched_country.size >= 1
       true
     else
       annotation = [
@@ -1228,18 +1231,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "geo_loc_name"},
         {key: "Attribute value", value: geo_loc_name}
       ]
-      if !matched_country.nil? # auto-annotation
-        replaced_value = matched_country + ":" + geo_loc_name.split(":")[1..-1].join(":")
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, "geo_loc_name", "value")
-        else
-          location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
-        end
-        annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       false
     end
@@ -3580,5 +3572,46 @@ class BioSampleValidator < ValidatorBase
       result = false
     end
     result
+  end
+  #
+  # rule:137
+  # collection_dateとgeo_loc_nameについて、reporting_level_term を記述しているかチェック
+  # この2属性については値を記述しない場合に missing 等の null 相当値は許可しない
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  #
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_reporting_level_term (rule_code, sample_name, sample_attr, null_accepted_list, line_num)
+    missing_attr_names = []
+    # reporting level term だけを null相当値から抽出
+    reporting_level_term_list = null_accepted_list.select{|value| value.start_with?("missing:")}
+    reporting_level_term_attr_list = ["collection_date", "geo_loc_name"]
+    reporting_level_term_attr_list.each do |reporting_level_term_attr|
+      # null相当値である
+      attr_value = sample_attr[reporting_level_term_attr]
+      if CommonUtils::null_value?(attr_value) || CommonUtils::null_not_recommended_value?(attr_value)
+        # reporting_level_term ではない
+        if !reporting_level_term_list.include?(sample_attr[reporting_level_term_attr])
+          # エラー属性名を配列に追加
+          missing_attr_names.push(reporting_level_term_attr)
+        end
+      end
+    end
+    if missing_attr_names.size <= 0
+      true
+    else
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute names", value: missing_attr_names.join(", ")}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      false
+    end
   end
 end

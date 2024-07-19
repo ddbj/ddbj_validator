@@ -328,20 +328,18 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_missing_mandatory_attribute
-    conf = @validator.instance_variable_get (:@conf)
-    null_not_recommended_at_reporting_level_term = conf[:null_not_recommended_at_reporting_level_term]
     #ok case
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended_at_reporting_level_term, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # geo_loc_name, collection_date以外の必須項目(strain等)では"missing"を許容する。geo_loc_name, collection_dateでは"missing: control sample"等のreporting level termであればOKとする
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_ok2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended_at_reporting_level_term, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
@@ -350,14 +348,14 @@ class TestBioSampleValidator < Minitest::Test
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error1.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended_at_reporting_level_term, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## brank required attr
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error2.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended_at_reporting_level_term, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not recommended null value
@@ -365,27 +363,11 @@ class TestBioSampleValidator < Minitest::Test
     xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error3.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
     attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended_at_reporting_level_term, 1)
+    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     error_attributes = ret[:error_list].first[:annotation].select{|item| item[:key] == "Attribute names" }.first[:value]
-    assert_equal true, error_attributes.split(",").size == 5
-    assert_equal true, error_attributes.include?("collection_date")
-    assert_equal true, error_attributes.include?("geo_loc_name")
-    assert_equal true, error_attributes.include?("lat_lon")
-    assert_equal true, error_attributes.include?("env_local_scale")
-    assert_equal true, error_attributes.include?("env_medium")
-    # reporting level term属性(ger_loc_name, collection_date)で "n. a.", ".", "-", "missing", "Not Applicable", "NA" "unknown"を記述
-    xml_data = File.read("#{@test_file_dir}/27_missing_mandatory_attribute_SSUB000019_error4.xml")
-    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
-    attr_list = @validator.get_attributes_of_package(biosample_data[0]["package"], @package_version)
-    ret = exec_validator("missing_mandatory_attribute", "BS_R0027", "SampleA", biosample_data[0]["attributes"], attr_list, null_not_recommended_at_reporting_level_term, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    error_attributes = ret[:error_list].first[:annotation].select{|item| item[:key] == "Attribute names" }.first[:value]
-    assert_equal true, error_attributes.split(",").size == 5
-    assert_equal true, error_attributes.include?("collection_date")
-    assert_equal true, error_attributes.include?("geo_loc_name")
+    assert_equal true, error_attributes.split(",").size == 3
     assert_equal true, error_attributes.include?("lat_lon")
     assert_equal true, error_attributes.include?("env_local_scale")
     assert_equal true, error_attributes.include?("env_medium")
@@ -498,39 +480,71 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
-  def test_format_of_geo_loc_name_is_invalid
+  def test_invalid_geo_loc_name_format
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/historical_country_list.json"))
+    valid_country_list = country_list - historical_country_list
     #ok case
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "Japan:Kanagawa, Hakone, Lake Ashi", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "Japan:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "Japan : Kanagaw,Hakone,  Lake Ashi", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "Japan : Kanagaw,Hakone,  Lake Ashi", valid_country_list, 1)
     expect_annotation = "Japan:Kanagaw, Hakone, Lake Ashi"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "Japan: Kanagaw,Hakone,  Lake Ashi", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "Japan: Kanagaw,Hakone,  Lake Ashi", valid_country_list, 1)
     expect_annotation = "Japan:Kanagaw, Hakone, Lake Ashi"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ## multi-colon
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "USA : Alaska : Fairbanks", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "USA : Alaska : Fairbanks", valid_country_list, 1)
     expect_annotation = "USA:Alaska , Fairbanks"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+
+    # county auto-annotation
+    #ok case
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #not exist country (not auto-annotation)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "sampleA", "Non exist country:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    #histrical country (not auto-annotation)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "sampleA", "Korea", valid_country_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    
+    # ng case(auto-annotation)
+    # case insensitive
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "sampleA", "JAPAN:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
+    expect_annotation = "Japan:Kanagawa, Hakone, Lake Ashi"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    # viet num(ignore space)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "sampleA", "vietnam:Hanoi", valid_country_list, 1)
+    expect_annotation = "Viet Nam:Hanoi"
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
+    
     #params are nil pattern
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", nil, 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", nil, valid_country_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "missing", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "missing", valid_country_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "n.a.", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "n.a.", valid_country_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("format_of_geo_loc_name_is_invalid", "BS_R0094", "SampleA", "missing: control sample", 1)
+    ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "missing: control sample", valid_country_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -547,28 +561,23 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Non exist country:Kanagawa, Hakone, Lake Ashi", country_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    # case no match (auto-annotation)
+    # case no match
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "JAPAN : Kanagawa, Hakone, Lake Ashi", country_list, 1)
-    expect_annotation = "Japan: Kanagawa, Hakone, Lake Ashi"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     # viet num(ignore space)
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "vietnam:Hanoi", country_list, 1)
-    expect_annotation = "Viet Nam:Hanoi"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ##histrical country
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Korea", country_list, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+
     #params are nil pattern
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", nil, country_list, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-
-    # nil value
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "missing", country_list, 1)
     assert_nil ret[:result]
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "n.a.", country_list, 1)
@@ -2287,6 +2296,29 @@ jkl\"  "
     # nil value (strain)
     ret = exec_validator("invalid_strain_value", "BS_R0135", "SampleA", "", "Escherichia coli", invalid_strain_value_settings, 1)
     assert_nil ret[:result]
+  end
+
+  def test_missing_reporting_level_term
+    conf = @validator.instance_variable_get (:@conf)
+    null_accepted_list = conf[:null_accepted]
+    # ok case 対象属性の全てを reporting_level_term で記述
+    xml_data = File.read("#{@test_file_dir}/137_missing_reporting_level_term_SSUB000019_ok.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    ret = exec_validator("missing_reporting_level_term", "BS_R0137", "SampleA", biosample_data[0]["attributes"], null_accepted_list, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng case
+    # reporting level term属性(geo_loc_name, collection_date)で Nmissing", "Not Applicable"を記述. "n,a,"は"missing"に置換されるとして
+    xml_data = File.read("#{@test_file_dir}/137_missing_reporting_level_term_SSUB000019_error.xml")
+    biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
+    ret = exec_validator("missing_reporting_level_term", "BS_R0137", "SampleA", biosample_data[0]["attributes"], null_accepted_list, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    error_attributes = ret[:error_list].first[:annotation].select{|item| item[:key] == "Attribute names" }.first[:value]
+    assert_equal true, error_attributes.split(",").size == 2
+    assert_equal true, error_attributes.include?("collection_date")
+    assert_equal true, error_attributes.include?("geo_loc_name")
   end
 
 =begin (suppressed)

@@ -93,11 +93,11 @@
   "ruleBS_R0008": {
     "rule_class": "BioSample",
     "code": "BS_R0008",
-    "level": "warning",
-    "internal_ignore": false,
+    "level": "error",
+    "internal_ignore": true,
     "name": "Invalid country",
     "method": "invalid_country",
-    "message": "Entered country is not in controlled terms.",
+    "message": "Entered country is not in controlled terms.\nWhen you do not report the location, enter missing values in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason.",
     "object": [
       "BioSample"
     ],
@@ -240,7 +240,7 @@
     "internal_ignore": true,
     "name": "Missing mandatory attribute",
     "method": "missing_mandatory_attribute",
-    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible). Note that the reporting level term is required for \r\n\"collection_date\" and \"geo_loc_name\".",
+    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible).",
     "object": [
       "BioSample"
     ],
@@ -667,8 +667,8 @@
     "code": "BS_R0094",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Format of geo_loc_name is invalid",
-    "method": "format_of_geo_loc_name_is_invalid",
+    "name": "Invalid geo_loc_name format",
+    "method": "invalid_geo_loc_name_format",
     "message": "Format of geo_loc_name is invalid.",
     "object": [
       "BioSample"
@@ -1130,19 +1130,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0130"
   },
-  "ruleBS_R0131": {
-    "rule_class": "BioSample",
-    "code": "BS_R0131",
-    "level": "warning",
-    "internal_ignore": false,
-    "name": "Culture/material/specimen id not found",
-    "method": "culture_material_specimen_id_not_found",
-    "message": "Culture/material/specimen id is not found in the institution. Please submit the sample if the culture/material/specimen has been registered to the institution.",
-    "object": [
-      "BioSample"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0131"
-  },
   "ruleBS_R0132": {
     "rule_class": "BioSample",
     "code": "BS_R0132",
@@ -1187,6 +1174,30 @@
     "name": "Invalid strain value",
     "method": "invalid_strain_value",
     "message": "The following values are not allowed: 'bacteria', 'clinical isolate', 'environmental', 'microbial', 'no', 'soil', 'sp', 'sp.', strain', 'whole organism', 'yes'. Additionally, strain name should not start with 'subsp.', 'serovar' or the organism name. All checks are case-insensitive. Provide a valid strain name rather than a descriptive term. This is generally the identifier that you use in your lab work for this sample.",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0136": {
+    "rule_class": "BioSample",
+    "code": "BS_R0136",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid datetime format",
+    "method": "invalid_datetime_format",
+    "message": "Invalid datetime format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0137": {
+    "rule_class": "BioSample",
+    "code": "BS_R0137",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Missing reporting level term",
+    "method": "missing_reporting_level_term",
+    "message": "When you do not report \"collection_date\" and \"geo_loc_name\", provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason. A reporting level term is required in these two attributes.",
     "object": [
       "BioSample"
     ]
