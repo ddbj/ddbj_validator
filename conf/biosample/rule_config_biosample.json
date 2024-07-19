@@ -80,11 +80,11 @@
   "ruleBS_R0007": {
     "rule_class": "BioSample",
     "code": "BS_R0007",
-    "level": "warning",
-    "internal_ignore": false,
-    "name": "Invalid date format",
-    "method": "invalid_date_format",
-    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid datetime",
+    "method": "invalid_datetime",
+    "message": "Invalid datetime. Datetimes must be in Coordinated Universal Time (UTC) and follow ISO 8601 standard formats \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\".",
     "object": [
       "BioSample"
     ],

@@ -235,10 +235,13 @@ class BioSampleValidator < ValidatorBase
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = invalid_date_format("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        # 日付属性をDDBJフォーマットに補正
+        ret = invalid_datetime_format("BS_R0136", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
+        # 日付属性がDDBJフォーマットであるか(補正後)にチェック
+        ret = invalid_datetime("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         attribute_value_is_not_integer("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
         if @use_db
           ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
@@ -1861,7 +1864,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # rule:7
+  # rule:136
   # 日付(time stamp)型の属性のフォーマットの検証と補正
   #
   # http://www.ddbj.nig.ac.jp/sub/ref6-j.html#collection_date
@@ -1875,7 +1878,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
+  def invalid_datetime_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
     return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
@@ -1917,6 +1920,41 @@ class BioSampleValidator < ValidatorBase
       end
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+  #
+  # rule:7
+  # 日付(time stamp)型の属性のフォーマットがDDBJ フォーマットであるか検証
+  # 補正は R00136 で行われている事を前提に、フォーマットに沿わない値はエラーとする
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # ts_attr 日付型の属性名のリスト ["douche", "extreme_event", ...]
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_datetime (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
+    # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
+    return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
+
+    result = true
+    df = DateFormat.new
+    if !df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
+      result = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: attr_name},
+        {key: "Attribute value", value: attr_val_org}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
     end
     result
   end
