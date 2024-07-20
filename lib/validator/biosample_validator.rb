@@ -1901,23 +1901,20 @@ class BioSampleValidator < ValidatorBase
       attr_val = df.convert2utc(attr_val)
     end
 
-    if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
+    # 置換が発生した場合だけwarningを出す
+    if attr_val_org != attr_val
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val_org}
       ]
-      if attr_val_org != attr_val #replace_candidate
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, attr_name, "value")
-        else
-          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-        end
-        annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      if @data_format == "json" || @data_format == "tsv"
+        location = auto_annotation_location(@data_format, line_num, attr_name, "value")
       else
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       end
+      annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
     end
@@ -1946,12 +1943,14 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     df = DateFormat.new
-    if !df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
+    is_ddbj_format = df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
+    parsable_date = df.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
+    if !(is_ddbj_format && parsable_date) # DDBJフォーマットであるか
       result = false
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val_org}
+        {key: "Attribute value", value: attr_val}
       ]
       error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)

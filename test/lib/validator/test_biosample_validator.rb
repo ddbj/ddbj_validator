@@ -1090,12 +1090,59 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1952-10-21T23:10:02Z/2018-10-21T23:44:30Z", ts_attr,  1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # ng case
-    ##invalid format
+    ## invalid format (but not auto-correct)
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "No Date", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ##auto annotation
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## 区切り文字の解釈が難しく auto-correctしない
+    ### 1952-10の意味だと思うが解釈は難しい
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "195210", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### 20180504の意味だと思うが解釈は難しい
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "180504", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### dMMy(年が2桁)の形式はDDBJformatとしては受け付けられず、自動補正しない
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1-Apr-15", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### 不正な日付 32日
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### 過去すぎる、未来過ぎる日付
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "18880801", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2050/1/2", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### 区切りが不明瞭
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "200710/200802", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### 範囲で不正な日付 14月
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1952-10-22T23:10:02Z / 1952-14-21T23:44:30Z", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### NN-NNパターンの場合(年月日の区別がつかないのでエラーは出すが補正はしない)
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "21-11", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "11-21", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "Aug-01", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ### 月名のスペルミス
+    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # ng = auto annotation
     ### 年の順序替え
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2/1/2011", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -1132,14 +1179,6 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-18", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "195210", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #1952-10の意味だと思うが解釈は難しい
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "180504", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #20180504の意味だと思うが解釈は難しい
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1952.10", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -1164,23 +1203,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "2017-06-29", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1-Apr-15", ts_attr,  1) #dMMy(年が2桁)の形式はDDBJformatとしては受け付けられず、自動補正しない
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
-    ### 不正な日付 32日
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ### 過去すぎる、未来過ぎる日付
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "18880801", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2050/1/2", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
+
     ### 範囲
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1952/10/21/1952/11/20", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -1190,10 +1213,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal true, ret[:result]
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2007-10/2008-02", ts_attr,  1)
     assert_equal true, ret[:result]
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "200710/200802", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
+    
     ### 範囲の区切りに空白がある　
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1952.10.21T23:10:02Z /  2018.10.21T23:44:30Z", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -1209,24 +1229,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "1952-10-21T23:44:30Z/1952-10-22T23:10:02Z", get_auto_annotation(ret[:error_list])
-    ### 範囲で不正な日付 14月
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "1952-10-22T23:10:02Z / 1952-14-21T23:44:30Z", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
-    ### NN-NNパターンの場合(年月日の区別がつかないのでエラーは出すが補正はしない)
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "21-11", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "11-21", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "Aug-01", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list])
+    
     ### timezoneがない場合にtimeを削除
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2015-04-16T12:00:00", ts_attr,  1)
     assert_equal false, ret[:result]
@@ -1270,17 +1273,11 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal "2016-07-10T02:43Z/2016-07-10T04:43Z", get_auto_annotation(ret[:error_list])
-    #月名のスペルミス
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_nil get_auto_annotation(ret[:error_list]) #auto-annotation無し
-    # params are nil pattern
+
+    # nil value
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "", ts_attr,  1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-
-    # nil value
     ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "missing", ts_attr,  1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
@@ -1302,26 +1299,80 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## 範囲(年月)
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "2007-10/2008-02", ts_attr,  1)
+    ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "2007-10/2008-02", ts_attr,  1)
     assert_equal true, ret[:result]
 
     # ng case
     ##invalid format
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "missing...", ts_attr,  1)
+    ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "missing...", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "24 Feb 2015", ts_attr,  1)
+    ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "24 Feb 2015", ts_attr,  1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
 
+    # 過去に warningを出していたauto-correctしないものがエラーになるか(BS_R0136ではチェックしなくなったので)
+     ## invalid format (but not auto-correct)
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "No Date", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ## 区切り文字の解釈が難しく BS_R0136 でauto-correctできない
+     ### 1952-10の意味だと思うが解釈は難しい
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "195210", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### 20180504の意味だと思うが解釈は難しい
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "180504", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### dMMy(年が2桁)の形式はDDBJformatとしては受け付けられず、自動補正しない
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "1-Apr-15", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### 不正な日付 32日
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "2016-01-32", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### 過去すぎる、未来過ぎる日付
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "18880801", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     assert_nil get_auto_annotation(ret[:error_list]) #自動補正なし
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "2050/1/2", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### 区切りが不明瞭
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "200710/200802", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### 範囲で不正な日付 14月
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "1952-10-22T23:10:02Z / 1952-14-21T23:44:30Z", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### NN-NNパターンの場合(年月日の区別がつかないのでエラーは出すが補正はしない)
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "21-11", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     # これは通るようになる(11-21の解釈で問題なさそう)
+     #ret = exec_validator("invalid_datetime_format", "BS_R0007", "SampleA", "collection_date", "11-21", ts_attr,  1)
+     #assert_equal false, ret[:result]
+     #assert_equal 1, ret[:error_list].size
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "Aug-01", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+     ### 月名のスペルミス
+     ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "24 Feburary 2015", ts_attr,  1)
+     assert_equal false, ret[:result]
+     assert_equal 1, ret[:error_list].size
+
     # nil value
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "missing", ts_attr,  1)
+    ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "missing", ts_attr,  1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "n.a.", ts_attr,  1)
+    ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "n.a.", ts_attr,  1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_datetime_format", "BS_R0136", "SampleA", "collection_date", "missing: control sample", ts_attr,  1)
+    ret = exec_validator("invalid_datetime", "BS_R0007", "SampleA", "collection_date", "missing: control sample", ts_attr,  1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
