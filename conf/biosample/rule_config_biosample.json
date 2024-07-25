@@ -1140,7 +1140,8 @@
     "message": "Enter non-null value (other than missing etc) for infraspecific identifiers (strain, isolate, cultivar and ecotype) for samples of assembled genome sequences and clinical isolates.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0132"
   },
   "ruleBS_R0133": {
     "rule_class": "BioSample",
@@ -1152,7 +1153,8 @@
     "message": "If the sample is for an assembled genome sequence, enter non-null value (other than missing etc) for infraspecific identifiers (strain, isolate, cultivar and ecotype).",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0133"
   },
   "ruleBS_R0134": {
     "rule_class": "BioSample",
@@ -1164,7 +1166,8 @@
     "message": "The identifier in the organism name after 'sp./bacterium/archeon' differs from strain/isolate. Use strain/isolate as the identifier for the organism not registered in the NCBI Taxonomy.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0134"
   },
   "ruleBS_R0135": {
     "rule_class": "BioSample",
@@ -1176,7 +1179,8 @@
     "message": "The following values are not allowed: 'bacteria', 'clinical isolate', 'environmental', 'microbial', 'no', 'soil', 'sp', 'sp.', strain', 'whole organism', 'yes'. Additionally, strain name should not start with 'subsp.', 'serovar' or the organism name. All checks are case-insensitive. Provide a valid strain name rather than a descriptive term. This is generally the identifier that you use in your lab work for this sample.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0135"
   },
   "ruleBS_R0136": {
     "rule_class": "BioSample",
@@ -1188,7 +1192,8 @@
     "message": "Invalid datetime format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0136"
   },
   "ruleBS_R0137": {
     "rule_class": "BioSample",
@@ -1200,6 +1205,7 @@
     "message": "When you do not report \"collection_date\" and \"geo_loc_name\", provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason. A reporting level term is required in these two attributes.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0137"
   }
 }
