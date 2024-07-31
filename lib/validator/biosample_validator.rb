@@ -230,7 +230,11 @@ class BioSampleValidator < ValidatorBase
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
         non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
-        invalid_attribute_value_for_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        ret = attribute_value_not_in_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        end
+        invalid_attribute_value_for_controlled_terms("BS_R0138", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
         ret = invalid_publication_identifier("BS_R0011", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
@@ -302,6 +306,7 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
+      invalid_lat_lon("BS_R0139", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
       invalid_host_organism_name("BS_R0015", sample_name, biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
       future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
       invalid_sample_name_format("BS_R0101", sample_name, line_num)
@@ -980,12 +985,11 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
+  def attribute_value_not_in_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
     result =  true
     if !cv_attr[attr_name].nil? # CVを使用する属性か
-      is_cv_term = false
       replace_value = ""
       if attr_name == 'sex' && (attr_val.casecmp("M") == 0 || attr_val.casecmp("F") == 0)
         #sex属性の場合の特殊な置換
@@ -997,34 +1001,63 @@ class BioSampleValidator < ValidatorBase
       else
         cv_attr[attr_name].each do |term|
           if term.casecmp(attr_val) == 0 #大文字小文字を区別せず一致
-            is_cv_term = true
             if term != attr_val #大文字小文字で異なる
               replace_value = term #置換が必要
-              is_cv_term = false
             end
           end
         end
       end
-      if !is_cv_term # CVリストに値がない
+      if replace_value != "" # 置換が必要な場合
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        if replace_value != "" #置換候補があればAuto annotationをつける
-          if @data_format == "json" || @data_format == "tsv"
-            location = auto_annotation_location(@data_format, line_num, attr_name, "value")
-          else
-            location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-          end
-          annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-        else #置換候補がないエラー
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+        if @data_format == "json" || @data_format == "tsv"
+          location = auto_annotation_location(@data_format, line_num, attr_name, "value")
+        else
+          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
         end
+        annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
         @error_list.push(error_hash)
         result = false
       end
+    end
+    result
+  end
+
+  #
+  # rule:138
+  # CV(controlled vocabulary)を使用するべき属性値であるか検証する。
+  # rule;2 で補正した後の値でCVではない場合にはエラーとする
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # cv_attr CVを使用する属性名とCVのハッシュ {"biotic_relationship"=>[cv_list], "cur_land_use"=>[cv_list], ...}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
+    result =  true
+    if !cv_attr[attr_name].nil? # CVを使用する属性か
+      unless cv_attr[attr_name].include?(attr_val) # CVリストの値ではない
+        result = false
+      end
+    end
+    if result == false # CVリストに値がない
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: attr_name},
+        {key: "Attribute value", value: attr_val}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      @error_list.push(error_hash)
     end
     result
   end
@@ -1254,31 +1287,62 @@ class BioSampleValidator < ValidatorBase
   def invalid_lat_lon_format (rule_code, sample_name, lat_lon, line_num)
     return nil if CommonUtils::null_value?(lat_lon)
 
+    result = true
     common = CommonUtils.new
     insdc_latlon = common.format_insdc_latlon(lat_lon)
-    if insdc_latlon == lat_lon
-      true
-    else
-      value = [lat_lon]
+    # INSDC の formatに直せなかった場合はnilが返るが、auto-correctはないのでこのメソッドでは無視。これらはBS_R0139でエラーになる。
+    # 入力値から補正された場合には (lat_lon != insdc_latlon) warningを返す
+    if (!insdc_latlon.nil?) && lat_lon != insdc_latlon
+      result = false
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: "lat_lon"},
         {key: "Attribute value", value: lat_lon}
       ]
-      if !insdc_latlon.nil? #置換候補があればAuto annotationをつける
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, "lat_lon", "value")
-        else
-          location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
-        end
-        annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-      else #置換候補がないエラー
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      if @data_format == "json" || @data_format == "tsv"
+        location = auto_annotation_location(@data_format, line_num, "lat_lon", "value")
+      else
+        location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
       end
+      annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
       @error_list.push(error_hash)
-      false
     end
+    result
+  end
+
+  #
+  # rule:139
+  # 緯度経度のフォーマットの検証。
+  # rule:9 で補正された後の値が、DDBJのlat_lonフォーマットでなければエラーを返す
+  #
+  # ==== Args
+  # rule_code
+  # lat_lon ex."47.94 N 28.12 W", "45.0123 S 4.1234 E"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_lat_lon (rule_code, sample_name, lat_lon, line_num)
+    return nil if CommonUtils::null_value?(lat_lon)
+
+    result = true
+    common = CommonUtils.new
+    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    # INSDC の formatに直せなかった場合はnilが返るので、その場合にはエラー
+    # BS_R0009でauto-annotationが行われている事が前提なので、このメソッドの入力値のままでなければ(=補正が発生していれば)エラー
+    if insdc_latlon.nil? || lat_lon != insdc_latlon
+      result = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "lat_lon"},
+        {key: "Attribute value", value: lat_lon}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
   end
 
   #
@@ -3651,4 +3715,5 @@ class BioSampleValidator < ValidatorBase
       false
     end
   end
+
 end

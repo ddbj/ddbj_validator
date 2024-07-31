@@ -398,46 +398,88 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
-  def test_invalid_attribute_value_for_controlled_terms
+  def test_attribute_value_not_in_controlled_terms
     cv_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/controlled_terms.json"))
     #ok case
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "aerobe", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "aerobe", cv_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "source_uvig", "viral single amplified genome (vSAG)", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "source_uvig", "viral single amplified genome (vSAG)", cv_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # can't auto-autocorrect (will check at BS_R0138)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
     ##auto annotation 大文字小文字が異なる場合の修正
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "horizon", "o horizon", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "horizon", "o horizon", cv_attr, 1)
     expect_annotation = "O horizon"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
     ##sex attribute xattr replace
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "sex", "f", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "sex", "f", cv_attr, 1)
     expect_annotation = "female"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
 
     #params are nil pattern
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ##attr value is coequal null
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "missing: data agreement established pre-2023", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "missing: data agreement established pre-2023", cv_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "missing", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", "rel_to_oxygen", "missing", cv_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
     ##attr name is blank
-    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0002", "sampleA", " ", "xxxxx", cv_attr, 1)
+    ret = exec_validator("attribute_value_not_in_controlled_terms", "BS_R0002", "sampleA", " ", "xxxxx", cv_attr, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
+  def test_invalid_attribute_value_for_controlled_terms
+    cv_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/controlled_terms.json"))
+    #ok case
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "rel_to_oxygen", "aerobe", cv_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "source_uvig", "viral single amplified genome (vSAG)", cv_attr, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # This method does not perform auto-correction (will auto-correction by BS_R0002)
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "horizon", "o horizon", cv_attr, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##sex attribute xattr replace
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "sex", "f", cv_attr, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # can't auto-autocorrect
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "rel_to_oxygen", "aaaaaaa", cv_attr, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    #params are nil pattern
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "rel_to_oxygen", nil, cv_attr, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##attr value is coequal null
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "rel_to_oxygen", "missing: data agreement established pre-2023", cv_attr, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", "rel_to_oxygen", "missing", cv_attr, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ##attr name is blank
+    ret = exec_validator("invalid_attribute_value_for_controlled_terms", "BS_R0138", "sampleA", " ", "xxxxx", cv_attr, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
@@ -594,9 +636,10 @@ class TestBioSampleValidator < Minitest::Test
     ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "47.94345678 N 28.12345678 W", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    # like nil value
-    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "not applicable", 1)
-    assert_nil ret[:result]
+    # can't auto-autocorrect format as lat lon (will check at BS_R0139)
+    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "invalid latlon format", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #ng case
     ##dec format(auto annotation)
@@ -617,12 +660,50 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     assert_equal expect_annotation, get_auto_annotation(ret[:error_list])
-    ##can't parse format as lat lon
-    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "invalid latlon format", 1)
+
+    #params are nil pattern
+    # like nil value
+    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", "not applicable", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", nil, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+  end
+
+  def test_invalid_lat_lon
+    #ok case
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", "45.0123 S 4.1234 E", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", "47.94345678 N 28.12345678 W", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    #ng case
+    # This method does not perform auto-correction (will auto-correction by BS_R0009)
+    ##dec format
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", "-23.00279 ,   -120.21840", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
+    ##deg format
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", "37°26′36.42″N 06°15′14.28″W", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## too detail lat lon
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", "5.385667527 N 150.334778119 W", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ##can't parse format as lat lon
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", "invalid latlon format", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
     #params are nil pattern
-    ret = exec_validator("invalid_lat_lon_format", "BS_R0009", "sampleA", nil, 1)
+    ret = exec_validator("invalid_lat_lon_format", "BS_R0139", "sampleA", "missing: third party data", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ret = exec_validator("invalid_lat_lon", "BS_R0139", "sampleA", nil, 1)
     assert_nil ret[:result]
     assert_equal 0, ret[:error_list].size
   end
