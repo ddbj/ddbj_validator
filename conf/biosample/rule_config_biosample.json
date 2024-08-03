@@ -17,8 +17,8 @@
     "code": "BS_R0002",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Invalid Attribute value for controlled terms",
-    "method": "invalid_attribute_value_for_controlled_terms",
+    "name": "Attribute value not in controlled terms",
+    "method": "attribute_value_not_in_controlled_terms",
     "message": "Attribute value is not in controlled terms.",
     "object": [
       "BioSample"
@@ -80,11 +80,11 @@
   "ruleBS_R0007": {
     "rule_class": "BioSample",
     "code": "BS_R0007",
-    "level": "warning",
-    "internal_ignore": false,
-    "name": "Invalid date format",
-    "method": "invalid_date_format",
-    "message": "Invalid date format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid datetime",
+    "method": "invalid_datetime",
+    "message": "Invalid datetime. Datetimes must be in Coordinated Universal Time (UTC) and follow ISO 8601 standard formats \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\".",
     "object": [
       "BioSample"
     ],
@@ -93,11 +93,11 @@
   "ruleBS_R0008": {
     "rule_class": "BioSample",
     "code": "BS_R0008",
-    "level": "warning",
-    "internal_ignore": false,
+    "level": "error",
+    "internal_ignore": true,
     "name": "Invalid country",
     "method": "invalid_country",
-    "message": "Entered country is not in controlled terms.",
+    "message": "Entered country is not in controlled terms.\nWhen you do not report the location, enter missing values in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason.",
     "object": [
       "BioSample"
     ],
@@ -240,7 +240,7 @@
     "internal_ignore": true,
     "name": "Missing mandatory attribute",
     "method": "missing_mandatory_attribute",
-    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible). Note that the reporting level term is required for \r\n\"collection_date\" and \"geo_loc_name\".",
+    "message": "Sample has missing mandatory attribute(s). If you do not have information for the required field(s), please provide missing value as either 'not collected', 'not applicable', 'missing' or in format \"missing: reporting level term\" (e.g. \"missing: control sample\") for mandatory attribute to declare both the absence of a true value as well as the reason (when possible).",
     "object": [
       "BioSample"
     ],
@@ -654,8 +654,8 @@
     "code": "BS_R0093",
     "level": "error",
     "internal_ignore": true,
-    "name": "Attribute value is not integer",
-    "method": "attribute_value_is_not_integer",
+    "name": "Non-integer attribute value",
+    "method": "non_integer_attribute_value",
     "message": "Attribute value must be integer.",
     "object": [
       "BioSample"
@@ -667,8 +667,8 @@
     "code": "BS_R0094",
     "level": "warning",
     "internal_ignore": false,
-    "name": "Format of geo_loc_name is invalid",
-    "method": "format_of_geo_loc_name_is_invalid",
+    "name": "Invalid geo_loc_name format",
+    "method": "invalid_geo_loc_name_format",
     "message": "Format of geo_loc_name is invalid.",
     "object": [
       "BioSample"
@@ -1094,8 +1094,8 @@
   "ruleBS_R0128": {
     "rule_class": "BioSample",
     "code": "BS_R0128",
-    "level": "warning",
-    "internal_ignore": false,
+    "level": "error",
+    "internal_ignore": true,
     "name": "Missing BioProject ID for locus tag prefix",
     "method": "missing_bioproject_id_for_locus_tag_prefix",
     "message": "Provide a BioProject ID for a locus tag prefix.",
@@ -1130,19 +1130,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0130"
   },
-  "ruleBS_R0131": {
-    "rule_class": "BioSample",
-    "code": "BS_R0131",
-    "level": "warning",
-    "internal_ignore": false,
-    "name": "Culture/material/specimen id not found",
-    "method": "culture_material_specimen_id_not_found",
-    "message": "Culture/material/specimen id is not found in the institution. Please submit the sample if the culture/material/specimen has been registered to the institution.",
-    "object": [
-      "BioSample"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0131"
-  },
   "ruleBS_R0132": {
     "rule_class": "BioSample",
     "code": "BS_R0132",
@@ -1153,7 +1140,8 @@
     "message": "Enter non-null value (other than missing etc) for infraspecific identifiers (strain, isolate, cultivar and ecotype) for samples of assembled genome sequences and clinical isolates.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0132"
   },
   "ruleBS_R0133": {
     "rule_class": "BioSample",
@@ -1165,7 +1153,8 @@
     "message": "If the sample is for an assembled genome sequence, enter non-null value (other than missing etc) for infraspecific identifiers (strain, isolate, cultivar and ecotype).",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0133"
   },
   "ruleBS_R0134": {
     "rule_class": "BioSample",
@@ -1177,6 +1166,72 @@
     "message": "The identifier in the organism name after 'sp./bacterium/archeon' differs from strain/isolate. Use strain/isolate as the identifier for the organism not registered in the NCBI Taxonomy.",
     "object": [
       "BioSample"
-    ]
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0134"
+  },
+  "ruleBS_R0135": {
+    "rule_class": "BioSample",
+    "code": "BS_R0135",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid strain value",
+    "method": "invalid_strain_value",
+    "message": "The following values are not allowed: 'bacteria', 'clinical isolate', 'environmental', 'microbial', 'no', 'soil', 'sp', 'sp.', strain', 'whole organism', 'yes'. Additionally, strain name should not start with 'subsp.', 'serovar' or the organism name. All checks are case-insensitive. Provide a valid strain name rather than a descriptive term. This is generally the identifier that you use in your lab work for this sample.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0135"
+  },
+  "ruleBS_R0136": {
+    "rule_class": "BioSample",
+    "code": "BS_R0136",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid datetime format",
+    "method": "invalid_datetime_format",
+    "message": "Invalid datetime format. Follow ISO 8601 standard \"YYYY-mm-dd\", \"YYYY-mm\" or \"YYYY-mm-ddThh:mm:ssZ\" (e.g., 1990-10-30, 1990-10 or 1990-10-30T14:41:36Z). Collection times must be in Coordinated Universal Time (UTC). Times without time zone are processed as UTC. Non-UTC times are converted to UTC.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0136"
+  },
+  "ruleBS_R0137": {
+    "rule_class": "BioSample",
+    "code": "BS_R0137",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Missing reporting level term",
+    "method": "missing_reporting_level_term",
+    "message": "When you do not report \"collection_date\" and \"geo_loc_name\", provide missing value in format \"missing: reporting level term\" (e.g. \"missing: control sample\") to declare both the absence of a true value as well as the reason. A reporting level term is required in these two attributes.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0137"
+  },
+  "ruleBS_R0138": {
+    "rule_class": "BioSample",
+    "code": "BS_R0138",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid Attribute value for controlled terms",
+    "method": "invalid_attribute_value_for_controlled_terms",
+    "message": "Attribute value is not in controlled terms.",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0138"
+  },
+  "ruleBS_R0139": {
+    "rule_class": "BioSample",
+    "code": "BS_R0139",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Invalid lat_lon",
+    "method": "invalid_lat_lon",
+    "message": "Invalid lat_lon. Specify as degrees latitude and longitude in format \"d[d.dddddddd] N|S d[dd.dddddddd] W|E\".",
+    "object": [
+      "BioSample"
+    ],
+    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0139"
   }
 }

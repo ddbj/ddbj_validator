@@ -67,8 +67,6 @@ class BioSampleValidator < ValidatorBase
       config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_biosample.json")) #TODO auto update when genereted
       config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
       config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
-      # reporting level termが必要な属性において許可しないnull相当値のリスト
-      config[:null_not_recommended_at_reporting_level_term] = (config[:null_accepted] + config[:null_not_recommended]).delete_if{|row| row.start_with?("missing:")}
       config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
       config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
       config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
@@ -80,6 +78,7 @@ class BioSampleValidator < ValidatorBase
       config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
+      config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + "/invalid_strain_value.json"))
       config[:json_schema] = JSON.parse(File.read(config_file_dir + "/schema.json"))
       config[:institution_list_file] = config_file_dir + "/coll_dump.txt"
       config[:google_api_key] = @conf[:google_api_key]
@@ -231,16 +230,23 @@ class BioSampleValidator < ValidatorBase
       ### 全属性値を対象とした検証
       biosample_data["attributes"].each do|attr_name, value|
         non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
-        invalid_attribute_value_for_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        ret = attribute_value_not_in_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        end
+        invalid_attribute_value_for_controlled_terms("BS_R0138", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
         ret = invalid_publication_identifier("BS_R0011", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        ret = invalid_date_format("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        # 日付属性をDDBJフォーマットに補正
+        ret = invalid_datetime_format("BS_R0136", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
           biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
         end
-        attribute_value_is_not_integer("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
+        # 日付属性がDDBJフォーマットであるか(補正後)にチェック
+        ret = invalid_datetime("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        non_integer_attribute_value("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
         if @use_db
           ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
           if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
@@ -281,7 +287,7 @@ class BioSampleValidator < ValidatorBase
       invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
       invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
       duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num) if @use_db
-      ret = format_of_geo_loc_name_is_invalid("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], line_num)
+      ret = invalid_geo_loc_name_format("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
@@ -300,12 +306,14 @@ class BioSampleValidator < ValidatorBase
       if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
         biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
       end
+      invalid_lat_lon("BS_R0139", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
       invalid_host_organism_name("BS_R0015", sample_name, biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
       future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
       invalid_sample_name_format("BS_R0101", sample_name, line_num)
 
       invalid_gisaid_accession("BS_R0122", sample_name, biosample_data["attributes"]["gisaid_accession"], line_num)
       biosample_not_found("BS_R0129", sample_name, biosample_data["attributes"]["derived_from"], @submitter_id, line_num) if @use_db
+      invalid_strain_value("BS_R0135", sample_name, biosample_data["attributes"]["strain"], biosample_data["attributes"]["organism"], @conf[:invalid_strain_value], line_num)
 
       ### 値が複数記述される可能性がある項目の検証
       biosample_data["attribute_list"].each do |attr|
@@ -354,6 +362,7 @@ class BioSampleValidator < ValidatorBase
         cov2_package_versus_organism("BS_R0048", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
       end
       invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+      non_identical_identifiers_among_organism_strain_isolate("BS_R0134", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], biosample_data["attributes"]["strain"], biosample_data["attributes"]["isolate"], line_num)
 
       ### 重要属性の欠損検証
       missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
@@ -363,10 +372,13 @@ class BioSampleValidator < ValidatorBase
       # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
       # パッケージから属性情報(必須項目やグループ)を取得
       attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, @conf[:null_not_recommended_at_reporting_level_term], line_num)
+      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, line_num)
+      missing_reporting_level_term("BS_R0137", sample_name, biosample_data["attributes"], @conf[:null_accepted], line_num)
       missing_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
       attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
       missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
+      null_value_for_infraspecific_identifier_error("BS_R0132", sample_name, biosample_data["attributes"], biosample_data["package"], line_num)
+      null_value_for_infraspecific_identifier_warning("BS_R0133", sample_name, biosample_data["attributes"], biosample_data["package"], line_num)
     end
   end
 
@@ -855,12 +867,11 @@ class BioSampleValidator < ValidatorBase
   # rule_code
   # sample_attr ユーザ入力の属性リスト
   # package_attr_list パッケージに対する属性リスト
-  # null_not_recommended_at_reporting_level_term reporting level term 属性においてNULL値として推奨されない値(正規表現)のリスト
   # line_num
   # ==== Return
   # true/false
   #
-  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, null_not_recommended_at_reporting_level_term, line_num)
+  def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
     mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
@@ -872,10 +883,6 @@ class BioSampleValidator < ValidatorBase
       if mandatory_attr_list.include?(attr_name)
         if CommonUtils::blank?(attr_value)
           missing_attr_names.push(attr_name)
-        elsif attr_name == "collection_date" || attr_name == "geo_loc_name" # 記述があっても推奨されないnull値だとerrorとする。この2属性は"missing: xxxx"のreporting level termsで記述されている必要がある為
-          if null_not_recommended_at_reporting_level_term.select {|refexp| attr_value =~ /^(#{refexp})$/i }.size > 0 # 正規表現リストにマッチすればNG
-            missing_attr_names.push(attr_name)
-          end
         end
       end
     end
@@ -978,12 +985,11 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
+  def attribute_value_not_in_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
     result =  true
     if !cv_attr[attr_name].nil? # CVを使用する属性か
-      is_cv_term = false
       replace_value = ""
       if attr_name == 'sex' && (attr_val.casecmp("M") == 0 || attr_val.casecmp("F") == 0)
         #sex属性の場合の特殊な置換
@@ -995,34 +1001,63 @@ class BioSampleValidator < ValidatorBase
       else
         cv_attr[attr_name].each do |term|
           if term.casecmp(attr_val) == 0 #大文字小文字を区別せず一致
-            is_cv_term = true
             if term != attr_val #大文字小文字で異なる
               replace_value = term #置換が必要
-              is_cv_term = false
             end
           end
         end
       end
-      if !is_cv_term # CVリストに値がない
+      if replace_value != "" # 置換が必要な場合
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        if replace_value != "" #置換候補があればAuto annotationをつける
-          if @data_format == "json" || @data_format == "tsv"
-            location = auto_annotation_location(@data_format, line_num, attr_name, "value")
-          else
-            location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-          end
-          annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-        else #置換候補がないエラー
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+        if @data_format == "json" || @data_format == "tsv"
+          location = auto_annotation_location(@data_format, line_num, attr_name, "value")
+        else
+          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
         end
+        annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
         @error_list.push(error_hash)
         result = false
       end
+    end
+    result
+  end
+
+  #
+  # rule:138
+  # CV(controlled vocabulary)を使用するべき属性値であるか検証する。
+  # rule;2 で補正した後の値でCVではない場合にはエラーとする
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # cv_attr CVを使用する属性名とCVのハッシュ {"biotic_relationship"=>[cv_list], "cur_land_use"=>[cv_list], ...}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+
+    result =  true
+    if !cv_attr[attr_name].nil? # CVを使用する属性か
+      unless cv_attr[attr_name].include?(attr_val) # CVリストの値ではない
+        result = false
+      end
+    end
+    if result == false # CVリストに値がない
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: attr_name},
+        {key: "Attribute value", value: attr_val}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      @error_list.push(error_hash)
     end
     result
   end
@@ -1149,16 +1184,17 @@ class BioSampleValidator < ValidatorBase
 
   #
   # rule:94
-  # geo_loc_name属性のフォーマットの空白除去等の補正
+  # geo_loc_name属性のフォーマットの空白除去等の補正. Countty nameも大文字/小文字等の修正を行う
   #
   # ==== Args
   # rule_code
   # geo_loc_name ex."Japan:Kanagawa, Hakone, Lake Ashi"
+  # country_list json of ISNDC country_list
   # line_num
   # ==== Return
   # true/false
   #
-  def format_of_geo_loc_name_is_invalid (rule_code, sample_name, geo_loc_name, line_num)
+  def invalid_geo_loc_name_format (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
 
     annotated_name = geo_loc_name.sub(/\s*:\s*/, ":") #最初のコロンの前後の空白を詰める
@@ -1171,6 +1207,19 @@ class BioSampleValidator < ValidatorBase
     end
     annotated_name = annotated_name.gsub(/,\s+/, ', ')
     annotated_name = annotated_name.gsub(/,(?![ ])/, ', ')
+    # 国名の補正
+    country_name = annotated_name.split(":").first.strip
+    matched_country = country_list.find do |define_country|
+      if define_country == "Viet Nam" #間違いが多いためadhocに対応
+        define_country.gsub(" ", "").downcase == country_name.gsub(" ", "").downcase
+      else
+        define_country =~ /^#{country_name}$/i # case-insensitive
+      end
+    end
+    # 規定国名から補正できるものがあれば修正
+    if (!matched_country.nil?) && !(matched_country == country_name)
+      annotated_name.sub!(country_name, matched_country)
+    end
 
     if geo_loc_name == annotated_name
       true
@@ -1195,7 +1244,8 @@ class BioSampleValidator < ValidatorBase
 
   #
   # rule:8
-  # geo_loc_name属性に記載された国名が妥当であるかの検証
+  # geo_loc_name属性に記載された国名が規定された国名であるかの検証
+  # 可能な補正は invalid_geo_loc_name_format(R0094) で行われていることを前提に、規定された国名に完全一致する値でなければエラーとする
   #
   # ==== Args
   # rule_code
@@ -1208,14 +1258,8 @@ class BioSampleValidator < ValidatorBase
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
     country_name = geo_loc_name.split(":").first.strip
-    matched_country = country_list.find do |define_country|
-      if define_country == "Viet Nam" #間違いが多いためadhocに対応
-        define_country.gsub(" ", "").downcase == country_name.gsub(" ", "").downcase
-      else
-        define_country =~ /^#{country_name}$/i # case-insensitive
-      end
-    end
-    if (!matched_country.nil?) && (matched_country == country_name)
+    matched_country = country_list.select{|country| country == country_name}
+    if matched_country.size >= 1
       true
     else
       annotation = [
@@ -1223,18 +1267,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "geo_loc_name"},
         {key: "Attribute value", value: geo_loc_name}
       ]
-      if !matched_country.nil? # auto-annotation
-        replaced_value = matched_country + ":" + geo_loc_name.split(":")[1..-1].join(":")
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, "geo_loc_name", "value")
-        else
-          location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
-        end
-        annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      end
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
       @error_list.push(error_hash)
       false
     end
@@ -1254,31 +1287,62 @@ class BioSampleValidator < ValidatorBase
   def invalid_lat_lon_format (rule_code, sample_name, lat_lon, line_num)
     return nil if CommonUtils::null_value?(lat_lon)
 
+    result = true
     common = CommonUtils.new
     insdc_latlon = common.format_insdc_latlon(lat_lon)
-    if insdc_latlon == lat_lon
-      true
-    else
-      value = [lat_lon]
+    # INSDC の formatに直せなかった場合はnilが返るが、auto-correctはないのでこのメソッドでは無視。これらはBS_R0139でエラーになる。
+    # 入力値から補正された場合には (lat_lon != insdc_latlon) warningを返す
+    if (!insdc_latlon.nil?) && lat_lon != insdc_latlon
+      result = false
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: "lat_lon"},
         {key: "Attribute value", value: lat_lon}
       ]
-      if !insdc_latlon.nil? #置換候補があればAuto annotationをつける
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, "lat_lon", "value")
-        else
-          location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
-        end
-        annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-      else #置換候補がないエラー
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      if @data_format == "json" || @data_format == "tsv"
+        location = auto_annotation_location(@data_format, line_num, "lat_lon", "value")
+      else
+        location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
       end
+      annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
       @error_list.push(error_hash)
-      false
     end
+    result
+  end
+
+  #
+  # rule:139
+  # 緯度経度のフォーマットの検証。
+  # rule:9 で補正された後の値が、DDBJのlat_lonフォーマットでなければエラーを返す
+  #
+  # ==== Args
+  # rule_code
+  # lat_lon ex."47.94 N 28.12 W", "45.0123 S 4.1234 E"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_lat_lon (rule_code, sample_name, lat_lon, line_num)
+    return nil if CommonUtils::null_value?(lat_lon)
+
+    result = true
+    common = CommonUtils.new
+    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    # INSDC の formatに直せなかった場合はnilが返るので、その場合にはエラー
+    # BS_R0009でauto-annotationが行われている事が前提なので、このメソッドの入力値のままでなければ(=補正が発生していれば)エラー
+    if insdc_latlon.nil? || lat_lon != insdc_latlon
+      result = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: "lat_lon"},
+        {key: "Attribute value", value: lat_lon}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
   end
 
   #
@@ -1864,7 +1928,7 @@ class BioSampleValidator < ValidatorBase
   end
 
   #
-  # rule:7
+  # rule:136
   # 日付(time stamp)型の属性のフォーマットの検証と補正
   #
   # http://www.ddbj.nig.ac.jp/sub/ref6-j.html#collection_date
@@ -1878,7 +1942,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_date_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
+  def invalid_datetime_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
     return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
@@ -1901,25 +1965,59 @@ class BioSampleValidator < ValidatorBase
       attr_val = df.convert2utc(attr_val)
     end
 
-    if !is_ddbj_format || !parsable_date || attr_val_org != attr_val
+    # 置換が発生した場合だけwarningを出す
+    if attr_val_org != attr_val
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val_org}
       ]
-      if attr_val_org != attr_val #replace_candidate
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, attr_name, "value")
-        else
-          location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-        end
-        annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+      if @data_format == "json" || @data_format == "tsv"
+        location = auto_annotation_location(@data_format, line_num, attr_name, "value")
       else
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       end
+      annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
       @error_list.push(error_hash)
       result = false
+    end
+    result
+  end
+
+  #
+  # rule:7
+  # 日付(time stamp)型の属性のフォーマットがDDBJ フォーマットであるか検証
+  # 補正は R00136 で行われている事を前提に、フォーマットに沿わない値はエラーとする
+  #
+  # ==== Args
+  # rule_code
+  # attr_name 属性名
+  # attr_val 属性値
+  # ts_attr 日付型の属性名のリスト ["douche", "extreme_event", ...]
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_datetime (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
+    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
+    # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
+    return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
+
+    result = true
+    df = DateFormat.new
+    is_ddbj_format = df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
+    parsable_date = df.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
+    if !(is_ddbj_format && parsable_date) # DDBJフォーマットであるか
+      result = false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute", value: attr_name},
+        {key: "Attribute value", value: attr_val}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
     end
     result
   end
@@ -2328,7 +2426,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def attribute_value_is_not_integer (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
+  def non_integer_attribute_value (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
     return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
     result =  true
@@ -2626,7 +2724,7 @@ class BioSampleValidator < ValidatorBase
   def invalid_locus_tag_prefix_format (rule_code, sample_name, locus_tag, line_num)
     return nil if CommonUtils::null_value?(locus_tag)
     result = true
-    if locus_tag.size < 3 || locus_tag.size > 12 || !locus_tag =~ /^[0-9a-zA-Z]+$/ || locus_tag =~ /^[0-9]+/
+    if locus_tag.size < 3 || locus_tag.size > 12 || !(locus_tag =~ /^[0-9a-zA-Z]+$/) || locus_tag =~ /^[0-9]+/
       annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "locus_tag_prefix"},
@@ -3381,4 +3479,241 @@ class BioSampleValidator < ValidatorBase
     end
     result
   end
+
+  #
+  # rule:132
+  # 種レベル以下の識別子 strain/isolate/cultivar/ecotype で missing不許可(mandatory)の項目でnull相当値ではないかチェック
+  # Errorレベル
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # sample_attr {"strain": "HB-1", "organism": "xxxx"}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_value_for_infraspecific_identifier_error (rule_code, sample_name, sample_attr, package_name, line_num)
+    return nil if CommonUtils::blank?(package_name)
+    # 設定ファイルに書くか？
+    package_vs_attr_settings = {
+      "MIGS.ba" => ["strain"],
+      "MIGS.eu" => ["strain", "isolate", "cultivar", "ecotype"],
+      "MIGS.vi" => ["strain", "isolate"],
+      "MIMAG" => ["isolate"],
+      "MISAG" => ["isolate"],
+      "MIUVIG" => ["isolate"],
+      "SARS-CoV-2.cl" => ["isolate"],
+      "Pathogen.cl" => ["strain", "isolate"]
+    }
+    null_value_for_infraspecific_identifier(rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
+  end
+
+  #
+  # rule:133
+  # 種レベル以下の識別子 strain/isolate/cultivar/ecotype で missing不許可(mandatory)の項目でnull相当値ではないかチェック
+  # Errorレベル
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # sample_attr {"strain": "HB-1", "organism": "xxxx"}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_value_for_infraspecific_identifier_warning (rule_code, sample_name, sample_attr, package_name, line_num)
+    return nil if CommonUtils::blank?(package_name)
+    # 設定ファイルに書くか？
+    package_vs_attr_settings = {
+      "Microbe" => ["strain", "isolate"]
+    }
+    null_value_for_infraspecific_identifier(rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
+  end
+
+  #
+  # rule:132,133 用の共通メソッド
+  # 種レベル以下の識別子 strain/isolate/cultivar/ecotype で missing不許可(mandatory)の項目でnull相当値ではないかチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # sample_attr {"strain": "HB-1", "organism": "xxxx"}
+  # package_vs_attr_settings パッケージと記述必須属性の関係の設定値 {"MIGS.vi" => ["strain", "isolate"], ...}
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def null_value_for_infraspecific_identifier (rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
+    return nil if CommonUtils::blank?(package_name)
+    ret = true
+    mandatory_attr_list_to_message = nil
+    package_vs_attr_settings.each do |package_prefix, mandatory_attr_list|
+      if package_name.start_with?(package_prefix) # package名は前方一致でチェック。MIGS.ba"だと"MIGS.ba.human-gut"でもチェック対象
+        exist_value = false # 意味のある値が入っているか
+        mandatory_attr_list.each do |mandatory_attr|
+          if !CommonUtils::null_value?(sample_attr[mandatory_attr]) # null相当値(nil, 空白, null_accepted)ではないか
+            exist_value = true
+          end
+        end
+        if exist_value == false # どの属性にも意味のある値がなければ
+          ret = false
+          mandatory_attr_list_to_message = mandatory_attr_list
+        end
+      end
+    end
+    if ret == false
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "package", value: package_name},
+        {key: "attibutes", value: mandatory_attr_list_to_message.join("/")}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+    end
+    ret
+  end
+
+  #
+  # rule:134
+  # MIGS.ba.* パッケージでorganism名の sp./bacterium/archaeon の後の名称が strain と isolate のいずれかの値に一致するかチェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # package_name "MIGS.ba"
+  # organism "Faecalibacterium sp. I4-3-84"
+  # strain "i21-0019-B1"
+  # isolate "missing"
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def non_identical_identifiers_among_organism_strain_isolate (rule_code, sample_name, package_name, organism, strain, isolate, line_num)
+    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
+    result = true
+    if package_name.start_with?("MIGS.ba")
+      keywords = ["sp.", "bacterium", "archaeon"]
+      organism_sufix = ""
+      keywords.each do |keyword|
+        regex = /#{Regexp.escape(keyword)}/i # escapeで正規表現のメタ文字に対応
+        match = regex.match(organism)
+        if match # マッチした部分の終了位置以降の文字列を取得
+          organism_sufix = organism[match.end(0)..-1].chomp.strip
+          break
+        end
+      end
+      # organism名に sp./bacterium/archaeon が含まれている場合、その後の文字列でチェック
+      unless organism_sufix == "" 
+        match_sufix = false # strain or isolate に一致するか
+        if !CommonUtils::null_value?(strain) && organism_sufix == strain
+          match_sufix = true
+        elsif !CommonUtils::null_value?(isolate) && organism_sufix == isolate
+          match_sufix = true
+        end
+        if match_sufix == false # strain or isolate のいずれにも一致しなければfalse
+          result = false
+        end
+      end
+    end
+    if result == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "organism", value: organism},
+          {key: "strain", value: strain.to_s},
+          {key: "isolate", value: isolate.to_s}
+        ]
+        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+        @error_list.push(error_hash)
+    end
+    result
+  end
+
+  #
+  # rule:135
+  # 無効な straiin の値チェック
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  # strain strainの値
+  # organism organismの値
+  # invalid_value_settings 無効な値の設定値
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def invalid_strain_value (rule_code, sample_name, strain, orgainsm, invalid_value_settings, line_num)
+    return nil if CommonUtils::null_value?(strain)
+    result = true
+
+    if invalid_value_settings["exact_match"].include?(strain.downcase)
+      result = false
+    else
+      invalid_value_settings["prefix_match"].each do |invalid_prefix|
+        if strain.downcase.start_with?(invalid_prefix.downcase)
+          result = false
+        end
+      end
+    end
+    if !CommonUtils::null_value?(orgainsm) && strain.downcase.start_with?(orgainsm.downcase)
+      result = false
+    end
+    if result == false
+      annotation = [
+          {key: "Sample name", value: sample_name},
+          {key: "Attribute", value: "strain"},
+          {key: "Attribute value", value: strain}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      result = false
+    end
+    result
+  end
+  #
+  # rule:137
+  # collection_dateとgeo_loc_nameについて、reporting_level_term を記述しているかチェック
+  # この2属性については値を記述しない場合に missing 等の null 相当値は許可しない
+  #
+  # ==== Args
+  # rule_code
+  # sample_name サンプル名
+  #
+  # line_num
+  # ==== Return
+  # true/false
+  #
+  def missing_reporting_level_term (rule_code, sample_name, sample_attr, null_accepted_list, line_num)
+    missing_attr_names = []
+    # reporting level term だけを null相当値から抽出
+    reporting_level_term_list = null_accepted_list.select{|value| value.start_with?("missing:")}
+    reporting_level_term_attr_list = ["collection_date", "geo_loc_name"]
+    reporting_level_term_attr_list.each do |reporting_level_term_attr|
+      # null相当値である
+      attr_value = sample_attr[reporting_level_term_attr]
+      if CommonUtils::null_value?(attr_value) || CommonUtils::null_not_recommended_value?(attr_value)
+        # reporting_level_term ではない
+        if !reporting_level_term_list.include?(sample_attr[reporting_level_term_attr])
+          # エラー属性名を配列に追加
+          missing_attr_names.push(reporting_level_term_attr)
+        end
+      end
+    end
+    if missing_attr_names.size <= 0
+      true
+    else
+      annotation = [
+        {key: "Sample name", value: sample_name},
+        {key: "Attribute names", value: missing_attr_names.join(", ")}
+      ]
+      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+      @error_list.push(error_hash)
+      false
+    end
+  end
+
 end

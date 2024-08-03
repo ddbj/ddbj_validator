@@ -3,7 +3,7 @@ require 'erb'
 require 'bundler/setup'
 require 'dotenv'
 require 'minitest/autorun'
-require '../../../../lib/validator/common/organism_validator.rb'
+require File.expand_path('../../../../../lib/validator/common/organism_validator.rb', __FILE__)
 
 class TestOrganismValidator < Minitest::Test
   def setup
@@ -91,7 +91,14 @@ class TestOrganismValidator < Minitest::Test
     ret = @validator.suggest_taxid_from_name("escherichia coli")
     assert_equal expect_value, ret
     #multiple
-    expect_value = {status: "multiple exist", tax_id: "10088, 10090"}
+    expect_value = {
+      status: "multiple exist", 
+      tax_id: "10088, 10090",
+      tax_list: [
+        {tax_no: "10088", organism_name: "mouse", name_type: "common name", scientific_name: "Mus"}, 
+        {tax_no: "10090", organism_name: "mouse", name_type: "common name", scientific_name: "Mus musculus"}
+      ]
+    }
     ret = @validator.suggest_taxid_from_name("mouse")
     assert_equal expect_value, ret
 
@@ -339,6 +346,13 @@ WHERE
     ret = @validator.org_vs_package_validate("9606", "MIUVIG.human-oral") #human
     assert_equal "error", ret[:status]
     ret = @validator.org_vs_package_validate("447426", "MIUVIG.human-oral") #human oral metagenome
+    assert_equal "error", ret[:status]
+  end
+
+  def test_org_vs_packagea_130
+    ret = @validator.org_vs_package_validate("1148", "MIMARKS.specimen") #bacteria
+    assert_equal "ok", ret[:status]
+    ret = @validator.org_vs_package_validate("539655", "MIMARKS.specimen") #human skin metagenome
     assert_equal "error", ret[:status]
   end
 

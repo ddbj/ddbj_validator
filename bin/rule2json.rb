@@ -67,6 +67,12 @@ class CreateRuleJson
   end
 end
 
+# 手順
+# 1. 以下のルール表にアクセスして(要閲覧権限)、データベースのシートを選びCSV形式でダウンロード
+# https://docs.google.com/spreadsheets/d/15pENGHA9hkl6QIueFb44fhQfQMThRB2tbvSE6hItHEU/edit?pli=1&gid=0#gid=0
+# 2. そのファイルを引数にJSONに変換
+# 3. 生成されたファイルを conf/<DB_NAME>/rule_config_xxxxx.json に配置
+
 if ARGV.size < 2
   puts "Usage: ruby rule2json.rb <biosample | bioproject | dra | jvar | trad | metabobankidf | metabobanksdrf> rule_file.csv"
   exit(1);
