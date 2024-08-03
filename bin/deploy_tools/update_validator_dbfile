@@ -16,7 +16,7 @@ LOG "copy dbfile"
 cp /data1/ddbj/DDBJValidator/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso.db.new
 
 cd $BASE_DIR
-active_container="$(docker-compose ps | grep virtuoso | grep running |  wc -l)"
+active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
 if [[ $active_container -gt 0 ]]; then
   LOG "stop virtuoso"
   docker-compose stop virtuoso

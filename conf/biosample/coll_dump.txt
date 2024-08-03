@@ -275,6 +275,7 @@ ARKH	s	Chingan State Nature Reserve
 ARM	s	County Museum			
 ARMFN	s	Armagh Field Naturalists' Society			
 ARRI	s	Ayurveda Regional Research Institute			
+ARRIAM	c	All-Russia Research Institute for Agricultural Microbiology			
 ARSEF	c	ARS Collection of Entomopathogenic Fungi			
 ARTH	s	Artvin Coruh University			
 ARUN	s	Botanical Survey of India, Arunachal Pradesh Regional Centre			
@@ -938,6 +939,7 @@ CCIM	c	Culture Collection of Industrial Microorganisms
 CCM	c	Czech Collection of Microorganisms	CCM<CZE>		
 CCM-A	c	Coleccion de Cultivos Microbianos			
 CCM-CIBE	c	Escuela Superior Politecnica del Litoral			
+CCM-UFV	c	Collection of Cyanobacteria and Microalgae at the Universidade Federal de Vicosa			
 CCM<CHN>	s	Changchun College of Traditional Chinese Medicine, Department of Chinese Materia Medica			
 CCM<USA-MT>	s	Carter County Museum			
 CCMA-UFSCar	c	Culture Collection of Freshwater Microalgae			
@@ -3676,6 +3678,7 @@ LEC	s	Universita degli Studi di Lecce, Dipartimento di Biologia
 LECB	s	Saint Petersburg State University, Botany Department			
 LEDLIE	s	Patricia Ledlie Herbarium			
 LEF	s	Economic Forestry Institute of Liaoning Province			
+LEGEcc	c	Blue Biotechnology and Ecotoxicology Culture Collection			
 LEH	s	Lehigh University			
 LEI	s	Leicester Literary and Philosophical Society			
 LEISHCRYOBANK	c	International Cryobank of Leishmania			
@@ -4676,6 +4679,7 @@ MZCP	s	Universidade de Coimbra
 MZCR	s	Museo de Zoologia			
 MZFC	s	Museo de Zoologia "Alfonso L. Herrera"			
 MZFN	s	Museo Zoologico dell'Universita "Federico II"			
+MZFS-DAR	s	Museu de Zoologia da Universidade Estadual de Feira de Santana			
 MZGZ	s	Museum Zoologia del Giardino Zoologico			
 MZH	s	Zoolgical Museum, Finnish Museum of Natural History			
 MZKI	c	Microbial Culture Collection of National Institute of Chemistry			
@@ -4770,6 +4774,7 @@ NCATG	s	North Carolina A & T State University, Biology Department
 NCAW	s	North-West College of Agriculture			
 NCB	c	National Culture Bank			
 NCBS	s	Yale University, Connecticut Botanical Society			
+NCBS<IND>	s	National Centre for Biological Sciences, Bangalore			
 NCC<FRA>	c	Nantes Culture Collection			
 NCC<USA-CA>	s	Sonoma State University, Biology Department			
 NCCB	c	The Netherlands Culture Collection of Bacteria	LMD,NCCB<NLD>		
@@ -5132,6 +5137,7 @@ NRC	c	Division of Biological Sciences, National Research Council of Canada
 NRC<EGY>	s	National Research Centre			
 NRCC	s	National Research Council of Canada			
 NRCS	c	National Reference Center for Streptococci in Aachen			
+NRI	s	Texas A&M Natural Resources Institute			
 NRIBAS	s	National Research Institute of Biology, Academia Sinica			
 NRIC	c	NODAI Research Institute Culture Collection			
 NRL	c	Neisseria Reference Laboratory			
@@ -5140,9 +5146,9 @@ NRN	s	Nairn Literary Society Library, Public Library
 NRNZ	s	Northland Regional Museum			
 NRPSU	c	Department of Agro-industry, Faculty of Natural Resources			
 NRRL	c	Agricultural Research Service Culture Collection		https://nrrl.ncaur.usda.gov/cgi-bin/usda/prokaryote/report.html?nrrlcodes=	
-NRRL:MOLD	sc	Agricultural Research Service Culture Collection, Mold collection	http://nrrl.ncaur.usda.gov/cgi-bin/usda/mold/report.html?nrrlcodes=
+NRRL:MOLD	sc	Agricultural Research Service Culture Collection, Mold collection	https://www.ncbi.nlm.nih.gov/Taxonomy/nrrl/mold.cgi?
 NRRL:PROK	sc	Agricultural Research Service Culture Collection, Prokaryotic collection	http://nrrl.ncaur.usda.gov/cgi-bin/usda/prokaryote/report.html?nrrlcodes=
-NRRL:YEAST	sc	Agricultural Research Service Culture Collection, Yeast Collection	https://nrrl.ncaur.usda.gov/cgi-bin/usda/yeast/report.html?nrrlcodes=
+NRRL:YEAST	sc	Agricultural Research Service Culture Collection, Yeast Collection	https://www.ncbi.nlm.nih.gov/Taxonomy/nrrl/yeast.cgi?
 NRS	s	Naturhistoriska Riksmuseet			
 NRWC	s	N. R. Whitney Collection			
 NRZM	c	German Reference Center for Meningococci			
@@ -7937,6 +7943,7 @@ YUC	s	INIREB
 YUKU	s	Yunnan University, Biology Department			
 YUO	s	Youngstown State University, Biological Sciences Department			
 YUTO	s	York University, Biology Department			
+YUZM	s	Yasouj University Zoological Museum			
 YXDC	s	Yuxi District Institute for Drug Control			
 YZU	s	Yuzhou University			
 Z	sb	Institut fur Systematische Botanik Universitat Zurich			
