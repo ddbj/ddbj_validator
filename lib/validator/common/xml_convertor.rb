@@ -243,7 +243,11 @@ class XmlConvertor < ValidatorBase
   #
   def xpath_from_attrname_with_index (attr_name, item_no, attr_index)
     xpath = []
-    xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[position()=" + attr_index.to_s + " and @attribute_name=\"" + attr_name + "\"]")
+    if attr_index.nil? || attr_name == "sample_name"
+      xpath.concat(xpath_from_attrname(attr_name, item_no))
+    else
+      xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[position()=" + attr_index.to_s + " and @attribute_name=\"" + attr_name + "\"]")
+    end
     xpath
   end
 
