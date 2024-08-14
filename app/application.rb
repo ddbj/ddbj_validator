@@ -267,7 +267,7 @@ module DDBJValidator
         else
           submission_id = "SSUB009526"
         end
-        local_port = ENV.fetch("DDBJ_VALIDATOR_APP_UNICORN_PORT")
+        local_port = ENV.fetch("DDBJ_VALIDATOR_APP_UNICORN_PORT", "3000")
         # api url path
         api_url = "http://localhost:#{local_port}/api/"
         # get xml file
