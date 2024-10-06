@@ -2079,20 +2079,20 @@ jkl\"  "
     assert_equal true, ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:ES:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ATCC:1234", institution_list, 5, 1) # institude code for specimen voucher
+    assert_equal true, ret[:result]
 
     # ng case
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "HOGEHOGE:1234", institution_list, 5, 1) # not exist institude code
     assert_equal false, ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:HOGEHOGE:1234", institution_list, 5, 1) # not exist collection code
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ATCC:1234", institution_list, 5, 1) # institude code for not specimen voucher
-    assert_equal false, ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM : es : 12345", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
     assert_equal "UAM:ES:12345", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ZMB:MAMMAL: 1234", institution_list, 5, 1) # auto correct
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ZMB:mam: 1234", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
-    assert_equal "ZMB:Mammal:1234", get_auto_annotation(ret[:error_list])
+    assert_equal "ZMB:Mam:1234", get_auto_annotation(ret[:error_list])
 
     # nil case
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "", institution_list, 5, 1)
