@@ -20,6 +20,6 @@ sb_line_count=$(cut -f2 ${NEW_FILE} | grep -c "sb")
 
 # 条件に合った場合だけ新しいファイルに置き換える
 if (( $(echo "$ratio >= 90" | bc -l) )) && [ "$atcc_line_count" -ge 1 ] && [ "$sb_line_count" -ge 1 ]; then
-  echo "replace coll_dump.txt"
   mv "${NEW_FILE}" "${CURRENT_FILE}"
+  echo "replaced coll_dump.txt"
 fi
