@@ -3589,7 +3589,11 @@ class BioSampleValidator < ValidatorBase
       keywords = ["sp.", "bacterium", "archaeon"]
       organism_sufix = ""
       keywords.each do |keyword|
-        regex = /#{Regexp.escape(keyword)}/i # escapeで正規表現のメタ文字に対応
+        if keyword == "sp." # "sp." の前に空白があるかで単語区切りを判断
+          regex = /\s#{Regexp.escape(keyword)}/i # escapeで正規表現のメタ文字に対応
+        else # "sp."以外では \b を使って単語単位で単語区切りを判断
+          regex = /\b#{Regexp.escape(keyword)}\b/i # escapeで正規表現のメタ文字に対応
+        end
         match = regex.match(organism)
         if match # マッチした部分の終了位置以降の文字列を取得
           organism_sufix = organism[match.end(0)..-1].chomp.strip

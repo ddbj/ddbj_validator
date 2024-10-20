@@ -2399,6 +2399,14 @@ jkl\"  "
     ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "marine Bacterium CS-89", nil, "CS-89", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
+    # Bifidobacterium (is is not 'bacterium' word. it's not need with match strain name)
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Bifidobacterium longum", nil, "BB536", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # end with 'bacterium' (not need to check)
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Campylobacter jejuni-like bacterium", nil, "BB536", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
     # not MIGS.ba
     ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.me", "Caryophanon sp. AS70", "aaaa", "bbb", 1)
     assert_equal true, ret[:result]
