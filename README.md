@@ -17,6 +17,16 @@ If a SPARQL endpoint is provided separately, you do not need to do this, just mo
 ```
 $ curl -Lo "./shared/data/virtuoso/virtuoso.db" "http://ddbj.nig.ac.jp/ontologies/virtuoso.db"
 ```
+### Download coll_dump.txt
+```
+$ mkdir -p conf/coll_dump
+$ curl -o conf/coll_dump/coll_dump.txt "https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/coll_dump.txt"
+```
+
+### Download pub repository
+```
+$ git clone https://github.com/ddbj/pub.git conf/pub
+```
 
 ### Prepare .env file
 Create the `.env` file for the environment variables by copying the `template.env` file.
@@ -110,6 +120,12 @@ The directory path on the host to mount the validation log directory(e.g. valida
 
 `DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR`  
 The directory path on the host to mount the `shared` directory(e.g. unicorn's log) in the container on the host.
+
+`DDBJ_VALIDATOR_APP_COLL_DUMP_DIR`  
+The directory path on the host to mount the coll_dump directory. coll_dump.txt should includes in this directory.
+
+`DDBJ_VALIDATOR_APP_PUB_REPOSITORY_DIR`
+The directory path on the host to mount the pub repository directory. This is the directory created by `git clone https://github.com/ddbj/pub.git`.
 
 `DDBJ_VALIDATOR_APP_MONITORING_SSUB_ID`  
 For administration. No changes required.

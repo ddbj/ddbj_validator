@@ -35,6 +35,8 @@ services:
       - ${PWD}:/usr/src/ddbj_validator
       - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/usr/src/ddbj_validator/shared
       - ${DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR:-./logs}:/usr/src/ddbj_validator/logs
+      - ${DDBJ_VALIDATOR_APP_COLL_DUMP_DIR:-./conf/coll_dump}:/usr/src/ddbj_validator/conf/coll_dump
+      - ${DDBJ_VALIDATOR_APP_PUB_REPOSITORY_DIR:-./conf/pub}:/usr/src/ddbj_validator/conf/pub
 
 
   virtuoso:

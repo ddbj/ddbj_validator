@@ -19,7 +19,8 @@ logs
 shared/log
 shared/tmp
 deploy_tools/log
-conf/biosample/coll_dump.txt
+conf/coll_dump
+conf/pub
 data/
 
 log_analysis/data/
