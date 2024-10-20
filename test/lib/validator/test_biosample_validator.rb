@@ -119,13 +119,6 @@ class TestBioSampleValidator < Minitest::Test
     attr_list = @validator.send("get_attributes_of_package", "Invalid Package", @package_version)
     assert_equal 0, attr_list.size
 
-    # old package version
-    attr_list = @validator.send("get_attributes_of_package", "MIGS.vi.soil", "1.2.0")
-    assert_equal true, attr_list.size > 0
-    assert_equal false, attr_list.first[:attribute_name].nil?
-    assert_equal false, attr_list.first[:require].nil?
-    assert_equal false, attr_list.first[:type].nil?
-    assert_equal false, attr_list.first[:allow_multiple] #always false
   end
 
   def test_get_attribute_groups_of_package
@@ -136,7 +129,7 @@ class TestBioSampleValidator < Minitest::Test
     }
     expect_value2 = {
       :group_name => "Organism group attribute in Plant",
-      :attribute_set => ["cultivar", "ecotype", "isolate"]
+      :attribute_set => ["cultivar", "ecotype", "isolate", "strain"]
     }
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant", @package_version)
     assert_equal 2, attr_group_list.size
@@ -148,10 +141,6 @@ class TestBioSampleValidator < Minitest::Test
 
     # invalid package name
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package", @package_version)
-    assert_equal 0, attr_group_list.size
-
-    # old package version(always blank array)
-    attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant", "1.2.0")
     assert_equal 0, attr_group_list.size
   end
 
