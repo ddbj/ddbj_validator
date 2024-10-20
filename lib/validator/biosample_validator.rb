@@ -22,7 +22,7 @@ require File.dirname(__FILE__) + "/common/tsv_column_validator.rb"
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
   attr_reader :conf
-  DEFAULT_PACKAGE_VERSION = "1.4.1"
+  DEFAULT_PACKAGE_VERSION = "1.5.0"
   #
   # Initializer
   #
@@ -387,7 +387,7 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # package name ex."MIGS.ba.soil"
-  # package_version ex. "1.2.0", "1.4.0"
+  # package_version ex. "1.4.0", "1.5.0"
   #
   # ==== Return
   # An array of the attributes.
@@ -407,11 +407,7 @@ class BioSampleValidator < ValidatorBase
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name, version: package_version}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      if Gem::Version.create(package_version) >= Gem::Version.create('1.4.0')
-        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
-      else
-        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package_1.2.rq", params)
-      end
+      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
       result = sparql.query(sparql_query)
       attr_list = []
       result.each do |row|
@@ -422,9 +418,7 @@ class BioSampleValidator < ValidatorBase
           attr_require = "optional"
         end
         type = row[:require].sub("has_","")  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
-        if Gem::Version.create(package_version) < Gem::Version.create('1.4.0') #package version 1.4未満では同一属性複数記述は許可されない
-          allow_multiple = false
-        elsif row[:max_cardinality] == "1" || row[:max_cardinality] == 1
+        if row[:max_cardinality] == "1" || row[:max_cardinality] == 1
           allow_multiple = false
         else
           allow_multiple = true
@@ -447,7 +441,7 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # package name ex."Plant"
-  # package_version ex. "1.2.0", "1.4.0"
+  # package_version ex. "1.4.0", "1.5.0"
   #
   # ==== Return
   # array of hash of each attr group.
@@ -733,7 +727,7 @@ class BioSampleValidator < ValidatorBase
   #
   # ==== Args
   # package name ex."MIGS.ba.microbial"
-  # package_version ex. "1.2.0", "1.4.0"
+  # package_version ex. "1.4.0", "1.5.0"
   # ==== Return
   # true/false
   #
@@ -745,11 +739,7 @@ class BioSampleValidator < ValidatorBase
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name, version: package_version}
       template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      if Gem::Version.create(package_version) >= Gem::Version.create('1.4.0')
-        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
-      else
-        sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name_1.2.rq", params)
-      end
+      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
       result = sparql.query(sparql_query)
       @cache.save(ValidatorCache::UNKNOWN_PACKAGE, package_name, result) unless @cache.nil?
     else

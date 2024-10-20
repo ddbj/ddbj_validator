@@ -94,7 +94,7 @@ Password for PostgreSQL.
 Setting of request timeout for PostgreSQL. 30 seconds unless otherwise specified.
 
 `DDBJ_VALIDATOR_APP_BIOSAMPLE_PACKAGE_VERSION`  
-Versions of BioSample attributes and package definition information. ,Currently, `1.2.0` or `1.2.1`, `1.4.0`, `1.4.1` can be specified.
+Versions of BioSample attributes and package definition information. ,Currently, `1.4.0`, `1.4.1`, `1.5.0` can be specified.
 
 `DDBJ_VALIDATOR_APP_GOOGLE_API_KEY`  
 Google API key.  Without this specification, some rules using Google's data (e.g. [BS_R0041] GeocodingAPI for Latlon versus country) will be ignored, even if the value is wrong.
