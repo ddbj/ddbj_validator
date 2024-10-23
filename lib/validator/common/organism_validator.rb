@@ -137,7 +137,7 @@ class OrganismValidator < SPARQLBase
   def search_tax_from_name_ignore_case(organism_name)
     #特殊文字のエスケープ https://www.w3.org/TR/sparql11-query/#grammarEscapes
     organism_name = organism_name.gsub("\t", '\\t').gsub("\n", '\\n').gsub("\r", '\\r').gsub("\b", '\\b').gsub("\f", '\\f')
-    organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub("\"", "")
+    organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub("\"", "").gsub("*", "")
     organism_name = organism_name.gsub("'", "\\\\'").gsub("\"", "\\\\\\\\\\\"")
     params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/search_taxid_from_fuzzy_name.rq", params)
