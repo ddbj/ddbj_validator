@@ -26,7 +26,6 @@
     </Models>
     <Attributes>
         <Attribute attribute_name="sample_name">MTB313</Attribute>
-        <Attribute attribute_name="strain">MTB313</Attribute>
         <Attribute attribute_name="env_broad_scale">urban biome</Attribute>
         <Attribute attribute_name="collection_date">2011</Attribute>
         <Attribute attribute_name="env_local_scale">town</Attribute>

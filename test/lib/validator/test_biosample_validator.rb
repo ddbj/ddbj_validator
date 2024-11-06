@@ -119,13 +119,6 @@ class TestBioSampleValidator < Minitest::Test
     attr_list = @validator.send("get_attributes_of_package", "Invalid Package", @package_version)
     assert_equal 0, attr_list.size
 
-    # old package version
-    attr_list = @validator.send("get_attributes_of_package", "MIGS.vi.soil", "1.2.0")
-    assert_equal true, attr_list.size > 0
-    assert_equal false, attr_list.first[:attribute_name].nil?
-    assert_equal false, attr_list.first[:require].nil?
-    assert_equal false, attr_list.first[:type].nil?
-    assert_equal false, attr_list.first[:allow_multiple] #always false
   end
 
   def test_get_attribute_groups_of_package
@@ -136,7 +129,7 @@ class TestBioSampleValidator < Minitest::Test
     }
     expect_value2 = {
       :group_name => "Organism group attribute in Plant",
-      :attribute_set => ["cultivar", "ecotype", "isolate"]
+      :attribute_set => ["cultivar", "ecotype", "isolate", "strain"]
     }
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant", @package_version)
     assert_equal 2, attr_group_list.size
@@ -148,10 +141,6 @@ class TestBioSampleValidator < Minitest::Test
 
     # invalid package name
     attr_group_list = @validator.send("get_attribute_groups_of_package", "Invalid Package", @package_version)
-    assert_equal 0, attr_group_list.size
-
-    # old package version(always blank array)
-    attr_group_list = @validator.send("get_attribute_groups_of_package", "Plant", "1.2.0")
     assert_equal 0, attr_group_list.size
   end
 
@@ -523,8 +512,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_geo_loc_name_format
-    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/country_list.json"))
-    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/historical_country_list.json"))
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/historical_country_list.json"))
     valid_country_list = country_list - historical_country_list
     #ok case
     ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "Japan:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
@@ -592,8 +581,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_country
-    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/country_list.json"))
-    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/biosample/historical_country_list.json"))
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/historical_country_list.json"))
     country_list = country_list - historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
@@ -1996,7 +1985,7 @@ jkl\"  "
   end
 
   def test_invalid_culture_collection
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/biosample/coll_dump.txt")
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATCC:1234", institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2073,11 +2062,13 @@ jkl\"  "
   end
 
   def test_invalid_specimen_voucher
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/biosample/coll_dump.txt")
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:ES:12345", institution_list, 5, 1)
+    assert_equal true, ret[:result]
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ATCC:1234", institution_list, 5, 1) # ATCC is added institude code for specimen voucher
     assert_equal true, ret[:result]
 
     # ng case
@@ -2085,14 +2076,14 @@ jkl\"  "
     assert_equal false, ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:HOGEHOGE:1234", institution_list, 5, 1) # not exist collection code
     assert_equal false, ret[:result]
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ATCC:1234", institution_list, 5, 1) # institude code for not specimen voucher
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UMCC:1234", institution_list, 5, 1) # institude code for not specimen voucher
     assert_equal false, ret[:result]
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM : es : 12345", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
     assert_equal "UAM:ES:12345", get_auto_annotation(ret[:error_list])
-    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ZMB:MAMMAL: 1234", institution_list, 5, 1) # auto correct
+    ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "ZMB:MAM: 1234", institution_list, 5, 1) # auto correct
     assert_equal false, ret[:result]
-    assert_equal "ZMB:Mammal:1234", get_auto_annotation(ret[:error_list])
+    assert_equal "ZMB:Mam:1234", get_auto_annotation(ret[:error_list])
 
     # nil case
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "", institution_list, 5, 1)
@@ -2120,7 +2111,7 @@ jkl\"  "
   end
 
   def test_invalid_bio_material
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/biosample/coll_dump.txt")
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "ABRC:CS22676", institution_list, 1)
     assert_equal true, ret[:result]
@@ -2406,6 +2397,14 @@ jkl\"  "
     assert_equal 0, ret[:error_list].size
     # bacterium
     ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "marine Bacterium CS-89", nil, "CS-89", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # Bifidobacterium (is is not 'bacterium' word. it's not need with match strain name)
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Bifidobacterium longum", nil, "BB536", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # end with 'bacterium' (not need to check)
+    ret = exec_validator("non_identical_identifiers_among_organism_strain_isolate", "BS_R0134", "SampleA", "MIGS.ba.microbial", "Campylobacter jejuni-like bacterium", nil, "BB536", 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # not MIGS.ba

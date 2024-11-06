@@ -3,7 +3,7 @@
   "info": {
     "title": "DDBJ Biosample Package & Attribute API",
     "description": "DDBJ Biosample Package & Attribute API",
-    "version": "1.4.1"
+    "version": "1.5.0"
   },
   "host": "ddbj-staging.nig.ac.jp",
   "schemes": [
@@ -212,7 +212,7 @@
     "version": {
       "name": "version",
       "in": "query",
-      "description": "Version of biosample package set. \"1.4.0\"",
+      "description": "Version of biosample package set.",
       "required": true,
       "type": "string"
     },

@@ -31,11 +31,7 @@ class Package < SPARQLBase
   def package_list (version)
     begin
       params = {version: version}
-      if version.start_with?("1.2")
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list_1.2.rq", params)
-      else
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list_1.4.rq", params)
-      end
+      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list.rq", params)
       ret = query(sparql_query)
       if ret.size > 0
         {status: "success", data: ret}
@@ -67,14 +63,14 @@ class Package < SPARQLBase
       end
 
       # package listを取得
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list_1.4.rq", params)
+      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list.rq", params)
       package_list = query(sparql_query)
       package_list.each do |row|
         row[:type] = "package"
       end
 
       # package group listを取得
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_group_list_1.4.rq", params)
+      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_group_list.rq", params)
       package_group_list = query(sparql_query)
       package_group_list.each do |row|
         row[:type] = "package_group"
@@ -148,24 +144,18 @@ class Package < SPARQLBase
   def attribute_list (version, package_id)
     begin
       params = {version: version, package_id: package_id}
-      if version.start_with?("1.2")
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_list_1.2.rq", params)
-      else
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_list_1.4.rq", params)
-      end
+      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_list.rq", params)
       attr_list = query(sparql_query)
       if attr_list.size > 0
-        if version.start_with?("1.4")
-          sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_group_list_1.4.rq", params)
-          group_list = query(sparql_query)
-          attr_list.each do |row|
-            match = group_list.find{|group| group[:attribute_name] == row[:attribute_name]}
-            unless match.nil?
-              row[:require_type] = "has_either_one_mandatory_attribute"
-              row[:group_name] = match[:group_name]
-            else
-              row[:group_name] = ""
-            end
+        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_group_list.rq", params)
+        group_list = query(sparql_query)
+        attr_list.each do |row|
+          match = group_list.find{|group| group[:attribute_name] == row[:attribute_name]}
+          unless match.nil?
+            row[:require_type] = "has_either_one_mandatory_attribute"
+            row[:group_name] = match[:group_name]
+          else
+            row[:group_name] = ""
           end
         end
         {status: "success", data: attr_list}
@@ -187,8 +177,8 @@ class Package < SPARQLBase
   def attribute_template_file (version, package_id, only_biosample_sheet, accept_heder)
     begin
       params = {version: version, package_id: package_id}
-      unless version.start_with?("1.4")
-        return {status: "fail", message: "Invalid package version. Expected version is 1.4x"}
+      unless version.split(".")[0..1].join(".").to_f >= 1.4 # 1.4以上でなければ
+        return {status: "fail", message: "Invalid package version. Expected version is over 1.4"}
       end
 
       # accept header から希望ファイル形式を決める
@@ -226,11 +216,7 @@ class Package < SPARQLBase
   def package_info (version, package_id)
     begin
       params = {version: version, package_id: package_id}
-      if version.start_with?("1.2")
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_info_1.2.rq", params)
-      else
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_info_1.4.rq", params)
-      end
+      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_info.rq", params)
       ret = query(sparql_query)
       if ret.size > 0
         {status: "success", data: ret.first}
