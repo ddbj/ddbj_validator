@@ -17,7 +17,7 @@ cp /data1/ddbj/DDBJValidator/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso
 
 cd $BASE_DIR
 active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
-if [[ $active_container -gt 0 ]]; then
+if [ $active_container -gt 0 ]; then
   LOG "stop virtuoso"
   docker-compose stop virtuoso
 fi
@@ -45,7 +45,7 @@ docker-compose start virtuoso
 while :
 do
   length="$(curl -fsSL http://localhost:${VIRT_PORT} | wc -l)"
-  if [[ $length -ne 0 ]]; then
+  if [ $length -ne 0 ]; then
     break
   fi
   sleep 1
