@@ -1,9 +1,9 @@
-#!/bin/bash -l
+#!/bin/bash
 set -e
 
 # .envの環境変数を使用
 if [ -f .env ]; then
-    source .env
+  export $(grep -v '^#' .env | xargs)
 fi
 
 VIRTUOSO_DIR=$BASE_DIR/virtuoso
@@ -30,16 +30,19 @@ LOG "copy ontology files to virtuoso dir"
 if [ ! -d "$VIRTUOSO_DIR/data/taxonomy" ]; then
     mkdir -p "$VIRTUOSO_DIR/data/taxonomy"
 fi
-cp $TAX_OWL_DIR/data/taxonomy/taxonomy.ttl $VIRTUOSO_DIR/data/taxonomy/taxonomy_private.ttl
+cp $TAX_OWL_DIR/data/taxonomy/taxonomy.ttl $VIRTUOSO_DIR/rdf_data/taxonomy/taxonomy_private.ttl
 
 # Virtuoso をクリアして起動
+cd $VIRTUOSO_DIR
+podman-compose down
+sleep 120;
+
 LOG "clear previous data"
 if [ -e $VIRTUOSO_DIR/database/virtuoso.db ]; then
   rm $VIRTUOSO_DIR/database/virtuoso.db $VIRTUOSO_DIR/database/virtuoso.pxa $VIRTUOSO_DIR/database/virtuoso-temp.db $VIRTUOSO_DIR/database/virtuoso.trx
 fi
 
 LOG "start virtuoso"
-cd $VIRTUOSO_DIR
 podman-compose up -d
 
 # 起動が完了するまで待つ
@@ -60,7 +63,7 @@ done
 
 # 起動後にファイルをロード(biosampleパッケージとtaxonomyのデータ)
 LOG "load data"
-podman-compose exec -T virtuoso /opt/virtuoso-opensource/bin/isql 1111 dba dba "/database/load_ontologies.sql"
+podman-compose exec -T virtuoso /opt/virtuoso-opensource/bin/isql 1111 dba dba "/rdf_data/load_ontologies.sql"
 # SPARQL SELECT ?g COUNT(*) { GRAPH ?g { ?s ?p ?o }} GROUP BY ?g ORDER BY DESC 2;
 # 検索インデックスを明示的に作成
 podman-compose exec -T virtuoso /opt/virtuoso-opensource/bin/isql 1111 dba dba exec="DB.DBA.VT_INC_INDEX_DB_DBA_RDF_OBJ ();"

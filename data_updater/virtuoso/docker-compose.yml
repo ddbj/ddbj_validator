@@ -5,7 +5,7 @@ services:
     container_name: ddbj_validator_updater_virtuoso
     environment:
       DBA_PASSWORD: "dba"
-      VIRT_Parameters_DirsAllowed: "., ../vad, /usr/share/proj, /database"
+      VIRT_Parameters_DirsAllowed: "., ../vad, /usr/share/proj, /database, /rdf_data"
       VIRT_Parameters_NumberOfBuffers: "680000"
       VIRT_Parameters_MaxDirtyBuffers: "500000"
       VIRT_Client_SQL_PREFETCH_ROWS: "10000"

@@ -15,6 +15,7 @@ vendor
 logs
 .bundle
 *.swp
+*.log
 
 shared/log
 shared/tmp
@@ -34,3 +35,4 @@ shared/data/
 
 data_updater/virtuoso/database
 data_updater/virtuoso/rdf_data/taxonomy
+data_updater/dbfile
