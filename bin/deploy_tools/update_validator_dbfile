@@ -13,13 +13,13 @@ LOG()
 
 LOG "start update"
 LOG "copy dbfile"
-cp /data1/ddbj/DDBJValidator/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso.db.new
+cp /data1/w3sabi/DDBJValidator/db_update/data_updater/dbfile/virtuoso.db $VIRT_HOME/virtuoso.db.new
 
 cd $BASE_DIR
-active_container="$(docker-compose ps | grep virtuoso | grep Up |  wc -l)"
+active_container="$(podman-compose ps | grep virtuoso | grep Up |  wc -l)"
 if [ $active_container -gt 0 ]; then
   LOG "stop virtuoso"
-  docker-compose stop virtuoso
+  podman-compose stop virtuoso
 fi
 
 
@@ -28,9 +28,8 @@ cd $VIRT_HOME
 if [ -e $VIRT_HOME/virtuoso.db ]; then
   mv $VIRT_HOME/virtuoso.db $VIRT_HOME/virtuoso.db.old
 fi
-dbfiles=($VIRT_HOME/virtuoso.pxa $VIRT_HOME/virtuoso-temp.db $VIRT_HOME/virtuoso.trx)
-for dbfile in ${dbfiles[@]}
-do
+dbfiles="$VIRT_HOME/virtuoso.pxa $VIRT_HOME/virtuoso-temp.db $VIRT_HOME/virtuoso.trx"
+for dbfile in $dbfiles; do
   if [ -e ${dbfile} ]; then
     rm ${dbfile}
   fi
@@ -40,7 +39,7 @@ mv $VIRT_HOME/virtuoso.db.new $VIRT_HOME/virtuoso.db
 
 LOG "restart virtuoso"
 cd $BASE_DIR
-docker-compose start virtuoso
+podman-compose start virtuoso
 
 while :
 do
