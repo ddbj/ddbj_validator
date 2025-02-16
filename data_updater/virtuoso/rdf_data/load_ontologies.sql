@@ -1,0 +1,13 @@
+log_enable(2,1);
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v0.9.0.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/0.9.0');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.0.0.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.0.0');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.1.0.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.1.0');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.1.1.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.1.1');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.2.0.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.2.0');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.2.1.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.2.1');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.4.0.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.4.0');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.4.1.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.4.1');
+ld_dir_all('/rdf_data/biosample', 'ddbj_biosample_definition_table_v1.5.0.ttl.gz', 'http://ddbj.nig.ac.jp/ontologies/biosample/1.5.0');
+ld_dir_all('/rdf_data/taxonomy', 'taxonomy_private.ttl', 'http://ddbj.nig.ac.jp/ontologies/taxonomy-private');
+rdf_loader_run();
+checkpoint;

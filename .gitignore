@@ -31,3 +31,6 @@ shared/config/virtuoso/
 shared/data/
 
 .env
+
+data_updater/virtuoso/database
+data_updater/virtuoso/rdf_data/taxonomy
