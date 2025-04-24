@@ -1042,7 +1042,7 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     #ng case
-    ret = exec_validator("future_collection_date", "BS_R0040", "sampleA", "2025", 1)
+    ret = exec_validator("future_collection_date", "BS_R0040", "sampleA", "2099", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ret = exec_validator("future_collection_date", "BS_R0040", "sampleA", "2052-10-21", 1)
