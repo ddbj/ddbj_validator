@@ -698,7 +698,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_bioproject_submission_id_replacement
-    return nil if @ddbj_db_mode == false
+    return unless @ddbj_db_mode
+
     #ok case
     ## not psub_id
     ret = exec_validator("bioproject_submission_id_replacement", "BS_R0095","", "PRJNA1", 1)
@@ -726,7 +727,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_bioproject_accession
-    return nil if @ddbj_db_mode == false
+    return unless @ddbj_db_mode
+
     #ok case
     ## ncbi
     ret = exec_validator("invalid_bioproject_accession", "BS_R0005","", "PRJNA1", 1)
@@ -1561,7 +1563,8 @@ jkl\"  "
   end
 
   def test_bioproject_not_found
-    return nil if @ddbj_db_mode == false
+    return unless @ddbj_db_mode
+
     # ok case (given submitter_id matches DB response submitter_id)
     ## valid data
     ret = exec_validator("bioproject_not_found", "BS_R0006", "Sample A", "PSUB004388", "hirakawa", 1)
@@ -1647,7 +1650,8 @@ jkl\"  "
   end
 
   def test_invalid_bioproject_type
-    return nil if @ddbj_db_mode == false
+    return unless @ddbj_db_mode
+
     #ok case
     #PSUB
     ret = exec_validator("invalid_bioproject_type", "BS_R0070", "Sample A", "PSUB004142", 1)
@@ -1703,7 +1707,8 @@ jkl\"  "
   end
 
   def test_duplicated_locus_tag_prefix
-    return nil if @ddbj_db_mode == false
+    return unless @ddbj_db_mode
+
     # ok case
     xml_data = File.read("#{@test_file_dir}/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
@@ -2327,6 +2332,8 @@ jkl\"  "
   end
 
   def test_biosample_not_found
+    return unless @ddbj_db_mode
+
     #ok case
     ret = exec_validator("biosample_not_found", "BS_R0129", "SampleA", "SAMD00032107, SAMD00032108-SAMD00032156, SAMD00032157", "hirotoju", 1)
     assert_equal true, ret[:result]
