@@ -2,8 +2,8 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
 require 'fileutils'
-require File.expand_path('../../../../lib/validator/jvar_validator.rb', __FILE__)
-require File.expand_path('../../../../lib/validator/common/common_utils.rb', __FILE__)
+require_relative '../../../lib/validator/jvar_validator'
+require_relative '../../../lib/validator/common/common_utils'
 
 class TestJVarValidator < Minitest::Test
   def setup

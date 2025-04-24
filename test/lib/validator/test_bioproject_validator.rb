@@ -1,9 +1,9 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
-require '../../../lib/validator/bioproject_validator.rb'
-require '../../../lib/validator/common/common_utils.rb'
-require '../../../lib/validator/common/organism_validator.rb'
+require_relative '../../../lib/validator/bioproject_validator'
+require_relative '../../../lib/validator/common/common_utils'
+require_relative '../../../lib/validator/common/organism_validator'
 
 class TestBioProjectValidator < Minitest::Test
   def setup
