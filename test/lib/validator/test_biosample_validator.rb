@@ -1,9 +1,9 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
-require File.expand_path('../../../../lib/validator/biosample_validator.rb', __FILE__)
-require File.expand_path('../../../../lib/validator/common/common_utils.rb', __FILE__)
-require File.expand_path('../../../../lib/validator/common/xml_convertor.rb', __FILE__)
+require_relative '../../../lib/validator/biosample_validator'
+require_relative '../../../lib/validator/common/common_utils'
+require_relative '../../../lib/validator/common/xml_convertor'
 
 class TestBioSampleValidator < Minitest::Test
   def setup

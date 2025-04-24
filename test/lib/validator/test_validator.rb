@@ -2,7 +2,7 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
 require 'json'
-require File.expand_path('../../../../lib/validator/validator.rb', __FILE__)
+require_relative '../../../lib/validator/validator'
 
 class TestValidator < Minitest::Test
   def setup
