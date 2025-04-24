@@ -1,82 +1,118 @@
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.8.0)
-      public_suffix (>= 2.0.2, < 5.0)
-    backports (3.8.0)
+    addressable (2.8.7)
+      public_suffix (>= 2.0.2, < 7.0)
+    base64 (0.2.0)
+    bigdecimal (3.1.9)
     crass (1.0.6)
-    dotenv (2.7.5)
-    erubis (2.7.0)
-    geocoder (1.4.4)
-    get_process_mem (0.2.1)
-    haml (5.0.1)
-      temple (>= 0.8.0)
+    csv (3.3.4)
+    date (3.4.1)
+    dotenv (3.1.8)
+    ffi (1.17.2-x86_64-linux-gnu)
+    geocoder (1.8.5)
+      base64 (>= 0.1.0)
+      csv (>= 3.0.0)
+    get_process_mem (0.2.7)
+      ffi (~> 1.0)
+    haml (6.3.0)
+      temple (>= 0.8.2)
+      thor
       tilt
-    json-schema (2.8.1)
-      addressable (>= 2.4)
-    kgio (2.11.0)
-    mail (2.6.6)
-      mime-types (>= 1.16, < 4)
-    mime-types (3.1)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2016.0521)
-    mini_portile2 (2.1.0)
-    minitest (5.10.2)
-    multi_json (1.12.1)
-    mustermann (1.0.0)
-    nokogiri (1.6.8.1)
-      mini_portile2 (~> 2.1.0)
-    nokogumbo (1.5.0)
-      nokogiri
-    pg (0.21.0)
-    public_suffix (4.0.6)
-    rack (2.0.3)
-    rack-protection (2.0.0)
-      rack
-    raindrops (0.17.0)
-    roo (2.8.3)
+    json-schema (5.1.1)
+      addressable (~> 2.8)
+      bigdecimal (~> 3.1)
+    kgio (2.11.4)
+    logger (1.7.0)
+    mail (2.8.1)
+      mini_mime (>= 0.1.1)
+      net-imap
+      net-pop
+      net-smtp
+    mini_mime (1.1.5)
+    minitest (5.25.5)
+    multi_json (1.15.0)
+    mustermann (3.0.3)
+      ruby2_keywords (~> 0.0.1)
+    net-ftp (0.3.8)
+      net-protocol
+      time
+    net-imap (0.5.7)
+      date
+      net-protocol
+    net-pop (0.1.2)
+      net-protocol
+    net-protocol (0.2.2)
+      timeout
+    net-smtp (0.5.1)
+      net-protocol
+    nkf (0.2.0)
+    nokogiri (1.18.8-x86_64-linux-gnu)
+      racc (~> 1.4)
+    ostruct (0.6.1)
+    pg (1.5.9)
+    public_suffix (6.0.1)
+    racc (1.8.1)
+    rack (3.1.13)
+    rack-protection (4.1.1)
+      base64 (>= 0.1.0)
+      logger (>= 1.6.0)
+      rack (>= 3.0.0, < 4)
+    rack-session (2.1.0)
+      base64 (>= 0.1.0)
+      rack (>= 3.0.0)
+    raindrops (0.20.1)
+    roo (2.10.1)
       nokogiri (~> 1)
       rubyzip (>= 1.3.0, < 3.0.0)
-    rubyzip (2.3.0)
-    sanitize (4.6.6)
+    ruby2_keywords (0.0.5)
+    rubyzip (2.4.1)
+    sanitize (7.0.0)
       crass (~> 1.0.2)
-      nokogiri (>= 1.4.4)
-      nokogumbo (~> 1.4)
-    sinatra (2.0.0)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.0)
+      nokogiri (>= 1.16.8)
+    sinatra (4.1.1)
+      logger (>= 1.6.0)
+      mustermann (~> 3.0)
+      rack (>= 3.0.0, < 4)
+      rack-protection (= 4.1.1)
+      rack-session (>= 2.0.0, < 3)
       tilt (~> 2.0)
-    sinatra-contrib (2.0.0)
-      backports (>= 2.0)
-      multi_json
-      mustermann (~> 1.0)
-      rack-protection (= 2.0.0)
-      sinatra (= 2.0.0)
-      tilt (>= 1.3, < 3)
+    sinatra-contrib (4.1.1)
+      multi_json (>= 0.0.2)
+      mustermann (~> 3.0)
+      rack-protection (= 4.1.1)
+      sinatra (= 4.1.1)
+      tilt (~> 2.0)
     sinatra-reloader (1.0)
       sinatra-contrib
-    temple (0.8.0)
-    tilt (2.0.7)
-    unicorn (5.2.0)
+    temple (0.10.3)
+    thor (1.3.2)
+    tilt (2.6.0)
+    time (0.4.1)
+      date
+    timeout (0.4.3)
+    unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
-    unicorn-worker-killer (0.4.4)
+    unicorn-worker-killer (0.4.5)
       get_process_mem (~> 0)
-      unicorn (>= 4, < 6)
+      unicorn (>= 4, < 7)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
+  csv
   dotenv
-  erubis
   geocoder
   haml
   json-schema
   mail
   minitest
+  net-ftp
+  nkf
   nokogiri
+  ostruct
   pg
   rack
   roo
@@ -88,4 +124,4 @@ DEPENDENCIES
   unicorn-worker-killer
 
 BUNDLED WITH
-   2.3.27
+   2.6.8
