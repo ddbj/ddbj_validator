@@ -1,9 +1,9 @@
-FROM ruby:2.5
+FROM ruby:2.7.8
 
 WORKDIR /usr/src/ddbj_validator/
 
 COPY ./Gemfile ./Gemfile.lock ./
-RUN gem install bundler -v 2.3.27
+RUN gem install bundler -v 2.4.22
 RUN bundle install
 COPY ./ ./
 
