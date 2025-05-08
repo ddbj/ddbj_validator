@@ -19,10 +19,11 @@ module DDBJValidator
     @@biosample_package_version = BioSampleValidator::DEFAULT_PACKAGE_VERSION
 
     configure do
-      set :public_folder  , File.expand_path('../../public', __FILE__)
-      set :views          , File.expand_path('../views', __FILE__)
-      set :root           , File.dirname(__FILE__)
-      set :show_exceptions, development?
+      set :root,               __dir__
+      set :views,              File.expand_path('views', __dir__)
+      set :public_folder,      File.expand_path('../public', __dir__)
+      set :show_exceptions,    development?
+      set :host_authorization, permitted_hosts: []
     end
 
     before do
@@ -36,12 +37,12 @@ module DDBJValidator
 
     get '/api/' do
       content_type 'text/html; charset=utf-8'
-      send_file File.join(settings.public_folder, 'api/index.html')
+      send_file 'api/index.html', root: settings.public_folder
     end
 
     get '/api/apispec/' do
       content_type 'text/html; charset=utf-8'
-      send_file File.join(settings.public_folder, 'api/apispec/index.html')
+      send_file 'api/apispec/index.html', root: settings.public_folder
     end
 
     get '/api/client/index' do
@@ -438,13 +439,13 @@ module DDBJValidator
       if status == 400 #400番の場合は詳細メッセージを表示するために、設定されたresponseをそのまま返す
         response
       elsif status == 401
-        send_file(File.join(settings.public_folder, 'error_unauthorized.json'), {status: 401})
+        send_file 'error_unauthorized.json', root: settings.public_folder, status: 401
       elsif status == 403
-        send_file(File.join(settings.public_folder, 'error_forbidden.json'), {status: 403})
+        send_file 'error_forbidden.json', root: settings.public_folder, status: 403
       elsif status == 404
-        send_file(File.join(settings.public_folder, 'error_not_found.json'), {status: 404})
+        send_file 'error_not_found.json', root: settings.public_folder, status: 404
       elsif status == 500
-        send_file(File.join(settings.public_folder, 'error_internal_server_error.json'), {status: 500})
+        send_file 'error_internal_server_error.json', root: settings.public_folder, status: 500
       else #other error with rack default message
         { status: "error", "message": Rack::Utils::HTTP_STATUS_CODES[status] }.to_json
       end
@@ -468,7 +469,6 @@ module DDBJValidator
         # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する
         file_combination = true
         form_vars = @env["rack.request.form_input"].read
-        Rack::Utils.key_space_limit = 100000000
         form_vars = Rack::Utils.escape(form_vars)
         req_params = Rack::Utils.parse_query(form_vars)
         param_names = req_params["name"]

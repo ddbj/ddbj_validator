@@ -7,7 +7,7 @@ require File.expand_path('../../../../../lib/validator/common/organism_validator
 
 class TestOrganismValidator < Minitest::Test
   def setup
-    Dotenv.load "../../../../../.env"
+    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
     setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)
     conf = setting["sparql_endpoint"]

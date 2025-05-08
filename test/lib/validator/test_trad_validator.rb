@@ -7,7 +7,7 @@ require_relative '../../../lib/validator/common/common_utils'
 
 class TestTradValidator < Minitest::Test
   def setup
-    Dotenv.load "../../../../.env"
+    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = TradValidator.new
     @test_file_dir = File.expand_path('../../../data/trad', __FILE__)
     # DDBJ RDBを使用するテストするか否か。を設定ファイルから判定

@@ -6,7 +6,7 @@ require_relative '../../../lib/validator/validator'
 
 class TestValidator < Minitest::Test
   def setup
-    Dotenv.load "../../../../.env"
+    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = Validator.new
     @tmp_file_dir = File.expand_path('../../../data/tmp', __FILE__)
     @bs_test_file_dir = File.expand_path('../../../data/biosample', __FILE__)

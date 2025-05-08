@@ -6,7 +6,7 @@ require File.expand_path('../../../../../lib/validator/common/common_utils.rb', 
 
 class TestCommonUtils < Minitest::Test
   def setup
-    Dotenv.load "../../../../../.env"
+    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     conf_dir = File.expand_path('../../../../../conf/biosample', __FILE__)
     @common = CommonUtils.new
     config_obj = {}

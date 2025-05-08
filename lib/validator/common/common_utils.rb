@@ -1,5 +1,4 @@
 require 'erb'
-require 'erubis'
 require 'geocoder'
 require 'net/http'
 require 'net/https'
@@ -30,8 +29,8 @@ class CommonUtils
     if File.exist?(template)
       template = File.read(template)
     end
-    result = Erubis::Eruby.new(template).result(params)
-    return result
+
+    ERB.new(template).result_with_hash(params || {})
   end
 
   #

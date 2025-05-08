@@ -7,7 +7,7 @@ require '../../../../lib/validator/common/validator_cache.rb'
 class TestValidatorCache < Minitest::Test
 
   def setup
-    Dotenv.load "../../../../../.env"
+    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioSampleValidator.new
   end
 
