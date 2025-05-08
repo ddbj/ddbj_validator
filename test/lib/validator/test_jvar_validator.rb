@@ -7,7 +7,7 @@ require_relative '../../../lib/validator/common/common_utils'
 
 class TestJVarValidator < Minitest::Test
   def setup
-    Dotenv.load "../../../../.env"
+    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = JVarValidator.new
     @test_file_dir = File.expand_path('../../../data/jvar', __FILE__)
   end
