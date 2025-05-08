@@ -2534,32 +2534,80 @@ jkl\"  "
 =end
 
   def test_uncultured_organism_name_for_mimag_package
-    exec_validator("validate", "#{@test_file_dir}/mimag_uncultured.xml") => {error_list:}
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIMAG.metagenome",
 
-    assert_includes error_list, {
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "uncultured Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    refute result
+
+    assert_equal error_list, [
       id:        "BS_R0141",
       message:   "Organism names containing 'uncultured' cannot be used for Metagenome-assembled Genome Sequences (MIMAG) package.",
-      reference: "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0141",
+      reference: nil,
       level:     "error",
       external:  true,
       method:    "BioSample",
       object:    ["BioSample"],
-      source:    "mimag_uncultured.xml",
+      source:    nil,
 
       annotation: [
         {
           key:   "Sample name",
-          value: "MTB313",
+          value: "MTB313"
         },
         {
           key:   "Attribute",
-          value: "organism",
+          value: "organism"
         },
         {
           key:   "Attribute value",
-          value: "uncultured Streptococcus pyogenes",
+          value: "uncultured Streptococcus pyogenes"
         }
       ]
-    }
+    ]
+
+    # camel case
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIMAG.metagenome",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Uncultured Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    refute result
+    assert_equal 1, error_list.size
+
+    # organism not starting with uncultured
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIMAG.metagenome",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    assert result
+    assert_empty error_list
+
+    # other package
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIGS.ba.microbial",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "uncultured Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    assert result
+    assert_empty error_list
   end
 end

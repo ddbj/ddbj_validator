@@ -3715,7 +3715,7 @@ class BioSampleValidator < ValidatorBase
   def uncultured_organism_name_for_mimag_package(data)
     return true unless data["package"]&.start_with?("MIMAG")
     return true unless organism = data.dig("attributes", "organism")
-    return true unless organism.start_with?(/uncultured/i)
+    return true unless organism.start_with?(/uncultured /i)
 
     @error_list.push CommonUtils.error_obj(@validation_config["ruleBS_R0141"], @data_file, [
       {
