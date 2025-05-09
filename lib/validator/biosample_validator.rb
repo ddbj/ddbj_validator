@@ -267,7 +267,7 @@ class BioSampleValidator < ValidatorBase
         if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
           ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, input_organism, line_num)
         else
-          ret = taxonomy_error_warning("BS_R0045", sample_name, biosample_data["attributes"]["organism"], line_num)
+          ret = taxonomy_error_warning("BS_R0045", sample_name, input_organism, line_num)
           if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
             taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
             unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
@@ -280,6 +280,8 @@ class BioSampleValidator < ValidatorBase
           end
         end
       end
+
+      uncultured_organism_name_for_mimag_package biosample_data
 
       ### 特定の属性値に対する検証
       invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
@@ -3710,4 +3712,26 @@ class BioSampleValidator < ValidatorBase
     end
   end
 
+  def uncultured_organism_name_for_mimag_package(data)
+    return true unless data["package"]&.start_with?("MIMAG")
+    return true unless organism = data.dig("attributes", "organism")
+    return true unless organism.start_with?(/uncultured/i)
+
+    @error_list.push CommonUtils.error_obj(@validation_config["ruleBS_R0141"], @data_file, [
+      {
+        key:   "Sample name",
+        value: data.dig("attributes", "sample_name")
+      },
+      {
+        key:   "Attribute",
+        value: "organism"
+      },
+      {
+        key:   "Attribute value",
+        value: organism
+      }
+    ])
+
+    false
+  end
 end

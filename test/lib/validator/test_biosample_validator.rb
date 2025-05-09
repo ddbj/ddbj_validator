@@ -2532,4 +2532,34 @@ jkl\"  "
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
   end
 =end
+
+  def test_uncultured_organism_name_for_mimag_package
+    exec_validator("validate", "#{@test_file_dir}/mimag_uncultured.xml") => {error_list:}
+
+    assert_includes error_list, {
+      id:        "BS_R0141",
+      message:   "Organism names containing 'uncultured' cannot be used for Metagenome-assembled Genome Sequences (MIMAG) package.",
+      reference: "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0141",
+      level:     "error",
+      external:  true,
+      method:    "BioSample",
+      object:    ["BioSample"],
+      source:    "mimag_uncultured.xml",
+
+      annotation: [
+        {
+          key:   "Sample name",
+          value: "MTB313",
+        },
+        {
+          key:   "Attribute",
+          value: "organism",
+        },
+        {
+          key:   "Attribute value",
+          value: "uncultured Streptococcus pyogenes",
+        }
+      ]
+    }
+  end
 end
