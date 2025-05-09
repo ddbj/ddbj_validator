@@ -281,6 +281,7 @@ class BioSampleValidator < ValidatorBase
         end
       end
 
+      invalid_taxonomy_for_genome_sample_2       biosample_data
       uncultured_organism_name_for_mimag_package biosample_data
 
       ### 特定の属性値に対する検証
@@ -3710,6 +3711,29 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
       false
     end
+  end
+  
+  def invalid_taxonomy_for_genome_sample_2(data)
+    return true unless [ "Microbe", "Pathogen.cl", "Pathogen.env" ].include?(data["package"])
+    return true unless organism = data.dig("attributes", "organism")
+    return true unless organism.match?(/ sp\.\z/i)
+
+    @error_list.push CommonUtils.error_obj(@validation_config["ruleBS_R0140"], @data_file, [
+      {
+        key:   "Sample name",
+        value: data.dig("attributes", "sample_name")
+      },
+      {
+        key:   "Attribute",
+        value: "organism"
+      },
+      {
+        key:   "Attribute value",
+        value: organism
+      }
+    ])
+
+    false
   end
 
   def uncultured_organism_name_for_mimag_package(data)
