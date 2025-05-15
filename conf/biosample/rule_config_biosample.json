@@ -799,7 +799,7 @@
     "internal_ignore": true,
     "name": "Invalid taxonomy for genome sample",
     "method": "invalid_taxonomy_for_genome_sample",
-    "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" should be used.",
+    "message": "For a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in form of \"Genus sp. strain\" (or sp. isolate/cultivar/ecotype) should be used. Leave the taxonomy_id empty when submitting a new informal name.",
     "object": [
       "BioSample"
     ],
@@ -1233,5 +1233,29 @@
       "BioSample"
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0139"
+  },
+  "ruleBS_R0140": {
+    "rule_class": "BioSample",
+    "code": "BS_R0140",
+    "level": "warning",
+    "internal_ignore": false,
+    "name": "Invalid taxonomy for genome sample",
+    "method": "invalid_taxonomy_for_genome_sample",
+    "message": "If the sample is for a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in the form of \"Genus sp. strain/isolate\" should be used. Leave the taxonomy_id empty when submitting a new informal name.",
+    "object": [
+      "BioSample"
+    ]
+  },
+  "ruleBS_R0141": {
+    "rule_class": "BioSample",
+    "code": "BS_R0141",
+    "level": "error",
+    "internal_ignore": true,
+    "name": "Uncultured organism name for MIMAG package",
+    "method": "uncultured_organism_name_for_mimag_package",
+    "message": "Organism names containing 'uncultured' cannot be used for Metagenome-assembled Genome Sequences (MIMAG) package.",
+    "object": [
+      "BioSample"
+    ]
   }
 }

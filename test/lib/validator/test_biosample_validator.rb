@@ -2532,4 +2532,82 @@ jkl\"  "
     assert_equal expect_msg, get_error_column_value(ret[:error_list], "Attribute names")
   end
 =end
+
+  def test_uncultured_organism_name_for_mimag_package
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIMAG.metagenome",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "uncultured Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    refute result
+
+    assert_equal error_list, [
+      id:        "BS_R0141",
+      message:   "Organism names containing 'uncultured' cannot be used for Metagenome-assembled Genome Sequences (MIMAG) package.",
+      reference: nil,
+      level:     "error",
+      external:  true,
+      method:    "BioSample",
+      object:    ["BioSample"],
+      source:    nil,
+
+      annotation: [
+        {
+          key:   "Sample name",
+          value: "MTB313"
+        },
+        {
+          key:   "Attribute",
+          value: "organism"
+        },
+        {
+          key:   "Attribute value",
+          value: "uncultured Streptococcus pyogenes"
+        }
+      ]
+    ]
+
+    # camel case
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIMAG.metagenome",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Uncultured Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    refute result
+    assert_equal 1, error_list.size
+
+    # organism not starting with uncultured
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIMAG.metagenome",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    assert result
+    assert_empty error_list
+
+    # other package
+    exec_validator("uncultured_organism_name_for_mimag_package", **{
+      "package" => "MIGS.ba.microbial",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "uncultured Streptococcus pyogenes"
+      }
+    }) => {result:, error_list:}
+
+    assert result
+    assert_empty error_list
+  end
 end
