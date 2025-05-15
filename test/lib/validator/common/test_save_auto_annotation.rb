@@ -10,7 +10,7 @@ require '../../../../lib/validator/common/xml_convertor.rb'
 class TestSaveAutoAnnotation < Minitest::Test
 
   def setup
-    Dotenv.load "../../../../../.env"
+    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../../data/biosample', __FILE__)

@@ -7,7 +7,7 @@ require_relative '../../../lib/validator/common/organism_validator'
 
 class TestBioProjectValidator < Minitest::Test
   def setup
-    Dotenv.load "../../../../.env"
+    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioProjectValidator.new
     @test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
   end

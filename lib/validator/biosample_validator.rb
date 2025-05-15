@@ -530,7 +530,7 @@ class BioSampleValidator < ValidatorBase
           @attr_index_offset += 1
         else
           if attribute["key"].start_with?("*")
-            attr_name = attribute["key"].sub!(/^(\*)+/, "")
+            attr_name = attribute["key"].sub(/^(\*)+/, "")
           else
             attr_name = attribute["key"]
           end
@@ -2206,7 +2206,7 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     unless attr_val.ascii_only?
-      disp_attr_val = "" #属性値のどこにnon ascii文字があるか示すメッセージを作成
+      disp_attr_val = +"" #属性値のどこにnon ascii文字があるか示すメッセージを作成
       attr_val.chars.each_with_index do |ch, idx|
         if ch.ascii_only?
           disp_attr_val << ch.to_s
