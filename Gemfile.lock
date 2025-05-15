@@ -38,7 +38,7 @@ GEM
     net-ftp (0.3.8)
       net-protocol
       time
-    net-imap (0.5.7)
+    net-imap (0.5.8)
       date
       net-protocol
     net-pop (0.1.2)
@@ -54,14 +54,14 @@ GEM
       racc (~> 1.4)
     ostruct (0.6.1)
     pg (1.5.9)
-    public_suffix (6.0.1)
+    public_suffix (6.0.2)
     racc (1.8.1)
-    rack (3.1.13)
+    rack (3.1.14)
     rack-protection (4.1.1)
       base64 (>= 0.1.0)
       logger (>= 1.6.0)
       rack (>= 3.0.0, < 4)
-    rack-session (2.1.0)
+    rack-session (2.1.1)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
     raindrops (0.20.1)
