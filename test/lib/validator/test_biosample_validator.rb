@@ -2548,7 +2548,7 @@ jkl\"  "
     assert_equal error_list, [
       id:        "BS_R0141",
       message:   "Organism names containing 'uncultured' cannot be used for Metagenome-assembled Genome Sequences (MIMAG) package.",
-      reference: nil,
+      reference: "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0141",
       level:     "error",
       external:  true,
       method:    "BioSample",
