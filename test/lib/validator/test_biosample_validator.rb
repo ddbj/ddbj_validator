@@ -2533,6 +2533,71 @@ jkl\"  "
   end
 =end
 
+  def test_invalid_taxonomy_for_genome_sample_2
+    exec_validator("invalid_taxonomy_for_genome_sample_2", **{
+      "package" => "Microbe",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Bacilus sp."
+      }
+    }) => {result:, error_list:}
+
+    refute result
+
+    assert_equal error_list, [
+      id:        "BS_R0140",
+      message:   "If the sample is for a genome assembly derived from an unidentified/unpublished organism, a species-level informal name in the form of \"Genus sp. strain/isolate\" should be used. Leave the taxonomy_id empty when submitting a new informal name.",
+      reference: "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0140",
+      level:     "warning",
+      external:  false,
+      method:    "BioSample",
+      object:    ["BioSample"],
+      source:    nil,
+
+      annotation: [
+        {
+          key:   "Sample name",
+          value: "MTB313"
+        },
+        {
+          key:   "Attribute",
+          value: "organism"
+        },
+        {
+          key:   "Attribute value",
+          value: "Bacilus sp."
+        }
+      ]
+    ]
+
+    # upper case SP.
+    exec_validator("invalid_taxonomy_for_genome_sample_2", **{
+      "package" => "Pathogen.cl",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Bacilus SP."
+      }
+    }) => {result:, error_list:}
+
+    refute result
+    assert_equal 1, error_list.size
+
+    # other package
+    exec_validator("invalid_taxonomy_for_genome_sample_2", **{
+      "package" => "MIGS.eu",
+
+      "attributes" => {
+        "sample_name" => "MTB313",
+        "organism"    => "Bacilus sp."
+      }
+    }) => {result:, error_list:}
+
+    assert result
+    assert_empty error_list
+  end
+
   def test_uncultured_organism_name_for_mimag_package
     exec_validator("uncultured_organism_name_for_mimag_package", **{
       "package" => "MIMAG.metagenome",

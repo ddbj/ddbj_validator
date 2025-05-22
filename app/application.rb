@@ -503,14 +503,10 @@ module DDBJValidator
         FileUtils.mkdir_p(save_dir)
         if params[validator_type.to_sym].is_a?(String) #fileではなくデータで送られた場合
           save_path = save_dir + "/#{validator_type}" #ファイル名はデータの種類名("biosample"等)
-          File.open(save_path, 'wb') do |f|
-            f.write params[validator_type.to_sym]
-          end
+          File.write save_path, params[validator_type.to_sym]
         else
           save_path = save_dir + "/" + params[validator_type.to_sym][:filename]
-          File.open(save_path, 'wb') do |f|
-            f.write params[validator_type.to_sym][:tempfile].read
-          end
+          FileUtils.cp params[validator_type.to_sym][:tempfile].path, save_path
         end
         save_path
       end
