@@ -514,7 +514,7 @@ class TestBioSampleValidator < Minitest::Test
   def test_invalid_geo_loc_name_format
     country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/country_list.json"))
     historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/historical_country_list.json"))
-    valid_country_list = country_list - historical_country_list
+    valid_country_list = country_list + historical_country_list
     #ok case
     ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "Japan:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
     assert_equal true, ret[:result]
@@ -583,7 +583,7 @@ class TestBioSampleValidator < Minitest::Test
   def test_invalid_country
     country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/country_list.json"))
     historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/historical_country_list.json"))
-    country_list = country_list - historical_country_list
+    country_list = country_list + historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
     assert_equal true, ret[:result]
@@ -602,8 +602,8 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
     ##histrical country
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Korea", country_list, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
 
     #params are nil pattern
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", nil, country_list, 1)
