@@ -36,4 +36,5 @@ jobs:
       - name: Load taxonomy / biosample fixture
         run: docker compose -f compose.test.yaml exec -T virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 
-      - run: bundle exec rake test
+      # -v で各テスト名を標準出力に流す。どのテストで詰まったかを CI ログから特定できるように
+      - run: bundle exec ruby test/run_all.rb -v
