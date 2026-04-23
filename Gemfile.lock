@@ -9,6 +9,7 @@ GEM
     csv (3.3.5)
     date (3.4.1)
     dotenv (3.1.8)
+    drb (2.2.3)
     ffi (1.17.2-arm64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
     geocoder (1.8.6)
@@ -31,7 +32,9 @@ GEM
       net-pop
       net-smtp
     mini_mime (1.1.5)
-    minitest (5.25.5)
+    minitest (6.0.5)
+      drb (~> 2.0)
+      prism (~> 1.5)
     multi_json (1.15.0)
     mustermann (3.0.3)
       ruby2_keywords (~> 0.0.1)
@@ -55,6 +58,7 @@ GEM
     ostruct (0.6.3)
     pg (1.6.3-arm64-darwin)
     pg (1.6.3-x86_64-linux)
+    prism (1.9.0)
     public_suffix (6.0.2)
     racc (1.8.1)
     rack (3.1.16)
