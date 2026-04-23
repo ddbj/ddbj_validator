@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'fileutils'
 require_relative '../../../test_helpers'
 require 'validator/common/common_utils'

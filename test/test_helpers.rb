@@ -20,6 +20,7 @@
 # `require 'validator/foo'` で書けるようにする
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
+require 'bundler/setup'
 require 'minitest/autorun'
 require 'net/http'
 require 'uri'

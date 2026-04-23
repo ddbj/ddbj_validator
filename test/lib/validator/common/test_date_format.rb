@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'json'
 require 'yaml'
 require_relative '../../../test_helpers'

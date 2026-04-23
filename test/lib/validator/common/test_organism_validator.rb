@@ -1,8 +1,6 @@
 require 'yaml'
 require 'erb'
-require 'bundler/setup'
 require 'dotenv'
-require 'minitest/autorun'
 require_relative '../../../test_helpers'
 require 'validator/common/organism_validator'
 

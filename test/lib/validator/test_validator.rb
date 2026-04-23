@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'dotenv'
 require 'fileutils'
 require 'json'

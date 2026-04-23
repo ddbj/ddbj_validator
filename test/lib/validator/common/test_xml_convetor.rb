@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'dotenv'
 require_relative '../../../test_helpers'
 require 'validator/common/xml_convertor'

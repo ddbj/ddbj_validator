@@ -1,10 +1,7 @@
-require 'bundler/setup'
 require 'json'
 require 'yaml'
 require 'erb'
 require 'dotenv'
-require 'bundler/setup'
-require 'minitest/autorun'
 require_relative '../../../test_helpers'
 require 'validator/common/ddbj_db_validator'
 

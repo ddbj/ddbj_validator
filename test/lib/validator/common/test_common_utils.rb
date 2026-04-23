@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'yaml'
 require 'dotenv'
 require_relative '../../../test_helpers'

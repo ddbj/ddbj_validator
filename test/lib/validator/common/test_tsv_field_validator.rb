@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require_relative '../../../test_helpers'
 require 'validator/common/common_utils'
 require 'validator/common/tsv_field_validator'

@@ -1,5 +1,3 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require_relative '../../../test_helpers'
 require 'validator/common/file_parser'
 require 'validator/auto_annotator/auto_annotator_tsv'
