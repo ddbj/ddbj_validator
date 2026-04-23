@@ -1,0 +1,28 @@
+# 開発/テスト用のバッキングサービスだけを起動する compose ファイル
+# 本番構成 (docker-compose.yml) とは独立。アプリ本体はホスト側の Ruby (mise 等) で動かし、
+# テストは localhost:8890 の Virtuoso を参照する。
+#
+# 使い方:
+#   docker compose -f compose.dev.yaml up -d
+#   bundle exec rake test
+#   docker compose -f compose.dev.yaml down
+services:
+  virtuoso:
+    image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
+    ports:
+      - '127.0.0.1:8890:8890'
+    environment:
+      DBA_PASSWORD: dba
+      VIRT_Parameters_DirsAllowed: '., ../vad, /usr/share/proj, /database'
+      VIRT_Parameters_NumberOfBuffers: '170000'
+      VIRT_Parameters_MaxDirtyBuffers: '130000'
+      VIRT_Client_SQL_PREFETCH_ROWS: '10000'
+      VIRT_Client_SQL_PREFETCH_BYTES: '160000'
+      VIRT_SPARQL_ResultSetMaxRows: '1000000'
+      VIRT_SPARQL_MaxSortedTopRows: '100000'
+      VIRT_SPARQL_MaxQueryExecutionTime: '300'
+      VIRT_SPARQL_MaxQueryCostEstimationTime: '-1'
+    user: ${UID:-0}:${GID:-0}
+    volumes:
+      - ./shared/config/virtuoso:/settings
+      - ./shared/data/virtuoso:/database

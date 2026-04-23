@@ -1,8 +1,7 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'fileutils'
-require '../../../../lib/validator/common/common_utils.rb'
-require '../../../../lib/validator/common/excel2tsv.rb'
+require_relative '../../../test_helpers'
+require 'validator/common/common_utils'
+require 'validator/common/excel2tsv'
 
 class TestExcel2Tsv < Minitest::Test
   def setup

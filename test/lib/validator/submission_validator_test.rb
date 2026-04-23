@@ -1,6 +1,5 @@
-require 'bundler/setup'
-require 'minitest/autorun'
-require_relative '../../../lib/validator/submission_validator'
+require_relative '../../test_helpers'
+require 'validator/submission_validator'
 
 class TestSubmissionValidator < Minitest::Test
   def setup
@@ -47,6 +46,7 @@ class TestSubmissionValidator < Minitest::Test
 
   # rule:DRA_R0004
   def test_invalid_center_name
+    skip_unless_pg_configured
     #ok case
     submission_set = get_submission_set_node("#{@test_file_dir}/4_invalid_center_name_submission_ok.xml")
     ret = exec_validator("invalid_center_name", "DRA_R0004", "submission name" , submission_set.first, "test01", 1)
@@ -77,6 +77,7 @@ class TestSubmissionValidator < Minitest::Test
 
   # rule:DRA_R0005
   def test_invalid_laboratory_name
+    skip_unless_pg_configured
     #ok case
     submission_set = get_submission_set_node("#{@test_file_dir}/5_invalid_laboratory_name_ok.xml")
     ret = exec_validator("invalid_laboratory_name", "DRA_R0005", "submission name" , submission_set.first, "test01", 1)
@@ -133,6 +134,7 @@ class TestSubmissionValidator < Minitest::Test
 
   # rule:DRA_R0007
   def test_invalid_submitter_name
+    skip_unless_pg_configured
     #ok case
     submission_set = get_submission_set_node("#{@test_file_dir}/7_invalid_submitter_name_ok.xml")
     ret = exec_validator("invalid_submitter_name", "DRA_R0007", "submission name" , submission_set.first, "test01", 1)
@@ -163,6 +165,7 @@ class TestSubmissionValidator < Minitest::Test
 
   # rule:DRA_R0008
   def test_invalid_submitter_email_address
+    skip_unless_pg_configured
     #ok case
     submission_set = get_submission_set_node("#{@test_file_dir}/8_invalid_submitter_email_address_ok.xml")
     ret = exec_validator("invalid_submitter_email_address", "DRA_R0008", "submission name" , submission_set.first, "test01", 1)

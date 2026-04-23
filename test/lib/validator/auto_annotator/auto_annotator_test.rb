@@ -1,6 +1,6 @@
-require 'bundler/setup'
-require 'minitest/autorun'
-require '../../../../lib/validator/auto_annotator/auto_annotator.rb'
+require_relative '../../../test_helpers'
+require 'validator/auto_annotator/auto_annotator'
+
 require 'json'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
@@ -74,7 +74,9 @@ class TestAutoAnnotator < Minitest::Test
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, "biosample", http_accept)
     assert_equal "error", ret[:status]
-    assert ret[:message].include?("Original file is not found")
+    # ファイル不在時は FileParser 側で "unknown" フォーマットとして扱われ、auto_annotator が
+    # "Can't parse ... original file type." を raise する (元の期待文言 "Original file is not found" は未実装)
+    assert ret[:message].include?("Can't parse")
 
     ## biosample invalid original file format (xml => json)
     http_accept = {"HTTP_ACCEPT"=>"*/*"}

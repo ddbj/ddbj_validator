@@ -1,8 +1,7 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'dotenv'
-require '../../../../lib/validator/biosample_validator.rb'
-require '../../../../lib/validator/common/xml_convertor.rb'
+require_relative '../../../test_helpers'
+require 'validator/biosample_validator'
+require 'validator/common/xml_convertor'
 
 # auto_annotationの補正が効いているかの検証
 # auto_annotationが効いているかを確認するため、補正された上で別の検証メソッドでエラーとなる値を用意し、補正値が使用されているかを確認
@@ -10,6 +9,7 @@ require '../../../../lib/validator/common/xml_convertor.rb'
 class TestSaveAutoAnnotation < Minitest::Test
 
   def setup
+    skip_unless_virtuoso_available
     Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new

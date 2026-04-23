@@ -1,6 +1,5 @@
-require 'bundler/setup'
-require 'minitest/autorun'
-require_relative '../../../lib/validator/analysis_validator'
+require_relative '../../test_helpers'
+require 'validator/analysis_validator'
 
 class TestAnalysisValidator < Minitest::Test
   def setup
@@ -47,6 +46,7 @@ class TestAnalysisValidator < Minitest::Test
 
   # rule:DRA_R0004
   def test_invalid_center_name
+    skip_unless_pg_configured
     #ok case
     analysis_set = get_analysis_set_node("#{@test_file_dir}/4_invalid_center_name_analysis_ok.xml")
     ret = exec_validator("invalid_center_name", "DRA_R0004", "analysis name" , analysis_set.first, "test01", 1)

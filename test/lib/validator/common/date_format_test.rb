@@ -1,8 +1,7 @@
-require 'bundler/setup'
-require 'minitest/autorun'
 require 'json'
 require 'yaml'
-require '../../../../lib/validator/common/date_format.rb'
+require_relative '../../../test_helpers'
+require 'validator/common/date_format'
 
 class TestDateFormat < Minitest::Test
   def setup

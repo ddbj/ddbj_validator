@@ -1,0 +1,25 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  rake-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      # pg gem のビルドに必要
+      - run: sudo apt-get update && sudo apt-get install -y libpq-dev
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      # バッキングサービス (Virtuoso / PostgreSQL) は CI では起動しない。
+      # サービス依存のテストは test/test_helpers.rb の skip_unless_* ヘルパで自動 skip される。
+      - run: bundle exec rake test
