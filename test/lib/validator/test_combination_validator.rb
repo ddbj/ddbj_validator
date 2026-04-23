@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require_relative '../../../lib/validator/combination_validator'
+require_relative '../../test_helpers'
+require 'validator/combination_validator'
 
 class TestCombinationValidator < Minitest::Test
   def setup

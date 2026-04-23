@@ -2,7 +2,8 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'yaml'
 require 'dotenv'
-require File.expand_path('../../../../../lib/validator/common/common_utils.rb', __FILE__)
+require_relative '../../../test_helpers'
+require 'validator/common/common_utils'
 
 class TestCommonUtils < Minitest::Test
   def setup

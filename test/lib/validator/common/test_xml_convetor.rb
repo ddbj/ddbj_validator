@@ -1,7 +1,8 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
-require '../../../../lib/validator/common/xml_convertor.rb'
+require_relative '../../../test_helpers'
+require 'validator/common/xml_convertor'
 
 class TestXmlConvertor < Minitest::Test
   def setup

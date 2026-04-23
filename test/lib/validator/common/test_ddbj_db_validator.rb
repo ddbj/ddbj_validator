@@ -6,7 +6,7 @@ require 'dotenv'
 require 'bundler/setup'
 require 'minitest/autorun'
 require_relative '../../../test_helpers'
-require '../../../../lib/validator/common/ddbj_db_validator.rb'
+require 'validator/common/ddbj_db_validator'
 
 class TestDDBJDbValidator < Minitest::Test
 

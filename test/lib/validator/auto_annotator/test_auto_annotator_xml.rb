@@ -1,8 +1,9 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'json'
-require '../../../../lib/validator/auto_annotator/auto_annotator_xml.rb'
-require '../../../../lib/validator/common/xml_convertor.rb'
+require_relative '../../../test_helpers'
+require 'validator/auto_annotator/auto_annotator_xml'
+require 'validator/common/xml_convertor'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
 #

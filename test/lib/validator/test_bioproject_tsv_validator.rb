@@ -2,9 +2,9 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
 require_relative '../../test_helpers'
-require_relative '../../../lib/validator/bioproject_tsv_validator'
-require_relative '../../../lib/validator/common/common_utils'
-require_relative '../../../lib/validator/common/organism_validator'
+require 'validator/bioproject_tsv_validator'
+require 'validator/common/common_utils'
+require 'validator/common/organism_validator'
 
 class TestBioProjectTsvValidator < Minitest::Test
   def setup

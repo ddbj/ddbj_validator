@@ -4,7 +4,7 @@ require 'dotenv'
 require 'fileutils'
 require 'json'
 require_relative '../../test_helpers'
-require_relative '../../../lib/validator/validator'
+require 'validator/validator'
 
 class TestValidator < Minitest::Test
   def setup

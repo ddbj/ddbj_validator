@@ -3,8 +3,8 @@ require 'minitest/autorun'
 require 'dotenv'
 require 'fileutils'
 require_relative '../../test_helpers'
-require_relative '../../../lib/validator/trad_validator'
-require_relative '../../../lib/validator/common/common_utils'
+require 'validator/trad_validator'
+require 'validator/common/common_utils'
 
 class TestTradValidator < Minitest::Test
   def setup

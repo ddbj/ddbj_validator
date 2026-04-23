@@ -1,7 +1,8 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../../lib/validator/common/file_parser.rb'
-require '../../../../lib/validator/auto_annotator/auto_annotator_tsv.rb'
+require_relative '../../../test_helpers'
+require 'validator/common/file_parser'
+require 'validator/auto_annotator/auto_annotator_tsv'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
 #

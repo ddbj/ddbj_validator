@@ -4,7 +4,7 @@ require 'bundler/setup'
 require 'dotenv'
 require 'minitest/autorun'
 require_relative '../../../test_helpers'
-require File.expand_path('../../../../../lib/validator/common/organism_validator.rb', __FILE__)
+require 'validator/common/organism_validator'
 
 class TestOrganismValidator < Minitest::Test
   def setup

@@ -1,7 +1,7 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require_relative '../../test_helpers'
-require_relative '../../../lib/validator/analysis_validator'
+require 'validator/analysis_validator'
 
 class TestAnalysisValidator < Minitest::Test
   def setup

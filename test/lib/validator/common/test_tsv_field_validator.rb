@@ -1,7 +1,8 @@
 require 'bundler/setup'
 require 'minitest/autorun'
-require '../../../../lib/validator/common/common_utils.rb'
-require '../../../../lib/validator/common/tsv_field_validator.rb'
+require_relative '../../../test_helpers'
+require 'validator/common/common_utils'
+require 'validator/common/tsv_field_validator'
 
 class TestTsvFieldValidator < Minitest::Test
   def setup

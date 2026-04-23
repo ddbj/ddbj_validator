@@ -2,8 +2,8 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
 require_relative '../../../test_helpers'
-require '../../../../lib/validator/biosample_validator.rb'
-require '../../../../lib/validator/common/validator_cache.rb'
+require 'validator/biosample_validator'
+require 'validator/common/validator_cache'
 
 class TestValidatorCache < Minitest::Test
 

@@ -2,8 +2,9 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
 require 'fileutils'
-require_relative '../../../lib/validator/jvar_validator'
-require_relative '../../../lib/validator/common/common_utils'
+require_relative '../../test_helpers'
+require 'validator/jvar_validator'
+require 'validator/common/common_utils'
 
 class TestJVarValidator < Minitest::Test
   def setup
