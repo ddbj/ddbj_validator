@@ -16,7 +16,7 @@ task 'test:per_file' do
 
   failed = []
 
-  Dir.glob('test/lib/**/*_test.rb', base: __dir__).sort.each do |test|
+  Dir.glob('test/**/*_test.rb', base: __dir__).sort.each do |test|
     puts
     puts "==> #{test}"
 
