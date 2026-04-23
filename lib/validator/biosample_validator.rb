@@ -343,7 +343,10 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 複数属性の組合せの検証
-      latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], @google_api_key, line_num)
+      # BS_R0041 (latlon_versus_country) は Google Geocoding API の有償化により無効化
+      # Google Geocoding API を再利用する予定はない。Natural Earth 等のオフラインデータを使った自前実装に置き換え次第復活させる
+      # https://ddbj-dev.atlassian.net/browse/VALIDATOR-284
+      # latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], @google_api_key, line_num)
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
