@@ -9,6 +9,11 @@ jobs:
   rake-test:
     runs-on: ubuntu-latest
 
+    env:
+      # conf/validator.yml のデフォルトはコンテナ内の "http://virtuoso:8890/sparql" だが、
+      # CI の runner からはコンテナに host ネットワーク経由でアクセスするため localhost を使う
+      DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: http://localhost:8890/sparql
+
     steps:
       - uses: actions/checkout@v4
         with:
