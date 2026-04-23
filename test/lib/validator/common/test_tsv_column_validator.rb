@@ -3,7 +3,7 @@ require 'minitest/autorun'
 require '../../../../lib/validator/common/common_utils.rb'
 require '../../../../lib/validator/common/tsv_column_validator.rb'
 
-class TestTsvFieldValidator < Minitest::Test
+class TestTsvColumnValidator < Minitest::Test
   def setup
     @validator = TsvColumnValidator.new
   end

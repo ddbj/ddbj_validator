@@ -1,29 +1,29 @@
-require 'fileutils'
-
-REPO_ROOT = __dir__
-TESTS     = Dir.glob('test/**/test_*.rb', base: REPO_ROOT).sort
-
 task default: :test
 
-desc 'Run all tests. Each file is executed from its own directory so legacy relative requires keep working.'
+desc 'Run all tests in one process. Results are aggregated into a single summary.'
 task :test do
-  ENV['IGNORE_DOTENV'] ||= '1'
+  sh 'bundle', 'exec', 'ruby', 'test/run_all.rb'
+end
 
-  # ログパスはリポジトリ配下に固定する。デフォルトは conf/validator.yml の "../logs/validator/" で
-  # CWD 依存、.env は本番用のコンテナ内パスが入っているため、いずれもテスト実行では使えない
-  ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'] = File.join(REPO_ROOT, 'logs')
+desc 'Run each test file in its own process. Useful when a test leaks state or hangs.'
+task 'test:per_file' do
+  require 'fileutils'
+
+  ENV['IGNORE_DOTENV']                        ||= '1'
+  ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR']   = File.join(__dir__, 'logs')
 
   FileUtils.mkdir_p(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'])
 
   failed = []
 
-  TESTS.each do |test|
-    path = File.join(REPO_ROOT, test)
+  Dir.glob('test/**/test_*.rb', base: __dir__).sort.each do |test|
+    path = File.join(__dir__, test)
     dir  = File.dirname(path)
     file = File.basename(path)
 
     puts
     puts "==> #{test}"
+
     ok = system('bundle', 'exec', 'ruby', file, chdir: dir)
     failed << test unless ok
   end

@@ -5,7 +5,7 @@ require_relative '../../../lib/validator/bioproject_tsv_validator'
 require_relative '../../../lib/validator/common/common_utils'
 require_relative '../../../lib/validator/common/organism_validator'
 
-class TestBioProjectValidator < Minitest::Test
+class TestBioProjectTsvValidator < Minitest::Test
   def setup
     Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioProjectTsvValidator.new
