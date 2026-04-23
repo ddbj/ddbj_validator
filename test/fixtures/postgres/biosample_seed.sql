@@ -13,7 +13,9 @@ INSERT INTO mass.submission (submission_id, submitter_id) VALUES
   ('SSUB000005', 'anyone'),     -- SAMD00060421 の親 (DRA 紐付け無し)
   ('SSUB000006', 'hirotoju'),   -- SAMD00032107-110 の親
   ('SSUB000007', 'anyone'),     -- SAMD00052345 の親
-  ('SSUB_LTP',   'anyone');     -- get_all_locus_tag_prefix 用 (まとめて 200+ サンプル)
+  ('SSUB_LTP',   'anyone'),     -- get_all_locus_tag_prefix 用 (まとめて 200+ サンプル)
+  ('SSUB005454', 'anyone'),     -- test_duplicated_locus_tag_prefix: PP14 を登録する submission
+  ('SSUB005462', 'anyone');     -- test_duplicated_locus_tag_prefix: RR1 を登録する別 submission
 
 -- samples
 -- smp_id は bigint. テストは to_s した値と比較するので、人間が読める値にしておく
@@ -37,15 +39,16 @@ INSERT INTO mass.sample (smp_id, submission_id, sample_name, status_id) VALUES
   (23002,'SSUB000004', 'SAMPLE-23002', NULL),
   -- SAMD00060421 exists no DRA
   (60421,'SSUB000005', 'SAMPLE-60421', NULL),
-  -- SAMD00032107-110 submitter hirotoju
-  (32107,'SSUB000006', 'SAMPLE-32107', NULL),
-  (32108,'SSUB000006', 'SAMPLE-32108', NULL),
-  (32109,'SSUB000006', 'SAMPLE-32109', NULL),
-  (32110,'SSUB000006', 'SAMPLE-32110', NULL),
+  -- SAMD00032107-32157 submitter hirotoju (51 件。test_biosample_not_found が 00032108-00032156 の
+  -- レンジを valid 扱いにすることを期待しているのでまとめて生成する)
+  -- ※ 個別の seed INSERT ではなく後段の DO ブロックで投入する
   -- SAMD00052345 / SSUB000007
   (52345,'SSUB000007', 'SAMPLE-52345', NULL),
   -- smp_id 104969 for test_get_bioproject_id_via_dra
-  (104969,'SSUB000002', 'SAMPLE-104969', NULL);
+  (104969,'SSUB000002', 'SAMPLE-104969', NULL),
+  -- test_duplicated_locus_tag_prefix 用
+  (55454, 'SSUB005454', 'SAMPLE-PP14', NULL),  -- locus_tag_prefix=PP14
+  (55462, 'SSUB005462', 'SAMPLE-RR1',  NULL);  -- locus_tag_prefix=RR1
 
 -- accession: smp_id ⇄ SAMD accession_id
 INSERT INTO mass.accession (smp_id, accession_id) VALUES
@@ -55,11 +58,7 @@ INSERT INTO mass.accession (smp_id, accession_id) VALUES
   (52345, 'SAMD00052345'),
   (10001, 'SAMD00000001'),
   (23002, 'SAMD00023002'),
-  (60421, 'SAMD00060421'),
-  (32107, 'SAMD00032107'),
-  (32108, 'SAMD00032108'),
-  (32109, 'SAMD00032109'),
-  (32110, 'SAMD00032110');
+  (60421, 'SAMD00060421');
 
 -- attribute (locus_tag_prefix / metadata 用)
 INSERT INTO mass.attribute (smp_id, attribute_name, attribute_value, seq_no) VALUES
@@ -71,7 +70,10 @@ INSERT INTO mass.attribute (smp_id, attribute_name, attribute_value, seq_no) VAL
   (64274, 'sample_name',      'sample_A',  3),
   -- SAMD00052345 も同様
   (52345, 'bioproject_id',    'PRJDB4841', 1),
-  (52345, 'collection_date',  '2020-01-01',2);
+  (52345, 'collection_date',  '2020-01-01',2),
+  -- test_duplicated_locus_tag_prefix 用
+  (55454, 'locus_tag_prefix', 'PP14', 1),
+  (55462, 'locus_tag_prefix', 'RR1',  1);
 
 -- get_all_locus_tag_prefix が >200 行を要求するので SSUB_LTP 配下に 210 サンプル + locus_tag_prefix を生成
 DO $$
@@ -81,5 +83,14 @@ BEGIN
   FOR i IN 1..210 LOOP
     INSERT INTO mass.sample    (smp_id, submission_id, sample_name) VALUES (base_smp + i, 'SSUB_LTP', 'LTP-' || i);
     INSERT INTO mass.attribute (smp_id, attribute_name, attribute_value, seq_no) VALUES (base_smp + i, 'locus_tag_prefix', 'LTP' || i, 1);
+  END LOOP;
+END $$;
+
+-- SAMD00032107-32157 (hirotoju) を一括生成
+DO $$
+BEGIN
+  FOR i IN 32107..32157 LOOP
+    INSERT INTO mass.sample    (smp_id, submission_id, sample_name) VALUES (i, 'SSUB000006', 'SAMPLE-' || i);
+    INSERT INTO mass.accession (smp_id, accession_id)               VALUES (i, 'SAMD' || lpad(i::text, 8, '0'));
   END LOOP;
 END $$;

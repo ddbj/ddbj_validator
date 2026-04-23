@@ -13,9 +13,11 @@ INSERT INTO mass.ext_entity (ext_id, acc_type, ref_name, status) VALUES
   -- PRJNA71719 → 1 submitter
   (12, 'PRJNA', 'PRJNA71719', 100);
 
+-- 参照 submitter を 2 件 (うち 1 件は hirakawa) にして
+-- test_bioproject_not_found の "submitter hirakawa で OK" 条件も満たす
 INSERT INTO mass.ext_permit (per_id, ext_id, submitter_id) VALUES
-  (1, 10, 'submitter_a'), (2, 10, 'submitter_b'),
-  (3, 11, 'submitter_c'), (4, 11, 'submitter_d'),
+  (1, 10, 'hirakawa'), (2, 10, 'submitter_b'),
+  (3, 11, 'hirakawa'), (4, 11, 'submitter_d'),
   (5, 12, 'submitter_e');
 
 -- ================================================================
