@@ -20,9 +20,10 @@ gem "unicorn"
 gem "unicorn-worker-killer"
 
 group :development do
-  gem "sinatra-reloader"
+  gem 'rake'
+  gem 'sinatra-reloader'
 end
 
 group :test do
-  gem "minitest"
+  gem 'minitest'
 end
