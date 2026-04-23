@@ -1,3 +1,4 @@
+require 'date'
 require 'dotenv'
 require 'fileutils'
 require_relative '../../test_helpers'
@@ -170,25 +171,31 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0001
   def test_invalid_hold_date
+    # 実行日から 7 日以降 3 年以内 (年末年始を除く) が有効範囲なので、固定値ではなく相対日付で組み立てる
+    today       = Date.today
+    valid_date  = (today + 30).strftime('%Y%m%d')   # 有効範囲内
+    past_date   = (today - 365).strftime('%Y%m%d')  # 過去
+    future_date = (today + 365 * 4).strftime('%Y%m%d') # 3 年超
+
     #ok case
-    data = [{entry: "COMMON", feature: "DATE", location: "", qualifier: "hold_date", value: "20240612", line_no: 24}]
+    data = [{entry: "COMMON", feature: "DATE", location: "", qualifier: "hold_date", value: valid_date, line_no: 24}]
     ret = exec_validator("invalid_hold_date", "TR_R0001", data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## multi hold_date (JP0125でエラーになるので無視)
-    data_multi = [{entry: "COMMON", feature: "DATE", location: "", qualifier: "hold_date", value: "20240612", line_no: 24}, {entry: "COMMON", feature: "DATE", location: "", qualifier: "hold_date", value: "20190612", line_no: 25}]
+    data_multi = [{entry: "COMMON", feature: "DATE", location: "", qualifier: "hold_date", value: valid_date, line_no: 24}, {entry: "COMMON", feature: "DATE", location: "", qualifier: "hold_date", value: past_date, line_no: 25}]
     ret = exec_validator("invalid_hold_date", "TR_R0001", data)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
 
     #ng case
     ## too early
-    data.first[:value] = "20210612" # past date
+    data.first[:value] = past_date
     ret = exec_validator("invalid_hold_date", "TR_R0001", data)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## too late
-    data.first[:value] = "20280612" # over 3year
+    data.first[:value] = future_date
     ret = exec_validator("invalid_hold_date", "TR_R0001", data)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
@@ -447,6 +454,7 @@ class TestTradValidator < Minitest::Test
   end
 
   def test_ddbj_parser
+    skip_unless_ddbj_parser_configured
     # TODO 正常系テスト
     # invalid file path
     params = {anno_file_path: "not_exist_ann_file", fasta_file_path: "not_exist_fasta_file", result_file_path: "not_exist_output_file"}
