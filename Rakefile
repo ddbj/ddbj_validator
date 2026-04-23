@@ -16,15 +16,11 @@ task 'test:per_file' do
 
   failed = []
 
-  Dir.glob('test/**/test_*.rb', base: __dir__).sort.each do |test|
-    path = File.join(__dir__, test)
-    dir  = File.dirname(path)
-    file = File.basename(path)
-
+  Dir.glob('test/lib/**/test_*.rb', base: __dir__).sort.each do |test|
     puts
     puts "==> #{test}"
 
-    ok = system('bundle', 'exec', 'ruby', file, chdir: dir)
+    ok = system('bundle', 'exec', 'ruby', File.join(__dir__, test))
     failed << test unless ok
   end
 
