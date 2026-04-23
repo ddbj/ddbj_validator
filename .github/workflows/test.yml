@@ -8,6 +8,7 @@ on:
 jobs:
   rake-test:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,6 +21,19 @@ jobs:
         with:
           bundler-cache: true
 
-      # バッキングサービス (Virtuoso / PostgreSQL) は CI では起動しない。
-      # サービス依存のテストは test/test_helpers.rb の skip_unless_* ヘルパで自動 skip される。
+      - name: Start Virtuoso with fixtures
+        run: docker compose -f compose.test.yaml up -d
+
+      - name: Wait for Virtuoso to accept SPARQL
+        run: |
+          for _ in $(seq 1 30); do
+            curl -sS -m 2 'http://localhost:8890/sparql?query=ASK+WHERE+%7B%7D' > /dev/null && exit 0
+            sleep 2
+          done
+          echo 'Virtuoso did not become ready' >&2
+          exit 1
+
+      - name: Load taxonomy / biosample fixture
+        run: docker compose -f compose.test.yaml exec -T virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
+
       - run: bundle exec rake test
