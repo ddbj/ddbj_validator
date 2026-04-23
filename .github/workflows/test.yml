@@ -14,6 +14,13 @@ jobs:
       # CI の runner からはコンテナに host ネットワーク経由でアクセスするため localhost を使う
       DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: http://localhost:8890/sparql
 
+      # Postgres fixture (compose.test.yaml の postgres サービス)
+      DDBJ_VALIDATOR_APP_POSTGRES_HOST:    localhost
+      DDBJ_VALIDATOR_APP_POSTGRES_PORT:    '15432'
+      DDBJ_VALIDATOR_APP_POSTGRES_USER:    validator
+      DDBJ_VALIDATOR_APP_POSTGRES_PASSWD:  validator
+      DDBJ_VALIDATOR_APP_POSTGRES_TIMEOUT: '30'
+
     steps:
       - uses: actions/checkout@v4
         with:
@@ -26,7 +33,7 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Start Virtuoso with fixtures
+      - name: Start Virtuoso & Postgres with fixtures
         run: docker compose -f compose.test.yaml up -d
 
       - name: Wait for Virtuoso to accept SPARQL
@@ -36,6 +43,16 @@ jobs:
             sleep 2
           done
           echo 'Virtuoso did not become ready' >&2
+          exit 1
+
+      - name: Wait for Postgres to be ready
+        run: |
+          for _ in $(seq 1 30); do
+            PGPASSWORD=validator psql -h localhost -p 15432 -U validator -d bioproject -c 'select 1 from mass.project limit 1' > /dev/null 2>&1 && exit 0
+            sleep 2
+          done
+          echo 'Postgres did not become ready' >&2
+          docker compose -f compose.test.yaml logs postgres | tail -40 >&2
           exit 1
 
       - name: Load taxonomy / biosample fixture
