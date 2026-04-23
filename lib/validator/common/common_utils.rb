@@ -627,7 +627,11 @@ class CommonUtils
     req = Net::HTTP::Get.new(url)
     ssl_flag = false
     ssl_flag = true if uri.start_with?("https")
-    res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag) {|http|
+    # 接続自体が通らないときに Net::HTTP デフォルトの長大な待ち時間を避ける。
+    # 外部エンドポイント (NCBI eutils / tm.dbcls.jp 等) が CI から届かないケースで
+    # テストがロックしないようにするための保険
+    open_timeout = ENV.fetch('DDBJ_VALIDATOR_APP_HTTP_OPEN_TIMEOUT', '10').to_i
+    res = Net::HTTP.start(url.host, url.port, :use_ssl => ssl_flag, open_timeout: open_timeout) {|http|
       http.read_timeout = timeout
       http.request(req)
     }
