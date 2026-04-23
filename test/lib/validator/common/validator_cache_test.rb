@@ -37,25 +37,27 @@ class TestValidatorCache < Minitest::Test
   end
 
   def test_cache_get_attributes_of_package
-    package_name = "MIGS.ba.soil"
-    ret1 = @validator.send("get_attributes_of_package", package_name)
-    cache = @validator.instance_variable_get (:@cache)
-    #p cache.instance_variable_get (:@cache_data)
+    package_name    = "MIGS.ba.soil"
+    package_version = @validator.instance_variable_get(:@package_version)
+
+    ret1 = @validator.send("get_attributes_of_package", package_name, package_version)
+    cache = @validator.instance_variable_get(:@cache)
     cache_data = cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
     assert_equal false, cache_data.nil? #not nil
     # expected output "use cache in get_attributes_of_package" when executes debug mode
-    ret2 = @validator.send("get_attributes_of_package", package_name)
+    ret2 = @validator.send("get_attributes_of_package", package_name, package_version)
     assert_equal true, ret1 == ret2
   end
 
   def test_cache_unknown_package
-    package_name = "MIGS.ba.soil"
-    ret1 = @validator.send("unknown_package", "BS_R0026", "sampleA", package_name, 1)
-    cache = @validator.instance_variable_get (:@cache)
-    #p cache.instance_variable_get (:@cache_data)
+    package_name    = "MIGS.ba.soil"
+    package_version = @validator.instance_variable_get(:@package_version)
+
+    ret1 = @validator.send("unknown_package", "BS_R0026", "sampleA", package_name, package_version, 1)
+    cache = @validator.instance_variable_get(:@cache)
     assert_equal true, cache.has_key(ValidatorCache::UNKNOWN_PACKAGE, package_name)
     # expected output "use cache in unknown_package" when executes debug mode
-    ret2 = @validator.send("unknown_package", "BS_R0026", "sampleA", package_name, 1)
+    ret2 = @validator.send("unknown_package", "BS_R0026", "sampleA", package_name, package_version, 1)
     assert_equal true, ret1 == ret2
   end
 

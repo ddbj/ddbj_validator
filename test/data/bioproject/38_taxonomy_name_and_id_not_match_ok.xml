@@ -14,7 +14,7 @@
           <ProjectTypeSubmission>
             <Target sample_scope="eMonoisolate" material="ePartialGenome" capture="eTargetedLocusLoci">
               <Organism taxID="103690">
-                <OrganismName>Nostoc sp. PCC 7120</OrganismName>
+                <OrganismName>Nostoc sp. PCC 7120 = FACHB-418</OrganismName>
               </Organism>
             </Target>
             <Method method_type="eSequencing" />

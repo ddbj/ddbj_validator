@@ -48,6 +48,15 @@ module ServiceAvailability
   def skip_unless_virtuoso_available
     skip 'Virtuoso SPARQL endpoint not reachable' unless VIRTUOSO_REACHABLE
   end
+
+  def skip_unless_ddbj_parser_configured
+    skip 'DDBJ parser not configured (set DDBJ_PARSER_APP_URL to enable)' if ENV['DDBJ_PARSER_APP_URL'].to_s.strip.empty?
+  end
+
+  def skip_unless_eutils_api_key_configured
+    key = ENV['DDBJ_VALIDATOR_APP_EUTILS_API_KEY'].to_s
+    skip 'NCBI E-utilities API key not configured' if key.empty? || key == 'your_api_key'
+  end
 end
 
 Minitest::Test.include(ServiceAvailability)

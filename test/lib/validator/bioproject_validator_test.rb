@@ -351,6 +351,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0014
   def test_invalid_publication_identifier
+    skip_unless_eutils_api_key_configured
     #ok case
     ## valid PubMed id
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok.xml")
@@ -677,7 +678,8 @@ class TestBioProjectValidator < Minitest::Test
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng2.xml")
     ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     expect_taxid_annotation = "103690"
-    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    # Virtuoso taxonomy データ上の scientific name (= 末尾に strain 番号が付くフル表記)
+    expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
@@ -688,7 +690,8 @@ class TestBioProjectValidator < Minitest::Test
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng3.xml")
     ret = exec_validator("taxonomy_error_warning", "BP_R0039", "project name", get_input_organism_name(project_set.first), project_set, 1)
     expect_taxid_annotation = "103690"
-    expect_organism_annotation = "Nostoc sp. PCC 7120"
+    # Virtuoso taxonomy データ上の scientific name (= 末尾に strain 番号が付くフル表記)
+    expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
