@@ -7,7 +7,7 @@ GEM
     bigdecimal (3.2.2)
     crass (1.0.6)
     csv (3.3.5)
-    date (3.4.1)
+    date (3.5.1)
     dotenv (3.1.8)
     ffi (1.17.2-arm64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
@@ -25,7 +25,8 @@ GEM
       bigdecimal (~> 3.1)
     kgio (2.11.4)
     logger (1.7.0)
-    mail (2.8.1)
+    mail (2.9.0)
+      logger
       mini_mime (>= 0.1.1)
       net-imap
       net-pop
@@ -38,7 +39,7 @@ GEM
     net-ftp (0.3.8)
       net-protocol
       time
-    net-imap (0.5.8)
+    net-imap (0.6.3)
       date
       net-protocol
     net-pop (0.1.2)
@@ -95,7 +96,7 @@ GEM
     tilt (2.6.0)
     time (0.4.1)
       date
-    timeout (0.4.3)
+    timeout (0.6.1)
     unicorn (6.1.0)
       kgio (~> 2.6)
       raindrops (~> 0.7)
