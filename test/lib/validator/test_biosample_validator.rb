@@ -884,6 +884,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_latlon_versus_country
+    skip 'BS_R0041 は Google Geocoding API 無効化のため呼び出しを停止中 (VALIDATOR-284)'
     #ok case
     ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "35.2399 N, 139.0306 E", nil, 1)
     assert_equal true, ret[:result]

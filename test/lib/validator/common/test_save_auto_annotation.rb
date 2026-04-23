@@ -65,6 +65,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   # 94(format_of_geo_loc_name_is_invalid)のauto annotationの保存が効いているかの検証
   # auto-annotated "  Jaaaapan: Hikone-shi" => "Jaaaapan: Hikone-shi"
   def test_save_annotation_94
+    skip 'BS_R0041 を経由した間接検証のため BS_R0041 停止中は動作不可 (VALIDATOR-284)'
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_94.xml")
     error_list = @validator.instance_variable_get (:@error_list)
     error =  error_list.find {|error| error[:id] == "BS_R0041"}
@@ -76,6 +77,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   # 9(invalid_lat_lon_format)のauto annotationの保存が効いているかの検証
   # auto-annotated "37°26′36.42″N 06°15′14.28″W" => "37.4435 N 6.254 W"
   def test_save_annotation_9
+    skip 'BS_R0041 を経由した間接検証のため BS_R0041 停止中は動作不可 (VALIDATOR-284)'
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_9.xml")
     error_list = @validator.instance_variable_get (:@error_list)
     error =  error_list.find {|error| error[:id] == "BS_R0041"}

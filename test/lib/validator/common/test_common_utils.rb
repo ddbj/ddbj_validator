@@ -142,16 +142,17 @@ class TestCommonUtils < Minitest::Test
     assert_nil ret
   end
 
-  def test_geocode_country_from_latlon 
+  def test_geocode_country_from_latlon
+    skip 'Google Geocoding API 無効化のため未使用 (VALIDATOR-284)'
     #ok case
     ret = @common.geocode_country_from_latlon("35.2095, 139.0034")
     assert_equal ["Japan"], ret
 
-    #no hit case 
+    #no hit case
     ret = @common.geocode_country_from_latlon("not valid latlon format")
     assert_nil ret
- 
-    #nil case 
+
+    #nil case
     ret = @common.geocode_country_from_latlon(nil)
     assert_nil ret
   end

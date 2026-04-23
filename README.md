@@ -107,7 +107,7 @@ Setting of request timeout for PostgreSQL. 30 seconds unless otherwise specified
 Versions of BioSample attributes and package definition information. ,Currently, `1.4.0`, `1.4.1`, `1.5.0` can be specified.
 
 `DDBJ_VALIDATOR_APP_GOOGLE_API_KEY`  
-Google API key.  Without this specification, some rules using Google's data (e.g. [BS_R0041] GeocodingAPI for Latlon versus country) will be ignored, even if the value is wrong.
+(Deprecated) Previously used by [BS_R0041] (Latlon versus country) via the Google Geocoding API. The rule is now disabled and there is no plan to use Google Geocoding again; a future replacement will be built on an offline geographic dataset such as Natural Earth. See [VALIDATOR-284](https://ddbj-dev.atlassian.net/browse/VALIDATOR-284).
 
 `DDBJ_VALIDATOR_APP_EUTILS_API_KEY`  
 API key for NCBI E-utilities. Without this specification, some rules using NCBI data (e.g. [BP_R0014]PMC ID validity) will be ignored, even if the value is wrong. See https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/

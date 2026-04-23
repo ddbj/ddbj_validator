@@ -60,6 +60,7 @@ class TestValidatorCache < Minitest::Test
   end
 
   def test_cache_latlon_versus_country
+    skip 'BS_R0041 は Google Geocoding API 無効化のため呼び出しを停止中 (VALIDATOR-284)'
     lat_lon = "35.2399 N, 139.0306 E"
     ret1 = @validator.send("latlon_versus_country", "BS_R0041", "SampleA", "Japan", lat_lon, 1)
     cache = @validator.instance_variable_get (:@cache)
