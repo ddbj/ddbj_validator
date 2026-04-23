@@ -5,11 +5,13 @@ require 'erb'
 require 'dotenv'
 require 'bundler/setup'
 require 'minitest/autorun'
+require_relative '../../../test_helpers'
 require '../../../../lib/validator/common/ddbj_db_validator.rb'
 
 class TestDDBJDbValidator < Minitest::Test
 
   def setup
+    skip_unless_pg_configured
     Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
     setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)

@@ -1,6 +1,7 @@
 require 'bundler/setup'
 require 'fileutils'
 require 'minitest/autorun'
+require_relative 'test_helpers'
 
 REPO_ROOT = File.expand_path('..', __dir__)
 

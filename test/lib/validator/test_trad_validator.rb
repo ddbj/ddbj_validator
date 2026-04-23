@@ -2,11 +2,13 @@ require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
 require 'fileutils'
+require_relative '../../test_helpers'
 require_relative '../../../lib/validator/trad_validator'
 require_relative '../../../lib/validator/common/common_utils'
 
 class TestTradValidator < Minitest::Test
   def setup
+    skip_unless_virtuoso_available
     Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = TradValidator.new
     @test_file_dir = File.expand_path('../../../data/trad', __FILE__)

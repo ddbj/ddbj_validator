@@ -1,17 +1,22 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
+require 'fileutils'
 require 'json'
+require_relative '../../test_helpers'
 require_relative '../../../lib/validator/validator'
 
 class TestValidator < Minitest::Test
   def setup
+    skip_unless_virtuoso_available
     Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = Validator.new
     @tmp_file_dir = File.expand_path('../../../data/tmp', __FILE__)
     @bs_test_file_dir = File.expand_path('../../../data/biosample', __FILE__)
     @bp_test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
     @all_test_file_dir = File.expand_path('../../../data/all_data', __FILE__)
+
+    FileUtils.mkdir_p(@tmp_file_dir)
   end
 
   def test_json

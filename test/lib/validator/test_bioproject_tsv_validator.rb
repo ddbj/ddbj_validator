@@ -1,12 +1,14 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
+require_relative '../../test_helpers'
 require_relative '../../../lib/validator/bioproject_tsv_validator'
 require_relative '../../../lib/validator/common/common_utils'
 require_relative '../../../lib/validator/common/organism_validator'
 
 class TestBioProjectTsvValidator < Minitest::Test
   def setup
+    skip_unless_virtuoso_available
     Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioProjectTsvValidator.new
     @test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
@@ -104,6 +106,7 @@ class TestBioProjectTsvValidator < Minitest::Test
 
   # BP_R0016
   def test_invalid_umbrella_project
+    skip_unless_pg_configured
     #ok case
     data = [{"key" => "umbrella_bioproject_accession", "values" => ["PRJDB1893"]}] # accession_id
     ret = exec_validator("invalid_umbrella_project", "BP_R0016", data)

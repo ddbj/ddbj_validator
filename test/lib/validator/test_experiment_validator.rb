@@ -1,5 +1,6 @@
 require 'bundler/setup'
 require 'minitest/autorun'
+require_relative '../../test_helpers'
 require_relative '../../../lib/validator/experiment_validator'
 
 class TestExperimentValidator < Minitest::Test
@@ -47,6 +48,7 @@ class TestExperimentValidator < Minitest::Test
 
   # rule:DRA_R0004
   def test_invalid_center_name
+    skip_unless_pg_configured
     #ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok.xml")
     ret = exec_validator("invalid_center_name", "DRA_R0004", "experiment name" , experiment_set.first, "test01", 1)

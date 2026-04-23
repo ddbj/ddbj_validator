@@ -3,10 +3,12 @@ require 'erb'
 require 'bundler/setup'
 require 'dotenv'
 require 'minitest/autorun'
+require_relative '../../../test_helpers'
 require File.expand_path('../../../../../lib/validator/common/organism_validator.rb', __FILE__)
 
 class TestOrganismValidator < Minitest::Test
   def setup
+    skip_unless_virtuoso_available
     Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
     setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)

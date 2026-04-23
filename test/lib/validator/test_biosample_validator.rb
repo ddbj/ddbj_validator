@@ -1,12 +1,14 @@
 require 'bundler/setup'
 require 'minitest/autorun'
 require 'dotenv'
+require_relative '../../test_helpers'
 require_relative '../../../lib/validator/biosample_validator'
 require_relative '../../../lib/validator/common/common_utils'
 require_relative '../../../lib/validator/common/xml_convertor'
 
 class TestBioSampleValidator < Minitest::Test
   def setup
+    skip_unless_virtuoso_available
     Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
