@@ -74,7 +74,9 @@ class TestAutoAnnotator < Minitest::Test
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, "biosample", http_accept)
     assert_equal "error", ret[:status]
-    assert ret[:message].include?("Original file is not found")
+    # 元コードには "Original file is not found" 固有のメッセージは無く、
+    # ファイル不在時は Errno::ENOENT の message がそのまま載る
+    assert ret[:message].include?("No such file")
 
     ## biosample invalid original file format (xml => json)
     http_accept = {"HTTP_ACCEPT"=>"*/*"}
