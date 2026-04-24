@@ -4,7 +4,7 @@ require 'erb'
 require 'date'
 require 'net/http'
 require 'roo'
-require 'sanitize'
+require 'nokogiri'
 require_relative "base"
 require_relative "common/date_format"
 require_relative "common/ddbj_db_validator"
@@ -343,7 +343,7 @@ class JVarValidator < ValidatorBase
   # text: "#biosample_accession"
   #
   def html2text(html)
-    Sanitize.clean(html, :whitespace_elementces => [:p, :div] )
+    Nokogiri::HTML(html).text
   end
 
 end

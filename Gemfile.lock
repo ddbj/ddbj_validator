@@ -23,7 +23,6 @@ GEM
     crack (1.0.1)
       bigdecimal
       rexml
-    crass (1.0.6)
     csv (3.3.5)
     date (3.5.1)
     domain_name (0.6.20240107)
@@ -96,9 +95,6 @@ GEM
       nokogiri (~> 1)
       rubyzip (>= 3.0.0, < 4.0.0)
     rubyzip (3.2.2)
-    sanitize (7.0.0)
-      crass (~> 1.0.2)
-      nokogiri (>= 1.16.8)
     securerandom (0.4.1)
     sinatra (4.2.1)
       logger (>= 1.6.0)
@@ -144,7 +140,6 @@ DEPENDENCIES
   rack
   rake
   roo
-  sanitize
   sinatra
   sinatra-contrib
   webmock
