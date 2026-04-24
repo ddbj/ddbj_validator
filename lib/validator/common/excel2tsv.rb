@@ -46,7 +46,7 @@ class Excel2Tsv
       annotation = [
         {key: "Message", value: "Failed read excel file."},
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + "ALL_R0001"],  @data_file, annotation)
+      error_hash = ErrorBuilder.error_obj(@validation_config["rule" + "ALL_R0001"],  @data_file, annotation)
       ret[:status] = "failed"
       ret[:error_list] = [error_hash]
       return ret
@@ -89,7 +89,7 @@ class Excel2Tsv
             {key: "Message", value: "Failed parse sheet in Excel file."},
             {key: "Sheet name", value: sheet.to_s}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + "ALL_R0001"], @data_file, annotation)
+          error_hash = ErrorBuilder.error_obj(@validation_config["rule" + "ALL_R0001"], @data_file, annotation)
           ret[:status] = "failed"
           ret[:error_list] = [error_hash]
           return ret
@@ -128,7 +128,7 @@ class Excel2Tsv
         {key: "Mandatory sheet names", value: mandatory_sheet_list.to_s},
         {key: "Missing sheet names", value: missing_sheet_list.to_s}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + "ALL_R0002"],  @data_file, annotation)
+      error_hash = ErrorBuilder.error_obj(@validation_config["rule" + "ALL_R0002"],  @data_file, annotation)
       @error_list.push(error_hash)
     end
     ret

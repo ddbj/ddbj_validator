@@ -111,12 +111,12 @@ class BioProjectValidator < ValidatorBase
         ret = taxonomy_name_and_id_not_match("BP_R0038", project_name, taxonomy_id, input_organism, project_node, idx)
       else
         ret = taxonomy_error_warning("BP_R0039", project_name, input_organism, project_node, idx)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
-          taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxID")
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #auto annotation値がある
+          taxid_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, "taxID")
           unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
             taxonomy_id = taxid_annotation
           end
-          organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "OrganismName")
+          organism_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, "OrganismName")
           unless organism_annotation.nil? #organismの補正があれば値を置き換える
             input_organism = organism_annotation
           end
@@ -464,10 +464,10 @@ class BioProjectValidator < ValidatorBase
       scientific_name = ret[:scientific_name]
       #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_name
-        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "OrganismName", [@orgname_path], true));
+        annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "OrganismName", [@orgname_path], true));
       end
       annotation.push({key: "taxID", value: ""})
-      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxID", [@taxid_path], true))
+      annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxID", [@taxid_path], true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})

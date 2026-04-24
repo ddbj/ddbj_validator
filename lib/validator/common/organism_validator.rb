@@ -9,6 +9,11 @@ require File.dirname(__FILE__) + "/common_utils.rb"
 #
 class OrganismValidator < SPARQLBase
 
+  # クラス読み込み時に lib/validator/sparql/*.rq を ERB コンパイルしてキャッシュする。
+  SPARQL = Dir["#{__dir__}/../sparql/*.rq"].to_h {|path|
+    [File.basename(path, ".rq").to_sym, ERB.new(File.read(path)).freeze]
+  }.freeze
+
   TAX_GRAPH_URI = "http://ddbj.nig.ac.jp/ontologies/taxonomy"
 
   TAX_INVALID = "-1" #invalid id
@@ -38,11 +43,7 @@ class OrganismValidator < SPARQLBase
   #
   def initialize (endpoint, tax_graph_uri=nil)
     super(endpoint)
-    @template_dir = File.absolute_path(File.dirname(__FILE__) + "/../sparql")
-    @tax_graph_uri = tax_graph_uri
-    if @tax_graph_uri.nil?
-      @tax_graph_uri = TAX_GRAPH_URI
-    end
+    @tax_graph_uri = tax_graph_uri || TAX_GRAPH_URI
   end
 
   #
@@ -55,7 +56,7 @@ class OrganismValidator < SPARQLBase
   #
   def exist_organism_name? (organism_name)
     params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_taxid_from_name.rq", params)
+    sparql_query = SPARQL[:get_taxid_from_name].result_with_hash(params)
     result = query(sparql_query)
     !result.empty?
   end
@@ -71,7 +72,7 @@ class OrganismValidator < SPARQLBase
   #
   def organism_name_of_synonym (synonym)
     params = {synonym: synonym, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/organism_name_of_synonym.rq", params)
+    sparql_query = SPARQL[:organism_name_of_synonym].result_with_hash(params)
     result = query(sparql_query)
     result.map do |row|
       row[:organism_name]
@@ -89,7 +90,7 @@ class OrganismValidator < SPARQLBase
   #
   def get_taxid_from_name (organism_name)
     params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_taxid_from_name.rq", params)
+    sparql_query = SPARQL[:get_taxid_from_name].result_with_hash(params)
     result = query(sparql_query)
     result.map do |row|
       row[:tax_no]
@@ -107,7 +108,7 @@ class OrganismValidator < SPARQLBase
   #
   def get_organism_name(tax_id)
     params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_organism_name.rq", params)
+    sparql_query = SPARQL[:get_organism_name].result_with_hash(params)
     result = query(sparql_query)
     if result.empty?
       nil
@@ -136,7 +137,7 @@ class OrganismValidator < SPARQLBase
     organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub("\"", "").gsub("*", "")
     organism_name = organism_name.gsub("'", "\\\\'").gsub("\"", "\\\\\\\\\\\"")
     params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/search_taxid_from_fuzzy_name.rq", params)
+    sparql_query = SPARQL[:search_taxid_from_fuzzy_name].result_with_hash(params)
     result = query(sparql_query)
   end
 
@@ -191,7 +192,7 @@ class OrganismValidator < SPARQLBase
       "id-tax:" + linage
     }.join(" ")
     params = {tax_id: tax_id, parent_tax_id: parent_tax_id, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_linage.rq", params)
+    sparql_query = SPARQL[:has_linage].result_with_hash(params)
     result = query(sparql_query)
     return result.any?
   end
@@ -207,7 +208,7 @@ class OrganismValidator < SPARQLBase
   #
   def has_plastids(tax_id)
     params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
-    sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_plastid.rq", params)
+    sparql_query = SPARQL[:has_plastid].result_with_hash(params)
     result = query(sparql_query)
     return result.any?
   end
@@ -227,7 +228,7 @@ class OrganismValidator < SPARQLBase
     result = []
     infraspecific_rank.each do |rank|
       params[:rank] = rank
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_parent_rank.rq", params)
+      sparql_query = SPARQL[:get_parent_rank].result_with_hash(params)
       result = query(sparql_query)
       break if result.any?
     end

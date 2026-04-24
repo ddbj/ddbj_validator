@@ -2,6 +2,7 @@ require 'yaml'
 require 'json'
 require 'json-schema'
 require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/error_builder.rb"
 
 class ValidatorBase
 
@@ -69,7 +70,7 @@ class ValidatorBase
   # 戻り値は push したエラー hash (push 後に :external 等を上書きしたい呼び出し元向け)。
   #
   def add_raw_error (rule, annotation, auto_annotation: false, source: @data_file)
-    error = CommonUtils.error_obj(rule, source, annotation, auto_annotation)
+    error = ErrorBuilder.error_obj(rule, source, annotation, auto_annotation)
     @error_list.push(error)
     error
   end

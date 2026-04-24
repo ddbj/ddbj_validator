@@ -7,6 +7,12 @@ require File.dirname(__FILE__) + "/../validator/common/common_utils.rb"
 
 class Package < SPARQLBase
 
+  # クラス読み込み時に sparql/*.rq を全部 ERB コンパイルしてキャッシュする。
+  # 呼び出し側は SPARQL[:package_list].result_with_hash(params) だけで済む。
+  SPARQL = Dir["#{__dir__}/sparql/*.rq"].to_h {|path|
+    [File.basename(path, ".rq").to_sym, ERB.new(File.read(path)).freeze]
+  }.freeze
+
   #
   # Initializer
   #
@@ -15,7 +21,6 @@ class Package < SPARQLBase
   #
   def initialize (endpoint)
     super(endpoint)
-    @template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
     config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
     @setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
     @log_file = @setting["api_log"]["path"] + "/validator.log"
@@ -31,12 +36,12 @@ class Package < SPARQLBase
   def package_list (version)
     begin
       params = {version: version}
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list.rq", params)
+      sparql_query = SPARQL[:package_list].result_with_hash(params)
       ret = query(sparql_query)
       if ret.any?
         {status: "success", data: ret}
       else  # 結果が空の場合に存在するversionかチェック
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
+        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
         ret_package_data = query(sparql_query)
         if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version"}
@@ -63,14 +68,14 @@ class Package < SPARQLBase
       end
 
       # package listを取得
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list.rq", params)
+      sparql_query = SPARQL[:package_list].result_with_hash(params)
       package_list = query(sparql_query)
       package_list.each do |row|
         row[:type] = "package"
       end
 
       # package group listを取得
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_group_list.rq", params)
+      sparql_query = SPARQL[:package_group_list].result_with_hash(params)
       package_group_list = query(sparql_query)
       package_group_list.each do |row|
         row[:type] = "package_group"
@@ -85,7 +90,7 @@ class Package < SPARQLBase
         end
         {status: "success", data: package_tree}
       else # 結果が空の場合に存在するversionかチェック
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
+        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
         ret_package_data = query(sparql_query)
         if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version."}
@@ -144,10 +149,10 @@ class Package < SPARQLBase
   def attribute_list (version, package_id)
     begin
       params = {version: version, package_id: package_id}
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_list.rq", params)
+      sparql_query = SPARQL[:attribute_list].result_with_hash(params)
       attr_list = query(sparql_query)
       if attr_list.any?
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_group_list.rq", params)
+        sparql_query = SPARQL[:attribute_group_list].result_with_hash(params)
         group_list = query(sparql_query)
         attr_list.each do |row|
           match = group_list.find{|group| group[:attribute_name] == row[:attribute_name]}
@@ -160,7 +165,7 @@ class Package < SPARQLBase
         end
         {status: "success", data: attr_list}
       else # 結果が空の場合に存在するversionかチェック
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
+        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
         ret_package_data = query(sparql_query)
         if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version."}
@@ -216,12 +221,12 @@ class Package < SPARQLBase
   def package_info (version, package_id)
     begin
       params = {version: version, package_id: package_id}
-      sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_info.rq", params)
+      sparql_query = SPARQL[:package_info].result_with_hash(params)
       ret = query(sparql_query)
       if ret.any?
         {status: "success", data: ret.first}
       else  # 結果が空の場合に存在するversionかチェック
-        sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
+        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
         ret_package_data = query(sparql_query)
         if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version."}

@@ -322,13 +322,13 @@ class TestBioProjectValidator < Minitest::Test
     ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_nil CommonUtils::get_auto_annotation(ret[:error_list].first)
+    assert_nil ErrorBuilder.auto_annotation(ret[:error_list].first)
     #organism name blank
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng2.xml")
     ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    assert_nil CommonUtils::get_auto_annotation(ret[:error_list].first)
+    assert_nil ErrorBuilder.auto_annotation(ret[:error_list].first)
     #not exist taxid
     project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng3.xml")
     ret = exec_validator("taxonomy_name_and_id_not_match", "BP_R0038", "project name", get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
@@ -346,7 +346,7 @@ class TestBioProjectValidator < Minitest::Test
     expect_taxid_annotation = "103690"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "taxID")
     assert_equal expect_taxid_annotation, suggest_value
     ##exist but not correct as scientific name ("Anabaena sp. PCC 7120"=>"Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng2.xml")
@@ -356,9 +356,9 @@ class TestBioProjectValidator < Minitest::Test
     expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "taxID")
     assert_equal expect_taxid_annotation, suggest_value
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
     assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case ("nostoc sp. pcc 7120" => "Nostoc sp. PCC 7120")
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng3.xml")
@@ -368,9 +368,9 @@ class TestBioProjectValidator < Minitest::Test
     expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxID")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "taxID")
     assert_equal expect_taxid_annotation, suggest_value
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "OrganismName")
     assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng4.xml")
