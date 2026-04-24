@@ -5,12 +5,12 @@ require 'ostruct'
 require 'date'
 require 'net/http'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
-require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
-require File.dirname(__FILE__) + "/common/organism_validator.rb"
-require File.dirname(__FILE__) + "/common/tsv_field_validator.rb"
-require File.dirname(__FILE__) + "/common/file_parser.rb"
+require_relative "base"
+require_relative "common/insdc_nullability"
+require_relative "common/ddbj_db_validator"
+require_relative "common/organism_validator"
+require_relative "common/tsv_field_validator"
+require_relative "common/file_parser"
 
 #
 # A class for BioProject validation

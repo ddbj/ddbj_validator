@@ -6,10 +6,10 @@ require 'date'
 require 'net/http'
 require 'nokogiri'
 require 'active_support/core_ext/integer/inflections'
-require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
-require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
-require File.dirname(__FILE__) + "/common/organism_validator.rb"
+require_relative "base"
+require_relative "common/insdc_nullability"
+require_relative "common/ddbj_db_validator"
+require_relative "common/organism_validator"
 
 #
 # A class for BioProject validation

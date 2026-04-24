@@ -3,12 +3,12 @@ require 'json'
 require 'erb'
 require 'date'
 require 'http'
-require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/date_format.rb"
-require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
-require File.dirname(__FILE__) + "/common/organism_validator.rb"
-require File.dirname(__FILE__) + "/common/sparql_base.rb"
-require File.dirname(__FILE__) + "/common/validator_cache.rb"
+require_relative "base"
+require_relative "common/date_format"
+require_relative "common/ddbj_db_validator"
+require_relative "common/organism_validator"
+require_relative "common/sparql_base"
+require_relative "common/validator_cache"
 
 #
 # A class for Trad validation

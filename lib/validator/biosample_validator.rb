@@ -5,18 +5,18 @@ require 'ostruct'
 require 'date'
 require 'net/http'
 require 'active_support/core_ext/string/filters'
-require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
-require File.dirname(__FILE__) + "/common/coll_dump.rb"
-require File.dirname(__FILE__) + "/common/date_format.rb"
-require File.dirname(__FILE__) + "/common/geolocation.rb"
-require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
-require File.dirname(__FILE__) + "/common/organism_validator.rb"
-require File.dirname(__FILE__) + "/common/sparql_base.rb"
-require File.dirname(__FILE__) + "/common/validator_cache.rb"
-require File.dirname(__FILE__) + "/common/xml_convertor.rb"
-require File.dirname(__FILE__) + "/common/file_parser.rb"
-require File.dirname(__FILE__) + "/common/tsv_column_validator.rb"
+require_relative "base"
+require_relative "common/insdc_nullability"
+require_relative "common/coll_dump"
+require_relative "common/date_format"
+require_relative "common/geolocation"
+require_relative "common/ddbj_db_validator"
+require_relative "common/organism_validator"
+require_relative "common/sparql_base"
+require_relative "common/validator_cache"
+require_relative "common/xml_convertor"
+require_relative "common/file_parser"
+require_relative "common/tsv_column_validator"
 
 #
 # A class for BioSample validation

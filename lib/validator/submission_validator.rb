@@ -3,9 +3,9 @@ require 'json'
 require 'erb'
 require 'date'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
-require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
+require_relative "base"
+require_relative "common/insdc_nullability"
+require_relative "common/ddbj_db_validator"
 
 #
 # A class for DRA submission validation

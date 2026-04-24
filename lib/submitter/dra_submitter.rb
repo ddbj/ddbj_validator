@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/base.rb"
+require_relative "base"
 
 class DraSubmitter < SubmitterBase
   DRA_DB_NAME = "drmdb"

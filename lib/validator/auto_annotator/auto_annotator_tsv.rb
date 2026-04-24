@@ -1,6 +1,6 @@
 require 'fileutils'
 
-require File.dirname(__FILE__) + "/base.rb"
+require_relative "base"
 
 #
 # A class for Auto-annotation. TSV file base.
