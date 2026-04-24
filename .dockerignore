@@ -17,7 +17,6 @@ Procfile.dev
 
 # Local env / secrets
 .env
-template.env
 
 # Docker build inputs aren't needed inside the final image
 .dockerignore

@@ -28,13 +28,8 @@ $ curl -o conf/coll_dump/coll_dump.txt "https://ftp.ncbi.nlm.nih.gov/pub/taxonom
 $ git clone https://github.com/ddbj/pub.git conf/pub
 ```
 
-### Prepare .env file
-Create the `.env` file for the environment variables by copying the `template.env` file.
-```
-$ cp template.env .env
-```
-A description of each environment variable can be found below in this document.
-The environment variables that need to be changed are `DDBJ_VALIDATOR_APP_GOOGLE_API_KEY` and `DDBJ_VALIDATOR_APP_EUTILS_API_KEY`. If these are not changed, several rules in the validator will return errors or warnings for valid values.
+### Prepare .env file (optional)
+All environment variables used by `docker-compose.yml` have sensible defaults, so the container starts without any configuration. If you need to override anything (e.g. a real NCBI eutils API key, or to change the host port), create a `.env` file at the repo root. See the "Environment Variables" section below for the full list.
 
 ## Start containers
 ```
