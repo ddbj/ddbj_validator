@@ -68,7 +68,6 @@ GEM
     net-smtp (0.5.1)
       net-protocol
     nio4r (2.7.5)
-    nkf (0.2.0)
     nokogiri (1.19.2-arm64-darwin)
       racc (~> 1.4)
     nokogiri (1.19.2-x86_64-linux-gnu)
@@ -139,7 +138,6 @@ DEPENDENCIES
   mail
   minitest
   net-ftp
-  nkf
   nokogiri
   pg
   puma

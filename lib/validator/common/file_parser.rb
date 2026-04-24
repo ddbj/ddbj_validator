@@ -1,4 +1,3 @@
-require 'nkf'
 require 'erb'
 require 'logger'
 require 'yaml'
@@ -95,8 +94,9 @@ class FileParser
       tsv_data = CSV.read(file_path, encoding: "UTF-8:UTF-8", col_sep: col_sep)
     rescue => ex1
       if ex1.message.downcase.include?("invalid byte sequence") || ex1.message.downcase.include?("unquoted fields do not allow") # encodeか改行文字関連のエラー
-        encoding = "CP932:UTF-8"
-        encoding = "UTF-16:UTF-8" if  NKF.guess(File.read(file_path)).to_s.downcase == "utf-16"
+        # Excel 由来のファイルは BOM 付き UTF-16 なので BOM で判別する。
+        bom = File.read(file_path, 2, mode: 'rb')
+        encoding = (bom == "\xFF\xFE".b || bom == "\xFE\xFF".b) ? 'UTF-16:UTF-8' : 'CP932:UTF-8'
         begin
           tsv_data = CSV.read(file_path, encoding: encoding, col_sep: col_sep, row_sep: "\r\n")
         rescue => ex2
