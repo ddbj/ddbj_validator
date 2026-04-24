@@ -31,8 +31,10 @@ log 'podman-compose up -d --force-recreate app'
 podman-compose up -d --force-recreate app
 
 # podman-compose が project 名 (ディレクトリ basename) から container 名を自動生成する。
-# 名前は podman-compose のバージョン依存 (underscore / hyphen) なので ID で掴む。
-cid="$(podman-compose ps -q app 2>/dev/null | head -1)"
+# 名前は podman-compose のバージョン依存 (underscore / hyphen) なので、コンテナに貼られた
+# compose label から ID を引く。`podman-compose ps -q` は 1.0.6 で空を返すことがあるので
+# 使わない。
+cid="$(podman ps -q --filter "label=io.podman.compose.project=$instance" --filter 'label=com.docker.compose.service=app' | head -1 || true)"
 
 if [[ -z "$cid" ]]; then
   log 'app container not found'
