@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'json'
 require 'erb'
-require 'ostruct'
 require 'date'
 require 'nokogiri'
 require_relative "../base"
