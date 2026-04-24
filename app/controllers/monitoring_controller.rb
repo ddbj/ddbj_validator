@@ -1,4 +1,4 @@
-require 'net/http'
+require 'http'
 require 'tempfile'
 
 class MonitoringController < ApplicationController
@@ -6,36 +6,33 @@ class MonitoringController < ApplicationController
   # NG のときは HTTP 503 で返すことで curl --fail probe を失敗させる。
   def show
     submission_id = validator_setting.dig('monitoring', 'ssub_id') || 'SSUB009526'
-    local_port    = ENV.fetch('DDBJ_VALIDATOR_APP_UNICORN_PORT', '3000')
-    api_url       = "http://localhost:#{local_port}/api/"
+    api_url       = "http://localhost:#{ENV.fetch('DDBJ_VALIDATOR_APP_UNICORN_PORT', '3000')}/api/"
 
-    res = http_get(api_url + "submission/biosample/#{submission_id}", 'API_KEY' => 'curator')
-    raise "Can't get submission xml file. Please check the validation service." unless res.body.start_with?('<?xml')
+    xml_body = HTTP.headers('API_KEY' => 'curator').get("#{api_url}submission/biosample/#{submission_id}").body.to_s
+    raise "Can't get submission xml file. Please check the validation service." unless xml_body.start_with?('<?xml')
 
-    tmp_xml_file = Tempfile.open('test_biosample') {|f|
-      f.puts(res.body)
+    tmp = Tempfile.open('test_biosample') {|f|
+      f.puts(xml_body)
       f
     }
 
-    post_data = [['biosample', tmp_xml_file.open, {filename: "#{submission_id}.xml"}]]
-    res       = http_post(api_url + 'validation', post_data)
-    uuid      = JSON.parse(res.body)['uuid']
+    uuid = HTTP.post("#{api_url}validation", form: {
+      biosample: HTTP::FormData::File.new(tmp.path, filename: "#{submission_id}.xml")
+    }).parse(:json)['uuid']
 
-    status = ''
-    count  = 0
+    final_status = nil
 
-    until %w[finished error].include?(status)
-      count += 1
-      res    = http_get(api_url + "validation/#{uuid}/status")
-      status = JSON.parse(res.body)['status']
+    50.times do
+      final_status = HTTP.get("#{api_url}validation/#{uuid}/status").parse(:json)['status']
 
-      raise 'Validation processing timed out.' if count > 50
+      break if %w[finished error].include?(final_status)
 
       sleep(2)
     end
 
-    res          = http_get(api_url + "validation/#{uuid}")
-    final_status = JSON.parse(res.body)['status']
+    raise 'Validation processing timed out.' unless %w[finished error].include?(final_status)
+
+    final_status = HTTP.get("#{api_url}validation/#{uuid}").parse(:json)['status']
 
     FileUtils.rm_rf(File.join(data_dir, uuid[0..1], uuid))
 
@@ -48,22 +45,5 @@ class MonitoringController < ApplicationController
   rescue => e
     render json: {status: 'NG', message: "Error has occurred during monitoring processing. Please check the validation service. #{e.message}"},
            status: :service_unavailable
-  end
-
-  private
-
-  def http_get (uri, headers = {})
-    url = URI.parse(uri)
-    req = Net::HTTP::Get.new(url)
-    headers.each {|k, v| req[k] = v }
-    Net::HTTP.start(url.host, url.port, use_ssl: uri.start_with?('https')) {|http| http.request(req) }
-  end
-
-  def http_post (uri, data, headers = {})
-    url = URI.parse(uri)
-    req = Net::HTTP::Post.new(url)
-    req.set_form(data, 'multipart/form-data')
-    headers.each {|k, v| req[k] = v }
-    Net::HTTP.start(url.host, url.port, use_ssl: uri.start_with?('https')) {|http| http.request(req) }
   end
 end
