@@ -13,7 +13,7 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 WebMock.disable_net_connect!(allow_localhost: true)
 
 # test_ddbj_parser がエンドポイント設定済みの状態を前提にしているので、未設定なら stub URL を差し込む
-ENV['DDBJ_PARSER_APP_URL'] = 'http://ddbj-parser.stub/validate' if ENV['DDBJ_PARSER_APP_URL'].to_s.strip.empty?
+ENV['DDBJ_PARSER_APP_URL'] = 'http://ddbj-parser.stub/validate' if ENV['DDBJ_PARSER_APP_URL'].blank?
 
 # trad_validator の file_path_on_log_dir テストが log_dir セット済みを前提にしているので、
 # テストでは明示的に作成する (本番/開発はコンテナで埋まる)。
@@ -72,7 +72,7 @@ Minitest::Test.include(DefaultHttpStubs)
 #     end
 #   end
 module ServiceAvailability
-  PG_CONFIGURED = !ENV['DDBJ_VALIDATOR_APP_POSTGRES_HOST'].to_s.strip.empty?
+  PG_CONFIGURED = ENV['DDBJ_VALIDATOR_APP_POSTGRES_HOST'].present?
 
   VIRTUOSO_REACHABLE = begin
     endpoint = ENV['DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER'] || 'http://localhost:8890/sparql'
