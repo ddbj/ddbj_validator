@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'json'
 require 'erb'
-require 'ostruct'
 require 'date'
 require 'net/http'
 require 'active_support/core_ext/string/filters'
