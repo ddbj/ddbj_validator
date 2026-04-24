@@ -17,6 +17,8 @@ Procfile.dev
 
 # Local env / secrets
 .env
+config/master.key
+config/credentials/*.key
 
 # Docker build inputs aren't needed inside the final image
 .dockerignore
