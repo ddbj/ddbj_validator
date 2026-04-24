@@ -83,8 +83,7 @@ class JVarValidator < ValidatorBase
         {key: "Excel file", value: @data_file},
         {key: "Error message", value: ex.message}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       message = "Failed to load the Excel file.: Please check the files: '#{data_xlsx}'.\n"
       message += "#{ex.message} (#{ex.class})"
       @log.warn("An Excel(Roo::Excelx) loading error has occurred.")
@@ -147,8 +146,7 @@ class JVarValidator < ValidatorBase
         {key: "Sheet name", value: sheet_name},
         {key: "Error message", value: ex.message}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       message = "Failed to load the Excel file.: Please check the files: '#{@data_file}'.\n"
       message += "#{ex.message} (#{ex.class})"
       @log.warn("An Excel(Roo::Excelx) sheet loading error has occurred.")
@@ -240,8 +238,7 @@ class JVarValidator < ValidatorBase
         {key: "Excel file", value: @data_file},
         {key: "Sheet name", value: sheet_name}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -259,8 +256,7 @@ class JVarValidator < ValidatorBase
         {key: "Sheet name", value: sheet_name},
         {key: "line number", value: row_num}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -278,8 +274,7 @@ class JVarValidator < ValidatorBase
         {key: "Sheet name", value: sheet_name},
         {key: "line number", value: row_num}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -300,8 +295,7 @@ class JVarValidator < ValidatorBase
           {key: "Cell", value: cell_pos},
           {key: "Value", value: cell_value(cell)}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     ret
@@ -320,8 +314,7 @@ class JVarValidator < ValidatorBase
         {key: "Sheet name", value: sheet_name},
         {key: "line number", value: row_num}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end

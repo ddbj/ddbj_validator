@@ -140,8 +140,7 @@ class ExperimentValidator < ValidatorBase
           {key: "center name", value: center_name},
           {key: "Path", value: "//EXPERIMENT/@center_name"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -166,8 +165,7 @@ class ExperimentValidator < ValidatorBase
         {key: "Experimentt name", value: experiment_label},
         {key: "Path", value: "#{title_path}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -191,8 +189,7 @@ class ExperimentValidator < ValidatorBase
         {key: "Experimentt name", value: experiment_label},
         {key: "Path", value: "#{desc_path}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -216,8 +213,7 @@ class ExperimentValidator < ValidatorBase
         {key: "Experimentt name", value: experiment_label},
         {key: "Path", value: "#{lib_path}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -243,8 +239,7 @@ class ExperimentValidator < ValidatorBase
           {key: "Experimentt name", value: experiment_label},
           {key: "Path", value: "#{length_path}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -273,8 +268,7 @@ class ExperimentValidator < ValidatorBase
           {key: "Nominal length", value: "#{length}"},
           {key: "Path", value: "#{length_path}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end

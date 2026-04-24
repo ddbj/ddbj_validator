@@ -226,8 +226,7 @@ class BioProjectTsvValidator < ValidatorBase
           {key: "title value", value: title_value},
           {key: "description value", value: description_value}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     result
@@ -254,8 +253,7 @@ class BioProjectTsvValidator < ValidatorBase
            {key: "Field name", value: "pubmed_id"},
            {key: "Value", value: pubmed_id}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result = false
         end
       end
@@ -282,8 +280,7 @@ class BioProjectTsvValidator < ValidatorBase
          {key: "Project name", value: "None"},
          {key: "BioProject accession", value: bioproject_accession}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -316,8 +313,7 @@ class BioProjectTsvValidator < ValidatorBase
           {key: "sample_scope", value: sample_scope},
           {key: "Message", value: "When sample_scope is '#{sample_scope}', organism is required."}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       elsif !(CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
         result = @org_validator.is_infraspecific_rank(taxonomy_id)
         if result == false
@@ -325,8 +321,7 @@ class BioProjectTsvValidator < ValidatorBase
             {key: "organism", value: organism_name},
             {key: "taxonomy_id", value: taxonomy_id}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
@@ -357,8 +352,7 @@ class BioProjectTsvValidator < ValidatorBase
           {key: "organism", value: organism_name},
           {key: "taxonomy_id", value: taxonomy_id}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -398,8 +392,7 @@ class BioProjectTsvValidator < ValidatorBase
       unless scientific_name.nil?
         annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -453,8 +446,7 @@ class BioProjectTsvValidator < ValidatorBase
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
     end #該当するtaxonomy_idが無かった場合は単なるエラー
-    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
-    @error_list.push(error_hash)
+    add_error(rule_code, annotation) #このルールではauto-annotation用のメッセージは表示しない
     false
   end
 
@@ -486,11 +478,8 @@ class BioProjectTsvValidator < ValidatorBase
           annotation = [
             {key: "Field name", value: invalid_field}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          if level == "error_internal_ignore"
-            error_hash[:external] = true
-          end
-          @error_list.push(error_hash)
+          error = add_error(rule_code, annotation)
+          error[:external] = true if level == "error_internal_ignore"
         end
       end
     end
@@ -527,11 +516,8 @@ class BioProjectTsvValidator < ValidatorBase
             {key: "Value", value: invalid[:value]},
             {key: "Position", value: invalid[:field_idx]}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          if level == "error_internal_ignore"
-            error_hash[:external] = true
-          end
-          @error_list.push(error_hash)
+          error = add_error(rule_code, annotation)
+          error[:external] = true if level == "error_internal_ignore"
         end
       end
     end
@@ -563,8 +549,7 @@ class BioProjectTsvValidator < ValidatorBase
           {key: "Value", value: invalid[:value]},
           {key: "Position", value: "#{invalid[:field_idx]}"} # TSVだと++1?
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     result
@@ -600,11 +585,8 @@ class BioProjectTsvValidator < ValidatorBase
             {key: "Value", value: invalid[:value]},
             {key: "format_type", value: invalid[:format_type]}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          if level == "error_internal_ignore"
-            error_hash[:external] = true
-          end
-          @error_list.push(error_hash)
+          error = add_error(rule_code, annotation)
+          error[:external] = true if level == "error_internal_ignore"
         end
       end
     end
@@ -643,11 +625,8 @@ class BioProjectTsvValidator < ValidatorBase
             {key: "Filed names", value: invalid[:field_list].to_s},
             {key: "Meesage", value: "At least one of #{invalid[:field_list].to_s} is required for the '#{invalid[:field_group_name]}' field group."}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          if level == "error_internal_ignore"
-            error_hash[:external] = true
-          end
-          @error_list.push(error_hash)
+          error = add_error(rule_code, annotation)
+          error[:external] = true if level == "error_internal_ignore"
         end
       end
     end
@@ -686,11 +665,8 @@ class BioProjectTsvValidator < ValidatorBase
             {key: "Position(value)", value: invalid[:value_idx]},
             {key: "Meesage", value: "#{invalid[:missing_fields].to_s} is required for the '#{invalid[:field_group_name]}' field group."}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          if level == "error_internal_ignore"
-            error_hash[:external] = true
-          end
-          @error_list.push(error_hash)
+          error = add_error(rule_code, annotation)
+          error[:external] = true if level == "error_internal_ignore"
         end
       end
     end
@@ -727,11 +703,8 @@ class BioProjectTsvValidator < ValidatorBase
             {key: "Field name", value: invalid[:field_name]},
             {key: "Value", value: invalid[:value]}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          if level == "error_internal_ignore"
-            error_hash[:external] = true
-          end
-          @error_list.push(error_hash)
+          error = add_error(rule_code, annotation)
+          error[:external] = true if level == "error_internal_ignore"
         end
       end
     end
@@ -763,8 +736,7 @@ class BioProjectTsvValidator < ValidatorBase
         location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
         annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -791,8 +763,7 @@ class BioProjectTsvValidator < ValidatorBase
         annotation.push({key: "Value", value: invalid[:value]})
       end
       annotation.push({key: "Invalid Position", value: invalid[:disp_txt]})
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -820,8 +791,7 @@ class BioProjectTsvValidator < ValidatorBase
       ]
       location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
       annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -850,8 +820,7 @@ class BioProjectTsvValidator < ValidatorBase
       elsif @file_format == "json"
         annotation.push( {key: "Potision", value: invalid[:field_idx]})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -879,8 +848,7 @@ class BioProjectTsvValidator < ValidatorBase
       ]
       location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
       annotation.push(CommonUtils::create_suggested_annotation([invalid[:replace_value]], "Value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -906,8 +874,7 @@ class BioProjectTsvValidator < ValidatorBase
       annotation = [
         {key: "Field name", value: invalid[:field_name]}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -930,8 +897,7 @@ class BioProjectTsvValidator < ValidatorBase
       annotation = [
         {key: "Field name", value: invalid[:field_name]}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -960,8 +926,7 @@ class BioProjectTsvValidator < ValidatorBase
       elsif @file_format == "json"
         annotation.push( {key: "Position", value: invalid[:field_idx]})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -989,8 +954,7 @@ class BioProjectTsvValidator < ValidatorBase
         annotation = [
           {key: "Missing field names", value: invalid[:field_names]}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     result

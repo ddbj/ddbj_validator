@@ -224,8 +224,7 @@ class BioProjectValidator < ValidatorBase
         {key: "Description", value: description},
         {key: "Path", value: [title_path, desc_path]},
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -254,8 +253,7 @@ class BioProjectValidator < ValidatorBase
           {key: "Description", value: description},
           {key: "Path", value: [title_path, desc_path]},
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -298,8 +296,7 @@ class BioProjectValidator < ValidatorBase
             {key: "ID", value: id},
             {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"} #順番を表示
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result = false
         end
       rescue => ex #NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
@@ -310,8 +307,7 @@ class BioProjectValidator < ValidatorBase
           {key: "Path", value: "#{pub_path}[#{idx + 1}]/@id"}, #順番を表示
           {key: "Message", value: "Validation processing failed because connection to NCBI service failed." }
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -343,8 +339,7 @@ class BioProjectValidator < ValidatorBase
              {key: "BioProject accession", value: bioproject_accession},
              {key: "Path", value: "//Link/Hierarchical[#{idx_h + 1}]/#{member_path}[#{idx_m + 1}]"}
             ]
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-            @error_list.push(error_hash)
+            add_error(rule_code, annotation)
             result = false
           end
         end
@@ -381,8 +376,7 @@ class BioProjectValidator < ValidatorBase
           {key: "OrganismName", value: organism_name},
           {key: "taxID", value: taxonomy_id}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     result
@@ -414,8 +408,7 @@ class BioProjectValidator < ValidatorBase
           {key: "OrganismName", value: organism_name},
           {key: "taxID", value: taxonomy_id}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -454,8 +447,7 @@ class BioProjectValidator < ValidatorBase
       unless scientific_name.nil?
         annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -499,8 +491,7 @@ class BioProjectValidator < ValidatorBase
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
     end #該当するtaxonomy_idが無かった場合は単なるエラー
-    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
-    @error_list.push(error_hash)
+    add_error(rule_code, annotation) #このルールではauto-annotation用のメッセージは表示しない
     false
   end
 end

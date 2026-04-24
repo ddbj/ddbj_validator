@@ -23,7 +23,7 @@ class CombinationValidator < ValidatorBase
 
     @error_list = error_list = []
 
-    @dra_validation_config = @conf[:dra_validation_config] #need?
+    @validation_config = @conf[:validation_config] #need?
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -43,7 +43,7 @@ class CombinationValidator < ValidatorBase
   def read_config (config_file_dir)
     config = {}
     begin
-      config[:dra_validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_dra.json")) #TODO auto update when genereted
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_dra.json")) #TODO auto update when genereted
       config[:platform_filetype] = JSON.parse(File.read(config_file_dir + "/platform_filetype.json"))
       config
     rescue => ex
@@ -137,8 +137,7 @@ class CombinationValidator < ValidatorBase
         {key: "STUDY_REF", value: ref_project_list.to_s},
         {key: "Path", value: "//EXPERIMENT/STUDY_REF/@accession, //ANALYSIS/STUDY_REF/@accession"}
       ]
-      error_hash = CommonUtils::error_obj(@dra_validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -175,8 +174,7 @@ class CombinationValidator < ValidatorBase
             {key: "refname", value: refname},
             {key: "Path", value: "//RUN[#{idx}]/#{refname_path}"}
           ]
-          error_hash = CommonUtils::error_obj(@dra_validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result = false
         end
       end
@@ -215,8 +213,7 @@ class CombinationValidator < ValidatorBase
                 {key: "refname", value: refname},
                 {key: "Path", value: "//RUN[#{idx}]/DATA_BLOCK/FILES/FILE"}
               ]
-              error_hash = CommonUtils::error_obj(@dra_validation_config["rule" + rule_code], @data_file, annotation)
-              @error_list.push(error_hash)
+              add_error(rule_code, annotation)
               result = false
             end
           end
@@ -257,8 +254,7 @@ class CombinationValidator < ValidatorBase
                 {key: "refname", value: refname},
                 {key: "Path", value: "//RUN[#{idx}]/DATA_BLOCK/FILES/FILE"}
               ]
-              error_hash = CommonUtils::error_obj(@dra_validation_config["rule" + rule_code], @data_file, annotation)
-              @error_list.push(error_hash)
+              add_error(rule_code, annotation)
               result = false
             end
           end
@@ -306,8 +302,7 @@ class CombinationValidator < ValidatorBase
                   {key: "filetype", value: unaccept_filetype_list.uniq.to_s},
                   {key: "Path", value: "//RUN[#{idx}]/DATA_BLOCK/FILES/FILE"}
                 ]
-                error_hash = CommonUtils::error_obj(@dra_validation_config["rule" + rule_code], @data_file, annotation)
-                @error_list.push(error_hash)
+                add_error(rule_code, annotation)
                 result = false
               end
             end

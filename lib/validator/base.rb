@@ -50,6 +50,31 @@ class ValidatorBase
   end
 
   #
+  # rule_code から @validation_config を引いて add_raw_error に渡す薄いラッパ。
+  # 通常の rule check はこちらを使う。
+  #
+  # ==== Args
+  # rule_code: "BS_R0009" 等の rule code (内部で "rule" prefix を付けて @validation_config を引く)
+  # annotation: annotation 配列
+  # auto_annotation: auto-annotation 用メッセージを付け足すかどうか (default: false)
+  # source: error_obj の source フィールド (default: @data_file)
+  #
+  def add_error (rule_code, annotation, auto_annotation: false, source: @data_file)
+    add_raw_error(@validation_config["rule" + rule_code], annotation, auto_annotation: auto_annotation, source: source)
+  end
+
+  #
+  # 既に組み立て済みの rule hash を直接渡す版。trad_validator の ddbj_parser_rule(msg) や
+  # @conf[:validation_parser_config] のように @validation_config 以外から rule を引くケース用。
+  # 戻り値は push したエラー hash (push 後に :external 等を上書きしたい呼び出し元向け)。
+  #
+  def add_raw_error (rule, annotation, auto_annotation: false, source: @data_file)
+    error = CommonUtils.error_obj(rule, source, annotation, auto_annotation)
+    @error_list.push(error)
+    error
+  end
+
+  #
   # Exception発生時のlog出力(backtraceを含む)
   #
   # ==== Args
@@ -87,8 +112,7 @@ class ValidatorBase
         {key: "XML file", value: @data_file},
         {key: "XML error message", value: xml_error_msg}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -116,8 +140,7 @@ class ValidatorBase
           {key: "XML file", value: @data_file},
           {key: "XSD error message", value: error.message}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
       false
     end
@@ -199,8 +222,7 @@ class ValidatorBase
           annotation = [
             {key: "Message", value: invalid}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
@@ -225,8 +247,7 @@ class ValidatorBase
       annotation = [
         {key: "Message", value: "Failed to read the file as #{allow_text}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end

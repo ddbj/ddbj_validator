@@ -140,8 +140,7 @@ class AnalysisValidator < ValidatorBase
           {key: "center name", value: center_name},
           {key: "Path", value: "//ANALYSIS/@center_name"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -166,8 +165,7 @@ class AnalysisValidator < ValidatorBase
         {key: "Analysis name", value: analysis_label},
         {key: "Path", value: "#{title_path}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -192,8 +190,7 @@ class AnalysisValidator < ValidatorBase
         {key: "DESCRIPTION", value: ""},
         {key: "Path", value: "//ANALYSIS[#{line_num}]/#{desc_path.gsub('//','')}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -221,8 +218,7 @@ class AnalysisValidator < ValidatorBase
             {key: "filename", value: ""},
             {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result = false
         end
       end
@@ -254,8 +250,7 @@ class AnalysisValidator < ValidatorBase
               {key: "filename", value: filename},
               {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
             ]
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-            @error_list.push(error_hash)
+            add_error(rule_code, annotation)
             result = false
           end
         end
@@ -288,8 +283,7 @@ class AnalysisValidator < ValidatorBase
               {key: "checksum", value: checksum},
               {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
             ]
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-            @error_list.push(error_hash)
+            add_error(rule_code, annotation)
             result = false
           end
         end
