@@ -1,14 +1,10 @@
 services:
   app:
-    container_name: ${DDBJ_VALIDATOR_APP_CONTAINER_NAME:-ddbj_validator_app}
     build:
       context: .
       dockerfile: Dockerfile
-    image: ${DDBJ_VALIDATOR_APP_IMAGE_NAME:-ddbj_validator_app}
     depends_on:
       - virtuoso
-    networks:
-      - ddbj
     ports:
       - ${DDBJ_VALIDATOR_APP_PORT:-18840}:3000
     environment:
@@ -17,7 +13,6 @@ services:
       RAILS_ENV: ${RAILS_ENV}
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       DDBJ_VALIDATOR_APP_UNICORN_PORT: 3000
-      DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: ${DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER}
       DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR: /usr/src/ddbj_validator/logs
     user: ${UID:-0}:${GID:-0}
     volumes:
@@ -29,7 +24,6 @@ services:
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
-    container_name: ${DDBJ_VALIDATOR_VIRTUOSO_CONTAINER_NAME:-ddbj_validator_virtuoso}
     environment:
       DBA_PASSWORD: "dba"
       VIRT_Parameters_DirsAllowed: "., ../vad, /usr/share/proj, /database"
@@ -41,16 +35,9 @@ services:
       VIRT_SPARQL_MaxSortedTopRows: "100000"
       VIRT_SPARQL_MaxQueryExecutionTime: "300"
       VIRT_SPARQL_MaxQueryCostEstimationTime: "-1"
-    networks:
-      - ddbj
     ports:
       - ${DDBJ_VALIDATOR_VIRTUOSO_PORT:-18841}:8890
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}/shared/config/virtuoso:/settings
       - ${PWD}/shared/data/virtuoso:/database
-
-networks:
-  ddbj:
-    name: ${DDBJ_NETWORK_NAME:-ddbj}
-    external: true

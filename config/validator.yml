@@ -37,9 +37,7 @@ staging:
   api_log:
     path: /usr/src/ddbj_validator/logs
   sparql_endpoint:
-    # 各 staging インスタンスが自分の virtuoso コンテナ (virtuoso_staging1 / staging2)
-    # を見に行くので ENV から受け取る。値は .env で設定。
-    master_endpoint: <%= ENV['DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER'] %>
+    master_endpoint: http://virtuoso:8890/sparql
   named_graph_uri:
     taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy-private
   ddbj_rdb:
@@ -60,7 +58,7 @@ production:
   api_log:
     path: /usr/src/ddbj_validator/logs
   sparql_endpoint:
-    master_endpoint: <%= ENV['DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER'] %>
+    master_endpoint: http://virtuoso:8890/sparql
   named_graph_uri:
     taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy-private
   ddbj_rdb:
