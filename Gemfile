@@ -6,6 +6,7 @@ gem "bootsnap", require: false
 
 gem "csv"
 gem "http"
+gem "rack-cors"
 gem "json-schema"
 gem "mail"
 gem "net-ftp"

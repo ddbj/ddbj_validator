@@ -1,11 +1,5 @@
 class ApplicationController < ActionController::API
-  before_action :set_cors_headers
-
   private
-
-  def set_cors_headers
-    response.headers['Access-Control-Allow-Origin'] = '*'
-  end
 
   def validator_setting
     Rails.configuration.validator
