@@ -28,13 +28,6 @@ class ApplicationController < ActionController::API
     render json: {status: 'error', message: message}, status: status
   end
 
-  def require_curator!
-    return if request.headers['API_KEY'] == 'curator'
-
-    send_file Rails.public_path.join('error_unauthorized.json'),
-              type: 'application/json', disposition: 'inline', status: :unauthorized
-  end
-
   def http_get_response (uri, options = {})
     url = URI.parse(uri)
     req = Net::HTTP::Get.new(url)

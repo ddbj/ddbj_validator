@@ -304,8 +304,10 @@ class ApiController < ApplicationController
 
   private
 
+  # request.headers['API_KEY'] は underscore を含むキーを HTTP_ プレフィックス変換
+  # しないため env を直接参照する。旧 Sinatra 版の headers["HTTP_API_KEY"] と互換。
   def authenticate_curator
-    return true if request.headers['API_KEY'] == 'curator'
+    return true if request.env['HTTP_API_KEY'] == 'curator'
 
     send_file Rails.public_path.join('error_unauthorized.json'),
               type: 'application/json', disposition: 'inline', status: :unauthorized
