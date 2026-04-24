@@ -22,11 +22,6 @@ class ValidatorBase
     begin
       setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
       config[:sparql_config] = setting["sparql_endpoint"]
-      @pg_host = config["pg_host"]
-      @pg_port = config["pg_port"]
-      @pg_user = config["pg_user"]
-      @pg_pass = config["pg_pass"]
-      @pg_timeout = config["pg_timeout"]
       if setting["ddbj_rdb"].nil? \
         || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == "" \
         || setting["ddbj_rdb"]["pg_port"].nil? || setting["ddbj_rdb"]["pg_port"] == "" \
@@ -46,9 +41,6 @@ class ValidatorBase
       config[:biosample] = setting["biosample"]
       config[:eutils_api_key] = setting["eutils_api_key"]
       config[:log_dir] = setting["api_log"]["path"]
-      config[:log_file] = setting["api_log"]["path"] + "/validator.log"
-      version = YAML.load(ERB.new(File.read(config_file_dir + "/version.yml")).result)
-      config[:version] = version["version"]
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
