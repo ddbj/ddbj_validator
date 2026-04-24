@@ -1,6 +1,6 @@
 require 'json'
 require 'yaml'
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/common/date_format'
 
 class TestDateFormat < Minitest::Test

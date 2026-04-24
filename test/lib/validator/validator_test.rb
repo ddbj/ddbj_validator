@@ -1,6 +1,6 @@
 require 'fileutils'
 require 'json'
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/validator'
 
 class TestValidator < Minitest::Test

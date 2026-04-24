@@ -1,4 +1,4 @@
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/combination_validator'
 
 class TestCombinationValidator < Minitest::Test

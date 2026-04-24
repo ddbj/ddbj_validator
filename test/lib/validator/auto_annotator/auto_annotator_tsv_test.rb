@@ -1,4 +1,4 @@
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/common/file_parser'
 require 'validator/auto_annotator/auto_annotator_tsv'
 

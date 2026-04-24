@@ -1,7 +1,7 @@
 require 'json'
 require 'yaml'
 require 'erb'
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/common/ddbj_db_validator'
 
 class TestDDBJDbValidator < Minitest::Test

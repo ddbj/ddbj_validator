@@ -1,4 +1,4 @@
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/bioproject_validator'
 require 'validator/common/insdc_nullability'
 require 'validator/common/organism_validator'

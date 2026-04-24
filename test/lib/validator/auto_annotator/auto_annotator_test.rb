@@ -1,4 +1,4 @@
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/auto_annotator/auto_annotator'
 
 require 'json'

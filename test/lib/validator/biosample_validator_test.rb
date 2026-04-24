@@ -1,4 +1,4 @@
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/biosample_validator'
 require 'validator/common/coll_dump'
 require 'validator/common/insdc_nullability'

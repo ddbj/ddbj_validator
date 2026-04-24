@@ -1,4 +1,4 @@
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/common/ncbi_eutils'
 
 class TestNcbiEutils < Minitest::Test

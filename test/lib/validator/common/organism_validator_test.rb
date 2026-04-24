@@ -1,6 +1,6 @@
 require 'yaml'
 require 'erb'
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/common/organism_validator'
 
 class TestOrganismValidator < Minitest::Test

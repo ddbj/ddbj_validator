@@ -1,5 +1,5 @@
 require 'fileutils'
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/jvar_validator'
 require 'validator/common/insdc_nullability'
 

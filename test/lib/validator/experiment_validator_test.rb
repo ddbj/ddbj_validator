@@ -1,4 +1,4 @@
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/experiment_validator'
 
 class TestExperimentValidator < Minitest::Test

@@ -1,4 +1,4 @@
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/biosample_validator'
 require 'validator/common/xml_convertor'
 

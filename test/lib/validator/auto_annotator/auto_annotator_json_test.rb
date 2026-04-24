@@ -1,4 +1,4 @@
-require_relative '../../../test_helpers'
+require 'test_helper'
 require 'validator/auto_annotator/auto_annotator_json'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認

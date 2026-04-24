@@ -1,4 +1,4 @@
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/submission_validator'
 
 class TestSubmissionValidator < Minitest::Test

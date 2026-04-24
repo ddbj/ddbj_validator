@@ -1,6 +1,6 @@
 require 'date'
 require 'fileutils'
-require_relative '../../test_helpers'
+require 'test_helper'
 require 'validator/trad_validator'
 require 'validator/common/insdc_nullability'
 
