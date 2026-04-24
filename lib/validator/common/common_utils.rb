@@ -1,7 +1,6 @@
 require 'erb'
 require 'net/http'
 require 'net/https'
-require 'net/ftp'
 require 'date'
 require 'active_support/core_ext/integer/inflections'
 require 'active_support/core_ext/object/blank'
