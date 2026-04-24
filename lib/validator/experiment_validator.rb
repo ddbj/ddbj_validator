@@ -158,17 +158,15 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_experiment_title (rule_code, experiment_label, experiment_node, line_num)
-    result = true
     title_path = "//EXPERIMENT/TITLE"
-    if node_blank?(experiment_node, title_path)
-      annotation = [
-        {key: "Experimentt name", value: experiment_label},
-        {key: "Path", value: "#{title_path}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true unless node_blank?(experiment_node, title_path)
+
+    annotation = [
+      {key: "Experimentt name", value: experiment_label},
+      {key: "Path",             value: "#{title_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -182,17 +180,15 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_experiment_description (rule_code, experiment_label, experiment_node, line_num)
-    result = true
     desc_path = "//EXPERIMENT/DESIGN/DESIGN_DESCRIPTION"
-    if node_blank?(experiment_node, desc_path)
-      annotation = [
-        {key: "Experimentt name", value: experiment_label},
-        {key: "Path", value: "#{desc_path}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true unless node_blank?(experiment_node, desc_path)
+
+    annotation = [
+      {key: "Experimentt name", value: experiment_label},
+      {key: "Path",             value: "#{desc_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -206,17 +202,15 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_library_name (rule_code, experiment_label, experiment_node, line_num)
-    result = true
     lib_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_NAME"
-    if node_blank?(experiment_node, lib_path)
-      annotation = [
-        {key: "Experimentt name", value: experiment_label},
-        {key: "Path", value: "#{lib_path}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true unless node_blank?(experiment_node, lib_path)
+
+    annotation = [
+      {key: "Experimentt name", value: experiment_label},
+      {key: "Path",             value: "#{lib_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -230,20 +224,18 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_insert_size_for_paired_library (rule_code, experiment_label, experiment_node, line_num)
-    result = true
     paired_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED"
-    unless experiment_node.xpath(paired_path).empty?
-      length_path = paired_path + "/@NOMINAL_LENGTH"
-      if node_blank?(experiment_node, length_path)
-        annotation = [
-          {key: "Experimentt name", value: experiment_label},
-          {key: "Path", value: "#{length_path}"}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    return true if experiment_node.xpath(paired_path).empty?
+
+    length_path = paired_path + "/@NOMINAL_LENGTH"
+    return true unless node_blank?(experiment_node, length_path)
+
+    annotation = [
+      {key: "Experimentt name", value: experiment_label},
+      {key: "Path",             value: "#{length_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -257,22 +249,20 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def insert_size_too_large (rule_code, experiment_label, experiment_node, line_num)
-    result = true
     length_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED/@NOMINAL_LENGTH"
-    unless node_blank?(experiment_node, length_path)
-      length = get_node_text(experiment_node, length_path)
-      #TODO 型チェック
-      if length.to_i > 10000000
-        annotation = [
-          {key: "Experimentt name", value: experiment_label},
-          {key: "Nominal length", value: "#{length}"},
-          {key: "Path", value: "#{length_path}"}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    return true if node_blank?(experiment_node, length_path)
+
+    length = get_node_text(experiment_node, length_path)
+    #TODO 型チェック
+    return true unless length.to_i > 10000000
+
+    annotation = [
+      {key: "Experimentt name", value: experiment_label},
+      {key: "Nominal length",   value: "#{length}"},
+      {key: "Path",             value: "#{length_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
 end

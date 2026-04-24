@@ -216,20 +216,18 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def identical_project_title_and_description(rule_code, data)
-    result = true
-    title_value = @tsv_validator.field_value(data, "title", 0)
+    title_value       = @tsv_validator.field_value(data, "title",       0)
     description_value = @tsv_validator.field_value(data, "description", 0)
-    if !(CommonUtils.blank?(title_value) || CommonUtils.blank?(description_value)) #どちらかが空白なら比較しない(他でエラーになる)
-      if title_value == description_value # 同値の場合にエラー
-        result = false
-        annotation = [
-          {key: "title value", value: title_value},
-          {key: "description value", value: description_value}
-        ]
-        add_error(rule_code, annotation)
-      end
-    end
-    result
+    # どちらかが空白なら比較しない (他でエラーになる)
+    return true if CommonUtils.blank?(title_value) || CommonUtils.blank?(description_value)
+    return true unless title_value == description_value
+
+    annotation = [
+      {key: "title value",       value: title_value},
+      {key: "description value", value: description_value}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -271,20 +269,16 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_umbrella_project(rule_code, data)
-    result = true
     bioproject_accession = @tsv_validator.field_value(data, "umbrella_bioproject_accession", 0)
-    unless CommonUtils.blank?(bioproject_accession)
-      is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
-      if !is_umbrella
-        annotation = [
-         {key: "Project name", value: "None"},
-         {key: "BioProject accession", value: bioproject_accession}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    return true if CommonUtils.blank?(bioproject_accession)
+    return true if @db_validator.umbrella_project?(bioproject_accession)
+
+    annotation = [
+      {key: "Project name",         value: "None"},
+      {key: "BioProject accession", value: bioproject_accession}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -340,23 +334,20 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def metagenome_or_environmental (rule_code, taxonomy_id, organism_name, sample_scope)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
-    return nil if CommonUtils::blank?(sample_scope)
+    return nil  if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil  if CommonUtils::blank?(sample_scope)
+    return true unless sample_scope.downcase == "environment"
 
-    result = true
-    if sample_scope.downcase == "environment"
-      #tax_id がmetagenome配下かどうか
-      linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
-      unless @org_validator.has_linage(taxonomy_id, linages) && !organism_name.nil? && organism_name.end_with?("metagenome")
-        annotation = [
-          {key: "organism", value: organism_name},
-          {key: "taxonomy_id", value: taxonomy_id}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    # tax_id がmetagenome配下かどうか
+    linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
+    return true if @org_validator.has_linage(taxonomy_id, linages) && !organism_name.nil? && organism_name.end_with?("metagenome")
+
+    annotation = [
+      {key: "organism",    value: organism_name},
+      {key: "taxonomy_id", value: taxonomy_id}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
 
@@ -378,24 +369,21 @@ class BioProjectTsvValidator < ValidatorBase
   def taxonomy_name_and_id_not_match (rule_code, taxonomy_id, organism_name)
     return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
     return nil if (CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID) && CommonUtils::blank?(organism_name) # BPの場合はorganism nameは必須でない(Multiisolateの場合)のでtax_id共にnilならチェックしない
-    result = true
+
     organism_name = "" if CommonUtils::blank?(organism_name)
     organism_name.chomp.strip!
     scientific_name = @org_validator.get_organism_name(taxonomy_id)
-    if !scientific_name.nil? && scientific_name == organism_name
-      retuls = true
-    else
-      annotation = [
-        {key: "OrganismName", value: organism_name},
-        {key: "taxID", value: taxonomy_id}
-      ]
-      unless scientific_name.nil?
-        annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
-      end
-      add_error(rule_code, annotation)
-      result = false
+    return true if !scientific_name.nil? && scientific_name == organism_name
+
+    annotation = [
+      {key: "OrganismName", value: organism_name},
+      {key: "taxID",        value: taxonomy_id}
+    ]
+    unless scientific_name.nil?
+      annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
     end
-    result
+    add_error(rule_code, annotation)
+    false
   end
 
   #

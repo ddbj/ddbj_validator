@@ -158,17 +158,15 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def missing_run_title (rule_code, run_label, run_node, line_num)
-    result = true
     title_path = "//RUN/TITLE"
-    if node_blank?(run_node, title_path)
-      annotation = [
-        {key: "Run name", value: run_label},
-        {key: "Path", value: "#{title_path}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true unless node_blank?(run_node, title_path)
+
+    annotation = [
+      {key: "Run name", value: run_label},
+      {key: "Path",     value: "#{title_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -278,23 +276,18 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def invalid_bam_alignment_file_series (rule_code, run_label, run_node, line_num)
-    result = true
     filetype_path = "//DATA_BLOCK/FILES/FILE/@filetype"
-    filetype_list = []
-    run_node.xpath(filetype_path).each_with_index do |filetype_node, f_idx|
-      filetype_list.push(get_node_text(filetype_node))
-    end
-    filetype_list.select! {|filetype| filetype == 'bam' || filetype == 'tab' || filetype == 'reference_fasta'}
-    if filetype_list.size >= 2
-      annotation = [
-        {key: "Run name", value: run_label},
-        {key: "filetypes", value: filetype_list.to_s},
-        {key: "Path", value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    filetype_list = run_node.xpath(filetype_path).map { get_node_text(it) }
+                            .select {|filetype| %w[bam tab reference_fasta].include?(filetype) }
+    return true if filetype_list.size < 2
+
+    annotation = [
+      {key: "Run name",  value: run_label},
+      {key: "filetypes", value: filetype_list.to_s},
+      {key: "Path",      value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -311,24 +304,19 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def mixed_filetype (rule_code, run_label, run_node, line_num)
-    result = true
     filetype_path = "//DATA_BLOCK/FILES/FILE/@filetype"
-    filetype_list = []
-    run_node.xpath(filetype_path).each_with_index do |filetype_node, f_idx|
-      filetype_list.push(get_node_text(filetype_node))
-    end
+    filetype_list = run_node.xpath(filetype_path).map { get_node_text(it) }
     org_filetype_list = filetype_list.dup
-    filetype_list.delete_if {|filetype| filetype == 'bam' || filetype == 'tab' || filetype == 'reference_fasta' || filetype == 'SOLiD_native_csfasta' || filetype == 'SOLiD_native_qual'}
-    if filetype_list.uniq.size >= 2
-      annotation = [
-        {key: "Run name", value: run_label},
-        {key: "filetypes", value: org_filetype_list.to_s},
-        {key: "Path", value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    filetype_list.delete_if {|filetype| %w[bam tab reference_fasta SOLiD_native_csfasta SOLiD_native_qual].include?(filetype) }
+    return true if filetype_list.uniq.size < 2
+
+    annotation = [
+      {key: "Run name",  value: run_label},
+      {key: "filetypes", value: org_filetype_list.to_s},
+      {key: "Path",      value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
 end

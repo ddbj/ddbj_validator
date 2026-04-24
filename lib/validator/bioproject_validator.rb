@@ -240,24 +240,23 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def identical_project_title_and_description (rule_code, project_label, project_node, line_num)
-    result = true
     title_path = "//Project/ProjectDescr/Title"
-    desc_path = "//Project/ProjectDescr/Description"
-    if !project_node.xpath(title_path).empty? && !project_node.xpath(desc_path).empty? #両方要素あり
-      title = get_node_text(project_node, title_path)
-      description = get_node_text(project_node, desc_path)
-      if title == description
-        annotation = [
-          {key: "Project name", value: project_label},
-          {key: "Title", value: title},
-          {key: "Description", value: description},
-          {key: "Path", value: [title_path, desc_path]},
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    desc_path  = "//Project/ProjectDescr/Description"
+    # 両方要素ありの時だけ比較する
+    return true if project_node.xpath(title_path).empty? || project_node.xpath(desc_path).empty?
+
+    title       = get_node_text(project_node, title_path)
+    description = get_node_text(project_node, desc_path)
+    return true unless title == description
+
+    annotation = [
+      {key: "Project name", value: project_label},
+      {key: "Title",        value: title},
+      {key: "Description",  value: description},
+      {key: "Path",         value: [title_path, desc_path]},
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -395,24 +394,23 @@ class BioProjectValidator < ValidatorBase
   #
   def metagenome_or_environmental (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
     return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
-    result = true
 
+    # eEnvironment でなければチェックしない
     environment = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eEnvironment']")
-    unless environment.empty? #eEnvironmentである場合にチェック
-      #tax_id がmetagenome配下かどうか
-      linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
-      unless @org_validator.has_linage(taxonomy_id, linages) && !organism_name.nil? && organism_name.end_with?("metagenome")
-        annotation = [
-          {key: "Project name", value: project_label},
-          {key: "Path", value: [@taxid_path, @orgname_path]},
-          {key: "OrganismName", value: organism_name},
-          {key: "taxID", value: taxonomy_id}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    return true if environment.empty?
+
+    # tax_id がmetagenome配下かどうか
+    linages = [OrganismValidator::TAX_UNCLASSIFIED_SEQUENCES]
+    return true if @org_validator.has_linage(taxonomy_id, linages) && !organism_name.nil? && organism_name.end_with?("metagenome")
+
+    annotation = [
+      {key: "Project name", value: project_label},
+      {key: "Path",         value: [@taxid_path, @orgname_path]},
+      {key: "OrganismName", value: organism_name},
+      {key: "taxID",        value: taxonomy_id}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -432,25 +430,22 @@ class BioProjectValidator < ValidatorBase
   #
   def taxonomy_name_and_id_not_match (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
     return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
-    result = true
-    organism_name = "" if CommonUtils::blank?(organism_name)
+
+    organism_name   = "" if CommonUtils::blank?(organism_name)
     scientific_name = @org_validator.get_organism_name(taxonomy_id)
-    if !scientific_name.nil? && scientific_name == organism_name
-      retuls = true
-    else
-      annotation = [
-        {key: "Project name", value: project_label},
-        {key: "Path", value: [@taxid_path, @orgname_path]},
-        {key: "OrganismName", value: organism_name},
-        {key: "taxID", value: taxonomy_id}
-      ]
-      unless scientific_name.nil?
-        annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
-      end
-      add_error(rule_code, annotation)
-      result = false
+    return true if !scientific_name.nil? && scientific_name == organism_name
+
+    annotation = [
+      {key: "Project name", value: project_label},
+      {key: "Path",         value: [@taxid_path, @orgname_path]},
+      {key: "OrganismName", value: organism_name},
+      {key: "taxID",        value: taxonomy_id}
+    ]
+    unless scientific_name.nil?
+      annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
     end
-    result
+    add_error(rule_code, annotation)
+    false
   end
 
   #

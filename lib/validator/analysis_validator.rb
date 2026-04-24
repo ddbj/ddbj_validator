@@ -158,17 +158,15 @@ class AnalysisValidator < ValidatorBase
   # true/false
   #
   def missing_analysis_title (rule_code, analysis_label, analysis_node, line_num)
-    result = true
     title_path = "//ANALYSIS/TITLE"
-    if node_blank?(analysis_node, title_path)
-      annotation = [
-        {key: "Analysis name", value: analysis_label},
-        {key: "Path", value: "#{title_path}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true unless node_blank?(analysis_node, title_path)
+
+    annotation = [
+      {key: "Analysis name", value: analysis_label},
+      {key: "Path", value: "#{title_path}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -182,18 +180,16 @@ class AnalysisValidator < ValidatorBase
   # true/false
   #
   def missing_analysis_description (rule_code, analysis_label, analysis_node, line_num)
-    result = true
     desc_path = "//DESCRIPTION"
-    if node_blank?(analysis_node, desc_path)
-      annotation = [
-        {key: "Analysis name", value: analysis_label},
-        {key: "DESCRIPTION", value: ""},
-        {key: "Path", value: "//ANALYSIS[#{line_num}]/#{desc_path.gsub('//','')}"}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true unless node_blank?(analysis_node, desc_path)
+
+    annotation = [
+      {key: "Analysis name", value: analysis_label},
+      {key: "DESCRIPTION", value: ""},
+      {key: "Path", value: "//ANALYSIS[#{line_num}]/#{desc_path.gsub('//','')}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
