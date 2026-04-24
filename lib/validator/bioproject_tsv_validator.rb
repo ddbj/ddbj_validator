@@ -158,7 +158,7 @@ class BioProjectTsvValidator < ValidatorBase
 
     ### organismの検証とtaxonomy_idの確定
     input_taxid_with_pos =  @tsv_validator.field_value_with_position(bp_data, "taxonomy_id", 0)
-    if input_taxid_with_pos.nil? || CommonUtils::blank?(input_taxid_with_pos[:value]) #taxonomy_idの記述がない
+    if input_taxid_with_pos.nil? || input_taxid_with_pos[:value].blank? #taxonomy_idの記述がない
       taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
     else
       taxonomy_id = input_taxid_with_pos[:value]
@@ -219,7 +219,7 @@ class BioProjectTsvValidator < ValidatorBase
     title_value       = @tsv_validator.field_value(data, "title",       0)
     description_value = @tsv_validator.field_value(data, "description", 0)
     # どちらかが空白なら比較しない (他でエラーになる)
-    return true if CommonUtils.blank?(title_value) || CommonUtils.blank?(description_value)
+    return true if title_value.blank? || description_value.blank?
     return true unless title_value == description_value
 
     annotation = [
@@ -245,7 +245,7 @@ class BioProjectTsvValidator < ValidatorBase
     return true if pubmed_id_list.nil?
     common = CommonUtils.new
     pubmed_id_list.each do |pubmed_id|
-      unless CommonUtils.blank?(pubmed_id)
+      unless pubmed_id.blank?
         unless common.exist_pubmed_id?(pubmed_id.to_s)
           annotation = [
            {key: "Field name", value: "pubmed_id"},
@@ -270,7 +270,7 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def invalid_umbrella_project(rule_code, data)
     bioproject_accession = @tsv_validator.field_value(data, "umbrella_bioproject_accession", 0)
-    return true if CommonUtils.blank?(bioproject_accession)
+    return true if bioproject_accession.blank?
     return true if @db_validator.umbrella_project?(bioproject_accession)
 
     annotation = [
@@ -296,11 +296,11 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, taxonomy_id, organism_name, sample_scope)
-    return nil if CommonUtils::blank?(sample_scope)
+    return nil if sample_scope.blank?
     result = true
 
     unless sample_scope.downcase == "multiisolate" # multiの場合は無視
-      if CommonUtils::blank?(organism_name) || CommonUtils::null_value?(organism_name) # organismの記載がない
+      if organism_name.blank? || CommonUtils::null_value?(organism_name) # organismの記載がない
         result = false
         annotation = [
           {key: "organism", value: ""},
@@ -308,7 +308,7 @@ class BioProjectTsvValidator < ValidatorBase
           {key: "Message", value: "When sample_scope is '#{sample_scope}', organism is required."}
         ]
         add_error(rule_code, annotation)
-      elsif !(CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
+      elsif !(taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID)
         result = @org_validator.is_infraspecific_rank(taxonomy_id)
         if result == false
           annotation = [
@@ -334,8 +334,8 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def metagenome_or_environmental (rule_code, taxonomy_id, organism_name, sample_scope)
-    return nil  if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
-    return nil  if CommonUtils::blank?(sample_scope)
+    return nil  if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil  if sample_scope.blank?
     return true unless sample_scope.downcase == "environment"
 
     # tax_id がmetagenome配下かどうか
@@ -367,10 +367,10 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def taxonomy_name_and_id_not_match (rule_code, taxonomy_id, organism_name)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
-    return nil if (CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID) && CommonUtils::blank?(organism_name) # BPの場合はorganism nameは必須でない(Multiisolateの場合)のでtax_id共にnilならチェックしない
+    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if (taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID) && organism_name.blank? # BPの場合はorganism nameは必須でない(Multiisolateの場合)のでtax_id共にnilならチェックしない
 
-    organism_name = "" if CommonUtils::blank?(organism_name)
+    organism_name = "" if organism_name.blank?
     organism_name.chomp.strip!
     scientific_name = @org_validator.get_organism_name(taxonomy_id)
     return true if !scientific_name.nil? && scientific_name == organism_name
@@ -400,8 +400,8 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def taxonomy_error_warning (rule_code, organism_with_pos, taxid_with_pos)
-    return nil if CommonUtils::blank?(organism_with_pos) #organismの記載無し
-    organism_with_pos[:value] = "" if CommonUtils::blank?(organism_with_pos[:value])
+    return nil if organism_with_pos.blank? #organismの記載無し
+    organism_with_pos[:value] = "" if organism_with_pos[:value].blank?
     result = false #このメソッドが呼び出されている時点でfalse
 
     unless organism_with_pos[:value] == ""

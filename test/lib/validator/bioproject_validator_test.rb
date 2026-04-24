@@ -50,7 +50,7 @@ class TestBioProjectValidator < Minitest::Test
   def get_input_taxid (project_node)
     taxonomy_id = OrganismValidator::TAX_INVALID
     input_taxid = @validator.get_node_text(project_node,  "//Organism/@taxID")
-    unless CommonUtils::blank?(input_taxid) #taxonomy_idの記述があれば
+    unless input_taxid.blank? #taxonomy_idの記述があれば
       taxonomy_id = input_taxid
     end
     taxonomy_id
@@ -59,7 +59,7 @@ class TestBioProjectValidator < Minitest::Test
   def get_input_organism_name (project_node)
     organism_name = ""
     input_oganism_name = @validator.get_node_text(project_node,  "//Organism/OrganismName")
-    unless CommonUtils::blank?(input_oganism_name) #organism_nameの記述があれば
+    unless input_oganism_name.blank? #organism_nameの記述があれば
       organism_name = input_oganism_name
     end
     organism_name

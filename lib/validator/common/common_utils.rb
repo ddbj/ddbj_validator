@@ -3,6 +3,9 @@ require 'net/http'
 require 'net/https'
 require 'net/ftp'
 require 'date'
+require 'active_support/core_ext/integer/inflections'
+require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/string/filters'
 
 class CommonUtils
   @@AUTO_ANNOTAION_MSG = "An automatically-generated correction will be applied."
@@ -171,18 +174,6 @@ class CommonUtils
     else
       annotation[:suggested_value].first
     end
-  end
-
-  #
-  # 引数がnilか空白文字であればtrueを返す
-  #
-  # ==== Args
-  # value: 検査する値
-  # ==== Return
-  # true/false
-  #
-  def self.blank?(value)
-    value.nil? || value.to_s.strip.empty?
   end
 
   #

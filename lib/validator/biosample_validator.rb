@@ -536,7 +536,7 @@ class BioSampleValidator < ValidatorBase
           else
             attr_name = attribute["key"]
           end
-          #if !(CommonUtils::blank?(attribute["key"]) && CommonUtils::blank?(attribute["value"]))
+          #if !(attribute["key"].blank? && attribute["value"].blank?)
           # 値が空でない属性だけの属性ハッシュ&リストを生成。taxonomy_idは値追加の機会が多いので空値でも属性として保持する
           if biosample["attributes"][attr_name].nil? # 同一属性が出現する場合は、先の記述を優先
             biosample["attributes"][attr_name] = attribute["value"]
@@ -638,7 +638,7 @@ class BioSampleValidator < ValidatorBase
     return if attribute_list.nil?
     missing_attr_list = []
     attribute_list.each do |attr|
-      if CommonUtils::blank?(attr.keys.first) && !CommonUtils::blank?(attr[attr.keys.first]) # keyがなくvalueだけあるもの
+      if attr.keys.first.blank? && attr[attr.keys.first].present? # keyがなくvalueだけあるもの
         missing_attr_list.push(attr)
       end
     end
@@ -707,7 +707,7 @@ class BioSampleValidator < ValidatorBase
   def missing_package_information (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil?
 
-    if !CommonUtils::blank?(biosample_data["package"])
+    if biosample_data["package"].present?
       true
     else
       annotation = [
@@ -730,7 +730,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def unknown_package (rule_code, sample_name, package_name, package_version, line_num)
-    return nil if CommonUtils::blank?(package_name)
+    return nil if package_name.blank?
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
@@ -852,7 +852,7 @@ class BioSampleValidator < ValidatorBase
 
     sample_attr.each do |attr_name, attr_value|
       if mandatory_attr_list.include?(attr_name)
-        if CommonUtils::blank?(attr_value)
+        if attr_value.blank?
           missing_attr_names.push(attr_name)
         end
       end
@@ -890,7 +890,7 @@ class BioSampleValidator < ValidatorBase
       exist_attr_list = []
       attr_set.each do |mandatory_attr_name|
         sample_attr.each do |attr_name, attr_value|
-          if mandatory_attr_name == attr_name && !CommonUtils::blank?(attr_value)
+          if mandatory_attr_name == attr_name && attr_value.present?
             exist_attr_list.push(attr_name)
           end
         end
@@ -954,7 +954,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def attribute_value_not_in_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
 
     result =  true
     if !cv_attr[attr_name].nil? # CVを使用する属性か
@@ -1009,7 +1009,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
 
     # CVを使用しない属性か、CVリストに値があれば OK
     return true if cv_attr[attr_name].nil? || cv_attr[attr_name].include?(attr_val)
@@ -1037,7 +1037,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_publication_identifier (rule_code, sample_name, attr_name, attr_val, ref_attr, line_num)
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
 
     common = CommonUtils.new
     result =  true
@@ -1550,7 +1550,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
-    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if package_name.blank? || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
     #あればキャッシュを使用
     cache_key = ValidatorCache::create_key(taxonomy_id, package_name)
@@ -1593,7 +1593,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def sex_for_bacteria (rule_code, sample_name, taxonomy_id, sex, organism, line_num)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID || CommonUtils::null_value?(sex)
+    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID || CommonUtils::null_value?(sex)
 
     ret = true
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
@@ -1782,7 +1782,7 @@ class BioSampleValidator < ValidatorBase
   # line_num
   # ==== Return
   def invalid_missing_value(rule_code, sample_name, attr_name, attr_val, null_accepted_list, null_not_recommended_list, package_attr_list, attr_no, line_num)
-    return nil if CommonUtils::blank?(attr_val)
+    return nil if attr_val.blank?
     result = true
 
     unless package_attr_list.nil?
@@ -1856,7 +1856,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_datetime_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
     return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
@@ -1912,7 +1912,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_datetime (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
     return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
@@ -1949,10 +1949,10 @@ class BioSampleValidator < ValidatorBase
   #
   def special_character_included (rule_code, sample_name, attr_name, attr_val, special_chars, target, line_num)
     if target == "attr_name" #属性名の検証
-      return nil if CommonUtils::blank?(attr_name)
+      return nil if attr_name.blank?
       replaced = attr_name.dup
     elsif target == "attr_value" #属性値の検証
-      return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+      return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
       replaced = attr_val.dup
     else
       return nil
@@ -2025,9 +2025,9 @@ class BioSampleValidator < ValidatorBase
     if taxon_values.size == uniq_taxon_values.size
       return true
     else
-      organism = "" if CommonUtils::blank?(organism)
-      host = "" if CommonUtils::blank?(host)
-      isolation_source = "" if CommonUtils::blank?(isolation_source)
+      organism = "" if organism.blank?
+      host = "" if host.blank?
+      isolation_source = "" if isolation_source.blank?
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "organism", value: organism},
@@ -2055,25 +2055,22 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_data_format (rule_code, sample_name, attr_name, attr_val, target, attr_no, line_num)
     if target == "attr_name" #属性名の検証
-      return nil if CommonUtils::blank?(attr_name)
+      return nil if attr_name.blank?
       replaced = attr_name.dup
     elsif target == "attr_value" #属性値の検証
-      return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+      return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
       replaced = attr_val.dup
     else
       return nil
     end
 
     result = true
-    replaced.strip!  #セル内の前後の空白文字を除去
-    replaced.gsub!(/\t/, " ") #セル内部のタブを空白1個に
-    replaced.gsub!(/\s+/, " ") #二個以上の連続空白を１個に
-    replaced.gsub!(/(\r\n|\r|\n)/, " ") #セル内部の改行を空白1個に
-    #セル内の最初と最後が ' or " で囲われていたら削除
+    # 前後の空白除去 + タブ/改行/連続空白を 1 個の空白に圧縮
+    replaced = replaced.squish
+    # セル内の最初と最後が ' or " で囲われていたら削除 → 再度 strip
     if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
-      replaced = replaced[1..-2]
+      replaced = replaced[1..-2].strip
     end
-    replaced.strip!  #引用符を除いた後にセル内の前後の空白文字をもう一度除去
     if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
       annotation = [
         {key: "Sample name", value: sample_name},
@@ -2118,7 +2115,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_ascii_attribute_value (rule_code, sample_name, attr_name, attr_val, line_num)
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
     return true if attr_val.ascii_only?
 
     # 属性値のどこにnon ascii文字があるか示すメッセージを作成
@@ -2145,7 +2142,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def duplicated_sample_title_in_this_submission (rule_code, biosample_list)
-    return nil if CommonUtils::blank?(biosample_list)
+    return nil if biosample_list.blank?
 
     result = true
     biosample_list_lite = []
@@ -2317,7 +2314,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_integer_attribute_value (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
-    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
     # 整数型の属性であり有効な入力値がある場合だけチェック
     return true unless int_attr.include?(attr_name)
 
@@ -2346,7 +2343,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def duplicate_sample_names(rule_code, biosample_list)
-    return nil if CommonUtils::blank?(biosample_list)
+    return nil if biosample_list.blank?
     result = true
 
     # 同一ファイル内での重複チェック. 同じsubmissionは1ファイル内に列挙されていることを前提とする
@@ -2697,7 +2694,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_taxonomy_for_genome_sample (rule_code, sample_name, package_name, taxonomy_id, organism, line_num)
-    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
+    return nil if package_name.blank? || CommonUtils::null_value?(organism)
     result = true
     if package_name.start_with?("MIGS.ba") || package_name.start_with?("MIGS.eu")
       # "sp."終わり、または"xxx sp. (in: yyy)", "xxx sp. (ex yyy)"であればエラー seealso: https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
@@ -3095,7 +3092,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def cov2_package_versus_organism (rule_code, sample_name, package_name, organism, line_num)
-    return nil if CommonUtils::blank?(package_name) || CommonUtils::blank?(organism)
+    return nil if package_name.blank? || organism.blank?
     ret = true
     if package_name.downcase.start_with?("sars-cov-2.") # SARS-CoV-2.clとSARS-CoV-2.wwsurvの場合だけエラーにする
       ret = false
@@ -3346,7 +3343,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def null_value_for_infraspecific_identifier_error (rule_code, sample_name, sample_attr, package_name, line_num)
-    return nil if CommonUtils::blank?(package_name)
+    return nil if package_name.blank?
     # 設定ファイルに書くか？
     package_vs_attr_settings = {
       "MIGS.ba" => ["strain"],
@@ -3376,7 +3373,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def null_value_for_infraspecific_identifier_warning (rule_code, sample_name, sample_attr, package_name, line_num)
-    return nil if CommonUtils::blank?(package_name)
+    return nil if package_name.blank?
     # 設定ファイルに書くか？
     package_vs_attr_settings = {
       "Microbe" => ["strain", "isolate"]
@@ -3399,7 +3396,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def null_value_for_infraspecific_identifier (rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
-    return nil if CommonUtils::blank?(package_name)
+    return nil if package_name.blank?
     ret = true
     mandatory_attr_list_to_message = nil
     package_vs_attr_settings.each do |package_prefix, mandatory_attr_list|
@@ -3443,7 +3440,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_identical_identifiers_among_organism_strain_isolate (rule_code, sample_name, package_name, organism, strain, isolate, line_num)
-    return nil if CommonUtils::blank?(package_name) || CommonUtils::null_value?(organism)
+    return nil if package_name.blank? || CommonUtils::null_value?(organism)
     result = true
     if package_name.start_with?("MIGS.ba")
       keywords = ["sp.", "bacterium", "archaeon"]
