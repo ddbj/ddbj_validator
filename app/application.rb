@@ -316,6 +316,10 @@ module DDBJValidator
       rescue => e
         ret_message = '{"status": "NG", "message": "Error has occurred during monitoring processing. Please check the validation service. ' + e.message + '"}'
       end
+      # NG のときは HTTP レベルでも不健全を表す。200 で返すと deploy の curl --fail probe や
+      # 外形監視ツールがサービス正常と判断してしまうため
+      content_type :json
+      status 503 unless ret_message.start_with?('{"status": "OK"')
       ret_message
     end
 
@@ -466,9 +470,14 @@ module DDBJValidator
     helpers do
       # file数と組み合わせをチェック
       def valid_file_combination?
-        # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する
+        # paramsでは重複を省いたrequest parameterで渡されるため、form_inputで全データ確認する。
+        # Rack 3 で rack.request.form_input は multipart 時でも nil になり得るので、常に生 body
+        # を保持する rack.input から読む。他のミドルウェアが先に読んでいる場合に備えて rewind する
         file_combination = true
-        form_vars = @env["rack.request.form_input"].read
+        input = @env["rack.input"]
+        input.rewind if input.respond_to?(:rewind)
+        form_vars = input.read
+        input.rewind if input.respond_to?(:rewind)
         form_vars = Rack::Utils.escape(form_vars)
         req_params = Rack::Utils.parse_query(form_vars)
         param_names = req_params["name"]
