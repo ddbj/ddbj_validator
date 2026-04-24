@@ -35,7 +35,7 @@ class SubmissionsController < ApplicationController
   def authenticate_curator
     return if request.env['HTTP_API_KEY'] == 'curator'
 
-    send_file Rails.public_path.join('error_unauthorized.json'),
+    send_file Rails.public_path.join('api/error_unauthorized.json'),
               type: 'application/json', disposition: 'inline', status: :unauthorized
   end
 end

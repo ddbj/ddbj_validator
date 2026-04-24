@@ -2,13 +2,10 @@ Rails.application.routes.draw do
   get '/up' => 'rails/health#show', as: :rails_health_check
 
   scope '/api' do
-    root to: 'home#index', as: :api_root
-
-    get  'apispec/'                => 'home#apispec'
-    get  'client/index'            => 'home#client'
-    get  'error_unauthorized.json' => 'home#error_unauthorized'
-    get  'error_forbidden.json'    => 'home#error_forbidden'
-    get  'error_not_found.json'    => 'home#error_not_found'
+    # 静的ファイル (index.html / apispec/index.html / client/index.html /
+    # error_*.json) は public/api/ 配下に置いて ActionDispatch::Static に
+    # 任せる。送信元: URL → ファイルのマッピングは Static が .html や
+    # index.html を自動補完するのでルート定義は不要。
 
     post 'validation'                             => 'validations#create'
     get  'validation/:uuid'                       => 'validations#show',        constraints: {uuid: /[0-9a-f-]+/}
