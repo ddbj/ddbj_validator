@@ -738,9 +738,6 @@ class TestTradValidator < Minitest::Test
   # rule:TR_R0013
   def test_invalid_combination_of_accessions
     return nil if @ddbj_db_mode == false
-    # fixture に DRR101361 / DRR101362 / SAMD00093579-93784 等の具体的な DRA 関係データが未投入なので、
-    # 本テストで期待される linked_bioproject / linked_run を再現できない。必要が出てきたら seed を拡充する
-    skip 'TR_R0013 の ok/ng 判定に必要な DRA 関係 fixture が未投入'
     #ok case
     ##common name
     dblink_list = [

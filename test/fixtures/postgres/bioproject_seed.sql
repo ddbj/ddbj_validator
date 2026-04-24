@@ -19,6 +19,8 @@ INSERT INTO mass.submission (submission_id, submitter_id) VALUES
   ('PSUB002342', 'anyone'),     -- PSUB002342 umbrella (test_invalid_umbrella_project submission_id 経由)
   ('PSUB000051', 'anyone'),     -- PRJDB51 (deleted)
   ('PSUB005969', 'anyone'),     -- PRJDB5969
+  ('PSUB005067', 'anyone'),     -- PRJDB5067 (test_invalid_combination_of_accessions)
+  ('PSUB006348', 'anyone'),     -- PRJDB6348 (test_invalid_combination_of_accessions)
   ('PSUB004841', 'hirakawa'),   -- PRJDB4841
   ('PSUB000001', 'anyone'),     -- PRJDB1 (test_invalid_bioproject_accession)
   ('PSUB003675', 'anyone'),     -- test_invalid_bioproject_accession 用の PSUB path
@@ -44,6 +46,8 @@ INSERT INTO mass.project (submission_id, project_id_prefix, project_id_counter, 
   ('PSUB002342', 'PRJDB', 2342, 'umbrella', NULL),
   ('PSUB000051', 'PRJDB',   51, 'primary',  5700),  -- deleted
   ('PSUB005969', 'PRJDB', 5969, 'primary',  NULL),
+  ('PSUB005067', 'PRJDB', 5067, 'primary',  NULL),
+  ('PSUB006348', 'PRJDB', 6348, 'primary',  NULL),
   ('PSUB004841', 'PRJDB', 4841, 'primary',  NULL),
   ('PSUB_ffpri', 'PRJDB', 9999, 'primary',  NULL);
 

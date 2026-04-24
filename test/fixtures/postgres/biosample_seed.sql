@@ -55,7 +55,11 @@ INSERT INTO mass.sample (smp_id, submission_id, sample_name, status_id) VALUES
   (56903, 'SSUB_REF', 'SAMPLE-56903', NULL),
   (56904, 'SSUB_REF', 'SAMPLE-56904', NULL),
   (80626, 'SSUB_REF', 'SAMPLE-80626', NULL),
-  (80628, 'SSUB_REF', 'SAMPLE-80628', NULL);
+  (80628, 'SSUB_REF', 'SAMPLE-80628', NULL),
+  -- test_invalid_combination_of_accessions (TR_R0013) 用
+  (93784, 'SSUB_REF', 'SAMPLE-93784', NULL),   -- DRA 未紐付けサンプル (case "not link via DRA")
+  (93579, 'SSUB_REF', 'SAMPLE-93579', NULL),   -- → PRJDB6348 + DRR101361
+  (93580, 'SSUB_REF', 'SAMPLE-93580', NULL);   -- → PRJDB6348 + DRR101362
 
 -- accession: smp_id ⇄ SAMD accession_id
 INSERT INTO mass.accession (smp_id, accession_id) VALUES
@@ -70,7 +74,10 @@ INSERT INTO mass.accession (smp_id, accession_id) VALUES
   (56903, 'SAMD00056903'),
   (56904, 'SAMD00056904'),
   (80626, 'SAMD00080626'),
-  (80628, 'SAMD00080628');
+  (80628, 'SAMD00080628'),
+  (93784, 'SAMD00093784'),
+  (93579, 'SAMD00093579'),
+  (93580, 'SAMD00093580');
 
 -- attribute (locus_tag_prefix / metadata 用)
 INSERT INTO mass.attribute (smp_id, attribute_name, attribute_value, seq_no) VALUES
