@@ -2,7 +2,7 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require File.dirname(__FILE__) + "/sparql_base.rb"
-require File.dirname(__FILE__) + "/common_utils.rb"
+require File.dirname(__FILE__) + "/insdc_nullability.rb"
 
 #
 # A class for BioSample validation that is relevant organism

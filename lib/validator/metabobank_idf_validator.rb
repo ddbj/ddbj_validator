@@ -6,7 +6,7 @@ require 'date'
 require 'net/http'
 require 'json-schema'
 require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
 require File.dirname(__FILE__) + "/common/tsv_field_validator.rb"
 require File.dirname(__FILE__) + "/common/file_parser.rb"
 
@@ -23,7 +23,8 @@ class MetaboBankIdfValidator < ValidatorBase
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/metabobank_idf")))
     @conf[:null_accepted] = @conf[:field_settings]["null_value"]["value_list"]
-    CommonUtils::set_config(@conf)
+    InsdcNullability.null_accepted        = @conf[:null_accepted]
+    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 
@@ -139,12 +140,11 @@ class MetaboBankIdfValidator < ValidatorBase
       value_text.each_char do |char1|
         index += 1
         unless char1.ascii_only?
-          regex_check = CommonUtils::format_check_with_regexp(char1, "^(\s|°|±|°|μ|\u00B5|≦|≧|≒|≠|←|→|↑|↓|↔|Å|[Α-Ω]|[α-ω])+$")
-          if regex_check == false
+          if char1.match?(/^(\s|°|±|°|μ|µ|≦|≧|≒|≠|←|→|↑|↓|↔|Å|[Α-Ω]|[α-ω])+$/)
+            disp_text += char1.to_s
+          else
             disp_text += "[### invalid char ###]"
             ret = false
-          else
-            disp_text += char1.to_s
           end
         else
           disp_text += char1.to_s

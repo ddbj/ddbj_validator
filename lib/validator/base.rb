@@ -1,7 +1,6 @@
 require 'yaml'
 require 'json'
 require 'json-schema'
-require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/error_builder.rb"
 require File.dirname(__FILE__) + "/common/ncbi_eutils.rb"
 

@@ -6,7 +6,7 @@ require 'date'
 require 'net/http'
 require 'json-schema'
 require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
 require File.dirname(__FILE__) + "/common/tsv_column_validator.rb"
 require File.dirname(__FILE__) + "/common/file_parser.rb"
 
@@ -22,7 +22,8 @@ class MetaboBankSdrfValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/metabobank_sdrf")))
-    CommonUtils::set_config(@conf)
+    InsdcNullability.null_accepted        = @conf[:null_accepted]
+    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 

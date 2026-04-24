@@ -3,7 +3,7 @@ require 'dotenv'
 require 'fileutils'
 require_relative '../../test_helpers'
 require 'validator/trad_validator'
-require 'validator/common/common_utils'
+require 'validator/common/insdc_nullability'
 
 class TestTradValidator < Minitest::Test
   def setup
