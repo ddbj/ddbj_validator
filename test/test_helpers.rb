@@ -36,6 +36,11 @@ WebMock.disable_net_connect!(allow_localhost: true)
 # test_ddbj_parser がエンドポイント設定済みの状態を前提にしているので、未設定なら stub URL を差し込む
 ENV['DDBJ_PARSER_APP_URL'] = 'http://ddbj-parser.stub/validate' if ENV['DDBJ_PARSER_APP_URL'].to_s.strip.empty?
 
+# BioSampleValidator#read_config が参照する INSDC 国名リスト / coll_dump を
+# test/fixtures 配下のスナップショットに向ける。本番は .env で別ディレクトリを指すので影響なし
+ENV['DDBJ_VALIDATOR_APP_PUB_DIR']        ||= File.expand_path('fixtures/conf/pub',                   __dir__)
+ENV['DDBJ_VALIDATOR_APP_COLL_DUMP_FILE'] ||= File.expand_path('fixtures/conf/coll_dump/coll_dump.txt', __dir__)
+
 # webmock/minitest は各テスト完了後に stub を reset するので、default stub を
 # 個別 setup 前に都度貼り直すモジュールを Minitest::Test に挟み込む
 module DefaultHttpStubs

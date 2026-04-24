@@ -58,13 +58,7 @@ jobs:
       - name: Load taxonomy / biosample fixture
         run: docker compose -f compose.test.yaml exec -T virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 
-      # conf/pub と conf/coll_dump は本番で外部データをマウントするため .gitignore 済み。
-      # テスト用のスナップショットを test/fixtures/conf/ に置いてあるので所定の場所へ配置する
-      - name: Stage reference data (country list, coll_dump)
-        run: |
-          mkdir -p conf/pub conf/coll_dump
-          cp -r test/fixtures/conf/pub/.       conf/pub/
-          cp -r test/fixtures/conf/coll_dump/. conf/coll_dump/
-
       # -v で各テスト名を標準出力に流す。どのテストで詰まったかを CI ログから特定できるように
+      # pub / coll_dump は test/test_helpers.rb が env 経由で test/fixtures を指すので、
+      # ここで conf/pub にステージする必要はない
       - run: bundle exec ruby test/run_all.rb -v
