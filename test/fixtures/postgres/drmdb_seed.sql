@@ -38,7 +38,15 @@ INSERT INTO mass.ext_entity (ext_id, acc_type, ref_name, status) VALUES
   (20, 'SSUB', '64274',        100),
   (21, 'PSUB', 'PSUB004841',   100),   -- → PRJDB4841
   (22, 'SSUB', '104969',       100),
-  (23, 'PSUB', 'PSUB005969',   100);   -- → PRJDB5969
+  (23, 'PSUB', 'PSUB005969',   100),   -- → PRJDB5969
+  -- TR_R0013: SAMD00056903 / SAMD00056904 ref biosample → PRJDB5067
+  (30, 'SSUB', '56903',        100),
+  (31, 'SSUB', '56904',        100),
+  (32, 'PSUB', 'PSUB005067',   100),   -- → PRJDB5067
+  -- TR_R0013: SAMD00093579 / SAMD00093580 ref biosample → PRJDB6348 + DRR101361/101362
+  (40, 'SSUB', '93579',        100),
+  (41, 'SSUB', '93580',        100),
+  (42, 'PSUB', 'PSUB006348',   100);   -- → PRJDB6348
 
 -- ext_relation: SMP/PSUB と SSUB accession の紐付け
 INSERT INTO mass.ext_relation (ext_id, acc_id, grp_id) VALUES
@@ -46,7 +54,19 @@ INSERT INTO mass.ext_relation (ext_id, acc_id, grp_id) VALUES
   (21, 'dra_ssub_1',  'grp_prj_1'),   -- PSUB004841 も同じ SSUB に紐付き
   (22, 'dra_ssub_2',  'grp_prj_2'),
   (23, 'dra_ssub_2',  'grp_prj_2'),
-  (20, 'dra_drx_1',   'grp_run_1');   -- SMP 64274 → DRX accession (Run 取得用)
+  (20, 'dra_drx_1',   'grp_run_1'),   -- SMP 64274 → DRX accession (Run 取得用)
+  -- TR_R0013 derived biosample ケース: SMP 56903/56904 とも SSUB_5067 → PSUB005067 グループ
+  (30, 'dra_ssub_5067', 'grp_prj_5067'),
+  (31, 'dra_ssub_5067', 'grp_prj_5067'),
+  (32, 'dra_ssub_5067', 'grp_prj_5067'),
+  -- TR_R0013 drr via ref ケース: SMP 93579 → PSUB006348 (SSUB_6348_1) + DRR101361 (DRX_1)
+  (40, 'dra_ssub_6348_1', 'grp_prj_6348_1'),
+  (42, 'dra_ssub_6348_1', 'grp_prj_6348_1'),
+  (40, 'dra_drx_93579',    'grp_run_93579'),
+  -- SMP 93580 → 同じ PSUB006348 (別 SSUB にする) + DRR101362
+  (41, 'dra_ssub_6348_2', 'grp_prj_6348_2'),
+  (42, 'dra_ssub_6348_2', 'grp_prj_6348_2'),
+  (41, 'dra_drx_93580',    'grp_run_93580');
 -- DRR060519 は smp_id 64274 とは紐付けない
 -- (test_get_run_id_via_dra で smp_id 64274 に対して DRR060518 のみ返ることを期待しているため)
 -- exist_check_run_ids / get_run_submitter_ids は accession_entity + accession_relation 側だけで
@@ -55,19 +75,30 @@ INSERT INTO mass.ext_relation (ext_id, acc_id, grp_id) VALUES
 -- accession_entity (DRX / DRR エンティティ)
 -- acc_no は bigint。validator 側で acc_no.rjust(6,'0') されるので数値で入れる
 INSERT INTO mass.accession_entity (acc_id, acc_type, acc_no, is_delete) VALUES
-  ('dra_drx_1',   'DRX',    1, false),
-  ('dra_drr_1',   'DRR',60518, false),
-  ('dra_drx_db1', 'DRX',    2, false),
-  ('dra_drr_db1', 'DRR',60519, false);
+  ('dra_drx_1',       'DRX',      1, false),
+  ('dra_drr_1',       'DRR',  60518, false),
+  ('dra_drx_db1',     'DRX',      2, false),
+  ('dra_drr_db1',     'DRR',  60519, false),
+  ('dra_drx_93579',   'DRX',      3, false),
+  ('dra_drr_93579',   'DRR', 101361, false),
+  ('dra_drx_93580',   'DRX',      4, false),
+  ('dra_drr_93580',   'DRR', 101362, false);
 
 -- accession_relation (DRX -> DRR)
 INSERT INTO mass.accession_relation (p_acc_id, acc_id, grp_id) VALUES
-  ('dra_drx_1',   'dra_drr_1',   'grp_run_1'),
-  ('dra_drx_db1', 'dra_drr_db1', 'grp_run_db1');
+  ('dra_drx_1',     'dra_drr_1',     'grp_run_1'),
+  ('dra_drx_db1',   'dra_drr_db1',   'grp_run_db1'),
+  ('dra_drx_93579', 'dra_drr_93579', 'grp_run_93579'),
+  ('dra_drx_93580', 'dra_drr_93580', 'grp_run_93580');
 
 -- current_dra_submission_group_view (status NOT IN (900, 1000, 1100) が有効 group)
 INSERT INTO mass.current_dra_submission_group_view (grp_id, sub_id, submitter_id, status) VALUES
-  ('grp_prj_1',    'sub_prj_1',    'hirakawa', 200),
-  ('grp_prj_2',    'sub_prj_2',    'anyone',   200),
-  ('grp_run_1',    'sub_run_1',    'hirakawa', 200),
-  ('grp_run_db1',  'sub_run_db1',  'someone',  200);
+  ('grp_prj_1',        'sub_prj_1',        'hirakawa', 200),
+  ('grp_prj_2',        'sub_prj_2',        'anyone',   200),
+  ('grp_run_1',        'sub_run_1',        'hirakawa', 200),
+  ('grp_run_db1',      'sub_run_db1',      'someone',  200),
+  ('grp_prj_5067',     'sub_prj_5067',     'anyone',   200),
+  ('grp_prj_6348_1',   'sub_prj_6348_1',   'anyone',   200),
+  ('grp_prj_6348_2',   'sub_prj_6348_2',   'anyone',   200),
+  ('grp_run_93579',    'sub_run_93579',    'anyone',   200),
+  ('grp_run_93580',    'sub_run_93580',    'anyone',   200);

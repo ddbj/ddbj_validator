@@ -61,18 +61,6 @@ class TestValidatorCache < Minitest::Test
     assert_equal true, ret1 == ret2
   end
 
-  def test_cache_latlon_versus_country
-    skip 'BS_R0041 は Google Geocoding API 無効化のため呼び出しを停止中 (VALIDATOR-284)'
-    lat_lon = "35.2399 N, 139.0306 E"
-    ret1 = @validator.send("latlon_versus_country", "BS_R0041", "SampleA", "Japan", lat_lon, 1)
-    cache = @validator.instance_variable_get (:@cache)
-    #p cache.instance_variable_get (:@cache_data)
-    assert_equal true, cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon)
-    # expected output "use cache in latlon_versus_country" when executes debug mode
-    ret2 = @validator.send("latlon_versus_country", "BS_R0041", "SampleA", "Japan", lat_lon, 1)
-    assert_equal true, ret1 == ret2
-  end
-
   def test_cache_invalid_publication_identifier
     ref_attr = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../../conf/biosample/reference_attributes.json"))
     pubchem_id = "27148491"

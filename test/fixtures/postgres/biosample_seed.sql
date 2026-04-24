@@ -15,7 +15,8 @@ INSERT INTO mass.submission (submission_id, submitter_id) VALUES
   ('SSUB000007', 'anyone'),     -- SAMD00052345 の親
   ('SSUB_LTP',   'anyone'),     -- get_all_locus_tag_prefix 用 (まとめて 200+ サンプル)
   ('SSUB005454', 'anyone'),     -- test_duplicated_locus_tag_prefix: PP14 を登録する submission
-  ('SSUB005462', 'anyone');     -- test_duplicated_locus_tag_prefix: RR1 を登録する別 submission
+  ('SSUB005462', 'anyone'),     -- test_duplicated_locus_tag_prefix: RR1 を登録する別 submission
+  ('SSUB_REF',   'anyone');     -- test_get_biosample_info / test_invalid_combination_of_accessions 用
 
 -- samples
 -- smp_id は bigint. テストは to_s した値と比較するので、人間が読める値にしておく
@@ -48,7 +49,17 @@ INSERT INTO mass.sample (smp_id, submission_id, sample_name, status_id) VALUES
   (104969,'SSUB000002', 'SAMPLE-104969', NULL),
   -- test_duplicated_locus_tag_prefix 用
   (55454, 'SSUB005454', 'SAMPLE-PP14', NULL),  -- locus_tag_prefix=PP14
-  (55462, 'SSUB005462', 'SAMPLE-RR1',  NULL);  -- locus_tag_prefix=RR1
+  (55462, 'SSUB005462', 'SAMPLE-RR1',  NULL),  -- locus_tag_prefix=RR1
+  -- test_get_biosample_info 用 (note/derived_from で別 BioSample を参照するケース)
+  (81372, 'SSUB_REF', 'SAMPLE-81372', NULL),
+  (56903, 'SSUB_REF', 'SAMPLE-56903', NULL),
+  (56904, 'SSUB_REF', 'SAMPLE-56904', NULL),
+  (80626, 'SSUB_REF', 'SAMPLE-80626', NULL),
+  (80628, 'SSUB_REF', 'SAMPLE-80628', NULL),
+  -- test_invalid_combination_of_accessions (TR_R0013) 用
+  (93784, 'SSUB_REF', 'SAMPLE-93784', NULL),   -- DRA 未紐付けサンプル (case "not link via DRA")
+  (93579, 'SSUB_REF', 'SAMPLE-93579', NULL),   -- → PRJDB6348 + DRR101361
+  (93580, 'SSUB_REF', 'SAMPLE-93580', NULL);   -- → PRJDB6348 + DRR101362
 
 -- accession: smp_id ⇄ SAMD accession_id
 INSERT INTO mass.accession (smp_id, accession_id) VALUES
@@ -58,7 +69,15 @@ INSERT INTO mass.accession (smp_id, accession_id) VALUES
   (52345, 'SAMD00052345'),
   (10001, 'SAMD00000001'),
   (23002, 'SAMD00023002'),
-  (60421, 'SAMD00060421');
+  (60421, 'SAMD00060421'),
+  (81372, 'SAMD00081372'),
+  (56903, 'SAMD00056903'),
+  (56904, 'SAMD00056904'),
+  (80626, 'SAMD00080626'),
+  (80628, 'SAMD00080628'),
+  (93784, 'SAMD00093784'),
+  (93579, 'SAMD00093579'),
+  (93580, 'SAMD00093580');
 
 -- attribute (locus_tag_prefix / metadata 用)
 INSERT INTO mass.attribute (smp_id, attribute_name, attribute_value, seq_no) VALUES
@@ -73,7 +92,16 @@ INSERT INTO mass.attribute (smp_id, attribute_name, attribute_value, seq_no) VAL
   (52345, 'collection_date',  '2020-01-01',2),
   -- test_duplicated_locus_tag_prefix 用
   (55454, 'locus_tag_prefix', 'PP14', 1),
-  (55462, 'locus_tag_prefix', 'RR1',  1);
+  (55462, 'locus_tag_prefix', 'RR1',  1),
+  -- test_get_biosample_info: 参照 BioSample を note/derived_from 属性に埋め込む
+  -- get_biosample_metadata は attribute_value != '' の行のみ返すので、参照先の BioSample にも
+  -- 何か属性を付けておかないと戻り値 hash の keys.size が期待値に届かない
+  (60421, 'note',             'related samples SAMD00056903 and SAMD00056904', 1),
+  (81372, 'derived_from',     'Derived from SAMD00080626 / SAMD00080628',      1),
+  (56903, 'sample_name',      'sample 56903', 1),
+  (56904, 'sample_name',      'sample 56904', 1),
+  (80626, 'sample_name',      'sample 80626', 1),
+  (80628, 'sample_name',      'sample 80628', 1);
 
 -- get_all_locus_tag_prefix が >200 行を要求するので SSUB_LTP 配下に 210 サンプル + locus_tag_prefix を生成
 DO $$

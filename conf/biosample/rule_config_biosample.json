@@ -311,19 +311,6 @@
     ],
     "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0040"
   },
-  "ruleBS_R0041": {
-    "rule_class": "BioSample",
-    "code": "BS_R0041",
-    "level": "warning",
-    "internal_ignore": false,
-    "name": "Latlon versus country",
-    "method": "latlon_versus_country",
-    "message": "Values provided for 'latitude and longitude' and 'geographic location' contradict each other.",
-    "object": [
-      "BioSample"
-    ],
-    "reference": "https://www.ddbj.nig.ac.jp/biosample/validation-e.html#BS_R0041"
-  },
   "ruleBS_R0045": {
     "rule_class": "BioSample",
     "code": "BS_R0045",
