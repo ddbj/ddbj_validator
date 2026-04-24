@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# Deploy main HEAD to staging or production.
+#
+# Usage:
+#   bin/deploy staging
+#   bin/deploy production
+#   bin/deploy staging 1       # only instance 1 (canary)
+#
+# Runs `git fetch && git merge --ff-only origin/main` on the target server,
+# rebuilds the app image, and force-recreates the container — sequentially
+# across the two load-balanced instances so nginx never loses both at once.
+#
+# Requires password-less SSH to w3sabi@<host>.
+set -euo pipefail
+
+usage() {
+  echo "Usage: $(basename "$0") {staging|production} [1|2]" >&2
+  exit 64
+}
+
+[[ $# -ge 1 && $# -le 2 ]] || usage
+
+env="$1"
+only="${2:-}"
+
+case "$env" in
+  staging)
+    host='w3sabi@a012'
+    base='/data1/w3sabi/DDBJValidator/ddbj_validator_staging'
+    ;;
+  production)
+    host='w3sabi@a011'
+    base='/data1/w3sabi/DDBJValidator/ddbj_validator_production'
+    ;;
+  *)
+    usage
+    ;;
+esac
+
+case "$only" in
+  '')   instances=(1 2) ;;
+  1|2)  instances=("$only") ;;
+  *)    usage ;;
+esac
+
+echo "=== Deploying $env to $host (instances: ${instances[*]}) ==="
+
+for i in "${instances[@]}"; do
+  dir="${base}${i}"
+  echo
+  echo ">>> ${env}${i}"
+  ssh -o BatchMode=yes -t "$host" "cd '$dir' && git fetch --prune origin && git merge --ff-only origin/main && ./bin/deploy-remote.sh"
+  echo "<<< ${env}${i} up"
+done
+
+echo
+echo "=== Done ==="
