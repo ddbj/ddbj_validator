@@ -23,8 +23,7 @@ config/credentials/*.key
 # Docker build inputs aren't needed inside the final image
 .dockerignore
 Dockerfile
-docker-compose.yml
-compose.*.yaml
+compose*.yaml
 
 # Dev-only docs
 README.md

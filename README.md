@@ -29,11 +29,11 @@ $ git clone https://github.com/ddbj/pub.git conf/pub
 ```
 
 ### Prepare .env file (optional)
-All environment variables used by `docker-compose.yml` have sensible defaults, so the container starts without any configuration. If you need to override anything (e.g. a real NCBI eutils API key, or to change the host port), create a `.env` file at the repo root. See the "Environment Variables" section below for the full list.
+All environment variables used by `compose.yaml` have sensible defaults, so the container starts without any configuration. If you need to override anything (e.g. the host port), create a `.env` file at the repo root. See the "Environment Variables" section below for the full list. Production/staging secrets live in `config/credentials/<env>.yml.enc`; pass `RAILS_MASTER_KEY` through `.env` to decrypt.
 
 ## Start containers
 ```
-$ docker-compose up -d
+$ podman-compose up -d
 ```
 
 ## How to use
