@@ -176,7 +176,6 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0014
   def test_invalid_publication_identifier
-    skip_unless_eutils_api_key_configured
     #ok case
     ## valid PubMed id
     project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok.xml")
