@@ -1,8 +1,6 @@
-require 'rack'
-require './app/application.rb'
+# This file is used by Rack-based servers to start the application.
 
-if defined?(Unicorn)
-  require 'unicorn/worker_killer'
-  use Unicorn::WorkerKiller::MaxRequests, 1000, 2000
-end
-run DDBJValidator::Application
+require_relative "config/environment"
+
+run Rails.application
+Rails.application.load_server

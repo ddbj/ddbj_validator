@@ -36,3 +36,13 @@ shared/data/
 data_updater/virtuoso/database
 data_updater/virtuoso/rdf_data/taxonomy
 data_updater/dbfile
+
+# Rails
+/log/*
+!/log/.keep
+/storage/*
+!/storage/.keep
+/config/master.key
+/config/credentials/*.key
+.byebug_history
+

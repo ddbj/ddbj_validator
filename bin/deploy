@@ -1,27 +1,56 @@
 #!/usr/bin/env bash
-# Deploy main HEAD to staging or production.
+# Deploy a branch to staging or production.
 #
 # Usage:
-#   bin/deploy staging
-#   bin/deploy production
-#   bin/deploy staging 1       # only instance 1 (canary)
+#   bin/deploy staging                           # main (default)
+#   bin/deploy staging 1                         # only instance 1 (canary)
+#   bin/deploy staging -b migrate-to-rails       # deploy a feature branch to staging
+#   bin/deploy staging 1 -b migrate-to-rails
+#   bin/deploy production                        # production always deploys main
 #
-# Runs `git fetch && git merge --ff-only origin/main` on the target server,
-# rebuilds the app image, and force-recreates the container — sequentially
-# across the two load-balanced instances so nginx never loses both at once.
+# production refuses any branch other than main. Promote by merging the
+# feature branch into main and running `bin/deploy production`.
+#
+# Fast-forwards the target server's worktree to origin/<branch>, rebuilds the
+# app image, and force-recreates the container — sequentially across the two
+# load-balanced instances so nginx never loses both at once.
 #
 # Requires password-less SSH to w3sabi@<host>.
 set -euo pipefail
 
 usage() {
-  echo "Usage: $(basename "$0") {staging|production} [1|2]" >&2
+  echo "Usage: $(basename "$0") {staging|production} [1|2] [-b <branch>]" >&2
   exit 64
 }
 
-[[ $# -ge 1 && $# -le 2 ]] || usage
+branch=main
+positional=()
 
-env="$1"
-only="${2:-}"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -b|--branch)
+      [[ $# -ge 2 ]] || usage
+      branch="$2"
+      shift 2
+      ;;
+    -b=*|--branch=*)
+      branch="${1#*=}"
+      shift
+      ;;
+    -*)
+      usage
+      ;;
+    *)
+      positional+=("$1")
+      shift
+      ;;
+  esac
+done
+
+[[ ${#positional[@]} -ge 1 && ${#positional[@]} -le 2 ]] || usage
+
+env="${positional[0]}"
+only="${positional[1]:-}"
 
 case "$env" in
   staging)
@@ -31,6 +60,10 @@ case "$env" in
   production)
     host='w3sabi@a011'
     base='/data1/w3sabi/DDBJValidator/ddbj_validator_production'
+    if [[ "$branch" != 'main' ]]; then
+      echo "production only deploys main. merge '$branch' into main first." >&2
+      exit 1
+    fi
     ;;
   *)
     usage
@@ -43,13 +76,13 @@ case "$only" in
   *)    usage ;;
 esac
 
-echo "=== Deploying $env to $host (instances: ${instances[*]}) ==="
+echo "=== Deploying $env from '$branch' to $host (instances: ${instances[*]}) ==="
 
 for i in "${instances[@]}"; do
   dir="${base}${i}"
   echo
   echo ">>> ${env}${i}"
-  ssh -o BatchMode=yes -t "$host" "cd '$dir' && git fetch --prune origin && git merge --ff-only origin/main && ./bin/deploy-remote.sh"
+  ssh -o BatchMode=yes -t "$host" "cd '$dir' && git fetch --prune origin && git checkout '$branch' && git merge --ff-only 'origin/$branch' && ./bin/deploy-remote.sh"
   echo "<<< ${env}${i} up"
 done
 

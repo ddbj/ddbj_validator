@@ -1,24 +1,19 @@
 source "https://rubygems.org"
 
-gem "activesupport"
+gem "rails", "~> 8.1.3"
+gem "puma"
+gem "bootsnap", require: false
+
 gem "csv"
 gem "http"
+gem "rack-cors"
 gem "json-schema"
 gem "mail"
 gem "net-ftp"
 gem "nokogiri"
 gem "pg"
-gem "rack"
 gem "roo"
-gem "puma"
-gem "sinatra"
-gem "sinatra-contrib"
-
-group :development do
-  gem 'rake'
-end
 
 group :test do
-  gem 'minitest'
-  gem 'webmock'
+  gem "webmock"
 end
