@@ -3,15 +3,15 @@ require 'logger'
 require 'yaml'
 require 'fileutils'
 
-require File.expand_path('../common/excel2tsv.rb', __FILE__)
-require File.expand_path('../common/file_parser.rb', __FILE__)
-require File.expand_path('../biosample_validator.rb', __FILE__)
-require File.expand_path('../bioproject_validator.rb', __FILE__)
-require File.expand_path('../bioproject_tsv_validator.rb', __FILE__)
-require File.expand_path('../jvar_validator.rb', __FILE__)
-require File.expand_path('../trad_validator.rb', __FILE__)
-require File.expand_path('../metabobank_idf_validator.rb', __FILE__)
-require File.expand_path('../metabobank_sdrf_validator.rb', __FILE__)
+require_relative 'common/excel2tsv'
+require_relative 'common/file_parser'
+require_relative 'biosample_validator'
+require_relative 'bioproject_validator'
+require_relative 'bioproject_tsv_validator'
+require_relative 'jvar_validator'
+require_relative 'trad_validator'
+require_relative 'metabobank_idf_validator'
+require_relative 'metabobank_sdrf_validator'
 
 # Validator main class
 class Validator

@@ -1,10 +1,10 @@
 require 'logger'
 
-require File.expand_path('../auto_annotator_xml.rb', __FILE__)
-require File.expand_path('../auto_annotator_tsv.rb', __FILE__)
-require File.expand_path('../auto_annotator_json.rb', __FILE__)
-require File.expand_path('../../common/file_parser.rb', __FILE__)
-require File.expand_path('../../common/tsv_field_validator.rb', __FILE__)
+require_relative 'auto_annotator_xml'
+require_relative 'auto_annotator_tsv'
+require_relative 'auto_annotator_json'
+require_relative '../common/file_parser'
+require_relative '../common/tsv_field_validator'
 
 # 元ファイルからAuto annotateしたファイルを生成して返す
 class AutoAnnotator
