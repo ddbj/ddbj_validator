@@ -43,7 +43,7 @@ class TsvColumnValidator
 
     header = {}
     tsv_data.each do |row|
-      if header == {} && (row.size == 0 || row[0].nil? || row[0].to_s.chomp.strip.start_with?("#")) #ヘッダー前のコメント行や空白行は無視
+      if header == {} && (row.empty? || row[0].nil? || row[0].to_s.chomp.strip.start_with?("#")) #ヘッダー前のコメント行や空白行は無視
         @row_count_offset += 1  #行数表示用に残しておく
         next
       end

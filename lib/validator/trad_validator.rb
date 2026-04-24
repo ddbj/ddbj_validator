@@ -255,7 +255,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_hold_date(rule_code, hold_date_list)
-    return nil if hold_date_list.nil? || hold_date_list.size == 0
+    return nil if hold_date_list.nil? || hold_date_list.empty?
     ret = true
     message = ""
     #if hold_date_list.size != 1
@@ -337,7 +337,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def missing_hold_date(rule_code, hold_date_list)
-    if hold_date_list.nil? || hold_date_list.size == 0
+    if hold_date_list.nil? || hold_date_list.empty?
       range = range_hold_date(Date.today)
       message = "If you like to hold your data until publication, specify 'COMMON/DATE/hold_date' from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
       annotation = [
@@ -364,12 +364,12 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def organism_warning(rule_code, organism_data_list, biosample_data_list, organism_info_list=[])
-    return nil if organism_data_list.nil? || organism_data_list.size == 0
+    return nil if organism_data_list.nil? || organism_data_list.empty?
     ret = true
     biosample_data_list = [] if biosample_data_list.nil?
     organism_data_list.each do |line|
       # BioSampleの記載があればスキップする
-      next if biosample_data_list.select{|bs_line| bs_line[:entry] == line[:entry]}.size > 0 || biosample_data_list.select{|bs_line| bs_line[:entry] == "COMMON"}.size > 0
+      next if biosample_data_list.any?{|bs_line| bs_line[:entry] == line[:entry]} || biosample_data_list.any?{|bs_line| bs_line[:entry] == "COMMON"}
 
       valid_flag = true
       organism_name = line[:value]
@@ -453,7 +453,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank(rule_code, organism_info_list)
-    return nil if organism_info_list.nil? || organism_info_list.size == 0
+    return nil if organism_info_list.nil? || organism_info_list.empty?
     ret = true
     organism_info_list.each do |organism|
       valid_flag = true
@@ -499,7 +499,7 @@ class TradValidator < ValidatorBase
     keyword = data_by_feat_qual("KEYWORD", "keyword", anno_by_qual)
     wgs_datatype_list = data_type.select{|line| line[:value].upcase == "WGS" }
     wgs_keyword_list = keyword.select{|line| line[:value].upcase == "WGS" }
-    if wgs_datatype_list.size > 0 || wgs_keyword_list.size > 0
+    if wgs_datatype_list.any? || wgs_keyword_list.any?
       wgs_keyword = true
     end
     # WGSの記載があった場合に complete genome のような内容ではないかチェックする
@@ -510,18 +510,18 @@ class TradValidator < ValidatorBase
         # titleに"complete genome"という文字列が含まれている
         title_lines = data_by_feat_qual("REFERENCE", "title", anno_by_qual)
         title_lines.concat(data_by_feat_qual("source", "ff_definition", anno_by_qual))
-        if title_lines.select{|line| line[:value].downcase.include?("complete genome")}.size > 0
+        if title_lines.any?{|line| line[:value].downcase.include?("complete genome")}
           message = "Found 'complete genome' in REFERENCE/title or source/ff_definition."
           ret = false
         else
           # 複数のエントリがあり、そのうちplasmidが1つ以上含まれている。ただし全てがplasmidではない(chromosomeと推測)
           plasmid_lines = data_by_feat_qual("source", "plasmid", anno_by_qual)
-          if entry_size >= 2 && plasmid_lines.size > 0 && (entry_size - plasmid_lines.size) > 0
+          if entry_size >= 2 && plasmid_lines.any? && (entry_size - plasmid_lines.size) > 0
             message = "Number of entries is a few with including some plasmid entries."
             ret = false
           else
             # COMMONまたはChromosomeの全てのエントリにTOPOLOGY=circularの記載がある
-            if data_by_ent_feat_qual("COMMON", "TOPOLOGY", "circular", anno_by_qual).size > 0
+            if data_by_ent_feat_qual("COMMON", "TOPOLOGY", "circular", anno_by_qual).any?
               message = "Found 'circular' in COMMON/TOPOLOGY/circular"
               ret = false
             else
@@ -532,7 +532,7 @@ class TradValidator < ValidatorBase
               circlar_entry_list = circlar_lines.map{|row| row[:entry]}.uniq
               plasmid_entry_list = plasmid_lines.map{|row| row[:entry]}.uniq #plasmidが含まれていると前の条件ではじくので基本0件
               chromosome_circlar_entry_list = circlar_entry_list - plasmid_entry_list
-              if chromosome_circlar_entry_list.size > 0
+              if chromosome_circlar_entry_list.any?
                 entry_names = chromosome_circlar_entry_list.join(", ")
                 message = "Found 'circular' in TOPOLOGY/circular at entry: #{entry_names}"
                 ret = false
@@ -547,11 +547,11 @@ class TradValidator < ValidatorBase
     if ret == false
       line = []
       key = []
-      if wgs_datatype_list.size > 0
+      if wgs_datatype_list.any?
         key.push("DATATYPE/type")
         line.push(wgs_datatype_list.first[:line_no])
       end
-      if wgs_keyword_list.size > 0
+      if wgs_keyword_list.any?
         key.push("KEYWORD/keyword")
         line.push(wgs_keyword_list.first[:line_no])
       end
@@ -835,11 +835,11 @@ class TradValidator < ValidatorBase
           message_list.compact!
           # 実質的なシステムエラー(Parserが最後まで実行できなかった)が発生した場合は補足する
           fat_list = message_list.select{|row| row[:level] == "FAT"}
-          if fat_list.size > 0 # FATALはユーザエラーとしては扱わない
+          if fat_list.any? # FATALはユーザエラーとしては扱わない
             raise "Parse error: 'ddbj_parser'. Fatal error has occurred. The check by #{parser_name} did not run correctly, so please run it separately.[#{fat_list}]\n"
           end
           sys_list = message_list.select{|row| row[:type] && row[:type] == "SYS"}
-          if sys_list.size > 0 # SystemエラーもユーザエラーでなくFATAL扱い
+          if sys_list.any? # SystemエラーもユーザエラーでなくFATAL扱い
             raise "Parse error: 'ddbj_parser'. System error has occurred. The check by #{parser_name} did not run correctly, so please run it separately.[#{sys_list}]\n"
           end
           if finished_flag == false # finished 行が見当たらず、最後まで実行されたか不明
@@ -920,8 +920,7 @@ class TradValidator < ValidatorBase
     rule_level = (message[:level].start_with?("ER") ||  message[:level].start_with?("FAT")) ? "error" : "warning"
     rule_info["level"] = rule_level
     rule_info["level_orginal"] = message[:level]
-    internal_ignore = message[:level].start_with?("ER1") ? true : false
-    rule_info["internal_ignore"] = internal_ignore
+    rule_info["internal_ignore"] = message[:level].start_with?("ER1")
     rule_info["message"] = message[:message]
     rule_info["reference"] = "https://www.ddbj.nig.ac.jp/ddbj/validator.html#" + message[:code]
     rule_info
@@ -946,7 +945,7 @@ class TradValidator < ValidatorBase
     #COMMON entryにDBLINKがあるか
     common_dblink_exist = false
     common_dblink = dblink_list.select{|row| row[:entry] == "COMMON"}
-    if common_dblink.size > 0
+    if common_dblink.any?
       qual_list = common_dblink.map{|row| row[:qualifier]}
       if qual_list.include?("project") && qual_list.include?("biosample")
         common_dblink_exist = true
@@ -962,7 +961,7 @@ class TradValidator < ValidatorBase
     anno_by_ent.each do |entry_name, data|
       next if entry_name == "COMMON"
       entry_dblink = dblink_list.select{|row| row[:entry] == entry_name}
-      if entry_dblink.size > 0
+      if entry_dblink.any?
         entry_dblink_count += entry_dblink.size
         qual_list = entry_dblink.map{|row| row[:qualifier]}
         unless qual_list.include?("project") && qual_list.include?("biosample")
@@ -982,7 +981,7 @@ class TradValidator < ValidatorBase
     end
 
     if result == false
-      entry_name = missing_dblink_entry_list.size > 0 ? missing_dblink_entry_list.join(", ") : "COMMON"
+      entry_name = missing_dblink_entry_list.any? ? missing_dblink_entry_list.join(", ") : "COMMON"
       annotation = [
         {key: "entry", value: entry_name},
         {key: "File name", value: @anno_file}
@@ -1006,7 +1005,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_bioproject_accession(rule_code, bioproject_list)
-    return nil if bioproject_list.nil? || bioproject_list.size == 0
+    return nil if bioproject_list.nil? || bioproject_list.empty?
 
     result = true
     invalid_id_list = []
@@ -1053,7 +1052,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_biosample_accession(rule_code, biosample_list)
-    return nil if biosample_list.nil? || biosample_list.size == 0
+    return nil if biosample_list.nil? || biosample_list.empty?
 
     result = true
     invalid_id_list = []
@@ -1100,7 +1099,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_drr_accession(rule_code, drr_list)
-    return nil if drr_list.nil? || drr_list.size == 0
+    return nil if drr_list.nil? || drr_list.empty?
 
     result = true
     invalid_id_list = []
@@ -1178,7 +1177,7 @@ class TradValidator < ValidatorBase
   # SAMD00000000 はdbから値が取得できないため結果には含まれない
   #
   def get_biosample_info(biosample_id_list)
-    return {} if biosample_id_list.nil? || biosample_id_list.size == 0
+    return {} if biosample_id_list.nil? || biosample_id_list.empty?
 
     unless @db_validator.nil?
       ref_biosample_id_list = []
@@ -1194,7 +1193,7 @@ class TradValidator < ValidatorBase
         end
       end
       # noteかderived_fromに記載された
-      if ref_biosample_id_list.size > 0
+      if ref_biosample_id_list.any?
         ref_biosample_info = @db_validator.get_biosample_metadata(ref_biosample_id_list.uniq)
         biosample_info.merge!(ref_biosample_info)
       end
@@ -1234,7 +1233,7 @@ class TradValidator < ValidatorBase
   #    { entry: "Entry1", feature: "source", location: "", qualifier: "isolate", value: "BMS3Abin12", line_no: 24}
   #  ]
   def corresponding_biosample_attr_value(annotation_line_list, biosample_data_list, biosample_info, attribute_name)
-    return [] if annotation_line_list.nil? || annotation_line_list.size == 0
+    return [] if annotation_line_list.nil? || annotation_line_list.empty?
     target_line_list = annotation_line_list.clone
     set_list = []
     target_line_list.each do |target_line|
@@ -1242,10 +1241,10 @@ class TradValidator < ValidatorBase
       entry_name = target_line[:entry]
       # 同じエントリにDBLINK/biosampleの値を検索
       biosample_line = biosample_data_list.select{|bs_line| bs_line[:entry] == entry_name}
-      if biosample_line.size == 0 # なければCOMMON/DBLINK/biosampleの値を検索
+      if biosample_line.empty? # なければCOMMON/DBLINK/biosampleの値を検索
         biosample_line = biosample_data_list.select{|bs_line| bs_line[:entry] == "COMMON"}
       end
-      if biosample_line.size == 0
+      if biosample_line.empty?
         ## TR_R0009:missing_dblink で別途チェックされるのでここでは無視
       else
         biosample_id = biosample_line.first[:value]
@@ -1255,7 +1254,7 @@ class TradValidator < ValidatorBase
         else
           attr_list = biosample_info[biosample_id][:attribute_list]
           target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
-          if target_attribute_list.size == 0 # BioSample側に当該属性の値がない
+          if target_attribute_list.empty? # BioSample側に当該属性の値がない
             target_line[:biosample] = {biosample_id: biosample_id, attr_value: nil}
           else
             # attribute_value
@@ -1350,20 +1349,20 @@ class TradValidator < ValidatorBase
         attr_list = biosample_info[biosample_id][:attribute_list]
         target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
         target_attribute_list.delete_if{|attr|  @conf[:bs_null_accepted].include?(attr[:attribute_value]) } # 属性値がnull相当の場合は入力無し扱いとする
-        if target_attribute_list.size > 0 # Biosampleの属性値はある
+        if target_attribute_list.any? # Biosampleの属性値はある
           flag = true
           qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == entry_name}
-          if qual_line.size == 0 # 同じエントリにqualifierデータがなければCOMMONの値を検索
+          if qual_line.empty? # 同じエントリにqualifierデータがなければCOMMONの値を検索
             qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == "COMMON"}
           end
           missing_qual_entry_list = []
-          if qual_line.size == 0 # COMMONのqualifierにも記載がない場合には個別Entryの記載をチェック
+          if qual_line.empty? # COMMONのqualifierにも記載がない場合には個別Entryの記載をチェック
             if entry_name == "COMMON" #BioSampleIDがCOMMONに、qualifierがCOMMON以外に記載されているケースをカバー
               #COMMON以外の全エントリに値があればOK
               exist_entry_name_list = qual_data_list.map{|row| row[:entry]}
               missing_qual_entry_list = all_entry_name_list - exist_entry_name_list - ["COMMON"]
               # 一つでも値がないエントリがあればNG。どのエントリに値がないかを確認
-              if missing_qual_entry_list.size > 0
+              if missing_qual_entry_list.any?
                 flag = false
               end
             else
@@ -1403,7 +1402,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_combination_of_accessions(rule_code, dblink_list, biosample_info)
-    return nil if dblink_list.nil? || dblink_list.size == 0
+    return nil if dblink_list.nil? || dblink_list.empty?
     return nil if biosample_info.nil? || biosample_info == {}
     return nil if @db_validator.nil?
     ret = true
@@ -1425,11 +1424,11 @@ class TradValidator < ValidatorBase
       biosample_line_list.each do |biosample_line|
         biosample_line_with_id = biosample_line.dup
         bioproject_line_list = dblink_list.select{|row| row[:qualifier] == "project" && row[:entry] == entry}
-        if bioproject_line_list.size == 0
+        if bioproject_line_list.empty?
           bioproject_line_list = dblink_list.select{|row| row[:qualifier] == "project" && row[:entry] == "COMMON"}
         end
         run_line_list = dblink_list.select{|row| row[:qualifier] == "sequence read archive" && row[:entry] == entry}
-        if run_line_list.size == 0
+        if run_line_list.empty?
           run_line_list = dblink_list.select{|row| row[:qualifier] == "sequence read archive" && row[:entry] == "COMMON"}
         end
         biosample_line_with_id[:bioproject_id_list] = bioproject_line_list.map{|row| row[:value]}
@@ -1471,9 +1470,9 @@ class TradValidator < ValidatorBase
       end
 
       # Annotationファイルに記述されているBioProjectIDからDRA経由で紐づくIDを引いて、余分なIDがあるかチェックする
-      if linked_bioproject_id_list.size > 0 # BioProjectIDはDRA経由で紐づかないケースもある為、その場合はチェックしない
+      if linked_bioproject_id_list.any? # BioProjectIDはDRA経由で紐づかないケースもある為、その場合はチェックしない
         extra_bioproject_id = biosample_line[:bioproject_id_list] - linked_bioproject_id_list
-        if extra_bioproject_id.size > 0
+        if extra_bioproject_id.any?
           ret = false
           annotation = [
             {key: "DBLINK/biosample", value: biosample_id},
@@ -1488,7 +1487,7 @@ class TradValidator < ValidatorBase
 
       # Annotationファイルに記述されているDRRIDからDBAで経由で紐づくIDを引いて、余分なIDがあるかチェックする
       extra_run_id = biosample_line[:run_id_list] - linked_run_id_list
-      if extra_run_id.size > 0
+      if extra_run_id.any?
         ret = false
         annotation = [
           {key: "DBLINK/biosample", value: biosample_id},
@@ -1517,7 +1516,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def inconsistent_submitter(rule_code, dblink_list, submitter_id)
-    return nil if dblink_list.nil? || dblink_list.size == 0
+    return nil if dblink_list.nil? || dblink_list.empty?
     return nil if submitter_id.nil? || submitter_id == ""
     return nil if @db_validator.nil?
     ret = true
@@ -1545,7 +1544,7 @@ class TradValidator < ValidatorBase
         unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
       end
     end
-    if unmatch_submitter_accession_list.size > 0
+    if unmatch_submitter_accession_list.any?
       ret = false
       unmatch_submitter_accession_list.each do |error_line|
         annotation = [
@@ -1588,7 +1587,7 @@ class TradValidator < ValidatorBase
     unmatch_list = []
     dblink_list.each do |dblink|
       hit_list = with_submitter_id_list.select{|row| row[key.to_sym] == dblink[:value] }
-      if hit_list.size == 0
+      if hit_list.empty?
       else
         hit_list.each do |hit|
           if hit[:submitter_id].nil?
@@ -1619,7 +1618,7 @@ class TradValidator < ValidatorBase
   #
   def inconsistent_organism_with_biosample(rule_code, orgnism_data_list, strain_data_list, biosample_data_list, biosample_info)
     # annotationの/organismは必須項目であり、記述がなければjParserでエラーになるため、BioSampleにしか記載がないというチェックは行わない。
-    return nil if orgnism_data_list.nil? || orgnism_data_list.size == 0
+    return nil if orgnism_data_list.nil? || orgnism_data_list.empty?
 
     ret = true
     # 対応するBioSampleとそのorganismとstrain属性値を取得
@@ -1635,7 +1634,7 @@ class TradValidator < ValidatorBase
         trad_strain_value = ""
         # /organismと同じfeatureに/strainの記述があれば対応するBioSampleのstrain属性を取得する
         strain_lines = strain_data_list_with_bs_value.select{|strain_line| strain_line[:feature_no] == organism_line[:feature_no]}
-        if strain_lines.size > 0
+        if strain_lines.any?
           trad_strain_value = strain_lines.first[:value]
           unless strain_lines.first[:biosample][:attr_value_list].nil?
             biosample_strain_attr_values = strain_lines.first[:biosample][:attr_value_list].join(", ")
@@ -1651,7 +1650,7 @@ class TradValidator < ValidatorBase
             message = "Value of organism qualifier is not matched with BioSample attribute."
           else #organismの値が一致する場合はstrainのチェックを行う
             biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
-            if strain_lines.size > 0 #annotation側に/strainの記述がある
+            if strain_lines.any? #annotation側に/strainの記述がある
               if strain_lines.first[:biosample][:attr_value_list].nil? #strain属性がない
                 check = false
                 message = "The strain attribute is not used in BioSample."
@@ -1668,7 +1667,7 @@ class TradValidator < ValidatorBase
               bs_info = biosample_info[organism_line[:biosample][:biosample_id]]
               strain_attr_values = bs_info[:attribute_list].select{|attr| attr[:attribute_name] == 'strain'}
               # TODO ここでmissing等の値を除外するか
-              if strain_attr_values.size > 0 # BioSample側にはstrainの記述がある
+              if strain_attr_values.any? # BioSample側にはstrainの記述がある
                 check = false
                 biosample_strain_attr_values = strain_attr_values.map{|attr| attr[:attribute_value]}.join(", ")
                 message = "The strain qualifier is not found, though the strain attribute is used in BioSample."
@@ -1815,7 +1814,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def inconsistent_locus_tag_with_biosample(rule_code, locus_tag_data_list, biosample_data_list, biosample_info)
-    return nil if locus_tag_data_list.nil? || locus_tag_data_list.size == 0
+    return nil if locus_tag_data_list.nil? || locus_tag_data_list.empty?
     ret = true
     locus_tag_data_list_with_bs_value = corresponding_biosample_attr_value(locus_tag_data_list, biosample_data_list, biosample_info, "locus_tag_prefix")
     faild_list = []
@@ -1841,7 +1840,7 @@ class TradValidator < ValidatorBase
     end
 
     # locus_tagは大量に記述されている可能性があるため、locus_tag_prefix単位にまとめてエラーを出力
-    if faild_list.size > 0
+    if faild_list.any?
       ret = false #1行でもエラーがあればfalse
       faild_list.group_by{|row| row[:trad_locus_tag_prefix_value]}.each do |locus_tag_prefix, lines|
         annotation = [
@@ -1878,7 +1877,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def duplicate_locus_tag(rule_code, locus_tag_data_list, annotation_line_list)
-    return nil if locus_tag_data_list.nil? || locus_tag_data_list.size == 0
+    return nil if locus_tag_data_list.nil? || locus_tag_data_list.empty?
     ret = true
     locus_tag_group = locus_tag_data_list.group_by{|row| row[:value]}
     duplicated_locus_tag = {}
@@ -1887,7 +1886,7 @@ class TradValidator < ValidatorBase
         duplicated_locus_tag[locus_tag_value] = lines
       end
     end
-    if duplicated_locus_tag.keys.size > 0 #重複データが一つでもある場合
+    if duplicated_locus_tag.keys.any? #重複データが一つでもある場合
       all_features = annotation_line_list.group_by{|row| row[:feature_no]} #全行を出現feature毎にグルーピング
       duplicated_locus_tag.each do |locus_tag_value, lines|
         duplicated = false
@@ -1911,11 +1910,11 @@ class TradValidator < ValidatorBase
             message = "Not use the same value for different genes."
           else
             # 特定のfeature種の組合せの場合には許容する
-            if (feature_name_list - ["regulatory", "mRNA", "5’UTR", "3’UTR", "CDS", "exon", "intron", "sig_peptide", "propeptide", "mat_peptide", "transit_peptide"]).size == 0
-            elsif (feature_name_list - ["rRNA", "exon", "intron"]).size == 0
-            elsif (feature_name_list - ["tRNA", "exon", "intron"]).size == 0
-            elsif (feature_name_list - ["nc_RNA", "exon", "intron"]).size == 0
-            elsif (feature_name_list - ["tmRNA", "exon", "intron"]).size == 0
+            if (feature_name_list - ["regulatory", "mRNA", "5’UTR", "3’UTR", "CDS", "exon", "intron", "sig_peptide", "propeptide", "mat_peptide", "transit_peptide"]).empty?
+            elsif (feature_name_list - ["rRNA", "exon", "intron"]).empty?
+            elsif (feature_name_list - ["tRNA", "exon", "intron"]).empty?
+            elsif (feature_name_list - ["nc_RNA", "exon", "intron"]).empty?
+            elsif (feature_name_list - ["tmRNA", "exon", "intron"]).empty?
             else
               duplicated = true
               message = "Not use the same locus_tag for different genes."
@@ -1957,12 +1956,12 @@ class TradValidator < ValidatorBase
         feature_group = lines.group_by{|row| row[:feature_no]} # 個々のfeature毎にgrouping
         feature_group.each do |feature_no, feature_line|
           locus_tag_line = feature_line.select{|row| row[:qualifier] == "locus_tag"}
-          if locus_tag_line.size == 0 # locus_tagの記述が見当たらない
+          if locus_tag_line.empty? # locus_tagの記述が見当たらない
             ret = false
             location_list.push(feature_line.map{|row| row[:line_no]}.min)
           end
         end
-        if location_list.size > 0
+        if location_list.any?
           annotation = [
             {key: "feature", value: feature},
             {key: "File name", value: @anno_file},
@@ -2047,7 +2046,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def other_insdc_partners_accession(rule_code, dblink_list)
-    return nil if dblink_list.nil? || dblink_list.size == 0
+    return nil if dblink_list.nil? || dblink_list.empty?
     ret = true
 
     dblink_list.each{|row|
@@ -2079,7 +2078,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def invalid_bioproject_type(rule_code, bioproject_list)
-    return nil if bioproject_list.nil? || bioproject_list.size == 0
+    return nil if bioproject_list.nil? || bioproject_list.empty?
     return nil if @db_validator.nil?
 
     ret  = true

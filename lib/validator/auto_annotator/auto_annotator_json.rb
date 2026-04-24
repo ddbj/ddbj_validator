@@ -28,7 +28,7 @@ class AutoAnnotatorJson < AutoAnnotatorBase
 
     #auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
-    if annotation_list.size > 0
+    if annotation_list.any?
       begin
         json_data = JSON.parse(File.read(original_file))
       rescue => ex
@@ -108,7 +108,7 @@ class AutoAnnotatorJson < AutoAnnotatorBase
     add_header_list = add_annotation_list.map {|annotation| annotation["location"]["header"]}.uniq # 列名が異なるがindexが分かれていたり、同じ列名が別indexであるという不整合はないものとする
     add_header_list.each do |add_header| # 追加する項目ごとに処理。全行走査して、補足値を挿入するか空値で挿入するか、
       original_data.each_with_index do |row, row_idx|
-        if row.select{|cell| cell["key"] == add_header["name"]}.size == 0 # 行に追加列名が存在しない
+        if row.none?{|cell| cell["key"] == add_header["name"]} # 行に追加列名が存在しない
           insert_value = nil
           insert_annotation = add_annotation_list.find{|annotation| annotation["location"]["header"]["name"] == add_header["name"] && annotation["location"]["row_idx"] == row_idx}
           unless insert_annotation.nil?

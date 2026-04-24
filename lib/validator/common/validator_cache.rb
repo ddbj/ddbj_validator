@@ -30,11 +30,7 @@ class ValidatorCache
   # キャッシュされたキーがあればtrue,なければfalseを返す
   #
   def has_key (cache_name, key)
-    if @cache_data[cache_name].nil? || !@cache_data[cache_name].has_key?(key)
-      false
-    else
-      true
-    end
+    !!@cache_data[cache_name]&.has_key?(key)
   end
 
   #

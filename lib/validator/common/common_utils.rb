@@ -204,11 +204,7 @@ class CommonUtils
   # true/false
   #
   def self.blank?(value)
-    if value.nil? || value.to_s.strip.empty?
-      true
-    else
-      false
-    end
+    value.nil? || value.to_s.strip.empty?
   end
 
   #
@@ -223,7 +219,7 @@ class CommonUtils
   def self.null_value?(value)
     if value.nil? || value.to_s.strip.empty?
       true
-    elsif @@null_accepted.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0
+    elsif @@null_accepted.select {|refexp| value =~ /^(#{refexp})$/i }.any?
       true
     else
       false
@@ -242,7 +238,7 @@ class CommonUtils
   def self.null_not_recommended_value?(value)
     ret = false
     if !(value.nil? || value.strip.empty?)
-      if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
+      if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.any? # null_not_recommendedの正規表現リストにマッチすればNG
         ret = true
       end
     end
@@ -268,9 +264,9 @@ class CommonUtils
       else  # reporting termを許容するなら null定義値から削除する
         null_accepted = @@null_accepted.dup.delete_if{|null_value| null_value.start_with?("missing:")}
       end
-      if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0 # null_not_recommendedの正規表現リストにマッチすればNG
+      if @@null_not_recommended.select {|refexp| value =~ /^(#{refexp})$/i }.any? # null_not_recommendedの正規表現リストにマッチすればNG
         ret = true
-      elsif null_accepted.select {|refexp| value =~ /^(#{refexp})$/i }.size > 0
+      elsif null_accepted.select {|refexp| value =~ /^(#{refexp})$/i }.any?
         ret = true
       else
         # 入力値からnull値を削除する
@@ -490,7 +486,7 @@ class CommonUtils
         begin
           entry_info = JSON.parse(res.body)
           # MedlineCitationSetの中身が空でなければOK
-          if !entry_info["MedlineCitationSet"].nil? && !(entry_info["MedlineCitationSet"].keys.size == 0)
+          if !entry_info["MedlineCitationSet"].nil? && !entry_info["MedlineCitationSet"].keys.empty?
             return true
           else
             return false
@@ -595,7 +591,7 @@ class CommonUtils
         keys.push("culture_collection") if row[1].strip.include?('c')
         keys.push("specimen_voucher") if row[1].strip.include?('s')
         keys.push("bio_material") if row[1].strip.include?('b')
-        next if keys.size == 0
+        next if keys.empty?
         keys.each do |key|
           if row[0].strip.split(":").size == 1 # only institude name
             ret[key.to_sym].push(row[0].strip.split(":").first)

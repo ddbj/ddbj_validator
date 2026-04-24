@@ -480,7 +480,7 @@ class BioProjectTsvValidator < ValidatorBase
     end
 
     invalid_list.each do |level, list|
-      unless list.size == 0
+      unless list.empty?
         result = false
         list.each do |invalid_field|
           annotation = [
@@ -519,7 +519,7 @@ class BioProjectTsvValidator < ValidatorBase
     end
 
     invalid_list.each do |level, list|
-      unless list.size == 0
+      unless list.empty?
         result = false
         list.each do |invalid|
           annotation = [
@@ -555,7 +555,7 @@ class BioProjectTsvValidator < ValidatorBase
       invalid_list = @tsv_validator.multiple_values(data, allow_multiple_values_conf)
     end
 
-    unless invalid_list.size == 0
+    unless invalid_list.empty?
       result = false
       invalid_list.each do |invalid|
         annotation = [
@@ -592,7 +592,7 @@ class BioProjectTsvValidator < ValidatorBase
     end
 
     invalid_list.each do |level, list|
-      unless list.size == 0
+      unless list.empty?
         result = false
         list.each do |invalid|
           annotation = [
@@ -635,7 +635,7 @@ class BioProjectTsvValidator < ValidatorBase
     end
 
     invalid_list.each do |level, list|
-      unless list.size == 0
+      unless list.empty?
         result = false
         list.each do |invalid|
           annotation = [
@@ -677,7 +677,7 @@ class BioProjectTsvValidator < ValidatorBase
     end
 
     invalid_list.each do |level, list|
-      unless list.size == 0
+      unless list.empty?
         result = false
         list.each do |invalid|
           annotation = [
@@ -720,7 +720,7 @@ class BioProjectTsvValidator < ValidatorBase
       invalid_list["error_internal_ignore"] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf["error_internal_ignore"], null_accepted_list, null_not_recommended_list)
     end
     invalid_list.each do |level, list|
-      unless list.size == 0
+      unless list.empty?
         result = false
         list.each do |invalid|
           annotation = [
@@ -752,7 +752,7 @@ class BioProjectTsvValidator < ValidatorBase
     result = true
     invalid_list = @tsv_validator.invalid_data_format(data)
 
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: "Field name", value: invalid[:field_name]}]
       if invalid[:value_idx].nil? # field_nameの補正
@@ -783,7 +783,7 @@ class BioProjectTsvValidator < ValidatorBase
     result = true
     invalid_list = @tsv_validator.non_ascii_characters(data)
 
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: "Field name", value: invalid[:field_name]}]
       if invalid[:value_idx].nil? # field_nameがNG
@@ -812,7 +812,7 @@ class BioProjectTsvValidator < ValidatorBase
     result = true
     invalid_list = @tsv_validator.invalid_value_for_null(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
 
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: "Field name", value: invalid[:field_name]},
@@ -839,7 +839,7 @@ class BioProjectTsvValidator < ValidatorBase
   def missing_field_name(rule_code, data)
     result = true
     invalid_list = @tsv_validator.invalid_value_input(data)
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: "Field name", value: invalid[:field_name]},
@@ -871,7 +871,7 @@ class BioProjectTsvValidator < ValidatorBase
     result = true
     invalid_list = @tsv_validator.null_value_in_optional_field(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
 
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: "Field name", value: invalid[:field_name]},
@@ -901,7 +901,7 @@ class BioProjectTsvValidator < ValidatorBase
     unless predefined_field_name_conf.nil?
       invalid_list = @tsv_validator.not_predefined_field_name(data, predefined_field_name_conf)
     end
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: "Field name", value: invalid[:field_name]}
@@ -925,7 +925,7 @@ class BioProjectTsvValidator < ValidatorBase
   def duplicated_field_name(rule_code, data)
     result = true
     invalid_list = @tsv_validator.duplicated_field_name(data)
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: "Field name", value: invalid[:field_name]}
@@ -949,7 +949,7 @@ class BioProjectTsvValidator < ValidatorBase
   def value_in_comment_line(rule_code, data)
     result = true
     invalid_list = @tsv_validator.invalid_value_input(data, "comment_line")
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: "Field name", value: invalid[:field_name]},
@@ -983,7 +983,7 @@ class BioProjectTsvValidator < ValidatorBase
       invalid_list = @tsv_validator.missing_mandatory_field_name(data, mandatory_field_names_conf)
     end
 
-    unless invalid_list.size == 0
+    unless invalid_list.empty?
       result = false
       invalid_list.each do |invalid|
         annotation = [

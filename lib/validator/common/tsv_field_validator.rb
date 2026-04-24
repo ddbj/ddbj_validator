@@ -28,7 +28,7 @@ class TsvFieldValidator
     end
     tsv_data.each do |row|
       data = {"key" => nil, "values" => []}
-      if row.size == 0 || row[0].nil?
+      if row.empty? || row[0].nil?
         data["key"] = ""
       else
         data["key"] = row[0]
@@ -201,7 +201,7 @@ class TsvFieldValidator
     check_field_list = mandatory_conf
     check_field_list.each do |mandatory_field|
       field_data = data.select{|row| row["key"] == mandatory_field}
-      if field_data.size == 0 # field名がない
+      if field_data.empty? # field名がない
         invalid_list.push(mandatory_field)
       else
         field = field_data.first # 複数fieldを記載していた場合は前方の値を優先
@@ -314,7 +314,7 @@ class TsvFieldValidator
       exist_value = false # group fieldの中で一つでも値があればtrueとする
       group["field_list"].each do |mandatory_field|
         field_data = data.select{|row| row["key"] == mandatory_field}
-        if field_data.size > 0
+        if field_data.any?
           field = field_data.first # 複数fieldを記載していた場合は前方の値を優先
           value_count = 0
           unless field["values"].nil?
@@ -358,9 +358,9 @@ class TsvFieldValidator
             group_field_values[field_name] = field_value(data, field_name, value_idx)
           end
         end
-        if group_field_values.keys.size > 0 # Groupに対する何らかの記載がある
+        if group_field_values.keys.any? # Groupに対する何らかの記載がある
           missing_fields = check_group_conf["mandatory_field"] - group_field_values.keys
-          if missing_fields.size > 0 #mandatory_fieldの記載がない
+          if missing_fields.any? #mandatory_fieldの記載がない
             invalid_list.push({field_group_name: check_group_conf["group_name"], missing_fields: missing_fields, value_idx: value_idx})
           end
         end
@@ -375,7 +375,7 @@ class TsvFieldValidator
     # 同じfieldに値が複数ある場合
     field_name_list = data.map {|row| row["key"]}
     missing_field_name_list = mandatory_field_names_conf - field_name_list
-    if missing_field_name_list.size > 0
+    if missing_field_name_list.any?
       invalid_list.push({field_names: missing_field_name_list.join(", ")})
     end
     invalid_list
@@ -389,7 +389,7 @@ class TsvFieldValidator
   def field_value(data, field_name, value_index=nil)
     value = nil
     field_lines = data.select{|row| row["key"] == field_name}
-    if field_lines.size > 0
+    if field_lines.any?
       # 常に最初に出てきたfield名が優先で、複数ある場合は無視
       row = field_lines.first
       if value_index.nil? # value indexの指定がない場合はvalue_listを返す
@@ -423,7 +423,7 @@ class TsvFieldValidator
         field_lines.push({field_idx: idx}.merge(row))
       end
     }
-    if field_lines.size > 0
+    if field_lines.any?
       # 常に最初に出てきたfield名が優先で、複数ある場合は無視
       row = field_lines.first
       value = {field_idx: row[:field_idx], field_name: row["key"]}

@@ -30,7 +30,7 @@ class AutoAnnotatorXml < AutoAnnotatorBase
 
     #auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
-    if annotation_list.size > 0
+    if annotation_list.any?
       begin
         doc = Nokogiri::XML(File.read(original_file))
       rescue => ex # 元ファイルのXMLがParseできない場合はエラー
@@ -39,7 +39,7 @@ class AutoAnnotatorXml < AutoAnnotatorBase
 
       annotation_list.each do |annotation|
         annotation["location"].each do |location| #XPathを取得
-          if doc.xpath(location).size == 0 #XPathで要素/属性がヒットしないなら作成する
+          if doc.xpath(location).empty? #XPathで要素/属性がヒットしないなら作成する
             create_node_from_xapth(doc, location)
           end
           doc.xpath(location).each do |node|
@@ -85,7 +85,7 @@ class AutoAnnotatorXml < AutoAnnotatorBase
     parent_location = ""
     (1..location.split("/").size).each do |pos|
       parent_location = location.split("/")[0..-pos].join("/")
-      if doc.xpath(parent_location).size > 0
+      if doc.xpath(parent_location).any?
         break
       end
     end

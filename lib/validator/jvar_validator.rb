@@ -114,7 +114,7 @@ class JVarValidator < ValidatorBase
         sheet_name = hit[0]
       elsif hit.size > 1
         hit = xlsx.sheets.select {|sheet| sheet.downcase == conf["sheet_name"].downcase } # allow case-insensitive
-        sheet_name = hit[0] if hit.size >= 1
+        sheet_name = hit[0] if hit.any?
       end
       if sheet_name == ""
         #TODO 存在必須シートではエラーを出す。ここか？(OWL定義が来てから)

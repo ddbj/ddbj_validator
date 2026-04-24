@@ -661,14 +661,14 @@ class DDBJDbValidator
   #  SAMD00000000 はdbから値が取得できないため結果には含まれない
   #
   def get_biosample_metadata(biosample_accession_list)
-    return {} if biosample_accession_list.nil? || biosample_accession_list.size == 0
+    return {} if biosample_accession_list.nil? || biosample_accession_list.empty?
     sample_id_list = []
     biosample_accession_list.each do |accession_id|
       if accession_id =~ /^SAMD\d+/
         sample_id_list.push(accession_id)
       end
     end
-    if sample_id_list.size == 0
+    if sample_id_list.empty?
       return {}
     else
       id_place_holder = (1..sample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
@@ -725,7 +725,7 @@ class DDBJDbValidator
       end
     end
 
-    if prj_counter_id_list.size > 0
+    if prj_counter_id_list.any?
       begin
         connection = get_connection(BIOPROJCT_DB_NAME)
 
@@ -777,7 +777,7 @@ class DDBJDbValidator
         biosample_id_list.push(biosample_accession)
       end
     end
-    if biosample_id_list.size > 0
+    if biosample_id_list.any?
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)
         id_place_holder = (1..biosample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
@@ -827,7 +827,7 @@ class DDBJDbValidator
         run_id_list.push({acc_type: m[:acc_type], acc_no: m[:acc_no].to_i})
       end
     end
-    unless run_id_list.size == 0
+    unless run_id_list.empty?
       # RUN IDのパラメータ分のIN句のquery parameterを組み立てる
       # SQL側 =>  IN ( ($1, $2), ($3, $4) )
       # parameter => ["DRR", 60518, "DRR", 60519]
@@ -892,7 +892,7 @@ class DDBJDbValidator
         biosample_id_list.push(biosample_accession)
       end
     end
-    if biosample_id_list.size > 0
+    if biosample_id_list.any?
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)
         id_place_holder = (1..biosample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
@@ -937,7 +937,7 @@ class DDBJDbValidator
     biosample_smp_id_list.each do |smp_id|
       result.push({smp_id: smp_id})
     end
-    if biosample_smp_id_list.size > 0
+    if biosample_smp_id_list.any?
       begin
         connection = get_connection(DRA_DB_NAME)
         id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
@@ -1003,7 +1003,7 @@ class DDBJDbValidator
     biosample_smp_id_list.each do |smp_id|
       result.push({smp_id: smp_id})
     end
-    if biosample_smp_id_list.size > 0
+    if biosample_smp_id_list.any?
       begin
         connection = get_connection(DRA_DB_NAME)
         id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
@@ -1071,11 +1071,11 @@ class DDBJDbValidator
     biosample_list_with_smp_id.each do |biosample|
       unless biosample[:smp_id].nil?
         related_project = project_id_list.select{|row| row[:smp_id] == biosample[:smp_id]}
-        if related_project.size > 0 && !related_project[0][:bioproject_accession_id_list].nil?
+        if related_project.any? && !related_project[0][:bioproject_accession_id_list].nil?
           biosample[:bioproject_accession_id_list] = related_project[0][:bioproject_accession_id_list]
         end
         related_run = run_id_list.select{|row| row[:smp_id] == biosample[:smp_id]}
-        if related_run.size > 0 && !related_run[0][:drr_accession_id_list].nil?
+        if related_run.any? && !related_run[0][:drr_accession_id_list].nil?
           biosample[:drr_accession_id_list] = related_run[0][:drr_accession_id_list]
         end
       end
@@ -1108,7 +1108,7 @@ class DDBJDbValidator
         biosample_id_list.push(biosample_accession)
       end
     end
-    if biosample_id_list.size > 0
+    if biosample_id_list.any?
       param_list = [submitter_id].concat(biosample_id_list)
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)

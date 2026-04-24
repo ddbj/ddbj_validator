@@ -81,7 +81,7 @@ class Validator
             end
           end
         end
-        if permission_error_list.size > 0
+        if permission_error_list.any?
           @log.error("File not found or permision denied: #{permission_error_list.join(', ')}")
           ret = {status: "error", format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
           JSON.generate(ret)
@@ -111,7 +111,7 @@ class Validator
         #error_list.concat(validate("combination", params))
         #TODO dra validator
 
-        if error_list.size == 0
+        if error_list.empty?
           ret = {version: @latest_version, validity: true}
           ret["stats"]  = get_result_stats(error_list)
           ret["messages"] = []
@@ -248,7 +248,7 @@ class Validator
       result["messages"].each do |msg|
         group_key = msg["id"]
         group_data = group_list.select{|group| group["id"] == group_key}
-        if group_data.size == 0
+        if group_data.empty?
           group_list.push({
                             "id" => group_key,
                             "message" => msg["message"],
@@ -338,9 +338,9 @@ class Validator
       @@filetype.each do |filetype|
         autocorrect_item = error_list.select{|item|
           item[:method].casecmp(filetype) == 0 \
-           && item[:annotation].select{|anno| anno[:is_auto_annotation] == true }.size > 0
+           && item[:annotation].any?{|anno| anno[:is_auto_annotation] == true }
         }
-        if autocorrect_item.size > 0
+        if autocorrect_item.any?
           autocorrect[filetype] = true
         else
           autocorrect[filetype] = false

@@ -643,7 +643,7 @@ class BioSampleValidator < ValidatorBase
         missing_attr_list.push(attr)
       end
     end
-    if missing_attr_list.size == 0
+    if missing_attr_list.empty?
       true
     else
       missing_attr_list.each do |missing_attr|
@@ -837,7 +837,7 @@ class BioSampleValidator < ValidatorBase
 
     predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] } #属性名だけを抽出
     not_predifined_attr_names = sample_attr.keys - predefined_attr_list #属性名の差分をとる
-    if not_predifined_attr_names.size <= 0
+    if not_predifined_attr_names.empty?
       true
     else
       annotation = [
@@ -879,7 +879,7 @@ class BioSampleValidator < ValidatorBase
       end
     end
    
-    if missing_attr_names.size <= 0
+    if missing_attr_names.empty?
       true
     else
       annotation = [
@@ -917,7 +917,7 @@ class BioSampleValidator < ValidatorBase
           end
         end
       end
-      if exist_attr_list.size == 0 #記述属性が一つもない
+      if exist_attr_list.empty? #記述属性が一つもない
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute names", value: attr_set.join(", ")}
@@ -950,7 +950,7 @@ class BioSampleValidator < ValidatorBase
       attr[:attribute_name] if attr[:require] == "mandatory"
     }.compact
     missing_attr_names = mandatory_attr_list - sample_attr.keys
-    if missing_attr_names.size <= 0
+    if missing_attr_names.empty?
       true
     else
       annotation = [
@@ -1251,7 +1251,7 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
     country_name = geo_loc_name.split(":").first.strip
     matched_country = country_list.select{|country| country == country_name}
-    if matched_country.size >= 1
+    if matched_country.any?
       true
     else
       annotation = [
@@ -1714,7 +1714,7 @@ class BioSampleValidator < ValidatorBase
       end
     end
 
-    if vouchers_list.size == 0 # 当該属性の記述がない
+    if vouchers_list.empty? # 当該属性の記述がない
       return nil
     elsif vouchers_list.size == 1 # 当該属性の記述が1つだけ
       return true
@@ -1726,7 +1726,7 @@ class BioSampleValidator < ValidatorBase
           multiple_list.concat(inst_list)
         end
       end
-      if multiple_list.size == 0 #同じinstitution_codeが含まれていない
+      if multiple_list.empty? #同じinstitution_codeが含まれていない
         return true
       else
         values = multiple_list.map {|voucher|
@@ -2295,7 +2295,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def identical_attributes (rule_code, biosample_list)
-    return nil if biosample_list.nil? || biosample_list.size == 0
+    return nil if biosample_list.nil? || biosample_list.empty?
 
     result = true
     # 同値比較しない基本属性
@@ -2542,7 +2542,7 @@ class BioSampleValidator < ValidatorBase
 
     # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
     duplicated_list = all_prefix_list.select {|row| row[:locus_tag_prefix] == locus_tag && row[:submission_id] != submission_id}
-    result = false if duplicated_list.size >= 1
+    result = false if duplicated_list.any?
 
     if result == false
       annotation = [
@@ -3264,7 +3264,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def unaligned_sample_attributes(rule_code, biosample_list)
-    return nil if biosample_list.nil? || biosample_list.size == 0
+    return nil if biosample_list.nil? || biosample_list.empty?
     result = true
 
     first_attr_name_list = [] #最初のサンプルの属性名リスト
@@ -3302,7 +3302,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def multiple_packages(rule_code, biosample_list)
-    return nil if biosample_list.nil? || biosample_list.size == 0
+    return nil if biosample_list.nil? || biosample_list.empty?
     result = true
 
     package_list = biosample_list.map {|biosample_data| biosample_data["package"]}
@@ -3337,7 +3337,7 @@ class BioSampleValidator < ValidatorBase
     end
     mandatory_attr_name_list = ["sample_name", "sample_title", "description", "organism", "taxonomy_id", "bioproject_id"]
     missing_attr_list = mandatory_attr_name_list - attr_name_list
-    if missing_attr_list.size > 0
+    if missing_attr_list.any?
       result = false
       annotation = [
         {key: "Sample name", value: sample_name},
@@ -3428,10 +3428,10 @@ class BioSampleValidator < ValidatorBase
       end 
     end
     
-    if submission_id_list.size > 0
+    if submission_id_list.any?
       valid_id_list = @db_validator.get_valid_sample_id_list(submission_id_list, submitter_id)
       invalid_id_list = submission_id_list - valid_id_list # 指定IDから有効なIDを差し引いてinvalidなリストを取得
-      if invalid_id_list.size > 0
+      if invalid_id_list.any?
         annotation = [
           {key: "Sample name", value: sample_name},
           {key: "Attribute", value: "derived_from"},
@@ -3672,7 +3672,7 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
-    if missing_attr_names.size <= 0
+    if missing_attr_names.empty?
       true
     else
       annotation = [

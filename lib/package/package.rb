@@ -33,12 +33,12 @@ class Package < SPARQLBase
       params = {version: version}
       sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_list.rq", params)
       ret = query(sparql_query)
-      if ret.size > 0
+      if ret.any?
         {status: "success", data: ret}
       else  # 結果が空の場合に存在するversionかチェック
         sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
         ret_package_data = query(sparql_query)
-        if ret_package_data.size == 0
+        if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version"}
         else
           {status: "error", message: "Processing finished with error. Please check the validation service."}
@@ -78,7 +78,7 @@ class Package < SPARQLBase
 
       # mergeして階層型に整形
       package_list.concat(package_group_list)
-      if package_list.size > 0
+      if package_list.any?
         package_tree = []
         package_list.each_with_index do |package_info, idx|
           package_tree = add_package_tree(package_info, package_list, package_tree)
@@ -87,7 +87,7 @@ class Package < SPARQLBase
       else # 結果が空の場合に存在するversionかチェック
         sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
         ret_package_data = query(sparql_query)
-        if ret_package_data.size == 0
+        if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version."}
         else
           {status: "error", message: "Processing finished with error. Please check the validation service."}
@@ -146,7 +146,7 @@ class Package < SPARQLBase
       params = {version: version, package_id: package_id}
       sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_list.rq", params)
       attr_list = query(sparql_query)
-      if attr_list.size > 0
+      if attr_list.any?
         sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/attribute_group_list.rq", params)
         group_list = query(sparql_query)
         attr_list.each do |row|
@@ -162,7 +162,7 @@ class Package < SPARQLBase
       else # 結果が空の場合に存在するversionかチェック
         sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
         ret_package_data = query(sparql_query)
-        if ret_package_data.size == 0
+        if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version."}
         else
           {status: "fail", message: "Wrong parameter: invalid package version or package id."}
@@ -218,12 +218,12 @@ class Package < SPARQLBase
       params = {version: version, package_id: package_id}
       sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/package_info.rq", params)
       ret = query(sparql_query)
-      if ret.size > 0
+      if ret.any?
         {status: "success", data: ret.first}
       else  # 結果が空の場合に存在するversionかチェック
         sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/is_exist_package_version.rq", params)
         ret_package_data = query(sparql_query)
-        if ret_package_data.size == 0
+        if ret_package_data.empty?
           {status: "fail", message: "Wrong parameter: invalid package version."}
         else
           {status: "fail", message: "Wrong parameter: invalid package version or package id."}
