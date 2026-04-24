@@ -46,8 +46,4 @@ Rails.application.configure do
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
-
-  # 旧 Sinatra 側が host_authorization permitted_hosts: [] でフリーにしていたので踏襲。
-  # 外部に直接晒していないクローズドネットワーク前提。
-  config.hosts.clear
 end
