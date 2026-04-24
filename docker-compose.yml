@@ -14,6 +14,7 @@ services:
     environment:
       TZ: Asia/Tokyo
       RUBY_YJIT_ENABLE: "true"
+      RAILS_ENV: ${RAILS_ENV}
       DDBJ_VALIDATOR_APP_ROOT_PATH: ${DDBJ_ONTOLOGIES_APP_ROOT_DIR:-/usr/src/ddbj_validator}
       DDBJ_VALIDATOR_SHARED_PATH: ${DDBJ_ONTOLOGIES_SHARED_DIR:-/usr/src/ddbj_validator/shared}
       DDBJ_VALIDATOR_APP_UNICORN_PORT: 3000
