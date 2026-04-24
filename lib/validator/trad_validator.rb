@@ -574,7 +574,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def check_by_jparser(rule_code, anno_file_path, seq_file_path)
-    return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path)
+    return nil if anno_file_path.blank? || seq_file_path.blank?
     return if @use_parser.nil? || @use_parser == false
     ret = true
 
@@ -634,7 +634,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def check_by_transchecker(rule_code, anno_file_path, seq_file_path)
-    return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path)
+    return nil if anno_file_path.blank? || seq_file_path.blank?
     return if @use_parser.nil? || @use_parser == false
     ret = true
 
@@ -687,7 +687,7 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def check_by_agpparser(rule_code, anno_file_path, seq_file_path, agp_file_path)
-    return nil if CommonUtils::blank?(anno_file_path) || CommonUtils::blank?(seq_file_path) || CommonUtils::blank?(agp_file_path)
+    return nil if anno_file_path.blank? || seq_file_path.blank? || agp_file_path.blank?
     return if @use_parser.nil? || @use_parser == false
     ret = true
 

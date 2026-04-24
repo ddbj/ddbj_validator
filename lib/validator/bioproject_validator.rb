@@ -99,7 +99,7 @@ class BioProjectValidator < ValidatorBase
       @taxid_path = "//Organism/@taxID"
       @orgname_path = "//Organism/OrganismName"
       input_taxid = get_node_text(project_node, @taxid_path)
-      if input_taxid.nil? || CommonUtils::blank?(input_taxid) #taxonomy_idの記述がない
+      if input_taxid.nil? || input_taxid.blank? #taxonomy_idの記述がない
         taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
       else
         taxonomy_id = input_taxid
@@ -362,7 +362,7 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
     result = true
     primary_taxid = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission")
     multispecies = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eMultispecies']")
@@ -393,7 +393,7 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def metagenome_or_environmental (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
 
     # eEnvironment でなければチェックしない
     environment = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eEnvironment']")
@@ -429,9 +429,9 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def taxonomy_name_and_id_not_match (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
-    return nil if CommonUtils::blank?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
 
-    organism_name   = "" if CommonUtils::blank?(organism_name)
+    organism_name   = "" if organism_name.blank?
     scientific_name = @org_validator.get_organism_name(taxonomy_id)
     return true if !scientific_name.nil? && scientific_name == organism_name
 
@@ -461,7 +461,7 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def taxonomy_error_warning (rule_code, project_label, organism_name, project_node, line_num)
-    organism_name = "" if CommonUtils::blank?(organism_name)
+    organism_name = "" if organism_name.blank?
     result = false
 
     unless organism_name == ""

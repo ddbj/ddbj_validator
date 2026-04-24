@@ -47,13 +47,13 @@ class TsvFieldValidator
   def invalid_value_input(data, mode=nil)
     invalid_list = []
     data.each_with_index do |row, field_idx|
-      if CommonUtils.blank?(row["key"]) || row["key"].start_with?("#")
+      if row["key"].blank? || row["key"].start_with?("#")
         next if row["values"].nil?
         value_list = row["values"].uniq.compact
         unless (value_list == [] || value_list == [""])
           if mode == "comment_line" && row["key"].start_with?("#")
             invalid_list.push({field_name: row["key"], value: row["values"].to_s, field_idx: field_idx})
-          elsif (mode.nil? || mode == "") && CommonUtils.blank?(row["key"])
+          elsif (mode.nil? || mode == "") && row["key"].blank?
             invalid_list.push({field_name: "", value: row["values"].to_s, field_idx: field_idx})
           end
         end
@@ -99,7 +99,7 @@ class TsvFieldValidator
     data.each_with_index do |row, field_idx|
       next if mandatory_field_list.include?(row["key"]) # ここではoptional fieldのみ置換する
       row["values"].each_with_index do |value, value_idx|
-        next if CommonUtils.blank?(value)
+        next if value.blank?
         null_accepted_size = null_accepted_list.select{|refexp| value =~ /#{refexp}/i }.size
         null_not_recomm_size = null_not_recommended_list.select {|refexp| value =~ /^(#{refexp})$/i }.size
         if (null_accepted_size + null_not_recomm_size) > 0
@@ -226,7 +226,7 @@ class TsvFieldValidator
     data.each_with_index do |row, field_idx|
       next if cv_check_field[row["key"]].nil? || row["values"].nil?
       row["values"].each_with_index do |value, value_idx|
-        next if CommonUtils.blank?(value)
+        next if value.blank?
         unless cv_check_field[row["key"]].first["value_list"].include?(value) #CVに含まれていない値
           if null_accepted_list.include?(value) # null値での記載
             if not_allow_null_field_list.include?(row["key"]) # null値の入力が許容されていなければNG
@@ -287,7 +287,7 @@ class TsvFieldValidator
     data.each_with_index do |row, field_idx|
       next if field_format[row["key"]].nil? || row["values"].nil?
       row["values"].each_with_index do |value, value_idx|
-        next if CommonUtils.blank?(value) # is null val?
+        next if value.blank? # is null val?
         format_conf = field_format[row["key"]].first
         if !format_conf["regex"].nil? # 正規表現によるチェック
           unless CommonUtils.format_check_with_regexp(value, format_conf["regex"])
@@ -354,7 +354,7 @@ class TsvFieldValidator
       (0..max_value_index).each do |value_idx|
         group_field_values = {}
         group["field_list"].each do |field_name|
-          unless CommonUtils.blank?(field_value(data, field_name, value_idx))
+          unless field_value(data, field_name, value_idx).blank?
             group_field_values[field_name] = field_value(data, field_name, value_idx)
           end
         end
@@ -505,7 +505,7 @@ class TsvFieldValidator
     CSV.open(output_file, "w", col_sep: "\t") do |csv|
       input_data.each do |row|
         row_data = []
-        if CommonUtils.blank?(row["key"]) && (CommonUtils.blank?(row["values"]) || row["values"] == [])
+        if row["key"].blank? && (row["values"].blank? || row["values"] == [])
           row_data = [nil]
         else
           row_data.push(row["key"])
