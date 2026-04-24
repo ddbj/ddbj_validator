@@ -449,8 +449,12 @@ module DDBJValidator
         send_file 'error_not_found.json', root: settings.public_folder, status: 404
       elsif status == 500
         send_file 'error_internal_server_error.json', root: settings.public_folder, status: 500
-      else #other error with rack default message
-        { status: "error", "message": Rack::Utils::HTTP_STATUS_CODES[status] }.to_json
+      else
+        # route がすでに診断用の body を書いていればそれをそのまま返す。
+        # (例: /api/monitoring が 503 + 具体的なエラーメッセージを返すケース)
+        # body が空のときだけ Rack の汎用メッセージにフォールバックする。
+        current_body = [body].flatten.join
+        current_body.empty? ? { status: "error", "message": Rack::Utils::HTTP_STATUS_CODES[status] }.to_json : current_body
       end
     end
 
