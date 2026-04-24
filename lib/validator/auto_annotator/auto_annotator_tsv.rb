@@ -29,7 +29,7 @@ class AutoAnnotatorTsv < AutoAnnotatorBase
     #auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
     original_tsv_data = nil
-    if annotation_list.size > 0
+    if annotation_list.any?
       begin
         tsv_data = FileParser.new().parse_csv(original_file, "\t")
         original_tsv_data = tsv_data[:data]

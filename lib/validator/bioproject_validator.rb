@@ -213,7 +213,7 @@ class BioProjectValidator < ValidatorBase
 
     duplicated_submission = project_names_list.select{|item| item[:bioproject_title] == title && item[:public_description] == description}
     # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じtitle&descがあるとNG
-    result = false if submission_id.nil? && duplicated_submission.size >= 1
+    result = false if submission_id.nil? && duplicated_submission.any?
     # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
     result = false if !submission_id.nil? && duplicated_submission.size >= 2
 

@@ -57,11 +57,7 @@ class OrganismValidator < SPARQLBase
     params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_taxid_from_name.rq", params)
     result = query(sparql_query)
-    if result.size <= 0
-      false
-    else
-      true
-    end
+    !result.empty?
   end
 
   #
@@ -113,7 +109,7 @@ class OrganismValidator < SPARQLBase
     params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_organism_name.rq", params)
     result = query(sparql_query)
-    if result.size <= 0
+    if result.empty?
       nil
     else
       result.first[:organism_name]
@@ -161,7 +157,7 @@ class OrganismValidator < SPARQLBase
     tax_list = search_tax_from_name_ignore_case(organism_name)
     ret = {}
     #該当するtax_idがない
-    if tax_list.size == 0
+    if tax_list.empty?
       ret[:status] = "no exist"
       ret [:tax_id] = TAX_ROOT
       return ret
@@ -197,7 +193,7 @@ class OrganismValidator < SPARQLBase
     params = {tax_id: tax_id, parent_tax_id: parent_tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_linage.rq", params)
     result = query(sparql_query)
-    return result.size > 0
+    return result.any?
   end
 
   #
@@ -213,7 +209,7 @@ class OrganismValidator < SPARQLBase
     params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/has_plastid.rq", params)
     result = query(sparql_query)
-    return result.size > 0
+    return result.any?
   end
 
   #
@@ -233,9 +229,9 @@ class OrganismValidator < SPARQLBase
       params[:rank] = rank
       sparql_query = CommonUtils::binding_template_with_hash("#{@template_dir}/get_parent_rank.rq", params)
       result = query(sparql_query)
-      break if result.size > 0
+      break if result.any?
     end
-    return result.size > 0
+    return result.any?
   end
 
   #

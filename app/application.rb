@@ -161,7 +161,7 @@ module DDBJValidator
           file = file_list.select{|file| file.end_with?(".json")} #変換できなかった場合はこのファイルは無い
           type = "application/json"
         end
-        if file.size == 0
+        if file.empty?
           status 400
           message = "Invalid uuid or filetype"
           { status: "error", "message": message}.to_json
@@ -554,7 +554,7 @@ module DDBJValidator
       # Acceptヘッダーをリストで返す
       def get_accept_header(request)
         accept = request.env.select { |k, v| k.start_with?('HTTP_ACCEPT') }
-        if accept.size == 0
+        if accept.empty?
           []
         else
           accept

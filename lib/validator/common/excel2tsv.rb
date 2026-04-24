@@ -122,7 +122,7 @@ class Excel2Tsv
     end
     # 不足シートのリスト
     missing_sheet_list = mandatory_sheet_list - exist_sheet_list
-    if missing_sheet_list.size > 0
+    if missing_sheet_list.any?
       ret = false
       annotation = [
         {key: "Mandatory sheet names", value: mandatory_sheet_list.to_s},

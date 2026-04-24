@@ -115,7 +115,7 @@ class MetaboBankIdfValidator < ValidatorBase
     invalid_list.concat(invalid_char_on_desc("Study Description", study_desc_value_list))
     invalid_list.concat(invalid_char_on_desc("Protocol Description", protocol_desc_value_list))
 
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: "Field name", value: invalid[:field_name]}]
       if invalid[:value_idx].nil? # field_nameがNG

@@ -293,7 +293,7 @@ when "prefix"
   puts serv.prefix
 when "query", "q"
   serv.prefix_default if command == "q"
-  if arguments.size > 0
+  if arguments.any?
     sparql = arguments.shift
     format = arguments.shift
     $stderr.puts "WARNING: invalid format #{format} (use 'xml' or 'json')" if format and not format[/(xml|json)/]
@@ -304,7 +304,7 @@ when "query", "q"
   end
 when "file", "f"
   serv.prefix_default if command == "f"
-  if arguments.size > 0
+  if arguments.any?
     sparql = File.read(arguments.shift)
     format = arguments.shift
     $stderr.puts "WARNING: invalid format #{format} (use 'xml' or 'json')" if format and not format[/(xml|json)/]
@@ -314,7 +314,7 @@ when "file", "f"
     $stderr.puts "> sparql.rb file <filename> [format]"
   end
 when "find"
-  if arguments.size > 0
+  if arguments.any?
     keyword = arguments.shift
     format = arguments.shift
     $stderr.puts "WARNING: invalid format '#{format}' (use 'xml' or 'json')" if format and not format[/(xml|json)/]
@@ -328,7 +328,7 @@ when "head"
     limit, offset, format, = *arguments
   elsif arguments.size > 1
     limit, offset, = *arguments
-  elsif arguments.size > 0
+  elsif arguments.any?
     limit, = *arguments
   end
   opts = {

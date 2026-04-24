@@ -283,10 +283,10 @@ class CombinationValidator < ValidatorBase
     experiment_node = experiment_set.xpath("//EXPERIMENT[@alias]")
     experiment_node.each do |ex_node|
       platform_node = ex_node.xpath("PLATFORM/*[position() = 1]") #PLATFORMの最初の子要素を取得
-      if platform_node.size > 0
+      if platform_node.any?
         platform_name = platform_node[0].name #子要素の要素名を取得し、confから該当するplatformの情報を抽出
         platform_setting = @conf[:platform_filetype].select{|item| item["platform"] == platform_name}
-        if platform_setting.size > 0 #confに記載されたplatform名であれば
+        if platform_setting.any? #confに記載されたplatform名であれば
           accept_filetype_list = platform_setting[0]["filetype"]
           refname = get_node_text(ex_node, "@alias")
           run_set.xpath("//RUN").each_with_index do |run_node, idx|
@@ -299,7 +299,7 @@ class CombinationValidator < ValidatorBase
               end
               # 記載されたfiletypeのリストから許容されたfiletypeを除き、他のfiletypeがあればNG
               unaccept_filetype_list = filetype_list - accept_filetype_list
-              if unaccept_filetype_list.size > 0
+              if unaccept_filetype_list.any?
                 annotation = [
                   {key: "refname", value: refname},
                   {key: "platform", value: platform_name},

@@ -108,7 +108,7 @@ class ValidatorBase
     schema = Nokogiri::XML::Schema.from_document(xsddoc)
     document = Nokogiri::XML(File.read(xml_file))
     validatan_ret = schema.validate(document)
-    if validatan_ret.size <= 0
+    if validatan_ret.empty?
       result
     else
       schema.validate(document).each do |error|
@@ -193,7 +193,7 @@ class ValidatorBase
     result = true
     begin
       invalid_list = JSON::Validator.fully_validate(schema_json_data, json_data)
-      if invalid_list.size > 0
+      if invalid_list.any?
         result = false
         invalid_list.each do |invalid|
           annotation = [

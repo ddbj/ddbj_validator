@@ -106,7 +106,7 @@ class MetaboBankSdrfValidator < ValidatorBase
     result = true
     invalid_list = @tsv_validator.non_ascii_characters(data)
 
-    result = false unless invalid_list.size == 0
+    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: "column name", value: invalid[:column_name]}]
       if invalid[:row_idx].nil? # ヘッダーがNG
