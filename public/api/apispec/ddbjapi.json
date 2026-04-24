@@ -52,9 +52,6 @@
             "$ref": "#/parameters/jvar"
           },
           {
-            "$ref": "#/parameters/vcf"
-          },
-          {
             "$ref": "#/parameters/trad_anno"
           },
           {
@@ -233,7 +230,7 @@
         ],
         "responses": {
           "200": {
-            "description": "An original xml file validated (converted json file on jvar|vcf)",
+            "description": "An original xml file validated (converted json file on jvar)",
             "schema": {
               "type": "file"
             }
@@ -411,13 +408,6 @@
       "required": false,
       "type": "file"
     },
-    "vcf": {
-      "name": "vcf",
-      "in": "formData",
-      "description": "Upload VCF file.",
-      "required": false,
-      "type": "file"
-    },
     "trad_anno": {
       "name": "trad_anno",
       "in": "formData",
@@ -498,7 +488,7 @@
     "filetype": {
       "name": "filetype",
       "in": "path",
-      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, vcf, trad_anno, trad_seq, trad_agp, metabobank_idf, metabobank_sdrf",
+      "description": "filetype e.g., submission, biosample, bioproject, run, jvar, trad_anno, trad_seq, trad_agp, metabobank_idf, metabobank_sdrf",
       "required": true,
       "type": "string"
     },

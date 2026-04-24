@@ -16,7 +16,7 @@ require File.expand_path('../metabobank_sdrf_validator.rb', __FILE__)
 
 # Validator main class
 class Validator
-    @@filetype = %w(all_db biosample bioproject submission experiment run analysis jvar vcf trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
+    @@filetype = %w(all_db biosample bioproject submission experiment run analysis jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -66,7 +66,7 @@ class Validator
 
         params.each do |k,v|
           case k.to_s
-          when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_agp', 'vcf', 'metabobank_idf', 'metabobank_sdrf', 'output'
+          when 'biosample', 'bioproject', 'submision', 'experiment', 'run', 'analysis', 'jvar', 'trad_anno', 'trad_seq', 'trad_agp', 'metabobank_idf', 'metabobank_sdrf', 'output'
             params[k] = File.expand_path(v)
             #TODO check file exist and permission, need write permission to output file
             if k.to_s == 'output'
@@ -105,7 +105,6 @@ class Validator
         error_list.concat(validate("biosample", params)) if !params[:biosample].nil?
         error_list.concat(validate("bioproject", params))if !params[:bioproject].nil?
         error_list.concat(validate("jvar", params))if !params[:jvar].nil?
-        error_list.concat(validate("vcf", params))if !params[:vcf].nil?
         error_list.concat(validate("trad", params))if (params[:trad_anno] || params[:trad_seq] || params[:trad_agp])
         error_list.concat(validate("metabobank_idf", params))if !params[:metabobank_idf].nil?
         error_list.concat(validate("metabobank_sdrf", params))if !params[:metabobank_sdrf].nil?
@@ -172,9 +171,6 @@ class Validator
         when "jvar"
           validator = JVarValidator.new
           data = params[:jvar]
-        when "vcf"
-          validator = VCFValidator.new
-          data = params[:vcf]
         when "metabobank_idf"
           validator = MetaboBankIdfValidator.new
           data = params[:metabobank_idf]
