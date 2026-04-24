@@ -17,8 +17,6 @@ class ValidatorBase
   def read_common_config
     setting = Rails.configuration.validator
 
-    NcbiEutils.api_key = setting.dig('eutils_api_key', 'key')
-
     db = setting['ddbj_rdb']
     db_configured = db && %w[pg_host pg_port pg_user pg_pass].all? { db[it].to_s != '' }
 

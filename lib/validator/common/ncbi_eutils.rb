@@ -3,14 +3,9 @@ require 'http'
 # NCBI E-utilities (esummary) と DBCLS tm medline に対する「この ID 実在する?」確認用
 # クライアント。PubMed ID と PMC ID の存在確認に使う。
 #
-# API key は process-wide で 1 つ。validator 起動時 (ValidatorBase#read_common_config) に
-# `NcbiEutils.api_key = ...` で設定されたものを使い回す。
+# 認証なしで叩いているので per-second rate limit (3 req/s) に縛られる。eutils_summary の
+# sleep(0.4) はその緩和。API key を使う必要が出たら NCBI に登録して credentials に入れる。
 module NcbiEutils
-  class << self
-    # NCBI eutils API key の文字列 (validator.yml の eutils_api_key.key)。
-    attr_accessor :api_key
-  end
-
   EUTILS_SUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
   DBCLS_MEDLINE_URL  = "http://tm.dbcls.jp/medline"
 
@@ -59,7 +54,7 @@ module NcbiEutils
   def self.eutils_summary (db_name, id)
     return nil if db_name.nil? || id.nil?
     sleep(0.4)
-    url = "#{EUTILS_SUMMARY_URL}?db=#{db_name}&id=#{id}&retmode=json&api_key=#{api_key}"
+    url = "#{EUTILS_SUMMARY_URL}?db=#{db_name}&id=#{id}&retmode=json"
     res = HTTP.get(url)
     raise "'NCBI eutils' returns a server error. url: #{url}\n" if res.status.server_error?
     raise "'NCBI eutils' returns an error. url: #{url}\n"       if res.status.client_error?

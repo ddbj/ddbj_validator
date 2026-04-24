@@ -2,10 +2,6 @@ require_relative '../../../test_helpers'
 require 'validator/common/ncbi_eutils'
 
 class TestNcbiEutils < Minitest::Test
-  def setup
-    NcbiEutils.api_key = Rails.configuration.validator.dig('eutils_api_key', 'key')
-  end
-
   def test_exist_pubmed_id?
     #ok
     ret = NcbiEutils.exist_pubmed_id?("27148491")

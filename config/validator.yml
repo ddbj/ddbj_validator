@@ -24,8 +24,6 @@ development: &dev
     pg_timeout: 30
   ddbj_parser:
     parser_api_url: <%= ENV['DDBJ_PARSER_APP_URL'] %>
-  eutils_api_key:
-    key: your_api_key
   monitoring:
     ssub_id: SSUB009526
 
@@ -48,8 +46,6 @@ staging:
     pg_timeout: 30
   ddbj_parser:
     parser_api_url:
-  eutils_api_key:
-    key: <%= Rails.application.credentials.eutils_api_key %>
   monitoring:
     ssub_id: SSUB004022
 
@@ -69,7 +65,5 @@ production:
     pg_timeout: 30
   ddbj_parser:
     parser_api_url:
-  eutils_api_key:
-    key: <%= Rails.application.credentials.eutils_api_key %>
   monitoring:
     ssub_id: SSUB004022
