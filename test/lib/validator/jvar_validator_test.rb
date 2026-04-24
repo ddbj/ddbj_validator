@@ -1,4 +1,3 @@
-require 'dotenv'
 require 'fileutils'
 require_relative '../../test_helpers'
 require 'validator/jvar_validator'
@@ -6,7 +5,6 @@ require 'validator/common/insdc_nullability'
 
 class TestJVarValidator < Minitest::Test
   def setup
-    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = JVarValidator.new
     @test_file_dir = File.expand_path('../../../data/jvar', __FILE__)
   end

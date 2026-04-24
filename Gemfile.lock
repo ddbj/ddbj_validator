@@ -26,7 +26,6 @@ GEM
     csv (3.3.5)
     date (3.5.1)
     domain_name (0.6.20240107)
-    dotenv (3.2.0)
     drb (2.2.3)
     hashdiff (1.2.1)
     http (6.0.3)
@@ -128,7 +127,6 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   csv
-  dotenv
   http
   json-schema
   mail

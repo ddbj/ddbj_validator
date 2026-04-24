@@ -1,11 +1,9 @@
 require 'yaml'
-require 'dotenv'
 require_relative '../../../test_helpers'
 require 'validator/common/ncbi_eutils'
 
 class TestNcbiEutils < Minitest::Test
   def setup
-    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     setting = YAML.load(ERB.new(File.read(File.expand_path('../../../../../conf/validator.yml', __FILE__))).result)
     NcbiEutils.api_key = setting.dig("eutils_api_key", "key")
   end

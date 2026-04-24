@@ -1,4 +1,3 @@
-require 'dotenv'
 require_relative '../../test_helpers'
 require 'validator/bioproject_validator'
 require 'validator/common/insdc_nullability'
@@ -7,7 +6,6 @@ require 'validator/common/organism_validator'
 class TestBioProjectValidator < Minitest::Test
   def setup
     skip_unless_virtuoso_available
-    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioProjectValidator.new
     @test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
   end

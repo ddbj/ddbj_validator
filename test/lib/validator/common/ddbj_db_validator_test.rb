@@ -1,7 +1,6 @@
 require 'json'
 require 'yaml'
 require 'erb'
-require 'dotenv'
 require_relative '../../../test_helpers'
 require 'validator/common/ddbj_db_validator'
 
@@ -9,7 +8,6 @@ class TestDDBJDbValidator < Minitest::Test
 
   def setup
     skip_unless_pg_configured
-    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     conf_dir = File.expand_path('../../../../../conf', __FILE__)
     setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)
     db_config = setting["ddbj_rdb"]

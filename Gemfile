@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 gem "activesupport"
 gem "csv"
-gem "dotenv"
 gem "http"
 gem "json-schema"
 gem "mail"

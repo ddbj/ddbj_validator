@@ -1,5 +1,4 @@
 require 'date'
-require 'dotenv'
 require 'fileutils'
 require_relative '../../test_helpers'
 require 'validator/trad_validator'
@@ -8,7 +7,6 @@ require 'validator/common/insdc_nullability'
 class TestTradValidator < Minitest::Test
   def setup
     skip_unless_virtuoso_available
-    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = TradValidator.new
     @test_file_dir = File.expand_path('../../../data/trad', __FILE__)
     # DDBJ RDBを使用するテストするか否か。を設定ファイルから判定

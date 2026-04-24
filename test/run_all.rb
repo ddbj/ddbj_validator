@@ -3,7 +3,6 @@ require_relative 'test_helpers'
 
 REPO_ROOT = File.expand_path('..', __dir__)
 
-ENV['IGNORE_DOTENV']                        ||= '1'
 ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR']   = File.join(REPO_ROOT, 'logs')
 
 FileUtils.mkdir_p(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'])

@@ -1,10 +1,8 @@
-require 'dotenv'
 require_relative '../../../test_helpers'
 require 'validator/common/xml_convertor'
 
 class TestXmlConvertor < Minitest::Test
   def setup
-    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     @convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../../data/biosample', __FILE__)
   end
