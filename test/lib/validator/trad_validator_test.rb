@@ -456,7 +456,6 @@ class TestTradValidator < Minitest::Test
   end
 
   def test_ddbj_parser
-    skip_unless_ddbj_parser_configured
     # TODO 正常系テスト
     # invalid file path
     params = {anno_file_path: "not_exist_ann_file", fasta_file_path: "not_exist_fasta_file", result_file_path: "not_exist_output_file"}

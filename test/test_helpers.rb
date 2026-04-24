@@ -1,4 +1,6 @@
-# 外部サービス (PostgreSQL / Virtuoso) が利用できない環境 (CI 等) でテストをスキップするヘルパ
+# 外部サービス (PostgreSQL / Virtuoso) が利用できない環境 (CI 等) でテストをスキップするヘルパと、
+# テスト中にプロダクションコードから発生する外部 HTTP リクエスト (NCBI eutils / tm.dbcls.jp /
+# DDBJ parser) を stub するセットアップを提供する。
 #
 # 使い方:
 #   class TestFoo < Minitest::Test
@@ -21,9 +23,57 @@
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'bundler/setup'
+require 'json'
 require 'minitest/autorun'
 require 'net/http'
 require 'uri'
+require 'webmock/minitest'
+
+# localhost (Virtuoso / Postgres) だけ許可して、それ以外の外部 HTTP は全て stub 経由に縛る
+# テスト中の「うっかり本物の外部 API を叩く」を防ぐための基本姿勢
+WebMock.disable_net_connect!(allow_localhost: true)
+
+# test_ddbj_parser がエンドポイント設定済みの状態を前提にしているので、未設定なら stub URL を差し込む
+ENV['DDBJ_PARSER_APP_URL'] = 'http://ddbj-parser.stub/validate' if ENV['DDBJ_PARSER_APP_URL'].to_s.strip.empty?
+
+# webmock/minitest は各テスト完了後に stub を reset するので、default stub を
+# 個別 setup 前に都度貼り直すモジュールを Minitest::Test に挟み込む
+module DefaultHttpStubs
+  def before_setup
+    super
+
+    # DBCLS TM medline: デフォルトは「該当 PubMed ID なし」(空 MedlineCitationSet を返す)
+    WebMock.stub_request(:get, %r{\Ahttp://tm\.dbcls\.jp/medline/\d+\.json\z})
+      .to_return(status: 200, body: '{"MedlineCitationSet":{}}')
+
+    # 既知の「存在する」PubMed ID (テスト群が fixture で参照する値)
+    %w[1 15 12345 16088826 27148491].each do |id|
+      WebMock.stub_request(:get, "http://tm.dbcls.jp/medline/#{id}.json")
+        .to_return(status: 200, body: JSON.generate('MedlineCitationSet' => {'MedlineCitation' => {'PMID' => id}}))
+    end
+
+    # NCBI eutils esummary: デフォルトは「該当 ID なし」
+    WebMock.stub_request(:get, %r{\Ahttps://eutils\.ncbi\.nlm\.nih\.gov/entrez/eutils/esummary\.fcgi})
+      .to_return(status: 200, body: '{"result":{}}')
+
+    # 既知の「存在する」PMC ID
+    WebMock.stub_request(:get, %r{\Ahttps://eutils\.ncbi\.nlm\.nih\.gov/entrez/eutils/esummary\.fcgi.*[?&]id=5343844(?:&|\z)})
+      .to_return(status: 200, body: JSON.generate('result' => {'5343844' => {'uid' => '5343844'}}))
+
+    # DDBJ parser: 正常系ダミーレスポンスが必要なテストは個別に override 想定。
+    # デフォルトは 4xx を返して、ddbj_parser メソッド側の rescue が "Parse error" を raise する挙動を維持
+    # (ddbj_parser は GET リクエストを使う)
+    WebMock.stub_request(:get, %r{\Ahttp://ddbj-parser\.stub/})
+      .to_return(status: 400, body: 'stub: invalid request')
+
+    # test_ddbj_parser は "invalid host" ケースとして http://hogehoge.com を渡し、
+    # ddbj_parser 側は 4xx を "Parse error: ... server not found" に変換するので、それを再現
+    WebMock.stub_request(:get, %r{\Ahttp://hogehoge\.com/})
+      .to_return(status: 404, body: 'stub: host not found')
+  end
+end
+
+Minitest::Test.include(DefaultHttpStubs)
 
 module ServiceAvailability
   PG_CONFIGURED = !ENV['DDBJ_VALIDATOR_APP_POSTGRES_HOST'].to_s.strip.empty?
@@ -47,15 +97,6 @@ module ServiceAvailability
 
   def skip_unless_virtuoso_available
     skip 'Virtuoso SPARQL endpoint not reachable' unless VIRTUOSO_REACHABLE
-  end
-
-  def skip_unless_ddbj_parser_configured
-    skip 'DDBJ parser not configured (set DDBJ_PARSER_APP_URL to enable)' if ENV['DDBJ_PARSER_APP_URL'].to_s.strip.empty?
-  end
-
-  def skip_unless_eutils_api_key_configured
-    key = ENV['DDBJ_VALIDATOR_APP_EUTILS_API_KEY'].to_s
-    skip 'NCBI E-utilities API key not configured' if key.empty? || key == 'your_api_key'
   end
 end
 
