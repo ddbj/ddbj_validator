@@ -45,4 +45,3 @@ data_updater/dbfile
 /config/master.key
 /config/credentials/*.key
 .byebug_history
-
