@@ -768,21 +768,14 @@ class BioSampleValidator < ValidatorBase
   #
   def missing_sample_name (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil? || biosample_data["attributes"].nil?
+    return true unless CommonUtils.null_value?(biosample_data["attributes"]["sample_name"])
 
-    result = true
-    if CommonUtils.null_value?(biosample_data["attributes"]["sample_name"])
-      result = false
-    end
-    if result == false
-      sample_title = biosample_data["attributes"]["sample_title"].nil? ? "" : biosample_data["attributes"]["sample_title"]
-      sample_name = biosample_data["attributes"]["sample_name"].nil? ? "" : biosample_data["attributes"]["sample_name"]
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "sample_title", value: sample_title}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: "Sample name", value: biosample_data["attributes"]["sample_name"].to_s},
+      {key: "sample_title", value: biosample_data["attributes"]["sample_title"].to_s}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -797,20 +790,14 @@ class BioSampleValidator < ValidatorBase
   #
   def missing_organism (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil? || biosample_data["attributes"].nil?
+    return true unless CommonUtils.null_value?(biosample_data["attributes"]["organism"])
 
-    result = true
-    if CommonUtils.null_value?(biosample_data["attributes"]["organism"])
-      result = false
-    end
-    if result == false
-      organism = biosample_data["attributes"]["organism"].nil? ? "" : biosample_data["attributes"]["organism"]
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "organism", value: organism}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: "Sample name", value: sample_name},
+      {key: "organism", value: biosample_data["attributes"]["organism"].to_s}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -1024,21 +1011,16 @@ class BioSampleValidator < ValidatorBase
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
     return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
 
-    result =  true
-    if !cv_attr[attr_name].nil? # CVを使用する属性か
-      unless cv_attr[attr_name].include?(attr_val) # CVリストの値ではない
-        result = false
-      end
-    end
-    if result == false # CVリストに値がない
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    # CVを使用しない属性か、CVリストに値があれば OK
+    return true if cv_attr[attr_name].nil? || cv_attr[attr_name].include?(attr_val)
+
+    annotation = [
+      {key: "Sample name", value: sample_name},
+      {key: "Attribute", value: attr_name},
+      {key: "Attribute value", value: attr_val}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -1261,27 +1243,25 @@ class BioSampleValidator < ValidatorBase
   def invalid_lat_lon_format (rule_code, sample_name, lat_lon, line_num)
     return nil if CommonUtils::null_value?(lat_lon)
 
-    result = true
     common = CommonUtils.new
     insdc_latlon = common.format_insdc_latlon(lat_lon)
     # INSDC の formatに直せなかった場合はnilが返るが、auto-correctはないのでこのメソッドでは無視。これらはBS_R0139でエラーになる。
     # 入力値から補正された場合には (lat_lon != insdc_latlon) warningを返す
-    if (!insdc_latlon.nil?) && lat_lon != insdc_latlon
-      result = false
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "lat_lon"},
-        {key: "Attribute value", value: lat_lon}
-      ]
-      if @data_format == "json" || @data_format == "tsv"
-        location = auto_annotation_location(@data_format, line_num, "lat_lon", "value")
-      else
-        location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
-      end
-      annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
-      add_error(rule_code, annotation, auto_annotation: true)
-    end
-    result
+    return true if insdc_latlon.nil? || lat_lon == insdc_latlon
+
+    annotation = [
+      {key: "Sample name", value: sample_name},
+      {key: "Attribute", value: "lat_lon"},
+      {key: "Attribute value", value: lat_lon}
+    ]
+    location = if @data_format == "json" || @data_format == "tsv"
+                 auto_annotation_location(@data_format, line_num, "lat_lon", "value")
+               else
+                 @xml_convertor.xpath_from_attrname("lat_lon", line_num)
+               end
+    annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
+    add_error(rule_code, annotation, auto_annotation: true)
+    false
   end
 
   #
@@ -2707,16 +2687,14 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_sample_name_format (rule_code, sample_name, line_num)
-    return nil if CommonUtils::null_value?(sample_name)
-    result = true
-    if sample_name.size > 100 || sample_name !~ /^[0-9a-zA-Z\s\(\)\{\}\[\]\+\-_.]+$/  #最大100文字で英数字、空白、記号 (){}[]+-_. から構成されること
-      annotation = [
-        {key: "Sample name", value: sample_name}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return nil  if CommonUtils::null_value?(sample_name)
+    return true if sample_name.size <= 100 && sample_name =~ /^[0-9a-zA-Z\s\(\)\{\}\[\]\+\-_.]+$/  #最大100文字で英数字、空白、記号 (){}[]+-_. から構成されること
+
+    annotation = [
+      {key: "Sample name", value: sample_name}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -3235,17 +3213,15 @@ class BioSampleValidator < ValidatorBase
   #
   def multiple_packages(rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.empty?
-    result = true
 
     package_list = biosample_list.map {|biosample_data| biosample_data["package"]}
-    if package_list.uniq.compact.size > 1 # 複数のPackage記載があればNG(記載なしも含む)
-      result = false
-      annotation = [
-        {key: "Package names", value: package_list.uniq.to_s}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    return true if package_list.uniq.compact.size <= 1 # 複数のPackage記載があればNG(記載なしも含む)
+
+    annotation = [
+      {key: "Package names", value: package_list.uniq.to_s}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
