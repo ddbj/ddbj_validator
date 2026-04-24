@@ -2,7 +2,7 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require 'date'
-require 'net/http'
+require 'http'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/date_format.rb"
@@ -784,17 +784,17 @@ class TradValidator < ValidatorBase
 
     # リクエスト実行
     begin
-      res = CommonUtils.new.http_get_response(url, 600)
-      if res.code =~ /^5/ # server error
+      res = HTTP.timeout(600).get(url)
+      if res.status.server_error?
         raise "Parse error: 'ddbj_parser' returns a server error. The check by #{parser_name} did not run correctly, so please run it separately.\n"
-      elsif res.code =~ /^4/ # client error
+      elsif res.status.client_error?
         raise "Parse error: 'ddbj_parser' returns a error or server not found. The check by #{parser_name} did not run correctly, so please run it separately.\n"
       else
         begin
           finished_flag = false
           message_list = []
           current_location = ""
-          res.body.each_line do |line|
+          res.body.to_s.each_line do |line|
             if parser_name.downcase == "transchecker" # transcheckerの場合にはfasta-likeなフォーマットでlocationが出力される
               if line.start_with?(">")
                 current_location = line.chomp.strip[1..-1]

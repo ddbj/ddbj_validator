@@ -243,10 +243,9 @@ class BioProjectTsvValidator < ValidatorBase
     result = true
     pubmed_id_list = @tsv_validator.field_value_list(data, "pubmed_id")
     return true if pubmed_id_list.nil?
-    common = CommonUtils.new
     pubmed_id_list.each do |pubmed_id|
       unless pubmed_id.blank?
-        unless common.exist_pubmed_id?(pubmed_id.to_s)
+        unless NcbiEutils.exist_pubmed_id?(pubmed_id.to_s)
           annotation = [
            {key: "Field name", value: "pubmed_id"},
            {key: "Value", value: pubmed_id}

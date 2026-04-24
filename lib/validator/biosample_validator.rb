@@ -91,7 +91,6 @@ class BioSampleValidator < ValidatorBase
       config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + "/invalid_strain_value.json"))
       config[:json_schema] = JSON.parse(File.read(config_file_dir + "/schema.json"))
       config[:institution_list_file] = coll_dump_file
-      config[:eutils_api_key] = @conf[:eutils_api_key]
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -1043,7 +1042,6 @@ class BioSampleValidator < ValidatorBase
   def invalid_publication_identifier (rule_code, sample_name, attr_name, attr_val, ref_attr, line_num)
     return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
 
-    common = CommonUtils.new
     result =  true
     if ref_attr.include?(attr_name) # リファレンス型の属性か
       ref = attr_val.gsub(/[ :]*P?M?ID[ :]+|[ :]*DOI[ :]+/i, "")
@@ -1056,7 +1054,7 @@ class BioSampleValidator < ValidatorBase
         if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
           #あればキャッシュを使用
           if @cache.nil? || @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref).nil?
-            exist_pubchem = common.exist_pubmed_id?(ref)
+            exist_pubchem = NcbiEutils.exist_pubmed_id?(ref)
             @cache.save(ValidatorCache::EXIST_PUBCHEM_ID, ref, exist_pubchem) unless @cache.nil?
          else
             puts "use cache in invalid_publication_identifier(pubchem)" if $DEBUG

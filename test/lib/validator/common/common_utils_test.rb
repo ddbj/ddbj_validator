@@ -11,8 +11,6 @@ class TestCommonUtils < Minitest::Test
     config_obj = {}
     config_obj[:null_accepted] = JSON.parse(File.read("#{conf_dir}/null_accepted.json"))
     config_obj[:null_not_recommended] = JSON.parse(File.read("#{conf_dir}/null_not_recommended.json"))
-    setting = YAML.load(ERB.new(File.read("#{conf_dir}/../validator.yml")).result)
-    config_obj[:eutils_api_key] = setting["eutils_api_key"]
     CommonUtils::set_config (config_obj)
   end
 
@@ -83,46 +81,5 @@ class TestCommonUtils < Minitest::Test
     ret = CommonUtils.null_not_recommended_value?("")
     assert_equal false, ret
   end
-
-  def test_exist_pubmed?
-    #ok
-    ret = @common.exist_pubmed_id?("27148491")
-    assert_equal true, ret
-
-    #ng
-    ret = @common.exist_pubmed_id?("99999999")
-    assert_equal false, ret
-
-    ret = @common.exist_pubmed_id?("aiueo")
-    assert_equal false, ret
-
-    ret = @common.exist_pubmed_id?("")
-    assert_equal false, ret
-
-    ret = @common.exist_pubmed_id?("2バイト文字")
-    assert_equal false, ret
-
-    #nil
-    ret = @common.exist_pubmed_id?(nil)
-    assert_nil ret
-  end
-=begin NCBI APIを使用するチェックは廃止
-  def test_exist_pmc?
-    #ok
-    ret = @common.exist_pmc_id?("5343844")
-    assert_equal true, ret
-
-    #ng
-    ret = @common.exist_pmc_id?("99999999")
-    assert_equal false, ret
-
-    ret = @common.exist_pmc_id?("aiueo")
-    assert_equal false, ret
-
-    #nil
-    ret = @common.exist_pmc_id?(nil)
-    assert_nil ret
-  end
-=end
 
 end

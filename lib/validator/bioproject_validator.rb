@@ -262,14 +262,13 @@ class BioProjectValidator < ValidatorBase
       valid = true
       db_type = ""
       id =  get_node_text(pub_node,"@id")
-      common = CommonUtils.new
       begin
-        if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !common.exist_pubmed_id?(id)
+        if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !NcbiEutils.exist_pubmed_id?(id)
           result = valid = false
           db_type = "ePubmed"
         elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
           # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
-        elsif !pub_node.xpath("DbType[text()='ePMC']").empty?  && !common.exist_pmc_id?(id)
+        elsif !pub_node.xpath("DbType[text()='ePMC']").empty?  && !NcbiEutils.exist_pmc_id?(id)
           result = valid = false
           db_type = "ePMC"
         end
