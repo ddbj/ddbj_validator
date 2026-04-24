@@ -1,37 +1,36 @@
 require 'erb'
-require_relative "sparql_base"
-require_relative "insdc_nullability"
+require_relative 'sparql_base'
+require_relative 'insdc_nullability'
 
 #
 # A class for BioSample validation that is relevant organism
 #
 class OrganismValidator < SPARQLBase
-
   # クラス読み込み時に lib/validator/sparql/*.rq を ERB コンパイルしてキャッシュする。
   SPARQL = Dir["#{__dir__}/../sparql/*.rq"].to_h {|path|
-    [File.basename(path, ".rq").to_sym, ERB.new(File.read(path)).freeze]
+    [File.basename(path, '.rq').to_sym, ERB.new(File.read(path)).freeze]
   }.freeze
 
-  TAX_GRAPH_URI = "http://ddbj.nig.ac.jp/ontologies/taxonomy"
+  TAX_GRAPH_URI = 'http://ddbj.nig.ac.jp/ontologies/taxonomy'
 
-  TAX_INVALID = "-1" #invalid id
-  TAX_ROOT = "1" #root
-  TAX_BACTERIA = "2" #bacteria
-  TAX_CYANOBACTERIA = "1117" #cyanobacteria
-  TAX_VIRUSES = "10239" #viruses
-  TAX_FUNGI = "4751" #fungi
-  TAX_ARCHAEA = "2157" #archaea
-  TAX_VIROIDS = "12884" #viroids
-  TAX_METAZOA = "33208" #metazoa
-  TAX_EMBRYOPHYTA = "3193" #embryophyta
-  TAX_UNCLASSIFIED_SEQUENCES = "12908" #unclassified_sequences
-  TAX_OTHER_SEQUENCES = "28384" #other sequences
-  TAX_HOMO_SAPIENS = "9606" #homo sapiens
-  TAX_VIRIDIPLANTAE = "33090" #viridiplantae
-  TAX_EUKARYOTA = "2759" #eukaryota
-  TAX_METAGENOMES = "408169" #metagenome
-  TAX_SARSCOV2 = "2697049" #SARS-CoV-2
-  TAX_WASTEWATER_METAGENOME = "527639" #wastewater metagenome
+  TAX_INVALID = '-1' # invalid id
+  TAX_ROOT = '1' # root
+  TAX_BACTERIA = '2' # bacteria
+  TAX_CYANOBACTERIA = '1117' # cyanobacteria
+  TAX_VIRUSES = '10239' # viruses
+  TAX_FUNGI = '4751' # fungi
+  TAX_ARCHAEA = '2157' # archaea
+  TAX_VIROIDS = '12884' # viroids
+  TAX_METAZOA = '33208' # metazoa
+  TAX_EMBRYOPHYTA = '3193' # embryophyta
+  TAX_UNCLASSIFIED_SEQUENCES = '12908' # unclassified_sequences
+  TAX_OTHER_SEQUENCES = '28384' # other sequences
+  TAX_HOMO_SAPIENS = '9606' # homo sapiens
+  TAX_VIRIDIPLANTAE = '33090' # viridiplantae
+  TAX_EUKARYOTA = '2759' # eukaryota
+  TAX_METAGENOMES = '408169' # metagenome
+  TAX_SARSCOV2 = '2697049' # SARS-CoV-2
+  TAX_WASTEWATER_METAGENOME = '527639' # wastewater metagenome
 
   #
   # Initializer
@@ -39,7 +38,7 @@ class OrganismValidator < SPARQLBase
   # ==== Args
   # endpoint: endpoint url
   #
-  def initialize (endpoint, tax_graph_uri=nil)
+  def initialize (endpoint, tax_graph_uri = nil)
     super(endpoint)
     @tax_graph_uri = tax_graph_uri || TAX_GRAPH_URI
   end
@@ -130,10 +129,10 @@ class OrganismValidator < SPARQLBase
   # *tax_type: "taxon" or "dummy taxon"
   #
   def search_tax_from_name_ignore_case(organism_name)
-    #特殊文字のエスケープ https://www.w3.org/TR/sparql11-query/#grammarEscapes
+    # 特殊文字のエスケープ https://www.w3.org/TR/sparql11-query/#grammarEscapes
     organism_name = organism_name.gsub("\t", '\\t').gsub("\n", '\\n').gsub("\r", '\\r').gsub("\b", '\\b').gsub("\f", '\\f')
-    organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub("\"", "").gsub("*", "")
-    organism_name = organism_name.gsub("'", "\\\\'").gsub("\"", "\\\\\\\\\\\"")
+    organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub('"', '').gsub('*', '')
+    organism_name = organism_name.gsub("'", "\\\\'").gsub('"', '\\\\\\\\\"')
     params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search, tax_graph_uri: @tax_graph_uri}
     sparql_query = SPARQL[:search_taxid_from_fuzzy_name].result_with_hash(params)
     result = query(sparql_query)
@@ -155,22 +154,22 @@ class OrganismValidator < SPARQLBase
   def suggest_taxid_from_name(organism_name)
     tax_list = search_tax_from_name_ignore_case(organism_name)
     ret = {}
-    #該当するtax_idがない
+    # 該当するtax_idがない
     if tax_list.empty?
-      ret[:status] = "no exist"
+      ret[:status] = 'no exist'
       ret [:tax_id] = TAX_ROOT
       return ret
     end
-    #synonymやcommon nameが同一の場合は同じtaxで複数候補がヒットするためグループ化
-    grouped_list = tax_list.group_by {|row| row[:tax_no]}
-    if grouped_list.size == 1 #候補のtax_id がひとつだけ
+    # synonymやcommon nameが同一の場合は同じtaxで複数候補がヒットするためグループ化
+    grouped_list = tax_list.group_by {|row| row[:tax_no] }
+    if grouped_list.size == 1 # 候補のtax_id がひとつだけ
       tax_id = grouped_list.keys.first
-      ret[:status] = "exist"
+      ret[:status] = 'exist'
       ret[:tax_id] = tax_id
       ret[:scientific_name] = grouped_list[tax_id].first[:scientific_name]
-    else ##候補が二つある
-      ret[:status] = "multiple exist"
-      ret[:tax_id] = grouped_list.keys.join(", ")
+    else # #候補が二つある
+      ret[:status] = 'multiple exist'
+      ret[:tax_id] = grouped_list.keys.join(', ')
       ret[:tax_list] = tax_list
     end
     ret
@@ -187,12 +186,12 @@ class OrganismValidator < SPARQLBase
   #
   def has_linage(tax_id, linages)
     parent_tax_id = linages.map {|linage|
-      "id-tax:" + linage
-    }.join(" ")
+      'id-tax:' + linage
+    }.join(' ')
     params = {tax_id: tax_id, parent_tax_id: parent_tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = SPARQL[:has_linage].result_with_hash(params)
     result = query(sparql_query)
-    return result.any?
+    result.any?
   end
 
   #
@@ -208,7 +207,7 @@ class OrganismValidator < SPARQLBase
     params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
     sparql_query = SPARQL[:has_plastid].result_with_hash(params)
     result = query(sparql_query)
-    return result.any?
+    result.any?
   end
 
   #
@@ -220,9 +219,9 @@ class OrganismValidator < SPARQLBase
   # true/false
   #
   def is_infraspecific_rank (tax_id)
-    infraspecific_rank = ["Species", "Subspecies", "Varietas", "Forma"]
+    infraspecific_rank = ['Species', 'Subspecies', 'Varietas', 'Forma']
     params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
-    #いずれかのランク以下であるかを検証
+    # いずれかのランク以下であるかを検証
     result = []
     infraspecific_rank.each do |rank|
       params[:rank] = rank
@@ -230,7 +229,7 @@ class OrganismValidator < SPARQLBase
       result = query(sparql_query)
       break if result.any?
     end
-    return result.any?
+    result.any?
   end
 
   #
@@ -248,128 +247,128 @@ class OrganismValidator < SPARQLBase
   def org_vs_package_validate (tax_id, package_name)
     result = true
     tax_id = tax_id.to_s
-    rule_id = ""
-    if package_name == "Pathogen.cl" #rule BS_R0074
-      rule_id = "BS_R0074"
+    rule_id = ''
+    if package_name == 'Pathogen.cl' # rule BS_R0074
+      rule_id = 'BS_R0074'
       linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
       result = has_linage(tax_id, linages)
-    elsif package_name == "Pathogen.env" #rule BS_R0075
-      rule_id = "BS_R0075"
+    elsif package_name == 'Pathogen.env' # rule BS_R0075
+      rule_id = 'BS_R0075'
       linages = [TAX_BACTERIA, TAX_VIRUSES, TAX_FUNGI]
       result = has_linage(tax_id, linages)
-    elsif package_name == "Microbe" #rule BS_R0076
-      rule_id = "BS_R0076"
+    elsif package_name == 'Microbe' # rule BS_R0076
+      rule_id = 'BS_R0076'
       prokaryota_linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_VIROIDS]
       is_prokaryota = has_linage(tax_id, prokaryota_linages)
-      #eukaryotesでありMETAZOAとEMBRYOPHYTA以外であればtrue
+      # eukaryotesでありMETAZOAとEMBRYOPHYTA以外であればtrue
       eukaryotes_linages = [TAX_EUKARYOTA]
       multicellular_linages = [TAX_METAZOA, TAX_EMBRYOPHYTA]
       is_unicellular_eukaryotes = has_linage(tax_id, eukaryotes_linages) && !has_linage(tax_id, multicellular_linages)
 
-      unless (is_prokaryota || is_unicellular_eukaryotes)
+      unless is_prokaryota || is_unicellular_eukaryotes
         result = false
       end
-    elsif package_name == "Model.organism.animal" #rule BS_R0077
-      rule_id = "BS_R0077"
+    elsif package_name == 'Model.organism.animal' # rule BS_R0077
+      rule_id = 'BS_R0077'
       linages = [TAX_BACTERIA, TAX_ARCHAEA, TAX_VIRUSES, TAX_FUNGI, TAX_VIROIDS, TAX_UNCLASSIFIED_SEQUENCES, TAX_OTHER_SEQUENCES]
       has_linage = has_linage(tax_id, linages)
-      if (tax_id.to_s == TAX_HOMO_SAPIENS || has_linage)
+      if tax_id.to_s == TAX_HOMO_SAPIENS || has_linage
         result = false
       end
-    elsif package_name == "Metagenome.environmental" #rule BS_R0078
-      rule_id = "BS_R0078"
+    elsif package_name == 'Metagenome.environmental' # rule BS_R0078
+      rule_id = 'BS_R0078'
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       organism_name = get_organism_name(tax_id)
-      if organism_name.nil? || !organism_name.end_with?("metagenome")
+      if organism_name.nil? || !organism_name.end_with?('metagenome')
         result = false
       end
-    elsif package_name == "Human" #rule BS_R0080
-      rule_id = "BS_R0080"
+    elsif package_name == 'Human' # rule BS_R0080
+      rule_id = 'BS_R0080'
       unless tax_id.to_s == TAX_HOMO_SAPIENS
         result = false
       end
-    elsif package_name == "Plant" #rule BS_R0081
-      rule_id = "BS_R0081"
+    elsif package_name == 'Plant' # rule BS_R0081
+      rule_id = 'BS_R0081'
       linages = [TAX_VIRIDIPLANTAE]
       has_plastids = has_plastids(tax_id)
-      unless (linages && has_plastids)
+      unless linages && has_plastids
         result = false
       end
       result = has_linage(tax_id, linages)
-    elsif package_name == "Virus" #rule BS_R0082
-      rule_id = "BS_R0082"
+    elsif package_name == 'Virus' # rule BS_R0082
+      rule_id = 'BS_R0082'
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIMS.me") #rule BS_R0083
-      rule_id = "BS_R0083"
+    elsif package_name.start_with?('MIMS.me') # rule BS_R0083
+      rule_id = 'BS_R0083'
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       organism_name = get_organism_name(tax_id)
-      if organism_name.nil? || !organism_name.end_with?("metagenome")
+      if organism_name.nil? || !organism_name.end_with?('metagenome')
         result = false
       end
-    elsif package_name.start_with?("MIGS.ba") #rule BS_R0084
-      rule_id = "BS_R0084"
+    elsif package_name.start_with?('MIGS.ba') # rule BS_R0084
+      rule_id = 'BS_R0084'
       linages = [TAX_BACTERIA, TAX_ARCHAEA]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIGS.eu") #rule BS_R0085
-      rule_id = "BS_R0085"
+    elsif package_name.start_with?('MIGS.eu') # rule BS_R0085
+      rule_id = 'BS_R0085'
       linages = [TAX_EUKARYOTA]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIGS.vi") #rule BS_R0086
-      rule_id = "BS_R0086"
+    elsif package_name.start_with?('MIGS.vi') # rule BS_R0086
+      rule_id = 'BS_R0086'
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIMARKS.specimen") #rule BS_R0130
-      rule_id = "BS_R0130"
+    elsif package_name.start_with?('MIMARKS.specimen') # rule BS_R0130
+      rule_id = 'BS_R0130'
       organism_name = get_organism_name(tax_id)
-      if organism_name.nil? || organism_name.downcase.end_with?("metagenome")
+      if organism_name.nil? || organism_name.downcase.end_with?('metagenome')
         result = false
       end
-    elsif package_name.start_with?("MIMARKS.survey") #rule BS_R0088
-      rule_id = "BS_R0088"
+    elsif package_name.start_with?('MIMARKS.survey') # rule BS_R0088
+      rule_id = 'BS_R0088'
       linages = [TAX_UNCLASSIFIED_SEQUENCES]
       result = has_linage(tax_id, linages)
       organism_name = get_organism_name(tax_id)
-      if organism_name.nil? || !organism_name.end_with?("metagenome")
+      if organism_name.nil? || !organism_name.end_with?('metagenome')
         result = false
       end
-    elsif package_name == "Beta-lactamase" #rule BS_R0089
-      rule_id = "BS_R0089"
+    elsif package_name == 'Beta-lactamase' # rule BS_R0089
+      rule_id = 'BS_R0089'
       linages = [TAX_BACTERIA]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("MIMAG") #rule BS_R0110
-      rule_id = "BS_R0110"
+    elsif package_name.start_with?('MIMAG') # rule BS_R0110
+      rule_id = 'BS_R0110'
       organism_name = get_organism_name(tax_id)
-      if organism_name.nil? || tax_id.to_s == TAX_HOMO_SAPIENS || organism_name.downcase.include?("metagenome")
+      if organism_name.nil? || tax_id.to_s == TAX_HOMO_SAPIENS || organism_name.downcase.include?('metagenome')
         result = false
       end
-    elsif package_name.start_with?("MISAG") #rule BS_R0111
-      rule_id = "BS_R0111"
+    elsif package_name.start_with?('MISAG') # rule BS_R0111
+      rule_id = 'BS_R0111'
       organism_name = get_organism_name(tax_id)
-      if organism_name.nil? || tax_id.to_s == TAX_HOMO_SAPIENS || organism_name.downcase.include?("metagenome")
+      if organism_name.nil? || tax_id.to_s == TAX_HOMO_SAPIENS || organism_name.downcase.include?('metagenome')
         result = false
       end
-    elsif package_name.start_with?("MIUVIG") #rule BS_R0112
-      rule_id = "BS_R0112"
+    elsif package_name.start_with?('MIUVIG') # rule BS_R0112
+      rule_id = 'BS_R0112'
       linages = [TAX_VIRUSES]
       result = has_linage(tax_id, linages)
-    elsif package_name.start_with?("SARS-CoV-2.cl") #rule BS_R0120
-      rule_id = "BS_R0120"
+    elsif package_name.start_with?('SARS-CoV-2.cl') # rule BS_R0120
+      rule_id = 'BS_R0120'
       unless tax_id.to_s == TAX_SARSCOV2
         result = false
       end
-    elsif package_name.start_with?("SARS-CoV-2.wwsurv") #rule BS_R0121
-      rule_id = "BS_R0121"
+    elsif package_name.start_with?('SARS-CoV-2.wwsurv') # rule BS_R0121
+      rule_id = 'BS_R0121'
       unless tax_id.to_s == TAX_WASTEWATER_METAGENOME
         result = false
       end
     end
     if result
-      return {status: "ok"}
+      {status: 'ok'}
     else
-      return {status: "error", error_code: rule_id}
+      {status: 'error', error_code: rule_id}
     end
   end
 

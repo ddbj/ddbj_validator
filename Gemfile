@@ -1,20 +1,24 @@
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
-gem "rails", "~> 8.1.3"
-gem "puma"
-gem "bootsnap", require: false
+gem 'rails', '~> 8.1.3'
 
-gem "csv"
-gem "http"
-gem "json"
-gem "json-schema"
-gem "mail"
-gem "net-ftp"
-gem "nokogiri"
-gem "pg"
-gem "rack-cors"
-gem "roo"
+gem 'bootsnap', require: false
+gem 'csv'
+gem 'http'
+gem 'json'
+gem 'json-schema'
+gem 'mail'
+gem 'net-ftp'
+gem 'nokogiri'
+gem 'pg'
+gem 'puma'
+gem 'rack-cors'
+gem 'roo'
+
+group :development do
+  gem 'rubocop-rails-omakase', require: false
+end
 
 group :test do
-  gem "webmock"
+  gem 'webmock'
 end

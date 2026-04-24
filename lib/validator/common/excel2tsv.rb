@@ -1,5 +1,5 @@
 require 'fileutils'
-require_relative "insdc_nullability"
+require_relative 'insdc_nullability'
 
 #
 # A class for convert from excel sheet to tsv files
@@ -7,14 +7,14 @@ require_relative "insdc_nullability"
 class Excel2Tsv
   # filetypeとExcelのシートの関係
   @@sheet_settings = {
-    "bioproject" => "BioProject",
-    "biosample" => "BioSample",
-    "metabobank_idf" => "Study (IDF)",
-    "metabobank_sdrf" => "Assay (SDRF)"
+    'bioproject' => 'BioProject',
+    'biosample' => 'BioSample',
+    'metabobank_idf' => 'Study (IDF)',
+    'metabobank_sdrf' => 'Assay (SDRF)'
   }
 
   def initialize
-    rule_path = File.absolute_path(File.dirname(__FILE__) + "/../../../conf/all_db/rule_config_all_db.json")
+    rule_path = File.absolute_path(File.dirname(__FILE__) + '/../../../conf/all_db/rule_config_all_db.json')
     @validation_config = JSON.parse(File.read(rule_path))
     @error_list = []
   end
@@ -32,20 +32,20 @@ class Excel2Tsv
   # {status: "succeed", filetypes: {bioproject: bioproject_tsv_path, biosample: biosample_tsv_path}}
   # {status: "failed", error_list: [xxx]}
   #
-  def split_sheet(original_excel_path, base_dir, mandatory_sheets=[])
+  def split_sheet(original_excel_path, base_dir, mandatory_sheets = [])
     ret = {}
     sheet_list = nil
     begin
-      @data_file = File::basename(original_excel_path)
-      xlsx = Roo::Excelx.new(original_excel_path, {:expand_merged_ranges => true})
+      @data_file = File.basename(original_excel_path)
+      xlsx = Roo::Excelx.new(original_excel_path, {expand_merged_ranges: true})
       sheet_list = xlsx.sheets
     rescue => ex
       # load error
       annotation = [
-        {key: "Message", value: "Failed read excel file."},
+        {key: 'Message', value: 'Failed read excel file.'}
       ]
-      error_hash = ErrorBuilder.error_obj(@validation_config["rule" + "ALL_R0001"],  @data_file, annotation)
-      ret[:status] = "failed"
+      error_hash = ErrorBuilder.error_obj(@validation_config['rule' + 'ALL_R0001'],  @data_file, annotation)
+      ret[:status] = 'failed'
       ret[:error_list] = [error_hash]
       return ret
     end
@@ -53,7 +53,7 @@ class Excel2Tsv
     # 必須シートが存在しているかのチェック
     unless mandatory_sheets == [] # 必須チェックの指定がない場合はOK
       unless mandatory_sheet_check(mandatory_sheets, sheet_list, @@sheet_settings) == true
-        ret[:status] = "failed"
+        ret[:status] = 'failed'
         ret[:error_list] = @error_list
         return ret
       end
@@ -67,7 +67,7 @@ class Excel2Tsv
           sheet = xlsx.sheet(sheet_name)
           # 出力先ファイルの決定
           output_file_dir = "#{base_dir}/#{filetype}"
-          if original_excel_path.end_with?(".xlsm") # with macro
+          if original_excel_path.end_with?('.xlsm') # with macro
             output_file_name = "#{File.basename(original_excel_path, ".xlsm")}_#{filetype}.tsv"
           else
             output_file_name = "#{File.basename(original_excel_path, ".xlsx")}_#{filetype}.tsv"
@@ -75,7 +75,7 @@ class Excel2Tsv
           FileUtils.mkdir_p(output_file_dir) unless File.exist?(output_file_dir)
           output_file_path = "#{output_file_dir}/#{output_file_name}"
           # TSVを出力
-          CSV.open(output_file_path, "w", col_sep: "\t") do |tsv|
+          CSV.open(output_file_path, 'w', col_sep: "\t") do |tsv|
             (1..sheet.last_row).each do |row_num|
               row = sheet.row(row_num)
               tsv << row
@@ -84,17 +84,17 @@ class Excel2Tsv
           filetypes[filetype.to_sym] = output_file_path # シートが読めたらValidation対象としてfiletypeと変換したTSVを追加する
         rescue
           annotation = [
-            {key: "Message", value: "Failed parse sheet in Excel file."},
-            {key: "Sheet name", value: sheet.to_s}
+            {key: 'Message', value: 'Failed parse sheet in Excel file.'},
+            {key: 'Sheet name', value: sheet.to_s}
           ]
-          error_hash = ErrorBuilder.error_obj(@validation_config["rule" + "ALL_R0001"], @data_file, annotation)
-          ret[:status] = "failed"
+          error_hash = ErrorBuilder.error_obj(@validation_config['rule' + 'ALL_R0001'], @data_file, annotation)
+          ret[:status] = 'failed'
           ret[:error_list] = [error_hash]
           return ret
         end
       end
     end
-    ret[:status] = "succeed"
+    ret[:status] = 'succeed'
     ret[:filetypes] = filetypes
     ret
   end
@@ -123,10 +123,10 @@ class Excel2Tsv
     if missing_sheet_list.any?
       ret = false
       annotation = [
-        {key: "Mandatory sheet names", value: mandatory_sheet_list.to_s},
-        {key: "Missing sheet names", value: missing_sheet_list.to_s}
+        {key: 'Mandatory sheet names', value: mandatory_sheet_list.to_s},
+        {key: 'Missing sheet names', value: missing_sheet_list.to_s}
       ]
-      error_hash = ErrorBuilder.error_obj(@validation_config["rule" + "ALL_R0002"],  @data_file, annotation)
+      error_hash = ErrorBuilder.error_obj(@validation_config['rule' + 'ALL_R0002'],  @data_file, annotation)
       @error_list.push(error_hash)
     end
     ret

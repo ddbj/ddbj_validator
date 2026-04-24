@@ -1,23 +1,22 @@
 
 class ValidatorCache
-
-  EXIST_HOST_NAME = "exist_host_name"
-  EXIST_ORGANISM_NAME = "exist_organism_name"
-  PACKAGE_ATTRIBUTES = "package_attributes"
-  PACKAGE_ATTRIBUTE_GROUPS = "package_attribute_groups"
-  UNKNOWN_PACKAGE = "unknown_package"
-  COUNTRY_FROM_LATLON = "country_from_latlon"
-  EXIST_PUBCHEM_ID = "exist_pubchem_id"
-  TAX_VS_PACKAGE = "tax_vs_package"
-  TAX_MATCH_ORGANISM = "tax_match_organism"
-  TAX_HAS_LINAGE = "tax_has_linage"
-  SUBMITTERS_SAMPLE_TITLE = "submitters_sample_title"
-  BIOPROJECT_SUBMITTER = "bioproject_submitter"
-  SUBMISSIONS_SAMPLE_NAME = "submissions_sample_name"
-  IS_UMBRELLA_ID = "is_umbrella_id"
-  BIOPROJECT_PRJD_ID = "bioproject_prjd_id"
-  LOCUS_TAG_PREFIX = "locus_tag_prefix"
-  METAGE_SOURCE_LINEAGE = "metagenome_source_lineage"
+  EXIST_HOST_NAME = 'exist_host_name'
+  EXIST_ORGANISM_NAME = 'exist_organism_name'
+  PACKAGE_ATTRIBUTES = 'package_attributes'
+  PACKAGE_ATTRIBUTE_GROUPS = 'package_attribute_groups'
+  UNKNOWN_PACKAGE = 'unknown_package'
+  COUNTRY_FROM_LATLON = 'country_from_latlon'
+  EXIST_PUBCHEM_ID = 'exist_pubchem_id'
+  TAX_VS_PACKAGE = 'tax_vs_package'
+  TAX_MATCH_ORGANISM = 'tax_match_organism'
+  TAX_HAS_LINAGE = 'tax_has_linage'
+  SUBMITTERS_SAMPLE_TITLE = 'submitters_sample_title'
+  BIOPROJECT_SUBMITTER = 'bioproject_submitter'
+  SUBMISSIONS_SAMPLE_NAME = 'submissions_sample_name'
+  IS_UMBRELLA_ID = 'is_umbrella_id'
+  BIOPROJECT_PRJD_ID = 'bioproject_prjd_id'
+  LOCUS_TAG_PREFIX = 'locus_tag_prefix'
+  METAGE_SOURCE_LINEAGE = 'metagenome_source_lineage'
 
   #
   # Initializer
@@ -60,7 +59,6 @@ class ValidatorCache
   def self.create_key (*params)
     params.map {|param|
       param.to_s
-    }.join("_")
+    }.join('_')
   end
-
 end

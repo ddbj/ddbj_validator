@@ -1,6 +1,6 @@
-require_relative "base"
-require_relative "common/insdc_nullability"
-require_relative "common/ddbj_db_validator"
+require_relative 'base'
+require_relative 'common/insdc_nullability'
+require_relative 'common/ddbj_db_validator'
 
 #
 # A class for DRA analysis validation
@@ -13,13 +13,13 @@ class AnalysisValidator < ValidatorBase
   #
   def initialize
     super
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/dra")))
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/dra')))
     InsdcNullability.null_accepted        = @conf[:null_accepted]
     InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 
-    @validation_config = @conf[:validation_config] #need?
+    @validation_config = @conf[:validation_config] # need?
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -39,8 +39,8 @@ class AnalysisValidator < ValidatorBase
   def read_config (config_file_dir)
     config = {}
     begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_dra.json")) #TODO auto update when genereted
-      config[:xsd_path] = File.absolute_path(config_file_dir + "/xsd/SRA.analysis.xsd")
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_dra.json')) # TODO auto update when genereted
+      config[:xsd_path] = File.absolute_path(config_file_dir + '/xsd/SRA.analysis.xsd')
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -57,30 +57,30 @@ class AnalysisValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml, params={})
-    if (params["submitter_id"].nil? || params["submitter_id"].strip == "")
-      @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
+  def validate (data_xml, params = {})
+    if params['submitter_id'].nil? || params['submitter_id'].strip == ''
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document) # TODO
     else
-      @submitter_id = params["submitter_id"]
+      @submitter_id = params['submitter_id']
     end
-    #TODO @submitter_id が取得できない場合はエラーにする?
-    @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
+    # TODO @submitter_id が取得できない場合はエラーにする?
+    @data_file = File.basename(data_xml)
+    valid_xml = not_well_format_xml('DRA_R0001', data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema('DRA_R0002', data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
-      analysis_set = doc.xpath("//ANALYSIS")
-      #各ラン毎の検証
+      analysis_set = doc.xpath('//ANALYSIS')
+      # 各ラン毎の検証
       analysis_set.each_with_index do |analysis_node, idx|
         idx += 1
         analysis_name = get_analysis_label(analysis_node, idx)
-        invalid_center_name("DRA_R0004", analysis_name, analysis_node, idx) if @use_db
-        missing_analysis_title("DRA_R0012", analysis_name, analysis_node, idx)
-        missing_analysis_description("DRA_R0014", analysis_name, analysis_node, idx)
-        missing_analysis_filename("DRA_R0022", analysis_name, analysis_node, idx)
-        invalid_analysis_filename("DRA_R0024", analysis_name, analysis_node, idx)
-        invalid_analysis_file_md5_checksum("DRA_R0026", analysis_name, analysis_node, idx)
+        invalid_center_name('DRA_R0004', analysis_name, analysis_node, idx) if @use_db
+        missing_analysis_title('DRA_R0012', analysis_name, analysis_node, idx)
+        missing_analysis_description('DRA_R0014', analysis_name, analysis_node, idx)
+        missing_analysis_filename('DRA_R0022', analysis_name, analysis_node, idx)
+        invalid_analysis_filename('DRA_R0024', analysis_name, analysis_node, idx)
+        invalid_analysis_file_md5_checksum('DRA_R0026', analysis_name, analysis_node, idx)
       end
     end
   end
@@ -94,26 +94,26 @@ class AnalysisValidator < ValidatorBase
   # line_num
   #
   def get_analysis_label (analysis_node, line_num)
-    analysis_name = "No:" + line_num
-    #name
-    title_node = analysis_node.xpath("ANALYSIS/@alias")
-    if !title_node.empty? && get_node_text(title_node) != ""
-      analysis_name += ", Name:" + get_node_text(title_node)
+    analysis_name = 'No:' + line_num
+    # name
+    title_node = analysis_node.xpath('ANALYSIS/@alias')
+    if !title_node.empty? && get_node_text(title_node) != ''
+      analysis_name += ', Name:' + get_node_text(title_node)
     end
-    #Title
-    title_node = analysis_node.xpath("ANALYSIS/TITLE")
-    if !title_node.empty? && get_node_text(title_node) != ""
-      analysis_name += ", TITLE:" + get_node_text(title_node)
+    # Title
+    title_node = analysis_node.xpath('ANALYSIS/TITLE')
+    if !title_node.empty? && get_node_text(title_node) != ''
+      analysis_name += ', TITLE:' + get_node_text(title_node)
     end
-    #Accession ID
-    archive_node = analysis_node.xpath("ANALYSIS[@accession]")
-    if !archive_node.empty? && get_node_text(archive_node) != ""
-      analysis_name += ", AccessionID:" +  get_node_text(archive_node)
+    # Accession ID
+    archive_node = analysis_node.xpath('ANALYSIS[@accession]')
+    if !archive_node.empty? && get_node_text(archive_node) != ''
+      analysis_name += ', AccessionID:' +  get_node_text(archive_node)
     end
     analysis_name
   end
 
-### validate method ###
+  ### validate method ###
 
   #
   # rule:DRA_R0004
@@ -128,13 +128,13 @@ class AnalysisValidator < ValidatorBase
   def invalid_center_name (rule_code, analysis_label, analysis_node, submitter_id, line_num)
     result = true
     acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    analysis_node.xpath("@center_name").each do |center_node|
-      center_name = get_node_text(center_node, ".")
+    analysis_node.xpath('@center_name').each do |center_node|
+      center_name = get_node_text(center_node, '.')
       if acc_center_name != center_name
         annotation = [
-          {key: "Analysis name", value: analysis_label},
-          {key: "center name", value: center_name},
-          {key: "Path", value: "//ANALYSIS/@center_name"}
+          {key: 'Analysis name', value: analysis_label},
+          {key: 'center name', value: center_name},
+          {key: 'Path', value: '//ANALYSIS/@center_name'}
         ]
         add_error(rule_code, annotation)
         result = false
@@ -154,12 +154,12 @@ class AnalysisValidator < ValidatorBase
   # true/false
   #
   def missing_analysis_title (rule_code, analysis_label, analysis_node, line_num)
-    title_path = "//ANALYSIS/TITLE"
+    title_path = '//ANALYSIS/TITLE'
     return true unless node_blank?(analysis_node, title_path)
 
     annotation = [
-      {key: "Analysis name", value: analysis_label},
-      {key: "Path", value: "#{title_path}"}
+      {key: 'Analysis name', value: analysis_label},
+      {key: 'Path', value: "#{title_path}"}
     ]
     add_error(rule_code, annotation)
     false
@@ -176,13 +176,13 @@ class AnalysisValidator < ValidatorBase
   # true/false
   #
   def missing_analysis_description (rule_code, analysis_label, analysis_node, line_num)
-    desc_path = "//DESCRIPTION"
+    desc_path = '//DESCRIPTION'
     return true unless node_blank?(analysis_node, desc_path)
 
     annotation = [
-      {key: "Analysis name", value: analysis_label},
-      {key: "DESCRIPTION", value: ""},
-      {key: "Path", value: "//ANALYSIS[#{line_num}]/#{desc_path.gsub('//','')}"}
+      {key: 'Analysis name', value: analysis_label},
+      {key: 'DESCRIPTION', value: ''},
+      {key: 'Path', value: "//ANALYSIS[#{line_num}]/#{desc_path.gsub('//', '')}"}
     ]
     add_error(rule_code, annotation)
     false
@@ -200,15 +200,15 @@ class AnalysisValidator < ValidatorBase
   #
   def missing_analysis_filename (rule_code, analysis_label, analysis_node, line_num)
     result = true
-    data_block_path = "//DATA_BLOCK"
+    data_block_path = '//DATA_BLOCK'
     analysis_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
-      file_path = "FILES/FILE"
+      file_path = 'FILES/FILE'
       data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
-        if node_blank?(file_node, "@filename")
+        if node_blank?(file_node, '@filename')
           annotation = [
-            {key: "Analysis name", value: analysis_label},
-            {key: "filename", value: ""},
-            {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
+            {key: 'Analysis name', value: analysis_label},
+            {key: 'filename', value: ''},
+            {key: 'Path', value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
           ]
           add_error(rule_code, annotation)
           result = false
@@ -230,17 +230,17 @@ class AnalysisValidator < ValidatorBase
   #
   def invalid_analysis_filename (rule_code, analysis_label, analysis_node, line_num)
     result = true
-    data_block_path = "//DATA_BLOCK"
+    data_block_path = '//DATA_BLOCK'
     analysis_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
-      file_path = "FILES/FILE"
+      file_path = 'FILES/FILE'
       data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
-        unless node_blank?(file_node, "@filename")
-          filename = get_node_text(file_node, "@filename")
+        unless node_blank?(file_node, '@filename')
+          filename = get_node_text(file_node, '@filename')
           unless filename =~ /^[A-Za-z0-9_.-]+$/
             annotation = [
-              {key: "Analysis name", value: analysis_label},
-              {key: "filename", value: filename},
-              {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
+              {key: 'Analysis name', value: analysis_label},
+              {key: 'filename', value: filename},
+              {key: 'Path', value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
             ]
             add_error(rule_code, annotation)
             result = false
@@ -263,17 +263,17 @@ class AnalysisValidator < ValidatorBase
   #
   def invalid_analysis_file_md5_checksum (rule_code, analysis_label, analysis_node, line_num)
     result = true
-    data_block_path = "//DATA_BLOCK"
+    data_block_path = '//DATA_BLOCK'
     analysis_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
-      file_path = "FILES/FILE"
+      file_path = 'FILES/FILE'
       data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
-        unless node_blank?(file_node, "@checksum")
-          checksum = get_node_text(file_node, "@checksum")
+        unless node_blank?(file_node, '@checksum')
+          checksum = get_node_text(file_node, '@checksum')
           unless checksum =~ /^[A-Za-z0-9]{32}$/
             annotation = [
-              {key: "Analysis name", value: analysis_label},
-              {key: "checksum", value: checksum},
-              {key: "Path", value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
+              {key: 'Analysis name', value: analysis_label},
+              {key: 'checksum', value: checksum},
+              {key: 'Path', value: "//ANALYSIS[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
             ]
             add_error(rule_code, annotation)
             result = false
@@ -283,5 +283,4 @@ class AnalysisValidator < ValidatorBase
     end
     result
   end
-
 end

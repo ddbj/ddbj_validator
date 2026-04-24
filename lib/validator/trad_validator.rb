@@ -1,10 +1,10 @@
 require 'date'
-require_relative "base"
-require_relative "common/date_format"
-require_relative "common/ddbj_db_validator"
-require_relative "common/organism_validator"
-require_relative "common/sparql_base"
-require_relative "common/validator_cache"
+require_relative 'base'
+require_relative 'common/date_format'
+require_relative 'common/ddbj_db_validator'
+require_relative 'common/organism_validator'
+require_relative 'common/sparql_base'
+require_relative 'common/validator_cache'
 
 #
 # A class for Trad validation
@@ -17,18 +17,18 @@ class TradValidator < ValidatorBase
   #
   def initialize
     super()
-    config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/trad")
+    config_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../conf/trad')
 
-    @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_trad.json"))
-    @conf[:validation_parser_config] = JSON.parse(File.read(config_file_dir + "/rule_config_parser.json"))
-    @conf[:locus_tag_require_features] = JSON.parse(File.read(config_file_dir + "/locus_tag_require_features.json"))
+    @conf[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_trad.json'))
+    @conf[:validation_parser_config] = JSON.parse(File.read(config_file_dir + '/rule_config_parser.json'))
+    @conf[:locus_tag_require_features] = JSON.parse(File.read(config_file_dir + '/locus_tag_require_features.json'))
 
-    bs_config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")
-    @conf[:bs_null_accepted] = JSON.parse(File.read(bs_config_file_dir + "/null_accepted.json"))
+    bs_config_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../conf/biosample')
+    @conf[:bs_null_accepted] = JSON.parse(File.read(bs_config_file_dir + '/null_accepted.json'))
 
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
     @error_list = error_list = []
-    @validation_config = @conf[:validation_config] #need?
+    @validation_config = @conf[:validation_config] # need?
 
     if @conf[:ddbj_parser_config].nil?
       @use_parser = false
@@ -57,67 +57,66 @@ class TradValidator < ValidatorBase
   # apg: AGP TSV file path
   #
   #
-  def validate(anno_file, seq_file, agp_file=nil, params={})
-    unless params["submitter_id"].nil?
-      submitter_id = params["submitter_id"]
+  def validate(anno_file, seq_file, agp_file = nil, params = {})
+    unless params['submitter_id'].nil?
+      submitter_id = params['submitter_id']
     end
     # TODO check mandatory files(anno_file, seq_file)
-    @anno_file = File::basename(anno_file)
-    @seq_file = File::basename(seq_file)
-    @agp_file = File::basename(agp_file) unless agp_file.nil?
+    @anno_file = File.basename(anno_file)
+    @seq_file = File.basename(seq_file)
+    @agp_file = File.basename(agp_file) unless agp_file.nil?
     annotation_list = anno_tsv2obj(anno_file)
-    anno_by_feat = annotation_list.group_by{|row| row[:feature]}
-    anno_by_qual = annotation_list.group_by{|row| row[:qualifier]}
-    anno_by_ent = annotation_list.group_by{|row| row[:entry]}
-    invalid_hold_date("TR_R0001", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
-    missing_hold_date("TR_R0002", data_by_ent_feat_qual("COMMON", "DATE", "hold_date", anno_by_qual))
+    anno_by_feat = annotation_list.group_by {|row| row[:feature] }
+    anno_by_qual = annotation_list.group_by {|row| row[:qualifier] }
+    anno_by_ent = annotation_list.group_by {|row| row[:entry] }
+    invalid_hold_date('TR_R0001', data_by_ent_feat_qual('COMMON', 'DATE', 'hold_date', anno_by_qual))
+    missing_hold_date('TR_R0002', data_by_ent_feat_qual('COMMON', 'DATE', 'hold_date', anno_by_qual))
     # parser
     if @use_parser
-      check_by_jparser("TR_R0006", anno_file, seq_file)
-      check_by_transchecker("TR_R0007", anno_file, seq_file)
-      check_by_agpparser("TR_R0008", anno_file, seq_file, agp_file)
+      check_by_jparser('TR_R0006', anno_file, seq_file)
+      check_by_transchecker('TR_R0007', anno_file, seq_file)
+      check_by_agpparser('TR_R0008', anno_file, seq_file, agp_file)
     end
 
     @organism_info_list = []
-    organism_warning("TR_R0003", data_by_qual("organism", anno_by_qual), data_by_feat_qual("DBLINK", "biosample", anno_by_qual), @organism_info_list)
-    taxonomy_at_species_or_infraspecific_rank("TR_R0004", @organism_info_list)
-    unnecessary_wgs_keywords("TR_R0005", annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
+    organism_warning('TR_R0003', data_by_qual('organism', anno_by_qual), data_by_feat_qual('DBLINK', 'biosample', anno_by_qual), @organism_info_list)
+    taxonomy_at_species_or_infraspecific_rank('TR_R0004', @organism_info_list)
+    unnecessary_wgs_keywords('TR_R0005', annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
 
     # DBLINKチェック
     if @use_db
-      missing_dblink("TR_R0009", data_by_feat("DBLINK", anno_by_feat), anno_by_ent)
-      invalid_bioproject_accession("TR_R0010", data_by_feat_qual("DBLINK", "project", anno_by_qual))
-      invalid_biosample_accession("TR_R0011", data_by_feat_qual("DBLINK", "biosample", anno_by_qual))
-      invalid_drr_accession("TR_R0012", data_by_feat_qual("DBLINK", "sequence read archive", anno_by_qual))
-      invalid_bioproject_type("TR_R0034", data_by_feat_qual("DBLINK", "project", anno_by_qual))
+      missing_dblink('TR_R0009', data_by_feat('DBLINK', anno_by_feat), anno_by_ent)
+      invalid_bioproject_accession('TR_R0010', data_by_feat_qual('DBLINK', 'project', anno_by_qual))
+      invalid_biosample_accession('TR_R0011', data_by_feat_qual('DBLINK', 'biosample', anno_by_qual))
+      invalid_drr_accession('TR_R0012', data_by_feat_qual('DBLINK', 'sequence read archive', anno_by_qual))
+      invalid_bioproject_type('TR_R0034', data_by_feat_qual('DBLINK', 'project', anno_by_qual))
       # biosampleの情報を取得(note.derived_from属性の参照サンプル含む)
-      biosample_id_list = data_by_feat_qual("DBLINK", "biosample", anno_by_qual).map{|row| row[:value]}
+      biosample_id_list = data_by_feat_qual('DBLINK', 'biosample', anno_by_qual).map {|row| row[:value] }
       biosample_info_list = get_biosample_info(biosample_id_list)
 
-      invalid_combination_of_accessions("TR_R0013", data_by_feat("DBLINK", anno_by_feat), biosample_info_list)
+      invalid_combination_of_accessions('TR_R0013', data_by_feat('DBLINK', anno_by_feat), biosample_info_list)
 
-      unless submitter_id.nil? || submitter_id.chomp.strip == ""
-        inconsistent_submitter("TR_R0014", data_by_feat("DBLINK", anno_by_feat), submitter_id)
+      unless submitter_id.nil? || submitter_id.chomp.strip == ''
+        inconsistent_submitter('TR_R0014', data_by_feat('DBLINK', anno_by_feat), submitter_id)
       end
 
       # BioSample整合性チェック
       all_entry_name_list = anno_by_ent.keys
-      biosample_line = data_by_feat_qual("DBLINK", "biosample", anno_by_qual)
-      inconsistent_organism_with_biosample("TR_R0015", data_by_qual("organism", anno_by_qual), data_by_qual("strain", anno_by_qual), biosample_line, biosample_info_list)
-      inconsistent_isolate_with_biosample("TR_R0016", data_by_qual("isolate", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_isolation_source_with_biosample("TR_R0017", data_by_qual("isolation_source", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_collection_date_with_biosample("TR_R0018", data_by_qual("collection_date", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_country_with_biosample("TR_R0019", data_by_feat_qual("source", "country", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_locus_tag_with_biosample("TR_R0020", data_by_qual("locus_tag", anno_by_qual), biosample_line, biosample_info_list)
-      inconsistent_culture_collection_with_biosample("TR_R0030", data_by_qual("culture_collection", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_host_with_biosample("TR_R0031", data_by_qual("host", anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      biosample_line = data_by_feat_qual('DBLINK', 'biosample', anno_by_qual)
+      inconsistent_organism_with_biosample('TR_R0015', data_by_qual('organism', anno_by_qual), data_by_qual('strain', anno_by_qual), biosample_line, biosample_info_list)
+      inconsistent_isolate_with_biosample('TR_R0016', data_by_qual('isolate', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_isolation_source_with_biosample('TR_R0017', data_by_qual('isolation_source', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_collection_date_with_biosample('TR_R0018', data_by_qual('collection_date', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_country_with_biosample('TR_R0019', data_by_feat_qual('source', 'country', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_locus_tag_with_biosample('TR_R0020', data_by_qual('locus_tag', anno_by_qual), biosample_line, biosample_info_list)
+      inconsistent_culture_collection_with_biosample('TR_R0030', data_by_qual('culture_collection', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+      inconsistent_host_with_biosample('TR_R0031', data_by_qual('host', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
     end
-    other_insdc_partners_accession("TR_R0033", data_by_feat("DBLINK", anno_by_feat))
+    other_insdc_partners_accession('TR_R0033', data_by_feat('DBLINK', anno_by_feat))
 
     # locus_tagチェック
-    duplicate_locus_tag("TR_R0023", data_by_qual("locus_tag", anno_by_qual), annotation_list)
-    missing_locus_tag("TR_R0024", anno_by_feat)
-
+    duplicate_locus_tag('TR_R0023', data_by_qual('locus_tag', anno_by_qual), annotation_list)
+    missing_locus_tag('TR_R0024', anno_by_feat)
   end
 
   #
@@ -131,28 +130,28 @@ class TradValidator < ValidatorBase
   def anno_tsv2obj(anno_file)
     annotation_list = []
     line_no = 1
-    current_entry = ""
+    current_entry = ''
     entry_no = 0
-    current_feature = ""
+    current_feature = ''
     feature_no = 0
-    current_location = ""
+    current_location = ''
     # entryとfeatureは番号振ってグループを識別できるようにした方がいいかもね
     File.open(anno_file) do |f|
       f.each_line do |line|
         row = line.split("\t")
-        if !(row[0].nil? || row[0].strip.chomp == "")
+        if !(row[0].nil? || row[0].strip.chomp == '')
           current_entry = row[0].chomp
           entry_no += 1
         end
-        if !(row[1].nil? || row[1].strip.chomp == "")
+        if !(row[1].nil? || row[1].strip.chomp == '')
           current_feature = row[1].chomp
           feature_no += 1
         end
-        if !(row[2].nil? || row[2].strip.chomp == "")
+        if !(row[2].nil? || row[2].strip.chomp == '')
           current_location = row[2].chomp
         end
-        qualifier = row[3].nil? ? "" : row[3].chomp
-        value = row[4].nil? ? "" : row[4].chomp
+        qualifier = row[3].nil? ? '' : row[3].chomp
+        value = row[4].nil? ? '' : row[4].chomp
         hash = {entry: current_entry, feature: current_feature, location: current_location, qualifier: qualifier, value: value, line_no: f.lineno, entry_no: entry_no, feature_no: feature_no}
         annotation_list.push(hash)
       end
@@ -211,7 +210,7 @@ class TradValidator < ValidatorBase
     if qual_lists.nil?
       ret = []
     else
-      ret = qual_lists.select{|row| row[:feature] == feature_name}
+      ret = qual_lists.select {|row| row[:feature] == feature_name }
     end
     ret
   end
@@ -234,7 +233,7 @@ class TradValidator < ValidatorBase
     if feat_qual_list.nil?
       ret = []
     else
-      ret = feat_qual_list.select{|row| row[:entry] == entry_name}
+      ret = feat_qual_list.select {|row| row[:entry] == entry_name }
     end
     ret
   end
@@ -252,17 +251,17 @@ class TradValidator < ValidatorBase
   def invalid_hold_date(rule_code, hold_date_list)
     return nil if hold_date_list.nil? || hold_date_list.empty?
     ret = true
-    message = ""
-    #if hold_date_list.size != 1
+    message = ''
+    # if hold_date_list.size != 1
     #  return nil # 2つ以上の値が記載されている場合は、JP0125でエラーになるので無視
-      #ret = false
-      #annotation = [
-      #  {key: "hold_date", value: hold_date_list.map{|row| row[:value]}.join(", ")}},
-      #  {key: "Message", value: "'hold_date' is written more than once."},
-      #  {key: "Location", value: "Line no: #{hold_date_list.map{|row| row[:line_no]}.join(", ")}"}
-      #]
-      #error_hash = ErrorBuilder.error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
-      #@error_list.push(error_hash)
+    # ret = false
+    # annotation = [
+    #  {key: "hold_date", value: hold_date_list.map{|row| row[:value]}.join(", ")}},
+    #  {key: "Message", value: "'hold_date' is written more than once."},
+    #  {key: "Location", value: "Line no: #{hold_date_list.map{|row| row[:line_no]}.join(", ")}"}
+    # ]
+    # error_hash = ErrorBuilder.error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
+    # @error_list.push(error_hash)
     if hold_date_list.size == 1 # 2つ以上の値が記載されている場合は、JP0125でエラーになるので無視
       hold_date = hold_date_list.first[:value]
       if hold_date !~ /^[0-9]{8}$/ # YYYYMMDD strptimeは多少由来でも解釈するため
@@ -270,27 +269,27 @@ class TradValidator < ValidatorBase
         message = "Invalid format. hold_date should be 'YYYYMMDD'"
       else
         begin
-          d = Date.strptime(hold_date, "%Y%m%d")
+          d = Date.strptime(hold_date, '%Y%m%d')
           range = range_hold_date(Date.today)
-          unless (d >= range[:min] && d <= range[:max]) # 実行日基準で7日後3年以内の範囲
+          unless d >= range[:min] && d <= range[:max] # 実行日基準で7日後3年以内の範囲
             ret = false
             message = "hold_date should be from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
-          else #範囲内であっても年末年始の日付は無効
+          else # 範囲内であっても年末年始の日付は無効
             if (d.month == 12 && d.day >= 27) || (d.month == 1 && d.day <= 4)
               ret = false
               message = "Avoid to specify 12/27 to 1/4. hold_date should be from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
             end
           end
-        rescue ArgumentError #日付が読めなかった場合
+        rescue ArgumentError # 日付が読めなかった場合
           ret = false
           message = "Invalid format. hold_date should be 'YYYYMMDD'"
         end
       end
       unless ret
         annotation = [
-          {key: "hold_date", value: hold_date},
-          {key: "Message", value: message},
-          {key: "Location", value: "Line: #{hold_date_list.first[:line_no]}"}
+          {key: 'hold_date', value: hold_date},
+          {key: 'Message', value: message},
+          {key: 'Location', value: "Line: #{hold_date_list.first[:line_no]}"}
         ]
         add_error(rule_code, annotation, source: @anno_file)
       end
@@ -335,7 +334,7 @@ class TradValidator < ValidatorBase
       range = range_hold_date(Date.today)
       message = "If you like to hold your data until publication, specify 'COMMON/DATE/hold_date' from #{range[:min].strftime("%Y%m%d")} to #{range[:max].strftime("%Y%m%d")}"
       annotation = [
-        {key: "Message", value: message},
+        {key: 'Message', value: message}
       ]
       add_error(rule_code, annotation, source: @anno_file)
       false
@@ -356,74 +355,74 @@ class TradValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def organism_warning(rule_code, organism_data_list, biosample_data_list, organism_info_list=[])
+  def organism_warning(rule_code, organism_data_list, biosample_data_list, organism_info_list = [])
     return nil if organism_data_list.nil? || organism_data_list.empty?
     ret = true
     biosample_data_list = [] if biosample_data_list.nil?
     organism_data_list.each do |line|
       # BioSampleの記載があればスキップする
-      next if biosample_data_list.any?{|bs_line| bs_line[:entry] == line[:entry]} || biosample_data_list.any?{|bs_line| bs_line[:entry] == "COMMON"}
+      next if biosample_data_list.any? {|bs_line| bs_line[:entry] == line[:entry] } || biosample_data_list.any? {|bs_line| bs_line[:entry] == 'COMMON' }
 
       valid_flag = true
       organism_name = line[:value]
-      #あればキャッシュを使用
+      # あればキャッシュを使用
       if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
         ret_org = @org_validator.suggest_taxid_from_name(organism_name)
         @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret_org) unless @cache.nil?
       else
-        puts "use cache in organism_warning" if $DEBUG
+        puts 'use cache in organism_warning' if $DEBUG
         ret_org = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
       end
       annotation = [
-        {key: "organism", value: organism_name},
-        {key: "File name", value: @anno_file},
-        {key: "Location", value: "Line: #{line[:line_no]}"}
+        {key: 'organism', value: organism_name},
+        {key: 'File name', value: @anno_file},
+        {key: 'Location', value: "Line: #{line[:line_no]}"}
       ]
-      if ret_org[:status] == "exist" #該当するtaxonomy_idがあった場合
+      if ret_org[:status] == 'exist' # 該当するtaxonomy_idがあった場合
         scientific_name = ret_org[:scientific_name]
         line[:tax_id] = ret_org[:tax_id]
         organism_info_list.push(line)
-        #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+        # ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
         if scientific_name != organism_name
           valid_flag = false
-          location = {column: "value", line_no: line[:line_no]}
-          annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+          location = {column: 'value', line_no: line[:line_no]}
+          annotation.push(ErrorBuilder.suggested_annotation_with_key('Suggested value (organism)', [scientific_name], 'organism', location, true))
         end
-      elsif ret_org[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、trad用に分岐
-        if organism_name.downcase == "environmental samples" #大量にある為除外
+      elsif ret_org[:status] == 'multiple exist' # 該当するtaxonomy_idが複数あった場合、trad用に分岐
+        if organism_name.downcase == 'environmental samples' # 大量にある為除外
           valid_flag = false
-          msg = "Use organism name for lower rank taxon."
-          annotation.push({key: "Message", value: msg})
+          msg = 'Use organism name for lower rank taxon.'
+          annotation.push({key: 'Message', value: msg})
         else
-          scientific_name_hit = ret_org[:tax_list].select{|hit_tax| hit_tax[:scientific_name] == organism_name}
+          scientific_name_hit = ret_org[:tax_list].select {|hit_tax| hit_tax[:scientific_name] == organism_name }
           # scientific nameに合致するTaxonomyが一件の場合はOK. "Bacteria"のようなケースで菌側を選択
           if scientific_name_hit.size == 1
             line[:tax_id] = scientific_name_hit.first[:tax_no] # TaxID確定
             organism_info_list.push(line)
           else # scientific nameに合致するものが0件または複数件ある
             infraspecific_tax_id_list = []
-            tax_id_list = ret_org[:tax_list].map{|hit_tax| hit_tax[:tax_no]}
+            tax_id_list = ret_org[:tax_list].map {|hit_tax| hit_tax[:tax_no] }
             tax_id_list.each do |hit_tax_id|
-              infraspecific_tax_id_list.push(hit_tax_id) if @org_validator.is_infraspecific_rank(hit_tax_id) #cacheしてもいいが、あまり通る経路ではない
+              infraspecific_tax_id_list.push(hit_tax_id) if @org_validator.is_infraspecific_rank(hit_tax_id) # cacheしてもいいが、あまり通る経路ではない
             end
             if infraspecific_tax_id_list.size == 1
               # ヒットしたinfraspecificな生物種のscientific_nameではなかった場合には補正をかける
-              infraspecific_tax_list = ret_org[:tax_list].select{|hit_tax| hit_tax[:tax_no] == infraspecific_tax_id_list.first}
+              infraspecific_tax_list = ret_org[:tax_list].select {|hit_tax| hit_tax[:tax_no] == infraspecific_tax_id_list.first }
               scientific_name = infraspecific_tax_list.first[:scientific_name]
               line[:tax_id] = infraspecific_tax_id_list.first # TaxID確定
               organism_info_list.push(line)
               unless scientific_name == organism_name
                 valid_flag = false
-                annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+                annotation.push(ErrorBuilder.suggested_annotation_with_key('Suggested value (organism)', [scientific_name], 'organism', location, true))
               end
             else # ヒットしたinfraspecificな生物種が複数、またはない。"Bacillus"のような両方infraspecificではないケース
               valid_flag = false
               msg = "Two or more taxa found with the same organism name. Please use the scientific name of taxonomy_id:[#{ret_org[:tax_id]}]"
-              annotation.push({key: "Message", value: msg})
+              annotation.push({key: 'Message', value: msg})
             end
           end
         end
-      else #該当するtaxonomy_idが無かった場合は単なるエラー
+      else # 該当するtaxonomy_idが無かった場合は単なるエラー
         valid_flag = false
       end
       if valid_flag == false
@@ -456,10 +455,10 @@ class TradValidator < ValidatorBase
         organism[:is_infraspecific] = false
         valid_flag = false
         annotation = [
-          {key: "organism", value: organism[:value]},
-          {key: "File name", value: @anno_file},
-          {key: "Location", value: "Line: #{organism[:line_no]}"},
-          {key: "taxonomy_id", value: organism[:tax_id]}
+          {key: 'organism', value: organism[:value]},
+          {key: 'File name', value: @anno_file},
+          {key: 'Location', value: "Line: #{organism[:line_no]}"},
+          {key: 'taxonomy_id', value: organism[:tax_id]}
         ]
         add_error(rule_code, annotation, source: @anno_file)
       end
@@ -486,45 +485,45 @@ class TradValidator < ValidatorBase
     ret = true
     # WGSの記載があるかチェック
     wgs_keyword = false
-    data_type = data_by_feat_qual("DATATYPE", "type", anno_by_qual)
-    keyword = data_by_feat_qual("KEYWORD", "keyword", anno_by_qual)
-    wgs_datatype_list = data_type.select{|line| line[:value].upcase == "WGS" }
-    wgs_keyword_list = keyword.select{|line| line[:value].upcase == "WGS" }
+    data_type = data_by_feat_qual('DATATYPE', 'type', anno_by_qual)
+    keyword = data_by_feat_qual('KEYWORD', 'keyword', anno_by_qual)
+    wgs_datatype_list = data_type.select {|line| line[:value].upcase == 'WGS' }
+    wgs_keyword_list = keyword.select {|line| line[:value].upcase == 'WGS' }
     if wgs_datatype_list.any? || wgs_keyword_list.any?
       wgs_keyword = true
     end
     # WGSの記載があった場合に complete genome のような内容ではないかチェックする
-    message = ""
+    message = ''
     if wgs_keyword == true
-      entry_size = anno_by_ent.keys.delete_if{|ent| ent == "COMMON"}.size
+      entry_size = anno_by_ent.keys.delete_if {|ent| ent == 'COMMON' }.size
       if entry_size <= 10 # entry数が10以下(少ない)
         # titleに"complete genome"という文字列が含まれている
-        title_lines = data_by_feat_qual("REFERENCE", "title", anno_by_qual)
-        title_lines.concat(data_by_feat_qual("source", "ff_definition", anno_by_qual))
-        if title_lines.any?{|line| line[:value].downcase.include?("complete genome")}
+        title_lines = data_by_feat_qual('REFERENCE', 'title', anno_by_qual)
+        title_lines.concat(data_by_feat_qual('source', 'ff_definition', anno_by_qual))
+        if title_lines.any? {|line| line[:value].downcase.include?('complete genome') }
           message = "Found 'complete genome' in REFERENCE/title or source/ff_definition."
           ret = false
         else
           # 複数のエントリがあり、そのうちplasmidが1つ以上含まれている。ただし全てがplasmidではない(chromosomeと推測)
-          plasmid_lines = data_by_feat_qual("source", "plasmid", anno_by_qual)
+          plasmid_lines = data_by_feat_qual('source', 'plasmid', anno_by_qual)
           if entry_size >= 2 && plasmid_lines.any? && (entry_size - plasmid_lines.size) > 0
-            message = "Number of entries is a few with including some plasmid entries."
+            message = 'Number of entries is a few with including some plasmid entries.'
             ret = false
           else
             # COMMONまたはChromosomeの全てのエントリにTOPOLOGY=circularの記載がある
-            if data_by_ent_feat_qual("COMMON", "TOPOLOGY", "circular", anno_by_qual).any?
+            if data_by_ent_feat_qual('COMMON', 'TOPOLOGY', 'circular', anno_by_qual).any?
               message = "Found 'circular' in COMMON/TOPOLOGY/circular"
               ret = false
             else
               # TODO plasmidではないentryをchromosomeとみなしているが(原核ではchromosomeエントリはqualifiereで明示されない)、
               # 実際はそれ以外のentryも混じっていて、"plasmidよりも長いエントリー"というフィルタリングが必要。
               # ただし重たくなるので割愛。全てのchromosomeがcirclularであるというチェックが望ましいが、一つでもcirclularであれば、というチェックにしている。
-              circlar_lines = data_by_feat_qual("TOPOLOGY", "circular", anno_by_qual)
-              circlar_entry_list = circlar_lines.map{|row| row[:entry]}.uniq
-              plasmid_entry_list = plasmid_lines.map{|row| row[:entry]}.uniq #plasmidが含まれていると前の条件ではじくので基本0件
+              circlar_lines = data_by_feat_qual('TOPOLOGY', 'circular', anno_by_qual)
+              circlar_entry_list = circlar_lines.map {|row| row[:entry] }.uniq
+              plasmid_entry_list = plasmid_lines.map {|row| row[:entry] }.uniq # plasmidが含まれていると前の条件ではじくので基本0件
               chromosome_circlar_entry_list = circlar_entry_list - plasmid_entry_list
               if chromosome_circlar_entry_list.any?
-                entry_names = chromosome_circlar_entry_list.join(", ")
+                entry_names = chromosome_circlar_entry_list.join(', ')
                 message = "Found 'circular' in TOPOLOGY/circular at entry: #{entry_names}"
                 ret = false
               else
@@ -539,19 +538,19 @@ class TradValidator < ValidatorBase
       line = []
       key = []
       if wgs_datatype_list.any?
-        key.push("DATATYPE/type")
+        key.push('DATATYPE/type')
         line.push(wgs_datatype_list.first[:line_no])
       end
       if wgs_keyword_list.any?
-        key.push("KEYWORD/keyword")
+        key.push('KEYWORD/keyword')
         line.push(wgs_keyword_list.first[:line_no])
       end
       annotation = [
-        {key: key.join(", "), value: "WGS"},
-        {key: "File name", value: @anno_file},
-        {key: "Location", value: "Line: #{line.join(", ")}"}
+        {key: key.join(', '), value: 'WGS'},
+        {key: 'File name', value: @anno_file},
+        {key: 'Location', value: "Line: #{line.join(", ")}"}
       ]
-      annotation.push({key: "Message", value: message}) unless message == ""
+      annotation.push({key: 'Message', value: message}) unless message == ''
       add_error(rule_code, annotation, source: @anno_file)
     end
     ret
@@ -576,17 +575,17 @@ class TradValidator < ValidatorBase
     # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
     anno_file_path = file_path_on_log_dir(anno_file_path)
     seq_file_path = file_path_on_log_dir(seq_file_path)
-    output_file_path = File.dirname(anno_file_path) + "/jparser_result.txt"
+    output_file_path = File.dirname(anno_file_path) + '/jparser_result.txt'
     params = {anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path}
 
     message_list = []
     begin
-      message_list = ddbj_parser(@parser_url, params, "jParser")
+      message_list = ddbj_parser(@parser_url, params, 'jParser')
     rescue => ex # parser実行に失敗(fatal/systemエラー含む)
       annotation = [
-        {key: "Message", value: "#{ex.message}" },
-        {key: "annotation file", value: @anno_file},
-        {key: "fasta file", value: @seq_file}
+        {key: 'Message', value: "#{ex.message}"},
+        {key: 'annotation file', value: @anno_file},
+        {key: 'fasta file', value: @seq_file}
       ]
       add_error(rule_code, annotation, source: "#{@anno_file}, #{@seq_file}")
       ret = false
@@ -595,23 +594,23 @@ class TradValidator < ValidatorBase
     message_list.each do |msg|
       ret = false
       annotation = [
-        {key: "Code", value: msg[:code]},
-        {key: "Level", value: msg[:level]}
+        {key: 'Code', value: msg[:code]},
+        {key: 'Level', value: msg[:level]}
       ]
-      annotation.push({key: "Type", value: msg[:type]}) if msg[:type]
+      annotation.push({key: 'Type', value: msg[:type]}) if msg[:type]
       if msg[:file]
-        if msg[:file] == "ANN"
-          annotation.push({key: "File name", value: @anno_file})
-        elsif msg[:file] == "SEQ"
-          annotation.push({key: "File name", value: @seq_file})
-        elsif msg[:file] == "AxS"
-          annotation.push({key: "File name", value: "#{@anno_file} and #{@seq_file}"})
+        if msg[:file] == 'ANN'
+          annotation.push({key: 'File name', value: @anno_file})
+        elsif msg[:file] == 'SEQ'
+          annotation.push({key: 'File name', value: @seq_file})
+        elsif msg[:file] == 'AxS'
+          annotation.push({key: 'File name', value: "#{@anno_file} and #{@seq_file}"})
         end
       end
-      annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
-      annotation.push({key: "Message", value: msg[:message]})
+      annotation.push({key: 'Location', value: msg[:location]}) if msg[:location]
+      annotation.push({key: 'Message', value: msg[:message]})
       parser_rule_code = msg[:code]
-      rule = @conf[:validation_parser_config]["rule" + parser_rule_code] || ddbj_parser_rule(msg)
+      rule = @conf[:validation_parser_config]['rule' + parser_rule_code] || ddbj_parser_rule(msg)
       add_raw_error(rule, annotation, source: "#{@anno_file}, #{@seq_file}")
     end
     ret
@@ -636,19 +635,19 @@ class TradValidator < ValidatorBase
     # parameter設定。ファイルパスはデータ(log)ディレクトリからの相対パスに直す
     anno_file_path = file_path_on_log_dir(anno_file_path)
     seq_file_path = file_path_on_log_dir(seq_file_path)
-    output_file_path = File.dirname(seq_file_path) + "/transchecker_result.txt"
-    rsl_file_path = File.dirname(seq_file_path) + "/rsl.fasta"
-    aln_file_path = File.dirname(seq_file_path) + "/aln.txt"
+    output_file_path = File.dirname(seq_file_path) + '/transchecker_result.txt'
+    rsl_file_path = File.dirname(seq_file_path) + '/rsl.fasta'
+    aln_file_path = File.dirname(seq_file_path) + '/aln.txt'
     params = {anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path, rsl_file_path: rsl_file_path, aln_file_path: aln_file_path}
 
     message_list = []
     begin
-      message_list = ddbj_parser(@parser_url, params, "transChecker")
+      message_list = ddbj_parser(@parser_url, params, 'transChecker')
     rescue => ex # parser実行に失敗(fatal/systemエラー含む)
       annotation = [
-        {key: "Message", value: "#{ex.message}" },
-        {key: "annotation file", value: @anno_file},
-        {key: "fasta file", value: @seq_file}
+        {key: 'Message', value: "#{ex.message}"},
+        {key: 'annotation file', value: @anno_file},
+        {key: 'fasta file', value: @seq_file}
       ]
       add_error(rule_code, annotation, source: "#{@anno_file}, #{@seq_file}")
       ret = false
@@ -657,13 +656,13 @@ class TradValidator < ValidatorBase
     message_list.each do |msg|
       ret = false
       annotation = [
-        {key: "Code", value: msg[:code]},
-        {key: "Level", value: msg[:level]},
-        {key: "Location", value: msg[:location].nil? ? "" : msg[:location] },
-        {key: "Message", value: msg[:message]}
+        {key: 'Code', value: msg[:code]},
+        {key: 'Level', value: msg[:level]},
+        {key: 'Location', value: msg[:location].nil? ? '' : msg[:location]},
+        {key: 'Message', value: msg[:message]}
       ]
       parser_rule_code = msg[:code]
-      rule = @conf[:validation_parser_config]["rule" + parser_rule_code] || ddbj_parser_rule(msg)
+      rule = @conf[:validation_parser_config]['rule' + parser_rule_code] || ddbj_parser_rule(msg)
       add_raw_error(rule, annotation, source: "#{@anno_file}, #{@seq_file}")
     end
     ret
@@ -690,17 +689,17 @@ class TradValidator < ValidatorBase
     anno_file_path = file_path_on_log_dir(anno_file_path)
     seq_file_path = file_path_on_log_dir(seq_file_path)
     agp_file_path = file_path_on_log_dir(agp_file_path)
-    output_file_path = File.dirname(agp_file_path) + "/agpparser_result.txt"
+    output_file_path = File.dirname(agp_file_path) + '/agpparser_result.txt'
     params = {agp_file_path: agp_file_path, anno_file_path: anno_file_path, fasta_file_path: seq_file_path, result_file_path: output_file_path}
 
     message_list = []
     begin
-      message_list = ddbj_parser(@parser_url, params, "AGPParser")
+      message_list = ddbj_parser(@parser_url, params, 'AGPParser')
     rescue => ex # parser実行に失敗(fatal/systemエラー含む)
       annotation = [
-        {key: "Message", value: "#{ex.message}" },
-        {key: "annotation file", value: @anno_file},
-        {key: "fasta file", value: @seq_file}
+        {key: 'Message', value: "#{ex.message}"},
+        {key: 'annotation file', value: @anno_file},
+        {key: 'fasta file', value: @seq_file}
       ]
       add_error(rule_code, annotation, source: "#{@anno_file}, #{@seq_file}")
       ret = false
@@ -709,13 +708,13 @@ class TradValidator < ValidatorBase
     message_list.each do |msg|
       ret = false
       annotation = [
-        {key: "Code", value: msg[:code]},
-        {key: "Level", value: msg[:level]}
+        {key: 'Code', value: msg[:code]},
+        {key: 'Level', value: msg[:level]}
       ]
-      annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
-      annotation.push({key: "Message", value: msg[:message]})
+      annotation.push({key: 'Location', value: msg[:location]}) if msg[:location]
+      annotation.push({key: 'Message', value: msg[:message]})
       parser_rule_code = msg[:code]
-      rule = @conf[:validation_parser_config]["rule" + parser_rule_code] || ddbj_parser_rule(msg)
+      rule = @conf[:validation_parser_config]['rule' + parser_rule_code] || ddbj_parser_rule(msg)
       add_raw_error(rule, annotation, source: "#{@anno_file}, #{@seq_file}")
     end
     ret
@@ -727,8 +726,8 @@ class TradValidator < ValidatorBase
   #
   def file_path_on_log_dir(file_path)
     unless ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'].nil?
-      file_path = file_path.sub(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'],"")
-      file_path = "." + file_path if file_path.start_with?("/") #絶対パス表現を避ける
+      file_path = file_path.sub(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'], '')
+      file_path = '.' + file_path if file_path.start_with?('/') # 絶対パス表現を避ける
     else
       file_path
     end
@@ -762,17 +761,17 @@ class TradValidator < ValidatorBase
     if api_server.nil?
       raise "'ddbj_parser' setting is not ready. The check by #{parser_name} did not run correctly, so please run it separately.\n"
     end
-    api_server = api_server[0..-2] if api_server.end_with?("/")
+    api_server = api_server[0..-2] if api_server.end_with?('/')
     # リクエストURLの組み立て
     # parser/jparser/?anno_file_path=CDS.ann&fasta_file_path=CDS.fasta&result_file_path=CDS.result.txt
     # parser/transchecker/?anno_file_path=CDS.ann&fasta_file_path=CDS.fasta&result_file_path=CDS.result.txt&rsl_file_path=rsl.fasta&aln_file_path=aln.txt
     # parser/agpparser/?agp_file_path=WGS_scaffold_error.agp&anno_file_path=WGS_scaffold.ann&fasta_file_path=WGS_piece.fasta&result_file_path=WGS.result.txt
-    if parser_name.downcase == "transchecker"
-      method = "/parser/transchecker/?"
-    elsif parser_name.downcase == "agpparser"
-      method = "/parser/agpparser/?"
+    if parser_name.downcase == 'transchecker'
+      method = '/parser/transchecker/?'
+    elsif parser_name.downcase == 'agpparser'
+      method = '/parser/agpparser/?'
     else # default "jParser"
-      method = "/parser/jparser/?"
+      method = '/parser/jparser/?'
     end
     params = URI.encode_www_form(params)
     url = api_server + method + params
@@ -788,32 +787,32 @@ class TradValidator < ValidatorBase
         begin
           finished_flag = false
           message_list = []
-          current_location = ""
+          current_location = ''
           res.body.to_s.each_line do |line|
-            if parser_name.downcase == "transchecker" # transcheckerの場合にはfasta-likeなフォーマットでlocationが出力される
-              if line.start_with?(">")
+            if parser_name.downcase == 'transchecker' # transcheckerの場合にはfasta-likeなフォーマットでlocationが出力される
+              if line.start_with?('>')
                 current_location = line.chomp.strip[1..-1]
-              elsif line.start_with?("//")
-                current_location = ""
+              elsif line.start_with?('//')
+                current_location = ''
               else
                 msg = parse_parser_msg(line.chomp, parser_name)
-                msg[:location] = current_location if !(msg.nil? || current_location.nil? || current_location == "")
+                msg[:location] = current_location if !(msg.nil? || current_location.nil? || current_location == '')
                 message_list.push(msg)
               end
             else
               message_list.push(parse_parser_msg(line.chomp, parser_name))
             end
-            if line.include?("finished") && line.downcase.include?(parser_name.downcase) # 実行完了メッセージ "jParser (Ver. 6.65) finished." or" "TransChecker (Ver. 2.22) finished" or "MES: AGPParser (Ver. 1.17) finished."
+            if line.include?('finished') && line.downcase.include?(parser_name.downcase) # 実行完了メッセージ "jParser (Ver. 6.65) finished." or" "TransChecker (Ver. 2.22) finished" or "MES: AGPParser (Ver. 1.17) finished."
               finished_flag = true
             end
           end
           message_list.compact!
           # 実質的なシステムエラー(Parserが最後まで実行できなかった)が発生した場合は補足する
-          fat_list = message_list.select{|row| row[:level] == "FAT"}
+          fat_list = message_list.select {|row| row[:level] == 'FAT' }
           if fat_list.any? # FATALはユーザエラーとしては扱わない
             raise "Parse error: 'ddbj_parser'. Fatal error has occurred. The check by #{parser_name} did not run correctly, so please run it separately.[#{fat_list}]\n"
           end
-          sys_list = message_list.select{|row| row[:type] && row[:type] == "SYS"}
+          sys_list = message_list.select {|row| row[:type] && row[:type] == 'SYS' }
           if sys_list.any? # SystemエラーもユーザエラーでなくFATAL扱い
             raise "Parse error: 'ddbj_parser'. System error has occurred. The check by #{parser_name} did not run correctly, so please run it separately.[#{sys_list}]\n"
           end
@@ -823,7 +822,7 @@ class TradValidator < ValidatorBase
           message_list
         rescue => ex
           # TODO log取っておく?
-          if ex.message.start_with?("Parse error")
+          if ex.message.start_with?('Parse error')
             raise ex.message
           else
             raise "Parse error: 'ddbj_parser'. The check by #{parser_name} did not run correctly, so please run it separately.\n"
@@ -831,7 +830,7 @@ class TradValidator < ValidatorBase
         end
       end
     rescue => ex
-      if ex.message.start_with?("Parse error")
+      if ex.message.start_with?('Parse error')
         message = ex.message
       else
         message = "Connection to 'ddbj_parser' server failed. The check by #{parser_name} did not run correctly, so please run it separately.\n"
@@ -854,21 +853,21 @@ class TradValidator < ValidatorBase
   def parse_parser_msg(line, parser_name)
     ret = nil
     parser_name = parser_name.downcase
-    if parser_name == "jparser"
+    if parser_name == 'jparser'
       if m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<file>(ANN|SEQ|AxS)):(?<loc>[^:]+):(?<message>.+)/)
         ret = {code: m[:code], level: m[:level], type: m[:type], file: m[:file], location: m[:loc], message: m[:message]}
-      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<file>(ANN|SEQ|AxS)):(?<message>.+)/) #エラー位置なし
+      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<file>(ANN|SEQ|AxS)):(?<message>.+)/) # エラー位置なし
         ret = {code: m[:code], level: m[:level], type: m[:type], file: m[:file], message: m[:message]}
-      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<message>.+)/) #Fileとエラー位置なし
+      elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<type>(STX|SYS|LOC)):(?<message>.+)/) # Fileとエラー位置なし
         ret = {code: m[:code], level: m[:level], type: m[:type], message: m[:message]}
       elsif m = line.match(/^(?<code>JP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR|MES)):(?<message>.+)/)
         ret = {code: m[:code], level: m[:level], message: m[:message]}
       end
-    elsif parser_name == "transchecker"
+    elsif parser_name == 'transchecker'
       if m = line.match(/^(?<code>TC[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR)):(?<message>.+)/)
         ret = {code: m[:code], level: m[:level], message: m[:message]}
       end
-    elsif parser_name == "agpparser"
+    elsif parser_name == 'agpparser'
       if m = line.match(/^(?<code>AP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR)):(?<loc>[^:]+):(?<message>.+)/)
         ret = {code: m[:code], level: m[:level], location: m[:loc], message: m[:message]}
       elsif m = line.match(/^(?<code>AP[0-9a-zA-Z]+):(?<level>(ER1|ER2|FAT|WAR)):(?<message>.+)/)
@@ -890,14 +889,14 @@ class TradValidator < ValidatorBase
   #   {"rule_class" => "Trad", "code" => "JP0045", "level" => "error", "level_original" => "ER1", "internal_ignore" => true, "message" => "[scaffold1]: [assembly_gap] [4302..4401] contains some base code other than [ n ] in sequence file.", "reference" => "https://www.ddbj.nig.ac.jp/ddbj/validator.html#JP0045" }
   #
   def ddbj_parser_rule(message)
-    rule_info = {"rule_class" => "Trad"}
-    rule_info["code"] = message[:code]
-    rule_level = (message[:level].start_with?("ER") ||  message[:level].start_with?("FAT")) ? "error" : "warning"
-    rule_info["level"] = rule_level
-    rule_info["level_orginal"] = message[:level]
-    rule_info["internal_ignore"] = message[:level].start_with?("ER1")
-    rule_info["message"] = message[:message]
-    rule_info["reference"] = "https://www.ddbj.nig.ac.jp/ddbj/validator.html#" + message[:code]
+    rule_info = {'rule_class' => 'Trad'}
+    rule_info['code'] = message[:code]
+    rule_level = (message[:level].start_with?('ER') ||  message[:level].start_with?('FAT')) ? 'error' : 'warning'
+    rule_info['level'] = rule_level
+    rule_info['level_orginal'] = message[:level]
+    rule_info['internal_ignore'] = message[:level].start_with?('ER1')
+    rule_info['message'] = message[:message]
+    rule_info['reference'] = 'https://www.ddbj.nig.ac.jp/ddbj/validator.html#' + message[:code]
     rule_info
   end
 
@@ -915,14 +914,14 @@ class TradValidator < ValidatorBase
   #
   def missing_dblink(rule_code, dblink_list, anno_by_ent)
     result = true
-    message = ""
+    message = ''
 
-    #COMMON entryにDBLINKがあるか
+    # COMMON entryにDBLINKがあるか
     common_dblink_exist = false
-    common_dblink = dblink_list.select{|row| row[:entry] == "COMMON"}
+    common_dblink = dblink_list.select {|row| row[:entry] == 'COMMON' }
     if common_dblink.any?
-      qual_list = common_dblink.map{|row| row[:qualifier]}
-      if qual_list.include?("project") && qual_list.include?("biosample")
+      qual_list = common_dblink.map {|row| row[:qualifier] }
+      if qual_list.include?('project') && qual_list.include?('biosample')
         common_dblink_exist = true
       else
         result = false
@@ -934,12 +933,12 @@ class TradValidator < ValidatorBase
     missing_dblink_entry_list = []
     entry_dblink_count = 0
     anno_by_ent.each do |entry_name, data|
-      next if entry_name == "COMMON"
-      entry_dblink = dblink_list.select{|row| row[:entry] == entry_name}
+      next if entry_name == 'COMMON'
+      entry_dblink = dblink_list.select {|row| row[:entry] == entry_name }
       if entry_dblink.any?
         entry_dblink_count += entry_dblink.size
-        qual_list = entry_dblink.map{|row| row[:qualifier]}
-        unless qual_list.include?("project") && qual_list.include?("biosample")
+        qual_list = entry_dblink.map {|row| row[:qualifier] }
+        unless qual_list.include?('project') && qual_list.include?('biosample')
           message += "#{entry_name} entry requires both 'project' and 'biosample' for DBLINK.."
           missing_dblink_entry_list.push(entry_name)
           result = false
@@ -956,12 +955,12 @@ class TradValidator < ValidatorBase
     end
 
     if result == false
-      entry_name = missing_dblink_entry_list.any? ? missing_dblink_entry_list.join(", ") : "COMMON"
+      entry_name = missing_dblink_entry_list.any? ? missing_dblink_entry_list.join(', ') : 'COMMON'
       annotation = [
-        {key: "entry", value: entry_name},
-        {key: "File name", value: @anno_file}
+        {key: 'entry', value: entry_name},
+        {key: 'File name', value: @anno_file}
       ]
-      annotation.push({key: "Message", value: message}) unless message == ""
+      annotation.push({key: 'Message', value: message}) unless message == ''
       add_error(rule_code, annotation)
     end
 
@@ -1005,9 +1004,9 @@ class TradValidator < ValidatorBase
 
     if result == false
       annotation = [
-        {key: "DBLINK/project", value: invalid_id_list.join(", ")},
-        {key: "File name", value: @anno_file},
-        {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
+        {key: 'DBLINK/project', value: invalid_id_list.join(', ')},
+        {key: 'File name', value: @anno_file},
+        {key: 'Location', value: "Line: #{line_no_list.join(", ")}"}
       ]
       add_error(rule_code, annotation)
     end
@@ -1051,9 +1050,9 @@ class TradValidator < ValidatorBase
 
     if result == false
       annotation = [
-        {key: "DBLINK/biosample", value: invalid_id_list.join(", ")},
-        {key: "File name", value: @anno_file},
-        {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
+        {key: 'DBLINK/biosample', value: invalid_id_list.join(', ')},
+        {key: 'File name', value: @anno_file},
+        {key: 'Location', value: "Line: #{line_no_list.join(", ")}"}
       ]
       add_error(rule_code, annotation)
     end
@@ -1077,25 +1076,25 @@ class TradValidator < ValidatorBase
     invalid_id_list = []
     line_no_list = []
     # DRRは複数記載されるケースがあり、まとめてDBチェックする
-    drr_accession_id_list = drr_list.map {|row| row[:value]}
-    drr_accession_id_list.delete_if{|run_id| run_id =~ /^(S|E)RR\w?\d{1,}$/} # 他極データは無視(TR_R0033でチェックする)
+    drr_accession_id_list = drr_list.map {|row| row[:value] }
+    drr_accession_id_list.delete_if {|run_id| run_id =~ /^(S|E)RR\w?\d{1,}$/ } # 他極データは無視(TR_R0033でチェックする)
     unless @db_validator.nil?
       result_run_list = @db_validator.exist_check_run_ids(drr_accession_id_list)
     end
     result_run_list.each do |result_run_id|
       if result_run_id[:is_exist] == false
         invalid_id_list.push(result_run_id[:accession_id])
-        lines = drr_list.select {|row| row[:value] == result_run_id[:accession_id]}
-        line_no_list.concat(lines.map{|row| row[:line_no]})
+        lines = drr_list.select {|row| row[:value] == result_run_id[:accession_id] }
+        line_no_list.concat(lines.map {|row| row[:line_no] })
         result = false
       end
     end
 
     if result == false
       annotation = [
-        {key: "DBLINK/sequence read archive", value: invalid_id_list.join(", ")},
-        {key: "File name", value: @anno_file},
-        {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
+        {key: 'DBLINK/sequence read archive', value: invalid_id_list.join(', ')},
+        {key: 'File name', value: @anno_file},
+        {key: 'Location', value: "Line: #{line_no_list.join(", ")}"}
       ]
       add_error(rule_code, annotation)
     end
@@ -1155,7 +1154,7 @@ class TradValidator < ValidatorBase
       biosample_info = @db_validator.get_biosample_metadata(biosample_id_list)
       biosample_info.each do |biosample_id, biosample_data|
         biosample_data[:attribute_list].each do |attr|
-          if attr[:attribute_name] == "note" || attr[:attribute_name] == "derived_from"
+          if attr[:attribute_name] == 'note' || attr[:attribute_name] == 'derived_from'
             ref_list = attr[:attribute_value].scan(/SAMD\w?\d{1,}/)
             biosample_data[:ref_biosample_list] = [] if biosample_data[:ref_biosample_list].nil?
             biosample_data[:ref_biosample_list].concat(ref_list).uniq!
@@ -1211,9 +1210,9 @@ class TradValidator < ValidatorBase
       trad_value = target_line[:value]
       entry_name = target_line[:entry]
       # 同じエントリにDBLINK/biosampleの値を検索
-      biosample_line = biosample_data_list.select{|bs_line| bs_line[:entry] == entry_name}
+      biosample_line = biosample_data_list.select {|bs_line| bs_line[:entry] == entry_name }
       if biosample_line.empty? # なければCOMMON/DBLINK/biosampleの値を検索
-        biosample_line = biosample_data_list.select{|bs_line| bs_line[:entry] == "COMMON"}
+        biosample_line = biosample_data_list.select {|bs_line| bs_line[:entry] == 'COMMON' }
       end
       if biosample_line.empty?
         ## TR_R0009:missing_dblink で別途チェックされるのでここでは無視
@@ -1224,12 +1223,12 @@ class TradValidator < ValidatorBase
           # TR_R0011:invalid_biosample_accessionで別途チェックされるので無視
         else
           attr_list = biosample_info[biosample_id][:attribute_list]
-          target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
+          target_attribute_list = attr_list.select {|attr| attr[:attribute_name] == attribute_name }
           if target_attribute_list.empty? # BioSample側に当該属性の値がない
             target_line[:biosample] = {biosample_id: biosample_id, attr_value: nil}
           else
             # attribute_value
-            target_line[:biosample] = {biosample_id: biosample_id, attr_value_list: target_attribute_list.map{|row| row[:attribute_value]}}
+            target_line[:biosample] = {biosample_id: biosample_id, attr_value_list: target_attribute_list.map {|row| row[:attribute_value] }}
           end
         end
       end
@@ -1256,39 +1255,39 @@ class TradValidator < ValidatorBase
     data_list_with_bs_value = corresponding_biosample_attr_value(data_list, biosample_data_list, biosample_info, attribute_name)
     data_list_with_bs_value.each do |line|
       check = true
-      message = ""
+      message = ''
       trad_value = line[:value]
       unless line[:biosample].nil?
         if line[:biosample][:attr_value_list].nil?
           check = false
-          biosample_attr_values = ""
+          biosample_attr_values = ''
           message = "The #{attribute_name} attribute is not used in BioSample"
         else
           bs_attribute_value_list = line[:biosample][:attr_value_list].dup
-          bs_attribute_value_list.delete_if{|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
+          bs_attribute_value_list.delete_if {|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
           if qualifier_name == 'country'
             # /countryは":"区切りの最初の単語を国名として期待するフォーマット
-            trad_country_name = trad_value.split(":").first.chomp.strip
-            bs_count_name_list = bs_attribute_value_list.map{|attr_val| attr_val.split(":").first.chomp.strip }
+            trad_country_name = trad_value.split(':').first.chomp.strip
+            bs_count_name_list = bs_attribute_value_list.map {|attr_val| attr_val.split(':').first.chomp.strip }
             if !bs_count_name_list.include?(trad_country_name)
               check = false
-              biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
+              biosample_attr_values = line[:biosample][:attr_value_list].join(', ')
             end
           elsif !bs_attribute_value_list.include?(trad_value)
             check = false
-            biosample_attr_values = line[:biosample][:attr_value_list].join(", ")
+            biosample_attr_values = line[:biosample][:attr_value_list].join(', ')
           end
         end
         if check == false
-          ret = false #1行でもエラーがあればfalse
+          ret = false # 1行でもエラーがあればfalse
           annotation = [
             {key: "#{qualifier_name}", value: trad_value},
-            {key: "BioSample ID", value: line[:biosample][:biosample_id]},
+            {key: 'BioSample ID', value: line[:biosample][:biosample_id]},
             {key: "BioSample value[#{attribute_name}]", value: biosample_attr_values},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{line[:line_no]}"}
+            {key: 'File name', value: @anno_file},
+            {key: 'Location', value: "Line: #{line[:line_no]}"}
           ]
-          annotation.push({key: "Message", value: message}) unless message == ""
+          annotation.push({key: 'Message', value: message}) unless message == ''
           add_error(rule_code, annotation)
         end
       end
@@ -1317,20 +1316,20 @@ class TradValidator < ValidatorBase
       entry_name = biosample_line[:entry]
       if (!biosample_info[biosample_id].nil?) && (!biosample_info[biosample_id][:attribute_list].nil?) # BioSampleの情報が取得できる
         attr_list = biosample_info[biosample_id][:attribute_list]
-        target_attribute_list = attr_list.select{|attr| attr[:attribute_name] == attribute_name}
-        target_attribute_list.delete_if{|attr|  @conf[:bs_null_accepted].include?(attr[:attribute_value]) } # 属性値がnull相当の場合は入力無し扱いとする
+        target_attribute_list = attr_list.select {|attr| attr[:attribute_name] == attribute_name }
+        target_attribute_list.delete_if {|attr|  @conf[:bs_null_accepted].include?(attr[:attribute_value]) } # 属性値がnull相当の場合は入力無し扱いとする
         if target_attribute_list.any? # Biosampleの属性値はある
           flag = true
-          qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == entry_name}
+          qual_line = qual_data_list.select {|qual_line| qual_line[:entry] == entry_name }
           if qual_line.empty? # 同じエントリにqualifierデータがなければCOMMONの値を検索
-            qual_line = qual_data_list.select{|qual_line| qual_line[:entry] == "COMMON"}
+            qual_line = qual_data_list.select {|qual_line| qual_line[:entry] == 'COMMON' }
           end
           missing_qual_entry_list = []
           if qual_line.empty? # COMMONのqualifierにも記載がない場合には個別Entryの記載をチェック
-            if entry_name == "COMMON" #BioSampleIDがCOMMONに、qualifierがCOMMON以外に記載されているケースをカバー
-              #COMMON以外の全エントリに値があればOK
-              exist_entry_name_list = qual_data_list.map{|row| row[:entry]}
-              missing_qual_entry_list = all_entry_name_list - exist_entry_name_list - ["COMMON"]
+            if entry_name == 'COMMON' # BioSampleIDがCOMMONに、qualifierがCOMMON以外に記載されているケースをカバー
+              # COMMON以外の全エントリに値があればOK
+              exist_entry_name_list = qual_data_list.map {|row| row[:entry] }
+              missing_qual_entry_list = all_entry_name_list - exist_entry_name_list - ['COMMON']
               # 一つでも値がないエントリがあればNG。どのエントリに値がないかを確認
               if missing_qual_entry_list.any?
                 flag = false
@@ -1341,17 +1340,17 @@ class TradValidator < ValidatorBase
             end
           end
           if flag == false
-            biosample_attr_values = target_attribute_list.map{|attr| attr[:attribute_value]}.join(", ")
-            ret = false #1行でもエラーがあればfalse
+            biosample_attr_values = target_attribute_list.map {|attr| attr[:attribute_value] }.join(', ')
+            ret = false # 1行でもエラーがあればfalse
             annotation = [
-              {key: "Entry", value: missing_qual_entry_list.join(",")},
-              {key: "#{qualifier_name}", value: ""},
-              {key: "BioSample ID", value: biosample_id},
+              {key: 'Entry', value: missing_qual_entry_list.join(',')},
+              {key: "#{qualifier_name}", value: ''},
+              {key: 'BioSample ID', value: biosample_id},
               {key: "BioSample value[#{attribute_name}]", value: biosample_attr_values},
-              {key: "File name", value: @anno_file},
-              {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
+              {key: 'File name', value: @anno_file},
+              {key: 'Location', value: "Line: #{biosample_line[:line_no]}"}
             ]
-            annotation.push({key: "Message", value: "BioSample[#{biosample_id})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' is not used."})
+            annotation.push({key: 'Message', value: "BioSample[#{biosample_id})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' is not used."})
             add_error(rule_code, annotation)
           end
         end
@@ -1377,31 +1376,31 @@ class TradValidator < ValidatorBase
     ret = true
 
     # 他極データは無視
-    dblink_list.delete_if{|row|
-      (row[:qualifier] == "project" && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
-      (row[:qualifier] == "biosample" && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
-      (row[:qualifier] == "sequence read archive" && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
+    dblink_list.delete_if {|row|
+      (row[:qualifier] == 'project' && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == 'biosample' && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == 'sequence read archive' && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
     }
     # 記載されているbiosampleと同じ(or COMMOM)エントリにあるBioProjectIDとRunIDのリストを追加する。
-    #[{:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00060421", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[]},
+    # [{:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00060421", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[]},
     # {:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00056903", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[], :derived_biosample_id=>"SAMD00060421"}, <= note/derived_from属性値から取得したBioSampleID
     # {:entry=>"COMMON", :feature=>"DBLINK", :location=>"", :qualifier=>"biosample", :value=>"SAMD00056904", :line_no=>25, :bioproject_id_list=>["PRJDB5067"], :run_id_list=>[], :derived_biosample_id=>"SAMD00060421"}] <= note/derived_from属性値から取得したBioSampleID
     biosample_list = []
     biosample_id_list = []
-    biosample_line_by_entry = dblink_list.select{|row| row[:qualifier] == "biosample"}.group_by{|row| row[:enty]}
+    biosample_line_by_entry = dblink_list.select {|row| row[:qualifier] == 'biosample' }.group_by {|row| row[:enty] }
     biosample_line_by_entry.each do |entry, biosample_line_list|
       biosample_line_list.each do |biosample_line|
         biosample_line_with_id = biosample_line.dup
-        bioproject_line_list = dblink_list.select{|row| row[:qualifier] == "project" && row[:entry] == entry}
+        bioproject_line_list = dblink_list.select {|row| row[:qualifier] == 'project' && row[:entry] == entry }
         if bioproject_line_list.empty?
-          bioproject_line_list = dblink_list.select{|row| row[:qualifier] == "project" && row[:entry] == "COMMON"}
+          bioproject_line_list = dblink_list.select {|row| row[:qualifier] == 'project' && row[:entry] == 'COMMON' }
         end
-        run_line_list = dblink_list.select{|row| row[:qualifier] == "sequence read archive" && row[:entry] == entry}
+        run_line_list = dblink_list.select {|row| row[:qualifier] == 'sequence read archive' && row[:entry] == entry }
         if run_line_list.empty?
-          run_line_list = dblink_list.select{|row| row[:qualifier] == "sequence read archive" && row[:entry] == "COMMON"}
+          run_line_list = dblink_list.select {|row| row[:qualifier] == 'sequence read archive' && row[:entry] == 'COMMON' }
         end
-        biosample_line_with_id[:bioproject_id_list] = bioproject_line_list.map{|row| row[:value]}
-        biosample_line_with_id[:run_id_list] = run_line_list.map{|row| row[:value]}
+        biosample_line_with_id[:bioproject_id_list] = bioproject_line_list.map {|row| row[:value] }
+        biosample_line_with_id[:run_id_list] = run_line_list.map {|row| row[:value] }
 
         # note属性やderived_from属性に記載されているBioSampleIDの情報を加える
         biosample_id = biosample_line_with_id[:value]
@@ -1418,8 +1417,8 @@ class TradValidator < ValidatorBase
     # {"SAMD00060421"=>{:biosample_id=>"SAMD00060421", :smp_id=>"75930", :bioproject_accession_id_list=>[], :drr_accession_id_list=>[]},
     #  "SAMD00056903"=>{:biosample_id=>"SAMD00056903", :smp_id=>"69937", :bioproject_accession_id_list=>["PRJDB5067"], :drr_accession_id_list=>["DRR066661", "DRR066655"]},
     #  "SAMD00056904"=>{:biosample_id=>"SAMD00056904", :smp_id=>"69938", :bioproject_accession_id_list=>["PRJDB5067"], :drr_accession_id_list=>["DRR066656", "DRR066662", "DRR066667"]}}
-    biosample_list_with_project_run_id_on_db = @db_validator.get_biosample_related_id(biosample_id_list).group_by{|row| row[:biosample_id]}
-    biosample_list_with_project_run_id_on_db.each {|biosample_id, list| biosample_list_with_project_run_id_on_db[biosample_id] = list.first}
+    biosample_list_with_project_run_id_on_db = @db_validator.get_biosample_related_id(biosample_id_list).group_by {|row| row[:biosample_id] }
+    biosample_list_with_project_run_id_on_db.each {|biosample_id, list| biosample_list_with_project_run_id_on_db[biosample_id] = list.first }
 
     biosample_list.each do |biosample_line|
       biosample_id = biosample_line[:value]
@@ -1444,10 +1443,10 @@ class TradValidator < ValidatorBase
         if extra_bioproject_id.any?
           ret = false
           annotation = [
-            {key: "DBLINK/biosample", value: biosample_id},
-            {key: "DBLINK/project", value: extra_bioproject_id.join(", ")},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
+            {key: 'DBLINK/biosample', value: biosample_id},
+            {key: 'DBLINK/project', value: extra_bioproject_id.join(', ')},
+            {key: 'File name', value: @anno_file},
+            {key: 'Location', value: "Line: #{biosample_line[:line_no]}"}
           ]
           add_error(rule_code, annotation)
         end
@@ -1458,10 +1457,10 @@ class TradValidator < ValidatorBase
       if extra_run_id.any?
         ret = false
         annotation = [
-          {key: "DBLINK/biosample", value: biosample_id},
-          {key: "DBLINK/sequence read archive", value: extra_run_id.join(", ")},
-          {key: "File name", value: @anno_file},
-          {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
+          {key: 'DBLINK/biosample', value: biosample_id},
+          {key: 'DBLINK/sequence read archive', value: extra_run_id.join(', ')},
+          {key: 'File name', value: @anno_file},
+          {key: 'Location', value: "Line: #{biosample_line[:line_no]}"}
         ]
         add_error(rule_code, annotation)
       end
@@ -1484,29 +1483,29 @@ class TradValidator < ValidatorBase
   #
   def inconsistent_submitter(rule_code, dblink_list, submitter_id)
     return nil if dblink_list.nil? || dblink_list.empty?
-    return nil if submitter_id.nil? || submitter_id == ""
+    return nil if submitter_id.nil? || submitter_id == ''
     return nil if @db_validator.nil?
     ret = true
 
     # 他極データは無視
-    dblink_list.delete_if{|row|
-      (row[:qualifier] == "project" && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
-      (row[:qualifier] == "biosample" && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
-      (row[:qualifier] == "sequence read archive" && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
+    dblink_list.delete_if {|row|
+      (row[:qualifier] == 'project' && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == 'biosample' && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
+      (row[:qualifier] == 'sequence read archive' && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
     }
     unmatch_submitter_accession_list = []
-    features = dblink_list.group_by{|row| row[:qualifier]}
+    features = dblink_list.group_by {|row| row[:qualifier] }
     features.each do |link_type, lines|
-      if link_type ==  "project"
-        bioproject_id_list = lines.map{|line| line[:value]}
+      if link_type ==  'project'
+        bioproject_id_list = lines.map {|line| line[:value] }
         with_submitter_list = @db_validator.get_bioproject_submitter_ids(bioproject_id_list)
         unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
-      elsif link_type == "biosample"
-        biosample_id_list = lines.map{|line| line[:value]}
+      elsif link_type == 'biosample'
+        biosample_id_list = lines.map {|line| line[:value] }
         with_submitter_list = @db_validator.get_biosample_submitter_ids(biosample_id_list)
         unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
-      elsif link_type == "sequence read archive"
-        run_id_list = lines.map{|line| line[:value]}
+      elsif link_type == 'sequence read archive'
+        run_id_list = lines.map {|line| line[:value] }
         with_submitter_list = @db_validator.get_run_submitter_ids(run_id_list)
         unmatch_submitter_accession_list.concat(unmatch_submitter_id(link_type, lines, with_submitter_list, submitter_id))
       end
@@ -1515,10 +1514,10 @@ class TradValidator < ValidatorBase
       ret = false
       unmatch_submitter_accession_list.each do |error_line|
         annotation = [
-          {key: "DBLINK", value: error_line[:value]},
-          {key: "Trad submitter_id", value: submitter_id},
-          {key: "File name", value: @anno_file},
-          {key: "Location", value: "Line: #{error_line[:line_no]}"}
+          {key: 'DBLINK', value: error_line[:value]},
+          {key: 'Trad submitter_id', value: submitter_id},
+          {key: 'File name', value: @anno_file},
+          {key: 'Location', value: "Line: #{error_line[:line_no]}"}
         ]
         add_error(rule_code, annotation)
       end
@@ -1540,19 +1539,19 @@ class TradValidator < ValidatorBase
   # unmatch_list: submitter_idが一致しないDBLINKのannotation行のリスト。accession_idがDBに登録のないIDである場合にもリストに含む。submitter_idが全て一致した場合には空のリストを返す
   #
   def unmatch_submitter_id(type, dblink_list, with_submitter_id_list, submitter_id)
-    return [] if submitter_id.nil? || submitter_id == ""
-    if type == "project"
-      key = "bioproject_id"
-    elsif type == "biosample"
-      key = "biosample_id"
-    elsif type == "sequence read archive"
-      key = "run_id"
+    return [] if submitter_id.nil? || submitter_id == ''
+    if type == 'project'
+      key = 'bioproject_id'
+    elsif type == 'biosample'
+      key = 'biosample_id'
+    elsif type == 'sequence read archive'
+      key = 'run_id'
     else
       return []
     end
     unmatch_list = []
     dblink_list.each do |dblink|
-      hit_list = with_submitter_id_list.select{|row| row[key.to_sym] == dblink[:value] }
+      hit_list = with_submitter_id_list.select {|row| row[key.to_sym] == dblink[:value] }
       if hit_list.empty?
       else
         hit_list.each do |hit|
@@ -1588,71 +1587,71 @@ class TradValidator < ValidatorBase
 
     ret = true
     # 対応するBioSampleとそのorganismとstrain属性値を取得
-    organism_data_list_with_bs_value = corresponding_biosample_attr_value(orgnism_data_list, biosample_data_list, biosample_info, "organism")
-    strain_data_list_with_bs_value = corresponding_biosample_attr_value(strain_data_list, biosample_data_list, biosample_info, "strain")
+    organism_data_list_with_bs_value = corresponding_biosample_attr_value(orgnism_data_list, biosample_data_list, biosample_info, 'organism')
+    strain_data_list_with_bs_value = corresponding_biosample_attr_value(strain_data_list, biosample_data_list, biosample_info, 'strain')
     organism_data_list_with_bs_value.each do |organism_line|
       check = true
-      message = ""
+      message = ''
       trad_organism_value = organism_line[:value]
-      unless organism_line[:biosample].nil? #対応biosampleがある
-        biosample_organism_attr_values = ""
-        biosample_strain_attr_values = ""
-        trad_strain_value = ""
+      unless organism_line[:biosample].nil? # 対応biosampleがある
+        biosample_organism_attr_values = ''
+        biosample_strain_attr_values = ''
+        trad_strain_value = ''
         # /organismと同じfeatureに/strainの記述があれば対応するBioSampleのstrain属性を取得する
-        strain_lines = strain_data_list_with_bs_value.select{|strain_line| strain_line[:feature_no] == organism_line[:feature_no]}
+        strain_lines = strain_data_list_with_bs_value.select {|strain_line| strain_line[:feature_no] == organism_line[:feature_no] }
         if strain_lines.any?
           trad_strain_value = strain_lines.first[:value]
           unless strain_lines.first[:biosample][:attr_value_list].nil?
-            biosample_strain_attr_values = strain_lines.first[:biosample][:attr_value_list].join(", ")
+            biosample_strain_attr_values = strain_lines.first[:biosample][:attr_value_list].join(', ')
           end
         end
-        if organism_line[:biosample][:attr_value_list].nil? #organism属性がない(mandatory属性なのでまずここは通らない)
+        if organism_line[:biosample][:attr_value_list].nil? # organism属性がない(mandatory属性なのでまずここは通らない)
           check = false
-          message = "The organism attribute is not used in BioSample."
+          message = 'The organism attribute is not used in BioSample.'
         else # organism属性がある
           if !organism_line[:biosample][:attr_value_list].include?(trad_organism_value) # organismの値が異なる
             check = false
-            biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
-            message = "Value of organism qualifier is not matched with BioSample attribute."
-          else #organismの値が一致する場合はstrainのチェックを行う
-            biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(", ")
-            if strain_lines.any? #annotation側に/strainの記述がある
-              if strain_lines.first[:biosample][:attr_value_list].nil? #strain属性がない
+            biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(', ')
+            message = 'Value of organism qualifier is not matched with BioSample attribute.'
+          else # organismの値が一致する場合はstrainのチェックを行う
+            biosample_organism_attr_values = organism_line[:biosample][:attr_value_list].join(', ')
+            if strain_lines.any? # annotation側に/strainの記述がある
+              if strain_lines.first[:biosample][:attr_value_list].nil? # strain属性がない
                 check = false
-                message = "The strain attribute is not used in BioSample."
+                message = 'The strain attribute is not used in BioSample.'
               else
                 strain_attr_list = strain_lines.first[:biosample][:attr_value_list].dup
-                strain_attr_list.delete_if{|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
+                strain_attr_list.delete_if {|attr_value|  @conf[:bs_null_accepted].include?(attr_value) } # 属性値がnull相当の場合は入力無し扱いとする
                 if !strain_attr_list.include?(trad_strain_value) # strainの値が異なる
                   check = false
-                  message = "Value of strain qualifier is not matched with BioSample attribute."
+                  message = 'Value of strain qualifier is not matched with BioSample attribute.'
                 end
               end
-            else #annotation側に/strainの記述がない
-              #organismのbiosampleidを辿ってstrain属性値を取得
+            else # annotation側に/strainの記述がない
+              # organismのbiosampleidを辿ってstrain属性値を取得
               bs_info = biosample_info[organism_line[:biosample][:biosample_id]]
-              strain_attr_values = bs_info[:attribute_list].select{|attr| attr[:attribute_name] == 'strain'}
+              strain_attr_values = bs_info[:attribute_list].select {|attr| attr[:attribute_name] == 'strain' }
               # TODO ここでmissing等の値を除外するか
               if strain_attr_values.any? # BioSample側にはstrainの記述がある
                 check = false
-                biosample_strain_attr_values = strain_attr_values.map{|attr| attr[:attribute_value]}.join(", ")
-                message = "The strain qualifier is not found, though the strain attribute is used in BioSample."
+                biosample_strain_attr_values = strain_attr_values.map {|attr| attr[:attribute_value] }.join(', ')
+                message = 'The strain qualifier is not found, though the strain attribute is used in BioSample.'
               end
             end
           end
         end
         if check == false
-          ret = false #1行でもエラーがあればfalse
+          ret = false # 1行でもエラーがあればfalse
           annotation = [
-            {key: "organism", value: trad_organism_value},
-            {key: "strain", value: trad_strain_value},
-            {key: "BioSample value[organism]", value: biosample_organism_attr_values},
-            {key: "BioSample value[strain]", value: biosample_strain_attr_values},
-            {key: "BioSample ID", value: organism_line[:biosample][:biosample_id]},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{organism_line[:line_no]}"}
+            {key: 'organism', value: trad_organism_value},
+            {key: 'strain', value: trad_strain_value},
+            {key: 'BioSample value[organism]', value: biosample_organism_attr_values},
+            {key: 'BioSample value[strain]', value: biosample_strain_attr_values},
+            {key: 'BioSample ID', value: organism_line[:biosample][:biosample_id]},
+            {key: 'File name', value: @anno_file},
+            {key: 'Location', value: "Line: #{organism_line[:line_no]}"}
           ]
-          annotation.push({key: "Message", value: message}) unless message == ""
+          annotation.push({key: 'Message', value: message}) unless message == ''
           add_error(rule_code, annotation)
         end
       end
@@ -1681,8 +1680,8 @@ class TradValidator < ValidatorBase
     return nil if isolate_data_list.nil?
     ret = true
 
-    inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info, "isolate", "isolate")
-    missing_qual = missing_qualifier_against_biosample(rule_code, isolate_data_list, all_entry_name_list, biosample_data_list, biosample_info, "isolate", "isolate")
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolate_data_list, biosample_data_list, biosample_info, 'isolate', 'isolate')
+    missing_qual = missing_qualifier_against_biosample(rule_code, isolate_data_list, all_entry_name_list, biosample_data_list, biosample_info, 'isolate', 'isolate')
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1707,8 +1706,8 @@ class TradValidator < ValidatorBase
     return nil if isolation_source_data_list.nil?
     ret = true
 
-    inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
-    missing_qual = missing_qualifier_against_biosample(rule_code, isolation_source_data_list, all_entry_name_list, biosample_data_list, biosample_info, "isolation_source", "isolation_source")
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, isolation_source_data_list, biosample_data_list, biosample_info, 'isolation_source', 'isolation_source')
+    missing_qual = missing_qualifier_against_biosample(rule_code, isolation_source_data_list, all_entry_name_list, biosample_data_list, biosample_info, 'isolation_source', 'isolation_source')
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1733,8 +1732,8 @@ class TradValidator < ValidatorBase
     return nil if collection_date_data_list.nil?
     ret = true
 
-    inconsistent = inconsistent_qualifier_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
-    missing_qual = missing_qualifier_against_biosample(rule_code, collection_date_data_list, all_entry_name_list, biosample_data_list, biosample_info, "collection_date", "collection_date")
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, collection_date_data_list, biosample_data_list, biosample_info, 'collection_date', 'collection_date')
+    missing_qual = missing_qualifier_against_biosample(rule_code, collection_date_data_list, all_entry_name_list, biosample_data_list, biosample_info, 'collection_date', 'collection_date')
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1759,8 +1758,8 @@ class TradValidator < ValidatorBase
   def inconsistent_country_with_biosample(rule_code, country_data_list, all_entry_name_list, biosample_data_list, biosample_info)
     return nil if country_data_list.nil?
     ret = true
-    inconsistent = inconsistent_qualifier_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
-    missing_qual = missing_qualifier_against_biosample(rule_code, country_data_list, all_entry_name_list, biosample_data_list, biosample_info, "country", "geo_loc_name")
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, country_data_list, biosample_data_list, biosample_info, 'country', 'geo_loc_name')
+    missing_qual = missing_qualifier_against_biosample(rule_code, country_data_list, all_entry_name_list, biosample_data_list, biosample_info, 'country', 'geo_loc_name')
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1781,22 +1780,22 @@ class TradValidator < ValidatorBase
   def inconsistent_locus_tag_with_biosample(rule_code, locus_tag_data_list, biosample_data_list, biosample_info)
     return nil if locus_tag_data_list.nil? || locus_tag_data_list.empty?
     ret = true
-    locus_tag_data_list_with_bs_value = corresponding_biosample_attr_value(locus_tag_data_list, biosample_data_list, biosample_info, "locus_tag_prefix")
+    locus_tag_data_list_with_bs_value = corresponding_biosample_attr_value(locus_tag_data_list, biosample_data_list, biosample_info, 'locus_tag_prefix')
     faild_list = []
     locus_tag_data_list_with_bs_value.each do |locus_tag_line|
       check = true
-      message = ""
+      message = ''
       trad_locus_tag_value = locus_tag_line[:value]
       unless locus_tag_line[:biosample].nil?
         # /locus_tagは　"#{locus_tag_prefix}_XXXX"形式
-        trad_locus_tag_prefix_name = trad_locus_tag_value.split("_").first.chomp.strip
+        trad_locus_tag_prefix_name = trad_locus_tag_value.split('_').first.chomp.strip
         locus_tag_line[:trad_locus_tag_prefix_value] = trad_locus_tag_prefix_name
         if locus_tag_line[:biosample][:attr_value_list].nil?
-          locus_tag_line[:biosample_attr_values] = "(not described)"
+          locus_tag_line[:biosample_attr_values] = '(not described)'
           faild_list.push(locus_tag_line)
         else
           if !locus_tag_line[:biosample][:attr_value_list].include?(trad_locus_tag_prefix_name)
-            biosample_attr_values = locus_tag_line[:biosample][:attr_value_list].join(", ")
+            biosample_attr_values = locus_tag_line[:biosample][:attr_value_list].join(', ')
             locus_tag_line[:biosample_attr_values] = biosample_attr_values
             faild_list.push(locus_tag_line)
           end
@@ -1806,14 +1805,14 @@ class TradValidator < ValidatorBase
 
     # locus_tagは大量に記述されている可能性があるため、locus_tag_prefix単位にまとめてエラーを出力
     if faild_list.any?
-      ret = false #1行でもエラーがあればfalse
-      faild_list.group_by{|row| row[:trad_locus_tag_prefix_value]}.each do |locus_tag_prefix, lines|
+      ret = false # 1行でもエラーがあればfalse
+      faild_list.group_by {|row| row[:trad_locus_tag_prefix_value] }.each do |locus_tag_prefix, lines|
         annotation = [
-          {key: "locus_tag", value: locus_tag_prefix},
-          {key: "BioSample value[locus_tag]", value: lines.map{|row| row[:biosample_attr_values]}.uniq.join(", ")},
-          {key: "BioSample ID", value: lines.map{|row| row[:biosample][:biosample_id]}.uniq.join(", ")},
-          {key: "File name", value: @anno_file},
-          {key: "Location", value: "Line: #{lines.map{|row| row[:line_no].to_s}.join(", ")}"}
+          {key: 'locus_tag', value: locus_tag_prefix},
+          {key: 'BioSample value[locus_tag]', value: lines.map {|row| row[:biosample_attr_values] }.uniq.join(', ')},
+          {key: 'BioSample ID', value: lines.map {|row| row[:biosample][:biosample_id] }.uniq.join(', ')},
+          {key: 'File name', value: @anno_file},
+          {key: 'Location', value: "Line: #{lines.map {|row| row[:line_no].to_s }.join(", ")}"}
         ]
         add_error(rule_code, annotation)
       end
@@ -1843,56 +1842,56 @@ class TradValidator < ValidatorBase
   def duplicate_locus_tag(rule_code, locus_tag_data_list, annotation_line_list)
     return nil if locus_tag_data_list.nil? || locus_tag_data_list.empty?
     ret = true
-    locus_tag_group = locus_tag_data_list.group_by{|row| row[:value]}
+    locus_tag_group = locus_tag_data_list.group_by {|row| row[:value] }
     duplicated_locus_tag = {}
     locus_tag_group.each do |locus_tag_value, lines|
       if lines.size > 1 # locus_tagの値に重複がある
         duplicated_locus_tag[locus_tag_value] = lines
       end
     end
-    if duplicated_locus_tag.keys.any? #重複データが一つでもある場合
-      all_features = annotation_line_list.group_by{|row| row[:feature_no]} #全行を出現feature毎にグルーピング
+    if duplicated_locus_tag.keys.any? # 重複データが一つでもある場合
+      all_features = annotation_line_list.group_by {|row| row[:feature_no] } # 全行を出現feature毎にグルーピング
       duplicated_locus_tag.each do |locus_tag_value, lines|
         duplicated = false
         gene_value_list = []
         entry_value_list = []
         feature_name_list = []
-        message = ""
+        message = ''
         lines.each do |line|
-          line[:same_feature_lines] = all_features[line[:feature_no]] #同じfeatureの行を取得
-          gene_value_list.concat(line[:same_feature_lines].select{|row| row[:qualifier] == "gene"}.map{|row| row[:value]}) # 同じfeatureのgeneの値を取得
+          line[:same_feature_lines] = all_features[line[:feature_no]] # 同じfeatureの行を取得
+          gene_value_list.concat(line[:same_feature_lines].select {|row| row[:qualifier] == 'gene' }.map {|row| row[:value] }) # 同じfeatureのgeneの値を取得
           feature_name_list.push(line[:feature])
           entry_value_list.push(line[:entry])
         end
         if entry_value_list.compact.uniq.size > 1 # 複数のentryまたがって同じlocus_tagが使用されるのはNG
           duplicated = true
-          message = "Not use the same value in two or more entries."
+          message = 'Not use the same value in two or more entries.'
         elsif gene_value_list.compact.uniq.size > 1 # geneの値が全て同じ(一種類)であればlocus_tagの値が同一であっても問題ない
           if feature_name_list.size > feature_name_list.uniq.size
             # 同じfeature("CDS"等が含まれている場合はNG)
             duplicated = true
-            message = "Not use the same value for different genes."
+            message = 'Not use the same value for different genes.'
           else
             # 特定のfeature種の組合せの場合には許容する
-            if (feature_name_list - ["regulatory", "mRNA", "5’UTR", "3’UTR", "CDS", "exon", "intron", "sig_peptide", "propeptide", "mat_peptide", "transit_peptide"]).empty?
-            elsif (feature_name_list - ["rRNA", "exon", "intron"]).empty?
-            elsif (feature_name_list - ["tRNA", "exon", "intron"]).empty?
-            elsif (feature_name_list - ["nc_RNA", "exon", "intron"]).empty?
-            elsif (feature_name_list - ["tmRNA", "exon", "intron"]).empty?
+            if (feature_name_list - ['regulatory', 'mRNA', '5’UTR', '3’UTR', 'CDS', 'exon', 'intron', 'sig_peptide', 'propeptide', 'mat_peptide', 'transit_peptide']).empty?
+            elsif (feature_name_list - ['rRNA', 'exon', 'intron']).empty?
+            elsif (feature_name_list - ['tRNA', 'exon', 'intron']).empty?
+            elsif (feature_name_list - ['nc_RNA', 'exon', 'intron']).empty?
+            elsif (feature_name_list - ['tmRNA', 'exon', 'intron']).empty?
             else
               duplicated = true
-              message = "Not use the same locus_tag for different genes."
+              message = 'Not use the same locus_tag for different genes.'
             end
           end
         end
-        if duplicated == true #許容できない重複がある
+        if duplicated == true # 許容できない重複がある
           ret = false
-          line_no = lines.map{|row| row[:line_no]}.sort.map{|line_no| line_no.to_s}.join(", ")
+          line_no = lines.map {|row| row[:line_no] }.sort.map {|line_no| line_no.to_s }.join(', ')
           annotation = [
-            {key: "locus_tag", value: locus_tag_value},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{line_no}"},
-            {key: "Message", value: message}
+            {key: 'locus_tag', value: locus_tag_value},
+            {key: 'File name', value: @anno_file},
+            {key: 'Location', value: "Line: #{line_no}"},
+            {key: 'Message', value: message}
           ]
           add_error(rule_code, annotation)
         end
@@ -1916,19 +1915,19 @@ class TradValidator < ValidatorBase
     anno_by_feat.each do |feature, lines|
       if @conf[:locus_tag_require_features].include?(feature) # locus_tagの記述が望ましいfeatureであれば
         location_list = []
-        feature_group = lines.group_by{|row| row[:feature_no]} # 個々のfeature毎にgrouping
+        feature_group = lines.group_by {|row| row[:feature_no] } # 個々のfeature毎にgrouping
         feature_group.each do |feature_no, feature_line|
-          locus_tag_line = feature_line.select{|row| row[:qualifier] == "locus_tag"}
+          locus_tag_line = feature_line.select {|row| row[:qualifier] == 'locus_tag' }
           if locus_tag_line.empty? # locus_tagの記述が見当たらない
             ret = false
-            location_list.push(feature_line.map{|row| row[:line_no]}.min)
+            location_list.push(feature_line.map {|row| row[:line_no] }.min)
           end
         end
         if location_list.any?
           annotation = [
-            {key: "feature", value: feature},
-            {key: "File name", value: @anno_file},
-            {key: "Location", value: "Line: #{location_list.sort.map{|line_no| line_no.to_s}.join(", ")}"}
+            {key: 'feature', value: feature},
+            {key: 'File name', value: @anno_file},
+            {key: 'Location', value: "Line: #{location_list.sort.map {|line_no| line_no.to_s }.join(", ")}"}
           ]
           add_error(rule_code, annotation)
         end
@@ -1959,8 +1958,8 @@ class TradValidator < ValidatorBase
     return nil if culture_collection_data_list.nil?
     ret = true
 
-    inconsistent = inconsistent_qualifier_with_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
-    missing_qual = missing_qualifier_against_biosample(rule_code, culture_collection_data_list, all_entry_name_list, biosample_data_list, biosample_info, "culture_collection", "culture_collection")
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, culture_collection_data_list, biosample_data_list, biosample_info, 'culture_collection', 'culture_collection')
+    missing_qual = missing_qualifier_against_biosample(rule_code, culture_collection_data_list, all_entry_name_list, biosample_data_list, biosample_info, 'culture_collection', 'culture_collection')
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -1989,8 +1988,8 @@ class TradValidator < ValidatorBase
     return nil if host_data_list.nil?
     ret = true
 
-    inconsistent = inconsistent_qualifier_with_biosample(rule_code, host_data_list, biosample_data_list, biosample_info, "host", "host")
-    missing_qual = missing_qualifier_against_biosample(rule_code, host_data_list, all_entry_name_list, biosample_data_list, biosample_info, "host", "host")
+    inconsistent = inconsistent_qualifier_with_biosample(rule_code, host_data_list, biosample_data_list, biosample_info, 'host', 'host')
+    missing_qual = missing_qualifier_against_biosample(rule_code, host_data_list, all_entry_name_list, biosample_data_list, biosample_info, 'host', 'host')
     if inconsistent == false || missing_qual == false
       ret = false
     end
@@ -2011,16 +2010,16 @@ class TradValidator < ValidatorBase
     return nil if dblink_list.nil? || dblink_list.empty?
     ret = true
 
-    dblink_list.each{|row|
-      if ((row[:qualifier] == "project" && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
-         (row[:qualifier] == "biosample" && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
-         (row[:qualifier] == "sequence read archive" && row[:value] =~ /^(S|E)RR\w?\d{1,}$/))
+    dblink_list.each {|row|
+      if (row[:qualifier] == 'project' && row[:value] =~ /^PRJ(E|N)\w?\d{1,}$/) ||
+         (row[:qualifier] == 'biosample' && row[:value] =~ /^SAM(E|N)\w?\d{1,}$/) ||
+         (row[:qualifier] == 'sequence read archive' && row[:value] =~ /^(S|E)RR\w?\d{1,}$/)
 
         ret = false
         annotation = [
           {key: "DBLINK/#{row[:qualifier]}", value: row[:value]},
-          {key: "File name", value: @anno_file},
-          {key: "Location", value: "Line: #{row[:line_no]}"}
+          {key: 'File name', value: @anno_file},
+          {key: 'Location', value: "Line: #{row[:line_no]}"}
         ]
         add_error(rule_code, annotation)
       end
@@ -2047,11 +2046,11 @@ class TradValidator < ValidatorBase
       bioproject_accession = row[:value]
       if bioproject_accession =~ /^PRJD\w?\d{1,}$/
         is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
-        if is_umbrella == true #NG
+        if is_umbrella == true # NG
           annotation = [
-              {key: "DBLINK/project", value: bioproject_accession},
-              {key: "File name", value: @anno_file},
-              {key: "Location", value: "Line: #{row[:line_no]}"}
+              {key: 'DBLINK/project', value: bioproject_accession},
+              {key: 'File name', value: @anno_file},
+              {key: 'Location', value: "Line: #{row[:line_no]}"}
           ]
           add_error(rule_code, annotation)
           ret = false

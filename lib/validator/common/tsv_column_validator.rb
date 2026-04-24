@@ -1,8 +1,7 @@
-require_relative "../auto_annotator/auto_annotator_json"
+require_relative '../auto_annotator/auto_annotator_json'
 
 # BioSample/MetaboBank(SDRF)のような一列目に項目名を記述するTSV(あるいはそれをJSONに変換した)形式を処理するクラス
 class TsvColumnValidator
-
   def initialize
     @row_count_offset = 0 # header記述前のコメント行のカウント.auto_annotation等で必要
   end
@@ -42,8 +41,8 @@ class TsvColumnValidator
 
     header = {}
     tsv_data.each do |row|
-      if header == {} && (row.empty? || row[0].nil? || row[0].to_s.chomp.strip.start_with?("#")) #ヘッダー前のコメント行や空白行は無視
-        @row_count_offset += 1  #行数表示用に残しておく
+      if header == {} && (row.empty? || row[0].nil? || row[0].to_s.chomp.strip.start_with?('#')) # ヘッダー前のコメント行や空白行は無視
+        @row_count_offset += 1  # 行数表示用に残しておく
         next
       end
       if header == {} # 上記以外であればヘッダーを設定する
@@ -54,9 +53,9 @@ class TsvColumnValidator
         row_data = []
         row.each_with_index do |cell, idx|
           unless header[idx].nil?
-            data = {"key" => header[idx],  "value" => cell}
+            data = {'key' => header[idx],  'value' => cell}
           else # ヘッダーがない場所に値が記載されている
-            data = {"key" => "",  "value" => cell}
+            data = {'key' => '',  'value' => cell}
           end
           row_data.push(data)
         end
@@ -85,7 +84,7 @@ class TsvColumnValidator
     data_list = tsv2ojb(tsv_data)
     package_id = nil
     tsv_data.each do |row|
-      if !row[0].nil? && row[0].to_s.chomp.strip.start_with?("# Package") #package名を取得
+      if !row[0].nil? && row[0].to_s.chomp.strip.start_with?('# Package') # package名を取得
         if m = row[0].match(/^# Package:(\s)?(?<package_id> [^,]+).*/)
           package_id = m[:package_id].strip
           break
@@ -110,57 +109,57 @@ class TsvColumnValidator
   # 元ファイルがJSONの場合 {position_list: [10, "values", 0]} # data[10]["values"][0]の値を修正
   # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値を修正
   #
-  def auto_annotation_location_with_index(data_format, line_num, attr_no, key_or_value, line_offset=0, column_offset=0)
+  def auto_annotation_location_with_index(data_format, line_num, attr_no, key_or_value, line_offset = 0, column_offset = 0)
     location = nil
-    line_idx = line_num -  1 #line_numは1始まりなので -1 する
+    line_idx = line_num -  1 # line_numは1始まりなので -1 する
     attr_idx = attr_no - 1 # attr_noも1始まりなので -1 する
-    attr_idx += column_offset #属性ではない制御用の列("_package"等)の分のindexをズラす
+    attr_idx += column_offset # 属性ではない制御用の列("_package"等)の分のindexをズラす
     if data_format == 'json'
       location = {position_list: [line_idx, attr_idx, key_or_value]}
     elsif data_format == 'tsv'
-      if key_or_value == "key" # ヘッダーの修正
-        location = {row_index: line_offset, column_index: attr_idx }
+      if key_or_value == 'key' # ヘッダーの修正
+        location = {row_index: line_offset, column_index: attr_idx}
       else # 値の修正
-        location = {row_index: row_index_on_tsv(line_num), column_index: attr_idx} #コメント行 + ヘッダーの1行をオフセット
+        location = {row_index: row_index_on_tsv(line_num), column_index: attr_idx} # コメント行 + ヘッダーの1行をオフセット
       end
     end
     location
   end
 
   def row_index_on_tsv(line_num)
-    line_offset = row_count_offset #ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
-    line_idx = line_num -  1 #line_numは1始まりなので -1
-    row_idx = line_idx + line_offset + 1 #コメント行 + ヘッダーの1行をオフセット
+    line_offset = row_count_offset # ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
+    line_idx = line_num -  1 # line_numは1始まりなので -1
+    row_idx = line_idx + line_offset + 1 # コメント行 + ヘッダーの1行をオフセット
     row_idx
   end
 
   # non-ASCIIが含まれていないか
-  def non_ascii_characters (data, ignore_field_list=nil)
+  def non_ascii_characters (data, ignore_field_list = nil)
     invalid_list = []
     data.each_with_index do |row, row_idx|
       if row_idx == 0 # ヘッダー値のチェック
         row.each_with_index do |column, column_idx|
-          next if column["key"].nil?
-          unless column["key"].ascii_only? # ヘッダー名のチェック
-            disp_txt = replace_invalid_char(column["key"])
-            invalid_list.push({column_name: column["key"],  disp_txt: disp_txt, column_idx: column_idx})
+          next if column['key'].nil?
+          unless column['key'].ascii_only? # ヘッダー名のチェック
+            disp_txt = replace_invalid_char(column['key'])
+            invalid_list.push({column_name: column['key'],  disp_txt: disp_txt, column_idx: column_idx})
           end
         end
       end
 
       # 値のチェック
       row.each_with_index do |column, column_idx|
-        next if column["value"].nil?
-        unless column["value"].ascii_only? #値のチェック
-          disp_txt = replace_invalid_char(column["value"])
-          invalid_list.push({column_name: column["key"], value: column["value"],  disp_txt: disp_txt, row_idx: row_idx, column_idx: column_idx})
+        next if column['value'].nil?
+        unless column['value'].ascii_only? # 値のチェック
+          disp_txt = replace_invalid_char(column['value'])
+          invalid_list.push({column_name: column['key'], value: column['value'],  disp_txt: disp_txt, row_idx: row_idx, column_idx: column_idx})
         end
       end
     end
     invalid_list
   end
   def replace_invalid_char(text)
-    disp_txt = "" # どこにnon ascii文字があるか示すメッセージを作成
+    disp_txt = '' # どこにnon ascii文字があるか示すメッセージを作成
     text.each_char do |ch|
       if ch.ascii_only?
         disp_txt << ch.to_s
@@ -179,7 +178,7 @@ class TsvColumnValidator
     first_key_list = []
     input_data[0].each do |cell|
       row.each do |cell|
-        first_key_list.push(cell["key"])
+        first_key_list.push(cell['key'])
       end
     end
     aligned_keys = true
@@ -187,25 +186,25 @@ class TsvColumnValidator
     input_data.each do |row|
       key_list = []
       row.each do |cell|
-        key_list.push(cell["key"])
+        key_list.push(cell['key'])
       end
       unless first_key_list == key_list
         aligned_keys = false
       end
     end
     if aligned_keys == true
-      return nil # TODO keyが揃っていなければTSV変換しない。正しく出来ないケースがある
+      nil # TODO keyが揃っていなければTSV変換しない。正しく出来ないケースがある
     else
       header_list = all_header_list.first
-      CSV.open(output_file, "w", col_sep: "\t") do |csv|
+      CSV.open(output_file, 'w', col_sep: "\t") do |csv|
         csv << header_list
         input_data.each do |row|
           row_data = []
           row.each do |cell|
-            if cell["value"].nil? || cell["value"] == ""
+            if cell['value'].nil? || cell['value'] == ''
               value = nil
             else
-              value = cell["value"]
+              value = cell['value']
             end
             row_data.push(value)
           end
@@ -219,7 +218,7 @@ class TsvColumnValidator
   def convert_tsv2json(input_file, output_file)
     file_content = FileParser.new.get_file_data(input_file)
     data = tsv2ojb(file_content[:data])
-    File.open(output_file, "w") do |out|
+    File.open(output_file, 'w') do |out|
       out.puts JSON.generate(data)
     end
   end
@@ -232,13 +231,12 @@ class TsvColumnValidator
       sample_list = data[:data_list]
     else # package_idがヘッダーから取得できる場合には各サンプルに"_package"という属性で追加する
       data[:data_list].each do |sample|
-        sample.unshift({key: "_package", value: data[:package_id]})
+        sample.unshift({key: '_package', value: data[:package_id]})
       end
       sample_list = data[:data_list]
     end
-    File.open(output_file, "w") do |out|
+    File.open(output_file, 'w') do |out|
       out.puts JSON.generate(sample_list)
     end
   end
-
 end

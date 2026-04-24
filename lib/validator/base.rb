@@ -1,8 +1,7 @@
-require_relative "common/error_builder"
-require_relative "common/ncbi_eutils"
+require_relative 'common/error_builder'
+require_relative 'common/ncbi_eutils'
 
 class ValidatorBase
-
   def initialize
     @conf = read_common_config
     @validation_config = {}
@@ -41,7 +40,7 @@ class ValidatorBase
   # source: error_obj の source フィールド (default: @data_file)
   #
   def add_error (rule_code, annotation, auto_annotation: false, source: @data_file)
-    add_raw_error(@validation_config["rule" + rule_code], annotation, auto_annotation: auto_annotation, source: source)
+    add_raw_error(@validation_config['rule' + rule_code], annotation, auto_annotation: auto_annotation, source: source)
   end
 
   #
@@ -65,7 +64,7 @@ class ValidatorBase
   def output_exception_log(ex, message)
     message += "#{ex.message} (#{ex.class})"
     @log.error(message)
-    trace = ex.backtrace.map {|row| row}.join("\n")
+    trace = ex.backtrace.map {|row| row }.join("\n")
     @log.error(trace)
   end
 
@@ -90,8 +89,8 @@ class ValidatorBase
       result
     else
       annotation = [
-        {key: "XML file", value: @data_file},
-        {key: "XML error message", value: xml_error_msg}
+        {key: 'XML file', value: @data_file},
+        {key: 'XML error message', value: xml_error_msg}
       ]
       add_error(rule_code, annotation)
       false
@@ -107,7 +106,7 @@ class ValidatorBase
   # ==== Return
   # true/false
   #
-  def xml_data_schema (rule_code, xml_file, xsd_path) #TODO add object
+  def xml_data_schema (rule_code, xml_file, xsd_path) # TODO add object
     result = true
     xsddoc = Nokogiri::XML(File.read(xsd_path), xsd_path)
     schema = Nokogiri::XML::Schema.from_document(xsddoc)
@@ -118,8 +117,8 @@ class ValidatorBase
     else
       schema.validate(document).each do |error|
         annotation = [
-          {key: "XML file", value: @data_file},
-          {key: "XSD error message", value: error.message}
+          {key: 'XML file', value: @data_file},
+          {key: 'XSD error message', value: error.message}
         ]
         add_error(rule_code, annotation)
       end
@@ -132,19 +131,19 @@ class ValidatorBase
   # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
   # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
   #
-  def node_blank? (node_obj, xpath = ".")
+  def node_blank? (node_obj, xpath = '.')
     ret = false
     target_node = node_obj.xpath(xpath)
     if target_node.empty?
       ret = true
     else
-      text_value = ""
-      #xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
+      text_value = ''
+      # xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
       target_node.each do |node|
-        #空白文字のみの場合もblank扱いとする
+        # 空白文字のみの場合もblank扱いとする
         text_value += get_node_text(node).chomp.strip
       end
-      if text_value == "" #要素/属性はあるが、テキスト/値が空白である
+      if text_value == '' # 要素/属性はあるが、テキスト/値が空白である
         ret =  true
       end
     end
@@ -157,20 +156,20 @@ class ValidatorBase
   # xpathの指定がない場合は、node_obj内のルートノードの存在チェックを行う
   # 要素のテキストは子孫のテキストを含まず要素自身のテキストをチェックする
   #
-  def get_node_text (node_obj, xpath = ".")
-    text_value = ""
+  def get_node_text (node_obj, xpath = '.')
+    text_value = ''
     target_node = node_obj.xpath(xpath)
     unless target_node.empty?
-      #xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
+      # xPathで複数ヒットする場合は、全てのノードのテキスト表現を連結して評価する
       target_node.each do |node|
         if node.class == Nokogiri::XML::Element
-          #elementの場合にはelementの要素自身のテキストを検索
-          target_text_node = node.xpath("text()") #子供のテキストを含まないテキスト要素を取得
+          # elementの場合にはelementの要素自身のテキストを検索
+          target_text_node = node.xpath('text()') # 子供のテキストを含まないテキスト要素を取得
           text_value += target_text_node.map {|text_node|
             text_node.text
-          }.join  #前後の空白を除去した文字列を繋げて返す
+          }.join  # 前後の空白を除去した文字列を繋げて返す
         elsif node.class == Nokogiri::XML::Attr
-          #attributeの場合にはattributeの値を検索
+          # attributeの場合にはattributeの値を検索
           text_value += node.text
         elsif node.class == Nokogiri::XML::Text
           text_value += node.text
@@ -201,7 +200,7 @@ class ValidatorBase
         result = false
         invalid_list.each do |invalid|
           annotation = [
-            {key: "Message", value: invalid}
+            {key: 'Message', value: invalid}
           ]
           add_error(rule_code, annotation)
         end
@@ -224,13 +223,12 @@ class ValidatorBase
     result = true
     unless allow_format_list.include?(file_format)
       result = false
-      allow_text = allow_format_list.map{|format| format.upcase }.join(" or ")
+      allow_text = allow_format_list.map {|format| format.upcase }.join(' or ')
       annotation = [
-        {key: "Message", value: "Failed to read the file as #{allow_text}"}
+        {key: 'Message', value: "Failed to read the file as #{allow_text}"}
       ]
       add_error(rule_code, annotation)
     end
     result
   end
-
 end

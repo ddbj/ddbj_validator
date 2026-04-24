@@ -1,12 +1,12 @@
-require_relative "base"
+require_relative 'base'
 
 class DraSubmitter < SubmitterBase
-  DRA_DB_NAME = "drmdb"
+  DRA_DB_NAME = 'drmdb'
 
   def output_xml_file(object_type, submission_id, output)
     begin
-      #parse submission_id(submitter_id, serial)
-      submission_id_text = submission_id.split("-")
+      # parse submission_id(submitter_id, serial)
+      submission_id_text = submission_id.split('-')
       valid_format = true
       valid_format = false if submission_id_text.size != 2
       begin
@@ -14,7 +14,7 @@ class DraSubmitter < SubmitterBase
       rescue
         valid_format = false
       end
-      if valid_format == false #invalid submission_id format
+      if valid_format == false # invalid submission_id format
         return nil
       end
       submitter_id = submission_id_text[0]
@@ -23,32 +23,32 @@ class DraSubmitter < SubmitterBase
       connection = get_connection(DRA_DB_NAME)
       res = connection.exec(xml_sql(object_type, submitter_id, serial))
       if res.ntuples > 0
-        if object_type == "submission" #submissionについてはSet要素不要
+        if object_type == 'submission' # submissionについてはSet要素不要
           row = res.first
-          content_node = Nokogiri::XML::Document.parse row["content"]
+          content_node = Nokogiri::XML::Document.parse row['content']
           submitter_id = row['submitter_id']
 
-          #sumbitter_idをSubmission要素の属性に追加
+          # sumbitter_idをSubmission要素の属性に追加
           content_node.root['submitter_id'] = submitter_id
           content_node.root['submission_id'] = submission_id
           doc = content_node
         else
           case object_type
-          when "experiment"
-            doc = Nokogiri::XML("<EXPERIMENT_SET>")
-          when "run"
-            doc = Nokogiri::XML("<RUN_SET>")
-          when "analysis"
-            doc = Nokogiri::XML("<ANALYSIS_SET>")
+          when 'experiment'
+            doc = Nokogiri::XML('<EXPERIMENT_SET>')
+          when 'run'
+            doc = Nokogiri::XML('<RUN_SET>')
+          when 'analysis'
+            doc = Nokogiri::XML('<ANALYSIS_SET>')
           end
           object_set = doc.root
-          submitter_id = ""
+          submitter_id = ''
           res.each do |row|
-            content_node = Nokogiri::XML::Document.parse row["content"]
+            content_node = Nokogiri::XML::Document.parse row['content']
             submitter_id = row['submitter_id']
             object_set << content_node.root
           end
-          #sumbitter_idをBioSampleSet要素の属性に追加
+          # sumbitter_idをBioSampleSet要素の属性に追加
           object_set['submitter_id'] = submitter_id
           object_set['submission_id'] = submission_id
         end

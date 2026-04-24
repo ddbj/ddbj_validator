@@ -1,17 +1,17 @@
 require 'erb'
 require 'date'
-require_relative "base"
-require_relative "common/insdc_nullability"
-require_relative "common/coll_dump"
-require_relative "common/date_format"
-require_relative "common/geolocation"
-require_relative "common/ddbj_db_validator"
-require_relative "common/organism_validator"
-require_relative "common/sparql_base"
-require_relative "common/validator_cache"
-require_relative "common/xml_convertor"
-require_relative "common/file_parser"
-require_relative "common/tsv_column_validator"
+require_relative 'base'
+require_relative 'common/insdc_nullability'
+require_relative 'common/coll_dump'
+require_relative 'common/date_format'
+require_relative 'common/geolocation'
+require_relative 'common/ddbj_db_validator'
+require_relative 'common/organism_validator'
+require_relative 'common/sparql_base'
+require_relative 'common/validator_cache'
+require_relative 'common/xml_convertor'
+require_relative 'common/file_parser'
+require_relative 'common/tsv_column_validator'
 
 #
 # A class for BioSample validation
@@ -19,33 +19,33 @@ require_relative "common/tsv_column_validator"
 class BioSampleValidator < ValidatorBase
   attr_reader :error_list
   attr_reader :conf
-  DEFAULT_PACKAGE_VERSION = "1.5.0"
+  DEFAULT_PACKAGE_VERSION = '1.5.0'
 
   # クラス読み込み時に lib/validator/sparql/*.rq を ERB コンパイルしてキャッシュする。
   SPARQL = Dir["#{__dir__}/sparql/*.rq"].to_h {|path|
-    [File.basename(path, ".rq").to_sym, ERB.new(File.read(path)).freeze]
+    [File.basename(path, '.rq').to_sym, ERB.new(File.read(path)).freeze]
   }.freeze
   #
   # Initializer
   #
   def initialize
     super()
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")))
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/biosample')))
     InsdcNullability.null_accepted        = @conf[:null_accepted]
     InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
-    DateFormat::set_config(@conf)
+    DateFormat.set_config(@conf)
 
     @error_list = error_list = []
 
-    @validation_config = @conf[:validation_config] #need?
+    @validation_config = @conf[:validation_config] # need?
     @xml_convertor = XmlConvertor.new
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
+    @org_validator = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
     @institution_list = CollDump.parse(@conf[:institution_list_file])
     @tsv_validator = TsvColumnValidator.new()
-    if @conf[:biosample].nil? || @conf[:biosample]["package_version"].nil?
+    if @conf[:biosample].nil? || @conf[:biosample]['package_version'].nil?
       @package_version = DEFAULT_PACKAGE_VERSION
     else
-      @package_version =  @conf[:biosample]["package_version"]
+      @package_version =  @conf[:biosample]['package_version']
     end
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
@@ -67,26 +67,26 @@ class BioSampleValidator < ValidatorBase
   def read_config (config_file_dir)
     config = {}
     begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_biosample.json")) #TODO auto update when genereted
-      config[:null_accepted] = JSON.parse(File.read(config_file_dir + "/null_accepted.json"))
-      config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + "/null_not_recommended.json"))
-      config[:cv_attr] = JSON.parse(File.read(config_file_dir + "/controlled_terms.json"))
-      config[:ref_attr] = JSON.parse(File.read(config_file_dir + "/reference_attributes.json"))
-      config[:ts_attr] = JSON.parse(File.read(config_file_dir + "/timestamp_attributes.json"))
-      config[:int_attr] = JSON.parse(File.read(config_file_dir + "/integer_attributes.json"))
-      config[:special_chars] = JSON.parse(File.read(config_file_dir + "/special_characters.json"))
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_biosample.json')) # TODO auto update when genereted
+      config[:null_accepted] = JSON.parse(File.read(config_file_dir + '/null_accepted.json'))
+      config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + '/null_not_recommended.json'))
+      config[:cv_attr] = JSON.parse(File.read(config_file_dir + '/controlled_terms.json'))
+      config[:ref_attr] = JSON.parse(File.read(config_file_dir + '/reference_attributes.json'))
+      config[:ts_attr] = JSON.parse(File.read(config_file_dir + '/timestamp_attributes.json'))
+      config[:int_attr] = JSON.parse(File.read(config_file_dir + '/integer_attributes.json'))
+      config[:special_chars] = JSON.parse(File.read(config_file_dir + '/special_characters.json'))
       # pub リポジトリ (github.com/ddbj/pub) と coll_dump は本番ではそれぞれ外部ディレクトリが
       # conf/pub / conf/coll_dump にバインドマウントされる。テストで本物のマウントを用意する代わりに、
       # env で test/fixtures/ 配下のスナップショットを指せるようにしておく
       pub_dir        = ENV.fetch('DDBJ_VALIDATOR_APP_PUB_DIR')        { config_file_dir + '/../pub' }
       coll_dump_file = ENV.fetch('DDBJ_VALIDATOR_APP_COLL_DUMP_FILE') { config_file_dir + '/../coll_dump/coll_dump.txt' }
-      config[:country_list] = JSON.parse(File.read(pub_dir + "/docs/common/country_list.json"))
-      config[:historical_country_list] = JSON.parse(File.read(pub_dir + "/docs/common/historical_country_list.json"))
+      config[:country_list] = JSON.parse(File.read(pub_dir + '/docs/common/country_list.json'))
+      config[:historical_country_list] = JSON.parse(File.read(pub_dir + '/docs/common/historical_country_list.json'))
       config[:valid_country_list] = config[:country_list] + config[:historical_country_list]
-      config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
-      config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
-      config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + "/invalid_strain_value.json"))
-      config[:json_schema] = JSON.parse(File.read(config_file_dir + "/schema.json"))
+      config[:convert_date_format] = JSON.parse(File.read(config_file_dir + '/convert_date_format.json'))
+      config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + '/ddbj_date_format.json'))
+      config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + '/invalid_strain_value.json'))
+      config[:json_schema] = JSON.parse(File.read(config_file_dir + '/schema.json'))
       config[:institution_list_file] = coll_dump_file
       config
     rescue => ex
@@ -104,59 +104,59 @@ class BioSampleValidator < ValidatorBase
   # data_file: input file path
   #
   #
-  def validate (data_file, params={})
-    @data_file = File::basename(data_file)
+  def validate (data_file, params = {})
+    @data_file = File.basename(data_file)
 
     params = {} if params.nil? # nil エラー回避
-    unless (params["submitter_id"].nil? || params["submitter_id"].strip == "")
-      @submitter_id = params["submitter_id"]
+    unless params['submitter_id'].nil? || params['submitter_id'].strip == ''
+      @submitter_id = params['submitter_id']
     end
-    unless (params["biosample_submission_id"].nil? || params["biosample_submission_id"].strip == "")
-      @submission_id = params["biosample_submission_id"]
+    unless params['biosample_submission_id'].nil? || params['biosample_submission_id'].strip == ''
+      @submission_id = params['biosample_submission_id']
     end
 
     # file typeのチェック
     file_content = nil
-    if (params["file_format"].nil? || params["file_format"]["biosample"].nil? || params["file_format"]["biosample"].strip.chomp == "")
-      #推測されたtypeがなければ中身をパースして推測
+    if params['file_format'].nil? || params['file_format']['biosample'].nil? || params['file_format']['biosample'].strip.chomp == ''
+      # 推測されたtypeがなければ中身をパースして推測
       file_content = FileParser.new.get_file_data(data_file)
       @data_format = file_content[:format]
     else
-      @data_format = params["file_format"]["biosample"]
+      @data_format = params['file_format']['biosample']
     end
-    ret = invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
-    return if ret == false #ファイルが読めなければvalidationは中止
+    ret = invalid_file_format('BS_R0124', @data_format, ['tsv', 'json', 'xml']) # baseのメソッドを呼び出し
+    return if ret == false # ファイルが読めなければvalidationは中止
 
-    if @data_format == "xml"
-      #valid_xml = not_well_format_xml("BS_R0097", data_file)
-      #return unless valid_xml
-      #convert to object for validator
+    if @data_format == 'xml'
+      # valid_xml = not_well_format_xml("BS_R0097", data_file)
+      # return unless valid_xml
+      # convert to object for validator
       xml_document = File.read(data_file)
-      valid_xml = xml_data_schema("BS_R0098", xml_document)
+      valid_xml = xml_data_schema('BS_R0098', xml_document)
       return unless valid_xml
       # xml検証が通った場合のみ実行
       @biosample_list = @xml_convertor.xml2obj(xml_document, 'biosample')
       if @submitter_id.nil?
         @submitter_id = @xml_convertor.get_biosample_submitter_id(xml_document)
       end
-      #submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
+      # submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
       if @submission_id.nil?
         @submission_id = @xml_convertor.get_biosample_submission_id(xml_document)
       end
-    elsif @data_format == "json"
-      file_content = FileParser.new.get_file_data(data_file, "json") if file_content.nil?
+    elsif @data_format == 'json'
+      file_content = FileParser.new.get_file_data(data_file, 'json') if file_content.nil?
       data_list = file_content[:data]
-      ret = invalid_json_structure("BS_R0123", data_list, @conf[:json_schema]) #baseのメソッドを呼び出し
-      return if ret == false #スキーマNGの場合はvalidationは中止
+      ret = invalid_json_structure('BS_R0123', data_list, @conf[:json_schema]) # baseのメソッドを呼び出し
+      return if ret == false # スキーマNGの場合はvalidationは中止
       @biosample_list = biosample_obj(data_list)
-    elsif @data_format == "tsv"
-      file_content = FileParser.new.get_file_data(data_file, "tsv") if file_content.nil?
+    elsif @data_format == 'tsv'
+      file_content = FileParser.new.get_file_data(data_file, 'tsv') if file_content.nil?
       data = @tsv_validator.tsv2ojb_with_package(file_content[:data])
       package_id = data[:package_id]
       data_list = data[:data_list]
       @biosample_list = biosample_obj(data_list, package_id)
-    else #xml,json,tsvでパースができなければerrorを追加して修了
-      invalid_file_format("BS_R0124", @data_format, ["tsv", "json", "xml"]) #baseのメソッドを呼び出し
+    else # xml,json,tsvでパースができなければerrorを追加して修了
+      invalid_file_format('BS_R0124', @data_format, ['tsv', 'json', 'xml']) # baseのメソッドを呼び出し
       return
     end
 
@@ -164,35 +164,35 @@ class BioSampleValidator < ValidatorBase
     ### 属性名の修正(Auto-annotation)が発生する可能性があるためrule: 13は先頭で実行
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      sample_name = biosample_data["attributes"]["sample_name"]
-      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
+      sample_name = biosample_data['attributes']['sample_name']
+      biosample_data['attribute_list'].each_with_index do |attr, attr_idx|
         attr_name = attr.keys.first
         value = attr[attr_name]
 
-        #attr name
-        ret = special_character_included("BS_R0012", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
-        ret = invalid_data_format("BS_R0013", sample_name, attr_name, value, "attr_name", attr["attr_no"], line_num)
-        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+        # attr name
+        ret = special_character_included('BS_R0012', sample_name, attr_name, value, @conf[:special_chars], 'attr_name', line_num)
+        ret = invalid_data_format('BS_R0013', sample_name, attr_name, value, 'attr_name', attr['attr_no'], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
           replaced_attr_name = ErrorBuilder.auto_annotation(@error_list.last)
-          #attrbutes(hash)の置換
-          biosample_data["attributes"][replaced_attr_name] = biosample_data["attributes"][attr_name]
-          biosample_data["attributes"].delete(attr_name)
-          #attrbute_list(array)の置換
-          biosample_data["attribute_list"][attr_idx] = {replaced_attr_name => value, "attr_no" => attr["attr_no"]}
+          # attrbutes(hash)の置換
+          biosample_data['attributes'][replaced_attr_name] = biosample_data['attributes'][attr_name]
+          biosample_data['attributes'].delete(attr_name)
+          # attrbute_list(array)の置換
+          biosample_data['attribute_list'][attr_idx] = {replaced_attr_name => value, 'attr_no' => attr['attr_no']}
           attr_name = replaced_attr_name
         end
 
-        #attr value
-        ret = special_character_included("BS_R0012", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
-        ret = invalid_data_format("BS_R0013", sample_name, attr_name, value, "attr_value",  attr["attr_no"], line_num)
-        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
+        # attr value
+        ret = special_character_included('BS_R0012', sample_name, attr_name, value, @conf[:special_chars], 'attr_value', line_num)
+        ret = invalid_data_format('BS_R0013', sample_name, attr_name, value, 'attr_value',  attr['attr_no'], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+          biosample_data['attributes'][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
-        package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
+        package_attr_list = get_attributes_of_package(biosample_data['package'], @package_version)
 
-        ret = invalid_missing_value("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, attr["attr_no"], line_num)
-        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
+        ret = invalid_missing_value('BS_R0001', sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, attr['attr_no'], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+          biosample_data['attributes'][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
       end
     end
@@ -200,84 +200,84 @@ class BioSampleValidator < ValidatorBase
     ### データスキーマに関連する検証
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      sample_name = biosample_data["attributes"]["sample_name"]
-      non_ascii_header_line("BS_R0030", sample_name, biosample_data["attribute_list"], line_num)
-      missing_attribute_name("BS_R0034", sample_name, biosample_data["attribute_list"], line_num)
-      package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-      multiple_attribute_values("BS_R0061", sample_name, biosample_data["attribute_list"], package_attr_list, line_num)
-      if @data_format == "json" || @data_format == "tsv"
-        missing_mandatory_attribute_name("BS_R0127", sample_name, biosample_data["attribute_list"], line_num)
+      sample_name = biosample_data['attributes']['sample_name']
+      non_ascii_header_line('BS_R0030', sample_name, biosample_data['attribute_list'], line_num)
+      missing_attribute_name('BS_R0034', sample_name, biosample_data['attribute_list'], line_num)
+      package_attr_list = get_attributes_of_package(biosample_data['package'], @package_version)
+      multiple_attribute_values('BS_R0061', sample_name, biosample_data['attribute_list'], package_attr_list, line_num)
+      if @data_format == 'json' || @data_format == 'tsv'
+        missing_mandatory_attribute_name('BS_R0127', sample_name, biosample_data['attribute_list'], line_num)
       end
     end
 
     ### 複数のサンプル間の関係(一意性など)の検証
-    identical_attributes("BS_R0024", @biosample_list)
-    warning_about_bioproject_increment("BS_R0069", @biosample_list)
-    duplicated_sample_title_in_this_submission("BS_R0003", @biosample_list)
-    duplicate_sample_names("BS_R0028", @biosample_list)
-    if @data_format == "json"
-      unaligned_sample_attributes("BS_R0125", @biosample_list)
-      multiple_packages("BS_R0126", @biosample_list)
+    identical_attributes('BS_R0024', @biosample_list)
+    warning_about_bioproject_increment('BS_R0069', @biosample_list)
+    duplicated_sample_title_in_this_submission('BS_R0003', @biosample_list)
+    duplicate_sample_names('BS_R0028', @biosample_list)
+    if @data_format == 'json'
+      unaligned_sample_attributes('BS_R0125', @biosample_list)
+      multiple_packages('BS_R0126', @biosample_list)
     end
 
     ### それ以外
     @biosample_list.each_with_index do |biosample_data, idx|
       line_num = idx + 1
-      sample_name = biosample_data["attributes"]["sample_name"]
+      sample_name = biosample_data['attributes']['sample_name']
 
       ### パッケージの関する検証
-      missing_package_information("BS_R0025", sample_name, biosample_data, line_num)
-      unknown_package("BS_R0026", sample_name, biosample_data["package"], @package_version, line_num)
+      missing_package_information('BS_R0025', sample_name, biosample_data, line_num)
+      unknown_package('BS_R0026', sample_name, biosample_data['package'], @package_version, line_num)
 
       ### 全属性値を対象とした検証
-      biosample_data["attributes"].each do|attr_name, value|
-        non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
-        ret = attribute_value_not_in_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
-        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
+      biosample_data['attributes'].each do |attr_name, value|
+        non_ascii_attribute_value('BS_R0058', sample_name, attr_name, value, line_num)
+        ret = attribute_value_not_in_controlled_terms('BS_R0002', sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+          biosample_data['attributes'][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
-        invalid_attribute_value_for_controlled_terms("BS_R0138", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
-        ret = invalid_publication_identifier("BS_R0011", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
-        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
+        invalid_attribute_value_for_controlled_terms('BS_R0138', sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
+        ret = invalid_publication_identifier('BS_R0011', sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+          biosample_data['attributes'][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
         # 日付属性をDDBJフォーマットに補正
-        ret = invalid_datetime_format("BS_R0136", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
-        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
+        ret = invalid_datetime_format('BS_R0136', sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+          biosample_data['attributes'][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
         # 日付属性がDDBJフォーマットであるか(補正後)にチェック
-        ret = invalid_datetime("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
-        non_integer_attribute_value("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
+        ret = invalid_datetime('BS_R0007', sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
+        non_integer_attribute_value('BS_R0093', sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
         if @use_db
-          ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-            biosample_data["attributes"]["bioproject_id"] = value = ErrorBuilder.auto_annotation(@error_list.last)
+          ret = bioproject_submission_id_replacement('BS_R0095', sample_name, biosample_data['attributes']['bioproject_id'], line_num)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+            biosample_data['attributes']['bioproject_id'] = value = ErrorBuilder.auto_annotation(@error_list.last)
           end
         end
       end
 
       ### organismの検証とtaxonomy_idの確定
-      input_taxid = biosample_data["attributes"]["taxonomy_id"]
-      if input_taxid.nil? || InsdcNullability.null_value?(input_taxid) #taxonomy_idの記述がない("missing"も未記入とみなす)
-        taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
+      input_taxid = biosample_data['attributes']['taxonomy_id']
+      if input_taxid.nil? || InsdcNullability.null_value?(input_taxid) # taxonomy_idの記述がない("missing"も未記入とみなす)
+        taxonomy_id = OrganismValidator::TAX_INVALID # tax_idを使用するルールをスキップさせるために無効値をセット
       else
         taxonomy_id = input_taxid
       end
-      input_organism = biosample_data["attributes"]["organism"]
-      if !(input_organism.nil? && InsdcNullability.null_value?(input_organism)) #organismの記述がある("missing"は未記入とみなす)
-        if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
-          ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, input_organism, line_num)
+      input_organism = biosample_data['attributes']['organism']
+      if !(input_organism.nil? && InsdcNullability.null_value?(input_organism)) # organismの記述がある("missing"は未記入とみなす)
+        if taxonomy_id != OrganismValidator::TAX_INVALID # tax_idの記述がある
+          ret = taxonomy_name_and_id_not_match('BS_R0004', sample_name, taxonomy_id, input_organism, line_num)
         else
-          ret = taxonomy_error_warning("BS_R0045", sample_name, input_organism, line_num)
-          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #auto annotation値がある
-            taxid_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
-            unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
-              taxonomy_id = biosample_data["attributes"]["taxonomy_id"] =  taxid_annotation
+          ret = taxonomy_error_warning('BS_R0045', sample_name, input_organism, line_num)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # auto annotation値がある
+            taxid_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, 'taxonomy_id')
+            unless taxid_annotation.nil? # organismからtaxonomy_idが取得できたなら値を保持
+              taxonomy_id = biosample_data['attributes']['taxonomy_id'] =  taxid_annotation
             end
-            organism_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, "organism")
-            unless organism_annotation.nil? #organismの補正があれば値を置き換える
-              biosample_data["attributes"]["organism"] = organism_annotation
+            organism_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, 'organism')
+            unless organism_annotation.nil? # organismの補正があれば値を置き換える
+              biosample_data['attributes']['organism'] = organism_annotation
             end
           end
         end
@@ -287,103 +287,103 @@ class BioSampleValidator < ValidatorBase
       uncultured_organism_name_for_mimag_package biosample_data
 
       ### 特定の属性値に対する検証
-      invalid_bioproject_accession("BS_R0005", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
-      bioproject_not_found("BS_R0006", sample_name, biosample_data["attributes"]["bioproject_id"], @submitter_id, line_num) if @use_db
-      invalid_bioproject_type("BS_R0070", sample_name, biosample_data["attributes"]["bioproject_id"], line_num) if @use_db
-      invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
-      duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num) if @use_db
-      ret = invalid_geo_loc_name_format("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["geo_loc_name"] = ErrorBuilder.auto_annotation(@error_list.last)
+      invalid_bioproject_accession('BS_R0005', sample_name, biosample_data['attributes']['bioproject_id'], line_num) if @use_db
+      bioproject_not_found('BS_R0006', sample_name, biosample_data['attributes']['bioproject_id'], @submitter_id, line_num) if @use_db
+      invalid_bioproject_type('BS_R0070', sample_name, biosample_data['attributes']['bioproject_id'], line_num) if @use_db
+      invalid_locus_tag_prefix_format('BS_R0099', sample_name, biosample_data['attributes']['locus_tag_prefix'], line_num)
+      duplicated_locus_tag_prefix('BS_R0091', sample_name, biosample_data['attributes']['locus_tag_prefix'], @biosample_list, @submission_id, line_num) if @use_db
+      ret = invalid_geo_loc_name_format('BS_R0094', sample_name, biosample_data['attributes']['geo_loc_name'], @conf[:valid_country_list], line_num)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+        biosample_data['attributes']['geo_loc_name'] = ErrorBuilder.auto_annotation(@error_list.last)
       end
 
-      invalid_bio_material_format("BS_R0118", sample_name, biosample_data["attributes"]["bio_material"], line_num)
-      ret = invalid_bio_material("BS_R0119", sample_name, biosample_data["attributes"]["bio_material"], @institution_list, line_num)
-      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["bio_material"] = ErrorBuilder.auto_annotation(@error_list.last)
+      invalid_bio_material_format('BS_R0118', sample_name, biosample_data['attributes']['bio_material'], line_num)
+      ret = invalid_bio_material('BS_R0119', sample_name, biosample_data['attributes']['bio_material'], @institution_list, line_num)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+        biosample_data['attributes']['bio_material'] = ErrorBuilder.auto_annotation(@error_list.last)
       end
 
-      ret = invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["geo_loc_name"] = ErrorBuilder.auto_annotation(@error_list.last)
+      ret = invalid_country('BS_R0008', sample_name, biosample_data['attributes']['geo_loc_name'], @conf[:valid_country_list], line_num)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+        biosample_data['attributes']['geo_loc_name'] = ErrorBuilder.auto_annotation(@error_list.last)
       end
-      ret = invalid_lat_lon_format("BS_R0009", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
-      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["lat_lon"] = ErrorBuilder.auto_annotation(@error_list.last)
+      ret = invalid_lat_lon_format('BS_R0009', sample_name, biosample_data['attributes']['lat_lon'], line_num)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+        biosample_data['attributes']['lat_lon'] = ErrorBuilder.auto_annotation(@error_list.last)
       end
-      invalid_lat_lon("BS_R0139", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
-      invalid_host_organism_name("BS_R0015", sample_name, biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
-      future_collection_date("BS_R0040", sample_name, biosample_data["attributes"]["collection_date"], line_num)
-      invalid_sample_name_format("BS_R0101", sample_name, line_num)
+      invalid_lat_lon('BS_R0139', sample_name, biosample_data['attributes']['lat_lon'], line_num)
+      invalid_host_organism_name('BS_R0015', sample_name, biosample_data['attributes']['host_taxid'], biosample_data['attributes']['host'], line_num)
+      future_collection_date('BS_R0040', sample_name, biosample_data['attributes']['collection_date'], line_num)
+      invalid_sample_name_format('BS_R0101', sample_name, line_num)
 
-      invalid_gisaid_accession("BS_R0122", sample_name, biosample_data["attributes"]["gisaid_accession"], line_num)
-      biosample_not_found("BS_R0129", sample_name, biosample_data["attributes"]["derived_from"], @submitter_id, line_num) if @use_db
-      invalid_strain_value("BS_R0135", sample_name, biosample_data["attributes"]["strain"], biosample_data["attributes"]["organism"], @conf[:invalid_strain_value], line_num)
+      invalid_gisaid_accession('BS_R0122', sample_name, biosample_data['attributes']['gisaid_accession'], line_num)
+      biosample_not_found('BS_R0129', sample_name, biosample_data['attributes']['derived_from'], @submitter_id, line_num) if @use_db
+      invalid_strain_value('BS_R0135', sample_name, biosample_data['attributes']['strain'], biosample_data['attributes']['organism'], @conf[:invalid_strain_value], line_num)
 
       ### 値が複数記述される可能性がある項目の検証
-      biosample_data["attribute_list"].each do |attr|
-        unless attr["metagenome_source"].nil?
-          invalid_metagenome_source("BS_R0106", sample_name, attr["metagenome_source"], attr["attr_no"], line_num)
+      biosample_data['attribute_list'].each do |attr|
+        unless attr['metagenome_source'].nil?
+          invalid_metagenome_source('BS_R0106', sample_name, attr['metagenome_source'], attr['attr_no'], line_num)
         end
-        unless attr["component_organism"].nil?
-          taxonomy_warning("BS_R0105", sample_name, attr["component_organism"], attr["attr_no"], line_num)
+        unless attr['component_organism'].nil?
+          taxonomy_warning('BS_R0105', sample_name, attr['component_organism'], attr['attr_no'], line_num)
         end
-        unless attr["culture_collection"].nil?
-          invalid_culture_collection_format("BS_R0113", sample_name, attr["culture_collection"], line_num)
-          ret = invalid_culture_collection("BS_R0114", sample_name, attr["culture_collection"], @institution_list, attr["attr_no"], line_num)
-          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-            attr["culture_collection"] = ErrorBuilder.auto_annotation(@error_list.last)
+        unless attr['culture_collection'].nil?
+          invalid_culture_collection_format('BS_R0113', sample_name, attr['culture_collection'], line_num)
+          ret = invalid_culture_collection('BS_R0114', sample_name, attr['culture_collection'], @institution_list, attr['attr_no'], line_num)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+            attr['culture_collection'] = ErrorBuilder.auto_annotation(@error_list.last)
           end
         end
-        unless attr["specimen_voucher"].nil?
-          invalid_specimen_voucher_format("BS_R0116", sample_name, attr["specimen_voucher"], line_num)
-          ret = invalid_specimen_voucher("BS_R0117", sample_name, attr["specimen_voucher"], @institution_list, attr["attr_no"], line_num)
-          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
-            attr["specimen_voucher"] = ErrorBuilder.auto_annotation(@error_list.last)
+        unless attr['specimen_voucher'].nil?
+          invalid_specimen_voucher_format('BS_R0116', sample_name, attr['specimen_voucher'], line_num)
+          ret = invalid_specimen_voucher('BS_R0117', sample_name, attr['specimen_voucher'], @institution_list, attr['attr_no'], line_num)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+            attr['specimen_voucher'] = ErrorBuilder.auto_annotation(@error_list.last)
           end
         end
       end
 
       ### 複数属性の組合せの検証
-      latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
-      redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
+      latlon_versus_country('BS_R0041', sample_name, biosample_data['attributes']['geo_loc_name'], biosample_data['attributes']['lat_lon'], line_num)
+      redundant_taxonomy_attributes('BS_R0073', sample_name, biosample_data['attributes']['organism'], biosample_data['attributes']['host'], biosample_data['attributes']['isolation_source'], line_num)
 
       ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
-      multiple_vouchers("BS_R0062", sample_name, biosample_data["attribute_list"], line_num) # 引数が可変なので属性リストを渡す
-      missing_bioproject_id_for_locus_tag_prefix("BS_R0128", sample_name, biosample_data["attribute_list"], line_num)
+      multiple_vouchers('BS_R0062', sample_name, biosample_data['attribute_list'], line_num) # 引数が可変なので属性リストを渡す
+      missing_bioproject_id_for_locus_tag_prefix('BS_R0128', sample_name, biosample_data['attribute_list'], line_num)
 
       ### taxonomy_idの値を使う検証
-      if taxonomy_id != OrganismValidator::TAX_INVALID #無効なtax_idでなければ実行
-        package_versus_organism("BS_R0048", sample_name, taxonomy_id, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
-        sex_for_bacteria("BS_R0059", sample_name, taxonomy_id, biosample_data["attributes"]["sex"], biosample_data["attributes"]["organism"], line_num)
-        taxonomy_at_species_or_infraspecific_rank("BS_R0096", sample_name, taxonomy_id, biosample_data["attributes"]["organism"], line_num)
+      if taxonomy_id != OrganismValidator::TAX_INVALID # 無効なtax_idでなければ実行
+        package_versus_organism('BS_R0048', sample_name, taxonomy_id, biosample_data['package'], biosample_data['attributes']['organism'], line_num)
+        sex_for_bacteria('BS_R0059', sample_name, taxonomy_id, biosample_data['attributes']['sex'], biosample_data['attributes']['organism'], line_num)
+        taxonomy_at_species_or_infraspecific_rank('BS_R0096', sample_name, taxonomy_id, biosample_data['attributes']['organism'], line_num)
         ### 値が複数記述される可能性がある項目
-        biosample_data["attribute_list"].each do |attr|
-          unless attr["specimen_voucher"].nil?
-            specimen_voucher_for_bacteria_and_unclassified_sequences("BS_R0115", sample_name, attr["specimen_voucher"], taxonomy_id, line_num)
+        biosample_data['attribute_list'].each do |attr|
+          unless attr['specimen_voucher'].nil?
+            specimen_voucher_for_bacteria_and_unclassified_sequences('BS_R0115', sample_name, attr['specimen_voucher'], taxonomy_id, line_num)
           end
         end
       else # taxonomy_idが確定できなかった場合に行う検証
-        cov2_package_versus_organism("BS_R0048", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], line_num)
+        cov2_package_versus_organism('BS_R0048', sample_name, biosample_data['package'], biosample_data['attributes']['organism'], line_num)
       end
-      invalid_taxonomy_for_genome_sample("BS_R0104", sample_name, biosample_data["package"], taxonomy_id, biosample_data["attributes"]["organism"], line_num)
-      non_identical_identifiers_among_organism_strain_isolate("BS_R0134", sample_name, biosample_data["package"], biosample_data["attributes"]["organism"], biosample_data["attributes"]["strain"], biosample_data["attributes"]["isolate"], line_num)
+      invalid_taxonomy_for_genome_sample('BS_R0104', sample_name, biosample_data['package'], taxonomy_id, biosample_data['attributes']['organism'], line_num)
+      non_identical_identifiers_among_organism_strain_isolate('BS_R0134', sample_name, biosample_data['package'], biosample_data['attributes']['organism'], biosample_data['attributes']['strain'], biosample_data['attributes']['isolate'], line_num)
 
       ### 重要属性の欠損検証
-      missing_sample_name("BS_R0018", sample_name, biosample_data, line_num)
-      missing_organism("BS_R0020", sample_name, biosample_data, line_num)
+      missing_sample_name('BS_R0018', sample_name, biosample_data, line_num)
+      missing_organism('BS_R0020', sample_name, biosample_data, line_num)
 
       ### 属性名や必須項目に関する検証
       # taxonomy_id等をauto-annotationしてから検証したいので最後にチェックする
       # パッケージから属性情報(必須項目やグループ)を取得
-      attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
-      missing_mandatory_attribute("BS_R0027", sample_name, biosample_data["attributes"], attr_list, line_num)
-      missing_reporting_level_term("BS_R0137", sample_name, biosample_data["attributes"], @conf[:null_accepted], line_num)
-      missing_values_provided_for_optional_attributes("BS_R0100", sample_name, biosample_data["attributes"], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
-      attr_group = get_attribute_groups_of_package(biosample_data["package"], @package_version)
-      missing_group_of_at_least_one_required_attributes("BS_R0036", sample_name, biosample_data["attributes"], attr_group, line_num)
-      null_value_for_infraspecific_identifier_error("BS_R0132", sample_name, biosample_data["attributes"], biosample_data["package"], line_num)
-      null_value_for_infraspecific_identifier_warning("BS_R0133", sample_name, biosample_data["attributes"], biosample_data["package"], line_num)
+      attr_list = get_attributes_of_package(biosample_data['package'], @package_version)
+      missing_mandatory_attribute('BS_R0027', sample_name, biosample_data['attributes'], attr_list, line_num)
+      missing_reporting_level_term('BS_R0137', sample_name, biosample_data['attributes'], @conf[:null_accepted], line_num)
+      missing_values_provided_for_optional_attributes('BS_R0100', sample_name, biosample_data['attributes'], @conf[:null_accepted], @conf[:null_not_recommended], attr_list, line_num)
+      attr_group = get_attribute_groups_of_package(biosample_data['package'], @package_version)
+      missing_group_of_at_least_one_required_attributes('BS_R0036', sample_name, biosample_data['attributes'], attr_group, line_num)
+      null_value_for_infraspecific_identifier_error('BS_R0132', sample_name, biosample_data['attributes'], biosample_data['package'], line_num)
+      null_value_for_infraspecific_identifier_warning('BS_R0133', sample_name, biosample_data['attributes'], biosample_data['package'], line_num)
     end
   end
 
@@ -406,23 +406,22 @@ class BioSampleValidator < ValidatorBase
   #   {...}, ...
   # ]
   def get_attributes_of_package (package_name, package_version)
-
-    #あればキャッシュを使用
+    # あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:attributes_of_package].result_with_hash(params)
       result = sparql.query(sparql_query)
       attr_list = []
       result.each do |row|
-        attr_require = "other"
-        if row[:require] == "has_mandatory_attribute"
-          attr_require = "mandatory"
+        attr_require = 'other'
+        if row[:require] == 'has_mandatory_attribute'
+          attr_require = 'mandatory'
         else # has_either_one_mandatory_attribute, has_optional_attribute, has_attribute
-          attr_require = "optional"
+          attr_require = 'optional'
         end
-        type = row[:require].sub("has_","")  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
-        if row[:max_cardinality] == "1" || row[:max_cardinality] == 1
+        type = row[:require].sub('has_', '')  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
+        if row[:max_cardinality] == '1' || row[:max_cardinality] == 1
           allow_multiple = false
         else
           allow_multiple = true
@@ -433,7 +432,7 @@ class BioSampleValidator < ValidatorBase
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list) unless @cache.nil?
       attr_list
     else
-      puts "use cache in get_attributes_of_package" if $DEBUG
+      puts 'use cache in get_attributes_of_package' if $DEBUG
       attr_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
       attr_list
     end
@@ -463,9 +462,9 @@ class BioSampleValidator < ValidatorBase
     # package version 1.4未満ではgroup attributeの定義はない
     return [] if Gem::Version.create(package_version) < Gem::Version.create('1.4.0')
 
-    #あればキャッシュを使用
+    # あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:attribute_groups_of_package].result_with_hash(params)
       result = sparql.query(sparql_query)
@@ -480,7 +479,7 @@ class BioSampleValidator < ValidatorBase
       @cache.save(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name, attr_group_list) unless @cache.nil?
       attr_group_list
     else
-      puts "use cache in get_attribute_groups_of_package" if $DEBUG
+      puts 'use cache in get_attribute_groups_of_package' if $DEBUG
       attr_group_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name)
       attr_group_list
     end
@@ -518,31 +517,31 @@ class BioSampleValidator < ValidatorBase
   #   {.....}, ....
   # ]
   #
-  def biosample_obj(data_list, package_id=nil)
+  def biosample_obj(data_list, package_id = nil)
     biosample_list = []
-    @attr_index_offset = 0 #属性には含めない列数をカウント
+    @attr_index_offset = 0 # 属性には含めない列数をカウント
     data_list.each do |row|
       attr_no = 1
-      biosample = {"package" => "", "attributes" => {}, "attribute_list" => []}
+      biosample = {'package' => '', 'attributes' => {}, 'attribute_list' => []}
       if !package_id.nil? # TSVやExcelで全体のpackage_idが取得できた場合
-        biosample["package"] = package_id
+        biosample['package'] = package_id
       end
       row.each do |attribute|
-        if attribute["key"] == "_package" # JSONで"_package"が記載されていた場合
-          biosample["package"] = attribute["value"]
+        if attribute['key'] == '_package' # JSONで"_package"が記載されていた場合
+          biosample['package'] = attribute['value']
           @attr_index_offset += 1
         else
-          if attribute["key"].start_with?("*")
-            attr_name = attribute["key"].sub(/^(\*)+/, "")
+          if attribute['key'].start_with?('*')
+            attr_name = attribute['key'].sub(/^(\*)+/, '')
           else
-            attr_name = attribute["key"]
+            attr_name = attribute['key']
           end
-          #if !(attribute["key"].blank? && attribute["value"].blank?)
+          # if !(attribute["key"].blank? && attribute["value"].blank?)
           # 値が空でない属性だけの属性ハッシュ&リストを生成。taxonomy_idは値追加の機会が多いので空値でも属性として保持する
-          if biosample["attributes"][attr_name].nil? # 同一属性が出現する場合は、先の記述を優先
-            biosample["attributes"][attr_name] = attribute["value"]
+          if biosample['attributes'][attr_name].nil? # 同一属性が出現する場合は、先の記述を優先
+            biosample['attributes'][attr_name] = attribute['value']
           end
-          biosample["attribute_list"].push({attr_name => attribute["value"], "attr_no" => attr_no})
+          biosample['attribute_list'].push({attr_name => attribute['value'], 'attr_no' => attr_no})
           attr_no += 1
         end
       end
@@ -565,7 +564,7 @@ class BioSampleValidator < ValidatorBase
   # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値を修正
   #
   def auto_annotation_location_with_index(data_format, line_num, attr_no, key_or_value)
-    line_offset = @tsv_validator.row_count_offset #ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
+    line_offset = @tsv_validator.row_count_offset # ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
     @tsv_validator.auto_annotation_location_with_index(data_format, line_num, attr_no, key_or_value, line_offset, @attr_index_offset)
   end
 
@@ -584,16 +583,16 @@ class BioSampleValidator < ValidatorBase
   # 元ファイルがTSVの場合 {row_index: 10, column_index: 1} # 行:10 列:1の値を修正
   #
   def auto_annotation_location(data_format, line_num, attr_name, key_or_value)
-    line_idx = line_num -  1 #line_numは1始まりなので -1する
+    line_idx = line_num -  1 # line_numは1始まりなので -1する
     # 属性が何番目に出現するか検索.
     attr_no = nil
-    selected = @biosample_list[line_idx]["attribute_list"].select{|attr| attr.keys.include?(attr_name)}
-    attr_no = selected.first["attr_no"] # 複数あった場合は先方優先のためfirstの値を取得
-    line_offset = @tsv_validator.row_count_offset #ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
+    selected = @biosample_list[line_idx]['attribute_list'].select {|attr| attr.keys.include?(attr_name) }
+    attr_no = selected.first['attr_no'] # 複数あった場合は先方優先のためfirstの値を取得
+    line_offset = @tsv_validator.row_count_offset # ヘッダー前のコメント行数. 修正時にはセルの位置を指すので加味する必要がある
     @tsv_validator.auto_annotation_location_with_index(data_format, line_num, attr_no, key_or_value, line_offset, @attr_index_offset)
   end
 
-### validate method ###
+  ### validate method ###
 
   #
   # rule:30
@@ -618,8 +617,8 @@ class BioSampleValidator < ValidatorBase
       result
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute names", value: invalid_headers.join(", ")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute names', value: invalid_headers.join(', ')}
       ]
       add_error(rule_code, annotation)
       result
@@ -648,9 +647,9 @@ class BioSampleValidator < ValidatorBase
     else
       missing_attr_list.each do |missing_attr|
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: missing_attr.keys.first},
-          {key: "Attribute value", value: missing_attr[missing_attr.keys.first]}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: missing_attr.keys.first},
+          {key: 'Attribute value', value: missing_attr[missing_attr.keys.first]}
         ]
         add_error(rule_code, annotation)
       end
@@ -672,22 +671,22 @@ class BioSampleValidator < ValidatorBase
     return if attribute_list.nil?
     result = true
 
-    #属性名でグルーピング
-    #grouped = {"depth"=>[{"depth"=>"1m"}, {"depth"=>"2m"}], "elev"=>[{"elev"=>"-1m"}, {"elev"=>"-2m"}]}
+    # 属性名でグルーピング
+    # grouped = {"depth"=>[{"depth"=>"1m"}, {"depth"=>"2m"}], "elev"=>[{"elev"=>"-1m"}, {"elev"=>"-2m"}]}
     grouped = attribute_list.group_by do |attr|
       attr.keys.first
     end
-    allow_multiple_attr_list = multiple_attribute_values.select{|attr| attr[:allow_multiple] == true }.map {|attr| attr[:attribute_name]} # 複数記述を許可する属性名リスト
+    allow_multiple_attr_list = multiple_attribute_values.select {|attr| attr[:allow_multiple] == true }.map {|attr| attr[:attribute_name] } # 複数記述を許可する属性名リスト
     grouped.each do |attr_name, attr_values|
-      if attr_values.size >= 2 && !(allow_multiple_attr_list.include?(attr_name)) #複数記述され、かつ複数許可許されていない属性
-        all_attr_value = [] #属性値を列挙するためのリスト ex. ["1m", "2m"]
-        attr_values.each{|attr|
-          attr.each{|k,v| all_attr_value.push(v) if k == attr_name }
+      if attr_values.size >= 2 && !(allow_multiple_attr_list.include?(attr_name)) # 複数記述され、かつ複数許可許されていない属性
+        all_attr_value = [] # 属性値を列挙するためのリスト ex. ["1m", "2m"]
+        attr_values.each {|attr|
+          attr.each {|k, v| all_attr_value.push(v) if k == attr_name }
         }
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: all_attr_value.join(", ")}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: attr_name},
+          {key: 'Attribute value', value: all_attr_value.join(', ')}
         ]
         add_error(rule_code, annotation)
         result = false
@@ -708,12 +707,12 @@ class BioSampleValidator < ValidatorBase
   def missing_package_information (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil?
 
-    if biosample_data["package"].present?
+    if biosample_data['package'].present?
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "package", value: ""}
+        {key: 'Sample name', value: sample_name},
+        {key: 'package', value: ''}
       ]
       add_error(rule_code, annotation)
       false
@@ -733,21 +732,21 @@ class BioSampleValidator < ValidatorBase
   def unknown_package (rule_code, sample_name, package_name, package_version, line_num)
     return nil if package_name.blank?
 
-    #あればキャッシュを使用
+    # あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
-      sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
+      sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:valid_package_name].result_with_hash(params)
       result = sparql.query(sparql_query)
       @cache.save(ValidatorCache::UNKNOWN_PACKAGE, package_name, result) unless @cache.nil?
     else
-      puts "use cache in unknown_package" if $DEBUG
+      puts 'use cache in unknown_package' if $DEBUG
       result = @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name)
     end
     if result.first[:count].to_i <= 0
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "package", value: package_name}
+        {key: 'Sample name', value: sample_name},
+        {key: 'package', value: package_name}
       ]
       add_error(rule_code, annotation)
       false
@@ -767,12 +766,12 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def missing_sample_name (rule_code, sample_name, biosample_data, line_num)
-    return nil if biosample_data.nil? || biosample_data["attributes"].nil?
-    return true unless InsdcNullability.null_value?(biosample_data["attributes"]["sample_name"])
+    return nil if biosample_data.nil? || biosample_data['attributes'].nil?
+    return true unless InsdcNullability.null_value?(biosample_data['attributes']['sample_name'])
 
     annotation = [
-      {key: "Sample name", value: biosample_data["attributes"]["sample_name"].to_s},
-      {key: "sample_title", value: biosample_data["attributes"]["sample_title"].to_s}
+      {key: 'Sample name', value: biosample_data['attributes']['sample_name'].to_s},
+      {key: 'sample_title', value: biosample_data['attributes']['sample_title'].to_s}
     ]
     add_error(rule_code, annotation)
     false
@@ -789,12 +788,12 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def missing_organism (rule_code, sample_name, biosample_data, line_num)
-    return nil if biosample_data.nil? || biosample_data["attributes"].nil?
-    return true unless InsdcNullability.null_value?(biosample_data["attributes"]["organism"])
+    return nil if biosample_data.nil? || biosample_data['attributes'].nil?
+    return true unless InsdcNullability.null_value?(biosample_data['attributes']['organism'])
 
     annotation = [
-      {key: "Sample name", value: sample_name},
-      {key: "organism", value: biosample_data["attributes"]["organism"].to_s}
+      {key: 'Sample name', value: sample_name},
+      {key: 'organism', value: biosample_data['attributes']['organism'].to_s}
     ]
     add_error(rule_code, annotation)
     false
@@ -812,17 +811,17 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def not_predefined_attribute_name (rule_code, sample_name, sample_attr, package_attr_list , line_num)
+  def not_predefined_attribute_name (rule_code, sample_name, sample_attr, package_attr_list, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
-    predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] } #属性名だけを抽出
-    not_predifined_attr_names = sample_attr.keys - predefined_attr_list #属性名の差分をとる
+    predefined_attr_list = package_attr_list.map {|attr| attr[:attribute_name] } # 属性名だけを抽出
+    not_predifined_attr_names = sample_attr.keys - predefined_attr_list # 属性名の差分をとる
     if not_predifined_attr_names.empty?
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute names", value: not_predifined_attr_names.join(", ")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute names', value: not_predifined_attr_names.join(', ')}
       ]
       add_error(rule_code, annotation)
       false
@@ -845,8 +844,8 @@ class BioSampleValidator < ValidatorBase
   def missing_mandatory_attribute (rule_code, sample_name, sample_attr, package_attr_list, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
 
-    mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-      attr[:attribute_name] if attr[:require] == "mandatory"
+    mandatory_attr_list = package_attr_list.map {|attr|  # 必須の属性名だけを抽出
+      attr[:attribute_name] if attr[:require] == 'mandatory'
     }.compact
     missing_attr_names = mandatory_attr_list - sample_attr.keys # 必須項目名が欠けている
 
@@ -857,13 +856,13 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
-   
+
     if missing_attr_names.empty?
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute names", value: missing_attr_names.join(", ")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute names', value: missing_attr_names.join(', ')}
       ]
       add_error(rule_code, annotation)
       false
@@ -895,10 +894,10 @@ class BioSampleValidator < ValidatorBase
           end
         end
       end
-      if exist_attr_list.empty? #記述属性が一つもない
+      if exist_attr_list.empty? # 記述属性が一つもない
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute names", value: attr_set.join(", ")}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute names', value: attr_set.join(', ')}
         ]
         add_error(rule_code, annotation)
         ret = false
@@ -907,18 +906,18 @@ class BioSampleValidator < ValidatorBase
     ret
   end
 
-  #
-  # rule:92
-  # 必須属性名の記載がないものを検証
-  #
-  # ==== Args
-  # rule_code
-  # sample_attr ユーザ入力の属性リスト
-  # package_attr_list パッケージに対する属性リスト
-  # line_num
-  # ==== Return
-  # true/false
-  #
+#
+# rule:92
+# 必須属性名の記載がないものを検証
+#
+# ==== Args
+# rule_code
+# sample_attr ユーザ入力の属性リスト
+# package_attr_list パッケージに対する属性リスト
+# line_num
+# ==== Return
+# true/false
+#
 =begin
   def missing_required_attribute_name (rule_code, sample_name, sample_attr, package_attr_list , line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
@@ -958,35 +957,35 @@ class BioSampleValidator < ValidatorBase
 
     result =  true
     if !cv_attr[attr_name].nil? # CVを使用する属性か
-      replace_value = ""
-      if attr_name == 'sex' && (attr_val.casecmp("M") == 0 || attr_val.casecmp("F") == 0)
-        #sex属性の場合の特殊な置換
-        if attr_val.casecmp("M") == 0
-          replace_value = "male"
-        elsif attr_val.casecmp("F") == 0
-          replace_value = "female"
+      replace_value = ''
+      if attr_name == 'sex' && (attr_val.casecmp('M') == 0 || attr_val.casecmp('F') == 0)
+        # sex属性の場合の特殊な置換
+        if attr_val.casecmp('M') == 0
+          replace_value = 'male'
+        elsif attr_val.casecmp('F') == 0
+          replace_value = 'female'
         end
       else
         cv_attr[attr_name].each do |term|
-          if term.casecmp(attr_val) == 0 #大文字小文字を区別せず一致
-            if term != attr_val #大文字小文字で異なる
-              replace_value = term #置換が必要
+          if term.casecmp(attr_val) == 0 # 大文字小文字を区別せず一致
+            if term != attr_val # 大文字小文字で異なる
+              replace_value = term # 置換が必要
             end
           end
         end
       end
-      if replace_value != "" # 置換が必要な場合
+      if replace_value != '' # 置換が必要な場合
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_val}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: attr_name},
+          {key: 'Attribute value', value: attr_val}
         ]
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, attr_name, "value")
+        if @data_format == 'json' || @data_format == 'tsv'
+          location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
         else
           location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
         end
-        annotation.push(ErrorBuilder.suggested_annotation([replace_value], "Attribute value", location, true));
+        annotation.push(ErrorBuilder.suggested_annotation([replace_value], 'Attribute value', location, true))
         add_error(rule_code, annotation, auto_annotation: true)
         result = false
       end
@@ -1015,9 +1014,9 @@ class BioSampleValidator < ValidatorBase
     return true if cv_attr[attr_name].nil? || cv_attr[attr_name].include?(attr_val)
 
     annotation = [
-      {key: "Sample name", value: sample_name},
-      {key: "Attribute", value: attr_name},
-      {key: "Attribute value", value: attr_val}
+      {key: 'Sample name', value: sample_name},
+      {key: 'Attribute', value: attr_name},
+      {key: 'Attribute value', value: attr_val}
     ]
     add_error(rule_code, annotation)
     false
@@ -1041,26 +1040,26 @@ class BioSampleValidator < ValidatorBase
 
     result =  true
     if ref_attr.include?(attr_name) # リファレンス型の属性か
-      ref = attr_val.gsub(/[ :]*P?M?ID[ :]+|[ :]*DOI[ :]+/i, "")
-      if attr_val != ref #auto-annotation
+      ref = attr_val.gsub(/[ :]*P?M?ID[ :]+|[ :]*DOI[ :]+/i, '')
+      if attr_val != ref # auto-annotation
         result = false
       end
 
       begin
         # check exist ref
-        if ref =~ /\d{6,}/ && ref !~ /\./ #pubmed id
-          #あればキャッシュを使用
+        if ref =~ /\d{6,}/ && ref !~ /\./ # pubmed id
+          # あればキャッシュを使用
           if @cache.nil? || @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref).nil?
             exist_pubchem = NcbiEutils.exist_pubmed_id?(ref)
             @cache.save(ValidatorCache::EXIST_PUBCHEM_ID, ref, exist_pubchem) unless @cache.nil?
-         else
-            puts "use cache in invalid_publication_identifier(pubchem)" if $DEBUG
+          else
+            puts 'use cache in invalid_publication_identifier(pubchem)' if $DEBUG
             exist_pubchem = @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref)
           end
           result = exist_pubchem && result
-        elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ #DOI
+        elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ # DOI
           # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
-        else #ref !~ /^https?/ #URL
+        else # ref !~ /^https?/ #URL
           begin
             url = URI.parse(ref)
           rescue URI::InvalidURIError
@@ -1070,29 +1069,29 @@ class BioSampleValidator < ValidatorBase
 
         if result == false
           annotation = [
-            {key: "Sample name", value: sample_name},
-            {key: "Attribute", value: attr_name},
-            {key: "Attribute value", value: attr_val}
+            {key: 'Sample name', value: sample_name},
+            {key: 'Attribute', value: attr_name},
+            {key: 'Attribute value', value: attr_val}
           ]
-          if attr_val != ref #置換候補があればAuto annotationをつける
-            if @data_format == "json" || @data_format == "tsv"
-              location = auto_annotation_location(@data_format, line_num, attr_name, "value")
+          if attr_val != ref # 置換候補があればAuto annotationをつける
+            if @data_format == 'json' || @data_format == 'tsv'
+              location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
             else
               location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
             end
-            annotation.push(ErrorBuilder.suggested_annotation([ref], "Attribute value", location, true));
+            annotation.push(ErrorBuilder.suggested_annotation([ref], 'Attribute value', location, true))
             add_error(rule_code, annotation, auto_annotation: true)
-          else #置換候補がないエラー
+          else # 置換候補がないエラー
             add_error(rule_code, annotation)
           end
           result = false
         end
-      rescue => ex #NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
+      rescue => ex # NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_val},
-          {key: "Message", value: "Validation processing failed because connection to NCBI service failed." }
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: attr_name},
+          {key: 'Attribute value', value: attr_val},
+          {key: 'Message', value: 'Validation processing failed because connection to NCBI service failed.'}
         ]
         add_error(rule_code, annotation)
         result = false
@@ -1118,7 +1117,7 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-      #DDBJ管理の場合にはDBにIDがあるか検証する
+      # DDBJ管理の場合にはDBにIDがあるか検証する
       if bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
         unless @db_validator.valid_bioproject_id?(bioproject_accession)
           result = false
@@ -1130,9 +1129,9 @@ class BioSampleValidator < ValidatorBase
 
     if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: bioproject_accession}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: 'bioproject_id'},
+          {key: 'Attribute value', value: bioproject_accession}
       ]
       add_error(rule_code, annotation)
     end
@@ -1154,21 +1153,21 @@ class BioSampleValidator < ValidatorBase
   def invalid_geo_loc_name_format (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if InsdcNullability.null_value?(geo_loc_name) || InsdcNullability.null_not_recommended_value?(geo_loc_name)
 
-    annotated_name = geo_loc_name.sub(/\s*:\s*/, ":") #最初のコロンの前後の空白を詰める
+    annotated_name = geo_loc_name.sub(/\s*:\s*/, ':') # 最初のコロンの前後の空白を詰める
     # 2つ目以降の":"は", "に置換する
     geo_loc_regex = %r{^(?<country>[\w\s\-\(\)]+):(?<other>.+)$}
     if geo_loc_regex.match(annotated_name)
       m = geo_loc_regex.match(annotated_name)
-      other = m['other'].gsub(":", ", ")
+      other = m['other'].gsub(':', ', ')
       annotated_name = "#{m['country']}:#{other}"
     end
     annotated_name = annotated_name.gsub(/,\s+/, ', ')
     annotated_name = annotated_name.gsub(/,(?![ ])/, ', ')
     # 国名の補正
-    country_name = annotated_name.split(":").first.strip
+    country_name = annotated_name.split(':').first.strip
     matched_country = country_list.find do |define_country|
-      if define_country == "Viet Nam" #間違いが多いためadhocに対応
-        define_country.gsub(" ", "").downcase == country_name.gsub(" ", "").downcase
+      if define_country == 'Viet Nam' # 間違いが多いためadhocに対応
+        define_country.gsub(' ', '').downcase == country_name.gsub(' ', '').downcase
       else
         define_country =~ /^#{country_name}$/i # case-insensitive
       end
@@ -1182,16 +1181,16 @@ class BioSampleValidator < ValidatorBase
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "geo_loc_name"},
-        {key: "Attribute value", value: geo_loc_name}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'geo_loc_name'},
+        {key: 'Attribute value', value: geo_loc_name}
       ]
-      if @data_format == "json" || @data_format == "tsv"
-        location = auto_annotation_location(@data_format, line_num, "geo_loc_name", "value")
+      if @data_format == 'json' || @data_format == 'tsv'
+        location = auto_annotation_location(@data_format, line_num, 'geo_loc_name', 'value')
       else
-        location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
+        location = @xml_convertor.xpath_from_attrname('geo_loc_name', line_num)
       end
-      annotation.push(ErrorBuilder.suggested_annotation([annotated_name], "Attribute value", location, true));
+      annotation.push(ErrorBuilder.suggested_annotation([annotated_name], 'Attribute value', location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
       false
@@ -1213,15 +1212,15 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
     return nil if InsdcNullability.null_value?(geo_loc_name) || InsdcNullability.null_not_recommended_value?(geo_loc_name)
-    country_name = geo_loc_name.split(":").first.strip
-    matched_country = country_list.select{|country| country == country_name}
+    country_name = geo_loc_name.split(':').first.strip
+    matched_country = country_list.select {|country| country == country_name }
     if matched_country.any?
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "geo_loc_name"},
-        {key: "Attribute value", value: geo_loc_name}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'geo_loc_name'},
+        {key: 'Attribute value', value: geo_loc_name}
       ]
       add_error(rule_code, annotation)
       false
@@ -1248,16 +1247,16 @@ class BioSampleValidator < ValidatorBase
     return true if insdc_latlon.nil? || lat_lon == insdc_latlon
 
     annotation = [
-      {key: "Sample name", value: sample_name},
-      {key: "Attribute", value: "lat_lon"},
-      {key: "Attribute value", value: lat_lon}
+      {key: 'Sample name', value: sample_name},
+      {key: 'Attribute', value: 'lat_lon'},
+      {key: 'Attribute value', value: lat_lon}
     ]
-    location = if @data_format == "json" || @data_format == "tsv"
-                 auto_annotation_location(@data_format, line_num, "lat_lon", "value")
-               else
-                 @xml_convertor.xpath_from_attrname("lat_lon", line_num)
-               end
-    annotation.push(ErrorBuilder.suggested_annotation([insdc_latlon], "Attribute value", location, true));
+    location = if @data_format == 'json' || @data_format == 'tsv'
+                 auto_annotation_location(@data_format, line_num, 'lat_lon', 'value')
+    else
+                 @xml_convertor.xpath_from_attrname('lat_lon', line_num)
+    end
+    annotation.push(ErrorBuilder.suggested_annotation([insdc_latlon], 'Attribute value', location, true))
     add_error(rule_code, annotation, auto_annotation: true)
     false
   end
@@ -1273,7 +1272,7 @@ class BioSampleValidator < ValidatorBase
   def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, line_num)
     return nil if InsdcNullability.null_value?(geo_loc_name) || InsdcNullability.null_value?(lat_lon)
 
-    country_name = geo_loc_name.split(":").first.strip
+    country_name = geo_loc_name.split(':').first.strip
     expected_iso = Geolocation.insdc_to_iso_a3[country_name]
     return nil if expected_iso.nil?
 
@@ -1286,18 +1285,18 @@ class BioSampleValidator < ValidatorBase
     key = ValidatorCache.create_key(lat, lon)
     actual_iso = if @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, key)
                    @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, key)
-                 else
+    else
                    value = Geolocation.country_at(lat, lon)
                    @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, key, value)
                    value
-                 end
+    end
     return nil if actual_iso.nil?
     return true if actual_iso == expected_iso
 
     annotation = [
-      {key: "Sample name",  value: sample_name},
-      {key: "geo_loc_name", value: geo_loc_name},
-      {key: "lat_lon",      value: lat_lon}
+      {key: 'Sample name',  value: sample_name},
+      {key: 'geo_loc_name', value: geo_loc_name},
+      {key: 'lat_lon',      value: lat_lon}
     ]
     add_error(rule_code, annotation)
     false
@@ -1325,9 +1324,9 @@ class BioSampleValidator < ValidatorBase
     if insdc_latlon.nil? || lat_lon != insdc_latlon
       result = false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "lat_lon"},
-        {key: "Attribute value", value: lat_lon}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'lat_lon'},
+        {key: 'Attribute value', value: lat_lon}
       ]
       add_error(rule_code, annotation)
       result = false
@@ -1354,19 +1353,19 @@ class BioSampleValidator < ValidatorBase
     ret = true
 
     annotation = [
-      {key: "Sample name", value: sample_name},
-      {key: "host", value: host_name}
+      {key: 'Sample name', value: sample_name},
+      {key: 'host', value: host_name}
     ]
-    if @data_format == "json" || @data_format == "tsv"
-      location = auto_annotation_location(@data_format, line_num, "host", "value")
+    if @data_format == 'json' || @data_format == 'tsv'
+      location = auto_annotation_location(@data_format, line_num, 'host', 'value')
     else
-      location = @xml_convertor.xpath_from_attrname("host", line_num)
+      location = @xml_convertor.xpath_from_attrname('host', line_num)
     end
 
-    if host_name.casecmp("human") == 0
+    if host_name.casecmp('human') == 0
       ret = false
-      #"human"は"Homo sapiens"にauto-annotation
-      annotation.push(ErrorBuilder.suggested_annotation(["Homo sapiens"], "host", location, true));
+      # "human"は"Homo sapiens"にauto-annotation
+      annotation.push(ErrorBuilder.suggested_annotation(['Homo sapiens'], 'host', location, true))
     else
       host_tax_id_not_integer = false
       begin
@@ -1374,49 +1373,49 @@ class BioSampleValidator < ValidatorBase
       rescue ArgumentError
         host_tax_id_not_integer = true
       end
-      if !(host_taxid.nil? || host_taxid.strip == "" || host_tax_id_not_integer) #host_taxid記述あり
-        annotation.push({key: "host_taxid", value: host_taxid})
-        #あればキャッシュを使用
-        if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid) == false #cache値がnilの可能性があるためhas_keyでチェック
+      if !(host_taxid.nil? || host_taxid.strip == '' || host_tax_id_not_integer) # host_taxid記述あり
+        annotation.push({key: 'host_taxid', value: host_taxid})
+        # あればキャッシュを使用
+        if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid) == false # cache値がnilの可能性があるためhas_keyでチェック
           scientific_name = @org_validator.get_organism_name(host_taxid)
           @cache.save(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid, scientific_name) unless @cache.nil?
         else
-          puts "use cache in taxonomy_name_from_id" if $DEBG
+          puts 'use cache in taxonomy_name_from_id' if $DEBG
           scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid)
         end
-        #scientific_nameがあり、ユーザの入力値と一致する
+        # scientific_nameがあり、ユーザの入力値と一致する
         if !scientific_name.nil? && scientific_name == host_name
           ret = true
         else
           # tax_idからscientifin_nameが拾えればauto-annotation
           if !scientific_name.nil?
-            annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "host", location, true))
+            annotation.push(ErrorBuilder.suggested_annotation([scientific_name], 'host', location, true))
           end
           ret = false
         end
-      else #host_id記述なしまたは不正
-        #あればキャッシュを使用
+      else # host_id記述なしまたは不正
+        # あればキャッシュを使用
         if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name).nil?
           org_ret = @org_validator.suggest_taxid_from_name(host_name)
           @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, host_name, org_ret) unless @cache.nil?
         else
-          puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
+          puts 'use cache EXIST_ORGANISM_NAME' if $DEBUG
           org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name)
         end
-        if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+        if org_ret[:status] == 'exist' # 該当するtaxonomy_idがあった場合
           scientific_name = org_ret[:scientific_name]
-          #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+          # ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
           if scientific_name != host_name
-            annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "host", location, true));
+            annotation.push(ErrorBuilder.suggested_annotation([scientific_name], 'host', location, true))
             ret = false
           end
-        elsif org_ret[:status] == "no exist"
+        elsif org_ret[:status] == 'no exist'
           ret = false
-        elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
-          msg = "Multiple taxonomies detected with the same host name. Please provide the host_taxid to distinguish the duplicated names."
-          annotation.push({key: "Message", value: msg + " host_taxid:[#{org_ret[:tax_id]}]"})
+        elsif org_ret[:status] == 'multiple exist' # 該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+          msg = 'Multiple taxonomies detected with the same host name. Please provide the host_taxid to distinguish the duplicated names.'
+          annotation.push({key: 'Message', value: msg + " host_taxid:[#{org_ret[:tax_id]}]"})
           ret = false
-        end #該当するtaxonomy_idが無かった場合は単なるエラー
+        end # 該当するtaxonomy_idが無かった場合は単なるエラー
       end
     end
 
@@ -1441,52 +1440,52 @@ class BioSampleValidator < ValidatorBase
   #
   def taxonomy_error_warning (rule_code, sample_name, organism_name, line_num)
     return nil if InsdcNullability.null_value?(organism_name)
-    #あればキャッシュを使用
+    # あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
       ret = @org_validator.suggest_taxid_from_name(organism_name)
       @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret) unless @cache.nil?
     else
-      puts "use cache in taxonomy_error_warning" if $DEBUG
+      puts 'use cache in taxonomy_error_warning' if $DEBUG
       ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
     end
     annotation = [
-      {key: "Sample name", value: sample_name},
-      {key: "organism", value: organism_name}
+      {key: 'Sample name', value: sample_name},
+      {key: 'organism', value: organism_name}
     ]
 
-    if ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+    if ret[:status] == 'exist' # 該当するtaxonomy_idがあった場合
       scientific_name = ret[:scientific_name]
-      #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+      # ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != organism_name
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, "organism", "value")
+        if @data_format == 'json' || @data_format == 'tsv'
+          location = auto_annotation_location(@data_format, line_num, 'organism', 'value')
         else
-          location = @xml_convertor.xpath_from_attrname("organism", line_num)
+          location = @xml_convertor.xpath_from_attrname('organism', line_num)
         end
-        annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation_with_key('Suggested value (organism)', [scientific_name], 'organism', location, true))
       end
-      annotation.push({key: "taxonomy_id", value: ""})
-      if @data_format == "json" || @data_format == "tsv"
-        if @biosample_list[line_num -1]["attributes"].keys.include?("taxonomy_id") # taxonomy_idの列(属性名)はある
-          location = auto_annotation_location(@data_format, line_num, "taxonomy_id", "value")
+      annotation.push({key: 'taxonomy_id', value: ''})
+      if @data_format == 'json' || @data_format == 'tsv'
+        if @biosample_list[line_num -1]['attributes'].keys.include?('taxonomy_id') # taxonomy_idの列(属性名)はある
+          location = auto_annotation_location(@data_format, line_num, 'taxonomy_id', 'value')
         else # taxonomy_idの列がなければ列追加モード
           if @data_format == 'json'
-            location = {mode: "add_column", type: "json", header: {column_idx: 5, name: "taxonomy_id"}, row_idx: (line_num - 1) }
+            location = {mode: 'add_column', type: 'json', header: {column_idx: 5, name: 'taxonomy_id'}, row_idx: (line_num - 1)}
           else # tsv
             row_idx = @tsv_validator.row_index_on_tsv(line_num)
             header_row_idx = @tsv_validator.row_count_offset
-            location = {mode: "add_column", type: "tsv", header: {column_idx: 5, name: "taxonomy_id", header_idx: header_row_idx}, row_idx: row_idx}
+            location = {mode: 'add_column', type: 'tsv', header: {column_idx: 5, name: 'taxonomy_id', header_idx: header_row_idx}, row_idx: row_idx}
           end
         end
       else
-        location = @xml_convertor.xpath_from_attrname("taxonomy_id", line_num)
+        location = @xml_convertor.xpath_from_attrname('taxonomy_id', line_num)
       end
-      annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
-    elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
-      msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
-      annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
-    end #該当するtaxonomy_idが無かった場合は単なるエラー
-    add_error(rule_code, annotation) #このルールではauto-annotation用のメッセージは表示しない
+      annotation.push(ErrorBuilder.suggested_annotation_with_key('Suggested value (taxonomy_id)', [ret[:tax_id]], 'taxonomy_id', location, true))
+    elsif ret[:status] == 'multiple exist' # 該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
+      msg = 'Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names.'
+      annotation.push({key: 'Message', value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
+    end # 該当するtaxonomy_idが無かった場合は単なるエラー
+    add_error(rule_code, annotation) # このルールではauto-annotation用のメッセージは表示しない
     false
   end
 
@@ -1507,25 +1506,25 @@ class BioSampleValidator < ValidatorBase
   def taxonomy_name_and_id_not_match (rule_code, sample_name, taxonomy_id, organism_name, line_num)
     return nil if InsdcNullability.null_value?(organism_name) || InsdcNullability.null_value?(taxonomy_id)
 
-    #あればキャッシュを使用
-    if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id) == false #cache値がnilの可能性があるためhas_keyでチェック
+    # あればキャッシュを使用
+    if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id) == false # cache値がnilの可能性があるためhas_keyでチェック
       scientific_name = @org_validator.get_organism_name(taxonomy_id)
       @cache.save(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id, scientific_name) unless @cache.nil?
     else
-      puts "use cache in taxonomy_name_from_id" if $DEBG
+      puts 'use cache in taxonomy_name_from_id' if $DEBG
       scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id)
     end
-    #scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
+    # scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
     if !scientific_name.nil? && scientific_name == organism_name
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "organism", value: organism_name},
-        {key: "taxonomy_id", value: taxonomy_id}
+        {key: 'Sample name', value: sample_name},
+        {key: 'organism', value: organism_name},
+        {key: 'taxonomy_id', value: taxonomy_id}
       ]
       unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameを提案する(自動補正はしない)
-        annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
+        annotation.push({key: 'Message', value: 'Organism name of this taxonomy_id: ' + scientific_name})
       end
       add_error(rule_code, annotation)
       false
@@ -1548,25 +1547,25 @@ class BioSampleValidator < ValidatorBase
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
     return nil if package_name.blank? || InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
-    #あればキャッシュを使用
-    cache_key = ValidatorCache::create_key(taxonomy_id, package_name)
+    # あればキャッシュを使用
+    cache_key = ValidatorCache.create_key(taxonomy_id, package_name)
     if @cache.nil? || @cache.check(ValidatorCache::TAX_VS_PACKAGE, cache_key).nil?
       valid_result = @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name)
       @cache.save(ValidatorCache::TAX_VS_PACKAGE, cache_key, valid_result) unless @cache.nil?
     else
-      puts "use cache in package_versus_organism" if $DEBUG
+      puts 'use cache in package_versus_organism' if $DEBUG
       valid_result = @cache.check(ValidatorCache::TAX_VS_PACKAGE, cache_key)
     end
 
-    if valid_result[:status] == "error"
-      #パッケージに適したルールのエラーメッセージを取得
+    if valid_result[:status] == 'error'
+      # パッケージに適したルールのエラーメッセージを取得
       message = ErrorBuilder.error_msg(@validation_config, valid_result[:error_code], nil)
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "organism", value: organism},
-        {key: "taxonomy_id", value: taxonomy_id},
-        {key: "package", value: package_name},
-        {key: "Message", value: message}
+        {key: 'Sample name', value: sample_name},
+        {key: 'organism', value: organism},
+        {key: 'taxonomy_id', value: taxonomy_id},
+        {key: 'package', value: package_name},
+        {key: 'Message', value: message}
       ]
       add_error(rule_code, annotation)
       false
@@ -1594,24 +1593,24 @@ class BioSampleValidator < ValidatorBase
     ret = true
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
     fungi_linages = [OrganismValidator::TAX_FUNGI]
-    unless sex == ""
-      #あればキャッシュを使用
-      #bacteria virus linage
-      cache_key_bac_vir = ValidatorCache::create_key(taxonomy_id, bac_vir_linages)
+    unless sex == ''
+      # あればキャッシュを使用
+      # bacteria virus linage
+      cache_key_bac_vir = ValidatorCache.create_key(taxonomy_id, bac_vir_linages)
       if @cache.nil? || @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir).nil?
         has_linage_bac_vir = @org_validator.has_linage(taxonomy_id, bac_vir_linages)
         @cache.save(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir, has_linage_bac_vir) unless @cache.nil?
       else
-        puts "use cache in sex_for_bacteria(bacteria virus)" if $DEBUG
+        puts 'use cache in sex_for_bacteria(bacteria virus)' if $DEBUG
         has_linage_bac_vir = @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir)
       end
-      #fungi linage
-      cache_key_fungi = ValidatorCache::create_key(taxonomy_id, fungi_linages)
+      # fungi linage
+      cache_key_fungi = ValidatorCache.create_key(taxonomy_id, fungi_linages)
       if @cache.nil? || @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi).nil?
         has_linage_fungi = @org_validator.has_linage(taxonomy_id, fungi_linages)
         @cache.save(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi, has_linage_fungi) unless @cache.nil?
       else
-        puts "use cache in sex_for_bacteria(fungi)" if $DEBUG
+        puts 'use cache in sex_for_bacteria(fungi)' if $DEBUG
         has_linage_fungi = @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi)
       end
 
@@ -1624,11 +1623,11 @@ class BioSampleValidator < ValidatorBase
       end
       if ret == false
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "taxonomy_id", value: taxonomy_id},
-          {key: "organism", value: organism},
-          {key: "sex", value: sex},
-          {key: "Message", value: message}
+          {key: 'Sample name', value: sample_name},
+          {key: 'taxonomy_id', value: taxonomy_id},
+          {key: 'organism', value: organism},
+          {key: 'sex', value: sex},
+          {key: 'Message', value: message}
         ]
         add_error(rule_code, annotation)
       end
@@ -1650,42 +1649,42 @@ class BioSampleValidator < ValidatorBase
   def multiple_vouchers (rule_code, sample_name, attr_list, line_num)
     vouchers_list = []
     attr_list.each do |attr|
-      unless attr["culture_collection"].nil?
-        vouchers_list.push({attr_name: "culture_collection", attr_no: attr["attr_no"], value: attr["culture_collection"], institution_code: attr["culture_collection"].split(":").first.strip}) unless InsdcNullability.null_value?(attr["culture_collection"])
+      unless attr['culture_collection'].nil?
+        vouchers_list.push({attr_name: 'culture_collection', attr_no: attr['attr_no'], value: attr['culture_collection'], institution_code: attr['culture_collection'].split(':').first.strip}) unless InsdcNullability.null_value?(attr['culture_collection'])
       end
-      unless attr["specimen_voucher"].nil?
-        vouchers_list.push({attr_name: "specimen_voucher", attr_no: attr["attr_no"], value: attr["specimen_voucher"], institution_code: attr["specimen_voucher"].split(":").first.strip}) unless InsdcNullability.null_value?(attr["specimen_voucher"])
+      unless attr['specimen_voucher'].nil?
+        vouchers_list.push({attr_name: 'specimen_voucher', attr_no: attr['attr_no'], value: attr['specimen_voucher'], institution_code: attr['specimen_voucher'].split(':').first.strip}) unless InsdcNullability.null_value?(attr['specimen_voucher'])
       end
-      unless attr["bio_material"].nil?
-        vouchers_list.push({attr_name: "bio_material", attr_no: attr["attr_no"], value: attr["bio_material"], institution_code: attr["bio_material"].split(":").first.strip}) unless InsdcNullability.null_value?(attr["bio_material"])
+      unless attr['bio_material'].nil?
+        vouchers_list.push({attr_name: 'bio_material', attr_no: attr['attr_no'], value: attr['bio_material'], institution_code: attr['bio_material'].split(':').first.strip}) unless InsdcNullability.null_value?(attr['bio_material'])
       end
     end
 
     if vouchers_list.empty? # 当該属性の記述がない
-      return nil
+      nil
     elsif vouchers_list.size == 1 # 当該属性の記述が1つだけ
-      return true
+      true
     else
       # 重複しているinstitusion_codeをリストアップ
       multiple_list = []
-      vouchers_list.group_by {|attr| attr[:institution_code]}.each do|inst_code, inst_list|
+      vouchers_list.group_by {|attr| attr[:institution_code] }.each do |inst_code, inst_list|
         if inst_list.size > 1 # 2つ以上同じinstitution_codeが書かれている
           multiple_list.concat(inst_list)
         end
       end
-      if multiple_list.empty? #同じinstitution_codeが含まれていない
-        return true
+      if multiple_list.empty? # 同じinstitution_codeが含まれていない
+        true
       else
         values = multiple_list.map {|voucher|
           "[#{voucher[:attr_name]} : #{voucher[:value]}]"
-        }.join(", ")
+        }.join(', ')
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attributes", value: multiple_list.map{|voucher|voucher[:attr_name]}.uniq.join(", ")},
-          {key: "Values", value: values},
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attributes', value: multiple_list.map {|voucher|voucher[:attr_name] }.uniq.join(', ')},
+          {key: 'Values', value: values}
         ]
         add_error(rule_code, annotation)
-        return false
+        false
       end
     end
   end
@@ -1721,15 +1720,15 @@ class BioSampleValidator < ValidatorBase
     df = DateFormat.new
     collection_date = df.format_date2ddbj(collection_date)
     @conf[:ddbj_date_format].each do |format|
-      parse_format = format["parse_date_format"]
+      parse_format = format['parse_date_format']
 
       ## single date format
-      regex = Regexp.new(format["regex"])
+      regex = Regexp.new(format['regex'])
       if collection_date =~ regex
         begin
           formated_date = DateTime.strptime(collection_date, parse_format)
           result = (Date.today <=> formated_date) >= 0
-        rescue ArgumentError #invalid ddbj date format
+        rescue ArgumentError # invalid ddbj date format
           result = nil
         end
       end
@@ -1737,14 +1736,14 @@ class BioSampleValidator < ValidatorBase
       ## range date format
       regex = Regexp.new("#{format["regex"][1..-2]}/#{format["regex"][1..-2]}")
       if collection_date =~ regex
-        range_date_list = collection_date.split("/")
+        range_date_list = collection_date.split('/')
         range_date_list.each do |date|
           begin
             formated_date = DateTime.strptime(date, parse_format)
             result = (Date.today <=> formated_date) >= 0
             break if result == false
           rescue ArgumentError
-            result = nil  #invalid ddbj date format
+            result = nil  # invalid ddbj date format
           end
        end
       end
@@ -1752,9 +1751,9 @@ class BioSampleValidator < ValidatorBase
 
     if result == false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "collection_date"},
-        {key: "Attribute value", value: collection_date}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'collection_date'},
+        {key: 'Attribute value', value: collection_date}
       ]
       add_error(rule_code, annotation)
       result = false
@@ -1782,22 +1781,22 @@ class BioSampleValidator < ValidatorBase
     result = true
 
     unless package_attr_list.nil?
-      mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-        attr[:attribute_name] if attr[:require] == "mandatory" || attr[:type].downcase.include?("either_one_mandatory")
+      mandatory_attr_list = package_attr_list.map {|attr|  # 必須の属性名だけを抽出
+        attr[:attribute_name] if attr[:require] == 'mandatory' || attr[:type].downcase.include?('either_one_mandatory')
       }.compact
       unless mandatory_attr_list.include?(attr_name) # optionalの場合にはBS_R0100で空白置換されるためこのルールではスルー
         return true
       end
     end
 
-    attr_val_result = ""
-    #推奨されている NULL 値("missing: control sample"等)の表記を揃える(大文字小文字、多少の表記揺れを正す)
+    attr_val_result = ''
+    # 推奨されている NULL 値("missing: control sample"等)の表記を揃える(大文字小文字、多少の表記揺れを正す)
     # "Missing; hoge ControlSample" => "missing: control sample"
     null_accepted_list.each do |null_accepted|
-      prefix = null_accepted.split(":").first.downcase # "missing"
-      sufix = null_accepted.split(":")[1..-1].join().gsub(" ", "").downcase # "controlsample" 空白の個数違いも吸収
-      if attr_val.downcase.start_with?(prefix) && attr_val.downcase.gsub(" ", "").end_with?(sufix)
-        unless (attr_name == "collection_date" || attr_name == "geo_loc_name") && !null_accepted.start_with?("missing:") # "collection_date", "geo_loc_name" の場合は"Missing" => "missing"等と無用な置換はしない
+      prefix = null_accepted.split(':').first.downcase # "missing"
+      sufix = null_accepted.split(':')[1..-1].join().gsub(' ', '').downcase # "controlsample" 空白の個数違いも吸収
+      if attr_val.downcase.start_with?(prefix) && attr_val.downcase.gsub(' ', '').end_with?(sufix)
+        unless (attr_name == 'collection_date' || attr_name == 'geo_loc_name') && !null_accepted.start_with?('missing:') # "collection_date", "geo_loc_name" の場合は"Missing" => "missing"等と無用な置換はしない
           attr_val_result = null_accepted
           unless attr_val_result == attr_val
             result = false
@@ -1805,29 +1804,29 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
-    #推奨されている NULL 値の表記を揃える(小文字表記へ)
+    # 推奨されている NULL 値の表記を揃える(小文字表記へ)
     # NULL 値を推奨値に変換
-    unless attr_name == "collection_date" || attr_name == "geo_loc_name" # この2属性は "N.A." => "missing"への置換は行わない("missing: xxxx"のreporting level termsで記述されている必要がある為)
+    unless attr_name == 'collection_date' || attr_name == 'geo_loc_name' # この2属性は "N.A." => "missing"への置換は行わない("missing: xxxx"のreporting level termsで記述されている必要がある為)
       null_not_recommended_list.each do |refexp|
         if attr_val =~ /^(#{refexp})$/i
-          attr_val_result = "missing"
+          attr_val_result = 'missing'
           result = false
-         end
+        end
       end
     end
 
     if result == false &&  attr_val_result != attr_val
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: attr_name},
+        {key: 'Attribute value', value: attr_val}
       ]
-      if @data_format == "json" || @data_format == "tsv"
-        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, "value")
+      if @data_format == 'json' || @data_format == 'tsv'
+        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
       else
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
-      annotation.push(ErrorBuilder.suggested_annotation([attr_val_result], "Attribute value", location, true));
+      annotation.push(ErrorBuilder.suggested_annotation([attr_val_result], 'Attribute value', location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     else
@@ -1851,11 +1850,11 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_datetime_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
+  def invalid_datetime_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num)
     return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
-    return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
+    return nil unless ts_attr.include?(attr_name) # 日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
-    return nil if attr_name == "collection_date" && (InsdcNullability.null_not_recommended_value?(attr_val))
+    return nil if attr_name == 'collection_date' && (InsdcNullability.null_not_recommended_value?(attr_val))
 
     attr_val_org = attr_val
     result = true
@@ -1865,10 +1864,10 @@ class BioSampleValidator < ValidatorBase
     attr_val = df.format_date2ddbj(attr_val)
 
     # 補正後の値が妥当な日付、フォーマットであるかチェックする
-    is_ddbj_format = df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
-    parsable_date = df.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
+    is_ddbj_format = df.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
+    parsable_date = df.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
 
-    if !is_ddbj_format || !parsable_date #無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
+    if !is_ddbj_format || !parsable_date # 無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
       attr_val = attr_val_org
     else # timezoneをUTC時間に変更
       attr_val = df.convert2utc(attr_val)
@@ -1877,16 +1876,16 @@ class BioSampleValidator < ValidatorBase
     # 置換が発生した場合だけwarningを出す
     if attr_val_org != attr_val
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val_org}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: attr_name},
+        {key: 'Attribute value', value: attr_val_org}
       ]
-      if @data_format == "json" || @data_format == "tsv"
-        location = auto_annotation_location(@data_format, line_num, attr_name, "value")
+      if @data_format == 'json' || @data_format == 'tsv'
+        location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
       else
         location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       end
-      annotation.push(ErrorBuilder.suggested_annotation([attr_val], "Attribute value", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation([attr_val], 'Attribute value', location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     end
@@ -1907,22 +1906,22 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def invalid_datetime (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
+  def invalid_datetime (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num)
     return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
-    return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
+    return nil unless ts_attr.include?(attr_name) # 日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
-    return nil if attr_name == "collection_date" && (InsdcNullability.null_not_recommended_value?(attr_val))
+    return nil if attr_name == 'collection_date' && (InsdcNullability.null_not_recommended_value?(attr_val))
 
     result = true
     df = DateFormat.new
-    is_ddbj_format = df.ddbj_date_format?(attr_val) #DDBJフォーマットであるか
-    parsable_date = df.parsable_date_format?(attr_val) #妥当な日付であるか(2018/13/34 => false)
+    is_ddbj_format = df.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
+    parsable_date = df.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
     if !(is_ddbj_format && parsable_date) # DDBJフォーマットであるか
       result = false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: attr_name},
+        {key: 'Attribute value', value: attr_val}
       ]
       add_error(rule_code, annotation)
     end
@@ -1944,10 +1943,10 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def special_character_included (rule_code, sample_name, attr_name, attr_val, special_chars, target, line_num)
-    if target == "attr_name" #属性名の検証
+    if target == 'attr_name' # 属性名の検証
       return nil if attr_name.blank?
       replaced = attr_name.dup
-    elsif target == "attr_value" #属性値の検証
+    elsif target == 'attr_value' # 属性値の検証
       return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
       replaced = attr_val.dup
     else
@@ -1958,36 +1957,36 @@ class BioSampleValidator < ValidatorBase
     special_chars.each do |target_val, replace_val|
       pos = 0
       while pos < replaced.length
-        #再起的に置換してしまうとまずいケースを想定しgsubは使用できない。
-        #"degree C" => "degree Celsius"と置換する場合、ユーザ入力値が"degree Celsius"だった場合には"degree C"にマッチするため"degree Celsiuselsius"になってしまう
+        # 再起的に置換してしまうとまずいケースを想定しgsubは使用できない。
+        # "degree C" => "degree Celsius"と置換する場合、ユーザ入力値が"degree Celsius"だった場合には"degree C"にマッチするため"degree Celsiuselsius"になってしまう
         hit_pos = replaced.index(target_val, pos)
         break if hit_pos.nil?
         target_str = replaced.slice(hit_pos, replace_val.length)
         if target_str == replace_val # "degree C"はその後に"degree Celsiuselsius"と続くか。続くなら置換不要(再起置換の防止)
           pos = hit_pos + target_val.length
         else
-          #置換(delete & insert)
+          # 置換(delete & insert)
           replaced.slice!(hit_pos, target_val.length)
           replaced.insert(hit_pos, replace_val)
           pos = hit_pos + replace_val.length
         end
       end
     end
-    if target == "attr_name" && replaced != attr_name
+    if target == 'attr_name' && replaced != attr_name
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute name", value: attr_name}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute name', value: attr_name}
       ]
-      annotation.push({key:"Suggestion",value: replaced})
+      annotation.push({key: 'Suggestion', value: replaced})
       add_error(rule_code, annotation)
       result = false
-    elsif target == "attr_value" && replaced != attr_val
+    elsif target == 'attr_value' && replaced != attr_val
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: attr_name},
+        {key: 'Attribute value', value: attr_val}
       ]
-      annotation.push({key:"Suggestion",value: replaced})
+      annotation.push({key: 'Suggestion', value: replaced})
       add_error(rule_code, annotation)
       result = false
     end
@@ -2016,22 +2015,22 @@ class BioSampleValidator < ValidatorBase
     taxon_values.push(host) unless InsdcNullability.null_value?(host)
     taxon_values.push(isolation_source) unless InsdcNullability.null_value?(isolation_source)
     uniq_taxon_values = taxon_values.map {|tax_name|
-      tax_name.strip.gsub(" ", "").downcase
+      tax_name.strip.gsub(' ', '').downcase
     }.uniq
     if taxon_values.size == uniq_taxon_values.size
-      return true
+      true
     else
-      organism = "" if organism.blank?
-      host = "" if host.blank?
-      isolation_source = "" if isolation_source.blank?
+      organism = '' if organism.blank?
+      host = '' if host.blank?
+      isolation_source = '' if isolation_source.blank?
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "organism", value: organism},
-        {key: "host", value: host},
-        {key: "isolation_source", value: isolation_source}
+        {key: 'Sample name', value: sample_name},
+        {key: 'organism', value: organism},
+        {key: 'host', value: host},
+        {key: 'isolation_source', value: isolation_source}
       ]
       add_error(rule_code, annotation)
-      return false
+      false
     end
   end
 
@@ -2050,10 +2049,10 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_data_format (rule_code, sample_name, attr_name, attr_val, target, attr_no, line_num)
-    if target == "attr_name" #属性名の検証
+    if target == 'attr_name' # 属性名の検証
       return nil if attr_name.blank?
       replaced = attr_name.dup
-    elsif target == "attr_value" #属性値の検証
+    elsif target == 'attr_value' # 属性値の検証
       return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
       replaced = attr_val.dup
     else
@@ -2067,31 +2066,31 @@ class BioSampleValidator < ValidatorBase
     if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
       replaced = replaced[1..-2].strip
     end
-    if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
+    if target == 'attr_name' && replaced != attr_name # 属性名のAuto-annotationが必要
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute name", value: attr_name}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute name', value: attr_name}
       ]
-      if @data_format == "json" || @data_format == "tsv"
-        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, "key")
+      if @data_format == 'json' || @data_format == 'tsv'
+        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'key')
       else
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
-      annotation.push(ErrorBuilder.suggested_annotation([replaced], "Attribute name", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation([replaced], 'Attribute name', location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
-    elsif target == "attr_value" && replaced != attr_val #属性値のAuto-annotationが必要
+    elsif target == 'attr_value' && replaced != attr_val # 属性値のAuto-annotationが必要
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: attr_name},
+        {key: 'Attribute value', value: attr_val}
       ]
-      if @data_format == "json" || @data_format == "tsv"
-        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, "value")
+      if @data_format == 'json' || @data_format == 'tsv'
+        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
       else
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
-      annotation.push(ErrorBuilder.suggested_annotation([replaced], "Attribute value", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation([replaced], 'Attribute value', location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     end
@@ -2118,10 +2117,10 @@ class BioSampleValidator < ValidatorBase
     disp_attr_val = attr_val.chars.map {|ch| ch.ascii_only? ? ch : '[### Non-ASCII character ###]' }.join
 
     annotation = [
-      {key: "Sample name",     value: sample_name},
-      {key: "Attribute",       value: attr_name},
-      {key: "Attribute value", value: attr_val},
-      {key: "Position",        value: disp_attr_val}
+      {key: 'Sample name',     value: sample_name},
+      {key: 'Attribute',       value: attr_name},
+      {key: 'Attribute value', value: attr_val},
+      {key: 'Position',        value: disp_attr_val}
     ]
     add_error(rule_code, annotation)
     false
@@ -2145,17 +2144,17 @@ class BioSampleValidator < ValidatorBase
     biosample_list.each_with_index do |biosample_data, index|
       index += 1
       biosample_list_lite.push({
-        sample_name: biosample_data["attributes"]["sample_name"],
-        sample_title: biosample_data["attributes"]["sample_title"],
+        sample_name: biosample_data['attributes']['sample_name'],
+        sample_title: biosample_data['attributes']['sample_title'],
         index: index
       })
     end
-    biosample_list_lite.group_by{|row| row[:sample_title]}.each do |sample_title, list|
+    biosample_list_lite.group_by {|row| row[:sample_title] }.each do |sample_title, list|
       if list.size > 1 # 重複あり
         list.each do |sample_data|
           annotation = [
-            {key: "Sample name", value: sample_data[:sample_name]},
-            {key: "Title", value: sample_title}
+            {key: 'Sample name', value: sample_data[:sample_name]},
+            {key: 'Title', value: sample_title}
           ]
           add_error(rule_code, annotation)
           result= false
@@ -2195,9 +2194,9 @@ class BioSampleValidator < ValidatorBase
     return true if ret.nil? || ret.include?(submitter_id)
 
     annotation = [
-      {key: "Sample name",   value: sample_name},
-      {key: "Submitter ID",  value: submitter_id},
-      {key: "bioproject_id", value: bioproject_accession}
+      {key: 'Sample name',   value: sample_name},
+      {key: 'Submitter ID',  value: submitter_id},
+      {key: 'bioproject_id', value: bioproject_accession}
     ]
     add_error(rule_code, annotation)
     false
@@ -2221,39 +2220,38 @@ class BioSampleValidator < ValidatorBase
 
     result = true
     # 同値比較しない基本属性
-    keys_excluding = ["sample_name", "sample_title", "bioproject_id", "description"]
+    keys_excluding = ['sample_name', 'sample_title', 'bioproject_id', 'description']
     attribute_list = []
     biosample_list.each do |biosample_data|
-      attribute_list.concat(biosample_data["attributes"].keys).uniq!
+      attribute_list.concat(biosample_data['attributes'].keys).uniq!
     end
     check_attribute_list = attribute_list - keys_excluding
     bs_list = []
     biosample_list.each_with_index do |biosample_data, current_idx|
       bs_data = {}
       check_attr_value_text = check_attribute_list.map {|attr_name|
-        val = biosample_data["attributes"][attr_name]
+        val = biosample_data['attributes'][attr_name]
         if val.nil?
-          ""
+          ''
         else
           val
         end
-      }.join(" ")
+      }.join(' ')
       keys_excluding.each do |attr_name|
-        bs_data[attr_name] = biosample_data["attributes"][attr_name]
+        bs_data[attr_name] = biosample_data['attributes'][attr_name]
       end
-      bs_data["check_attr_value_text"] = check_attr_value_text
+      bs_data['check_attr_value_text'] = check_attr_value_text
       bs_list.push(bs_data)
     end
 
-    group_by = bs_list.group_by{|row| row["check_attr_value_text"]}
+    group_by = bs_list.group_by {|row| row['check_attr_value_text'] }
     group_idx = 1
     group_by.each do |value_text, sample_list|
       if sample_list.size > 1 # 重複がある
         sample_list.each do |sample|
-          
           annotation = [
-            {key: "Sample name", value: sample["sample_name"]},
-            {key: "Sample group without distinguishing attribute", value: group_idx.to_s}
+            {key: 'Sample name', value: sample['sample_name']},
+            {key: 'Sample group without distinguishing attribute', value: group_idx.to_s}
           ]
           add_error(rule_code, annotation)
         end
@@ -2289,8 +2287,8 @@ class BioSampleValidator < ValidatorBase
     return true unless is_umbrella
 
     annotation = [
-      {key: "Sample name",   value: sample_name},
-      {key: "bioproject_id", value: bioproject_accession}
+      {key: 'Sample name',   value: sample_name},
+      {key: 'bioproject_id', value: bioproject_accession}
     ]
     add_error(rule_code, annotation)
     false
@@ -2316,12 +2314,12 @@ class BioSampleValidator < ValidatorBase
 
     begin
       Integer(attr_val)
-      return true
+      true
     rescue ArgumentError
       annotation = [
-        {key: "Sample name",     value: sample_name},
-        {key: "Attribute",       value: attr_name},
-        {key: "Attribute value", value: attr_val}
+        {key: 'Sample name',     value: sample_name},
+        {key: 'Attribute',       value: attr_name},
+        {key: 'Attribute value', value: attr_val}
       ]
       add_error(rule_code, annotation)
       false
@@ -2347,17 +2345,17 @@ class BioSampleValidator < ValidatorBase
     biosample_list.each_with_index do |biosample_data, index|
       index += 1
       biosample_list_lite.push({
-        sample_name: biosample_data["attributes"]["sample_name"],
-        sample_title: biosample_data["attributes"]["sample_title"],
+        sample_name: biosample_data['attributes']['sample_name'],
+        sample_title: biosample_data['attributes']['sample_title'],
         index: index
       })
     end
-    biosample_list_lite.group_by{|row| row[:sample_name]}.each do |sample_name, list|
+    biosample_list_lite.group_by {|row| row[:sample_name] }.each do |sample_name, list|
       if list.size > 1 # 重複あり
         list.each do |sample_data|
           annotation = [
-            {key: "Sample name", value: sample_name},
-            {key: "Sample title", value: sample_data[:sample_title]} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
+            {key: 'Sample name', value: sample_name},
+            {key: 'Sample title', value: sample_data[:sample_title]} # sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
           ]
           add_error(rule_code, annotation)
           result= false
@@ -2383,31 +2381,31 @@ class BioSampleValidator < ValidatorBase
     result = true
     bioproject_accession_list = []
     biosample_list.each do |biosample_data|
-      bioproject_accession_list.push(biosample_data["attributes"]["bioproject_id"])
+      bioproject_accession_list.push(biosample_data['attributes']['bioproject_id'])
     end
     compact_list = bioproject_accession_list.compact
-    if bioproject_accession_list.size != compact_list.size #nilが含まれていた場合には連続値ではないものとする
+    if bioproject_accession_list.size != compact_list.size # nilが含まれていた場合には連続値ではないものとする
       result = true
-    elsif biosample_list.size >= 3 #最低3サンプルから連続値チェック
-      #前後のサンプルのbioproject_accession(数値部分)の差分を配列に格納する
+    elsif biosample_list.size >= 3 # 最低3サンプルから連続値チェック
+      # 前後のサンプルのbioproject_accession(数値部分)の差分を配列に格納する
       @sub = []
       i = 0
       until i >= bioproject_accession_list.length - 1 do
-        if bioproject_accession_list[i] =~ /^PRJDB\d+/ #TODO PRJDNの場合
-          @sub.push( bioproject_accession_list[i + 1].gsub("PRJDB", "").to_i - bioproject_accession_list[i].gsub("PRJDB", "").to_i)
+        if bioproject_accession_list[i] =~ /^PRJDB\d+/ # TODO PRJDNの場合
+          @sub.push(bioproject_accession_list[i + 1].gsub('PRJDB', '').to_i - bioproject_accession_list[i].gsub('PRJDB', '').to_i)
         elsif bioproject_accession_list[i] =~ /^PSUB\d{6}/
-          @sub.push( bioproject_accession_list[i + 1].gsub("PSUB", "").to_i - bioproject_accession_list[i].gsub("PSUB", "").to_i)
+          @sub.push(bioproject_accession_list[i + 1].gsub('PSUB', '').to_i - bioproject_accession_list[i].gsub('PSUB', '').to_i)
         end
         i += 1
       end
-      @sub.uniq == [1] ? result = false : result = true #差分が常に1であれば連続値
+      @sub.uniq == [1] ? result = false : result = true # 差分が常に1であれば連続値
 
       if result == false
-        #連続値であれば全てのSample nameとbioproject_accessionを出力する
+        # 連続値であれば全てのSample nameとbioproject_accessionを出力する
         biosample_list.each do |biosample_data|
           annotation = [
-            {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
-            {key: "Attribute", value: biosample_data["attributes"]["bioproject_id"]}
+            {key: 'Sample name', value: biosample_data['attributes']['sample_name']},
+            {key: 'Attribute', value: biosample_data['attributes']['bioproject_id']}
           ]
           add_error(rule_code, annotation)
         end
@@ -2438,29 +2436,29 @@ class BioSampleValidator < ValidatorBase
 
     # 同一ファイル内での重複チェック
     duplicated = biosample_list.select do |biosample_data|
-      locus_tag == biosample_data["attributes"]["locus_tag_prefix"]
+      locus_tag == biosample_data['attributes']['locus_tag_prefix']
     end
 
-    result = false if duplicated.length > 1 #自身以外に同一のlocus_tag_prefixをもつサンプルがある
+    result = false if duplicated.length > 1 # 自身以外に同一のlocus_tag_prefixをもつサンプルがある
 
     # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
-    if @cache.nil? || @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all").nil?
+    if @cache.nil? || @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, 'all').nil?
       # biosample DBから全locus_tag_prefixのリストを取得
       all_prefix_list = @db_validator.get_all_locus_tag_prefix()
-      @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, "all", all_prefix_list)
+      @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, 'all', all_prefix_list)
     else
-      all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, "all")
+      all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, 'all')
     end
 
     # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
-    duplicated_list = all_prefix_list.select {|row| row[:locus_tag_prefix] == locus_tag && row[:submission_id] != submission_id}
+    duplicated_list = all_prefix_list.select {|row| row[:locus_tag_prefix] == locus_tag && row[:submission_id] != submission_id }
     result = false if duplicated_list.any?
 
     if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "locus_tag_prefix"},
-          {key: "Attribute value", value: locus_tag}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: 'locus_tag_prefix'},
+          {key: 'Attribute value', value: locus_tag}
       ]
       add_error(rule_code, annotation)
     end
@@ -2486,7 +2484,7 @@ class BioSampleValidator < ValidatorBase
     result = true
 
     if /^PSUB/ =~ psub_id
-      if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id) == false #cache値がnilの可能性があるためhas_keyでチェック
+      if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id) == false # cache値がnilの可能性があるためhas_keyでチェック
         biosample_accession = @db_validator.get_bioproject_accession(psub_id)
         @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id, biosample_accession)
       else
@@ -2494,19 +2492,19 @@ class BioSampleValidator < ValidatorBase
       end
 
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "bioproject_id"},
-          {key: "Attribute value", value: psub_id}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: 'bioproject_id'},
+          {key: 'Attribute value', value: psub_id}
       ]
 
       # biosample_accessionにAuto-annotationできる
       if !biosample_accession.nil?
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, "bioproject_id", "value")
+        if @data_format == 'json' || @data_format == 'tsv'
+          location = auto_annotation_location(@data_format, line_num, 'bioproject_id', 'value')
         else
-          location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
+          location = @xml_convertor.xpath_from_attrname('bioproject_id', line_num)
         end
-        annotation.push(ErrorBuilder.suggested_annotation([biosample_accession], "Attribute value", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation([biosample_accession], 'Attribute value', location, true))
         add_error(rule_code, annotation, auto_annotation: true)
         result = false
       end
@@ -2532,9 +2530,9 @@ class BioSampleValidator < ValidatorBase
     result = @org_validator.is_infraspecific_rank(taxonomy_id)
     if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "taxonomy_id", value: taxonomy_id},
-          {key: "organism", value: organism}
+          {key: 'Sample name', value: sample_name},
+          {key: 'taxonomy_id', value: taxonomy_id},
+          {key: 'organism', value: organism}
       ]
       add_error(rule_code, annotation)
     end
@@ -2556,22 +2554,22 @@ class BioSampleValidator < ValidatorBase
     result = true
     doc = Nokogiri::XML(xml_document)
     annotation = []
-    if doc.root.name == "BioSampleSet"
+    if doc.root.name == 'BioSampleSet'
       doc.root.children.each do |child_node|
-        #rootのchild nodeがBioSampleではない
-        if child_node.class == Nokogiri::XML::Element && child_node.name != "BioSample"
+        # rootのchild nodeがBioSampleではない
+        if child_node.class == Nokogiri::XML::Element && child_node.name != 'BioSample'
           annotation = [
-            {key: "second node name", value: child_node.name},
-            {key: "message", value: "Expected second node is BioSample"}
+            {key: 'second node name', value: child_node.name},
+            {key: 'message', value: 'Expected second node is BioSample'}
           ]
           result = false
           break
         end
       end
-    else #root nodeがBioSampleSetではない
+    else # root nodeがBioSampleSetではない
       annotation = [
-        {key: "root node name", value: doc.root.name},
-        {key: "message", value: "Expected root node is BioSampleSet"}
+        {key: 'root node name', value: doc.root.name},
+        {key: 'message', value: 'Expected root node is BioSampleSet'}
       ]
       result = false
     end
@@ -2599,9 +2597,9 @@ class BioSampleValidator < ValidatorBase
     return true if locus_tag.size.between?(3, 12) && locus_tag =~ /^[0-9a-zA-Z]+$/ && locus_tag !~ /^[0-9]+/
 
     annotation = [
-      {key: "Sample name",     value: sample_name},
-      {key: "Attribute",       value: "locus_tag_prefix"},
-      {key: "Attribute value", value: locus_tag}
+      {key: 'Sample name',     value: sample_name},
+      {key: 'Attribute',       value: 'locus_tag_prefix'},
+      {key: 'Attribute value', value: locus_tag}
     ]
     add_error(rule_code, annotation)
     false
@@ -2622,30 +2620,30 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   #
-  def missing_values_provided_for_optional_attributes (rule_code, sample_name, sample_attr, null_accepted_list, null_not_recommended_list, package_attr_list , line_num)
+  def missing_values_provided_for_optional_attributes (rule_code, sample_name, sample_attr, null_accepted_list, null_not_recommended_list, package_attr_list, line_num)
     return nil if sample_attr.nil? || package_attr_list.nil?
     result = true
-    mandatory_attr_list = package_attr_list.map { |attr|  #必須の属性名だけを抽出
-      attr[:attribute_name] if attr[:require] == "mandatory" || attr[:type].downcase.include?("either_one_mandatory")
+    mandatory_attr_list = package_attr_list.map {|attr|  # 必須の属性名だけを抽出
+      attr[:attribute_name] if attr[:require] == 'mandatory' || attr[:type].downcase.include?('either_one_mandatory')
     }.compact
-    optional_attr_list = sample_attr.keys - mandatory_attr_list #差分から必須ではない属性名だけを抽出
-    #一つずつoptionalな属性の値を検証
+    optional_attr_list = sample_attr.keys - mandatory_attr_list # 差分から必須ではない属性名だけを抽出
+    # 一つずつoptionalな属性の値を検証
     optional_attr_list.each do |optional_attr|
       # null_acceptedかnull_not_recommendedの正規表現リストにマッチすればNG
-      null_accepted_size = null_accepted_list.select{|refexp| sample_attr[optional_attr] =~ /#{refexp}/i }.size
+      null_accepted_size = null_accepted_list.select {|refexp| sample_attr[optional_attr] =~ /#{refexp}/i }.size
       null_not_recomm_size = null_not_recommended_list.select {|refexp| sample_attr[optional_attr] =~ /^(#{refexp})$/i }.size
       if (null_accepted_size + null_not_recomm_size) > 0
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute name", value: optional_attr},
-          {key: "Attribute value", value: sample_attr[optional_attr]},
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute name', value: optional_attr},
+          {key: 'Attribute value', value: sample_attr[optional_attr]}
         ]
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location(@data_format, line_num, optional_attr, "value") # TODO attr_no
+        if @data_format == 'json' || @data_format == 'tsv'
+          location = auto_annotation_location(@data_format, line_num, optional_attr, 'value') # TODO attr_no
         else
           location = @xml_convertor.xpath_from_attrname(optional_attr, line_num) # TODO attr_no
         end
-        annotation.push(ErrorBuilder.suggested_annotation([""], "Attribute value", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation([''], 'Attribute value', location, true))
         add_error(rule_code, annotation)
         result = false
       end
@@ -2665,10 +2663,10 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_sample_name_format (rule_code, sample_name, line_num)
     return nil  if InsdcNullability.null_value?(sample_name)
-    return true if sample_name.size <= 100 && sample_name =~ /^[0-9a-zA-Z\s\(\)\{\}\[\]\+\-_.]+$/  #最大100文字で英数字、空白、記号 (){}[]+-_. から構成されること
+    return true if sample_name.size <= 100 && sample_name =~ /^[0-9a-zA-Z\s\(\)\{\}\[\]\+\-_.]+$/  # 最大100文字で英数字、空白、記号 (){}[]+-_. から構成されること
 
     annotation = [
-      {key: "Sample name", value: sample_name}
+      {key: 'Sample name', value: sample_name}
     ]
     add_error(rule_code, annotation)
     false
@@ -2692,10 +2690,10 @@ class BioSampleValidator < ValidatorBase
   def invalid_taxonomy_for_genome_sample (rule_code, sample_name, package_name, taxonomy_id, organism, line_num)
     return nil if package_name.blank? || InsdcNullability.null_value?(organism)
     result = true
-    if package_name.start_with?("MIGS.ba") || package_name.start_with?("MIGS.eu")
+    if package_name.start_with?('MIGS.ba') || package_name.start_with?('MIGS.eu')
       # "sp."終わり、または"xxx sp. (in: yyy)", "xxx sp. (ex yyy)"であればエラー seealso: https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
-      if organism.downcase.end_with?("sp.") || organism =~ /.+sp\.\s*\((in\:|ex)\s.*\)$/
-        if (InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
+      if organism.downcase.end_with?('sp.') || organism =~ /.+sp\.\s*\((in\:|ex)\s.*\)$/
+        if InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
           # tax_idが不明な場合、新規生物種登録の可能性がありstrain名をつけてもらいたいためエラー
           result = false
         else
@@ -2709,9 +2707,9 @@ class BioSampleValidator < ValidatorBase
     end
     if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute name", value: "organism"},
-          {key: "Attribute value", value: organism}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute name', value: 'organism'},
+          {key: 'Attribute value', value: organism}
         ]
         add_error(rule_code, annotation)
     end
@@ -2732,35 +2730,35 @@ class BioSampleValidator < ValidatorBase
     ret = true
 
     annotation = [
-      {key: "Sample name", value: sample_name},
-      {key: "component_organism", value: component_organism}
+      {key: 'Sample name', value: sample_name},
+      {key: 'component_organism', value: component_organism}
     ]
 
-    #あればキャッシュを使用
+    # あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism).nil?
       org_ret = @org_validator.suggest_taxid_from_name(component_organism)
     else
-      puts "use cache EXIST_ORGANISM_NAME" if $DEBUG
+      puts 'use cache EXIST_ORGANISM_NAME' if $DEBUG
       org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism)
     end
 
-    if org_ret[:status] == "exist" #該当するtaxonomy_idがあった場合
+    if org_ret[:status] == 'exist' # 該当するtaxonomy_idがあった場合
       scientific_name = org_ret[:scientific_name]
-      #ユーザ入力のcomponent_organismがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
+      # ユーザ入力のcomponent_organismがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
       if scientific_name != component_organism
-        if @data_format == "json" || @data_format == "tsv"
-          location = auto_annotation_location_with_index(@data_format, line_num, attr_no, "value")
+        if @data_format == 'json' || @data_format == 'tsv'
+          location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
         else
-          location = @xml_convertor.xpath_from_attrname_with_index("component_organism", line_num, attr_no)
+          location = @xml_convertor.xpath_from_attrname_with_index('component_organism', line_num, attr_no)
         end
-        annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "component_organism", location, true));
+        annotation.push(ErrorBuilder.suggested_annotation([scientific_name], 'component_organism', location, true))
         ret = false
       end
-    elsif org_ret[:status] == "no exist" #該当するtaxonomy_idが無かった場合は単なるエラー
+    elsif org_ret[:status] == 'no exist' # 該当するtaxonomy_idが無かった場合は単なるエラー
       ret = false
-    elsif org_ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、警告のみ
-      msg = "Multiple taxonomies detected with the same component organism name."
-      annotation.push({key: "Message", value: msg + " taxids:[#{org_ret[:tax_id]}]"})
+    elsif org_ret[:status] == 'multiple exist' # 該当するtaxonomy_idが複数あった場合、警告のみ
+      msg = 'Multiple taxonomies detected with the same component organism name.'
+      annotation.push({key: 'Message', value: msg + " taxids:[#{org_ret[:tax_id]}]"})
       ret = false
     end
 
@@ -2786,32 +2784,32 @@ class BioSampleValidator < ValidatorBase
     ret = true
 
     metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
-    #あればキャッシュを使用
-    cache_key_metage_source = ValidatorCache::create_key(metagenome_source, metagenome_linages)
+    # あればキャッシュを使用
+    cache_key_metage_source = ValidatorCache.create_key(metagenome_source, metagenome_linages)
     if @cache.nil? || @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source).nil?
       org_ret = @org_validator.suggest_taxid_from_name(metagenome_source) # metagenome_sourceからtax_idを検索
-      if org_ret[:status] == "exist" # tax_idが1件
+      if org_ret[:status] == 'exist' # tax_idが1件
         linage_ret = @org_validator.has_linage(org_ret[:tax_id], metagenome_linages)
         ret = false if linage_ret == false
-        has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: linage_ret}
+        has_linage_metagenome = {tax_id: org_ret[:tax_id], lineage: linage_ret}
         unless org_ret[:scientific_name] == metagenome_source
           has_linage_metagenome[:annotation_name] = org_ret[:scientific_name]
         end
-      elsif org_ret[:status] == "multiple exist" # tax_idが複数件ヒット. どれかがmetagenomeならOK
-        has_linage_metagenome = {tax_id: org_ret[:tax_id] , lineage: false}
+      elsif org_ret[:status] == 'multiple exist' # tax_idが複数件ヒット. どれかがmetagenomeならOK
+        has_linage_metagenome = {tax_id: org_ret[:tax_id], lineage: false}
         org_ret[:tax_id].each do |tax_id|
           linage_ret = @org_validator.has_linage(tax_id.chomp.strip, metagenome_linages)
           has_linage_metagenome[:lineage] = true if linage_ret == true
         end
       else # not exist
-        has_linage_metagenome = {tax_id: nil , lineage: nil}
+        has_linage_metagenome = {tax_id: nil, lineage: nil}
       end
       @cache.save(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source, has_linage_metagenome) unless @cache.nil?
     else
       has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source)
     end
     if has_linage_metagenome[:tax_id].nil?
-      message = "This metagenome_source name is not in the taxonomy database."
+      message = 'This metagenome_source name is not in the taxonomy database.'
       ret = false
     elsif has_linage_metagenome[:lineage] == false
       ret = false
@@ -2821,13 +2819,13 @@ class BioSampleValidator < ValidatorBase
 
     if ret == false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "metagenome_source", value: metagenome_source}
+        {key: 'Sample name', value: sample_name},
+        {key: 'metagenome_source', value: metagenome_source}
       ]
-      annotation.push({key: "message", value: message}) unless message.nil?
+      annotation.push({key: 'message', value: message}) unless message.nil?
       if !has_linage_metagenome[:annotation_name].nil?
         attr_no = " (Attribute no: #{attr_idx})"
-        annotation.push({key: "Suggested value" + attr_no, value: has_linage_metagenome[:annotation_name]})
+        annotation.push({key: 'Suggested value' + attr_no, value: has_linage_metagenome[:annotation_name]})
       end
       add_error(rule_code, annotation)
     end
@@ -2850,12 +2848,12 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(culture_collection)
 
     ret = true
-    if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
+    if culture_collection.split(':').size < 2 || culture_collection.split(':').size > 3
       ret = false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "culture_collection"},
-        {key: "Attribute value", value: culture_collection}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'culture_collection'},
+        {key: 'Attribute value', value: culture_collection}
       ]
       add_error(rule_code, annotation)
     end
@@ -2877,9 +2875,9 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_culture_collection (rule_code, sample_name, culture_collection, institution_list, attr_idx, line_num)
     return nil if InsdcNullability.null_value?(culture_collection) || institution_list.nil?
-    return nil if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
+    return nil if culture_collection.split(':').size < 2 || culture_collection.split(':').size > 3
 
-    invalid_institude_name(rule_code, sample_name, "culture_collection", culture_collection, institution_list, attr_idx, line_num)
+    invalid_institude_name(rule_code, sample_name, 'culture_collection', culture_collection, institution_list, attr_idx, line_num)
   end
 
   #
@@ -2901,9 +2899,9 @@ class BioSampleValidator < ValidatorBase
     ret = @org_validator.target_organism_for_specimen_voucher?(taxonomy_id)
     if ret == false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "specimen_voucher"},
-        {key: "Attribute value", value: specimen_voucher}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'specimen_voucher'},
+        {key: 'Attribute value', value: specimen_voucher}
       ]
       add_error(rule_code, annotation)
     end
@@ -2926,12 +2924,12 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(specimen_voucher)
 
     ret = true
-    if specimen_voucher.split(":").size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
+    if specimen_voucher.split(':').size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
       ret = false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "specimen_voucher"},
-        {key: "Attribute value", value: specimen_voucher}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'specimen_voucher'},
+        {key: 'Attribute value', value: specimen_voucher}
       ]
       add_error(rule_code, annotation)
     end
@@ -2953,9 +2951,9 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_specimen_voucher (rule_code, sample_name, specimen_voucher, institution_list, attr_idx, line_num)
     return nil if InsdcNullability.null_value?(specimen_voucher) || institution_list.nil?
-    return nil if specimen_voucher.split(":").size > 3
+    return nil if specimen_voucher.split(':').size > 3
 
-    invalid_institude_name(rule_code, sample_name, "specimen_voucher", specimen_voucher, institution_list, attr_idx, line_num)
+    invalid_institude_name(rule_code, sample_name, 'specimen_voucher', specimen_voucher, institution_list, attr_idx, line_num)
   end
 
   #
@@ -2974,12 +2972,12 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(bio_material)
 
     ret = true
-    if bio_material.split(":").size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
+    if bio_material.split(':').size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
       ret = false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "bio_material"},
-        {key: "Attribute value", value: bio_material}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'bio_material'},
+        {key: 'Attribute value', value: bio_material}
       ]
       add_error(rule_code, annotation)
     end
@@ -3000,9 +2998,9 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_bio_material (rule_code, sample_name, bio_material, institution_list, line_num)
     return nil if InsdcNullability.null_value?(bio_material) || institution_list.nil?
-    return nil if bio_material.split(":").size > 3
+    return nil if bio_material.split(':').size > 3
 
-    invalid_institude_name(rule_code, sample_name, "bio_material", bio_material, institution_list, nil, line_num)
+    invalid_institude_name(rule_code, sample_name, 'bio_material', bio_material, institution_list, nil, line_num)
   end
 
   #
@@ -3020,26 +3018,26 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_institude_name (rule_code, sample_name, attr_name, attr_value, institution_list, attr_no, line_num)
-    return nil unless attr_name == "culture_collection" || attr_name == "specimen_voucher" || attr_name == "bio_material"
+    return nil unless attr_name == 'culture_collection' || attr_name == 'specimen_voucher' || attr_name == 'bio_material'
 
-    if attr_name == "culture_collection"
-      key = "culture_collection".to_sym
-    elsif attr_name == "specimen_voucher"
-      key = "specimen_voucher".to_sym
-    elsif attr_name == "bio_material"
-      key = "bio_material".to_sym
+    if attr_name == 'culture_collection'
+      key = 'culture_collection'.to_sym
+    elsif attr_name == 'specimen_voucher'
+      key = 'specimen_voucher'.to_sym
+    elsif attr_name == 'bio_material'
+      key = 'bio_material'.to_sym
     end
 
     ret = true
-    replaced_value = attr_value.split(":").map{|txt| txt.strip.chomp }.join(":")
+    replaced_value = attr_value.split(':').map {|txt| txt.strip.chomp }.join(':')
     valid_institution_name = false
-    if replaced_value.split(":").size >= 2
-      institution_name = replaced_value.split(":")[0..-2].join(":")
+    if replaced_value.split(':').size >= 2
+      institution_name = replaced_value.split(':')[0..-2].join(':')
       unless institution_list[key].include?(institution_name) || institution_list[key].include?(institution_name)
         ret = false
         replaced_candidate = institution_list[key].find {|inst| inst.downcase == institution_name.downcase }
         unless replaced_candidate.nil? # case insensitive
-          replaced_value = replaced_candidate + ":" + replaced_value.split(":").last
+          replaced_value = replaced_candidate + ':' + replaced_value.split(':').last
           valid_institution_name = true
         end
       else
@@ -3049,16 +3047,16 @@ class BioSampleValidator < ValidatorBase
 
     if ret == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_value}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: attr_name},
+          {key: 'Attribute value', value: attr_value}
       ]
       if replaced_value != attr_value && valid_institution_name == true
-        if @data_format == "json" || @data_format == "tsv"
+        if @data_format == 'json' || @data_format == 'tsv'
           if attr_no.nil?
-            location = auto_annotation_location(@data_format, line_num, attr_name, "value")
+            location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
           else
-            location = auto_annotation_location_with_index(@data_format, line_num, attr_no, "value")
+            location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
           end
         else
           if attr_no.nil?
@@ -3067,7 +3065,7 @@ class BioSampleValidator < ValidatorBase
             location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
           end
         end
-        annotation.push(ErrorBuilder.suggested_annotation([replaced_value], "Attribute value", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation([replaced_value], 'Attribute value', location, true))
       end
       add_error(rule_code, annotation)
     end
@@ -3090,22 +3088,22 @@ class BioSampleValidator < ValidatorBase
   def cov2_package_versus_organism (rule_code, sample_name, package_name, organism, line_num)
     return nil if package_name.blank? || organism.blank?
     ret = true
-    if package_name.downcase.start_with?("sars-cov-2.") # SARS-CoV-2.clとSARS-CoV-2.wwsurvの場合だけエラーにする
+    if package_name.downcase.start_with?('sars-cov-2.') # SARS-CoV-2.clとSARS-CoV-2.wwsurvの場合だけエラーにする
       ret = false
-      #パッケージに適したルールのエラーメッセージを取得
-      message = ""
-      if package_name.downcase == ("sars-cov-2.cl")
-        message = ErrorBuilder.error_msg(@validation_config, "BS_R0120", nil)
-      elsif package_name.downcase == ("sars-cov-2.wwsurv")
-        message = ErrorBuilder.error_msg(@validation_config, "BS_R0121", nil)
+      # パッケージに適したルールのエラーメッセージを取得
+      message = ''
+      if package_name.downcase == ('sars-cov-2.cl')
+        message = ErrorBuilder.error_msg(@validation_config, 'BS_R0120', nil)
+      elsif package_name.downcase == ('sars-cov-2.wwsurv')
+        message = ErrorBuilder.error_msg(@validation_config, 'BS_R0121', nil)
       end
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "organism", value: organism},
-        {key: "package", value: package_name},
+        {key: 'Sample name', value: sample_name},
+        {key: 'organism', value: organism},
+        {key: 'package', value: package_name}
       ]
-      unless message == ""
-        annotation.push({key: "Message", value: message})
+      unless message == ''
+        annotation.push({key: 'Message', value: message})
       end
       add_error(rule_code, annotation)
     end
@@ -3130,9 +3128,9 @@ class BioSampleValidator < ValidatorBase
     return true if gisaid_accession =~ /^EPI_[A-Z]+_[0-9]+$/
 
     annotation = [
-      {key: "Sample name",     value: sample_name},
-      {key: "Attribute",       value: "gisaid_accession"},
-      {key: "Attribute value", value: gisaid_accession}
+      {key: 'Sample name',     value: sample_name},
+      {key: 'Attribute',       value: 'gisaid_accession'},
+      {key: 'Attribute value', value: gisaid_accession}
     ]
     add_error(rule_code, annotation)
     false
@@ -3153,21 +3151,21 @@ class BioSampleValidator < ValidatorBase
     return nil if biosample_list.nil? || biosample_list.empty?
     result = true
 
-    first_attr_name_list = [] #最初のサンプルの属性名リスト
-    biosample_list.first["attribute_list"].each_with_index do |attr, attr_idx|
+    first_attr_name_list = [] # 最初のサンプルの属性名リスト
+    biosample_list.first['attribute_list'].each_with_index do |attr, attr_idx|
       first_attr_name_list.push(attr.keys.first)
     end
     biosample_list.each_with_index do |biosample_data, sample_idx|
       attr_name_list = []
-      biosample_data["attribute_list"].each_with_index do |attr, attr_idx|
+      biosample_data['attribute_list'].each_with_index do |attr, attr_idx|
         attr_name_list.push(attr.keys.first)
       end
-      unless first_attr_name_list == attr_name_list #最初のサンプルの属性名リストと異なる
+      unless first_attr_name_list == attr_name_list # 最初のサンプルの属性名リストと異なる
         result = false
         annotation = [
-          {key: "Sample index", value: sample_idx},
-          {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
-          {key: "Message", value: "Difference from the attribute names and order in the first sample."}
+          {key: 'Sample index', value: sample_idx},
+          {key: 'Sample name', value: biosample_data['attributes']['sample_name']},
+          {key: 'Message', value: 'Difference from the attribute names and order in the first sample.'}
         ]
         add_error(rule_code, annotation)
       end
@@ -3189,11 +3187,11 @@ class BioSampleValidator < ValidatorBase
   def multiple_packages(rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.empty?
 
-    package_list = biosample_list.map {|biosample_data| biosample_data["package"]}
+    package_list = biosample_list.map {|biosample_data| biosample_data['package'] }
     return true if package_list.uniq.compact.size <= 1 # 複数のPackage記載があればNG(記載なしも含む)
 
     annotation = [
-      {key: "Package names", value: package_list.uniq.to_s}
+      {key: 'Package names', value: package_list.uniq.to_s}
     ]
     add_error(rule_code, annotation)
     false
@@ -3217,13 +3215,13 @@ class BioSampleValidator < ValidatorBase
     attribute_list.each do |attr|
       attr_name_list.push(attr.keys.first)
     end
-    mandatory_attr_name_list = ["sample_name", "sample_title", "description", "organism", "taxonomy_id", "bioproject_id"]
+    mandatory_attr_name_list = ['sample_name', 'sample_title', 'description', 'organism', 'taxonomy_id', 'bioproject_id']
     missing_attr_list = mandatory_attr_name_list - attr_name_list
     if missing_attr_list.any?
       result = false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Missing attribute names", value: missing_attr_list.join(", ")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Missing attribute names', value: missing_attr_list.join(', ')}
       ]
       add_error(rule_code, annotation)
     end
@@ -3252,25 +3250,25 @@ class BioSampleValidator < ValidatorBase
     bioproject_id_values = [] # 実質1回しか記述されない
     # 有効な値のlocus_tag_prefixとbioproject_idの記述があるか
     attr_list.each do |attr|
-      unless attr["locus_tag_prefix"].nil?
-        if !InsdcNullability.null_value?(attr["locus_tag_prefix"]) && !InsdcNullability.null_not_recommended_value?(attr["locus_tag_prefix"])
+      unless attr['locus_tag_prefix'].nil?
+        if !InsdcNullability.null_value?(attr['locus_tag_prefix']) && !InsdcNullability.null_not_recommended_value?(attr['locus_tag_prefix'])
           edit_locus_tag_prefix = true
         end
-        locus_tag_prefix_values.push(attr["locus_tag_prefix"])
+        locus_tag_prefix_values.push(attr['locus_tag_prefix'])
       end
-      unless attr["bioproject_id"].nil?
-        if !InsdcNullability.null_value?(attr["bioproject_id"]) &&  !InsdcNullability.null_not_recommended_value?(attr["bioproject_id"])
+      unless attr['bioproject_id'].nil?
+        if !InsdcNullability.null_value?(attr['bioproject_id']) &&  !InsdcNullability.null_not_recommended_value?(attr['bioproject_id'])
           edit_bioproject_id = true
         end
-        bioproject_id_values.push(attr["bioproject_id"])
+        bioproject_id_values.push(attr['bioproject_id'])
       end
     end
     if edit_locus_tag_prefix == true && edit_bioproject_id == false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: "locus_tag_prefix, bioproject_id"},
-        {key: "Attribute value(locus_tag_prefix)", value: locus_tag_prefix_values.join(", ")},
-        {key: "Attribute value(bioproject_id)", value: bioproject_id_values.join(", ")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: 'locus_tag_prefix, bioproject_id'},
+        {key: 'Attribute value(locus_tag_prefix)', value: locus_tag_prefix_values.join(', ')},
+        {key: 'Attribute value(bioproject_id)', value: bioproject_id_values.join(', ')}
       ]
       add_error(rule_code, annotation)
       result = false
@@ -3301,21 +3299,21 @@ class BioSampleValidator < ValidatorBase
     range_matches = derived_from.scan(/SAMD[0-9]+\s?-\s?SAMD[0-9]+/) # 範囲記述のID抽出 SAMDXXXX-SAMDXXXX
     range_matches.each do |range|
       range_ids = range.scan(/[0-9]+/)
-      length = range_ids.first.size #0埋めの桁数は最初のIDに合わせる
-      range_ids = range_ids.map {|range_id| range_id.to_i}
+      length = range_ids.first.size # 0埋めの桁数は最初のIDに合わせる
+      range_ids = range_ids.map {|range_id| range_id.to_i }
       (range_ids.min..range_ids.max).each do |id|
         submission_id_list.push("SAMD%0#{length}d" % id)
-      end 
+      end
     end
-    
+
     if submission_id_list.any?
       valid_id_list = @db_validator.get_valid_sample_id_list(submission_id_list, submitter_id)
       invalid_id_list = submission_id_list - valid_id_list # 指定IDから有効なIDを差し引いてinvalidなリストを取得
       if invalid_id_list.any?
         annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "derived_from"},
-          {key: "Invalid Accession IDs", value: invalid_id_list.join(", ")}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: 'derived_from'},
+          {key: 'Invalid Accession IDs', value: invalid_id_list.join(', ')}
         ]
         add_error(rule_code, annotation)
         result = false
@@ -3342,14 +3340,14 @@ class BioSampleValidator < ValidatorBase
     return nil if package_name.blank?
     # 設定ファイルに書くか？
     package_vs_attr_settings = {
-      "MIGS.ba" => ["strain"],
-      "MIGS.eu" => ["strain", "isolate", "cultivar", "ecotype"],
-      "MIGS.vi" => ["strain", "isolate"],
-      "MIMAG" => ["isolate"],
-      "MISAG" => ["isolate"],
-      "MIUVIG" => ["isolate"],
-      "SARS-CoV-2.cl" => ["isolate"],
-      "Pathogen.cl" => ["strain", "isolate"]
+      'MIGS.ba' => ['strain'],
+      'MIGS.eu' => ['strain', 'isolate', 'cultivar', 'ecotype'],
+      'MIGS.vi' => ['strain', 'isolate'],
+      'MIMAG' => ['isolate'],
+      'MISAG' => ['isolate'],
+      'MIUVIG' => ['isolate'],
+      'SARS-CoV-2.cl' => ['isolate'],
+      'Pathogen.cl' => ['strain', 'isolate']
     }
     null_value_for_infraspecific_identifier(rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
   end
@@ -3372,7 +3370,7 @@ class BioSampleValidator < ValidatorBase
     return nil if package_name.blank?
     # 設定ファイルに書くか？
     package_vs_attr_settings = {
-      "Microbe" => ["strain", "isolate"]
+      'Microbe' => ['strain', 'isolate']
     }
     null_value_for_infraspecific_identifier(rule_code, sample_name, sample_attr, package_name, package_vs_attr_settings, line_num)
   end
@@ -3411,9 +3409,9 @@ class BioSampleValidator < ValidatorBase
     end
     if ret == false
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "package", value: package_name},
-        {key: "attibutes", value: mandatory_attr_list_to_message.join("/")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'package', value: package_name},
+        {key: 'attibutes', value: mandatory_attr_list_to_message.join('/')}
       ]
       add_error(rule_code, annotation)
     end
@@ -3438,11 +3436,11 @@ class BioSampleValidator < ValidatorBase
   def non_identical_identifiers_among_organism_strain_isolate (rule_code, sample_name, package_name, organism, strain, isolate, line_num)
     return nil if package_name.blank? || InsdcNullability.null_value?(organism)
     result = true
-    if package_name.start_with?("MIGS.ba")
-      keywords = ["sp.", "bacterium", "archaeon"]
-      organism_sufix = ""
+    if package_name.start_with?('MIGS.ba')
+      keywords = ['sp.', 'bacterium', 'archaeon']
+      organism_sufix = ''
       keywords.each do |keyword|
-        if keyword == "sp." # "sp." の前に空白があるかで単語区切りを判断
+        if keyword == 'sp.' # "sp." の前に空白があるかで単語区切りを判断
           regex = /\s#{Regexp.escape(keyword)}/i # escapeで正規表現のメタ文字に対応
         else # "sp."以外では \b を使って単語単位で単語区切りを判断
           regex = /\b#{Regexp.escape(keyword)}\b/i # escapeで正規表現のメタ文字に対応
@@ -3454,7 +3452,7 @@ class BioSampleValidator < ValidatorBase
         end
       end
       # organism名に sp./bacterium/archaeon が含まれている場合、その後の文字列でチェック
-      unless organism_sufix == "" 
+      unless organism_sufix == ''
         match_sufix = false # strain or isolate に一致するか
         if !InsdcNullability.null_value?(strain) && organism_sufix == strain
           match_sufix = true
@@ -3468,10 +3466,10 @@ class BioSampleValidator < ValidatorBase
     end
     if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "organism", value: organism},
-          {key: "strain", value: strain.to_s},
-          {key: "isolate", value: isolate.to_s}
+          {key: 'Sample name', value: sample_name},
+          {key: 'organism', value: organism},
+          {key: 'strain', value: strain.to_s},
+          {key: 'isolate', value: isolate.to_s}
         ]
         add_error(rule_code, annotation)
     end
@@ -3496,10 +3494,10 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(strain)
     result = true
 
-    if invalid_value_settings["exact_match"].include?(strain.downcase)
+    if invalid_value_settings['exact_match'].include?(strain.downcase)
       result = false
     else
-      invalid_value_settings["prefix_match"].each do |invalid_prefix|
+      invalid_value_settings['prefix_match'].each do |invalid_prefix|
         if strain.downcase.start_with?(invalid_prefix.downcase)
           result = false
         end
@@ -3510,9 +3508,9 @@ class BioSampleValidator < ValidatorBase
     end
     if result == false
       annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "strain"},
-          {key: "Attribute value", value: strain}
+          {key: 'Sample name', value: sample_name},
+          {key: 'Attribute', value: 'strain'},
+          {key: 'Attribute value', value: strain}
       ]
       add_error(rule_code, annotation)
       result = false
@@ -3535,8 +3533,8 @@ class BioSampleValidator < ValidatorBase
   def missing_reporting_level_term (rule_code, sample_name, sample_attr, null_accepted_list, line_num)
     missing_attr_names = []
     # reporting level term だけを null相当値から抽出
-    reporting_level_term_list = null_accepted_list.select{|value| value.start_with?("missing:")}
-    reporting_level_term_attr_list = ["collection_date", "geo_loc_name"]
+    reporting_level_term_list = null_accepted_list.select {|value| value.start_with?('missing:') }
+    reporting_level_term_attr_list = ['collection_date', 'geo_loc_name']
     reporting_level_term_attr_list.each do |reporting_level_term_attr|
       # null相当値である
       attr_value = sample_attr[reporting_level_term_attr]
@@ -3552,30 +3550,30 @@ class BioSampleValidator < ValidatorBase
       true
     else
       annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute names", value: missing_attr_names.join(", ")}
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute names', value: missing_attr_names.join(', ')}
       ]
       add_error(rule_code, annotation)
       false
     end
   end
-  
+
   def invalid_taxonomy_for_genome_sample_2(data)
-    return true unless [ "Microbe", "Pathogen.cl", "Pathogen.env" ].include?(data["package"])
-    return true unless organism = data.dig("attributes", "organism")
+    return true unless ['Microbe', 'Pathogen.cl', 'Pathogen.env'].include?(data['package'])
+    return true unless organism = data.dig('attributes', 'organism')
     return true unless organism.match?(/ sp\.\z/i)
 
-    add_error("BS_R0140", [
+    add_error('BS_R0140', [
       {
-        key:   "Sample name",
-        value: data.dig("attributes", "sample_name")
+        key:   'Sample name',
+        value: data.dig('attributes', 'sample_name')
       },
       {
-        key:   "Attribute",
-        value: "organism"
+        key:   'Attribute',
+        value: 'organism'
       },
       {
-        key:   "Attribute value",
+        key:   'Attribute value',
         value: organism
       }
     ])
@@ -3584,21 +3582,21 @@ class BioSampleValidator < ValidatorBase
   end
 
   def uncultured_organism_name_for_mimag_package(data)
-    return true unless data["package"]&.start_with?("MIMAG")
-    return true unless organism = data.dig("attributes", "organism")
+    return true unless data['package']&.start_with?('MIMAG')
+    return true unless organism = data.dig('attributes', 'organism')
     return true unless organism.start_with?(/uncultured /i)
 
-    add_error("BS_R0141", [
+    add_error('BS_R0141', [
       {
-        key:   "Sample name",
-        value: data.dig("attributes", "sample_name")
+        key:   'Sample name',
+        value: data.dig('attributes', 'sample_name')
       },
       {
-        key:   "Attribute",
-        value: "organism"
+        key:   'Attribute',
+        value: 'organism'
       },
       {
-        key:   "Attribute value",
+        key:   'Attribute value',
         value: organism
       }
     ])

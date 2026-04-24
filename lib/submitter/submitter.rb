@@ -1,8 +1,8 @@
 require 'logger'
 require 'yaml'
-require_relative "biosample_submitter"
-require_relative "bioproject_submitter"
-require_relative "dra_submitter"
+require_relative 'biosample_submitter'
+require_relative 'bioproject_submitter'
+require_relative 'dra_submitter'
 
 class Submitter
   def initialize
@@ -13,62 +13,61 @@ class Submitter
     @log = Logger.new(@log_file)
   end
   def submission_id_list(file_type)
-    ret = {status: "success"}
+    ret = {status: 'success'}
     begin
       case file_type
-      when "biosample"
+      when 'biosample'
         submitter = BioSampleSubmitter.new
         submission_id_list = submitter.public_submission_id_list()
         ret[:data] = submission_id_list
-      when "bioproject"
+      when 'bioproject'
         submitter = BioProjectSubmitter.new
         submission_id_list = submitter.public_submission_id_list()
         ret[:data] = submission_id_list
-      #when "submission", "experiment", "run", "analysis"
+      # when "submission", "experiment", "run", "analysis"
       #  submitter = DraSubmitter.new
       #  submission_id_list = submitter.public_submission_id_list()
       #  ret[:data] = submission_id_list
       else
-        ret[:status] = "fail"
+        ret[:status] = 'fail'
       end
       ret
     rescue => ex
       @log.error(ex.message)
-      trace = ex.backtrace.map {|row| row}.join("\n")
+      trace = ex.backtrace.map {|row| row }.join("\n")
       @log.error(trace)
-      ret[:status] = "error"
+      ret[:status] = 'error'
     end
   end
 
   def submission_xml(file_type, submission_id, output_dir)
     begin
       case file_type
-      when "biosample"
+      when 'biosample'
         submitter = BioSampleSubmitter.new
         file_path = output_dir + "/#{submission_id}.xml"
         submitter.output_xml_file(submission_id, file_path)
-      when "bioproject"
+      when 'bioproject'
         submitter = BioProjectSubmitter.new
         file_path = output_dir + "/#{submission_id}.xml"
         submitter.output_xml_file(submission_id, file_path)
-      when "submission", "experiment", "run", "analysis"
+      when 'submission', 'experiment', 'run', 'analysis'
         submitter = DraSubmitter.new
         file_path = output_dir + "/#{submission_id}.#{file_type}.xml"
         submitter.output_xml_file(file_type, submission_id, file_path)
-      else #invalid file_type
-        return { status: "fail", file_path: nil }
+      else # invalid file_type
+        return {status: 'fail', file_path: nil}
       end
       if File.exist?(file_path)
-        { status: "success", file_path: file_path }
+        {status: 'success', file_path: file_path}
       else
-        { status: "fail", file_path: nil }
+        {status: 'fail', file_path: nil}
       end
     rescue => ex
       @log.error(ex.message)
-      trace = ex.backtrace.map {|row| row}.join("\n")
+      trace = ex.backtrace.map {|row| row }.join("\n")
       @log.error(trace)
-      { status: "error", message: ex.message }
+      {status: 'error', message: ex.message}
     end
   end
-
 end

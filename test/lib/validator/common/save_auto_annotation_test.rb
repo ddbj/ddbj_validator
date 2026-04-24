@@ -6,7 +6,6 @@ require 'validator/common/xml_convertor'
 # auto_annotationが効いているかを確認するため、補正された上で別の検証メソッドでエラーとなる値を用意し、補正値が使用されているかを確認
 #
 class TestSaveAutoAnnotation < Minitest::Test
-
   def setup
     skip_unless_virtuoso_available
     @validator = BioSampleValidator.new
@@ -21,7 +20,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_13_attrname
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_13_attrname.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0018"}
+    error =  error_list.find {|error| error[:id] == 'BS_R0018' }
     assert_nil error
   end
 
@@ -32,9 +31,9 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_13
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_13.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0058"}
-    attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute value"}
-    assert_equal "12 hours テスト用：utf8ではない文字", attr_value[:value]
+    error =  error_list.find {|error| error[:id] == 'BS_R0058' }
+    attr_value = error[:annotation].find {|anno| anno[:key] == 'Attribute value' }
+    assert_equal '12 hours テスト用：utf8ではない文字', attr_value[:value]
   end
 
   #
@@ -43,9 +42,9 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_1
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_1.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0020"}
-    attr_value = error[:annotation].find {|anno| anno[:key] == "organism"}
-    assert_equal "missing", attr_value[:value]
+    error =  error_list.find {|error| error[:id] == 'BS_R0020' }
+    attr_value = error[:annotation].find {|anno| anno[:key] == 'organism' }
+    assert_equal 'missing', attr_value[:value]
   end
 
   #
@@ -54,23 +53,23 @@ class TestSaveAutoAnnotation < Minitest::Test
   def test_save_annotation_7
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_7.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0040"}
-    attr_value = error[:annotation].find {|anno| anno[:key] == "Attribute value"}
-    assert_equal "2050-01-01", attr_value[:value]
+    error =  error_list.find {|error| error[:id] == 'BS_R0040' }
+    attr_value = error[:annotation].find {|anno| anno[:key] == 'Attribute value' }
+    assert_equal '2050-01-01', attr_value[:value]
   end
 
   #
   # 45(taxonomy_error_warning)のauto annotationの保存が効いているかの検証
   # taxonomy_idの値が無かった場合の確認
   def test_save_annotation_45
-    #"escherichia"からtaxonomy_idの値が"561"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
+    # "escherichia"からtaxonomy_idの値が"561"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_45.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0096"}
-    annotation = error[:annotation].find {|anno| anno[:key] == "taxonomy_id" }
-    assert_equal "561", annotation[:value] #taxonomy_idが追加されている
-    annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
-    assert_equal "Escherichia", annotation[:value] #organism name が"escherichia" => "Escherichia"に補正されている
+    error =  error_list.find {|error| error[:id] == 'BS_R0096' }
+    annotation = error[:annotation].find {|anno| anno[:key] == 'taxonomy_id' }
+    assert_equal '561', annotation[:value] # taxonomy_idが追加されている
+    annotation = error[:annotation].find {|anno| anno[:key] == 'organism' }
+    assert_equal 'Escherichia', annotation[:value] # organism name が"escherichia" => "Escherichia"に補正されている
   end
 
   #
@@ -81,9 +80,9 @@ class TestSaveAutoAnnotation < Minitest::Test
     skip 'BS_R0096 auto-annotation prefers the fuzzy-matched tax (562) over the input tax (561); expected "Escherichia" not produced'
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_4.xml")
     error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0096"}
-    annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
-    assert_equal "Escherichia", annotation[:value]
+    error =  error_list.find {|error| error[:id] == 'BS_R0096' }
+    annotation = error[:annotation].find {|anno| anno[:key] == 'organism' }
+    assert_equal 'Escherichia', annotation[:value]
   end
 
 =begin
@@ -99,5 +98,4 @@ class TestSaveAutoAnnotation < Minitest::Test
     assert_equal "", attr_value[:value]
   end
 =end
-
 end

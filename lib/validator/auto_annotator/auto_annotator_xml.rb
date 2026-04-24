@@ -1,12 +1,11 @@
 require 'fileutils'
 
-require_relative "base"
+require_relative 'base'
 
 #
 # A class for Auto-annotation. XML file base.
 #
 class AutoAnnotatorXml < AutoAnnotatorBase
-
   #
   # 元ファイルのXMLとValidation結果のjsonファイルから
   # Auto-annotation部分を置換したXMLファイルを作成する
@@ -26,7 +25,7 @@ class AutoAnnotatorXml < AutoAnnotatorBase
       raise "Validation result file is not found. #{original_file}"
     end
 
-    #auto-annotation出来るエラーのみを抽出
+    # auto-annotation出来るエラーのみを抽出
     annotation_list = get_annotated_list(validate_result_file, filetype)
     if annotation_list.any?
       begin
@@ -36,25 +35,25 @@ class AutoAnnotatorXml < AutoAnnotatorBase
       end
 
       annotation_list.each do |annotation|
-        annotation["location"].each do |location| #XPathを取得
-          if doc.xpath(location).empty? #XPathで要素/属性がヒットしないなら作成する
+        annotation['location'].each do |location| # XPathを取得
+          if doc.xpath(location).empty? # XPathで要素/属性がヒットしないなら作成する
             create_node_from_xapth(doc, location)
           end
           doc.xpath(location).each do |node|
             if node.class == Nokogiri::XML::Element
-              #Elementの場合、子nodeのうち直下のText nodeの値を置き換える
+              # Elementの場合、子nodeのうち直下のText nodeの値を置き換える
               has_text = false
               node.children.each do |child|
                 if child.text?
-                  child.content = annotation["suggested_value"].first
+                  child.content = annotation['suggested_value'].first
                   has_text = true
                 end
               end
-              unless has_text #子要素がない場合はテキストを挿入する
-                node.content = annotation["suggested_value"].first
+              unless has_text # 子要素がない場合はテキストを挿入する
+                node.content = annotation['suggested_value'].first
               end
-            elsif node.class == Nokogiri::XML::Attr #Attributeの場合は値を置き換える
-              node.content = annotation["suggested_value"].first
+            elsif node.class == Nokogiri::XML::Attr # Attributeの場合は値を置き換える
+              node.content = annotation['suggested_value'].first
             end
           end
         end
@@ -79,32 +78,31 @@ class AutoAnnotatorXml < AutoAnnotatorBase
   # location: XPath
   #
   def create_node_from_xapth(doc, location)
-    #指定されたlocationを存在する要素まで上位に辿る
-    parent_location = ""
-    (1..location.split("/").size).each do |pos|
-      parent_location = location.split("/")[0..-pos].join("/")
+    # 指定されたlocationを存在する要素まで上位に辿る
+    parent_location = ''
+    (1..location.split('/').size).each do |pos|
+      parent_location = location.split('/')[0..-pos].join('/')
       if doc.xpath(parent_location).any?
         break
       end
     end
-    #存在する要素からlocationまでの要素を追加する
-    add_elements = location.sub(parent_location + "/", "") #足りていない要素/属性
-    add_elements.split("/").each do |element|
-      if element.start_with?("@")
-        attr_name = element.sub("@", "")
+    # 存在する要素からlocationまでの要素を追加する
+    add_elements = location.sub(parent_location + '/', '') # 足りていない要素/属性
+    add_elements.split('/').each do |element|
+      if element.start_with?('@')
+        attr_name = element.sub('@', '')
         doc.xpath(parent_location).each do |node|
-          node[attr_name] = ""
+          node[attr_name] = ''
         end
-      elsif !element.include?("@")
+      elsif !element.include?('@')
         doc.xpath(parent_location).each do |node|
           element_markup = "<#{element}></#{element}>"
           node.add_child(element_markup)
         end
       else
-        #TODO include "@" but not start_with e.g.(Attribute[@attribute_name=\"sample_name\"])
+        # TODO include "@" but not start_with e.g.(Attribute[@attribute_name=\"sample_name\"])
       end
-      parent_location += "/" + element
+      parent_location += '/' + element
     end
   end
-
 end

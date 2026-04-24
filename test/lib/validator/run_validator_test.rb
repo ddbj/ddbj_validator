@@ -7,7 +7,7 @@ class TestRunValidator < Minitest::Test
     @test_file_dir = File.expand_path('../../../data/dra', __FILE__)
   end
 
-#### テスト用共通メソッド ####
+  #### テスト用共通メソッド ####
 
   #
   # Executes validation method
@@ -24,7 +24,7 @@ class TestRunValidator < Minitest::Test
   # }
   #
   def exec_validator (method_name, *args)
-    @validator.instance_variable_set :@error_list, [] #clear
+    @validator.instance_variable_set :@error_list, [] # clear
     ret = @validator.send(method_name, *args)
     error_list = @validator.instance_variable_get (:@error_list)
     {result: ret, error_list: error_list}
@@ -33,177 +33,176 @@ class TestRunValidator < Minitest::Test
   def get_run_set_node (xml_file_path)
     xml_data = File.read(xml_file_path)
     doc = Nokogiri::XML(xml_data)
-    doc.xpath("//RUN")
+    doc.xpath('//RUN')
   end
 
-####
+  ####
 
   def test_get_run_label
-    #TODO
+    # TODO
   end
 
-#### 各validationメソッドのユニットテスト ####
+  #### 各validationメソッドのユニットテスト ####
 
   # rule:DRA_R0004
   def test_invalid_center_name
     skip_unless_pg_configured
-    #ok case
+    # ok case
     run_set = get_run_set_node("#{@test_file_dir}/4_invalid_center_name_run_ok.xml")
-    ret = exec_validator("invalid_center_name", "DRA_R0004", "run name" , run_set.first, "test01", 1)
+    ret = exec_validator('invalid_center_name', 'DRA_R0004', 'run name', run_set.first, 'test01', 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## no center_name
     run_set = get_run_set_node("#{@test_file_dir}/4_invalid_center_name_run_ok2.xml")
-    ret = exec_validator("invalid_center_name", "DRA_R0004", "run name" , run_set.first, "test01", 1)
+    ret = exec_validator('invalid_center_name', 'DRA_R0004', 'run name', run_set.first, 'test01', 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
-    ##invalid center name
+    # ng case
+    # #invalid center name
     run_set = get_run_set_node("#{@test_file_dir}/4_invalid_center_name_run_ng1.xml")
-    ret = exec_validator("invalid_center_name", "DRA_R0004", "run name" , run_set.first, "test01", 1)
+    ret = exec_validator('invalid_center_name', 'DRA_R0004', 'run name', run_set.first, 'test01', 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## center name empty
     run_set = get_run_set_node("#{@test_file_dir}/4_invalid_center_name_run_ng2.xml")
-    ret = exec_validator("invalid_center_name", "DRA_R0004", "run name" , run_set.first, "test01", 1)
+    ret = exec_validator('invalid_center_name', 'DRA_R0004', 'run name', run_set.first, 'test01', 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     ## not exist submitter_id
     run_set = get_run_set_node("#{@test_file_dir}/4_invalid_center_name_run_ok.xml")
-    ret = exec_validator("invalid_center_name", "DRA_R0004", "run name" , run_set.first, "not_exist_submitter", 1)
+    ret = exec_validator('invalid_center_name', 'DRA_R0004', 'run name', run_set.first, 'not_exist_submitter', 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
   # rule:DRA_R0011
   def test_missing_run_title
-    #ok case
+    # ok case
     run_set = get_run_set_node("#{@test_file_dir}/11_missing_run_title_ok.xml")
-    ret = exec_validator("missing_run_title", "DRA_R0011", "run name" , run_set.first, 1)
+    ret = exec_validator('missing_run_title', 'DRA_R0011', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
+    # ng case
     # no element
     run_set = get_run_set_node("#{@test_file_dir}/11_missing_run_title_ng1.xml")
-    ret = exec_validator("missing_run_title", "DRA_R0011", "run name" , run_set.first, 1)
+    ret = exec_validator('missing_run_title', 'DRA_R0011', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    #blank
+    # blank
     run_set = get_run_set_node("#{@test_file_dir}/11_missing_run_title_ng2.xml")
-    ret = exec_validator("missing_run_title", "DRA_R0011", "run name" , run_set.first, 1)
+    ret = exec_validator('missing_run_title', 'DRA_R0011', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
   # rule:DRA_R0021
   def test_missing_run_filename
-    #ok case
+    # ok case
     run_set = get_run_set_node("#{@test_file_dir}/21_missing_run_filename_ok.xml")
-    ret = exec_validator("missing_run_filename", "DRA_R0021", "run name" , run_set.first, 1)
+    ret = exec_validator('missing_run_filename', 'DRA_R0021', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no element
     run_set = get_run_set_node("#{@test_file_dir}/21_missing_run_filename_ok2.xml")
-    ret = exec_validator("missing_run_filename", "DRA_R0021", "run name" , run_set.first, 1)
+    ret = exec_validator('missing_run_filename', 'DRA_R0021', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
-    #blank filename
+    # ng case
+    # blank filename
     run_set = get_run_set_node("#{@test_file_dir}/21_missing_run_filename_ng1.xml")
-    ret = exec_validator("missing_run_filename", "DRA_R0021", "run name" , run_set.first, 1)
+    ret = exec_validator('missing_run_filename', 'DRA_R0021', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
   end
 
   # rule:DRA_R0023
   def test_invalid_run_filename
-    #ok case
+    # ok case
     run_set = get_run_set_node("#{@test_file_dir}/23_invalid_run_filename_ok.xml")
-    ret = exec_validator("invalid_run_filename", "DRA_R0023", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_run_filename', 'DRA_R0023', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no element
     run_set = get_run_set_node("#{@test_file_dir}/23_invalid_run_filename_ok2.xml")
-    ret = exec_validator("invalid_run_filename", "DRA_R0021", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_run_filename', 'DRA_R0021', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
-    #invalid filename
+    # ng case
+    # invalid filename
     run_set = get_run_set_node("#{@test_file_dir}/23_invalid_run_filename_ng1.xml")
-    ret = exec_validator("invalid_run_filename", "DRA_R0023", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_run_filename', 'DRA_R0023', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
   # rule:DRA_R0025
   def test_invalid_run_file_md5_checksum
-    #ok case
+    # ok case
     run_set = get_run_set_node("#{@test_file_dir}/25_invalid_run_file_md5_checksum_ok.xml")
-    ret = exec_validator("invalid_run_file_md5_checksum", "DRA_R0025", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_run_file_md5_checksum', 'DRA_R0025', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no element
     run_set = get_run_set_node("#{@test_file_dir}/25_invalid_run_file_md5_checksum_ok2.xml")
-    ret = exec_validator("invalid_run_file_md5_checksum", "DRA_R0025", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_run_file_md5_checksum', 'DRA_R0025', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
-    #invalid checksum
+    # ng case
+    # invalid checksum
     run_set = get_run_set_node("#{@test_file_dir}/25_invalid_run_file_md5_checksum_ng1.xml")
-    ret = exec_validator("invalid_run_file_md5_checksum", "DRA_R0025", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_run_file_md5_checksum', 'DRA_R0025', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
   end
 
   # rule:DRA_R0029
   def test_invalid_bam_alignment_file_series
-    #ok case
+    # ok case
     run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ok.xml")
-    ret = exec_validator("invalid_bam_alignment_file_series", "DRA_R0029", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_bam_alignment_file_series', 'DRA_R0029', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no element
     run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ok2.xml")
-    ret = exec_validator("invalid_bam_alignment_file_series", "DRA_R0029", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_bam_alignment_file_series', 'DRA_R0029', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
+    # ng case
     # 2 reference_fasta
     run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ng1.xml")
-    ret = exec_validator("invalid_bam_alignment_file_series", "DRA_R0029", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_bam_alignment_file_series', 'DRA_R0029', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # 1 reference_fasta and 1 bam
     run_set = get_run_set_node("#{@test_file_dir}/29_invalid_bam_alignment_file_series_ng2.xml")
-    ret = exec_validator("invalid_bam_alignment_file_series", "DRA_R0029", "run name" , run_set.first, 1)
+    ret = exec_validator('invalid_bam_alignment_file_series', 'DRA_R0029', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
 
   # rule:DRA_R0031
   def test_invalid_bam_alignment_file_series
-    #ok case
+    # ok case
     ## 2 fastq
     run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ok.xml")
-    ret = exec_validator("mixed_filetype", "DRA_R0031", "run name" , run_set.first, 1)
+    ret = exec_validator('mixed_filetype', 'DRA_R0031', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     ## 1 bam & 1 SOLiD_native_csfasta
     run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ok2.xml")
-    ret = exec_validator("mixed_filetype", "DRA_R0031", "run name" , run_set.first, 1)
+    ret = exec_validator('mixed_filetype', 'DRA_R0031', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
     # no element
     run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ok3.xml")
-    ret = exec_validator("mixed_filetype", "DRA_R0031", "run name" , run_set.first, 1)
+    ret = exec_validator('mixed_filetype', 'DRA_R0031', 'run name', run_set.first, 1)
     assert_equal true, ret[:result]
     assert_equal 0, ret[:error_list].size
-    #ng case
+    # ng case
     # 1 fastq % 1 sff
     run_set = get_run_set_node("#{@test_file_dir}/31_mixed_filetype_ng1.xml")
-    ret = exec_validator("mixed_filetype", "DRA_R0031", "run name" , run_set.first, 1)
+    ret = exec_validator('mixed_filetype', 'DRA_R0031', 'run name', run_set.first, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end
-
 end

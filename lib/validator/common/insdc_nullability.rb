@@ -34,7 +34,7 @@ module InsdcNullability
   # (英数字2文字以上) が残らなければ true。
   # allow_reporting_term=true の場合は "missing: ..." を許容する。
   #
-  def self.meaningless_value? (value, allow_reporting_term=false)
+  def self.meaningless_value? (value, allow_reporting_term = false)
     return false if value.blank?
     return true  if null_not_recommended.any? { value =~ /^(#{it})$/i }
 

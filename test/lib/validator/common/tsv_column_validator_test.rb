@@ -20,5 +20,4 @@ class TestTsvColumnValidator < Minitest::Test
   def test_invalid_data_format
     # TODO
   end
-
 end

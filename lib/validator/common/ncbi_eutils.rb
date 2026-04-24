@@ -4,8 +4,8 @@
 # 認証なしで叩いているので per-second rate limit (3 req/s) に縛られる。eutils_summary の
 # sleep(0.4) はその緩和。API key を使う必要が出たら NCBI に登録して credentials に入れる。
 module NcbiEutils
-  EUTILS_SUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
-  DBCLS_MEDLINE_URL  = "http://tm.dbcls.jp/medline"
+  EUTILS_SUMMARY_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi'
+  DBCLS_MEDLINE_URL  = 'http://tm.dbcls.jp/medline'
 
   #
   # 引数の PubMed ID が実在するかを DBCLS/medline 経由で確認する。
@@ -22,7 +22,7 @@ module NcbiEutils
   #
   def self.exist_pmc_id? (pmc_id)
     return nil if pmc_id.nil?
-    eutils_summary("pmc", pmc_id)
+    eutils_summary('pmc', pmc_id)
   end
 
   #
@@ -37,7 +37,7 @@ module NcbiEutils
     raise "'tm.dbcls.jp/medline' returns an error. url: #{url}\n"       if res.status.client_error?
 
     entry = res.parse(:json)
-    !entry["MedlineCitationSet"].nil? && !entry["MedlineCitationSet"].keys.empty?
+    !entry['MedlineCitationSet'].nil? && !entry['MedlineCitationSet'].keys.empty?
   rescue JSON::ParserError
     raise "Parse error: 'tm.dbcls.jp/medline' might not return JSON. url: #{url}\n body: #{res&.body}\n"
   rescue => ex
@@ -59,7 +59,7 @@ module NcbiEutils
 
     entry = res.parse(:json)
     # responseデータに error キーがなければ存在する ID
-    !entry["result"].nil? && !entry["result"][id].nil? && entry["result"][id]["error"].nil?
+    !entry['result'].nil? && !entry['result'][id].nil? && entry['result'][id]['error'].nil?
   rescue JSON::ParserError
     raise "Parse error: 'NCBI eutils' might not return JSON. url: #{url}\n body: #{res&.body}\n"
   rescue => ex

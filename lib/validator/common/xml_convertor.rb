@@ -1,4 +1,4 @@
-require_relative "../base"
+require_relative '../base'
 
 #
 # XMLの変換処理を行うクラス
@@ -8,7 +8,6 @@ require_relative "../base"
 # ftp://ftp.ddbj.nig.ac.jp/ddbj_database/biosample/schema/biosample_exchange.1.1.xsd
 #
 class XmlConvertor < ValidatorBase
-
   #
   # 引数のXMLデータをRubyオブジェクトにして返す
   #
@@ -25,7 +24,7 @@ class XmlConvertor < ValidatorBase
       raise StandardError, message, ex.backtrace
     end
 
-    if object_type == "biosample"
+    if object_type == 'biosample'
       parseBioSampleSet(doc)
     else
       nil
@@ -66,70 +65,70 @@ class XmlConvertor < ValidatorBase
   #
   def parseBioSampleSet(doc)
     sample_list = []
-    if doc.root.name == "BioSampleSet"
-      biosample_list = doc.xpath("//BioSample")
+    if doc.root.name == 'BioSampleSet'
+      biosample_list = doc.xpath('//BioSample')
       biosample_list.each do |biosample|
         sample_list.push(parseBioSample(biosample))
       end
-    elsif doc.root.name == "BioSample"
-      biosample_list = doc.xpath("//BioSample")
+    elsif doc.root.name == 'BioSample'
+      biosample_list = doc.xpath('//BioSample')
       sample_list.push(parseBioSample(biosample_list.first))
     else # is not BioSample XML
       raise "Failed to parse the biosample xml file. Excpected root tag are <BioSampleSet> or <BioSample>. Please check the format.\n"
     end
-    return sample_list
+    sample_list
   end
 
   def parseBioSample(biosample_element)
     sample_obj = {}
 
-    #biosample_accession
-    unless node_blank?(biosample_element, "Ids/Id[@namespace=\"BioSample\"]")
-      sample_obj["biosample_accession"] = get_node_text(biosample_element, "Ids/Id[@namespace=\"BioSample\"]")
+    # biosample_accession
+    unless node_blank?(biosample_element, 'Ids/Id[@namespace="BioSample"]')
+      sample_obj['biosample_accession'] = get_node_text(biosample_element, 'Ids/Id[@namespace="BioSample"]')
     end
-    #package
-    unless node_blank?(biosample_element, "Models/Model")
-      sample_obj["package"] = get_node_text(biosample_element, "Models/Model")
+    # package
+    unless node_blank?(biosample_element, 'Models/Model')
+      sample_obj['package'] = get_node_text(biosample_element, 'Models/Model')
     end
-    #attributes
+    # attributes
     attributes = {}
     attribute_list = []
 
-    unless node_blank?(biosample_element, "Description/Title")
-      attributes["sample_title"] = get_node_text(biosample_element, "Description/Title")
-      attribute_list.push({"sample_title" => attributes["sample_title"]});
+    unless node_blank?(biosample_element, 'Description/Title')
+      attributes['sample_title'] = get_node_text(biosample_element, 'Description/Title')
+      attribute_list.push({'sample_title' => attributes['sample_title']})
     end
-    unless node_blank?(biosample_element, "Description/Comment/Paragraph")
-      attributes["description"] = get_node_text(biosample_element, "Description/Comment/Paragraph")
-      attribute_list.push({"description" => attributes["description"]});
+    unless node_blank?(biosample_element, 'Description/Comment/Paragraph')
+      attributes['description'] = get_node_text(biosample_element, 'Description/Comment/Paragraph')
+      attribute_list.push({'description' => attributes['description']})
     end
-    unless node_blank?(biosample_element, "Description/Organism/OrganismName")
-      attributes["organism"] = get_node_text(biosample_element, "Description/Organism/OrganismName")
-      attribute_list.push({"organism" => attributes["organism"]});
+    unless node_blank?(biosample_element, 'Description/Organism/OrganismName')
+      attributes['organism'] = get_node_text(biosample_element, 'Description/Organism/OrganismName')
+      attribute_list.push({'organism' => attributes['organism']})
     end
-    unless node_blank?(biosample_element, "Description/Organism/@taxonomy_id")
-      attributes["taxonomy_id"] = get_node_text(biosample_element, "Description/Organism/@taxonomy_id")
-      attribute_list.push({"taxonomy_id" => attributes["taxonomy_id"]});
+    unless node_blank?(biosample_element, 'Description/Organism/@taxonomy_id')
+      attributes['taxonomy_id'] = get_node_text(biosample_element, 'Description/Organism/@taxonomy_id')
+      attribute_list.push({'taxonomy_id' => attributes['taxonomy_id']})
     end
-    attributes_list = biosample_element.xpath("Attributes/Attribute")
+    attributes_list = biosample_element.xpath('Attributes/Attribute')
     attributes_list.each_with_index do |attr, idx|
-      attr_name = attr.attribute("attribute_name").text
+      attr_name = attr.attribute('attribute_name').text
       attr_value = get_node_text(attr)
       attributes[attr_name] = attr_value
-      attribute_list.push({attr_name => attr_value, "attr_no" => idx + 1});
+      attribute_list.push({attr_name => attr_value, 'attr_no' => idx + 1})
     end
-    sample_obj["attributes"] = attributes
-    sample_obj["attribute_list"] = attribute_list
-    return sample_obj
+    sample_obj['attributes'] = attributes
+    sample_obj['attribute_list'] = attribute_list
+    sample_obj
   end
 
   def get_biosample_submitter_id(xml_document)
     submitter_id = nil
     begin
       doc = Nokogiri::XML(xml_document)
-      if doc.root.name == "BioSampleSet"
-        unless node_blank?(doc, "//BioSampleSet/@submitter_id")
-          submitter_id = get_node_text(doc, "//BioSampleSet/@submitter_id")
+      if doc.root.name == 'BioSampleSet'
+        unless node_blank?(doc, '//BioSampleSet/@submitter_id')
+          submitter_id = get_node_text(doc, '//BioSampleSet/@submitter_id')
         end
       end
     rescue => ex
@@ -144,9 +143,9 @@ class XmlConvertor < ValidatorBase
     submitter_id = nil
     begin
       doc = Nokogiri::XML(xml_document)
-      if doc.root.name == "PackageSet"
-        unless node_blank?(doc, "//PackageSet/@submitter_id")
-          submitter_id = get_node_text(doc, "//PackageSet/@submitter_id")
+      if doc.root.name == 'PackageSet'
+        unless node_blank?(doc, '//PackageSet/@submitter_id')
+          submitter_id = get_node_text(doc, '//PackageSet/@submitter_id')
         end
       end
     rescue => ex
@@ -161,9 +160,9 @@ class XmlConvertor < ValidatorBase
     submitter_id = nil
     begin
       doc = Nokogiri::XML(xml_document)
-      if doc.root.name == "BioSampleSet"
-        unless node_blank?(doc, "//BioSampleSet/@submission_id")
-          submitter_id = get_node_text(doc, "//BioSampleSet/@submission_id")
+      if doc.root.name == 'BioSampleSet'
+        unless node_blank?(doc, '//BioSampleSet/@submission_id')
+          submitter_id = get_node_text(doc, '//BioSampleSet/@submission_id')
         end
       end
     rescue => ex
@@ -178,9 +177,9 @@ class XmlConvertor < ValidatorBase
     submitter_id = nil
     begin
       doc = Nokogiri::XML(xml_document)
-      if doc.root.name == "PackageSet"
-        unless node_blank?(doc, "//PackageSet/@submission_id")
-          submitter_id = get_node_text(doc, "//PackageSet/@submission_id")
+      if doc.root.name == 'PackageSet'
+        unless node_blank?(doc, '//PackageSet/@submission_id')
+          submitter_id = get_node_text(doc, '//PackageSet/@submission_id')
         end
       end
     rescue => ex
@@ -205,19 +204,19 @@ class XmlConvertor < ValidatorBase
   def xpath_from_attrname (attr_name, item_no)
     xpath = []
     case attr_name
-    when "sample_name"
-      xpath.push("//BioSample[" + item_no.to_s + "]/Description/SampleName")
-      xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"sample_name\"]")
-    when "sample_title"
-      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Title")
-    when "description"
-      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Comment/Paragraph")
-    when "organism"
-      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Organism/OrganismName")
-    when "taxonomy_id"
-      xpath.push("//BioSample[" + item_no.to_s + "]/Description/Organism/@taxonomy_id")
+    when 'sample_name'
+      xpath.push('//BioSample[' + item_no.to_s + ']/Description/SampleName')
+      xpath.push('//BioSample[' + item_no.to_s + ']/Attributes/Attribute[@attribute_name="sample_name"]')
+    when 'sample_title'
+      xpath.push('//BioSample[' + item_no.to_s + ']/Description/Title')
+    when 'description'
+      xpath.push('//BioSample[' + item_no.to_s + ']/Description/Comment/Paragraph')
+    when 'organism'
+      xpath.push('//BioSample[' + item_no.to_s + ']/Description/Organism/OrganismName')
+    when 'taxonomy_id'
+      xpath.push('//BioSample[' + item_no.to_s + ']/Description/Organism/@taxonomy_id')
     else
-      xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]")
+      xpath.push('//BioSample[' + item_no.to_s + ']/Attributes/Attribute[@attribute_name="' + attr_name + '"]')
     end
     xpath
   end
@@ -236,10 +235,10 @@ class XmlConvertor < ValidatorBase
   #
   def xpath_from_attrname_with_index (attr_name, item_no, attr_index)
     xpath = []
-    if attr_index.nil? || attr_name == "sample_name"
+    if attr_index.nil? || attr_name == 'sample_name'
       xpath.concat(xpath_from_attrname(attr_name, item_no))
     else
-      xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[position()=" + attr_index.to_s + " and @attribute_name=\"" + attr_name + "\"]")
+      xpath.push('//BioSample[' + item_no.to_s + ']/Attributes/Attribute[position()=' + attr_index.to_s + ' and @attribute_name="' + attr_name + '"]')
     end
     xpath
   end
@@ -258,7 +257,7 @@ class XmlConvertor < ValidatorBase
   #
   def xpath_of_attrname (attr_name, item_no)
     xpath = []
-    xpath.push("//BioSample[" + item_no.to_s + "]/Attributes/Attribute[@attribute_name=\"" + attr_name + "\"]/@attribute_name")
+    xpath.push('//BioSample[' + item_no.to_s + ']/Attributes/Attribute[@attribute_name="' + attr_name + '"]/@attribute_name')
     xpath
   end
 end

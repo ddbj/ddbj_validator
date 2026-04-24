@@ -1,10 +1,10 @@
-require_relative "base"
-require_relative "common/date_format"
-require_relative "common/ddbj_db_validator"
-require_relative "common/organism_validator"
-require_relative "common/sparql_base"
-require_relative "common/validator_cache"
-require_relative "common/xml_convertor"
+require_relative 'base'
+require_relative 'common/date_format'
+require_relative 'common/ddbj_db_validator'
+require_relative 'common/organism_validator'
+require_relative 'common/sparql_base'
+require_relative 'common/validator_cache'
+require_relative 'common/xml_convertor'
 
 #
 # A class for JVar validation
@@ -17,15 +17,15 @@ class JVarValidator < ValidatorBase
   #
   def initialize
     super()
-    config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf/jvar")
-    xlsx_error_log = File.absolute_path(@conf[:log_dir] + "/excel_error.log")
+    config_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../conf/jvar')
+    xlsx_error_log = File.absolute_path(@conf[:log_dir] + '/excel_error.log')
 
     @log = Logger.new(xlsx_error_log)
-    @conf[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_jvar.json"))
-    @conf[:sheet_list] = JSON.parse(File.read(config_file_dir + "/sheet_list.json"))
+    @conf[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_jvar.json'))
+    @conf[:sheet_list] = JSON.parse(File.read(config_file_dir + '/sheet_list.json'))
 
     @error_list = error_list = []
-    @validation_config = @conf[:validation_config] #need?
+    @validation_config = @conf[:validation_config] # need?
   end
 
   #
@@ -36,17 +36,17 @@ class JVarValidator < ValidatorBase
   # data_xlsx: Excel file path
   #
   #
-  def validate(data_xlsx, submitter_id=nil)
-    @data_file = File::basename(data_xlsx)
+  def validate(data_xlsx, submitter_id = nil)
+    @data_file = File.basename(data_xlsx)
     # excelファイルのロード
-    xlsx = load_excel("JV_R0001", data_xlsx)
+    xlsx = load_excel('JV_R0001', data_xlsx)
     return if xlsx.nil?
-    jvar_data = xlsx2obj(xlsx) #パース
+    jvar_data = xlsx2obj(xlsx) # パース
 
     # JSONファイル出力
-    output_dir = File::dirname(data_xlsx)
-    json_file_name = @data_file.split(".")[0..-2].join(".") + ".json"
-    File.open("#{output_dir}/#{json_file_name}", "w") do |out|
+    output_dir = File.dirname(data_xlsx)
+    json_file_name = @data_file.split('.')[0..-2].join('.') + '.json'
+    File.open("#{output_dir}/#{json_file_name}", 'w') do |out|
       out.puts JSON.pretty_generate(jvar_data)
     end
 
@@ -68,16 +68,16 @@ class JVarValidator < ValidatorBase
     xlsx = nil
     begin
       # 結合セルは対象セルの全てに同じ値を埋めるモード
-      xlsx = Roo::Excelx.new(data_xlsx, {:expand_merged_ranges => true})
+      xlsx = Roo::Excelx.new(data_xlsx, {expand_merged_ranges: true})
     rescue => ex
       annotation = [
-        {key: "Excel file", value: @data_file},
-        {key: "Error message", value: ex.message}
+        {key: 'Excel file', value: @data_file},
+        {key: 'Error message', value: ex.message}
       ]
       add_error(rule_code, annotation)
       message = "Failed to load the Excel file.: Please check the files: '#{data_xlsx}'.\n"
       message += "#{ex.message} (#{ex.class})"
-      @log.warn("An Excel(Roo::Excelx) loading error has occurred.")
+      @log.warn('An Excel(Roo::Excelx) loading error has occurred.')
       output_exception_log(ex, message)
     end
     xlsx
@@ -94,24 +94,24 @@ class JVarValidator < ValidatorBase
   def xlsx2obj(xlsx)
     jvar_data = {}
     @conf[:sheet_list].each do |conf|
-      sheet_name = ""
-      if conf["sheet_name"]== "VARIANT CALL" || conf["sheet_name"] == "VARIANT REGION" # TODO 現状は無視する
-        jvar_data[conf["json_key"]] = []
+      sheet_name = ''
+      if conf['sheet_name']== 'VARIANT CALL' || conf['sheet_name'] == 'VARIANT REGION' # TODO 現状は無視する
+        jvar_data[conf['json_key']] = []
         next
       end
-      hit = xlsx.sheets.select {|sheet| sheet.strip.downcase.gsub(" ", "") == conf["sheet_name"].strip.downcase.gsub(" ", "") } # allow case-insensitive and white space
+      hit = xlsx.sheets.select {|sheet| sheet.strip.downcase.gsub(' ', '') == conf['sheet_name'].strip.downcase.gsub(' ', '') } # allow case-insensitive and white space
       if hit.size == 1
         sheet_name = hit[0]
       elsif hit.size > 1
-        hit = xlsx.sheets.select {|sheet| sheet.downcase == conf["sheet_name"].downcase } # allow case-insensitive
+        hit = xlsx.sheets.select {|sheet| sheet.downcase == conf['sheet_name'].downcase } # allow case-insensitive
         sheet_name = hit[0] if hit.any?
       end
-      if sheet_name == ""
-        #TODO 存在必須シートではエラーを出す。ここか？(OWL定義が来てから)
-        jvar_data[conf["json_key"]] = []
+      if sheet_name == ''
+        # TODO 存在必須シートではエラーを出す。ここか？(OWL定義が来てから)
+        jvar_data[conf['json_key']] = []
       else
-        sheet = load_sheet("JV_R0002", xlsx, sheet_name)
-        jvar_data[conf["json_key"]] = parse_sheet_data(sheet_name, sheet)
+        sheet = load_sheet('JV_R0002', xlsx, sheet_name)
+        jvar_data[conf['json_key']] = parse_sheet_data(sheet_name, sheet)
       end
     end
     jvar_data
@@ -133,14 +133,14 @@ class JVarValidator < ValidatorBase
       sheet = xlsx.sheet(sheet_name)
     rescue => ex
       annotation = [
-        {key: "Excel file", value: @data_file},
-        {key: "Sheet name", value: sheet_name},
-        {key: "Error message", value: ex.message}
+        {key: 'Excel file', value: @data_file},
+        {key: 'Sheet name', value: sheet_name},
+        {key: 'Error message', value: ex.message}
       ]
       add_error(rule_code, annotation)
       message = "Failed to load the Excel file.: Please check the files: '#{@data_file}'.\n"
       message += "#{ex.message} (#{ex.class})"
-      @log.warn("An Excel(Roo::Excelx) sheet loading error has occurred.")
+      @log.warn('An Excel(Roo::Excelx) sheet loading error has occurred.')
       output_exception_log(ex, message)
     end
     sheet
@@ -163,20 +163,20 @@ class JVarValidator < ValidatorBase
       if row.first =~ /^\*/ # comment line
         # ignore
       elsif row.first =~ /^#/ # header
-        if duplicated_header_line("JV_R0005", sheet_name, header, row_num) # 既にheader行が出現しているか
+        if duplicated_header_line('JV_R0005', sheet_name, header, row_num) # 既にheader行が出現しているか
           header = parse_header_line(row)
         end
       else # data line
         # TODO method名が紛らわしい
-        if data_line_before_header_line("JV_R0004", sheet_name, header, row_num) # headerより前に出現していない
-          if ignore_blank_line("JV_R0007", sheet_name, row, row_num) # 空白行では無い
+        if data_line_before_header_line('JV_R0004', sheet_name, header, row_num) # headerより前に出現していない
+          if ignore_blank_line('JV_R0007', sheet_name, row, row_num) # 空白行では無い
             row_data = parse_data_row(sheet_name, header, row, row_num)
             data_list.push(row_data)
           end
         end
       end
     end
-    exist_header_line("JV_R0003", sheet_name, header) # not found header line?
+    exist_header_line('JV_R0003', sheet_name, header) # not found header line?
     data_list
   end
 
@@ -205,11 +205,11 @@ class JVarValidator < ValidatorBase
   # row object:
   # { annotations: [ {name: "study_id", value: "Mishima2020"}, {name: "study_description", value: "xxxxx"}, ... ] }
   #
-  def parse_data_row(sheet_name, header,row, row_num)
+  def parse_data_row(sheet_name, header, row, row_num)
     row_data = {}
     annotations = []
     row.each_with_index do |cell, column_num|
-      if cell_value_with_no_header("JV_R0006", sheet_name, header, row_num, cell, column_num)
+      if cell_value_with_no_header('JV_R0006', sheet_name, header, row_num, cell, column_num)
         annotations.push({name: header[column_num], value: cell_value(cell)})
       end
     end
@@ -226,8 +226,8 @@ class JVarValidator < ValidatorBase
     if header.nil? || header == {}
       ret = false
       annotation = [
-        {key: "Excel file", value: @data_file},
-        {key: "Sheet name", value: sheet_name}
+        {key: 'Excel file', value: @data_file},
+        {key: 'Sheet name', value: sheet_name}
       ]
       add_error(rule_code, annotation)
     end
@@ -243,9 +243,9 @@ class JVarValidator < ValidatorBase
     if header.nil? || header == {}
       ret = false
       annotation = [
-        {key: "Excel file", value: @data_file},
-        {key: "Sheet name", value: sheet_name},
-        {key: "line number", value: row_num}
+        {key: 'Excel file', value: @data_file},
+        {key: 'Sheet name', value: sheet_name},
+        {key: 'line number', value: row_num}
       ]
       add_error(rule_code, annotation)
     end
@@ -261,9 +261,9 @@ class JVarValidator < ValidatorBase
     if !(header.nil? || header == {})
       ret = false
       annotation = [
-        {key: "Excel file", value: @data_file},
-        {key: "Sheet name", value: sheet_name},
-        {key: "line number", value: row_num}
+        {key: 'Excel file', value: @data_file},
+        {key: 'Sheet name', value: sheet_name},
+        {key: 'line number', value: row_num}
       ]
       add_error(rule_code, annotation)
     end
@@ -276,15 +276,15 @@ class JVarValidator < ValidatorBase
   #
   def cell_value_with_no_header(rule_code, sheet_name, header, row_num, cell, column_num)
     ret = true
-    if header[column_num].nil? || header[column_num] == "" || header[column_num].start_with?("#")
+    if header[column_num].nil? || header[column_num] == '' || header[column_num].start_with?('#')
       ret = false
       unless cell.nil? # ヘッダーがない列に値がある
-        cell_pos = "#{Roo::Utils.number_to_letter(column_num + 1)}#{row_num.to_s}"
+        cell_pos = "#{Roo::Utils.number_to_letter(column_num + 1)}#{row_num}"
         annotation = [
-          {key: "Excel file", value: @data_file},
-          {key: "Sheet name", value: sheet_name},
-          {key: "Cell", value: cell_pos},
-          {key: "Value", value: cell_value(cell)}
+          {key: 'Excel file', value: @data_file},
+          {key: 'Sheet name', value: sheet_name},
+          {key: 'Cell', value: cell_pos},
+          {key: 'Value', value: cell_value(cell)}
         ]
         add_error(rule_code, annotation)
       end
@@ -301,9 +301,9 @@ class JVarValidator < ValidatorBase
     if row.uniq == [nil]
       ret = false
       annotation = [
-        {key: "Excel file", value: @data_file},
-        {key: "Sheet name", value: sheet_name},
-        {key: "line number", value: row_num}
+        {key: 'Excel file', value: @data_file},
+        {key: 'Sheet name', value: sheet_name},
+        {key: 'line number', value: row_num}
       ]
       add_error(rule_code, annotation)
     end
@@ -316,11 +316,11 @@ class JVarValidator < ValidatorBase
   def cell_value(cell)
     value = nil
     if cell.nil?
-      value = ""
-    elsif cell.to_s.start_with?("<html")
+      value = ''
+    elsif cell.to_s.start_with?('<html')
       value = html2text(cell.to_s)
-    #elseif
-     #TODO date型をどうするか？そのまま？
+    # elseif
+    # TODO date型をどうするか？そのまま？
     else
       value = cell.to_s # all
     end
@@ -338,5 +338,4 @@ class JVarValidator < ValidatorBase
   def html2text(html)
     Nokogiri::HTML(html).text
   end
-
 end

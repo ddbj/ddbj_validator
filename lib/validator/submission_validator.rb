@@ -1,6 +1,6 @@
-require_relative "base"
-require_relative "common/insdc_nullability"
-require_relative "common/ddbj_db_validator"
+require_relative 'base'
+require_relative 'common/insdc_nullability'
+require_relative 'common/ddbj_db_validator'
 
 #
 # A class for DRA submission validation
@@ -13,13 +13,13 @@ class SubmissionValidator < ValidatorBase
   #
   def initialize
     super
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/dra")))
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/dra')))
     InsdcNullability.null_accepted        = @conf[:null_accepted]
     InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 
-    @validation_config = @conf[:validation_config] #need?
+    @validation_config = @conf[:validation_config] # need?
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -39,8 +39,8 @@ class SubmissionValidator < ValidatorBase
   def read_config (config_file_dir)
     config = {}
     begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_dra.json")) #TODO auto update when genereted
-      config[:xsd_path] = File.absolute_path(config_file_dir + "/xsd/SRA.submission.xsd")
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_dra.json')) # TODO auto update when genereted
+      config[:xsd_path] = File.absolute_path(config_file_dir + '/xsd/SRA.submission.xsd')
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -57,27 +57,27 @@ class SubmissionValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml, params={})
-    if (params["submitter_id"].nil? || params["submitter_id"].strip == "")
-      @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
+  def validate (data_xml, params = {})
+    if params['submitter_id'].nil? || params['submitter_id'].strip == ''
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document) # TODO
     else
-      @submitter_id = params["submitter_id"]
+      @submitter_id = params['submitter_id']
     end
-    #TODO @submitter_id が取得できない場合はエラーにする?
+    # TODO @submitter_id が取得できない場合はエラーにする?
 
-    @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
+    @data_file = File.basename(data_xml)
+    valid_xml = not_well_format_xml('DRA_R0001', data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema('DRA_R0002', data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
-      submission_set = doc.xpath("//SUBMISSION")
-      #各サブミッション毎の検証
+      submission_set = doc.xpath('//SUBMISSION')
+      # 各サブミッション毎の検証
       submission_set.each_with_index do |submission_node, idx|
         idx += 1
         submission_name = get_submission_label(submission_node, idx)
-        invalid_center_name("DRA_R0004", submission_name, submission_node, @submitter_id, idx) if @use_db
-        invalid_hold_date("DRA_R0006", submission_name, submission_node, idx)
+        invalid_center_name('DRA_R0004', submission_name, submission_node, @submitter_id, idx) if @use_db
+        invalid_hold_date('DRA_R0006', submission_name, submission_node, idx)
       end
     end
   end
@@ -92,22 +92,22 @@ class SubmissionValidator < ValidatorBase
   # line_num
   #
   def get_submission_label (submission_node, line_num)
-    submission_name = "No:" + line_num
-    #Submission Title
-    title_node = submission_node.xpath("SUBMISSION/TITLE")
-    if !title_node.empty? && get_node_text(title_node) != ""
-      submission_name += ", TITLE:" + get_node_text(title_node)
+    submission_name = 'No:' + line_num
+    # Submission Title
+    title_node = submission_node.xpath('SUBMISSION/TITLE')
+    if !title_node.empty? && get_node_text(title_node) != ''
+      submission_name += ', TITLE:' + get_node_text(title_node)
     elsif
-      #Accession ID
-      archive_node = submission_node.xpath("SUBMISSION[@accession]")
-      if !archive_node.empty? && get_node_text(archive_node) != ""
-        submission_name += ", AccessionID:" +  get_node_text(archive_node)
+      # Accession ID
+      archive_node = submission_node.xpath('SUBMISSION[@accession]')
+      if !archive_node.empty? && get_node_text(archive_node) != ''
+        submission_name += ', AccessionID:' +  get_node_text(archive_node)
       end
     end
     submission_name
   end
 
-### validate method ###
+  ### validate method ###
 
   #
   # rule:DRA_R0004
@@ -122,13 +122,13 @@ class SubmissionValidator < ValidatorBase
   def invalid_center_name (rule_code, submission_label, submission_node, submitter_id, line_num)
     result = true
     acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    submission_node.xpath("@center_name").each do |center_node|
-      center_name = get_node_text(center_node, ".")
+    submission_node.xpath('@center_name').each do |center_node|
+      center_name = get_node_text(center_node, '.')
       if acc_center_name != center_name
         annotation = [
-          {key: "Submission name", value: submission_label},
-          {key: "center name", value: center_name},
-          {key: "Path", value: "//SUBMISSION/@center_name"}
+          {key: 'Submission name', value: submission_label},
+          {key: 'center name', value: center_name},
+          {key: 'Path', value: '//SUBMISSION/@center_name'}
         ]
         add_error(rule_code, annotation)
         result = false
@@ -149,25 +149,25 @@ class SubmissionValidator < ValidatorBase
   #
   def invalid_hold_date (rule_code, submission_label, submission_node, line_num)
     result = true
-    data_path = "//SUBMISSION/ACTIONS/ACTION/HOLD/@HoldUntilDate"
-    submission_node.xpath(data_path).each_with_index do |data_node, idx| #複数出現の可能性あり
+    data_path = '//SUBMISSION/ACTIONS/ACTION/HOLD/@HoldUntilDate'
+    submission_node.xpath(data_path).each_with_index do |data_node, idx| # 複数出現の可能性あり
       unless node_blank?(data_node)
         date_text = get_node_text(data_node)
         begin
           hold_until_date = DateTime.parse(date_text)
-          two_years_later = DateTime.now >> 24 #24months
-          if (hold_until_date > two_years_later)
+          two_years_later = DateTime.now >> 24 # 24months
+          if hold_until_date > two_years_later
             result = false
           end
-        rescue ArgumentError #日付に変換できない形式
+        rescue ArgumentError # 日付に変換できない形式
           result = false
         end
         # parseで処理しきれない場合
         unless result
           annotation = [
-            {key: "Submission name", value: submission_label},
-            {key: "HoldUntilDate", value: date_text},
-            {key: "Path", value: "#{data_path}[#{idx + 1}]"} #順番を表示
+            {key: 'Submission name', value: submission_label},
+            {key: 'HoldUntilDate', value: date_text},
+            {key: 'Path', value: "#{data_path}[#{idx + 1}]"} # 順番を表示
           ]
           add_error(rule_code, annotation)
         end
@@ -175,5 +175,4 @@ class SubmissionValidator < ValidatorBase
     end
     result
   end
-
 end

@@ -1,6 +1,6 @@
-require_relative "base"
-require_relative "common/insdc_nullability"
-require_relative "common/ddbj_db_validator"
+require_relative 'base'
+require_relative 'common/insdc_nullability'
+require_relative 'common/ddbj_db_validator'
 
 #
 # A class for DRA experiment validation
@@ -13,13 +13,13 @@ class ExperimentValidator < ValidatorBase
   #
   def initialize
     super
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/dra")))
+    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/dra')))
     InsdcNullability.null_accepted        = @conf[:null_accepted]
     InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 
-    @validation_config = @conf[:validation_config] #need?
+    @validation_config = @conf[:validation_config] # need?
     unless @conf[:ddbj_db_config].nil?
       @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @use_db = true
@@ -39,8 +39,8 @@ class ExperimentValidator < ValidatorBase
   def read_config (config_file_dir)
     config = {}
     begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + "/rule_config_dra.json")) #TODO auto update when genereted
-      config[:xsd_path] = File.absolute_path(config_file_dir + "/xsd/SRA.experiment.xsd")
+      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_dra.json')) # TODO auto update when genereted
+      config[:xsd_path] = File.absolute_path(config_file_dir + '/xsd/SRA.experiment.xsd')
       config
     rescue => ex
       message = "Failed to parse the setting file. Please check the config file below.\n"
@@ -57,30 +57,30 @@ class ExperimentValidator < ValidatorBase
   # data_xml: xml file path
   #
   #
-  def validate (data_xml, submitter_id=nil)
+  def validate (data_xml, submitter_id = nil)
     if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_submitter_id(xml_document) #TODO
+      @submitter_id = @xml_convertor.get_submitter_id(xml_document) # TODO
     else
       @submitter_id = submitter_id
     end
-    #TODO @submitter_id が取得できない場合はエラーにする?
-    @data_file = File::basename(data_xml)
-    valid_xml = not_well_format_xml("DRA_R0001", data_xml)
+    # TODO @submitter_id が取得できない場合はエラーにする?
+    @data_file = File.basename(data_xml)
+    valid_xml = not_well_format_xml('DRA_R0001', data_xml)
     # xml検証が通った場合のみ実行
     if valid_xml
-      valid_schema = xml_data_schema("DRA_R0002", data_xml, @conf[:xsd_path])
+      valid_schema = xml_data_schema('DRA_R0002', data_xml, @conf[:xsd_path])
       doc = Nokogiri::XML(File.read(data_xml))
-      experiment_set = doc.xpath("//EXPERIMENT")
-      #各エクスペリメント毎の検証
+      experiment_set = doc.xpath('//EXPERIMENT')
+      # 各エクスペリメント毎の検証
       experiment_set.each_with_index do |experiment_node, idx|
         idx += 1
         experiment_name = get_experiment_label(experiment_node, idx)
-        invalid_center_name("DRA_R0004", submission_name, submission_node, acc_center_name, idx) if @use_db
-        missing_experiment_title("DRA_R0010", experiment_name, experiment_node, idx)
-        missing_experiment_description("DRA_R0013", experiment_name, experiment_node, idx)
-        missing_library_name("DRA_R0018", experiment_name, experiment_node, idx)
-        missing_insert_size_for_paired_library("DRA_R0019", experiment_name, experiment_node, idx)
-        insert_size_too_large("DRA_R0020", experiment_name, experiment_node, idx)
+        invalid_center_name('DRA_R0004', submission_name, submission_node, acc_center_name, idx) if @use_db
+        missing_experiment_title('DRA_R0010', experiment_name, experiment_node, idx)
+        missing_experiment_description('DRA_R0013', experiment_name, experiment_node, idx)
+        missing_library_name('DRA_R0018', experiment_name, experiment_node, idx)
+        missing_insert_size_for_paired_library('DRA_R0019', experiment_name, experiment_node, idx)
+        insert_size_too_large('DRA_R0020', experiment_name, experiment_node, idx)
       end
     end
   end
@@ -94,26 +94,26 @@ class ExperimentValidator < ValidatorBase
   # line_num
   #
   def get_experiment_label (experiment_node, line_num)
-    experiment_name = "No:" + line_num
-    #name
-    title_node = experiment_node.xpath("EXPERIMENT/@alias")
-    if !title_node.empty? && get_node_text(title_node) != ""
-      experiment_name += ", Name:" + get_node_text(title_node)
+    experiment_name = 'No:' + line_num
+    # name
+    title_node = experiment_node.xpath('EXPERIMENT/@alias')
+    if !title_node.empty? && get_node_text(title_node) != ''
+      experiment_name += ', Name:' + get_node_text(title_node)
     end
-    #Title
-    title_node = experiment_node.xpath("EXPERIMENT/TITLE")
-    if !title_node.empty? && get_node_text(title_node) != ""
-      experiment_name += ", TITLE:" + get_node_text(title_node)
+    # Title
+    title_node = experiment_node.xpath('EXPERIMENT/TITLE')
+    if !title_node.empty? && get_node_text(title_node) != ''
+      experiment_name += ', TITLE:' + get_node_text(title_node)
     end
-    #Accession ID
-    archive_node = experiment_node.xpath("EXPERIMENT[@accession]")
-    if !archive_node.empty? && get_node_text(archive_node) != ""
-      experiment_name += ", AccessionID:" +  get_node_text(archive_node)
+    # Accession ID
+    archive_node = experiment_node.xpath('EXPERIMENT[@accession]')
+    if !archive_node.empty? && get_node_text(archive_node) != ''
+      experiment_name += ', AccessionID:' +  get_node_text(archive_node)
     end
     experiment_name
   end
 
-### validate method ###
+  ### validate method ###
 
   #
   # rule:DRA_R0004
@@ -128,13 +128,13 @@ class ExperimentValidator < ValidatorBase
   def invalid_center_name (rule_code, experiment_label, experiment_node, submitter_id, line_num)
     result = true
     acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    experiment_node.xpath("@center_name").each do |center_node|
-      center_name = get_node_text(center_node, ".")
+    experiment_node.xpath('@center_name').each do |center_node|
+      center_name = get_node_text(center_node, '.')
       if acc_center_name != center_name
         annotation = [
-          {key: "Experiment name", value: experiment_label},
-          {key: "center name", value: center_name},
-          {key: "Path", value: "//EXPERIMENT/@center_name"}
+          {key: 'Experiment name', value: experiment_label},
+          {key: 'center name', value: center_name},
+          {key: 'Path', value: '//EXPERIMENT/@center_name'}
         ]
         add_error(rule_code, annotation)
         result = false
@@ -154,12 +154,12 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_experiment_title (rule_code, experiment_label, experiment_node, line_num)
-    title_path = "//EXPERIMENT/TITLE"
+    title_path = '//EXPERIMENT/TITLE'
     return true unless node_blank?(experiment_node, title_path)
 
     annotation = [
-      {key: "Experimentt name", value: experiment_label},
-      {key: "Path",             value: "#{title_path}"}
+      {key: 'Experimentt name', value: experiment_label},
+      {key: 'Path',             value: "#{title_path}"}
     ]
     add_error(rule_code, annotation)
     false
@@ -176,12 +176,12 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_experiment_description (rule_code, experiment_label, experiment_node, line_num)
-    desc_path = "//EXPERIMENT/DESIGN/DESIGN_DESCRIPTION"
+    desc_path = '//EXPERIMENT/DESIGN/DESIGN_DESCRIPTION'
     return true unless node_blank?(experiment_node, desc_path)
 
     annotation = [
-      {key: "Experimentt name", value: experiment_label},
-      {key: "Path",             value: "#{desc_path}"}
+      {key: 'Experimentt name', value: experiment_label},
+      {key: 'Path',             value: "#{desc_path}"}
     ]
     add_error(rule_code, annotation)
     false
@@ -198,12 +198,12 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_library_name (rule_code, experiment_label, experiment_node, line_num)
-    lib_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_NAME"
+    lib_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_NAME'
     return true unless node_blank?(experiment_node, lib_path)
 
     annotation = [
-      {key: "Experimentt name", value: experiment_label},
-      {key: "Path",             value: "#{lib_path}"}
+      {key: 'Experimentt name', value: experiment_label},
+      {key: 'Path',             value: "#{lib_path}"}
     ]
     add_error(rule_code, annotation)
     false
@@ -220,15 +220,15 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def missing_insert_size_for_paired_library (rule_code, experiment_label, experiment_node, line_num)
-    paired_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED"
+    paired_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED'
     return true if experiment_node.xpath(paired_path).empty?
 
-    length_path = paired_path + "/@NOMINAL_LENGTH"
+    length_path = paired_path + '/@NOMINAL_LENGTH'
     return true unless node_blank?(experiment_node, length_path)
 
     annotation = [
-      {key: "Experimentt name", value: experiment_label},
-      {key: "Path",             value: "#{length_path}"}
+      {key: 'Experimentt name', value: experiment_label},
+      {key: 'Path',             value: "#{length_path}"}
     ]
     add_error(rule_code, annotation)
     false
@@ -245,20 +245,19 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def insert_size_too_large (rule_code, experiment_label, experiment_node, line_num)
-    length_path = "//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED/@NOMINAL_LENGTH"
+    length_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED/@NOMINAL_LENGTH'
     return true if node_blank?(experiment_node, length_path)
 
     length = get_node_text(experiment_node, length_path)
-    #TODO 型チェック
+    # TODO 型チェック
     return true unless length.to_i > 10000000
 
     annotation = [
-      {key: "Experimentt name", value: experiment_label},
-      {key: "Nominal length",   value: "#{length}"},
-      {key: "Path",             value: "#{length_path}"}
+      {key: 'Experimentt name', value: experiment_label},
+      {key: 'Nominal length',   value: "#{length}"},
+      {key: 'Path',             value: "#{length_path}"}
     ]
     add_error(rule_code, annotation)
     false
   end
-
 end

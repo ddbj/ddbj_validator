@@ -30,7 +30,7 @@ module Geolocation
       lat = (g['lat_deg'].to_i + g['lat_min'].to_f/60 + g['lat_sec'].to_f/3600).round(4)
       lng = (g['lng_deg'].to_i + g['lng_min'].to_f/60 + g['lng_sec'].to_f/3600).round(4)
       insdc_latlon = "#{lat} #{g['lat_hemi']} #{lng} #{g['lng_hemi']}"
-    elsif dec_insdc_latlon_reg.match(lat_lon) #期待するformatであり変更は無し
+    elsif dec_insdc_latlon_reg.match(lat_lon) # 期待するformatであり変更は無し
       d = dec_insdc_latlon_reg.match(lat_lon)
       insdc_latlon = "#{d['lat_dec']} #{d['lat_dec_hemi']} #{d['lng_dec']} #{d['lng_dec_hemi']}"
     elsif dec_insdc_reversed_latlon_reg.match(lat_lon)
@@ -40,8 +40,8 @@ module Geolocation
       d = dec_latlon_reg.match(lat_lon)
       lat = d['lat_dec']
       lng = d['lng_dec']
-      lat_dec = lat.start_with?("-") ? lat[1..-1] + " S" : lat + " N"
-      lng_dec = lng.start_with?("-") ? lng[1..-1] + " W" : lng + " E"
+      lat_dec = lat.start_with?('-') ? lat[1..-1] + ' S' : lat + ' N'
+      lng_dec = lng.start_with?('-') ? lng[1..-1] + ' W' : lng + ' E'
       insdc_latlon = "#{lat_dec} #{lng_dec}"
     end
     return nil if insdc_latlon.nil?
@@ -78,9 +78,9 @@ module Geolocation
     return nil if md.nil?
 
     lat = md['lat'].to_f
-    lat = -lat if md['lat_hemi'] == "S"
+    lat = -lat if md['lat_hemi'] == 'S'
     lon = md['lon'].to_f
-    lon = -lon if md['lon_hemi'] == "W"
+    lon = -lon if md['lon_hemi'] == 'W'
     {latitude: lat, longitude: lon}
   end
 

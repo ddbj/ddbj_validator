@@ -1,9 +1,9 @@
-require_relative "base"
+require_relative 'base'
 
 class BioSampleSubmitter < SubmitterBase
-  BIOSAMPLE_DB_NAME = "biosample"
+  BIOSAMPLE_DB_NAME = 'biosample'
 
-  def public_submission_id_list()
+  def public_submission_id_list
     begin
       connection = get_connection(BIOSAMPLE_DB_NAME)
       q = "SELECT DISTINCT submission_id
@@ -21,11 +21,11 @@ class BioSampleSubmitter < SubmitterBase
     submission_id_list = []
     begin
       res.each do |row|
-        submission_id_list.push(row["submission_id"])
+        submission_id_list.push(row['submission_id'])
       end
       submission_id_list.uniq
     rescue => ex
-      message = "Failed to convert xml file"
+      message = 'Failed to convert xml file'
       message += "#{ex.message} (#{ex.class})"
       raise StandardError, message, ex.backtrace
     end
@@ -44,15 +44,15 @@ class BioSampleSubmitter < SubmitterBase
     end
     begin
       if res.ntuples > 0
-        doc = Nokogiri::XML("<BioSampleSet>")
+        doc = Nokogiri::XML('<BioSampleSet>')
         biosample_set = doc.root
-        submitter_id = ""
+        submitter_id = ''
         res.each do |row|
-          biosample_node = Nokogiri::XML::Document.parse row["content"]
+          biosample_node = Nokogiri::XML::Document.parse row['content']
           submitter_id = row['submitter_id']
           biosample_set << biosample_node.root
         end
-        #sumbitter_idをBioSampleSet要素の属性に追加
+        # sumbitter_idをBioSampleSet要素の属性に追加
         biosample_set['submitter_id'] = submitter_id
         biosample_set['submission_id'] = submission_id
 
@@ -61,7 +61,7 @@ class BioSampleSubmitter < SubmitterBase
         end
       end
     rescue => ex
-      message = "Failed to convert xml file"
+      message = 'Failed to convert xml file'
       message += "#{ex.message} (#{ex.class})"
       raise StandardError, message, ex.backtrace
     end
@@ -84,4 +84,3 @@ class BioSampleSubmitter < SubmitterBase
     SQL
   end
 end
-

@@ -3,24 +3,24 @@ require 'validator/common/ncbi_eutils'
 
 class TestNcbiEutils < Minitest::Test
   def test_exist_pubmed_id?
-    #ok
-    ret = NcbiEutils.exist_pubmed_id?("27148491")
+    # ok
+    ret = NcbiEutils.exist_pubmed_id?('27148491')
     assert_equal true, ret
 
-    #ng
-    ret = NcbiEutils.exist_pubmed_id?("99999999")
+    # ng
+    ret = NcbiEutils.exist_pubmed_id?('99999999')
     assert_equal false, ret
 
-    ret = NcbiEutils.exist_pubmed_id?("aiueo")
+    ret = NcbiEutils.exist_pubmed_id?('aiueo')
     assert_equal false, ret
 
-    ret = NcbiEutils.exist_pubmed_id?("")
+    ret = NcbiEutils.exist_pubmed_id?('')
     assert_equal false, ret
 
-    ret = NcbiEutils.exist_pubmed_id?("2バイト文字")
+    ret = NcbiEutils.exist_pubmed_id?('2バイト文字')
     assert_equal false, ret
 
-    #nil
+    # nil
     ret = NcbiEutils.exist_pubmed_id?(nil)
     assert_nil ret
   end

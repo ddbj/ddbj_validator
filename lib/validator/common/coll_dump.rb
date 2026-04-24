@@ -19,10 +19,10 @@ module CollDump
     # 指定された coll_dump.txt がない場合はダウンロードする
     unless File.exist?(dump_file)
       begin
-        ftp = Net::FTP.new("ftp.ncbi.nlm.nih.gov")
+        ftp = Net::FTP.new('ftp.ncbi.nlm.nih.gov')
         ftp.login
         ftp.passive = true
-        ftp.chdir("/pub/taxonomy/")
+        ftp.chdir('/pub/taxonomy/')
         ftp.getbinaryfile('coll_dump.txt', dump_file, 1024)
       rescue
       ensure
@@ -43,12 +43,12 @@ module CollDump
         keys.push(:bio_material)       if row[1].strip.include?('b')
         next if keys.empty?
 
-        parts = row[0].strip.split(":")
+        parts = row[0].strip.split(':')
         keys.each do |key|
           if parts.size == 1 # only institution name
             ret[key].push(parts.first)
           else # with collection name (e.g. "NBSB:Bird")
-            ret[key].push(parts.join(":"))
+            ret[key].push(parts.join(':'))
             ret[key].push(parts.first) # 念のため institution name だけも追加
           end
         end

@@ -1,11 +1,10 @@
 #!/usr/bin/env ruby
 
-require "net/http"
-require "uri"
-require "cgi"
+require 'net/http'
+require 'uri'
+require 'cgi'
 
 class SPARQL
-
   attr :prefix_hash
 
   def initialize(url)
@@ -25,27 +24,27 @@ class SPARQL
   end
 
   def host
-    return @endpoint
+    @endpoint
   end
 
   def prefix
     ary = []
-    @prefix_hash.sort.each { |key, value|
+    @prefix_hash.sort.each {|key, value|
       ary << "PREFIX #{key}: <#{value}>\n"
     }
-    return ary.join
+    ary.join
   end
 
-  def query(sparql, opts={}, &block)
-    result = ""
+  def query(sparql, opts = {}, &block)
+    result = ''
 
     case opts[:format]
-    when "xml"
-      format = "application/sparql-results+xml"
-    when "json"
-      format = "application/sparql-results+json"
+    when 'xml'
+      format = 'application/sparql-results+xml'
+    when 'json'
+      format = 'application/sparql-results+json'
     else # tabular text
-      format = "application/sparql-results+json"
+      format = 'application/sparql-results+json'
     end
 
     Net::HTTP.start(@host, @port) do |http|
@@ -65,11 +64,11 @@ class SPARQL
         $stderr.puts path
       end
 
-      req = Net::HTTP::Get.new(path, {"Accept" => "#{format}"})
+      req = Net::HTTP::Get.new(path, {'Accept' => "#{format}"})
       if @user and @pass
         req.basic_auth @user, @pass
       end
-      http.request(req) { |res|
+      http.request(req) {|res|
         if block and opts[:format] # xml or json
           yield res.body
         else # tabular text
@@ -79,7 +78,7 @@ class SPARQL
     end
 
     if opts[:format] # xml or json
-      return result
+      result
     else # generate tabular text
       if $DEBUG
         $stderr.puts result
@@ -88,17 +87,17 @@ class SPARQL
       if block
         yield table
       else
-        return table
+        table
       end
     end
   end
 
-  def find(keyword, opts={}, &block)
+  def find(keyword, opts = {}, &block)
     sparql = "select ?s ?p ?o where { ?s ?t '#{keyword}'. ?s ?p ?o . }"
     query(sparql, opts, &block)
   end
 
-  def head(opts={}, &block)
+  def head(opts = {}, &block)
     limit  = opts[:limit] || 20
     offset = (opts[:offset] || 1).to_i
     sparql = "select ?s ?p ?o where { ?s ?p ?o . } offset #{offset} limit #{limit}"
@@ -107,28 +106,28 @@ class SPARQL
 
   def prefix_default
     @prefix_hash = {
-      "rdf"       => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-      "rdfs"      => "http://www.w3.org/2000/01/rdf-schema#",
-      "owl"       => "http://www.w3.org/2002/07/owl#",
-      "xsd"       => "http://www.w3.org/2001/XMLSchema#",
-      "pext"      => "http://proton.semanticweb.org/protonext#",
-      "psys"      => "http://proton.semanticweb.org/protonsys#",
-      "xhtml"     => "http://www.w3.org/1999/xhtml#",
-      "dc"        => "http://purl.org/dc/elements/1.1/",
-      "dcterms"   => "http://purl.org/dc/terms/",
-      "foaf"      => "http://xmlns.com/foaf/0.1/",
-      "skos"      => "http://www.w3.org/2004/02/skos/core#",
-      "void"      => "http://rdfs.org/ns/void#",
-      "dbpedia"   => "http://dbpedia.org/resource/",
-      "dbp"       => "http://dbpedia.org/property/",
-      "dbo"       => "http://dbpedia.org/ontology/",
-      "yago"      => "http://dbpedia.org/class/yago/",
-      "fb"        => "http://rdf.freebase.com/ns/",
-      "sioc"      => "http://rdfs.org/sioc/ns#",
-      "geo"       => "http://www.w3.org/2003/01/geo/wgs84_pos#",
-      "geonames"  => "http://www.geonames.org/ontology#",
-      "bibo"      => "http://purl.org/ontology/bibo/",
-      "prism"     => "http://prismstandard.org/namespaces/basic/2.1/",
+      'rdf'       => 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+      'rdfs'      => 'http://www.w3.org/2000/01/rdf-schema#',
+      'owl'       => 'http://www.w3.org/2002/07/owl#',
+      'xsd'       => 'http://www.w3.org/2001/XMLSchema#',
+      'pext'      => 'http://proton.semanticweb.org/protonext#',
+      'psys'      => 'http://proton.semanticweb.org/protonsys#',
+      'xhtml'     => 'http://www.w3.org/1999/xhtml#',
+      'dc'        => 'http://purl.org/dc/elements/1.1/',
+      'dcterms'   => 'http://purl.org/dc/terms/',
+      'foaf'      => 'http://xmlns.com/foaf/0.1/',
+      'skos'      => 'http://www.w3.org/2004/02/skos/core#',
+      'void'      => 'http://rdfs.org/ns/void#',
+      'dbpedia'   => 'http://dbpedia.org/resource/',
+      'dbp'       => 'http://dbpedia.org/property/',
+      'dbo'       => 'http://dbpedia.org/ontology/',
+      'yago'      => 'http://dbpedia.org/class/yago/',
+      'fb'        => 'http://rdf.freebase.com/ns/',
+      'sioc'      => 'http://rdfs.org/sioc/ns#',
+      'geo'       => 'http://www.w3.org/2003/01/geo/wgs84_pos#',
+      'geonames'  => 'http://www.geonames.org/ontology#',
+      'bibo'      => 'http://purl.org/ontology/bibo/',
+      'prism'     => 'http://prismstandard.org/namespaces/basic/2.1/'
     }
   end
 
@@ -137,30 +136,29 @@ class SPARQL
   def format_json(json)
     begin
       hash = JSON.parse(json)
-      head = hash["head"]["vars"]
-      body = hash["results"]["bindings"]
+      head = hash['head']['vars']
+      body = hash['results']['bindings']
     rescue
-      return ""
+      return ''
     end
-    text = ""
+    text = ''
     text << head.join("\t") + "\n"
     body.each do |result|
       ary = []
       head.each do |key|
-        data = result[key] || { "type" => '', "value" => ''}
-        if data["type"] == "uri"
-          uri = '<' + data["value"].gsub('\\', '') + '>'
+        data = result[key] || {'type' => '', 'value' => ''}
+        if data['type'] == 'uri'
+          uri = '<' + data['value'].gsub('\\', '') + '>'
           ary << uri
         else
-          val = data["value"].gsub('\/', '/')
+          val = data['value'].gsub('\/', '/')
           ary << val
         end
       end
       text << ary.join("\t") + "\n"
     end
-    return text
+    text
   end
-
 end  # class SPARQL
 
 if $0 == __FILE__
@@ -270,58 +268,58 @@ Examples:
   # Peek triples in the store with limit and offset
   > sparql.rb head
   > sparql.rb head 10
-  > sparql.rb head 10 50 
+  > sparql.rb head 10 50#{' '}
   > sparql.rb head 10 50 json
   > sparql.rb head 10 50 xml
 
 USAGE
 end
 
-host = ENV['SPARQL_ENDPOINT'] || "http://beta.sparql.uniprot.org/sparql"
+host = ENV['SPARQL_ENDPOINT'] || 'http://beta.sparql.uniprot.org/sparql'
 serv = SPARQL.new(host)
 
 command = ARGV.shift
 arguments = ARGV
 
 case command
-when "host"
+when 'host'
   puts serv.host
-when "prefix"
+when 'prefix'
   serv.prefix_default
   puts serv.prefix
-when "query", "q"
-  serv.prefix_default if command == "q"
+when 'query', 'q'
+  serv.prefix_default if command == 'q'
   if arguments.any?
     sparql = arguments.shift
     format = arguments.shift
     $stderr.puts "WARNING: invalid format #{format} (use 'xml' or 'json')" if format and not format[/(xml|json)/]
-    serv.query(sparql, :format => format) {|x| print x}
+    serv.query(sparql, format: format) {|x| print x }
   else
-    $stderr.puts "ERROR: missing SPARQL to query."
-    $stderr.puts "> sparql.rb query SPARQL [format]"
+    $stderr.puts 'ERROR: missing SPARQL to query.'
+    $stderr.puts '> sparql.rb query SPARQL [format]'
   end
-when "file", "f"
-  serv.prefix_default if command == "f"
+when 'file', 'f'
+  serv.prefix_default if command == 'f'
   if arguments.any?
     sparql = File.read(arguments.shift)
     format = arguments.shift
     $stderr.puts "WARNING: invalid format #{format} (use 'xml' or 'json')" if format and not format[/(xml|json)/]
-    serv.query(sparql, :format => format) {|x| print x}
+    serv.query(sparql, format: format) {|x| print x }
   else
-    $stderr.puts "ERROR: missing SPARQL query file"
-    $stderr.puts "> sparql.rb file <filename> [format]"
+    $stderr.puts 'ERROR: missing SPARQL query file'
+    $stderr.puts '> sparql.rb file <filename> [format]'
   end
-when "find"
+when 'find'
   if arguments.any?
     keyword = arguments.shift
     format = arguments.shift
     $stderr.puts "WARNING: invalid format '#{format}' (use 'xml' or 'json')" if format and not format[/(xml|json)/]
-    serv.find(keyword, :format => format) {|x| print x}
+    serv.find(keyword, format: format) {|x| print x }
   else
-    $stderr.puts "ERROR: missing a keyword to search."
-    $stderr.puts "> sparql.rb find keyword"
+    $stderr.puts 'ERROR: missing a keyword to search.'
+    $stderr.puts '> sparql.rb find keyword'
   end
-when "head"
+when 'head'
   if arguments.size > 2
     limit, offset, format, = *arguments
   elsif arguments.size > 1
@@ -330,12 +328,12 @@ when "head"
     limit, = *arguments
   end
   opts = {
-    :limit => limit,
-    :offset => offset,
-    :format => format,
+    limit: limit,
+    offset: offset,
+    format: format
   }
-  serv.head(opts) {|x| print x}
-when "help"
+  serv.head(opts) {|x| print x }
+when 'help'
   help
   usage
 else
@@ -343,4 +341,3 @@ else
 end
 
 end # if $0
-

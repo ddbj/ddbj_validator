@@ -1,21 +1,21 @@
 class DDBJDbValidator
-  BIOPROJCT_DB_NAME = "bioproject"
-  BIOSAMPLE_DB_NAME = "biosample"
-  DRA_DB_NAME = "drmdb"
-  SUBMITTER_DB_NAME = "submitterdb"
+  BIOPROJCT_DB_NAME = 'bioproject'
+  BIOSAMPLE_DB_NAME = 'biosample'
+  DRA_DB_NAME = 'drmdb'
+  SUBMITTER_DB_NAME = 'submitterdb'
 
   def initialize (config)
-    @pg_host = config["pg_host"]
-    @pg_port = config["pg_port"]
-    @pg_user = config["pg_user"]
-    @pg_pass = config["pg_pass"]
-    @pg_timeout = config["pg_timeout"]
+    @pg_host = config['pg_host']
+    @pg_port = config['pg_port']
+    @pg_user = config['pg_user']
+    @pg_pass = config['pg_pass']
+    @pg_timeout = config['pg_timeout']
   end
 
   def get_connection(db_name)
     begin
       connection = PG::Connection.connect({host: @pg_host, port: @pg_port, dbname: db_name, user: @pg_user, password: @pg_pass, connect_timeout: @pg_timeout})
-      state_timeout = (@pg_timeout * 1000).to_s #millsec
+      state_timeout = (@pg_timeout * 1000).to_s # millsec
       connection.exec("SET SESSION statement_timeout = #{state_timeout}") ## 一定時間応答がなければエラーを発生させるように設定
       connection
     rescue => ex
@@ -41,16 +41,16 @@ class DDBJDbValidator
         psub_query_id = bioproject_accession
 
         q = "SELECT *
-             FROM mass.submission sub 
+             FROM mass.submission sub
               LEFT OUTER JOIN mass.project p USING(submission_id)
              WHERE sub.submission_id = $1
                AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
         prj_query_id = "#{psub_query_id}"
       elsif bioproject_accession =~ /^PRJDB\d+/
-        prjd_query_id = bioproject_accession.gsub("PRJDB", "").to_i
+        prjd_query_id = bioproject_accession.gsub('PRJDB', '').to_i
 
         q = "SELECT *
-             FROM mass.submission sub 
+             FROM mass.submission sub
               LEFT OUTER JOIN mass.project p USING(submission_id)
              WHERE p.project_id_counter = $1
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
@@ -58,8 +58,8 @@ class DDBJDbValidator
       else
         return false
       end
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [prj_query_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [prj_query_id])
       if 1 == res.ntuples then
         result = true
       end
@@ -87,8 +87,8 @@ class DDBJDbValidator
     return nil if bioproject_accession.nil?
     result = []
 
-    #無効なbioproject_idが指定された場合には空の配列を返す
-    if (bioproject_accession =~ /^PSUB\d{6}/ || bioproject_accession =~ /^PRJDB\d+/)
+    # 無効なbioproject_idが指定された場合には空の配列を返す
+    if bioproject_accession =~ /^PSUB\d{6}/ || bioproject_accession =~ /^PRJDB\d+/
       if !valid_bioproject_id?(bioproject_accession)
         return []
       end
@@ -100,7 +100,7 @@ class DDBJDbValidator
         prj_query_id = bioproject_accession
       elsif bioproject_accession =~ /^PRJDB\d+/
         prj_query_id = get_bioproject_submission(bioproject_accession)
-      else #外部ID(PRJNA,PRJDA等)
+      else # 外部ID(PRJNA,PRJDA等)
         prj_query_id = bioproject_accession
       end
 
@@ -110,10 +110,10 @@ class DDBJDbValidator
            WHERE status = 100
              AND ref_name = $1"
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [prj_query_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [prj_query_id])
       res.each do |item|
-        result.push(item["submitter_id"])
+        result.push(item['submitter_id'])
       end
     rescue => ex
       message = "Failed to execute the query to DDBJ '#{BIOPROJCT_DB_NAME}'.\n"
@@ -143,16 +143,16 @@ class DDBJDbValidator
         psub_query_id = bioproject_accession
 
         q = "SELECT COUNT(*)
-             FROM mass.project p 
+             FROM mass.project p
              WHERE p.submission_id = $1
               AND p.project_type = 'umbrella'
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
         prj_query_id = "#{psub_query_id}"
       elsif bioproject_accession =~ /^PRJDB\d+/
-        prjd_query_id = bioproject_accession.gsub("PRJDB", "").to_i
+        prjd_query_id = bioproject_accession.gsub('PRJDB', '').to_i
 
         q = "SELECT COUNT(*)
-             FROM mass.project p 
+             FROM mass.project p
              WHERE p.project_id_counter = $1
               AND p.project_type = 'umbrella'
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
@@ -161,10 +161,10 @@ class DDBJDbValidator
         return false
       end
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [prj_query_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [prj_query_id])
       # if "count" >= 1 this bioproject_accession is  umbrella id
-      if res[0]["count"].to_i > 0
+      if res[0]['count'].to_i > 0
         result = true
       end
 
@@ -202,22 +202,22 @@ class DDBJDbValidator
            AND submitter_id = $1
            AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [submitter_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [submitter_id])
 
-      #属性(name, title, description)毎に行が出力されるので、submission_id単位でグルーピングし、
-      #それぞれの属性の値を取得した後、カンマで連結してリストに格納する
-      keys = ["project_name", "project_title", "public_description"]
-      res.group_by {|item| item["submission_id"]}.each do |submission, data_list|
+      # 属性(name, title, description)毎に行が出力されるので、submission_id単位でグルーピングし、
+      # それぞれの属性の値を取得した後、カンマで連結してリストに格納する
+      keys = ['project_name', 'project_title', 'public_description']
+      res.group_by {|item| item['submission_id'] }.each do |submission, data_list|
         hash = {}
         keys.each do |key|
-          values_list = data_list.select {|data| data["data_name"] == key}
+          values_list = data_list.select {|data| data['data_name'] == key }
           if values_list.size == 1
-            hash[key.to_sym] = values_list.first["data_value"]
+            hash[key.to_sym] = values_list.first['data_value']
           elsif values_list.size > 1
-            hash[key.to_sym] = values_list.map{|item| item["data_value"]}.uniq.join(", ")
+            hash[key.to_sym] = values_list.map {|item| item['data_value'] }.uniq.join(', ')
           else
-            hash[key.to_sym] = ""
+            hash[key.to_sym] = ''
           end
         end
         bioproject_title_desc_list.push(hash)
@@ -253,11 +253,11 @@ class DDBJDbValidator
             WHERE smp.submission_id = $1
               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [submission_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [submission_id])
       res.each do |item|
-        unless item["sample_name"].empty?
-          sample_name_list.push(item["sample_name"])
+        unless item['sample_name'].empty?
+          sample_name_list.push(item['sample_name'])
         end
       end
 
@@ -291,10 +291,10 @@ class DDBJDbValidator
             AND p.project_id_prefix IS NOT NULL
             AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [psub_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [psub_id])
       if 1 == res.ntuples then ## 2つ以上返ってきてもエラー扱い
-        result = res[0]["prefix"] + res[0]["prj_id"]
+        result = res[0]['prefix'] + res[0]['prj_id']
       end
 
     rescue => ex
@@ -323,17 +323,17 @@ class DDBJDbValidator
       return nil
     end
     begin
-      project_id_counter = bioproject_accession.gsub("PRJDB", "").to_i
+      project_id_counter = bioproject_accession.gsub('PRJDB', '').to_i
       connection = get_connection(BIOPROJCT_DB_NAME)
       q = "SELECT p.submission_id
            FROM mass.project p
            WHERE p.project_id_counter = $1
             AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [project_id_counter])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [project_id_counter])
       if 1 == res.ntuples then ## 2つ以上返ってきてもエラー扱い
-        result = res[0]["submission_id"]
+        result = res[0]['submission_id']
       end
 
     rescue => ex
@@ -368,12 +368,12 @@ class DDBJDbValidator
            WHERE attribute_name = 'locus_tag_prefix' AND attribute_value <> ''
             AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query")
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query')
 
       res.each do |item|
-        unless item["attribute_value"].empty?
-          hash = {submission_id: item["submission_id"], locus_tag_prefix: item["attribute_value"]}
+        unless item['attribute_value'].empty?
+          hash = {submission_id: item['submission_id'], locus_tag_prefix: item['attribute_value']}
           prefix_list.push(hash)
         end
       end
@@ -439,8 +439,8 @@ class DDBJDbValidator
         return nil
       end
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [smp_query_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [smp_query_id])
       if 1 <= res.ntuples then
         result = res
       end
@@ -492,8 +492,8 @@ class DDBJDbValidator
         return nil
       end
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [smp_query_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [smp_query_id])
       if 1 <= res.ntuples then
         result = true
       else
@@ -532,10 +532,10 @@ class DDBJDbValidator
     begin
       connection = get_connection(SUBMITTER_DB_NAME)
 
-      q = "SELECT submitter_id, center_name, organization, department, affiliation, unit FROM mass.organization WHERE submitter_id = $1"
+      q = 'SELECT submitter_id, center_name, organization, department, affiliation, unit FROM mass.organization WHERE submitter_id = $1'
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [submitter_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [submitter_id])
       if 1 == res.ntuples then
         result = res[0]
       end
@@ -561,7 +561,7 @@ class DDBJDbValidator
     center_name = nil
     org_info = get_submitter_organization(submitter_id)
     if !org_info.nil?
-      center_name = org_info["center_name"]
+      center_name = org_info['center_name']
     end
     center_name
   end
@@ -589,10 +589,10 @@ class DDBJDbValidator
     begin
       connection = get_connection(SUBMITTER_DB_NAME)
 
-      q = "SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = $1 and is_pi = true"
+      q = 'SELECT submitter_id, email, first_name, middle_name, last_name FROM mass.contact WHERE submitter_id = $1 and is_pi = true'
 
-      connection.prepare("pre_query", q)
-      res = connection.exec_prepared("pre_query", [submitter_id])
+      connection.prepare('pre_query', q)
+      res = connection.exec_prepared('pre_query', [submitter_id])
       if res.ntuples > 0 then
         result = res
       end
@@ -666,9 +666,9 @@ class DDBJDbValidator
       end
     end
     if sample_id_list.empty?
-      return {}
+      {}
     else
-      id_place_holder = (1..sample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+      id_place_holder = (1..sample_id_list.size).map {|idx| '$' + idx.to_s }.join(',')
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)
 
@@ -680,14 +680,14 @@ class DDBJDbValidator
                acc.accession_id IN (#{id_place_holder})
                AND attr.attribute_value != ''
                AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", sample_id_list)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', sample_id_list)
 
         result = {}
-        res.group_by{|row| row["accession_id"]}.each do |acc_id, ret_list|
+        res.group_by {|row| row['accession_id'] }.each do |acc_id, ret_list|
           result[acc_id.to_s] = {attribute_list: []}
           ret_list.each do |row|
-            result[acc_id.to_s][:attribute_list].push({attribute_name: row["attribute_name"], attribute_value: row["attribute_value"]})
+            result[acc_id.to_s][:attribute_list].push({attribute_name: row['attribute_name'], attribute_value: row['attribute_value']})
           end
         end
         result
@@ -718,7 +718,7 @@ class DDBJDbValidator
     bioproject_accession_list.each do |bioproject_accession|
       result.push({bioproject_id: bioproject_accession})
       if bioproject_accession =~ /^PRJDB\d+/
-        prj_counter_id_list.push(bioproject_accession.gsub("PRJDB", "").to_i)
+        prj_counter_id_list.push(bioproject_accession.gsub('PRJDB', '').to_i)
       end
     end
 
@@ -726,21 +726,21 @@ class DDBJDbValidator
       begin
         connection = get_connection(BIOPROJCT_DB_NAME)
 
-        id_place_holder = (1..prj_counter_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+        id_place_holder = (1..prj_counter_id_list.size).map {|idx| '$' + idx.to_s }.join(',')
 
         q = "SELECT project_id_prefix, project_id_counter, submitter_id
              FROM mass.submission sub
               LEFT OUTER JOIN mass.project p USING(submission_id)
              WHERE p.project_id_counter IN (#{id_place_holder})
               AND (p.status_id IS NULL OR p.status_id NOT IN (5600, 5700))"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", prj_counter_id_list)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', prj_counter_id_list)
 
         res.each do |row|
           # 結果が返ってきたBioProjectがあればsubmitter_id情報を足す
           bioproject_accession_id = "#{row["project_id_prefix"]}#{row["project_id_counter"]}"
-          selected = result.select{|bioproject| bioproject[:bioproject_id] == bioproject_accession_id}
-          selected.each{|ret| ret[:submitter_id] = row["submitter_id"]}
+          selected = result.select {|bioproject| bioproject[:bioproject_id] == bioproject_accession_id }
+          selected.each {|ret| ret[:submitter_id] = row['submitter_id'] }
         end
 
       rescue => ex
@@ -777,7 +777,7 @@ class DDBJDbValidator
     if biosample_id_list.any?
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)
-        id_place_holder = (1..biosample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+        id_place_holder = (1..biosample_id_list.size).map {|idx| '$' + idx.to_s }.join(',')
 
         q = "SELECT DISTINCT sub.submitter_id, acc.accession_id, sub.submission_id
               FROM mass.sample smp
@@ -785,13 +785,13 @@ class DDBJDbValidator
                 JOIN mass.submission sub USING(submission_id)
               WHERE acc.accession_id IN (#{id_place_holder})
                 AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", biosample_id_list)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', biosample_id_list)
 
         res.each do |row|
           # 結果が返ってきたBioSampleがあればsubmitter_id情報を足す
-          selected = result.select{|biosample| biosample[:biosample_id] == row["accession_id"]}
-          selected.each{|ret| ret[:submitter_id] = row["submitter_id"]}
+          selected = result.select {|biosample| biosample[:biosample_id] == row['accession_id'] }
+          selected.each {|ret| ret[:submitter_id] = row['submitter_id'] }
         end
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
@@ -828,11 +828,11 @@ class DDBJDbValidator
       # RUN IDのパラメータ分のIN句のquery parameterを組み立てる
       # SQL側 =>  IN ( ($1, $2), ($3, $4) )
       # parameter => ["DRR", 60518, "DRR", 60519]
-      query_text = ""
+      query_text = ''
       param_index = 0
       query_params = []
       run_id_list.each do |param|
-        query_text += ", " unless param_index == 0
+        query_text += ', ' unless param_index == 0
         query_text += "($#{param_index += 1}, $#{param_index += 1})"
         query_params.concat([param[:acc_type], param[:acc_no]])
       end
@@ -849,14 +849,14 @@ class DDBJDbValidator
                AND g_view.status NOT IN (900, 1000, 1100)
                AND (ent2.acc_type, ent2.acc_no) IN ( #{query_text} )"
 
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", query_params)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', query_params)
 
         res.each do |row|
           # 結果が返ってきたRunがあればsubmitter_id情報を足す
           run_accession_id = "#{row["drr"]}#{row["drrno"].rjust(6, '0')}" # 0埋め6桁
-          selected = result.select {|search_run| search_run[:run_id] == run_accession_id}
-          selected.each{|ret| ret[:submitter_id] = row["submitter_id"]}
+          selected = result.select {|search_run| search_run[:run_id] == run_accession_id }
+          selected.each {|ret| ret[:submitter_id] = row['submitter_id'] }
         end
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{DRA_DB_NAME}'.\n"
@@ -892,20 +892,20 @@ class DDBJDbValidator
     if biosample_id_list.any?
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)
-        id_place_holder = (1..biosample_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+        id_place_holder = (1..biosample_id_list.size).map {|idx| '$' + idx.to_s }.join(',')
 
         q = "SELECT accession_id, smp_id
              FROM mass.accession
             JOIN mass.sample smp USING(smp_id)
             WHERE accession_id IN (#{id_place_holder})
              AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", biosample_id_list)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', biosample_id_list)
 
         res.each do |row|
           # 結果が返ってきたBioSampleがあればsmp_id情報を足す
-          selected = result.select{|biosample| biosample[:biosample_id] == row["accession_id"]}
-          selected.each{|ret| ret[:smp_id] = row["smp_id"]}
+          selected = result.select {|biosample| biosample[:biosample_id] == row['accession_id'] }
+          selected.each {|ret| ret[:smp_id] = row['smp_id'] }
         end
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
@@ -937,7 +937,7 @@ class DDBJDbValidator
     if biosample_smp_id_list.any?
       begin
         connection = get_connection(DRA_DB_NAME)
-        id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+        id_place_holder = (1..biosample_smp_id_list.size).map {|idx| '$' + idx.to_s }.join(',')
         # sub queryでの記述では数秒掛かるケースもあったため、クエリを分離して実行
         q = "SELECT acc_id
                FROM mass.ext_entity smp_ext
@@ -945,22 +945,22 @@ class DDBJDbValidator
              WHERE smp_ext.ref_name IN (#{id_place_holder})
                AND acc_type = 'SSUB'
               AND acc_id IS NOT NULL"
-        connection.prepare("pre_query_ssub", q)
-        res = connection.exec_prepared("pre_query_ssub", biosample_smp_id_list)
+        connection.prepare('pre_query_ssub', q)
+        res = connection.exec_prepared('pre_query_ssub', biosample_smp_id_list)
         if res.ntuples > 0 # hit ssub
-          ssub_list = res.map{|row| row["acc_id"]}
-          id_place_holder = (1..ssub_list.size).map{|idx| "$" + idx.to_s}.join(",")
+          ssub_list = res.map {|row| row['acc_id'] }
+          id_place_holder = (1..ssub_list.size).map {|idx| '$' + idx.to_s }.join(',')
           q = "SELECT DISTINCT acc_id, acc_type AS ext_acc_type, ref_name, g_view.status
                  FROM mass.ext_entity smp_ext
                  JOIN mass.ext_relation ext_ref USING(ext_id)
                  JOIN mass.current_dra_submission_group_view g_view USING(grp_id)
                WHERE ext_ref.acc_id IN (#{id_place_holder})
                  AND g_view.status NOT IN (900, 1000, 1100)"
-          connection.prepare("pre_query", q)
-          res = connection.exec_prepared("pre_query", ssub_list)
-          res.group_by{|row| row["acc_id"]}.each do |acc_id, ref_list|
+          connection.prepare('pre_query', q)
+          res = connection.exec_prepared('pre_query', ssub_list)
+          res.group_by {|row| row['acc_id'] }.each do |acc_id, ref_list|
             # DRA accessionに紐づくBioProjectIDを取得(一応リスト)
-            bioproject_submission_id_list = ref_list.select{|row| row["ext_acc_type"] == "PSUB"}.map{|row| row["ref_name"]}
+            bioproject_submission_id_list = ref_list.select {|row| row['ext_acc_type'] == 'PSUB' }.map {|row| row['ref_name'] }
             bioproject_accession_id_list = []
             bioproject_submission_id_list.each do |bioproject_submission_id|
               bioproject_accession_id_list.push(get_bioproject_accession(bioproject_submission_id))
@@ -968,8 +968,8 @@ class DDBJDbValidator
             bioproject_accession_id_list.compact!
             # 結果が返ってきたsmp_idに対してproject_id情報を足す
             ref_list.each do |row|
-              selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
-              selected.each{|ret| ret[:bioproject_accession_id_list] = bioproject_accession_id_list}
+              selected = result.select {|biosample| biosample[:smp_id] == row['ref_name'] }
+              selected.each {|ret| ret[:bioproject_accession_id_list] = bioproject_accession_id_list }
             end
           end
         end
@@ -1003,7 +1003,7 @@ class DDBJDbValidator
     if biosample_smp_id_list.any?
       begin
         connection = get_connection(DRA_DB_NAME)
-        id_place_holder = (1..biosample_smp_id_list.size).map{|idx| "$" + idx.to_s}.join(",")
+        id_place_holder = (1..biosample_smp_id_list.size).map {|idx| '$' + idx.to_s }.join(',')
 
         q = "SELECT ext_ent.ref_name, drr_ent.acc_type, drr_ent.acc_no, drx_drr_rel.grp_id, g_view.status
               FROM mass.ext_entity ext_ent
@@ -1015,15 +1015,15 @@ class DDBJDbValidator
              WHERE ext_ent.ref_name IN (#{id_place_holder})
               AND drx_drr_rel.grp_id = ext_rel.grp_id
               AND drr_ent.is_delete != TRUE"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", biosample_smp_id_list)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', biosample_smp_id_list)
         res.each do |row|
-          if row["status"].to_s == "900" || row["status"].to_s == "1000" || row["status"].to_s == "1100"
+          if row['status'].to_s == '900' || row['status'].to_s == '1000' || row['status'].to_s == '1100'
             # SQLが返ってこない為プログラムで無効なstatus分をfilter
             next
           end
           # 結果が返ってきたBioSampleがあればsmp_id情報を足す
-          selected = result.select{|biosample| biosample[:smp_id] == row["ref_name"]}
+          selected = result.select {|biosample| biosample[:smp_id] == row['ref_name'] }
           selected.each do |ret|
             ret[:drr_accession_id_list] = [] if ret[:drr_accession_id_list].nil?
             run_accession_id = "#{row["acc_type"]}#{row["acc_no"].rjust(6, '0')}" # 0埋め6桁
@@ -1058,20 +1058,20 @@ class DDBJDbValidator
     return [] if biosample_accession_list.nil?
 
     biosample_list_with_smp_id = get_valid_smp_id(biosample_accession_list)
-    biosample_list_with_smp_id.each{|row|
+    biosample_list_with_smp_id.each {|row|
       row[:bioproject_accession_id_list] = []
       row[:drr_accession_id_list] = []
     }
-    smp_id_list = biosample_list_with_smp_id.map{|row| row[:smp_id] }
+    smp_id_list = biosample_list_with_smp_id.map {|row| row[:smp_id] }
     project_id_list = get_bioproject_id_via_dra(smp_id_list)
     run_id_list = get_run_id_via_dra(smp_id_list)
     biosample_list_with_smp_id.each do |biosample|
       unless biosample[:smp_id].nil?
-        related_project = project_id_list.select{|row| row[:smp_id] == biosample[:smp_id]}
+        related_project = project_id_list.select {|row| row[:smp_id] == biosample[:smp_id] }
         if related_project.any? && !related_project[0][:bioproject_accession_id_list].nil?
           biosample[:bioproject_accession_id_list] = related_project[0][:bioproject_accession_id_list]
         end
-        related_run = run_id_list.select{|row| row[:smp_id] == biosample[:smp_id]}
+        related_run = run_id_list.select {|row| row[:smp_id] == biosample[:smp_id] }
         if related_run.any? && !related_run[0][:drr_accession_id_list].nil?
           biosample[:drr_accession_id_list] = related_run[0][:drr_accession_id_list]
         end
@@ -1109,7 +1109,7 @@ class DDBJDbValidator
       param_list = [submitter_id].concat(biosample_id_list)
       begin
         connection = get_connection(BIOSAMPLE_DB_NAME)
-        id_place_holder = (2..(biosample_id_list.size + 1) ).map{|idx| "$" + idx.to_s}.join(",") # submitter_idが $1 なので $2から
+        id_place_holder = (2..(biosample_id_list.size + 1)).map {|idx| '$' + idx.to_s }.join(',') # submitter_idが $1 なので $2から
         q = "SELECT accession_id
             FROM mass.sample smp
               JOIN mass.accession acc USING(smp_id)
@@ -1117,10 +1117,10 @@ class DDBJDbValidator
             WHERE submitter_id = $1
               AND accession_id IN (#{id_place_holder})
               AND (smp.status_id IS NULL OR smp.status_id NOT IN (5600, 5700))"
-        connection.prepare("pre_query", q)
-        res = connection.exec_prepared("pre_query", param_list)
+        connection.prepare('pre_query', q)
+        res = connection.exec_prepared('pre_query', param_list)
         res.each do |row|
-          result.push(row["accession_id"])
+          result.push(row['accession_id'])
         end
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{BIOSAMPLE_DB_NAME}'.\n"
@@ -1131,6 +1131,5 @@ class DDBJDbValidator
       end
     end
     result
-    
   end
 end

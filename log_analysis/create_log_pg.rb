@@ -47,18 +47,18 @@ class CreateLogIndex
   # hashデータからヘッダー付きTSVへ変換する
   module Hash2TSV
     def to_tsv(*keys)
-      keys = inject([]) { |keys, hash| keys | hash.keys } if keys.empty?
+      keys = inject([]) {|keys, hash| keys | hash.keys } if keys.empty?
       CSV.generate(col_sep: "\t") do |csv|
         csv << keys
-        each { |hash| csv << hash.values_at(*keys) }
+        each {|hash| csv << hash.values_at(*keys) }
       end
     end
   end
 
   def create_tsv
-    #日付単位でのログを取得(yyyy-MM-dd.log)
-    system(%Q[grep #{@target_date} #{LOG_DIR}/validator.log > #{LOG_DIR}/#{@target_date}.log])
-    #system(%Q[grep #{@target_date} #{LOG_DIR}/validator_staging20180309-0501.log >> #{LOG_DIR}/#{@target_date}.log])
+    # 日付単位でのログを取得(yyyy-MM-dd.log)
+    system(%Q(grep #{@target_date} #{LOG_DIR}/validator.log > #{LOG_DIR}/#{@target_date}.log))
+    # system(%Q[grep #{@target_date} #{LOG_DIR}/validator_staging20180309-0501.log >> #{LOG_DIR}/#{@target_date}.log])
     @status_list = []
     @message_list = []
     @annotation_list = []
@@ -67,7 +67,7 @@ class CreateLogIndex
       file.each_line do |row|
         # I, [2018-04-10T17:24:29.396851 #38545]  INFO -- : execute validation:{:biosample=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/biosample/SSUB000061.xml", :output=>"/home/w3sw/ddbj/DDBJValidator/deploy/logs/production//01/012a4409-8adf-4fbb-abda-bf7f4f519005/result.json"}
         if row.include?("execute validation")
-          unless (row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB004022.xml") || row.include?("SSUB000019_")) #monitoringやtestファイルを除外
+          unless row.include?("SSUB000061.xml") || row.include?("SSUB009526.xml") || row.include?("SSUB004022.xml") || row.include?("SSUB000019_") # monitoringやtestファイルを除外
             count += 1
             row = row.split("{").last.split("}").first
             log_reg = %r{^:biosample=>"(?<bs_file>.+)", :output=>"(?<op_file>.+)"$}
@@ -75,7 +75,7 @@ class CreateLogIndex
               m = log_reg.match(row)
               input_file = m['bs_file']
               output_file = m['op_file']
-              status_file = output_file.gsub("result.json","status.json")
+              status_file = output_file.gsub("result.json", "status.json")
               # UUID単位でファイルをパースしてリストに追加する
               if FileTest.exist?(input_file) && FileTest.exist?(output_file)
                 generate_table_data(input_file, output_file, status_file)
@@ -103,7 +103,7 @@ class CreateLogIndex
     end
 
     puts "Create index count(#{@target_date}): #{count}"
-    FileUtils.rm("#{LOG_DIR}/#{@target_date}.log") #日付単位のlogファイルを削除
+    FileUtils.rm("#{LOG_DIR}/#{@target_date}.log") # 日付単位のlogファイルを削除
   end
 
   # output_fileにTSV形式で出力する
@@ -117,7 +117,7 @@ class CreateLogIndex
     if File.exist?("#{ACCESS_LOG_DIR}/unicorn_err_all.log")
       log_file_name = "unicorn_err_all.log"
     end
-    system(%Q[grep #{uuid} #{ACCESS_LOG_DIR}/#{log_file_name} > #{ACCESS_LOG_DIR}/#{uuid}.log])
+    system(%Q(grep #{uuid} #{ACCESS_LOG_DIR}/#{log_file_name} > #{ACCESS_LOG_DIR}/#{uuid}.log))
     ip_list = []
     File.open("#{ACCESS_LOG_DIR}/#{uuid}.log") do |file|
       file.each_line do |row|
@@ -133,13 +133,13 @@ class CreateLogIndex
     submitter_id = xml_convertor.get_biosample_submitter_id(xml_document)
     ssub_id = xml_convertor.get_biosample_submission_id(xml_document)
     biosample_list = xml_convertor.xml2obj(xml_document)
-    packages = biosample_list.map {|biosample_data| biosample_data["package"]}.uniq
+    packages = biosample_list.map {|biosample_data| biosample_data["package"] }.uniq
 
     ip_address = ip_list.compact.first.nil? ? "" : ip_list.compact.first
     submitter_id = submitter_id.nil? ? "" : submitter_id
     ssub_id = ssub_id.nil??  "" : ssub_id
 
-    #status table
+    # status table
     status_data = {}
     status_data["uuid"] = uuid
     status_data["api_version"] = ret["version"]
@@ -162,13 +162,13 @@ class CreateLogIndex
     @status_list.push(status_data)
 
     ret["messages"].each_with_index do |err, msg_no|
-      #message table
+      # message table
       msg_no += 1
       message_data = {}
       message_data["uuid"] = uuid
       message_data["message_no"] = msg_no
       message_data["rule_id"] = err["id"]
-      #message_data["message"] = err["message"]
+      # message_data["message"] = err["message"]
       message_data["level"] = err["level"]
       message_data["external"] =  err["external"]
       message_data["method"] =  err["method"]
@@ -177,7 +177,7 @@ class CreateLogIndex
       @message_list.push(message_data)
 
       err["annotation"].each_with_index do |anno, anno_no|
-        #annotation table
+        # annotation table
         anno_no += 1
         anno_data = {}
         anno_data["uuid"] = uuid
@@ -193,7 +193,6 @@ class CreateLogIndex
         @annotation_list.push(anno_data)
       end
     end
-
   end
 
   # 指定されたtsvファイルのヘッダーをカンマ区切りに変更した文字列を返す.列名列挙用
@@ -201,14 +200,14 @@ class CreateLogIndex
   # "uuid,message_no,annotation_no, ..."
   def get_header(file)
     header = ""
-    File.open(file){|f|
+    File.open(file) {|f|
       header = f.gets
     }
-    header.gsub!("\t",",").chomp
+    header.gsub!("\t", ",").chomp
   end
 
   # postgresqlにロードするためのコマンドをファイルに書き込む
-  def generate_load_file()
+  def generate_load_file
     load_file = File.open(@pg_load_file, "w")
 
     load_file.puts "\\COPY tbl_status ( #{get_header(@log_tsv_status_file)} ) FROM '#{@log_tsv_status_file}' CSV HEADER DELIMITER E'\\t'"
@@ -271,7 +270,7 @@ class CreateLogIndex
 
       sql_file.flush
       sql_file.close
-      #system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
+      # system("/usr/bin/psql -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
       system("docker exec -it -e PGPASSWORD=#{@pg_user_password} #{@pg_host} psql -h #{@pg_host} -p #{@pg_port} -d #{@pg_database} -U #{@pg_user} -f #{@pg_refresh_views_file}")
     rescue => ex
       message = "Failed to execute the query to DDBJ 'validation_log'.\n"
@@ -300,8 +299,8 @@ class CreateLogIndex
         end
       end
       column_name.downcase!
-      unless column_name == 'suggested_value' #別途出力するため不要
-        if column_name == 'sample_name' #sample_nameは最初の列にする
+      unless column_name == 'suggested_value' # 別途出力するため不要
+        if column_name == 'sample_name' # sample_nameは最初の列にする
           pivot_columns.unshift("max(CASE WHEN key = '#{key}' THEN value END) AS #{column_name},")
         else
           pivot_columns.push("max(CASE WHEN key = '#{key}' THEN value END) AS #{column_name},")
@@ -356,8 +355,8 @@ creator.load_pg
 puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} End load index"
 
 # Pivot View更新
-#if ARGV.size >= 2 && ARGV[1] == 'refresh_views'
+# if ARGV.size >= 2 && ARGV[1] == 'refresh_views'
 puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} Start refresh views"
 creator.replace_views
 puts "#{Time.now.strftime("%Y-%m-%d %H:%M:%S")} End refresh view"
-#end
+# end

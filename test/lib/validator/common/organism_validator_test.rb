@@ -11,13 +11,13 @@ class TestOrganismValidator < Minitest::Test
   end
 
   def test_get_organism_name
-    assert_equal "Homo sapiens", @validator.get_organism_name("9606")
-    assert_nil @validator.get_organism_name("1111111111111")
+    assert_equal 'Homo sapiens', @validator.get_organism_name('9606')
+    assert_nil @validator.get_organism_name('1111111111111')
   end
 
   def test_exist_organism_name
-    assert_equal true, @validator.exist_organism_name?("Homo sapiens")
-    assert_equal false, @validator.exist_organism_name?("Not Home sapiens")
+    assert_equal true, @validator.exist_organism_name?('Homo sapiens')
+    assert_equal false, @validator.exist_organism_name?('Not Home sapiens')
   end
 
   def test_search_tax_from_name_ignore_case
@@ -25,9 +25,9 @@ class TestOrganismValidator < Minitest::Test
     # 特殊文字 (カンマ / 括弧 / アポストロフィ / バックティック / 波括弧等) のエスケープが正しく働くかの
     # 網羅テストは本来別の責務で、個別の organism 行が Virtuoso snapshot に含まれることに強く依存するため
     # fixture ベースでは再現不能。必要に応じて専用の fixture を用意して復活させる
-    ret = @validator.search_tax_from_name_ignore_case("bacteria")
+    ret = @validator.search_tax_from_name_ignore_case('bacteria')
     assert_equal true, ret.size > 0
-    ret = @validator.search_tax_from_name_ignore_case("mouse")
+    ret = @validator.search_tax_from_name_ignore_case('mouse')
     assert_equal true, ret.size > 0
 
     # not exist name
@@ -36,40 +36,40 @@ class TestOrganismValidator < Minitest::Test
   end
 
   def test_suggest_taxid_from_name
-    #no exist
-    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
-    ret = @validator.suggest_taxid_from_name("not exist name")
+    # no exist
+    expect_value = {status: 'no exist', tax_id: OrganismValidator::TAX_ROOT}
+    ret = @validator.suggest_taxid_from_name('not exist name')
     assert_equal expect_value, ret
-    #exist one tax
-    expect_value = {status: "exist", tax_id: "562", scientific_name: "Escherichia coli"}
-    ret = @validator.suggest_taxid_from_name("escherichia coli")
+    # exist one tax
+    expect_value = {status: 'exist', tax_id: '562', scientific_name: 'Escherichia coli'}
+    ret = @validator.suggest_taxid_from_name('escherichia coli')
     assert_equal expect_value, ret
-    #multiple
+    # multiple
     expect_value = {
-      status: "multiple exist", 
-      tax_id: "10088, 10090",
+      status: 'multiple exist',
+      tax_id: '10088, 10090',
       tax_list: [
-        {tax_no: "10088", organism_name: "mouse", name_type: "common name", scientific_name: "Mus"}, 
-        {tax_no: "10090", organism_name: "mouse", name_type: "common name", scientific_name: "Mus musculus"}
+        {tax_no: '10088', organism_name: 'mouse', name_type: 'common name', scientific_name: 'Mus'},
+        {tax_no: '10090', organism_name: 'mouse', name_type: 'common name', scientific_name: 'Mus musculus'}
       ]
     }
-    ret = @validator.suggest_taxid_from_name("mouse")
+    ret = @validator.suggest_taxid_from_name('mouse')
     assert_equal expect_value, ret
 
-    #特殊なID
-    #exist one tax(32644"Unidentified" tax) #scientificNameであればOK
-    expect_value = {status: "exist", tax_id: "32644", scientific_name: "unidentified"}
-    ret = @validator.suggest_taxid_from_name("Unidentified")
+    # 特殊なID
+    # exist one tax(32644"Unidentified" tax) #scientificNameであればOK
+    expect_value = {status: 'exist', tax_id: '32644', scientific_name: 'unidentified'}
+    ret = @validator.suggest_taxid_from_name('Unidentified')
     assert_equal expect_value, ret
-    #no exist (32644"Unidentified" tax) #Synonymは無効とする"none","other","unknown"などがある
-    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
-    ret = @validator.suggest_taxid_from_name("none")
+    # no exist (32644"Unidentified" tax) #Synonymは無効とする"none","other","unknown"などがある
+    expect_value = {status: 'no exist', tax_id: OrganismValidator::TAX_ROOT}
+    ret = @validator.suggest_taxid_from_name('none')
     assert_equal expect_value, ret
 
-    #dummy taxon
-    #exist one tax(unpublished tax)
-    expect_value = {status: "no exist", tax_id: OrganismValidator::TAX_ROOT}
-    ret = @validator.suggest_taxid_from_name("Alkalobacillus saladarense")
+    # dummy taxon
+    # exist one tax(unpublished tax)
+    expect_value = {status: 'no exist', tax_id: OrganismValidator::TAX_ROOT}
+    ret = @validator.suggest_taxid_from_name('Alkalobacillus saladarense')
     assert_equal expect_value, ret
   end
 =begin
@@ -91,234 +91,234 @@ WHERE
 =end
 
   def test_organism_name_of_synonym
-    org_name_list = @validator.organism_name_of_synonym("Anabaena sp. PCC 7120")
-    assert_equal "Nostoc sp. PCC 7120 = FACHB-418", org_name_list.first
+    org_name_list = @validator.organism_name_of_synonym('Anabaena sp. PCC 7120')
+    assert_equal 'Nostoc sp. PCC 7120 = FACHB-418', org_name_list.first
     # fixture に Abies beshanzuensis (synonym: "Abies sp. DZL-2011") が含まれていないためコメントアウト
     # org_name_list = @validator.organism_name_of_synonym("Abies sp. DZL-2011")
     # assert_includes org_name_list, "Abies beshanzuensis"
-    assert_equal [], @validator.organism_name_of_synonym("Not exist synonym")
+    assert_equal [], @validator.organism_name_of_synonym('Not exist synonym')
   end
 
   def test_get_taxid_from_name
-    tax_id_list = @validator.get_taxid_from_name("Homo sapiens")
-    assert_equal "9606", tax_id_list.first
-    tax_id_list = @validator.get_taxid_from_name("Cryptococcus")
-    assert_includes tax_id_list, "5206"
-    assert_equal [], @validator.get_taxid_from_name("Not exist organism name")
+    tax_id_list = @validator.get_taxid_from_name('Homo sapiens')
+    assert_equal '9606', tax_id_list.first
+    tax_id_list = @validator.get_taxid_from_name('Cryptococcus')
+    assert_includes tax_id_list, '5206'
+    assert_equal [], @validator.get_taxid_from_name('Not exist organism name')
   end
 
   def test_has_linage
-    assert_equal true, @validator.has_linage("103690", ["2"])
-    assert_equal false, @validator.has_linage("9606", ["2"])
+    assert_equal true, @validator.has_linage('103690', ['2'])
+    assert_equal false, @validator.has_linage('9606', ['2'])
   end
 
   def test_is_infraspecific_rank
-    assert_equal true, @validator.is_infraspecific_rank("1148") #species rank
-    assert_equal true, @validator.is_infraspecific_rank("1111708") #no rank, has species rank
-    assert_equal true, @validator.is_infraspecific_rank("1416348") #subspecies rank, has not species rank
-    assert_equal false, @validator.is_infraspecific_rank("1142") #genus rank
+    assert_equal true, @validator.is_infraspecific_rank('1148') # species rank
+    assert_equal true, @validator.is_infraspecific_rank('1111708') # no rank, has species rank
+    assert_equal true, @validator.is_infraspecific_rank('1416348') # subspecies rank, has not species rank
+    assert_equal false, @validator.is_infraspecific_rank('1142') # genus rank
   end
 
   def test_org_vs_packagea_74
-    ret = @validator.org_vs_package_validate("1148", "Pathogen.cl") #bacteria species
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1111708", "Pathogen.cl") #bacteria strain level
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("282702", "Pathogen.cl") #viruses
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("109903", "Pathogen.cl") #fungi
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1406378", "Pathogen.cl") #archaea
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("10228", "Pathogen.cl") #metazoa linage
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Pathogen.cl') # bacteria species
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1111708', 'Pathogen.cl') # bacteria strain level
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'Pathogen.cl') # viruses
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('109903', 'Pathogen.cl') # fungi
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1406378', 'Pathogen.cl') # archaea
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('10228', 'Pathogen.cl') # metazoa linage
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_75
-    ret = @validator.org_vs_package_validate("1148", "Pathogen.env") #bacteria species
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1111708", "Pathogen.env") #bacteria strain level
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("282702", "Pathogen.env") #viruses
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("109903", "Pathogen.env") #fungi
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1406378", "Pathogen.env") #archaea
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("10228", "Pathogen.env") #metazoa
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Pathogen.env') # bacteria species
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1111708', 'Pathogen.env') # bacteria strain level
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'Pathogen.env') # viruses
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('109903', 'Pathogen.env') # fungi
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1406378', 'Pathogen.env') # archaea
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('10228', 'Pathogen.env') # metazoa
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_76
-    ret = @validator.org_vs_package_validate("1148", "Microbe") #bacteria
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1406378", "Microbe") #archaea
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("282702", "Microbe") #viruses
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("12906", "Microbe") #viroids
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("109903", "Microbe") #fungi
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1003037", "Microbe") #unicellular eukaryotes
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("32133", "Microbe") #embryophyta
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("10228", "Microbe") #metazoa
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Microbe') # bacteria
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1406378', 'Microbe') # archaea
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'Microbe') # viruses
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('12906', 'Microbe') # viroids
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('109903', 'Microbe') # fungi
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1003037', 'Microbe') # unicellular eukaryotes
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('32133', 'Microbe') # embryophyta
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('10228', 'Microbe') # metazoa
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_77
-    ret = @validator.org_vs_package_validate("10090", "Model.organism.animal") #mus musculus
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("6231", "Model.organism.animal") #Nematoda
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("9606", "Model.organism.animal")
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("562", "Model.organism.animal") #Escherichia coli
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "Model.organism.animal") #bacteria
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("1406378", "Model.organism.animal") #archaea
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("282702", "Model.organism.animal") #viruses
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("12906", "Model.organism.animal") #viroids
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("109903", "Model.organism.animal") #fungi
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("655179", "Model.organism.animal") #unclassified sequences
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("28384", "Model.organism.animal") #other sequences
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('10090', 'Model.organism.animal') # mus musculus
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('6231', 'Model.organism.animal') # Nematoda
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('9606', 'Model.organism.animal')
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('562', 'Model.organism.animal') # Escherichia coli
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Model.organism.animal') # bacteria
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('1406378', 'Model.organism.animal') # archaea
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'Model.organism.animal') # viruses
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('12906', 'Model.organism.animal') # viroids
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('109903', 'Model.organism.animal') # fungi
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('655179', 'Model.organism.animal') # unclassified sequences
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('28384', 'Model.organism.animal') # other sequences
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_78
-    ret = @validator.org_vs_package_validate("655179", "Metagenome.environmental") #unclassified sequences
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1515699", "Metagenome.environmental") #unclassified sequences but not end with "metagenome"
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "Metagenome.environmental") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('655179', 'Metagenome.environmental') # unclassified sequences
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1515699', 'Metagenome.environmental') # unclassified sequences but not end with "metagenome"
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Metagenome.environmental') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_80
-    ret = @validator.org_vs_package_validate("9606", "Human")
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "Human") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('9606', 'Human')
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Human') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_81
-    ret = @validator.org_vs_package_validate("32133", "Plant") #embryophyta
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "Plant") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('32133', 'Plant') # embryophyta
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Plant') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_82
-    ret = @validator.org_vs_package_validate("282702", "Virus") #embryophyta
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "Virus") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'Virus') # embryophyta
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Virus') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_83
-    ret = @validator.org_vs_package_validate("655179", "MIMS.me") #unclassified sequences
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("655179", "MIMS.me.air") #unclassified sequences
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1515699", "MIMS.me") #unclassified sequences but not end with "metagenome"
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "MIMS.me") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('655179', 'MIMS.me') # unclassified sequences
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('655179', 'MIMS.me.air') # unclassified sequences
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1515699', 'MIMS.me') # unclassified sequences but not end with "metagenome"
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIMS.me') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_84
-    ret = @validator.org_vs_package_validate("1148", "MIGS.ba") #bacteria
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1406378", "MIGS.ba") #archaea
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("282702", "MIGS.ba") #viruses
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIGS.ba') # bacteria
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1406378', 'MIGS.ba') # archaea
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'MIGS.ba') # viruses
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_85
-    ret = @validator.org_vs_package_validate("9606", "MIGS.eu")
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "MIGS.eu") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('9606', 'MIGS.eu')
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIGS.eu') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_86
-    ret = @validator.org_vs_package_validate("282702", "MIGS.vi") #viruses
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "MIGS.vi") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'MIGS.vi') # viruses
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIGS.vi') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_88
-    ret = @validator.org_vs_package_validate("655179", "MIMARKS.survey") #unclassified sequences
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("655179", "MIMARKS.survey.air") #unclassified sequences
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1515699", "MIMARKS.survey") #unclassified sequences but not end with "metagenome"
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "MIMARKS.survey") #bacteria
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('655179', 'MIMARKS.survey') # unclassified sequences
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('655179', 'MIMARKS.survey.air') # unclassified sequences
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1515699', 'MIMARKS.survey') # unclassified sequences but not end with "metagenome"
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIMARKS.survey') # bacteria
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_89
-    ret = @validator.org_vs_package_validate("1148", "Beta-lactamase") #bacteria
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("282702", "Beta-lactamase") #viruses
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'Beta-lactamase') # bacteria
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('282702', 'Beta-lactamase') # viruses
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_110
-    ret = @validator.org_vs_package_validate("1148", "MIMAG.human-skin") #bacteria
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("9606", "MIMAG.human-skin") #human
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("539655", "MIMAG.human-skin") #human skin metagenome
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIMAG.human-skin') # bacteria
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('9606', 'MIMAG.human-skin') # human
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('539655', 'MIMAG.human-skin') # human skin metagenome
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_111
-    ret = @validator.org_vs_package_validate("1148", "MISAG.soil") #bacteria
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("9606", "MISAG.soil") #human
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("410658", "MISAG.soil") #soil metagenome
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MISAG.soil') # bacteria
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('9606', 'MISAG.soil') # human
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('410658', 'MISAG.soil') # soil metagenome
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_112
-    ret = @validator.org_vs_package_validate("11320", "MIUVIG.human-oral") #Influenza A virus
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("1148", "MIUVIG.human-oral") #bacteria
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("9606", "MIUVIG.human-oral") #human
-    assert_equal "error", ret[:status]
-    ret = @validator.org_vs_package_validate("447426", "MIUVIG.human-oral") #human oral metagenome
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('11320', 'MIUVIG.human-oral') # Influenza A virus
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIUVIG.human-oral') # bacteria
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('9606', 'MIUVIG.human-oral') # human
+    assert_equal 'error', ret[:status]
+    ret = @validator.org_vs_package_validate('447426', 'MIUVIG.human-oral') # human oral metagenome
+    assert_equal 'error', ret[:status]
   end
 
   def test_org_vs_packagea_130
-    ret = @validator.org_vs_package_validate("1148", "MIMARKS.specimen") #bacteria
-    assert_equal "ok", ret[:status]
-    ret = @validator.org_vs_package_validate("539655", "MIMARKS.specimen") #human skin metagenome
-    assert_equal "error", ret[:status]
+    ret = @validator.org_vs_package_validate('1148', 'MIMARKS.specimen') # bacteria
+    assert_equal 'ok', ret[:status]
+    ret = @validator.org_vs_package_validate('539655', 'MIMARKS.specimen') # human skin metagenome
+    assert_equal 'error', ret[:status]
   end
 
   def test_target_organism_for_specimen_voucher?
-    ret = @validator.target_organism_for_specimen_voucher?("9606") #eukaryote
+    ret = @validator.target_organism_for_specimen_voucher?('9606') # eukaryote
     assert_equal true, ret
-    ret = @validator.target_organism_for_specimen_voucher?("103690") #cyanobacteria
+    ret = @validator.target_organism_for_specimen_voucher?('103690') # cyanobacteria
     assert_equal true, ret
-    ret = @validator.target_organism_for_specimen_voucher?("562") #bacteria (not cyano)
+    ret = @validator.target_organism_for_specimen_voucher?('562') # bacteria (not cyano)
     assert_equal false, ret
-    ret = @validator.target_organism_for_specimen_voucher?("410658") #soil metagenome
+    ret = @validator.target_organism_for_specimen_voucher?('410658') # soil metagenome
     assert_equal false, ret
   end
 end

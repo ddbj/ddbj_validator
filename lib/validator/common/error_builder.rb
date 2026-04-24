@@ -5,7 +5,7 @@ require 'erb'
 # error hash のフォーマットは Wiki を参照:
 # https://github.com/ddbj/ddbj_validator/wiki/Validator-API
 module ErrorBuilder
-  AUTO_ANNOTATION_MSG = "An automatically-generated correction will be applied."
+  AUTO_ANNOTATION_MSG = 'An automatically-generated correction will be applied.'
 
   #
   # ルール定義から error hash を組み立てて返す。
@@ -17,16 +17,16 @@ module ErrorBuilder
   # auto_annotation: auto annotation 由来のエラーなら true (末尾に AUTO_ANNOTATION_MSG を追記)
   #
   def self.error_obj (rule, file_path, annotation, auto_annotation = false)
-    message = rule["message"]
+    message = rule['message']
     message = "#{message} #{AUTO_ANNOTATION_MSG}" if auto_annotation
     {
-      id:         rule["code"],
+      id:         rule['code'],
       message:    message,
-      reference:  rule["reference"],
-      level:      rule["level"],
-      external:   rule["internal_ignore"],
-      method:     rule["rule_class"],
-      object:     rule["object"],
+      reference:  rule['reference'],
+      level:      rule['level'],
+      external:   rule['internal_ignore'],
+      method:     rule['rule_class'],
+      object:     rule['object'],
       source:     file_path,
       annotation: annotation
     }
@@ -41,7 +41,7 @@ module ErrorBuilder
   # params:    テンプレートへ埋め込む変数の Hash
   #
   def self.error_msg (rule_obj, rule_code, params)
-    ERB.new(rule_obj["rule#{rule_code}"]["message"]).result_with_hash(params || {})
+    ERB.new(rule_obj["rule#{rule_code}"]['message']).result_with_hash(params || {})
   end
 
   #
@@ -56,7 +56,7 @@ module ErrorBuilder
   # is_auto_annotation:   auto annotation なら true、そうでなければ suggestion 扱い
   #
   def self.suggested_annotation_with_key (key, suggested_values, target_key, location, is_auto_annotation)
-    key = "Suggested value" if key.nil? || key == ""
+    key = 'Suggested value' if key.nil? || key == ''
     hash = {
       key:             key,
       suggested_value: suggested_values,
@@ -75,7 +75,7 @@ module ErrorBuilder
   # Suggest 形式の annotation hash を返す (デフォルト key 名 "Suggested value" 版)。
   #
   def self.suggested_annotation (suggested_values, target_key, location, is_auto_annotation)
-    suggested_annotation_with_key("Suggested value", suggested_values, target_key, location, is_auto_annotation)
+    suggested_annotation_with_key('Suggested value', suggested_values, target_key, location, is_auto_annotation)
   end
 
   #

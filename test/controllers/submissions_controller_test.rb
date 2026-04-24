@@ -21,5 +21,4 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     get '/api/submission/biosample/SSUB000000', headers: {'API_KEY' => 'wrong'}
     assert_response :unauthorized
   end
-
 end

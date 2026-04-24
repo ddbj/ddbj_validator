@@ -21,19 +21,19 @@ class TestValidator < Minitest::Test
     file_path = "#{@bs_test_file_dir}/json/biosample_test_ok.json"
     @validator.execute({biosample: file_path, output: output_file_path})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal 0, result["stats"]["error_count"]
-    assert_equal 0, result["stats"]["warning_count"]
+    assert_equal 0, result['stats']['error_count']
+    assert_equal 0, result['stats']['warning_count']
 
     file_path = "#{@bs_test_file_dir}/json/biosample_test_warning.json"
     @validator.execute({biosample: file_path, output: output_file_path})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal 0, result["stats"]["error_count"]
-    assert_equal true, result["stats"]["warning_count"] > 0
+    assert_equal 0, result['stats']['error_count']
+    assert_equal true, result['stats']['warning_count'] > 0
 
     file_path = "#{@bs_test_file_dir}/json/biosample_test_error.json"
     @validator.execute({biosample: file_path, output: output_file_path})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal true, result["stats"]["error_count"] > 0
+    assert_equal true, result['stats']['error_count'] > 0
 
     FileUtils.rm(output_file_path)
   end
@@ -44,19 +44,19 @@ class TestValidator < Minitest::Test
     file_path = "#{@bs_test_file_dir}/tsv/biosample_test_ok.tsv"
     @validator.execute({biosample: file_path, output: output_file_path})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal 0, result["stats"]["error_count"]
-    assert_equal 0, result["stats"]["warning_count"]
+    assert_equal 0, result['stats']['error_count']
+    assert_equal 0, result['stats']['warning_count']
 
     file_path = "#{@bs_test_file_dir}/tsv/biosample_test_warning.tsv"
     @validator.execute({biosample: file_path, output: output_file_path})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal 0, result["stats"]["error_count"]
-    assert_equal true, result["stats"]["warning_count"] > 0
+    assert_equal 0, result['stats']['error_count']
+    assert_equal true, result['stats']['warning_count'] > 0
 
     file_path = "#{@bs_test_file_dir}/tsv/biosample_test_error.tsv"
     @validator.execute({biosample: file_path, output: output_file_path})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal true, result["stats"]["error_count"] > 0
+    assert_equal true, result['stats']['error_count'] > 0
 
     FileUtils.rm(output_file_path)
   end
@@ -65,22 +65,22 @@ class TestValidator < Minitest::Test
     output_file_path = "#{@tmp_file_dir}/result.json"
 
     file_path = "#{@all_test_file_dir}/bpbs_test_ok.xlsx"
-    @validator.execute({all_db: file_path, output: output_file_path, params: {"check_sheet" => []}})
+    @validator.execute({all_db: file_path, output: output_file_path, params: {'check_sheet' => []}})
     result = JSON.parse(File.read(output_file_path))
-    #puts JSON.pretty_generate(result)
-    assert_equal 0, result["stats"]["error_count"]
-    assert_equal 0, result["stats"]["warning_count"]
+    # puts JSON.pretty_generate(result)
+    assert_equal 0, result['stats']['error_count']
+    assert_equal 0, result['stats']['warning_count']
 
     file_path = "#{@all_test_file_dir}/bpbs_test_warning.xlsx"
-    @validator.execute({all_db: file_path, output: output_file_path, params: {"check_sheet" => []}})
+    @validator.execute({all_db: file_path, output: output_file_path, params: {'check_sheet' => []}})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal 0, result["stats"]["error_count"]
-    assert_equal true, result["stats"]["warning_count"] > 0
+    assert_equal 0, result['stats']['error_count']
+    assert_equal true, result['stats']['warning_count'] > 0
 
     file_path = "#{@all_test_file_dir}/bpbs_test_error.xlsx"
-    @validator.execute({all_db: file_path, output: output_file_path, params: {"check_sheet" => []}})
+    @validator.execute({all_db: file_path, output: output_file_path, params: {'check_sheet' => []}})
     result = JSON.parse(File.read(output_file_path))
-    assert_equal true, result["stats"]["error_count"] > 0
+    assert_equal true, result['stats']['error_count'] > 0
 
     # split file削除
     FileUtils.rm("#{@bp_test_file_dir}/bpbs_test_ok_bioproject.tsv")
