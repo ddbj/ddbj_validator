@@ -1,9 +1,3 @@
-require 'rubygems'
-require 'json'
-require 'erb'
-require 'date'
-require 'net/http'
-require 'json-schema'
 require_relative "base"
 require_relative "common/insdc_nullability"
 require_relative "common/tsv_field_validator"

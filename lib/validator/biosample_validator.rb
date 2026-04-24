@@ -1,9 +1,5 @@
-require 'rubygems'
-require 'json'
 require 'erb'
 require 'date'
-require 'net/http'
-require 'active_support/core_ext/string/filters'
 require_relative "base"
 require_relative "common/insdc_nullability"
 require_relative "common/coll_dump"

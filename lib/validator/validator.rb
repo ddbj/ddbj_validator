@@ -1,7 +1,6 @@
 require 'optparse'
 require 'logger'
 require 'yaml'
-require 'mail'
 require 'fileutils'
 
 require File.expand_path('../common/excel2tsv.rb', __FILE__)

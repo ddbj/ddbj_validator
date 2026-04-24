@@ -246,6 +246,7 @@ DEPENDENCIES
   bootsnap
   csv
   http
+  json
   json-schema
   mail
   net-ftp

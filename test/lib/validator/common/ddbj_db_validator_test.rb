@@ -1,11 +1,7 @@
-require 'json'
-require 'yaml'
-require 'erb'
 require 'test_helper'
 require 'validator/common/ddbj_db_validator'
 
 class TestDDBJDbValidator < Minitest::Test
-
   def setup
     skip_unless_pg_configured
     @db_validator = DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])

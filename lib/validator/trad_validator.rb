@@ -1,8 +1,4 @@
-require 'rubygems'
-require 'json'
-require 'erb'
 require 'date'
-require 'http'
 require_relative "base"
 require_relative "common/date_format"
 require_relative "common/ddbj_db_validator"

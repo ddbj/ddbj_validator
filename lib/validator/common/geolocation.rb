@@ -1,5 +1,3 @@
-require 'json'
-
 # INSDC の lat_lon 文字列パース、ISO 小数度への変換、Natural Earth 1:50m の
 # オフラインポリゴンによる「座標 → 国 ISO_A3」ルックアップをまとめた純関数群。
 module Geolocation

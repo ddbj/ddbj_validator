@@ -1,8 +1,6 @@
 require 'test_helper'
 require 'validator/auto_annotator/auto_annotator'
 
-require 'json'
-
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
 #
 class TestAutoAnnotator < Minitest::Test

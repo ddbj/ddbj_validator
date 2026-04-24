@@ -1,10 +1,3 @@
-require 'rubygems'
-require 'json'
-require 'erb'
-require 'date'
-require 'net/http'
-require 'nokogiri'
-require 'active_support/core_ext/integer/inflections'
 require_relative "base"
 require_relative "common/insdc_nullability"
 require_relative "common/ddbj_db_validator"

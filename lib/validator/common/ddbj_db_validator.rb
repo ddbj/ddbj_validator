@@ -1,5 +1,4 @@
 require 'pg'
-require 'yaml'
 
 class DDBJDbValidator
   BIOPROJCT_DB_NAME = "bioproject"

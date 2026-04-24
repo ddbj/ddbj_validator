@@ -1,4 +1,3 @@
-require 'json'
 require 'test_helper'
 require 'validator/auto_annotator/auto_annotator_xml'
 require 'validator/common/xml_convertor'
@@ -6,7 +5,6 @@ require 'validator/common/xml_convertor'
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
 #
 class TestAutoAnnotatorXml < Minitest::Test
-
   def setup
     @auto_annotater = AutoAnnotatorXml.new
     @test_file_dir = File.expand_path('../../../../data/auto_annotator', __FILE__)
@@ -34,5 +32,4 @@ class TestAutoAnnotatorXml < Minitest::Test
     assert_equal attr["geo_loc_name"], "Japan:Hikone-shi" #BS_R0094 "Japan: Hikone-shi"
     assert_equal attr["component_organism"], "Escherichia coli" #BS_R0105 "Enterococcus coli"
   end
-
 end

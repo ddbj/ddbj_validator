@@ -1,5 +1,4 @@
 require 'logger'
-require 'nokogiri'
 require 'yaml'
 require_relative "biosample_submitter"
 require_relative "bioproject_submitter"

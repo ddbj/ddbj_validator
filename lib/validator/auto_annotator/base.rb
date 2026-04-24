@@ -1,6 +1,3 @@
-require 'yaml'
-require 'json'
-
 class AutoAnnotatorBase
 
   def initialize

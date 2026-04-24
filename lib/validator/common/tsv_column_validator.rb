@@ -1,4 +1,3 @@
-require 'json'
 require_relative "../auto_annotator/auto_annotator_json"
 
 # BioSample/MetaboBank(SDRF)のような一列目に項目名を記述するTSV(あるいはそれをJSONに変換した)形式を処理するクラス

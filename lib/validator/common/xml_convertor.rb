@@ -1,8 +1,3 @@
-require 'rubygems'
-require 'json'
-require 'erb'
-require 'date'
-require 'nokogiri'
 require_relative "../base"
 
 #

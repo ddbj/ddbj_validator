@@ -1,5 +1,4 @@
 require 'fileutils'
-require 'json'
 require 'test_helper'
 require 'validator/validator'
 

@@ -1,8 +1,4 @@
-require 'optparse'
 require 'logger'
-require 'yaml'
-require 'erb'
-require 'fileutils'
 
 require File.expand_path('../auto_annotator_xml.rb', __FILE__)
 require File.expand_path('../auto_annotator_tsv.rb', __FILE__)

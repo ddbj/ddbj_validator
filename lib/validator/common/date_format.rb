@@ -1,4 +1,3 @@
-require 'erb'
 require 'date'
 
 class DateFormat

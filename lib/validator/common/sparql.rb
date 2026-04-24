@@ -1,10 +1,8 @@
 #!/usr/bin/env ruby
 
-require "rubygems"
 require "net/http"
 require "uri"
 require "cgi"
-require "json"  # gem install json
 
 class SPARQL
 

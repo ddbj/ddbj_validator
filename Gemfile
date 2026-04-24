@@ -6,12 +6,13 @@ gem "bootsnap", require: false
 
 gem "csv"
 gem "http"
-gem "rack-cors"
+gem "json"
 gem "json-schema"
 gem "mail"
 gem "net-ftp"
 gem "nokogiri"
 gem "pg"
+gem "rack-cors"
 gem "roo"
 
 group :test do

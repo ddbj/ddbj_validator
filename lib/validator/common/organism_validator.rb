@@ -1,5 +1,3 @@
-require 'rubygems'
-require 'json'
 require 'erb'
 require_relative "sparql_base"
 require_relative "insdc_nullability"

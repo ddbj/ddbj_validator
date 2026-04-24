@@ -1,9 +1,4 @@
-require 'json'
-require 'rubygems'
-require 'json'
-require 'erb'
 require_relative "sparql"
-
 
 # A class for execute sparql query
 #

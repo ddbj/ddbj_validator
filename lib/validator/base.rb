@@ -1,5 +1,3 @@
-require 'json'
-require 'json-schema'
 require_relative "common/error_builder"
 require_relative "common/ncbi_eutils"
 

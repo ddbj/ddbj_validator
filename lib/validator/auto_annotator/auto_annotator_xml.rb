@@ -1,5 +1,3 @@
-require 'json'
-require 'nokogiri'
 require 'fileutils'
 
 require_relative "base"

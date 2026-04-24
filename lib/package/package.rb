@@ -1,5 +1,3 @@
-require 'rubygems'
-require 'json'
 require 'erb'
 require 'logger'
 require_relative "../validator/common/sparql_base"
