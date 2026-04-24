@@ -1,5 +1,4 @@
 require 'erb'
-require 'geocoder'
 require 'net/http'
 require 'net/https'
 require 'net/ftp'

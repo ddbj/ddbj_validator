@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 gem "csv"
 gem "dotenv"
-gem "geocoder"
 gem "haml"
 gem "json-schema"
 gem "mail"

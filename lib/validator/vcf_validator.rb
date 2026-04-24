@@ -2,7 +2,6 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require 'ostruct'
-require 'geocoder'
 require 'date'
 require 'net/http'
 require File.dirname(__FILE__) + "/base.rb"
