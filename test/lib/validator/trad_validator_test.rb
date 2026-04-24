@@ -738,7 +738,9 @@ class TestTradValidator < Minitest::Test
   # rule:TR_R0013
   def test_invalid_combination_of_accessions
     return nil if @ddbj_db_mode == false
-    skip 'fixture に DRR101361 / DRR101362 / SAMD00093579-93784 等の組み合わせデータが未投入'
+    # fixture に DRR101361 / DRR101362 / SAMD00093579-93784 等の具体的な DRA 関係データが未投入なので、
+    # 本テストで期待される linked_bioproject / linked_run を再現できない。必要が出てきたら seed を拡充する
+    skip 'TR_R0013 の ok/ng 判定に必要な DRA 関係 fixture が未投入'
     #ok case
     ##common name
     dblink_list = [
@@ -1005,7 +1007,6 @@ class TestTradValidator < Minitest::Test
 
   def test_get_biosample_info
     return nil if @ddbj_db_mode == false
-    skip 'fixture に SAMD00060421 / SAMD00081372 の ref_biosample_list (note/derived_from attribute) が未投入'
     ret = @validator.get_biosample_info(["SAMD00052344","SAMD00052345", "SAMD00000000", "SSUB000000"])
     assert_equal 2, ret.keys.size
 

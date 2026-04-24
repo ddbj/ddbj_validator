@@ -81,10 +81,7 @@ class SubmissionValidator < ValidatorBase
         idx += 1
         submission_name = get_submission_label(submission_node, idx)
         invalid_center_name("DRA_R0004", submission_name, submission_node, @submitter_id, idx) if @use_db
-        invalid_laboratory_name("DRA_R0005", submission_name, submission_node, @submitter_id, idx) if @use_db
         invalid_hold_date("DRA_R0006", submission_name, submission_node, idx)
-        invalid_submitter_name("DRA_R0007", submission_name, submission_node, @submitter_id, idx) if @use_db
-        invalid_submitter_email_address("DRA_R0008", submission_name, submission_node, @submitter_id, idx) if @use_db
       end
     end
   end
@@ -146,42 +143,6 @@ class SubmissionValidator < ValidatorBase
   end
 
   #
-  # rule:DRA_R0005
-  # submission lab name はアカウント情報と一致しているかどうか
-  #
-  # ==== Args
-  # submission_label: submission label for error displaying
-  # submission_node: a submission node object
-  # submitter_id: submitter_id
-  # ==== Return
-  # true/false
-  #
-  def invalid_laboratory_name (rule_code, submission_label, submission_node, submitter_id, line_num)
-    result = true
-    submitter_org = @db_validator.get_submitter_organization(submitter_id)
-    unless submitter_org != nil
-      db_lab_name = ""
-    else
-      db_lab_name = [submitter_org["unit"], submitter_org["affiliation"], submitter_org["department"], submitter_org["organization"]]
-      db_lab_name = db_lab_name.compact.join(", ")
-    end
-    lab_node = submission_node.xpath("@lab_name").each do |lab_node|
-      lab_name = get_node_text(lab_node, ".")
-      if submitter_org.nil? || lab_name != db_lab_name
-        annotation = [
-          {key: "Submission name", value: submission_label},
-          {key: "lab name", value: lab_name},
-          {key: "Path", value: "//SUBMISSION/@lab_name"} #順番を表示
-        ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
-        result = false
-      end
-    end
-    result
-  end
-
-  #
   # rule:DRA_R0006
   # 公開予定日は今日から二年後の範囲に入ってるかどうか
   #
@@ -217,102 +178,6 @@ class SubmissionValidator < ValidatorBase
           @error_list.push(error_hash)
         end
       end
-    end
-    result
-  end
-
-  #
-  # rule:DRA_R0007
-  # submitterのNameがContactsに含まれているかをチェックする
-  #
-  # ==== Args
-  # submission_label: submission label for error displaying
-  # submission_node: a submission node object
-  # ==== Return
-  # true/false
-  #
-  def invalid_submitter_name (rule_code, submission_label, submission_node, submitter_id, line_num)
-    result = true
-    submitter_fullname_list = []
-    #submitter_idで登録されている氏名をフルネームに直してリストに格納する
-    submitter_org = @db_validator.get_submitter_contact_list(submitter_id)
-    unless submitter_org.nil?
-      submitter_fullname_list = submitter_org.map{|row|
-        #TODO どのように繋げるか相談する
-        (row["first_name"] + " " + row["middle_name"] + " " + row["last_name"]).gsub(/\s+/, " ")
-      }
-      # CONTACTのname属性の値を配列に格納
-      contact_name_list = []
-      name_path = "CONTACTS/CONTACT/@name"
-      submission_node.xpath(name_path).each do |node|
-        contact_name_list.push(get_node_text(node))
-      end
-      # contact_nameの記載があり、その中にsubmitterのnameが含まれていなければNG
-      # contact_name_listの値を除外したsubmitter_fullname_listが元のlistと変わらなければ含まれていない
-      if contact_name_list.size > 0 \
-        && (submitter_fullname_list - contact_name_list).size == submitter_fullname_list.size
-        result = false
-      end
-    else #submitter_idにcontact情報がない場合のNG
-      result = false
-    end
-
-    if result == false
-      annotation = [
-        {key: "Submission name", value: submission_label},
-        {key: "Path", value: "//SUBMISSION/#{name_path}"} #順番を表示
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-    end
-    result
-  end
-
-  #
-  # rule:DRA_R0008
-  # submitterのメールアドレスがContactsに含まれているかをチェックする
-  #
-  # ==== Args
-  # submission_label: submission label for error displaying
-  # submission_node: a submission node object
-  # ==== Return
-  # true/false
-  #
-  def invalid_submitter_email_address (rule_code, submission_label, submission_node, submitter_id, line_num)
-    result = true
-    submitter_mail_list = []
-    #submitter_idで登録されているmailアドレスをリストに格納する
-    submitter_org = @db_validator.get_submitter_contact_list(submitter_id)
-    unless submitter_org.nil?
-      submitter_mail_list = submitter_org.map{|row| row["email"]}
-
-      # inform_on_statusとinform_on_errorの値を配列に格納
-      contact_email_list = []
-      email_status_path = "CONTACTS/CONTACT/@inform_on_status"
-      submission_node.xpath(email_status_path).each do |node|
-        contact_email_list.push(get_node_text(node))
-      end
-      email_error_path = "CONTACTS/CONTACT/@inform_on_error"
-      submission_node.xpath(email_error_path).each do |node|
-        contact_email_list.push(get_node_text(node))
-      end
-      # contact_emailの記載があり、その中にsubmitterのmailが含まれていなければNG
-      # contact_email_listの値を除外したsubmitter_mail_listが元のlistと変わらなければ含まれていない
-      if contact_email_list.size > 0 \
-        && (submitter_mail_list - contact_email_list).size == submitter_mail_list.size
-        result = false
-      end
-    else #submitter_idにcontact情報がない場合のNG
-      result = false
-    end
-
-    if result == false
-      annotation = [
-        {key: "Submission name", value: submission_label},
-        {key: "Path", value: "//SUBMISSION/#{email_status_path}, //SUBMISSION/#{email_error_path}"} #順番を表示
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
     end
     result
   end

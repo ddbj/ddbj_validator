@@ -883,37 +883,6 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
-  def test_latlon_versus_country
-    skip 'BS_R0041 は Google Geocoding API 無効化のため呼び出しを停止中 (VALIDATOR-284)'
-    #ok case
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "35.2399 N, 139.0306 E", nil, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## exchange google country to insdc country case
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Svalbard", "78.92268 N 11.98147 E", nil, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## invalid lat_lon value(no check)
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "not description", nil, 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-   
-    # ng case
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Norway:Svalbard", "78.92267 N 11.98147 E", nil, 1)
-    expect_msg = "Lat_lon '78.92267 N 11.98147 E' maps to 'Svalbard' instead of 'Norway'"
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    assert_equal expect_msg, get_error_column_value(ret[:error_list], "Message")
-  
-    # nil value
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "n.a.", "78.92267 N 11.98147 E", nil, 1)
-    assert_nil ret[:result]
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "missing: control sample", "78.92267 N 11.98147 E", nil, 1)
-    assert_nil ret[:result]
-    ret = exec_validator("latlon_versus_country", "BS_R0041", "SampleA", "Japan", "missing", nil, 1)
-    assert_nil ret[:result]
-  end
-
   def test_package_versus_organism
     #ok case
     ret = exec_validator("package_versus_organism", "BS_R0048", "SampleA", "103690", "MIGS.ba.microbial", "Nostoc sp. PCC 7120 = FACHB-418", 1)

@@ -75,37 +75,6 @@ class TestSubmissionValidator < Minitest::Test
     assert_equal 1, ret[:error_list].size
   end
 
-  # rule:DRA_R0005
-  def test_invalid_laboratory_name
-    skip 'rule DRA_R0005 is not defined in rule_config — commented out in the validator flow'
-    #ok case
-    submission_set = get_submission_set_node("#{@test_file_dir}/5_invalid_laboratory_name_ok.xml")
-    ret = exec_validator("invalid_laboratory_name", "DRA_R0005", "submission name" , submission_set.first, "test01", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## no lab name
-    submission_set = get_submission_set_node("#{@test_file_dir}/5_invalid_laboratory_name_ok2.xml")
-    ret = exec_validator("invalid_laboratory_name", "DRA_R0005", "submission name" , submission_set.first, "test01", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    ##invalid lab name
-    submission_set = get_submission_set_node("#{@test_file_dir}/5_invalid_laboratory_name_ng1.xml")
-    ret = exec_validator("invalid_laboratory_name", "DRA_R0005", "submission name" , submission_set.first, "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## lab name empty
-    submission_set = get_submission_set_node("#{@test_file_dir}/5_invalid_laboratory_name_ng2.xml")
-    ret = exec_validator("invalid_laboratory_name", "DRA_R0005", "submission name" , submission_set.first, "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## not exist submitter_id
-    submission_set = get_submission_set_node("#{@test_file_dir}/5_invalid_laboratory_name_ok.xml")
-    ret = exec_validator("invalid_laboratory_name", "DRA_R0005", "submission name" , submission_set.first, "not_exist_submitter", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-
   # rule:DRA_R0006
   def test_invalid_hold_date
     #ok case
@@ -128,67 +97,6 @@ class TestSubmissionValidator < Minitest::Test
     #"no date format"
     submission_set = get_submission_set_node("#{@test_file_dir}/6_invalid_hold_date_ng2.xml")
     ret = exec_validator("invalid_hold_date", "DRA_R0006", "submission name" , submission_set.first, 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-
-  # rule:DRA_R0007
-  def test_invalid_submitter_name
-    skip 'rule DRA_R0007 is not defined in rule_config — commented out in the validator flow'
-    #ok case
-    submission_set = get_submission_set_node("#{@test_file_dir}/7_invalid_submitter_name_ok.xml")
-    ret = exec_validator("invalid_submitter_name", "DRA_R0007", "submission name" , submission_set.first, "test01", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## no exist contact name
-    submission_set = get_submission_set_node("#{@test_file_dir}/7_invalid_submitter_name_ok2.xml")
-    ret = exec_validator("invalid_submitter_name", "DRA_R0007", "submission name" , submission_set.first, "test01", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    submission_set = get_submission_set_node("#{@test_file_dir}/7_invalid_submitter_name_ng1.xml")
-    ret = exec_validator("invalid_submitter_name", "DRA_R0007", "submission name" , submission_set.first, "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## contact name empty
-    submission_set = get_submission_set_node("#{@test_file_dir}/7_invalid_submitter_name_ng2.xml")
-    ret = exec_validator("invalid_submitter_name", "DRA_R0007", "submission name" , submission_set.first, "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## not exist submitter_id
-    submission_set = get_submission_set_node("#{@test_file_dir}/7_invalid_submitter_name_ok.xml")
-    ret = exec_validator("invalid_submitter_name", "DRA_R0007", "submission name" , submission_set.first, "not_exist_submitter", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-  end
-
-
-  # rule:DRA_R0008
-  def test_invalid_submitter_email_address
-    skip 'rule DRA_R0008 is not defined in rule_config — commented out in the validator flow'
-    #ok case
-    submission_set = get_submission_set_node("#{@test_file_dir}/8_invalid_submitter_email_address_ok.xml")
-    ret = exec_validator("invalid_submitter_email_address", "DRA_R0008", "submission name" , submission_set.first, "test01", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    ## no exist contact mail
-    submission_set = get_submission_set_node("#{@test_file_dir}/8_invalid_submitter_email_address_ok2.xml")
-    ret = exec_validator("invalid_submitter_email_address", "DRA_R0008", "submission name" , submission_set.first, "test01", 1)
-    assert_equal true, ret[:result]
-    assert_equal 0, ret[:error_list].size
-    #ng case
-    submission_set = get_submission_set_node("#{@test_file_dir}/8_invalid_submitter_email_address_ng1.xml")
-    ret = exec_validator("invalid_submitter_email_address", "DRA_R0008", "submission name" , submission_set.first, "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## contact mail empty
-    submission_set = get_submission_set_node("#{@test_file_dir}/8_invalid_submitter_email_address_ng2.xml")
-    ret = exec_validator("invalid_submitter_email_address", "DRA_R0008", "submission name" , submission_set.first, "test01", 1)
-    assert_equal false, ret[:result]
-    assert_equal 1, ret[:error_list].size
-    ## not exist submitter_id
-    submission_set = get_submission_set_node("#{@test_file_dir}/8_invalid_submitter_email_address_ok.xml")
-    ret = exec_validator("invalid_submitter_email_address", "DRA_R0008", "submission name" , submission_set.first, "not_exist_submitter", 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
   end

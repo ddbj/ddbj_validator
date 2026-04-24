@@ -343,10 +343,9 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 複数属性の組合せの検証
-      # BS_R0041 (latlon_versus_country) は Google Geocoding API の有償化により無効化
-      # Google Geocoding API を再利用する予定はない。Natural Earth 等のオフラインデータを使った自前実装に置き換え次第復活させる
-      # https://ddbj-dev.atlassian.net/browse/VALIDATOR-284
-      # latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], @google_api_key, line_num)
+      # NOTE: BS_R0041 (latlon_versus_country) は Google Geocoding API 依存だったため削除済み
+      # (https://ddbj-dev.atlassian.net/browse/VALIDATOR-284)。
+      # Natural Earth 等のオフラインデータベースで再実装する際は新規に追加する
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
@@ -1542,76 +1541,6 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
       false
     end
-  end
-
-  #
-  # rule:41
-  # 緯度経度と国名が一致しているかの検証
-  # Google geocooder APIを使用して検証を行う
-  #
-  # ==== Args
-  # rule_code
-  # geo_loc_name ex."Japan:Kanagawa, Hakone, Lake Ashi"
-  # lat_lon ex."35.2095674, 139.0034626"
-  # line_num
-  # ==== Return
-  # true/false
-  #
-  def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, google_api_key, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
-
-    country_name = geo_loc_name.split(":").first.strip
-
-    common = CommonUtils.new
-    error_geocoding = false
-    if @cache.nil? || @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon) == false #cache値がnilの可能性があるためhas_keyでチェック
-      insdc_latlon = common.format_insdc_latlon(lat_lon)
-      iso_latlon = common.convert_latlon_insdc2iso(insdc_latlon)
-      if iso_latlon.nil? #if value is not insdc format, not check country
-        return true
-      else
-        latlon_for_google = "#{iso_latlon[:latitude].to_s},#{iso_latlon[:longitude].to_s}"
-      end
-      begin
-        latlon_country_name = common.geocode_country_from_latlon(latlon_for_google, google_api_key)
-        @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon, latlon_country_name) unless @cache.nil?
-      rescue
-        #failed geocoding response 500. not save cache.
-        error_geocoding = true
-      end
-    else
-      puts "use cache in latlon_versus_country" if $DEBUG
-      latlon_country_name = @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, lat_lon)
-    end
-
-    ret = false
-    if !latlon_country_name.nil?
-      country_names = latlon_country_name.map{|country| common.country_name_google2insdc(country) }
-      if country_names.include?(country_name)
-        ret = true
-      else
-        ret = false
-      end
-    end
-
-    if ret == false
-      if error_geocoding == true
-        message = "Error has occured during Google geocoding API." #TODO add message
-      elsif latlon_country_name.nil? || latlon_country_name.size == 0
-        message = "Geographic location is not retrieved by geocoding '#{lat_lon}'."
-      else
-        message = "Lat_lon '#{lat_lon}' maps to '#{common.country_name_google2insdc(latlon_country_name.first)}' instead of '#{country_name}'"
-      end
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "geo_loc_name", value: geo_loc_name},
-        {key: "lat_lon", value: lat_lon},
-        {key: "Message", value: message}
-      ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
-    end
-    ret
   end
 
   #

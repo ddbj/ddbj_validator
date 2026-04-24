@@ -62,30 +62,6 @@ class TestSaveAutoAnnotation < Minitest::Test
   end
 
   #
-  # 94(format_of_geo_loc_name_is_invalid)のauto annotationの保存が効いているかの検証
-  # auto-annotated "  Jaaaapan: Hikone-shi" => "Jaaaapan: Hikone-shi"
-  def test_save_annotation_94
-    skip 'BS_R0041 を経由した間接検証のため BS_R0041 停止中は動作不可 (VALIDATOR-284)'
-    biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_94.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0041"}
-    attr_value = error[:annotation].find {|anno| anno[:key] == "geo_loc_name"}
-    assert_equal "Jaaaapan:Hikone-shi", attr_value[:value]
-  end
-
-  #
-  # 9(invalid_lat_lon_format)のauto annotationの保存が効いているかの検証
-  # auto-annotated "37°26′36.42″N 06°15′14.28″W" => "37.4435 N 6.254 W"
-  def test_save_annotation_9
-    skip 'BS_R0041 を経由した間接検証のため BS_R0041 停止中は動作不可 (VALIDATOR-284)'
-    biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_9.xml")
-    error_list = @validator.instance_variable_get (:@error_list)
-    error =  error_list.find {|error| error[:id] == "BS_R0041"}
-    annotation = error[:annotation].find {|anno| anno[:key] == "lat_lon" }
-    assert_equal "37.4435 N 6.254 W", annotation[:value]
-  end
-
-  #
   # 45(taxonomy_error_warning)のauto annotationの保存が効いているかの検証
   # taxonomy_idの値が無かった場合の確認
   def test_save_annotation_45
@@ -101,15 +77,15 @@ class TestSaveAutoAnnotation < Minitest::Test
 
   #
   # 4(taxonomy_error_warning)のauto annotationの保存が効いているかの検証
-  # taxonomy_idとorganismに整合性がなく、organismが自動補正されるケース
+  # 現状の validator は organism を "Escherchia coli" (入力のまま) として返すため期待値と不一致。
+  # 入力 tax_id にひもづく scientific_name を優先する意図と思われるが、実装が合っていない。要見直し
   def test_save_annotation_4
-    skip 'tax_id 561 → "eschericha coli" (typo) の fuzzy 補正には misspelling/synonym データが必要。fixture で再現できない'
-    #tax_id:561によって"eschericha coli"=>"Escherichia"に補正されるがGenusランクであるため96(taxonomy_at_species_or_infraspecific_rank)でエラーになることを想定
+    skip 'BS_R0096 auto-annotation prefers the fuzzy-matched tax (562) over the input tax (561); expected "Escherichia" not produced'
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_4.xml")
     error_list = @validator.instance_variable_get (:@error_list)
     error =  error_list.find {|error| error[:id] == "BS_R0096"}
     annotation = error[:annotation].find {|anno| anno[:key] == "organism" }
-    assert_equal "Escherichia", annotation[:value] #organism name が"escherichia coli" => "Escherichia"に補正されている
+    assert_equal "Escherichia", annotation[:value]
   end
 
 =begin
