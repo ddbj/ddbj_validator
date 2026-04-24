@@ -6,6 +6,7 @@ require 'date'
 require 'net/http'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/coll_dump.rb"
 require File.dirname(__FILE__) + "/common/date_format.rb"
 require File.dirname(__FILE__) + "/common/geolocation.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
@@ -37,7 +38,7 @@ class BioSampleValidator < ValidatorBase
     @validation_config = @conf[:validation_config] #need?
     @xml_convertor = XmlConvertor.new
     @org_validator = OrganismValidator.new(@conf[:sparql_config]["master_endpoint"], @conf[:named_graph_uri]["taxonomy"])
-    @institution_list = CommonUtils.new.parse_coll_dump(@conf[:institution_list_file])
+    @institution_list = CollDump.parse(@conf[:institution_list_file])
     @tsv_validator = TsvColumnValidator.new()
     if @conf[:biosample].nil? || @conf[:biosample]["package_version"].nil?
       @package_version = DEFAULT_PACKAGE_VERSION

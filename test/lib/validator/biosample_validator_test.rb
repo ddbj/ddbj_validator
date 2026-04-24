@@ -1,6 +1,7 @@
 require 'dotenv'
 require_relative '../../test_helpers'
 require 'validator/biosample_validator'
+require 'validator/common/coll_dump'
 require 'validator/common/common_utils'
 require 'validator/common/xml_convertor'
 
@@ -2019,7 +2020,7 @@ jkl\"  "
   end
 
   def test_invalid_culture_collection
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
+    institution_list = CollDump.parse(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATCC:1234", institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2096,7 +2097,7 @@ jkl\"  "
   end
 
   def test_invalid_specimen_voucher
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
+    institution_list = CollDump.parse(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2145,7 +2146,7 @@ jkl\"  "
   end
 
   def test_invalid_bio_material
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
+    institution_list = CollDump.parse(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "ABRC:CS22676", institution_list, 1)
     assert_equal true, ret[:result]
