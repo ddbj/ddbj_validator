@@ -2,7 +2,6 @@ source "https://rubygems.org"
 
 gem "csv"
 gem "dotenv"
-gem "haml"
 gem "json-schema"
 gem "mail"
 gem "net-ftp"
