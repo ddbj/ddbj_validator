@@ -7,6 +7,7 @@ require 'net/http'
 require File.dirname(__FILE__) + "/base.rb"
 require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/date_format.rb"
+require File.dirname(__FILE__) + "/common/geolocation.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/common/organism_validator.rb"
 require File.dirname(__FILE__) + "/common/sparql_base.rb"
@@ -1243,8 +1244,7 @@ class BioSampleValidator < ValidatorBase
   def invalid_lat_lon_format (rule_code, sample_name, lat_lon, line_num)
     return nil if CommonUtils::null_value?(lat_lon)
 
-    common = CommonUtils.new
-    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    insdc_latlon = Geolocation.format_insdc_latlon(lat_lon)
     # INSDC の formatに直せなかった場合はnilが返るが、auto-correctはないのでこのメソッドでは無視。これらはBS_R0139でエラーになる。
     # 入力値から補正された場合には (lat_lon != insdc_latlon) warningを返す
     return true if insdc_latlon.nil? || lat_lon == insdc_latlon
@@ -1276,12 +1276,11 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
 
     country_name = geo_loc_name.split(":").first.strip
-    expected_iso = CommonUtils.insdc_to_iso_a3[country_name]
+    expected_iso = Geolocation.insdc_to_iso_a3[country_name]
     return nil if expected_iso.nil?
 
-    common       = CommonUtils.new
-    insdc_latlon = common.format_insdc_latlon(lat_lon)
-    iso_latlon   = common.convert_latlon_insdc2iso(insdc_latlon)
+    insdc_latlon = Geolocation.format_insdc_latlon(lat_lon)
+    iso_latlon   = Geolocation.convert_latlon_insdc2iso(insdc_latlon)
     return nil if iso_latlon.nil?
 
     lat = iso_latlon[:latitude]
@@ -1290,7 +1289,7 @@ class BioSampleValidator < ValidatorBase
     actual_iso = if @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, key)
                    @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, key)
                  else
-                   value = common.country_at(lat, lon)
+                   value = Geolocation.country_at(lat, lon)
                    @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, key, value)
                    value
                  end
@@ -1322,8 +1321,7 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(lat_lon)
 
     result = true
-    common = CommonUtils.new
-    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    insdc_latlon = Geolocation.format_insdc_latlon(lat_lon)
     # INSDC の formatに直せなかった場合はnilが返るので、その場合にはエラー
     # BS_R0009でauto-annotationが行われている事が前提なので、このメソッドの入力値のままでなければ(=補正が発生していれば)エラー
     if insdc_latlon.nil? || lat_lon != insdc_latlon
