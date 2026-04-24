@@ -1,4 +1,4 @@
-FROM ruby:2.5
+FROM ruby:3.4.9
 
 RUN mkdir -p /usr/src/ddbj_validator/logs
 RUN mkdir -p /usr/src/ddbj_validator/shared
