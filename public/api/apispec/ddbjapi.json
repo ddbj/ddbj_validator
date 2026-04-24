@@ -83,9 +83,6 @@
           },
           {
             "$ref": "#/parameters/bioproject_submission_id"
-          },
-          {
-            "$ref": "#/parameters/google_api_key"
           }
         ],
         "responses": {
@@ -488,13 +485,6 @@
       "name": "bioproject_submission_id",
       "in": "formData",
       "description": "Submission ID of BioProject file to be validated. e.g., PSUB00xxxx",
-      "required": false,
-      "type": "string"
-    },
-    "google_api_key": {
-      "name": "google_api_key",
-      "in": "formData",
-      "description": "39 characters of Google API key for validation with geocoding.",
       "required": false,
       "type": "string"
     },

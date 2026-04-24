@@ -10,7 +10,6 @@ class CommonUtils
   def self.set_config (config_obj)
     @@null_accepted = config_obj[:null_accepted]
     @@null_not_recommended = config_obj[:null_not_recommended]
-    @@google_api_key = config_obj[:google_api_key]
     @@eutils_api_key = config_obj[:eutils_api_key]
   end
 
