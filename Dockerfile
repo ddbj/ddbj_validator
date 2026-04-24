@@ -1,13 +1,17 @@
 FROM ruby:4.0.3
 
+ENV RAILS_ENV=production \
+    BUNDLE_DEPLOYMENT=1 \
+    BUNDLE_WITHOUT=development:test
+
 WORKDIR /usr/src/ddbj_validator/
 
 COPY ./Gemfile ./Gemfile.lock ./
-# Skip dev/test groups in the production image so rake/minitest/webmock and
-# friends don't ship to servers. The config is written to .bundle/config and
-# persists for subsequent `bundle exec` invocations in this image.
-RUN bundle config set --local without 'development test' && bundle install
+RUN bundle install
+
 COPY ./ ./
 
+RUN SECRET_KEY_BASE=dummy bundle exec bootsnap precompile --gemfile app/ lib/ 2>/dev/null || true
+
 EXPOSE 3000
-CMD ["bundle", "exec", "puma", "-C", "/usr/src/ddbj_validator/conf/puma.rb", "-e", "production"]
+CMD ["bundle", "exec", "puma", "-C", "/usr/src/ddbj_validator/config/puma.rb"]
