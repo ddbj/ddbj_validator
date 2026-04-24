@@ -21,7 +21,7 @@ development: &dev
     pg_port:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PORT'] %>
     pg_user:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_USER'] %>
     pg_pass:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PASSWD'] %>
-    pg_timeout: '30'
+    pg_timeout: 30
   ddbj_parser:
     parser_api_url: <%= ENV['DDBJ_PARSER_APP_URL'] %>
   eutils_api_key:
@@ -43,13 +43,13 @@ staging:
   named_graph_uri:
     taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy-private
   ddbj_rdb:
-    pg_host:    # <staging DB host>
-    pg_port:    # <staging DB port>
-    pg_user:    # <staging DB user>
+    pg_host:    172.19.15.12
+    pg_port:    54301
+    pg_user:    const
     pg_pass:    <%= Rails.application.credentials.dig(:postgres, :password) %>
-    pg_timeout: '30'
+    pg_timeout: 30
   ddbj_parser:
-    parser_api_url: # <staging parser URL (未使用なら空)>
+    parser_api_url:
   eutils_api_key:
     key: <%= Rails.application.credentials.eutils_api_key %>
   monitoring:
@@ -64,13 +64,13 @@ production:
   named_graph_uri:
     taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy-private
   ddbj_rdb:
-    pg_host:    # <production DB host>
-    pg_port:    # <production DB port>
-    pg_user:    # <production DB user>
+    pg_host:    172.19.15.11
+    pg_port:    54301
+    pg_user:    const
     pg_pass:    <%= Rails.application.credentials.dig(:postgres, :password) %>
-    pg_timeout: '30'
+    pg_timeout: 30
   ddbj_parser:
-    parser_api_url: # <production parser URL (未使用なら空)>
+    parser_api_url:
   eutils_api_key:
     key: <%= Rails.application.credentials.eutils_api_key %>
   monitoring:
