@@ -3,7 +3,7 @@ require 'json'
 require 'erb'
 require 'logger'
 require File.dirname(__FILE__) + "/../validator/common/sparql_base.rb"
-require File.dirname(__FILE__) + "/../validator/common/common_utils.rb"
+require File.dirname(__FILE__) + "/../validator/common/insdc_nullability.rb"
 
 class Package < SPARQLBase
 

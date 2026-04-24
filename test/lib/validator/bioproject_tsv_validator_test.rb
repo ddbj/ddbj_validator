@@ -1,7 +1,7 @@
 require 'dotenv'
 require_relative '../../test_helpers'
 require 'validator/bioproject_tsv_validator'
-require 'validator/common/common_utils'
+require 'validator/common/insdc_nullability'
 require 'validator/common/organism_validator'
 
 class TestBioProjectTsvValidator < Minitest::Test

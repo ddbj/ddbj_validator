@@ -2,7 +2,7 @@ require 'dotenv'
 require 'fileutils'
 require_relative '../../test_helpers'
 require 'validator/jvar_validator'
-require 'validator/common/common_utils'
+require 'validator/common/insdc_nullability'
 
 class TestJVarValidator < Minitest::Test
   def setup

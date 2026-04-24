@@ -1,4 +1,5 @@
 require 'json'
+require 'active_support/core_ext/string/filters'
 require File.dirname(__FILE__) + "/../auto_annotator/auto_annotator_json.rb"
 
 # BioProject/MetaboBank(IDF)のような最左列に項目名を記述するTSV(あるいはそれをJSONに変換した)形式を処理するクラス
@@ -68,7 +69,7 @@ class TsvFieldValidator
     data.each_with_index do |row, field_idx|
       next unless mandatory_field_list.include?(row["key"]) # ここではmandatory fieldのみ置換する。optional fieldは空白に置換されるため
       row["values"].each_with_index do |value, value_idx|
-        next if CommonUtils.null_value?(value) # 既に推奨NULL表現
+        next if InsdcNullability.null_value?(value) # 既に推奨NULL表現
         replace_value = ""
         #推奨されている NULL 値の表記を揃える(小文字表記へ)
         null_accepted_list.each do |null_accepted|
@@ -286,7 +287,7 @@ class TsvFieldValidator
         next if value.blank? # is null val?
         format_conf = field_format[row["key"]].first
         if !format_conf["regex"].nil? # 正規表現によるチェック
-          unless CommonUtils.format_check_with_regexp(value, format_conf["regex"])
+          unless value.to_s.match?(Regexp.new(format_conf["regex"]))
             invalid_list.push({field_name: format_conf["field_name"], value: value, format_type: "regex: #{format_conf["regex"]}"})
           end
         elsif !format_conf["format"].nil? # 規定フォーマットのチェック

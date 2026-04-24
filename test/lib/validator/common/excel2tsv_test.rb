@@ -1,6 +1,6 @@
 require 'fileutils'
 require_relative '../../../test_helpers'
-require 'validator/common/common_utils'
+require 'validator/common/insdc_nullability'
 require 'validator/common/excel2tsv'
 
 class TestExcel2Tsv < Minitest::Test

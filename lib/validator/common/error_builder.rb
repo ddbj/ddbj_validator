@@ -1,7 +1,6 @@
 require 'erb'
 
 # 各 validator のチェック結果を error hash / suggested-annotation hash に組み立てる純関数群。
-# 以前は CommonUtils のクラスメソッドとして散らばっていた。
 #
 # error hash のフォーマットは Wiki を参照:
 # https://github.com/ddbj/ddbj_validator/wiki/Validator-API

@@ -5,8 +5,9 @@ require 'ostruct'
 require 'date'
 require 'net/http'
 require 'nokogiri'
+require 'active_support/core_ext/integer/inflections'
 require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/common/organism_validator.rb"
 
@@ -22,7 +23,8 @@ class BioProjectValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/bioproject")))
-    CommonUtils::set_config(@conf)
+    InsdcNullability.null_accepted        = @conf[:null_accepted]
+    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 

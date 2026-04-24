@@ -4,7 +4,7 @@ require 'erb'
 require 'date'
 require 'nokogiri'
 require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 
 #
@@ -19,7 +19,8 @@ class ExperimentValidator < ValidatorBase
   def initialize
     super
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/dra")))
-    CommonUtils::set_config(@conf)
+    InsdcNullability.null_accepted        = @conf[:null_accepted]
+    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 

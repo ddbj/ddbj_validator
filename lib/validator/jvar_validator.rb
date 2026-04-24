@@ -7,7 +7,6 @@ require 'net/http'
 require 'roo'
 require 'sanitize'
 require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/date_format.rb"
 require File.dirname(__FILE__) + "/common/ddbj_db_validator.rb"
 require File.dirname(__FILE__) + "/common/organism_validator.rb"

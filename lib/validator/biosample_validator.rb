@@ -4,8 +4,9 @@ require 'erb'
 require 'ostruct'
 require 'date'
 require 'net/http'
+require 'active_support/core_ext/string/filters'
 require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/common_utils.rb"
+require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
 require File.dirname(__FILE__) + "/common/coll_dump.rb"
 require File.dirname(__FILE__) + "/common/date_format.rb"
 require File.dirname(__FILE__) + "/common/geolocation.rb"
@@ -35,7 +36,8 @@ class BioSampleValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf/biosample")))
-    CommonUtils::set_config(@conf)
+    InsdcNullability.null_accepted        = @conf[:null_accepted]
+    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
     DateFormat::set_config(@conf)
 
     @error_list = error_list = []
@@ -262,13 +264,13 @@ class BioSampleValidator < ValidatorBase
 
       ### organismの検証とtaxonomy_idの確定
       input_taxid = biosample_data["attributes"]["taxonomy_id"]
-      if input_taxid.nil? || CommonUtils::null_value?(input_taxid) #taxonomy_idの記述がない("missing"も未記入とみなす)
+      if input_taxid.nil? || InsdcNullability.null_value?(input_taxid) #taxonomy_idの記述がない("missing"も未記入とみなす)
         taxonomy_id = OrganismValidator::TAX_INVALID #tax_idを使用するルールをスキップさせるために無効値をセット　
       else
         taxonomy_id = input_taxid
       end
       input_organism = biosample_data["attributes"]["organism"]
-      if !(input_organism.nil? && CommonUtils::null_value?(input_organism)) #organismの記述がある("missing"は未記入とみなす)
+      if !(input_organism.nil? && InsdcNullability.null_value?(input_organism)) #organismの記述がある("missing"は未記入とみなす)
         if taxonomy_id != OrganismValidator::TAX_INVALID #tax_idの記述がある
           ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, input_organism, line_num)
         else
@@ -771,7 +773,7 @@ class BioSampleValidator < ValidatorBase
   #
   def missing_sample_name (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil? || biosample_data["attributes"].nil?
-    return true unless CommonUtils.null_value?(biosample_data["attributes"]["sample_name"])
+    return true unless InsdcNullability.null_value?(biosample_data["attributes"]["sample_name"])
 
     annotation = [
       {key: "Sample name", value: biosample_data["attributes"]["sample_name"].to_s},
@@ -793,7 +795,7 @@ class BioSampleValidator < ValidatorBase
   #
   def missing_organism (rule_code, sample_name, biosample_data, line_num)
     return nil if biosample_data.nil? || biosample_data["attributes"].nil?
-    return true unless CommonUtils.null_value?(biosample_data["attributes"]["organism"])
+    return true unless InsdcNullability.null_value?(biosample_data["attributes"]["organism"])
 
     annotation = [
       {key: "Sample name", value: sample_name},
@@ -957,7 +959,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def attribute_value_not_in_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
-    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || InsdcNullability.null_value?(attr_val)
 
     result =  true
     if !cv_attr[attr_name].nil? # CVを使用する属性か
@@ -1012,7 +1014,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_attribute_value_for_controlled_terms (rule_code, sample_name, attr_name, attr_val, cv_attr, line_num)
-    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || InsdcNullability.null_value?(attr_val)
 
     # CVを使用しない属性か、CVリストに値があれば OK
     return true if cv_attr[attr_name].nil? || cv_attr[attr_name].include?(attr_val)
@@ -1040,7 +1042,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_publication_identifier (rule_code, sample_name, attr_name, attr_val, ref_attr, line_num)
-    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || InsdcNullability.null_value?(attr_val)
 
     result =  true
     if ref_attr.include?(attr_name) # リファレンス型の属性か
@@ -1117,7 +1119,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_bioproject_accession (rule_code, sample_name, bioproject_accession, line_num)
-    return nil if CommonUtils::null_value?(bioproject_accession)
+    return nil if InsdcNullability.null_value?(bioproject_accession)
 
     result = true
     if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
@@ -1155,7 +1157,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_geo_loc_name_format (rule_code, sample_name, geo_loc_name, country_list, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
+    return nil if InsdcNullability.null_value?(geo_loc_name) || InsdcNullability.null_not_recommended_value?(geo_loc_name)
 
     annotated_name = geo_loc_name.sub(/\s*:\s*/, ":") #最初のコロンの前後の空白を詰める
     # 2つ目以降の":"は", "に置換する
@@ -1215,7 +1217,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_country (rule_code, sample_name, geo_loc_name, country_list, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_not_recommended_value?(geo_loc_name)
+    return nil if InsdcNullability.null_value?(geo_loc_name) || InsdcNullability.null_not_recommended_value?(geo_loc_name)
     country_name = geo_loc_name.split(":").first.strip
     matched_country = country_list.select{|country| country == country_name}
     if matched_country.any?
@@ -1243,7 +1245,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_lat_lon_format (rule_code, sample_name, lat_lon, line_num)
-    return nil if CommonUtils::null_value?(lat_lon)
+    return nil if InsdcNullability.null_value?(lat_lon)
 
     insdc_latlon = Geolocation.format_insdc_latlon(lat_lon)
     # INSDC の formatに直せなかった場合はnilが返るが、auto-correctはないのでこのメソッドでは無視。これらはBS_R0139でエラーになる。
@@ -1274,7 +1276,7 @@ class BioSampleValidator < ValidatorBase
   # 実際に別の国にいる時だけ warning を返す
   #
   def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, line_num)
-    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
+    return nil if InsdcNullability.null_value?(geo_loc_name) || InsdcNullability.null_value?(lat_lon)
 
     country_name = geo_loc_name.split(":").first.strip
     expected_iso = Geolocation.insdc_to_iso_a3[country_name]
@@ -1319,7 +1321,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_lat_lon (rule_code, sample_name, lat_lon, line_num)
-    return nil if CommonUtils::null_value?(lat_lon)
+    return nil if InsdcNullability.null_value?(lat_lon)
 
     result = true
     insdc_latlon = Geolocation.format_insdc_latlon(lat_lon)
@@ -1353,7 +1355,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_host_organism_name (rule_code, sample_name, host_taxid, host_name, line_num)
-    return nil if CommonUtils::null_value?(host_name)
+    return nil if InsdcNullability.null_value?(host_name)
     ret = true
 
     annotation = [
@@ -1443,7 +1445,7 @@ class BioSampleValidator < ValidatorBase
   # taxonomy_idの指定が無かった場合に実行されるため、常にfalseを返す
   #
   def taxonomy_error_warning (rule_code, sample_name, organism_name, line_num)
-    return nil if CommonUtils::null_value?(organism_name)
+    return nil if InsdcNullability.null_value?(organism_name)
     #あればキャッシュを使用
     if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
       ret = @org_validator.suggest_taxid_from_name(organism_name)
@@ -1508,7 +1510,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def taxonomy_name_and_id_not_match (rule_code, sample_name, taxonomy_id, organism_name, line_num)
-    return nil if CommonUtils::null_value?(organism_name) || CommonUtils::null_value?(taxonomy_id)
+    return nil if InsdcNullability.null_value?(organism_name) || InsdcNullability.null_value?(taxonomy_id)
 
     #あればキャッシュを使用
     if @cache.nil? || @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id) == false #cache値がnilの可能性があるためhas_keyでチェック
@@ -1549,7 +1551,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
-    return nil if package_name.blank? || CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if package_name.blank? || InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
     #あればキャッシュを使用
     cache_key = ValidatorCache::create_key(taxonomy_id, package_name)
@@ -1592,7 +1594,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def sex_for_bacteria (rule_code, sample_name, taxonomy_id, sex, organism, line_num)
-    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID || CommonUtils::null_value?(sex)
+    return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID || InsdcNullability.null_value?(sex)
 
     ret = true
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
@@ -1654,13 +1656,13 @@ class BioSampleValidator < ValidatorBase
     vouchers_list = []
     attr_list.each do |attr|
       unless attr["culture_collection"].nil?
-        vouchers_list.push({attr_name: "culture_collection", attr_no: attr["attr_no"], value: attr["culture_collection"], institution_code: attr["culture_collection"].split(":").first.strip}) unless CommonUtils::null_value?(attr["culture_collection"])
+        vouchers_list.push({attr_name: "culture_collection", attr_no: attr["attr_no"], value: attr["culture_collection"], institution_code: attr["culture_collection"].split(":").first.strip}) unless InsdcNullability.null_value?(attr["culture_collection"])
       end
       unless attr["specimen_voucher"].nil?
-        vouchers_list.push({attr_name: "specimen_voucher", attr_no: attr["attr_no"], value: attr["specimen_voucher"], institution_code: attr["specimen_voucher"].split(":").first.strip}) unless CommonUtils::null_value?(attr["specimen_voucher"])
+        vouchers_list.push({attr_name: "specimen_voucher", attr_no: attr["attr_no"], value: attr["specimen_voucher"], institution_code: attr["specimen_voucher"].split(":").first.strip}) unless InsdcNullability.null_value?(attr["specimen_voucher"])
       end
       unless attr["bio_material"].nil?
-        vouchers_list.push({attr_name: "bio_material", attr_no: attr["attr_no"], value: attr["bio_material"], institution_code: attr["bio_material"].split(":").first.strip}) unless CommonUtils::null_value?(attr["bio_material"])
+        vouchers_list.push({attr_name: "bio_material", attr_no: attr["attr_no"], value: attr["bio_material"], institution_code: attr["bio_material"].split(":").first.strip}) unless InsdcNullability.null_value?(attr["bio_material"])
       end
     end
 
@@ -1718,7 +1720,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def future_collection_date (rule_code, sample_name, collection_date, line_num)
-    return nil if CommonUtils::null_value?(collection_date) || CommonUtils::null_not_recommended_value?(collection_date)
+    return nil if InsdcNullability.null_value?(collection_date) || InsdcNullability.null_not_recommended_value?(collection_date)
     result = nil
     # DDBJ 日付型へのフォーマットを試みる
     df = DateFormat.new
@@ -1855,10 +1857,10 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_datetime_format (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
-    return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
+    return nil if attr_name == "collection_date" && (InsdcNullability.null_not_recommended_value?(attr_val))
 
     attr_val_org = attr_val
     result = true
@@ -1911,10 +1913,10 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_datetime (rule_code, sample_name, attr_name, attr_val, ts_attr, line_num )
-    return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
     return nil unless ts_attr.include?(attr_name) #日付型の属性でなければスキップ
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
-    return nil if attr_name == "collection_date" && (CommonUtils::null_not_recommended_value?(attr_val))
+    return nil if attr_name == "collection_date" && (InsdcNullability.null_not_recommended_value?(attr_val))
 
     result = true
     df = DateFormat.new
@@ -1951,7 +1953,7 @@ class BioSampleValidator < ValidatorBase
       return nil if attr_name.blank?
       replaced = attr_name.dup
     elsif target == "attr_value" #属性値の検証
-      return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
+      return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
       replaced = attr_val.dup
     else
       return nil
@@ -2012,12 +2014,12 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def redundant_taxonomy_attributes (rule_code, sample_name, organism, host, isolation_source, line_num)
-    return nil  if CommonUtils::null_value?(organism) && CommonUtils::null_value?(host) && CommonUtils::null_value?(isolation_source)
+    return nil  if InsdcNullability.null_value?(organism) && InsdcNullability.null_value?(host) && InsdcNullability.null_value?(isolation_source)
 
     taxon_values = []
-    taxon_values.push(organism) unless CommonUtils::null_value?(organism)
-    taxon_values.push(host) unless CommonUtils::null_value?(host)
-    taxon_values.push(isolation_source) unless CommonUtils::null_value?(isolation_source)
+    taxon_values.push(organism) unless InsdcNullability.null_value?(organism)
+    taxon_values.push(host) unless InsdcNullability.null_value?(host)
+    taxon_values.push(isolation_source) unless InsdcNullability.null_value?(isolation_source)
     uniq_taxon_values = taxon_values.map {|tax_name|
       tax_name.strip.gsub(" ", "").downcase
     }.uniq
@@ -2057,7 +2059,7 @@ class BioSampleValidator < ValidatorBase
       return nil if attr_name.blank?
       replaced = attr_name.dup
     elsif target == "attr_value" #属性値の検証
-      return nil if attr_name.blank? || CommonUtils::null_value?(attr_val)
+      return nil if attr_name.blank? || InsdcNullability.null_value?(attr_val)
       replaced = attr_val.dup
     else
       return nil
@@ -2114,7 +2116,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_ascii_attribute_value (rule_code, sample_name, attr_name, attr_val, line_num)
-    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || InsdcNullability.null_value?(attr_val)
     return true if attr_val.ascii_only?
 
     # 属性値のどこにnon ascii文字があるか示すメッセージを作成
@@ -2183,7 +2185,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def bioproject_not_found (rule_code, sample_name, bioproject_accession, submitter_id, line_num)
-    return nil if CommonUtils::null_value?(bioproject_accession)
+    return nil if InsdcNullability.null_value?(bioproject_accession)
     return nil if submitter_id.nil?
 
     # cache 値が nil の可能性があるため has_key で判定する
@@ -2281,7 +2283,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
-    return nil if CommonUtils::null_value?(bioproject_accession)
+    return nil if InsdcNullability.null_value?(bioproject_accession)
 
     if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession).nil?
       is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
@@ -2313,7 +2315,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_integer_attribute_value (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
-    return nil  if attr_name.blank? || CommonUtils::null_value?(attr_val)
+    return nil  if attr_name.blank? || InsdcNullability.null_value?(attr_val)
     # 整数型の属性であり有効な入力値がある場合だけチェック
     return true unless int_attr.include?(attr_name)
 
@@ -2436,7 +2438,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def duplicated_locus_tag_prefix (rule_code, sample_name, locus_tag, biosample_list, submission_id, line_num)
-    return nil if CommonUtils::null_value?(locus_tag)
+    return nil if InsdcNullability.null_value?(locus_tag)
     result = true
 
     # 同一ファイル内での重複チェック
@@ -2485,7 +2487,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def bioproject_submission_id_replacement (rule_code, sample_name, psub_id, line_num)
-    return nil if CommonUtils::null_value?(psub_id)
+    return nil if InsdcNullability.null_value?(psub_id)
     result = true
 
     if /^PSUB/ =~ psub_id
@@ -2531,7 +2533,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, sample_name, taxonomy_id, organism, line_num)
-    return nil if CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
     result = @org_validator.is_infraspecific_rank(taxonomy_id)
     if result == false
       annotation = [
@@ -2598,7 +2600,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_locus_tag_prefix_format (rule_code, sample_name, locus_tag, line_num)
-    return nil  if CommonUtils::null_value?(locus_tag)
+    return nil  if InsdcNullability.null_value?(locus_tag)
     return true if locus_tag.size.between?(3, 12) && locus_tag =~ /^[0-9a-zA-Z]+$/ && locus_tag !~ /^[0-9]+/
 
     annotation = [
@@ -2667,7 +2669,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_sample_name_format (rule_code, sample_name, line_num)
-    return nil  if CommonUtils::null_value?(sample_name)
+    return nil  if InsdcNullability.null_value?(sample_name)
     return true if sample_name.size <= 100 && sample_name =~ /^[0-9a-zA-Z\s\(\)\{\}\[\]\+\-_.]+$/  #最大100文字で英数字、空白、記号 (){}[]+-_. から構成されること
 
     annotation = [
@@ -2693,12 +2695,12 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_taxonomy_for_genome_sample (rule_code, sample_name, package_name, taxonomy_id, organism, line_num)
-    return nil if package_name.blank? || CommonUtils::null_value?(organism)
+    return nil if package_name.blank? || InsdcNullability.null_value?(organism)
     result = true
     if package_name.start_with?("MIGS.ba") || package_name.start_with?("MIGS.eu")
       # "sp."終わり、または"xxx sp. (in: yyy)", "xxx sp. (ex yyy)"であればエラー seealso: https://ddbj-dev.atlassian.net/browse/VALIDATOR-14
       if organism.downcase.end_with?("sp.") || organism =~ /.+sp\.\s*\((in\:|ex)\s.*\)$/
-        if (CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
+        if (InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID)
           # tax_idが不明な場合、新規生物種登録の可能性がありstrain名をつけてもらいたいためエラー
           result = false
         else
@@ -2731,7 +2733,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   def taxonomy_warning (rule_code, sample_name, component_organism, attr_no, line_num)
-    return nil if CommonUtils::null_value?(component_organism)
+    return nil if InsdcNullability.null_value?(component_organism)
     ret = true
 
     annotation = [
@@ -2785,7 +2787,7 @@ class BioSampleValidator < ValidatorBase
   # ==== Return
   # true/false
   def invalid_metagenome_source (rule_code, sample_name, metagenome_source, attr_idx, line_num)
-    return nil if CommonUtils::null_value?(metagenome_source)
+    return nil if InsdcNullability.null_value?(metagenome_source)
     ret = true
 
     metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
@@ -2850,7 +2852,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_culture_collection_format (rule_code, sample_name, culture_collection, line_num)
-    return nil if CommonUtils::null_value?(culture_collection)
+    return nil if InsdcNullability.null_value?(culture_collection)
 
     ret = true
     if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
@@ -2879,7 +2881,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_culture_collection (rule_code, sample_name, culture_collection, institution_list, attr_idx, line_num)
-    return nil if CommonUtils::null_value?(culture_collection) || institution_list.nil?
+    return nil if InsdcNullability.null_value?(culture_collection) || institution_list.nil?
     return nil if culture_collection.split(":").size < 2 || culture_collection.split(":").size > 3
 
     invalid_institude_name(rule_code, sample_name, "culture_collection", culture_collection, institution_list, attr_idx, line_num)
@@ -2899,7 +2901,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def specimen_voucher_for_bacteria_and_unclassified_sequences (rule_code, sample_name, specimen_voucher, taxonomy_id, line_num)
-    return nil if CommonUtils::null_value?(specimen_voucher) ||  CommonUtils::null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return nil if InsdcNullability.null_value?(specimen_voucher) ||  InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
     ret = @org_validator.target_organism_for_specimen_voucher?(taxonomy_id)
     if ret == false
@@ -2926,7 +2928,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_specimen_voucher_format (rule_code, sample_name, specimen_voucher, line_num)
-    return nil if CommonUtils::null_value?(specimen_voucher)
+    return nil if InsdcNullability.null_value?(specimen_voucher)
 
     ret = true
     if specimen_voucher.split(":").size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
@@ -2955,7 +2957,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_specimen_voucher (rule_code, sample_name, specimen_voucher, institution_list, attr_idx, line_num)
-    return nil if CommonUtils::null_value?(specimen_voucher) || institution_list.nil?
+    return nil if InsdcNullability.null_value?(specimen_voucher) || institution_list.nil?
     return nil if specimen_voucher.split(":").size > 3
 
     invalid_institude_name(rule_code, sample_name, "specimen_voucher", specimen_voucher, institution_list, attr_idx, line_num)
@@ -2974,7 +2976,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_bio_material_format (rule_code, sample_name, bio_material, line_num)
-    return nil if CommonUtils::null_value?(bio_material)
+    return nil if InsdcNullability.null_value?(bio_material)
 
     ret = true
     if bio_material.split(":").size > 3 # <institution-code>と<collection-code>共に省略可能なので、区切り文字(":")が多くないかだけチェック
@@ -3002,7 +3004,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_bio_material (rule_code, sample_name, bio_material, institution_list, line_num)
-    return nil if CommonUtils::null_value?(bio_material) || institution_list.nil?
+    return nil if InsdcNullability.null_value?(bio_material) || institution_list.nil?
     return nil if bio_material.split(":").size > 3
 
     invalid_institude_name(rule_code, sample_name, "bio_material", bio_material, institution_list, nil, line_num)
@@ -3129,7 +3131,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_gisaid_accession (rule_code, sample_name, gisaid_accession, line_num)
-    return nil  if CommonUtils::null_value?(gisaid_accession)
+    return nil  if InsdcNullability.null_value?(gisaid_accession)
     return true if gisaid_accession =~ /^EPI_[A-Z]+_[0-9]+$/
 
     annotation = [
@@ -3256,13 +3258,13 @@ class BioSampleValidator < ValidatorBase
     # 有効な値のlocus_tag_prefixとbioproject_idの記述があるか
     attr_list.each do |attr|
       unless attr["locus_tag_prefix"].nil?
-        if !CommonUtils::null_value?(attr["locus_tag_prefix"]) && !CommonUtils::null_not_recommended_value?(attr["locus_tag_prefix"])
+        if !InsdcNullability.null_value?(attr["locus_tag_prefix"]) && !InsdcNullability.null_not_recommended_value?(attr["locus_tag_prefix"])
           edit_locus_tag_prefix = true
         end
         locus_tag_prefix_values.push(attr["locus_tag_prefix"])
       end
       unless attr["bioproject_id"].nil?
-        if !CommonUtils::null_value?(attr["bioproject_id"]) &&  !CommonUtils::null_not_recommended_value?(attr["bioproject_id"])
+        if !InsdcNullability.null_value?(attr["bioproject_id"]) &&  !InsdcNullability.null_not_recommended_value?(attr["bioproject_id"])
           edit_bioproject_id = true
         end
         bioproject_id_values.push(attr["bioproject_id"])
@@ -3295,7 +3297,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def biosample_not_found (rule_code, sample_name, derived_from, submitter_id, line_num)
-    return nil if CommonUtils::null_value?(derived_from)
+    return nil if InsdcNullability.null_value?(derived_from)
     return nil if submitter_id.nil?
 
     result = true
@@ -3402,7 +3404,7 @@ class BioSampleValidator < ValidatorBase
       if package_name.start_with?(package_prefix) # package名は前方一致でチェック。MIGS.ba"だと"MIGS.ba.human-gut"でもチェック対象
         exist_value = false # 意味のある値が入っているか
         mandatory_attr_list.each do |mandatory_attr|
-          if !CommonUtils::null_value?(sample_attr[mandatory_attr]) # null相当値(nil, 空白, null_accepted)ではないか
+          if !InsdcNullability.null_value?(sample_attr[mandatory_attr]) # null相当値(nil, 空白, null_accepted)ではないか
             exist_value = true
           end
         end
@@ -3439,7 +3441,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_identical_identifiers_among_organism_strain_isolate (rule_code, sample_name, package_name, organism, strain, isolate, line_num)
-    return nil if package_name.blank? || CommonUtils::null_value?(organism)
+    return nil if package_name.blank? || InsdcNullability.null_value?(organism)
     result = true
     if package_name.start_with?("MIGS.ba")
       keywords = ["sp.", "bacterium", "archaeon"]
@@ -3459,9 +3461,9 @@ class BioSampleValidator < ValidatorBase
       # organism名に sp./bacterium/archaeon が含まれている場合、その後の文字列でチェック
       unless organism_sufix == "" 
         match_sufix = false # strain or isolate に一致するか
-        if !CommonUtils::null_value?(strain) && organism_sufix == strain
+        if !InsdcNullability.null_value?(strain) && organism_sufix == strain
           match_sufix = true
-        elsif !CommonUtils::null_value?(isolate) && organism_sufix == isolate
+        elsif !InsdcNullability.null_value?(isolate) && organism_sufix == isolate
           match_sufix = true
         end
         if match_sufix == false # strain or isolate のいずれにも一致しなければfalse
@@ -3496,7 +3498,7 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_strain_value (rule_code, sample_name, strain, orgainsm, invalid_value_settings, line_num)
-    return nil if CommonUtils::null_value?(strain)
+    return nil if InsdcNullability.null_value?(strain)
     result = true
 
     if invalid_value_settings["exact_match"].include?(strain.downcase)
@@ -3508,7 +3510,7 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
-    if !CommonUtils::null_value?(orgainsm) && strain.downcase.start_with?(orgainsm.downcase)
+    if !InsdcNullability.null_value?(orgainsm) && strain.downcase.start_with?(orgainsm.downcase)
       result = false
     end
     if result == false
@@ -3543,7 +3545,7 @@ class BioSampleValidator < ValidatorBase
     reporting_level_term_attr_list.each do |reporting_level_term_attr|
       # null相当値である
       attr_value = sample_attr[reporting_level_term_attr]
-      if CommonUtils::null_value?(attr_value) || CommonUtils::null_not_recommended_value?(attr_value)
+      if InsdcNullability.null_value?(attr_value) || InsdcNullability.null_not_recommended_value?(attr_value)
         # reporting_level_term ではない
         if !reporting_level_term_list.include?(sample_attr[reporting_level_term_attr])
           # エラー属性名を配列に追加
