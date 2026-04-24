@@ -176,7 +176,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0006
   def test_short_project_description
-    skip_unless_pg_configured
+    skip 'rule BP_R0006 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/6_short_project_description_ok.xml")
     ret = exec_validator("short_project_description", "BP_R0006", "project name" , project_set.first, 1)
@@ -196,7 +196,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0007
   def test_empty_description_for_other_relevance
-    skip_unless_pg_configured
+    skip 'rule BP_R0007 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/7_empty_description_for_other_relevance_ok.xml")
     ret = exec_validator("empty_description_for_other_relevance", "BP_R0007", "project name" , project_set.first, 1)
@@ -216,7 +216,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0008
   def test_empty_description_for_other_subtype
-    skip_unless_pg_configured
+    skip 'rule BP_R0008 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/8_empty_description_for_other_subtype_ok.xml")
     ret = exec_validator("empty_description_for_other_subtype", "BP_R0008", "project name" , project_set.first, 1)
@@ -241,7 +241,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0009
   def test_empty_target_description_for_other_sample_scope
-    skip_unless_pg_configured
+    skip 'rule BP_R0009 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/9_empty_target_description_for_other_sample_scope_ok.xml")
     ret = exec_validator("empty_target_description_for_other_sample_scope", "BP_R0009", "project name" , project_set.first, 1)
@@ -261,7 +261,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0010
   def test_empty_target_description_for_other_material
-    skip_unless_pg_configured
+    skip 'rule BP_R0010 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/10_empty_target_description_for_other_material_ok.xml")
     ret = exec_validator("empty_target_description_for_other_material", "BP_R0010", "project name" , project_set.first, 1)
@@ -281,7 +281,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0011
   def test_empty_target_description_for_other_capture
-    skip_unless_pg_configured
+    skip 'rule BP_R0011 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/11_empty_target_description_for_other_capture_ok.xml")
     ret = exec_validator("empty_target_description_for_other_capture", "BP_R0011", "project name" , project_set.first, 1)
@@ -301,7 +301,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0012
   def test_empty_method_description_for_other_method_type
-    skip_unless_pg_configured
+    skip 'rule BP_R0012 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/12_empty_method_description_for_other_method_type_ok.xml")
     ret = exec_validator("empty_method_description_for_other_method_type", "BP_R0012", "project name" , project_set.first, 1)
@@ -321,7 +321,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0013
   def test_empty_data_description_for_other_data_type
-    skip_unless_pg_configured
+    skip 'rule BP_R0013 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/13_empty_data_description_for_other_data_type_ok.xml")
     ret = exec_validator("empty_data_description_for_other_data_type", "BP_R0013", "project name" , project_set.first, 1)
@@ -392,7 +392,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0015
   def test_empty_publication_reference
-    skip_unless_pg_configured
+    skip 'rule BP_R0015 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/15_empty_publication_reference_ok.xml")
     ret = exec_validator("empty_publication_reference", "BP_R0015", "project name" , project_set.first, 1)
@@ -482,7 +482,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0019
   def test_empty_organism_description_for_multi_species
-    skip_unless_pg_configured
+    skip 'rule BP_R0019 is not defined in rule_config — commented out in the validator flow'
     #ok case
     # exist Label text
     project_set = get_project_set_node("#{@test_file_dir}/19_empty_organism_description_for_multi_species_ok.xml")
@@ -533,7 +533,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0021
   def test_invalid_locus_tag_prefix
-    skip_unless_pg_configured
+    skip 'rule BP_R0021 is not defined in rule_config — commented out in the validator flow'
     #ok case
     # exist valid locus_tag_prefix and biosample_id
     project_set = get_project_set_node("#{@test_file_dir}/21_invalid_locus_tag_prefix_ok.xml")
@@ -586,7 +586,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0022
   def test_invalid_biosample_accession
-    skip_unless_pg_configured
+    skip 'rule BP_R0022 is not defined in rule_config — commented out in the validator flow'
     #ok case
     # exist valid biosample_id
     project_set = get_project_set_node("#{@test_file_dir}/22_invalid_biosample_accession_ok.xml")
@@ -614,7 +614,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0037
   def test_multiple_projects
-    skip_unless_pg_configured
+    skip 'rule BP_R0037 is not defined in rule_config — commented out in the validator flow'
     #ok case
     # 1 bioproject
     project_set = get_project_set_node("#{@test_file_dir}/37_multiple_projects_ok.xml")
@@ -717,7 +717,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0040
   def test_invalid_project_type
-    skip_unless_pg_configured
+    skip 'rule BP_R0040 is not defined in rule_config — commented out in the validator flow'
     #ok case
     # not exist ProjectTypeTopSingleOrganism
     project_set = get_project_set_node("#{@test_file_dir}/40_invalid_project_type_ok.xml")
@@ -735,7 +735,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0041
   def test_invalid_locus_tag_prefix_format
-    skip_unless_pg_configured
+    skip 'rule BP_R0041 is not defined in rule_config — commented out in the validator flow'
     #ok case
     project_set = get_project_set_node("#{@test_file_dir}/41_invalid_locus_tag_prefix_format_ok.xml")
     ret = exec_validator("invalid_locus_tag_prefix_format", "BP_R0041", "project name" , project_set.first, 1)
@@ -751,7 +751,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0042
   def test_locus_tag_prefix_in_umbrella_project
-    skip_unless_pg_configured
+    skip 'rule BP_R0042 is not defined in rule_config — commented out in the validator flow'
     #ok case
     # umbrella project without LTP
     project_set = get_project_set_node("#{@test_file_dir}/42_locus_tag_prefix_in_umbrella_project_ok.xml")

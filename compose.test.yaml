@@ -21,3 +21,16 @@ services:
       VIRT_Parameters_MaxDirtyBuffers: '130000'
     volumes:
       - ./test/fixtures/virtuoso:/fixtures:ro
+
+  postgres:
+    image: postgres:18.3
+    ports:
+      - '127.0.0.1:15432:5432'
+    environment:
+      POSTGRES_USER:     validator
+      POSTGRES_PASSWORD: validator
+      # docker-entrypoint-initdb.d の挙動でデフォルト DB は使わず init.sh で明示的に作成する
+      POSTGRES_DB:       postgres
+    volumes:
+      - ./test/fixtures/postgres:/fixtures:ro
+      - ./test/fixtures/postgres/init.sh:/docker-entrypoint-initdb.d/init.sh:ro
