@@ -3,6 +3,7 @@ require 'json'
 require 'json-schema'
 require File.dirname(__FILE__) + "/common/common_utils.rb"
 require File.dirname(__FILE__) + "/common/error_builder.rb"
+require File.dirname(__FILE__) + "/common/ncbi_eutils.rb"
 
 class ValidatorBase
 
@@ -40,7 +41,7 @@ class ValidatorBase
       end
       config[:named_graph_uri] = setting["named_graph_uri"]
       config[:biosample] = setting["biosample"]
-      config[:eutils_api_key] = setting["eutils_api_key"]
+      NcbiEutils.api_key = setting.dig("eutils_api_key", "key")
       config[:log_dir] = setting["api_log"]["path"]
       config
     rescue => ex
