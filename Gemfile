@@ -20,7 +20,6 @@ gem "sinatra-contrib"
 
 group :development do
   gem 'rake'
-  gem 'sinatra-reloader'
 end
 
 group :test do

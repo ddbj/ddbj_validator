@@ -1,11 +1,58 @@
-.dockerignore
-docker-compose.yml
-Dockerfile
-README.md
-shared/config/entrypoint.virtuoso.sh
-shared/config/virtuoso
-shared/data/virtuoso
+# Git metadata
+.git
+.github
+.gitignore
+.gitmodules
+
+# OS / editor / dev-tool junk
+.DS_Store
+*.swp
+*.swo
+.idea
+*.iml
+.mise.toml
+.ruby-lsp
+.memsearch
+Procfile.dev
+
+# Local env / secrets
+.env
 template.env
+
+# Docker build inputs aren't needed inside the final image
+.dockerignore
+Dockerfile
+docker-compose.yml
+compose.*.yaml
+
+# Dev-only docs
+README.md
+
+# Tests and their fixtures — production has no reason to ship Virtuoso
+# dumps, Postgres seeds, or the committed snapshots of ddbj/pub.
+test
+
+# Runtime bind-mount targets. Whatever is in the image at these paths is
+# masked by the compose volumes in staging/production, so shipping them
+# just bloats the image.
+conf/pub
+conf/coll_dump
+shared
+logs
+log
+
+# Separate sub-apps / tools not used by the validator runtime. Each has
+# its own Dockerfile or runs from the host.
+data_updater
+log_analysis
+
+# Ops scripts that run on the host, not inside the container.
+bin/deploy
+bin/deploy-remote.sh
+bin/deploy_tools
 deploy_tools
 monitoring
-logs
+
+# Scratch
+tmp
+*.log

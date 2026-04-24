@@ -2,7 +2,6 @@ require 'yaml'
 require 'sinatra/base'
 require 'sinatra/json'
 require "securerandom"
-require 'sinatra/reloader'
 require 'net/http'
 require 'net/https'
 require 'fileutils'
