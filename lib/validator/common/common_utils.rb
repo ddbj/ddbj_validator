@@ -3,7 +3,9 @@ require 'net/http'
 require 'net/https'
 require 'net/ftp'
 require 'date'
+require 'active_support/core_ext/integer/inflections'
 require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/string/filters'
 
 class CommonUtils
   @@AUTO_ANNOTAION_MSG = "An automatically-generated correction will be applied."

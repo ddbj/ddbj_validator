@@ -166,21 +166,7 @@ class BioProjectValidator < ValidatorBase
       end
     end
     # いずれの記述もない場合には何番目のprojectであるかを示す
-    if project_name == ""
-      ordinal_num = ""
-      if line_num == 11
-        ordinal_num = "11th"
-      elsif line_num.to_s[-1] == "1"
-        ordinal_num = line_num.to_s + "st"
-      elsif line_num.to_s[-1] == "2"
-        ordinal_num = line_num.to_s + "nd"
-      elsif line_num.to_s[-1] == "3"
-        ordinal_num = line_num.to_s + "rd"
-      else
-        ordinal_num = line_num.to_s + "th"
-      end
-      project_name = ordinal_num + " project"
-    end
+    project_name = "#{line_num.ordinalize} project" if project_name == ""
     project_name
   end
 

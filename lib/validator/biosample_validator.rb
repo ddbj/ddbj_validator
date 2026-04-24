@@ -2065,15 +2065,12 @@ class BioSampleValidator < ValidatorBase
     end
 
     result = true
-    replaced.strip!  #セル内の前後の空白文字を除去
-    replaced.gsub!(/\t/, " ") #セル内部のタブを空白1個に
-    replaced.gsub!(/\s+/, " ") #二個以上の連続空白を１個に
-    replaced.gsub!(/(\r\n|\r|\n)/, " ") #セル内部の改行を空白1個に
-    #セル内の最初と最後が ' or " で囲われていたら削除
+    # 前後の空白除去 + タブ/改行/連続空白を 1 個の空白に圧縮
+    replaced = replaced.squish
+    # セル内の最初と最後が ' or " で囲われていたら削除 → 再度 strip
     if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
-      replaced = replaced[1..-2]
+      replaced = replaced[1..-2].strip
     end
-    replaced.strip!  #引用符を除いた後にセル内の前後の空白文字をもう一度除去
     if target == "attr_name" && replaced != attr_name #属性名のAuto-annotationが必要
       annotation = [
         {key: "Sample name", value: sample_name},
