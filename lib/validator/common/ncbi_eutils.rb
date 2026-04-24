@@ -1,5 +1,3 @@
-require 'http'
-
 # NCBI E-utilities (esummary) と DBCLS tm medline に対する「この ID 実在する?」確認用
 # クライアント。PubMed ID と PMC ID の存在確認に使う。
 #

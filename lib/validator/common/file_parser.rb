@@ -1,5 +1,4 @@
 require 'logger'
-require 'csv'
 
 class FileParser
   def initialize

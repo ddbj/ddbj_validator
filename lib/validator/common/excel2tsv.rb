@@ -1,5 +1,3 @@
-require 'roo'
-require 'csv'
 require 'fileutils'
 require_relative "insdc_nullability"
 

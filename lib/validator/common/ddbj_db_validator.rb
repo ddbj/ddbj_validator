@@ -1,5 +1,3 @@
-require 'pg'
-
 class DDBJDbValidator
   BIOPROJCT_DB_NAME = "bioproject"
   BIOSAMPLE_DB_NAME = "biosample"

@@ -1,4 +1,3 @@
-require 'nokogiri'
 require_relative "base"
 
 class DraSubmitter < SubmitterBase

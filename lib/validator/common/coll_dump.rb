@@ -1,5 +1,3 @@
-require 'net/ftp'
-
 # NCBI の coll_dump.txt (https://ftp.ncbi.nlm.nih.gov/pub/taxonomy/coll_dump.txt) を
 # specimen_voucher / culture_collection / bio_material の institution 名リストにパースする。
 module CollDump
