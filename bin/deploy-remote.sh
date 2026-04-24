@@ -8,11 +8,15 @@ instance="$(basename "$PWD")"
 
 log() { printf '[%s] %s\n' "$instance" "$*"; }
 
-# Per-instance overrides (container names, ports, …). Sourced so we can read
-# DDBJ_VALIDATOR_APP_CONTAINER_NAME / DDBJ_VALIDATOR_APP_PORT below.
-if [[ -f .env ]]; then
-  set -a; source .env; set +a
-fi
+# Per-instance overrides (container names, ports, …). Read specific keys by
+# regex rather than sourcing .env — that file sets bash built-ins like UID/GID
+# which are readonly and would explode a naive `source`.
+read_env() {
+  [[ -f .env ]] || return 0
+  grep -E "^$1=" .env | tail -1 | cut -d= -f2-
+}
+DDBJ_VALIDATOR_APP_CONTAINER_NAME="$(read_env DDBJ_VALIDATOR_APP_CONTAINER_NAME)"
+DDBJ_VALIDATOR_APP_PORT="$(read_env DDBJ_VALIDATOR_APP_PORT)"
 
 log "HEAD $(git log -1 --format='%h %s')"
 
