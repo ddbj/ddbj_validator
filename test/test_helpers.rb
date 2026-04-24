@@ -23,6 +23,7 @@
 $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 
 require 'bundler/setup'
+require 'fileutils'
 require 'json'
 require 'minitest/autorun'
 require 'net/http'
@@ -35,6 +36,11 @@ WebMock.disable_net_connect!(allow_localhost: true)
 
 # test_ddbj_parser がエンドポイント設定済みの状態を前提にしているので、未設定なら stub URL を差し込む
 ENV['DDBJ_PARSER_APP_URL'] = 'http://ddbj-parser.stub/validate' if ENV['DDBJ_PARSER_APP_URL'].to_s.strip.empty?
+
+# trad_validator の file_path_on_log_dir テストが、log_dir がセットされていることを
+# 前提にしている。本番/開発ではコンテナで埋まるので、テストでは明示的に作成する。
+ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'] ||= File.expand_path('../logs', __dir__)
+FileUtils.mkdir_p(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'])
 
 # BioSampleValidator#read_config が参照する INSDC 国名リスト / coll_dump を
 # test/fixtures 配下のスナップショットに向ける。本番は .env で別ディレクトリを指すので影響なし
