@@ -18,10 +18,11 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # 内部ネットワーク (podman-compose + NIG 共用サーバ上の reverse proxy なし) で
-  # 運用しているため SSL 関連は無効。
-  config.assume_ssl = false
-  config.force_ssl  = false
+  # Nginx が TLS を終端してコンテナへは HTTP でプロキシするので、app 層には
+  # assume_ssl = true で SSL 扱いを伝える。force_ssl は HSTS 付与 + 非 SSL
+  # リクエストを HTTPS にリダイレクトする Rails 既定挙動を維持。
+  config.assume_ssl = true
+  config.force_ssl  = true
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
