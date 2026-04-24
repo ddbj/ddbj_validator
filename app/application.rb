@@ -60,7 +60,7 @@ module DDBJValidator
         save_dir = "#{@@data_dir}/#{uuid[0..1]}/#{uuid}"
         FileUtils.mkpath save_dir
 
-        input_file_list = %w(all_db biosample bioproject submission experiment run analysisx jvar vcf trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
+        input_file_list = %w(all_db biosample bioproject submission experiment run analysisx jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf)
         input_file_list.each do |file_category|
           if params[file_category.to_sym]
             save_path = save_file(save_dir, file_category, params)
