@@ -1,4 +1,4 @@
-FROM ruby:4.0.3
+FROM ruby:3.4.9
 
 WORKDIR /usr/src/ddbj_validator/
 
