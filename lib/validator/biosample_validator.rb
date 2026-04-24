@@ -84,7 +84,6 @@ class BioSampleValidator < ValidatorBase
       config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + "/invalid_strain_value.json"))
       config[:json_schema] = JSON.parse(File.read(config_file_dir + "/schema.json"))
       config[:institution_list_file] = coll_dump_file
-      config[:google_api_key] = @conf[:google_api_key]
       config[:eutils_api_key] = @conf[:eutils_api_key]
       config
     rescue => ex
@@ -111,9 +110,6 @@ class BioSampleValidator < ValidatorBase
     end
     unless (params["biosample_submission_id"].nil? || params["biosample_submission_id"].strip == "")
       @submission_id = params["biosample_submission_id"]
-    end
-    unless (params["google_api_key"].nil? || params["google_api_key"].strip == "")
-      @google_api_key = params["google_api_key"]
     end
 
     # file typeのチェック

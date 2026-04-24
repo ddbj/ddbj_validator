@@ -71,7 +71,7 @@ module DDBJValidator
             end
           end
         end
-        allow_params = %w(submitter_id biosample_submission_id bioproject_submission_id google_api_key check_sheet check_sheet[])
+        allow_params = %w(submitter_id biosample_submission_id bioproject_submission_id check_sheet check_sheet[])
         allow_params.each do |param_name|
           if params[param_name.to_sym]
             validation_params[:params][param_name] = params[param_name.to_sym]
