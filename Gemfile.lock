@@ -55,7 +55,7 @@ GEM
       prism (~> 1.5)
     multi_json (1.20.1)
     mustermann (3.1.1)
-    net-ftp (0.3.8)
+    net-ftp (0.3.9)
       net-protocol
       time
     net-imap (0.6.4)
@@ -116,7 +116,7 @@ GEM
       sinatra (= 4.2.1)
       tilt (~> 2.0)
     tilt (2.7.0)
-    time (0.4.1)
+    time (0.4.2)
       date
     timeout (0.6.1)
     tzinfo (2.0.6)
