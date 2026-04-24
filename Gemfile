@@ -14,10 +14,9 @@ gem "pg"
 gem "rack"
 gem "roo"
 gem "sanitize"
+gem "puma"
 gem "sinatra"
 gem "sinatra-contrib"
-gem "unicorn"
-gem "unicorn-worker-killer"
 
 group :development do
   gem 'rake'
