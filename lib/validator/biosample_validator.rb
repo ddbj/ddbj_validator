@@ -343,9 +343,7 @@ class BioSampleValidator < ValidatorBase
       end
 
       ### 複数属性の組合せの検証
-      # NOTE: BS_R0041 (latlon_versus_country) は Google Geocoding API 依存だったため削除済み
-      # (https://ddbj-dev.atlassian.net/browse/VALIDATOR-284)。
-      # Natural Earth 等のオフラインデータベースで再実装する際は新規に追加する
+      latlon_versus_country("BS_R0041", sample_name, biosample_data["attributes"]["geo_loc_name"], biosample_data["attributes"]["lat_lon"], line_num)
       redundant_taxonomy_attributes("BS_R0073", sample_name, biosample_data["attributes"]["organism"], biosample_data["attributes"]["host"], biosample_data["attributes"]["isolation_source"], line_num)
 
       ### 値が複数記述される可能性がある項目を含む複数属性の組合せの検証
@@ -1304,6 +1302,49 @@ class BioSampleValidator < ValidatorBase
       @error_list.push(error_hash)
     end
     result
+  end
+
+  #
+  # rule:41
+  # geo_loc_name が指定する国と lat_lon が実際に指す国が一致するかの検証
+  # Natural Earth 1:50m の国境データを使ってオフラインで判定する (VALIDATOR-284 の再実装)。
+  # 検証できない (= 国名が INSDC リストに無い・海洋/歴史名・lat_lon が parse 不能・
+  # 座標がどの国のポリゴンにも当たらない) 場合は nil を返してスキップし、
+  # 実際に別の国にいる時だけ warning を返す
+  #
+  def latlon_versus_country (rule_code, sample_name, geo_loc_name, lat_lon, line_num)
+    return nil if CommonUtils::null_value?(geo_loc_name) || CommonUtils::null_value?(lat_lon)
+
+    country_name = geo_loc_name.split(":").first.strip
+    expected_iso = CommonUtils.insdc_to_iso_a3[country_name]
+    return nil if expected_iso.nil?
+
+    common       = CommonUtils.new
+    insdc_latlon = common.format_insdc_latlon(lat_lon)
+    iso_latlon   = common.convert_latlon_insdc2iso(insdc_latlon)
+    return nil if iso_latlon.nil?
+
+    lat = iso_latlon[:latitude]
+    lon = iso_latlon[:longitude]
+    key = ValidatorCache.create_key(lat, lon)
+    actual_iso = if @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, key)
+                   @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, key)
+                 else
+                   value = common.country_at(lat, lon)
+                   @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, key, value)
+                   value
+                 end
+    return nil if actual_iso.nil?
+    return true if actual_iso == expected_iso
+
+    annotation = [
+      {key: "Sample name",  value: sample_name},
+      {key: "geo_loc_name", value: geo_loc_name},
+      {key: "lat_lon",      value: lat_lon}
+    ]
+    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
+    @error_list.push(error_hash)
+    false
   end
 
   #

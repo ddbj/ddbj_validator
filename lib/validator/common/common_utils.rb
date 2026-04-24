@@ -614,4 +614,59 @@ class CommonUtils
     end
     ret
   end
+
+  #
+  # 緯度経度 (WGS84 decimal degrees) が内部にある国の ISO_A3 を返す。どの国にも該当しなければ nil。
+  # 国境データは Natural Earth Admin 0 (1:50m) をスリムにしたもので、境界線付近や島の
+  # 省略により ±数km の誤差があるため、BS_R0041 では「大きくずれている」ケースの検出用に使う。
+  #
+  def country_at (lat, lon)
+    return nil if lat.nil? || lon.nil?
+    CommonUtils.ne_countries['features'].each {|feature|
+      geom = feature['geometry']
+      polygons = geom['type'] == 'MultiPolygon' ? geom['coordinates'] : [geom['coordinates']]
+      polygons.each {|polygon|
+        return feature['properties']['iso_a3'] if CommonUtils.point_in_polygon?(lat, lon, polygon)
+      }
+    }
+    nil
+  end
+
+  # GeoJSON の Polygon coordinates (外輪 + 任意個の穴) に点が含まれるか
+  def self.point_in_polygon? (lat, lon, polygon)
+    return false unless point_in_ring?(lat, lon, polygon[0])
+    polygon[1..].each {|hole|
+      return false if point_in_ring?(lat, lon, hole)
+    }
+    true
+  end
+
+  # Ray-casting による点内判定。ring は GeoJSON の LinearRing ([[lon, lat], ...])
+  def self.point_in_ring? (lat, lon, ring)
+    inside = false
+    n      = ring.length
+    j      = n - 1
+
+    (0...n).each {|i|
+      xi, yi = ring[i]
+      xj, yj = ring[j]
+      if (yi > lat) != (yj > lat) && lon < (xj - xi) * (lat - yi) / (yj - yi) + xi
+        inside = !inside
+      end
+      j = i
+    }
+    inside
+  end
+
+  NE_COUNTRIES_PATH    = File.expand_path('../../../conf/biosample/ne_countries.json',    __dir__)
+  INSDC_TO_ISO_A3_PATH = File.expand_path('../../../conf/biosample/insdc_to_iso_a3.json', __dir__)
+
+  # プロセス起動後に初回アクセス時のみ JSON を parse してキャッシュする (1.6MB あるのでリクエスト毎には開かない)
+  def self.ne_countries
+    @ne_countries ||= JSON.parse(File.read(NE_COUNTRIES_PATH))
+  end
+
+  def self.insdc_to_iso_a3
+    @insdc_to_iso_a3 ||= JSON.parse(File.read(INSDC_TO_ISO_A3_PATH))
+  end
 end

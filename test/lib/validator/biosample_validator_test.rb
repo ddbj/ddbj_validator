@@ -697,6 +697,64 @@ class TestBioSampleValidator < Minitest::Test
     assert_equal 0, ret[:error_list].size
   end
 
+  def test_latlon_versus_country
+    # ok case: coordinates inside the country that geo_loc_name claims
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Japan:Tokyo", "35.68 N 139.76 E", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "USA:New York", "40.80 N 74.00 W", 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # Same-country check passes even with a locality suffix after the colon
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", "35.24 N 139.03 E", 1)
+    assert_equal true, ret[:result]
+
+    # Territories whose NE 50m polygon is folded into the sovereign
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Svalbard", "78.22 N 15.65 E", 1)
+    assert_equal true, ret[:result]
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "French Guiana", "4.0 N 53.0 W", 1)
+    assert_equal true, ret[:result]
+
+    # ng case: coordinates clearly in a different country
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Japan", "40.80 N 74.00 W", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "France:Paris", "35.68 N 139.76 E", 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+
+    # skip: point over open ocean - we cannot disprove the claim
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Japan", "0 N 0 E", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # skip: geo_loc_name is an ocean / historical / disputed value with no ISO_A3
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Atlantic Ocean", "35.68 N 139.76 E", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # skip: country not in INSDC list (BS_R0008 will flag that separately)
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Atlantis", "35.68 N 139.76 E", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # skip: lat_lon unparseable (BS_R0009/0139 will flag that separately)
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Japan", "not a lat lon", 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+
+    # skip: nil / null-ish inputs
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", nil, "35.68 N 139.76 E", 1)
+    assert_nil ret[:result]
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "Japan", nil, 1)
+    assert_nil ret[:result]
+    ret = exec_validator("latlon_versus_country", "BS_R0041", "sampleA", "missing", "35.68 N 139.76 E", 1)
+    assert_nil ret[:result]
+  end
+
   def test_bioproject_submission_id_replacement
     skip unless @ddbj_db_mode
 

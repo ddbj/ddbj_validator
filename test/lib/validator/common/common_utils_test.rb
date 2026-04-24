@@ -141,6 +141,22 @@ class TestCommonUtils < Minitest::Test
     assert_nil ret
   end
 
+  def test_country_at
+    # ok: points comfortably inland land up in the expected country
+    assert_equal "JPN", @common.country_at(35.68, 139.76)
+    assert_equal "USA", @common.country_at(38.89, -77.04)
+    assert_equal "FRA", @common.country_at(48.86, 2.35)
+    assert_equal "BRA", @common.country_at(-23.55, -46.64)
+    assert_equal "AUS", @common.country_at(-33.87, 151.21)
+
+    # nil: open-ocean point is outside every polygon
+    assert_nil @common.country_at(0, 0)
+
+    # nil: missing coordinates
+    assert_nil @common.country_at(nil, 139.76)
+    assert_nil @common.country_at(35.68, nil)
+  end
+
   def test_exist_pubmed?
     #ok
     ret = @common.exist_pubmed_id?("27148491")
