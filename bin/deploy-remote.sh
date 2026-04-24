@@ -48,21 +48,27 @@ if [[ "$status" != running ]]; then
   exit 1
 fi
 
-# If a port is configured, probe unicorn — anything that gives us an HTTP
-# status (even 404) proves the process came up; 000 means still booting.
+# Probe the monitoring endpoint, which runs a full biosample validation cycle
+# end-to-end — anything less than a 2xx means unicorn is up but something in
+# the pipeline is broken, which is the signal we want.
+#
+# --retry-all-errors retries on both transport errors (connect refused while
+#   unicorn is still booting, timeouts from the kgio/unicorn SEGV that slipped
+#   past the old probe) and HTTP 4xx/5xx when paired with --fail.
+# --retry-max-time bounds total wall-clock across retries; --max-time caps
+#   one attempt so a hung worker can't swallow the entire window.
 if [[ -n "$port" ]]; then
-  log "probing http://localhost:$port"
-  for _ in $(seq 1 30); do
-    code="$(curl -s -o /dev/null -w '%{http_code}' -m 2 "http://localhost:$port/" || echo 000)"
-    [[ "$code" != 000 ]] && break
-    sleep 2
-  done
-  if [[ "$code" == 000 ]]; then
-    log 'app never opened the port — dumping logs'
+  url="http://localhost:$port/api/monitoring"
+  log "probing $url"
+  if code=$(curl --fail --silent --output /dev/null --write-out '%{http_code}' \
+                --max-time 90 --retry 10 --retry-all-errors --retry-delay 2 --retry-max-time 180 \
+                "$url"); then
+    log "HTTP $code"
+  else
+    log 'monitoring probe failed — dumping logs'
     podman logs --tail 60 "$cname" 2>&1 || true
     exit 1
   fi
-  log "HTTP $code"
 fi
 
 log 'deploy ok'
