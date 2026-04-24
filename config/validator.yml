@@ -5,13 +5,13 @@
 #   パスワードや API キーは Rails.application.credentials に置く。
 #   `bin/rails credentials:edit --environment <env>` で編集。
 default: &default
-  api_log:
-    path: <%= ENV.fetch('DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR', '../logs/validator/') %>
   biosample:
     package_version: '1.5.0'
 
 development: &dev
   <<: *default
+  api_log:
+    path: logs
   sparql_endpoint:
     master_endpoint: <%= ENV.fetch('DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql') %>
   named_graph_uri:
@@ -34,6 +34,8 @@ test:
 
 staging:
   <<: *default
+  api_log:
+    path: /usr/src/ddbj_validator/logs
   sparql_endpoint:
     master_endpoint: http://ddbj_validator_virtuoso_staging1:8890/sparql
   named_graph_uri:
@@ -53,6 +55,8 @@ staging:
 
 production:
   <<: *default
+  api_log:
+    path: /usr/src/ddbj_validator/logs
   sparql_endpoint:
     master_endpoint: http://ddbj_validator_virtuoso_production1:8890/sparql
   named_graph_uri:
