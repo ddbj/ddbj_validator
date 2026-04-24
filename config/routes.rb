@@ -2,7 +2,8 @@ Rails.application.routes.draw do
   get '/up' => 'rails/health#show', as: :rails_health_check
 
   scope '/api' do
-    get  ''                                       => 'home#index'
+    root to: 'home#index', as: :api_root
+
     get  'apispec/'                               => 'home#apispec'
     get  'client/index'                           => 'home#client'
     get  'error_unauthorized.json'                => 'home#error_unauthorized'
