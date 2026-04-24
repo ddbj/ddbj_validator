@@ -6,10 +6,8 @@ require 'validator/common/organism_validator'
 class TestOrganismValidator < Minitest::Test
   def setup
     skip_unless_virtuoso_available
-    conf_dir = File.expand_path('../../../../../conf', __FILE__)
-    setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)
-    conf = setting["sparql_endpoint"]
-    @validator = OrganismValidator.new(conf["master_endpoint"], setting["named_graph_uri"]["taxonomy"])
+    setting = Rails.configuration.validator
+    @validator = OrganismValidator.new(setting['sparql_endpoint']['master_endpoint'], setting['named_graph_uri']['taxonomy'])
   end
 
   def test_get_organism_name

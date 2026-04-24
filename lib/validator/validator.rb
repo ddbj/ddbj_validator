@@ -27,13 +27,12 @@ class Validator
     end
 
     # constructor
-    def initialize()
-      config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
-      @version = YAML.load(ERB.new(File.read(config_file_dir + "/version.yml")).result)
-      @latest_version = @version["version"]["validator"]
-      @setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
-      @log_file = @setting["api_log"]["path"] + "/validator.log"
-      @running_dir = @setting["api_log"]["path"] + "/running/"
+    def initialize
+      @version = YAML.load(ERB.new(File.read(File.expand_path('../../conf/version.yml', __dir__))).result)
+      @latest_version = @version['version']['validator']
+      @setting = Rails.configuration.validator
+      @log_file = @setting['api_log']['path'] + '/validator.log'
+      @running_dir = @setting['api_log']['path'] + '/running/'
       FileUtils.mkdir_p(@running_dir)
       @log = Logger.new(@log_file)
     end

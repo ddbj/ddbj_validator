@@ -6,15 +6,12 @@ require_relative "bioproject_submitter"
 require_relative "dra_submitter"
 
 class Submitter
-  # constructor
-  def initialize()
-    config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../conf")
-    @setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
-    @version = YAML.load(ERB.new(File.read(config_file_dir + "/version.yml")).result)
-    @latest_version = @version["version"]["validator"]
-    @log_file = @setting["api_log"]["path"] + "/validator.log"
+  def initialize
+    @setting = Rails.configuration.validator
+    @version = YAML.load(ERB.new(File.read(File.expand_path('../../conf/version.yml', __dir__))).result)
+    @latest_version = @version['version']['validator']
+    @log_file = @setting['api_log']['path'] + '/validator.log'
     @log = Logger.new(@log_file)
-
   end
   def submission_id_list(file_type)
     ret = {status: "success"}

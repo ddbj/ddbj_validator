@@ -1,4 +1,3 @@
-require 'yaml'
 require 'json'
 require 'json-schema'
 require_relative "common/error_builder"
@@ -7,47 +6,32 @@ require_relative "common/ncbi_eutils"
 class ValidatorBase
 
   def initialize
-    @conf = read_common_config(File.absolute_path(File.dirname(__FILE__) + "/../../conf"))
+    @conf = read_common_config
     @validation_config = {}
   end
 
   #
-  # 共通設定ファイルの読み込み
+  # config/validator.yml (env 別セクションを Rails.configuration.validator が
+  # マージ済み) を各 validator が期待する shape に整えて返す。
   #
-  # ==== Args
-  # config_file_dir: 設定ファイル設置ディレクトリ
-  #
-  #
-  def read_common_config (config_file_dir)
-    config = {}
-    begin
-      setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
-      config[:sparql_config] = setting["sparql_endpoint"]
-      if setting["ddbj_rdb"].nil? \
-        || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == "" \
-        || setting["ddbj_rdb"]["pg_port"].nil? || setting["ddbj_rdb"]["pg_port"] == "" \
-        || setting["ddbj_rdb"]["pg_user"].nil? || setting["ddbj_rdb"]["pg_user"] == "" \
-        || setting["ddbj_rdb"]["pg_pass"].nil? || setting["ddbj_rdb"]["pg_pass"] == ""
-        config[:ddbj_db_config] = nil
-      else
-        config[:ddbj_db_config] = setting["ddbj_rdb"]
-      end
-      # parser settings for trad
-      if setting["ddbj_parser"].nil? || setting["ddbj_parser"]["parser_api_url"].nil? || setting["ddbj_parser"]["parser_api_url"] == ""
-        config[:ddbj_parser_config] = nil
-      else
-        config[:ddbj_parser_config] = setting["ddbj_parser"]["parser_api_url"]
-      end
-      config[:named_graph_uri] = setting["named_graph_uri"]
-      config[:biosample] = setting["biosample"]
-      NcbiEutils.api_key = setting.dig("eutils_api_key", "key")
-      config[:log_dir] = setting["api_log"]["path"]
-      config
-    rescue => ex
-      message = "Failed to parse the setting file. Please check the config file below.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    end
+  def read_common_config
+    setting = Rails.configuration.validator
+
+    NcbiEutils.api_key = setting.dig('eutils_api_key', 'key')
+
+    db = setting['ddbj_rdb']
+    db_configured = db && %w[pg_host pg_port pg_user pg_pass].all? { db[it].to_s != '' }
+
+    parser_url = setting.dig('ddbj_parser', 'parser_api_url').to_s
+
+    {
+      sparql_config:       setting['sparql_endpoint'],
+      ddbj_db_config:      db_configured ? db : nil,
+      ddbj_parser_config:  parser_url.empty? ? nil : parser_url,
+      named_graph_uri:     setting['named_graph_uri'],
+      biosample:           setting['biosample'],
+      log_dir:             setting.dig('api_log', 'path')
+    }
   end
 
   #

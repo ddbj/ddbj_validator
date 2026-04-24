@@ -1,0 +1,54 @@
+# Validator 全体の実行時設定。
+#
+# - development / test: ENV か固定値。秘密情報は入れない。
+# - staging / production: 全て Rails.application.credentials から読む。
+#   credentials 編集: `bin/rails credentials:edit --environment <env>`
+default: &default
+  api_log:
+    path: <%= ENV.fetch('DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR', '../logs/validator/') %>
+  biosample:
+    package_version: '1.5.0'
+
+development: &dev
+  <<: *default
+  sparql_endpoint:
+    master_endpoint: <%= ENV.fetch('DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql') %>
+  named_graph_uri:
+    taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy
+  ddbj_rdb:
+    pg_host:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_HOST'] %>
+    pg_port:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PORT'] %>
+    pg_user:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_USER'] %>
+    pg_pass:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PASSWD'] %>
+    pg_timeout: '30'
+  ddbj_parser:
+    parser_api_url: <%= ENV['DDBJ_PARSER_APP_URL'] %>
+  eutils_api_key:
+    key: your_api_key
+  monitoring:
+    ssub_id: SSUB009526
+
+test:
+  <<: *dev
+
+staging: &deployed
+  <<: *default
+  sparql_endpoint:
+    master_endpoint: <%= Rails.application.credentials.dig(:virtuoso, :endpoint) %>
+  named_graph_uri:
+    taxonomy: <%= Rails.application.credentials.dig(:virtuoso, :taxonomy_graph) %>
+  ddbj_rdb:
+    pg_host:    <%= Rails.application.credentials.dig(:postgres, :host) %>
+    pg_port:    <%= Rails.application.credentials.dig(:postgres, :port) %>
+    pg_user:    <%= Rails.application.credentials.dig(:postgres, :user) %>
+    pg_pass:    <%= Rails.application.credentials.dig(:postgres, :password) %>
+    pg_timeout: <%= Rails.application.credentials.dig(:postgres, :timeout) || '30' %>
+  ddbj_parser:
+    parser_api_url: <%= Rails.application.credentials.dig(:ddbj_parser, :api_url) %>
+  eutils_api_key:
+    key: <%= Rails.application.credentials.eutils_api_key %>
+  monitoring:
+    ssub_id: <%= Rails.application.credentials.dig(:monitoring, :ssub_id) %>
+
+production:
+  <<: *deployed

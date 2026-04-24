@@ -10,8 +10,8 @@ class TestBioSampleValidator < Minitest::Test
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../data/biosample', __FILE__)
-    # DDBJ RDBを使用するテストするか否か。を設定ファイルから判定
-    setting = YAML.load(ERB.new(File.read(File.dirname(__FILE__) + "/../../../conf/validator.yml")).result)
+    # DDBJ RDBを使用するテストするか否か。を Rails 設定から判定
+    setting = Rails.configuration.validator
     @ddbj_db_mode = true
     if setting["ddbj_rdb"].nil? || setting["ddbj_rdb"]["pg_host"].nil? || setting["ddbj_rdb"]["pg_host"] == ""
       @ddbj_db_mode = false

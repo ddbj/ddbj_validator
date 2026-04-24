@@ -1,11 +1,9 @@
-require 'yaml'
 require_relative '../../../test_helpers'
 require 'validator/common/ncbi_eutils'
 
 class TestNcbiEutils < Minitest::Test
   def setup
-    setting = YAML.load(ERB.new(File.read(File.expand_path('../../../../../conf/validator.yml', __FILE__))).result)
-    NcbiEutils.api_key = setting.dig("eutils_api_key", "key")
+    NcbiEutils.api_key = Rails.configuration.validator.dig('eutils_api_key', 'key')
   end
 
   def test_exist_pubmed_id?

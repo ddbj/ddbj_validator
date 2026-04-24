@@ -8,10 +8,7 @@ class TestDDBJDbValidator < Minitest::Test
 
   def setup
     skip_unless_pg_configured
-    conf_dir = File.expand_path('../../../../../conf', __FILE__)
-    setting = YAML.load(ERB.new(File.read(conf_dir + "/validator.yml")).result)
-    db_config = setting["ddbj_rdb"]
-    @db_validator = DDBJDbValidator.new(db_config)
+    @db_validator = DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])
   end
 
   def test_valid_bioproject_id?

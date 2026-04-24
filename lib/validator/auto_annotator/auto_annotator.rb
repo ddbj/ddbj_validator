@@ -14,9 +14,8 @@ require File.expand_path('../../common/tsv_field_validator.rb', __FILE__)
 class AutoAnnotator
 
   def initialize
-    config_file_dir = File.absolute_path(File.dirname(__FILE__) + "/../../../conf")
-    @setting = YAML.load(ERB.new(File.read(config_file_dir + "/validator.yml")).result)
-    @log_file = @setting["api_log"]["path"] + "/validator.log"
+    @setting = Rails.configuration.validator
+    @log_file = @setting['api_log']['path'] + '/validator.log'
     @log = Logger.new(@log_file)
   end
 
