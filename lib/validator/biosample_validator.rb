@@ -79,7 +79,6 @@ class BioSampleValidator < ValidatorBase
       config[:country_list] = JSON.parse(File.read(pub_dir + "/docs/common/country_list.json"))
       config[:historical_country_list] = JSON.parse(File.read(pub_dir + "/docs/common/historical_country_list.json"))
       config[:valid_country_list] = config[:country_list] + config[:historical_country_list]
-      config[:exchange_country_list] = JSON.parse(File.read(config_file_dir + "/exchange_country_list.json"))
       config[:convert_date_format] = JSON.parse(File.read(config_file_dir + "/convert_date_format.json"))
       config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + "/ddbj_date_format.json"))
       config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + "/invalid_strain_value.json"))
