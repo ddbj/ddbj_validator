@@ -13,6 +13,7 @@ GEM
     date (3.5.1)
     dotenv (3.1.8)
     drb (2.2.3)
+    ffi (1.17.2)
     ffi (1.17.2-arm64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
     geocoder (1.8.6)
