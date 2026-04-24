@@ -10,4 +10,4 @@ RUN bundle config set --local without 'development test' && bundle install
 COPY ./ ./
 
 EXPOSE 3000
-CMD ["bundle", "exec", "puma", "-C", "/usr/src/ddbj_validator/conf/puma.rb", "-e", "development"]
+CMD ["bundle", "exec", "puma", "-C", "/usr/src/ddbj_validator/conf/puma.rb", "-e", "production"]
