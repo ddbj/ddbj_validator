@@ -620,8 +620,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute names", value: invalid_headers.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result
     end
   end
@@ -652,8 +651,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: missing_attr.keys.first},
           {key: "Attribute value", value: missing_attr[missing_attr.keys.first]}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
       false
     end
@@ -690,8 +688,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: all_attr_value.join(", ")}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -717,8 +714,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "package", value: ""}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -753,8 +749,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "package", value: package_name}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     else
       true
@@ -785,8 +780,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "sample_title", value: sample_title}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -814,8 +808,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "organism", value: organism}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -844,8 +837,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute names", value: not_predifined_attr_names.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -886,8 +878,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute names", value: missing_attr_names.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -922,8 +913,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Sample name", value: sample_name},
           {key: "Attribute names", value: attr_set.join(", ")}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         ret = false
       end
     end
@@ -957,8 +947,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute names", value: missing_attr_names.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -1011,8 +1000,7 @@ class BioSampleValidator < ValidatorBase
           location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
         end
         annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation, auto_annotation: true)
         result = false
       end
     end
@@ -1048,8 +1036,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -1113,11 +1100,10 @@ class BioSampleValidator < ValidatorBase
               location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
             end
             annotation.push(CommonUtils::create_suggested_annotation([ref], "Attribute value", location, true));
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
+            add_error(rule_code, annotation, auto_annotation: true)
           else #置換候補がないエラー
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
+            add_error(rule_code, annotation)
           end
-          @error_list.push(error_hash)
           result = false
         end
       rescue => ex #NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
@@ -1127,8 +1113,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute value", value: attr_val},
           {key: "Message", value: "Validation processing failed because connection to NCBI service failed." }
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, false)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -1168,8 +1153,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: "bioproject_id"},
           {key: "Attribute value", value: bioproject_accession}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -1227,8 +1211,7 @@ class BioSampleValidator < ValidatorBase
         location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
       end
       annotation.push(CommonUtils::create_suggested_annotation([annotated_name], "Attribute value", location, true));
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, auto_annotation: true)
       result = false
       false
     end
@@ -1259,8 +1242,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "geo_loc_name"},
         {key: "Attribute value", value: geo_loc_name}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -1297,8 +1279,7 @@ class BioSampleValidator < ValidatorBase
         location = @xml_convertor.xpath_from_attrname("lat_lon", line_num)
       end
       annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , true)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, auto_annotation: true)
     end
     result
   end
@@ -1341,8 +1322,7 @@ class BioSampleValidator < ValidatorBase
       {key: "geo_loc_name", value: geo_loc_name},
       {key: "lat_lon",      value: lat_lon}
     ]
-    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-    @error_list.push(error_hash)
+    add_error(rule_code, annotation)
     false
   end
 
@@ -1373,8 +1353,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "lat_lon"},
         {key: "Attribute value", value: lat_lon}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation , false)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -1466,12 +1445,8 @@ class BioSampleValidator < ValidatorBase
     end
 
     unless ret
-      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else #auto-annotation無
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      end
-      @error_list.push(error_hash)
+      auto = annotation.any? { it[:is_auto_annotation] }
+      add_error(rule_code, annotation, auto_annotation: auto)
     end
     ret
   end
@@ -1535,8 +1510,7 @@ class BioSampleValidator < ValidatorBase
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
     end #該当するtaxonomy_idが無かった場合は単なるエラー
-    error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation) #このルールではauto-annotation用のメッセージは表示しない
-    @error_list.push(error_hash)
+    add_error(rule_code, annotation) #このルールではauto-annotation用のメッセージは表示しない
     false
   end
 
@@ -1577,8 +1551,7 @@ class BioSampleValidator < ValidatorBase
       unless scientific_name.nil? # Scientific nameが取得できるならtaxonomy_idのscientific_nameを提案する(自動補正はしない)
         annotation.push({key: "Message", value: "Organism name of this taxonomy_id: " + scientific_name})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -1619,8 +1592,7 @@ class BioSampleValidator < ValidatorBase
         {key: "package", value: package_name},
         {key: "Message", value: message}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     else
       true
@@ -1682,8 +1654,7 @@ class BioSampleValidator < ValidatorBase
           {key: "sex", value: sex},
           {key: "Message", value: message}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     ret
@@ -1737,8 +1708,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attributes", value: multiple_list.map{|voucher|voucher[:attr_name]}.uniq.join(", ")},
           {key: "Values", value: values},
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         return false
       end
     end
@@ -1810,8 +1780,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "collection_date"},
         {key: "Attribute value", value: collection_date}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -1883,8 +1852,7 @@ class BioSampleValidator < ValidatorBase
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
       annotation.push(CommonUtils::create_suggested_annotation([attr_val_result], "Attribute value", location, true));
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, auto_annotation: true)
       result = false
     else
       result = true
@@ -1943,8 +1911,7 @@ class BioSampleValidator < ValidatorBase
         location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       end
       annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, auto_annotation: true)
       result = false
     end
     result
@@ -1981,8 +1948,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: attr_name},
         {key: "Attribute value", value: attr_val}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -2037,8 +2003,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute name", value: attr_name}
       ]
       annotation.push({key:"Suggestion",value: replaced})
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     elsif target == "attr_value" && replaced != attr_val
       annotation = [
@@ -2047,8 +2012,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute value", value: attr_val}
       ]
       annotation.push({key:"Suggestion",value: replaced})
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -2090,8 +2054,7 @@ class BioSampleValidator < ValidatorBase
         {key: "host", value: host},
         {key: "isolation_source", value: isolation_source}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       return false
     end
   end
@@ -2142,8 +2105,7 @@ class BioSampleValidator < ValidatorBase
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
       annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, auto_annotation: true)
       result = false
     elsif target == "attr_value" && replaced != attr_val #属性値のAuto-annotationが必要
       annotation = [
@@ -2157,8 +2119,7 @@ class BioSampleValidator < ValidatorBase
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
       annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, auto_annotation: true)
       result = false
     end
     result
@@ -2196,8 +2157,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute value", value: attr_val},
         {key: "Position", value: disp_attr_val}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -2233,8 +2193,7 @@ class BioSampleValidator < ValidatorBase
             {key: "Sample name", value: sample_data[:sample_name]},
             {key: "Title", value: sample_title}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result= false
         end
       end
@@ -2275,8 +2234,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Submitter ID", value: submitter_id},
         {key: "bioproject_id", value: bioproject_accession}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -2333,8 +2291,7 @@ class BioSampleValidator < ValidatorBase
             {key: "Sample name", value: sample["sample_name"]},
             {key: "Sample group without distinguishing attribute", value: group_idx.to_s}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
         group_idx += 1
         result = false
@@ -2371,8 +2328,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Sample name", value: sample_name},
           {key: "bioproject_id", value: bioproject_accession}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -2407,8 +2363,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: attr_name},
           {key: "Attribute value", value: attr_val}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     result
@@ -2445,8 +2400,7 @@ class BioSampleValidator < ValidatorBase
             {key: "Sample name", value: sample_name},
             {key: "Sample title", value: sample_data[:sample_title]} #sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result= false
         end
       end
@@ -2496,8 +2450,7 @@ class BioSampleValidator < ValidatorBase
             {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
             {key: "Attribute", value: biosample_data["attributes"]["bioproject_id"]}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     else
@@ -2550,8 +2503,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: "locus_tag_prefix"},
           {key: "Attribute value", value: locus_tag}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -2596,8 +2548,7 @@ class BioSampleValidator < ValidatorBase
           location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
         end
         annotation.push(CommonUtils::create_suggested_annotation([biosample_accession], "Attribute value", location, true))
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation, auto_annotation: true)
         result = false
       end
     end
@@ -2626,8 +2577,7 @@ class BioSampleValidator < ValidatorBase
           {key: "taxonomy_id", value: taxonomy_id},
           {key: "organism", value: organism}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -2667,8 +2617,7 @@ class BioSampleValidator < ValidatorBase
       result = false
     end
     if result == false
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -2695,8 +2644,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: "locus_tag_prefix"},
           {key: "Attribute value", value: locus_tag}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -2741,8 +2689,7 @@ class BioSampleValidator < ValidatorBase
           location = @xml_convertor.xpath_from_attrname(optional_attr, line_num) # TODO attr_no
         end
         annotation.push(CommonUtils::create_suggested_annotation([""], "Attribute value", location, true))
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -2766,8 +2713,7 @@ class BioSampleValidator < ValidatorBase
       annotation = [
         {key: "Sample name", value: sample_name}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -2812,8 +2758,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute name", value: "organism"},
           {key: "Attribute value", value: organism}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
     end
     result
   end
@@ -2865,12 +2810,8 @@ class BioSampleValidator < ValidatorBase
     end
 
     unless ret
-      unless annotation.find{|anno| anno[:is_auto_annotation] == true}.nil? #auto-annotation有
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation, true)
-      else #auto-annotation無
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      end
-      @error_list.push(error_hash)
+      auto = annotation.any? { it[:is_auto_annotation] }
+      add_error(rule_code, annotation, auto_annotation: auto)
     end
     ret
   end
@@ -2933,8 +2874,7 @@ class BioSampleValidator < ValidatorBase
         attr_no = " (Attribute no: #{attr_idx})"
         annotation.push({key: "Suggested value" + attr_no, value: has_linage_metagenome[:annotation_name]})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -2962,8 +2902,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "culture_collection"},
         {key: "Attribute value", value: culture_collection}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3011,8 +2950,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "specimen_voucher"},
         {key: "Attribute value", value: specimen_voucher}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3040,8 +2978,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "specimen_voucher"},
         {key: "Attribute value", value: specimen_voucher}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3089,8 +3026,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute", value: "bio_material"},
         {key: "Attribute value", value: bio_material}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3178,8 +3114,7 @@ class BioSampleValidator < ValidatorBase
         end
         annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true))
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3217,8 +3152,7 @@ class BioSampleValidator < ValidatorBase
       unless message == ""
         annotation.push({key: "Message", value: message})
       end
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3245,8 +3179,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: "gisaid_accession"},
           {key: "Attribute value", value: gisaid_accession}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -3283,8 +3216,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Sample name", value: biosample_data["attributes"]["sample_name"]},
           {key: "Message", value: "Difference from the attribute names and order in the first sample."}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     result
@@ -3311,8 +3243,7 @@ class BioSampleValidator < ValidatorBase
       annotation = [
         {key: "Package names", value: package_list.uniq.to_s}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -3343,8 +3274,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Missing attribute names", value: missing_attr_list.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -3391,8 +3321,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Attribute value(locus_tag_prefix)", value: locus_tag_prefix_values.join(", ")},
         {key: "Attribute value(bioproject_id)", value: bioproject_id_values.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -3437,8 +3366,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: "derived_from"},
           {key: "Invalid Accession IDs", value: invalid_id_list.join(", ")}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -3536,8 +3464,7 @@ class BioSampleValidator < ValidatorBase
         {key: "package", value: package_name},
         {key: "attibutes", value: mandatory_attr_list_to_message.join("/")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     ret
   end
@@ -3595,8 +3522,7 @@ class BioSampleValidator < ValidatorBase
           {key: "strain", value: strain.to_s},
           {key: "isolate", value: isolate.to_s}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
     end
     result
   end
@@ -3637,8 +3563,7 @@ class BioSampleValidator < ValidatorBase
           {key: "Attribute", value: "strain"},
           {key: "Attribute value", value: strain}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -3679,8 +3604,7 @@ class BioSampleValidator < ValidatorBase
         {key: "Sample name", value: sample_name},
         {key: "Attribute names", value: missing_attr_names.join(", ")}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       false
     end
   end
@@ -3690,7 +3614,7 @@ class BioSampleValidator < ValidatorBase
     return true unless organism = data.dig("attributes", "organism")
     return true unless organism.match?(/ sp\.\z/i)
 
-    @error_list.push CommonUtils.error_obj(@validation_config["ruleBS_R0140"], @data_file, [
+    add_error("BS_R0140", [
       {
         key:   "Sample name",
         value: data.dig("attributes", "sample_name")
@@ -3713,7 +3637,7 @@ class BioSampleValidator < ValidatorBase
     return true unless organism = data.dig("attributes", "organism")
     return true unless organism.start_with?(/uncultured /i)
 
-    @error_list.push CommonUtils.error_obj(@validation_config["ruleBS_R0141"], @data_file, [
+    add_error("BS_R0141", [
       {
         key:   "Sample name",
         value: data.dig("attributes", "sample_name")

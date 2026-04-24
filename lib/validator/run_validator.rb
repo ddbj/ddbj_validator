@@ -140,8 +140,7 @@ class RunValidator < ValidatorBase
           {key: "center name", value: center_name},
           {key: "Path", value: "//RUN/@center_name"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -166,8 +165,7 @@ class RunValidator < ValidatorBase
         {key: "Run name", value: run_label},
         {key: "Path", value: "#{title_path}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -195,8 +193,7 @@ class RunValidator < ValidatorBase
             {key: "filename", value: ""},
             {key: "Path", value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           result = false
         end
       end
@@ -228,8 +225,7 @@ class RunValidator < ValidatorBase
               {key: "filename", value: filename},
               {key: "Path", value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
             ]
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-            @error_list.push(error_hash)
+            add_error(rule_code, annotation)
             result = false
           end
         end
@@ -262,8 +258,7 @@ class RunValidator < ValidatorBase
               {key: "checksum", value: checksum},
               {key: "Path", value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
             ]
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-            @error_list.push(error_hash)
+            add_error(rule_code, annotation)
             result = false
           end
         end
@@ -296,8 +291,7 @@ class RunValidator < ValidatorBase
         {key: "filetypes", value: filetype_list.to_s},
         {key: "Path", value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result
@@ -331,8 +325,7 @@ class RunValidator < ValidatorBase
         {key: "filetypes", value: org_filetype_list.to_s},
         {key: "Path", value: "//RUN[#{line_num}]/#{filetype_path.gsub('//', '')}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
       result = false
     end
     result

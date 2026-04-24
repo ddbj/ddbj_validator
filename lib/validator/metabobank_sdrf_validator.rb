@@ -115,8 +115,7 @@ class MetaboBankSdrfValidator < ValidatorBase
         annotation.push({key: "Value", value: invalid[:value]})
       end
       annotation.push({key: "Invalid Position", value: invalid[:disp_txt]})
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end

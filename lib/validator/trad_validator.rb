@@ -297,8 +297,7 @@ class TradValidator < ValidatorBase
           {key: "Message", value: message},
           {key: "Location", value: "Line: #{hold_date_list.first[:line_no]}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation, source: @anno_file)
       end
     end
     ret
@@ -343,8 +342,7 @@ class TradValidator < ValidatorBase
       annotation = [
         {key: "Message", value: message},
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, source: @anno_file)
       false
     else
       true
@@ -435,8 +433,7 @@ class TradValidator < ValidatorBase
       end
       if valid_flag == false
         ret = false
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation, source: @anno_file)
       end
     end
     ret
@@ -469,8 +466,7 @@ class TradValidator < ValidatorBase
           {key: "Location", value: "Line: #{organism[:line_no]}"},
           {key: "taxonomy_id", value: organism[:tax_id]}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation, source: @anno_file)
       end
       if valid_flag == false
         ret = false
@@ -561,8 +557,7 @@ class TradValidator < ValidatorBase
         {key: "Location", value: "Line: #{line.join(", ")}"}
       ]
       annotation.push({key: "Message", value: message}) unless message == ""
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, source: @anno_file)
     end
     ret
   end
@@ -598,8 +593,7 @@ class TradValidator < ValidatorBase
         {key: "annotation file", value: @anno_file},
         {key: "fasta file", value: @seq_file}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], "#{@anno_file}, #{@seq_file}", annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, source: "#{@anno_file}, #{@seq_file}")
       ret = false
     end
     # 個別のerror/warningからエラーメッセージを追加する
@@ -622,12 +616,8 @@ class TradValidator < ValidatorBase
       annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
       annotation.push({key: "Message", value: msg[:message]})
       parser_rule_code = msg[:code]
-      if @conf[:validation_parser_config]["rule" + parser_rule_code].nil?
-        error_hash = CommonUtils::error_obj(ddbj_parser_rule(msg), "#{@anno_file}, #{@seq_file}", annotation)
-      else
-        error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
-      end
-      @error_list.push(error_hash)
+      rule = @conf[:validation_parser_config]["rule" + parser_rule_code] || ddbj_parser_rule(msg)
+      add_raw_error(rule, annotation, source: "#{@anno_file}, #{@seq_file}")
     end
     ret
   end
@@ -665,8 +655,7 @@ class TradValidator < ValidatorBase
         {key: "annotation file", value: @anno_file},
         {key: "fasta file", value: @seq_file}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], "#{@anno_file}, #{@seq_file}", annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, source: "#{@anno_file}, #{@seq_file}")
       ret = false
     end
     # 個別のerror/warningからエラーメッセージを追加する
@@ -679,12 +668,8 @@ class TradValidator < ValidatorBase
         {key: "Message", value: msg[:message]}
       ]
       parser_rule_code = msg[:code]
-      if @conf[:validation_parser_config]["rule" + parser_rule_code].nil?
-        error_hash = CommonUtils::error_obj(ddbj_parser_rule(msg), "#{@anno_file}, #{@seq_file}", annotation)
-      else
-        error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
-      end
-      @error_list.push(error_hash)
+      rule = @conf[:validation_parser_config]["rule" + parser_rule_code] || ddbj_parser_rule(msg)
+      add_raw_error(rule, annotation, source: "#{@anno_file}, #{@seq_file}")
     end
     ret
   end
@@ -722,8 +707,7 @@ class TradValidator < ValidatorBase
         {key: "annotation file", value: @anno_file},
         {key: "fasta file", value: @seq_file}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], "#{@anno_file}, #{@seq_file}", annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation, source: "#{@anno_file}, #{@seq_file}")
       ret = false
     end
     # 個別のerror/warningからエラーメッセージを追加する
@@ -736,12 +720,8 @@ class TradValidator < ValidatorBase
       annotation.push({key: "Location", value: msg[:location]}) if msg[:location]
       annotation.push({key: "Message", value: msg[:message]})
       parser_rule_code = msg[:code]
-      if @conf[:validation_parser_config]["rule" + parser_rule_code].nil?
-        error_hash = CommonUtils::error_obj(ddbj_parser_rule(msg), "#{@anno_file}, #{@seq_file}", annotation)
-      else
-        error_hash = CommonUtils::error_obj(@conf[:validation_parser_config]["rule" + parser_rule_code], "#{@anno_file}, #{@seq_file}", annotation)
-      end
-      @error_list.push(error_hash)
+      rule = @conf[:validation_parser_config]["rule" + parser_rule_code] || ddbj_parser_rule(msg)
+      add_raw_error(rule, annotation, source: "#{@anno_file}, #{@seq_file}")
     end
     ret
   end
@@ -987,8 +967,7 @@ class TradValidator < ValidatorBase
         {key: "File name", value: @anno_file}
       ]
       annotation.push({key: "Message", value: message}) unless message == ""
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
 
     result
@@ -1035,8 +1014,7 @@ class TradValidator < ValidatorBase
         {key: "File name", value: @anno_file},
         {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -1082,8 +1060,7 @@ class TradValidator < ValidatorBase
         {key: "File name", value: @anno_file},
         {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -1125,8 +1102,7 @@ class TradValidator < ValidatorBase
         {key: "File name", value: @anno_file},
         {key: "Location", value: "Line: #{line_no_list.join(", ")}"}
       ]
-      error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-      @error_list.push(error_hash)
+      add_error(rule_code, annotation)
     end
     result
   end
@@ -1318,8 +1294,7 @@ class TradValidator < ValidatorBase
             {key: "Location", value: "Line: #{line[:line_no]}"}
           ]
           annotation.push({key: "Message", value: message}) unless message == ""
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
@@ -1382,8 +1357,7 @@ class TradValidator < ValidatorBase
               {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
             ]
             annotation.push({key: "Message", value: "BioSample[#{biosample_id})] has '#{attribute_name}' attribute value, but qualifier '#{qualifier_name}' is not used."})
-            error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-            @error_list.push(error_hash)
+            add_error(rule_code, annotation)
           end
         end
       end
@@ -1480,8 +1454,7 @@ class TradValidator < ValidatorBase
             {key: "File name", value: @anno_file},
             {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
 
@@ -1495,8 +1468,7 @@ class TradValidator < ValidatorBase
           {key: "File name", value: @anno_file},
           {key: "Location", value: "Line: #{biosample_line[:line_no]}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
 
@@ -1553,8 +1525,7 @@ class TradValidator < ValidatorBase
           {key: "File name", value: @anno_file},
           {key: "Location", value: "Line: #{error_line[:line_no]}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     ret
@@ -1687,8 +1658,7 @@ class TradValidator < ValidatorBase
             {key: "Location", value: "Line: #{organism_line[:line_no]}"}
           ]
           annotation.push({key: "Message", value: message}) unless message == ""
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
@@ -1850,8 +1820,7 @@ class TradValidator < ValidatorBase
           {key: "File name", value: @anno_file},
           {key: "Location", value: "Line: #{lines.map{|row| row[:line_no].to_s}.join(", ")}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     end
     ret
@@ -1930,8 +1899,7 @@ class TradValidator < ValidatorBase
             {key: "Location", value: "Line: #{line_no}"},
             {key: "Message", value: message}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
@@ -1967,8 +1935,7 @@ class TradValidator < ValidatorBase
             {key: "File name", value: @anno_file},
             {key: "Location", value: "Line: #{location_list.sort.map{|line_no| line_no.to_s}.join(", ")}"}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
@@ -2060,8 +2027,7 @@ class TradValidator < ValidatorBase
           {key: "File name", value: @anno_file},
           {key: "Location", value: "Line: #{row[:line_no]}"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
       end
     }
     ret
@@ -2092,8 +2058,7 @@ class TradValidator < ValidatorBase
               {key: "File name", value: @anno_file},
               {key: "Location", value: "Line: #{row[:line_no]}"}
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
           ret = false
         end
       end

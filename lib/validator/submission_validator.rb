@@ -134,8 +134,7 @@ class SubmissionValidator < ValidatorBase
           {key: "center name", value: center_name},
           {key: "Path", value: "//SUBMISSION/@center_name"}
         ]
-        error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-        @error_list.push(error_hash)
+        add_error(rule_code, annotation)
         result = false
       end
     end
@@ -174,8 +173,7 @@ class SubmissionValidator < ValidatorBase
             {key: "HoldUntilDate", value: date_text},
             {key: "Path", value: "#{data_path}[#{idx + 1}]"} #順番を表示
           ]
-          error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @data_file, annotation)
-          @error_list.push(error_hash)
+          add_error(rule_code, annotation)
         end
       end
     end
