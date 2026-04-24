@@ -1,4 +1,3 @@
-require 'dotenv'
 require_relative '../../test_helpers'
 require 'validator/biosample_validator'
 require 'validator/common/coll_dump'
@@ -8,7 +7,6 @@ require 'validator/common/xml_convertor'
 class TestBioSampleValidator < Minitest::Test
   def setup
     skip_unless_virtuoso_available
-    Dotenv.load "../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../data/biosample', __FILE__)

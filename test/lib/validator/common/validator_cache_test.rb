@@ -1,4 +1,3 @@
-require 'dotenv'
 require_relative '../../../test_helpers'
 require 'validator/biosample_validator'
 require 'validator/common/validator_cache'
@@ -7,7 +6,6 @@ class TestValidatorCache < Minitest::Test
 
   def setup
     skip_unless_virtuoso_available
-    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     @validator = BioSampleValidator.new
   end
 

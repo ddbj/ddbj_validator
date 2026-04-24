@@ -1,11 +1,9 @@
 require 'json'
-require 'dotenv'
 require_relative '../../../test_helpers'
 require 'validator/common/insdc_nullability'
 
 class TestInsdcNullability < Minitest::Test
   def setup
-    Dotenv.load "../../../../../.env" unless ENV['IGNORE_DOTENV']
     conf_dir = File.expand_path('../../../../../conf/biosample', __FILE__)
     InsdcNullability.null_accepted        = JSON.parse(File.read("#{conf_dir}/null_accepted.json"))
     InsdcNullability.null_not_recommended = JSON.parse(File.read("#{conf_dir}/null_not_recommended.json"))

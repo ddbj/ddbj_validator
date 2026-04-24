@@ -9,7 +9,6 @@ desc 'Run each test file in its own process. Useful when a test leaks state or h
 task 'test:per_file' do
   require 'fileutils'
 
-  ENV['IGNORE_DOTENV']                        ||= '1'
   ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR']   = File.join(__dir__, 'logs')
 
   FileUtils.mkdir_p(ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'])
