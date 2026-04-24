@@ -1,8 +1,8 @@
 require 'yaml'
 require 'json'
 require 'json-schema'
-require File.dirname(__FILE__) + "/common/error_builder.rb"
-require File.dirname(__FILE__) + "/common/ncbi_eutils.rb"
+require_relative "common/error_builder"
+require_relative "common/ncbi_eutils"
 
 class ValidatorBase
 

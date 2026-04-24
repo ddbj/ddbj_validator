@@ -1,7 +1,7 @@
 require 'roo'
 require 'csv'
 require 'fileutils'
-require File.dirname(__FILE__) + "/insdc_nullability.rb"
+require_relative "insdc_nullability"
 
 #
 # A class for convert from excel sheet to tsv files

@@ -2,8 +2,8 @@ require 'rubygems'
 require 'json'
 require 'erb'
 require 'logger'
-require File.dirname(__FILE__) + "/../validator/common/sparql_base.rb"
-require File.dirname(__FILE__) + "/../validator/common/insdc_nullability.rb"
+require_relative "../validator/common/sparql_base"
+require_relative "../validator/common/insdc_nullability"
 
 class Package < SPARQLBase
 

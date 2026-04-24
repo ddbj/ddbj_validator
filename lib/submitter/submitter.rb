@@ -1,9 +1,9 @@
 require 'logger'
 require 'nokogiri'
 require 'yaml'
-require File.dirname(__FILE__) + "/biosample_submitter.rb"
-require File.dirname(__FILE__) + "/bioproject_submitter.rb"
-require File.dirname(__FILE__) + "/dra_submitter.rb"
+require_relative "biosample_submitter"
+require_relative "bioproject_submitter"
+require_relative "dra_submitter"
 
 class Submitter
   # constructor

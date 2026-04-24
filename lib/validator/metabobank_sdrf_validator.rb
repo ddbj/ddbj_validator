@@ -5,10 +5,10 @@ require 'ostruct'
 require 'date'
 require 'net/http'
 require 'json-schema'
-require File.dirname(__FILE__) + "/base.rb"
-require File.dirname(__FILE__) + "/common/insdc_nullability.rb"
-require File.dirname(__FILE__) + "/common/tsv_column_validator.rb"
-require File.dirname(__FILE__) + "/common/file_parser.rb"
+require_relative "base"
+require_relative "common/insdc_nullability"
+require_relative "common/tsv_column_validator"
+require_relative "common/file_parser"
 
 #
 # A class for MetaboBank SDRF validation

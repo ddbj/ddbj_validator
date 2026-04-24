@@ -4,7 +4,7 @@ require 'erb'
 require 'ostruct'
 require 'date'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/../base.rb"
+require_relative "../base"
 
 #
 # XMLの変換処理を行うクラス

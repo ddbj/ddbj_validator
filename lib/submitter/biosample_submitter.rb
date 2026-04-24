@@ -1,6 +1,6 @@
 require 'rubygems'
 require 'nokogiri'
-require File.dirname(__FILE__) + "/base.rb"
+require_relative "base"
 
 class BioSampleSubmitter < SubmitterBase
   BIOSAMPLE_DB_NAME = "biosample"
