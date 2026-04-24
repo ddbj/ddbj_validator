@@ -2118,29 +2118,20 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_ascii_attribute_value (rule_code, sample_name, attr_name, attr_val, line_num)
-    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return true if attr_val.ascii_only?
 
-    result = true
-    unless attr_val.ascii_only?
-      disp_attr_val = +"" #属性値のどこにnon ascii文字があるか示すメッセージを作成
-      attr_val.chars.each_with_index do |ch, idx|
-        if ch.ascii_only?
-          disp_attr_val << ch.to_s
-        else
-          disp_attr_val << '[### Non-ASCII character ###]'
-        end
-      end
+    # 属性値のどこにnon ascii文字があるか示すメッセージを作成
+    disp_attr_val = attr_val.chars.map {|ch| ch.ascii_only? ? ch : '[### Non-ASCII character ###]' }.join
 
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Attribute", value: attr_name},
-        {key: "Attribute value", value: attr_val},
-        {key: "Position", value: disp_attr_val}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    annotation = [
+      {key: "Sample name",     value: sample_name},
+      {key: "Attribute",       value: attr_name},
+      {key: "Attribute value", value: attr_val},
+      {key: "Position",        value: disp_attr_val}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -2199,24 +2190,24 @@ class BioSampleValidator < ValidatorBase
     return nil if CommonUtils::null_value?(bioproject_accession)
     return nil if submitter_id.nil?
 
-    result = true
-    if @cache.nil? || @cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession) == false #cache値がnilの可能性があるためhas_keyでチェック
+    # cache 値が nil の可能性があるため has_key で判定する
+    if @cache.nil? || !@cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
       ret = @db_validator.get_bioproject_referenceable_submitter_ids(bioproject_accession)
       @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession, ret)
     else
       ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
     end
-    #SubmitterIDが一致しない場合はNG
-    result = false if !ret.nil? && !ret.include?(submitter_id)
-    if result == false
-      annotation = [
-        {key: "Sample name", value: sample_name},
-        {key: "Submitter ID", value: submitter_id},
-        {key: "bioproject_id", value: bioproject_accession}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+
+    # SubmitterID が取得できない or 一致していれば OK
+    return true if ret.nil? || ret.include?(submitter_id)
+
+    annotation = [
+      {key: "Sample name",   value: sample_name},
+      {key: "Submitter ID",  value: submitter_id},
+      {key: "bioproject_id", value: bioproject_accession}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -2295,23 +2286,21 @@ class BioSampleValidator < ValidatorBase
   #
   def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
     return nil if CommonUtils::null_value?(bioproject_accession)
-    result  = true
+
     if @cache.nil? || @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession).nil?
       is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
       @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession, is_umbrella)
     else
       is_umbrella = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession)
     end
+    return true unless is_umbrella
 
-    if is_umbrella == true #NG
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "bioproject_id", value: bioproject_accession}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    annotation = [
+      {key: "Sample name",   value: sample_name},
+      {key: "bioproject_id", value: bioproject_accession}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -2328,25 +2317,22 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def non_integer_attribute_value (rule_code, sample_name, attr_name, attr_val, int_attr, line_num)
-    return nil if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    return nil  if CommonUtils::blank?(attr_name) || CommonUtils::null_value?(attr_val)
+    # 整数型の属性であり有効な入力値がある場合だけチェック
+    return true unless int_attr.include?(attr_name)
 
-    result =  true
-    if int_attr.include?(attr_name) && !(CommonUtils.null_value?(attr_val))# 整数型の属性であり有効な入力値がある
-      begin
-        Integer(attr_val)
-      rescue ArgumentError
-        result = false
-      end
-      if result == false
-        annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: attr_name},
-          {key: "Attribute value", value: attr_val}
-        ]
-        add_error(rule_code, annotation)
-      end
+    begin
+      Integer(attr_val)
+      return true
+    rescue ArgumentError
+      annotation = [
+        {key: "Sample name",     value: sample_name},
+        {key: "Attribute",       value: attr_name},
+        {key: "Attribute value", value: attr_val}
+      ]
+      add_error(rule_code, annotation)
+      false
     end
-    result
   end
 
   #
@@ -2616,18 +2602,16 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_locus_tag_prefix_format (rule_code, sample_name, locus_tag, line_num)
-    return nil if CommonUtils::null_value?(locus_tag)
-    result = true
-    if locus_tag.size < 3 || locus_tag.size > 12 || !(locus_tag =~ /^[0-9a-zA-Z]+$/) || locus_tag =~ /^[0-9]+/
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "locus_tag_prefix"},
-          {key: "Attribute value", value: locus_tag}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return nil  if CommonUtils::null_value?(locus_tag)
+    return true if locus_tag.size.between?(3, 12) && locus_tag =~ /^[0-9a-zA-Z]+$/ && locus_tag !~ /^[0-9]+/
+
+    annotation = [
+      {key: "Sample name",     value: sample_name},
+      {key: "Attribute",       value: "locus_tag_prefix"},
+      {key: "Attribute value", value: locus_tag}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -3149,18 +3133,16 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def invalid_gisaid_accession (rule_code, sample_name, gisaid_accession, line_num)
-    return nil if CommonUtils::null_value?(gisaid_accession)
-    result = true
-    if gisaid_accession !~ /^EPI_[A-Z]+_[0-9]+$/
-      annotation = [
-          {key: "Sample name", value: sample_name},
-          {key: "Attribute", value: "gisaid_accession"},
-          {key: "Attribute value", value: gisaid_accession}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return nil  if CommonUtils::null_value?(gisaid_accession)
+    return true if gisaid_accession =~ /^EPI_[A-Z]+_[0-9]+$/
+
+    annotation = [
+      {key: "Sample name",     value: sample_name},
+      {key: "Attribute",       value: "gisaid_accession"},
+      {key: "Attribute value", value: gisaid_accession}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
 
