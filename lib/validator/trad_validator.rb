@@ -266,7 +266,7 @@ class TradValidator < ValidatorBase
       #  {key: "Message", value: "'hold_date' is written more than once."},
       #  {key: "Location", value: "Line no: #{hold_date_list.map{|row| row[:line_no]}.join(", ")}"}
       #]
-      #error_hash = CommonUtils::error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
+      #error_hash = ErrorBuilder.error_obj(@validation_config["rule" + rule_code], @anno_file, annotation)
       #@error_list.push(error_hash)
     if hold_date_list.size == 1 # 2つ以上の値が記載されている場合は、JP0125でエラーになるので無視
       hold_date = hold_date_list.first[:value]
@@ -392,7 +392,7 @@ class TradValidator < ValidatorBase
         if scientific_name != organism_name
           valid_flag = false
           location = {column: "value", line_no: line[:line_no]}
-          annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+          annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
         end
       elsif ret_org[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、trad用に分岐
         if organism_name.downcase == "environmental samples" #大量にある為除外
@@ -419,7 +419,7 @@ class TradValidator < ValidatorBase
               organism_info_list.push(line)
               unless scientific_name == organism_name
                 valid_flag = false
-                annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+                annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
               end
             else # ヒットしたinfraspecificな生物種が複数、またはない。"Bacillus"のような両方infraspecificではないケース
               valid_flag = false

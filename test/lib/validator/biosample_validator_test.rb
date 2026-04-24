@@ -880,7 +880,7 @@ class TestBioSampleValidator < Minitest::Test
     expect_taxid_annotation = "9606"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
     assert_equal expect_taxid_annotation, suggest_value
     ## exist but not correct as scientific name
     ret = exec_validator("taxonomy_error_warning", "BS_R0045", "sampleA", "Anabaena sp. PCC 7120", 1)
@@ -888,9 +888,9 @@ class TestBioSampleValidator < Minitest::Test
     expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
     assert_equal expect_taxid_annotation, suggest_value
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "organism")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "organism")
     assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case
     ret = exec_validator("taxonomy_error_warning", "BS_R0045", "sampleA", "nostoc sp. pcc 7120 = FACHB-418", 1)
@@ -898,9 +898,9 @@ class TestBioSampleValidator < Minitest::Test
     expect_organism_annotation = "Nostoc sp. PCC 7120 = FACHB-418"
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "taxonomy_id")
     assert_equal expect_taxid_annotation, suggest_value
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "organism")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "organism")
     assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     ret = exec_validator("taxonomy_error_warning", "BS_R0045", "sampleA", "mouse", 1)
@@ -1960,13 +1960,13 @@ jkl\"  "
     ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "Homo Sapiens", 8, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
     assert_equal "Homo sapiens", suggest_value
     ## synonym
     ret = exec_validator("taxonomy_warning", "BS_R0105", "SampleA", "Anabaena sp. PCC 7120", 8, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = CommonUtils::get_auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], "component_organism")
     assert_equal "Nostoc sp. PCC 7120 = FACHB-418", suggest_value
 
     # nil case

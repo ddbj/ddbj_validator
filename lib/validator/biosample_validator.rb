@@ -24,6 +24,11 @@ class BioSampleValidator < ValidatorBase
   attr_reader :error_list
   attr_reader :conf
   DEFAULT_PACKAGE_VERSION = "1.5.0"
+
+  # クラス読み込み時に lib/validator/sparql/*.rq を ERB コンパイルしてキャッシュする。
+  SPARQL = Dir["#{__dir__}/sparql/*.rq"].to_h {|path|
+    [File.basename(path, ".rq").to_sym, ERB.new(File.read(path)).freeze]
+  }.freeze
   #
   # Initializer
   #
@@ -171,8 +176,8 @@ class BioSampleValidator < ValidatorBase
         #attr name
         ret = special_character_included("BS_R0012", sample_name, attr_name, value, @conf[:special_chars], "attr_name", line_num)
         ret = invalid_data_format("BS_R0013", sample_name, attr_name, value, "attr_name", attr["attr_no"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          replaced_attr_name = CommonUtils::get_auto_annotation(@error_list.last)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+          replaced_attr_name = ErrorBuilder.auto_annotation(@error_list.last)
           #attrbutes(hash)の置換
           biosample_data["attributes"][replaced_attr_name] = biosample_data["attributes"][attr_name]
           biosample_data["attributes"].delete(attr_name)
@@ -184,14 +189,14 @@ class BioSampleValidator < ValidatorBase
         #attr value
         ret = special_character_included("BS_R0012", sample_name, attr_name, value, @conf[:special_chars], "attr_value", line_num)
         ret = invalid_data_format("BS_R0013", sample_name, attr_name, value, "attr_value",  attr["attr_no"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
         package_attr_list = get_attributes_of_package(biosample_data["package"], @package_version)
 
         ret = invalid_missing_value("BS_R0001", sample_name, attr_name, value, @conf[:null_accepted], @conf[:null_not_recommended], package_attr_list, attr["attr_no"], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
       end
     end
@@ -232,26 +237,26 @@ class BioSampleValidator < ValidatorBase
       biosample_data["attributes"].each do|attr_name, value|
         non_ascii_attribute_value("BS_R0058", sample_name, attr_name, value, line_num)
         ret = attribute_value_not_in_controlled_terms("BS_R0002", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
         invalid_attribute_value_for_controlled_terms("BS_R0138", sample_name, attr_name.to_s, value, @conf[:cv_attr], line_num)
         ret = invalid_publication_identifier("BS_R0011", sample_name, attr_name.to_s, value, @conf[:ref_attr], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
         # 日付属性をDDBJフォーマットに補正
         ret = invalid_datetime_format("BS_R0136", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
-        if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-          biosample_data["attributes"][attr_name] = value = CommonUtils::get_auto_annotation(@error_list.last)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+          biosample_data["attributes"][attr_name] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
         # 日付属性がDDBJフォーマットであるか(補正後)にチェック
         ret = invalid_datetime("BS_R0007", sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         non_integer_attribute_value("BS_R0093", sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
         if @use_db
           ret = bioproject_submission_id_replacement("BS_R0095", sample_name, biosample_data["attributes"]["bioproject_id"], line_num)
-          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-            biosample_data["attributes"]["bioproject_id"] = value = CommonUtils::get_auto_annotation(@error_list.last)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+            biosample_data["attributes"]["bioproject_id"] = value = ErrorBuilder.auto_annotation(@error_list.last)
           end
         end
       end
@@ -269,12 +274,12 @@ class BioSampleValidator < ValidatorBase
           ret = taxonomy_name_and_id_not_match("BS_R0004", sample_name, taxonomy_id, input_organism, line_num)
         else
           ret = taxonomy_error_warning("BS_R0045", sample_name, input_organism, line_num)
-          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #auto annotation値がある
-            taxid_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #auto annotation値がある
+            taxid_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, "taxonomy_id")
             unless taxid_annotation.nil? #organismからtaxonomy_idが取得できたなら値を保持
               taxonomy_id = biosample_data["attributes"]["taxonomy_id"] =  taxid_annotation
             end
-            organism_annotation = CommonUtils::get_auto_annotation_with_target_key(@error_list.last, "organism")
+            organism_annotation = ErrorBuilder.auto_annotation_with_target_key(@error_list.last, "organism")
             unless organism_annotation.nil? #organismの補正があれば値を置き換える
               biosample_data["attributes"]["organism"] = organism_annotation
             end
@@ -292,23 +297,23 @@ class BioSampleValidator < ValidatorBase
       invalid_locus_tag_prefix_format("BS_R0099", sample_name, biosample_data["attributes"]["locus_tag_prefix"], line_num)
       duplicated_locus_tag_prefix("BS_R0091", sample_name, biosample_data["attributes"]["locus_tag_prefix"], @biosample_list, @submission_id, line_num) if @use_db
       ret = invalid_geo_loc_name_format("BS_R0094", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["geo_loc_name"] = ErrorBuilder.auto_annotation(@error_list.last)
       end
 
       invalid_bio_material_format("BS_R0118", sample_name, biosample_data["attributes"]["bio_material"], line_num)
       ret = invalid_bio_material("BS_R0119", sample_name, biosample_data["attributes"]["bio_material"], @institution_list, line_num)
-      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["bio_material"] = CommonUtils::get_auto_annotation(@error_list.last)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["bio_material"] = ErrorBuilder.auto_annotation(@error_list.last)
       end
 
       ret = invalid_country("BS_R0008", sample_name, biosample_data["attributes"]["geo_loc_name"], @conf[:valid_country_list], line_num)
-      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["geo_loc_name"] = CommonUtils::get_auto_annotation(@error_list.last)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["geo_loc_name"] = ErrorBuilder.auto_annotation(@error_list.last)
       end
       ret = invalid_lat_lon_format("BS_R0009", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
-      if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-        biosample_data["attributes"]["lat_lon"] = CommonUtils::get_auto_annotation(@error_list.last)
+      if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+        biosample_data["attributes"]["lat_lon"] = ErrorBuilder.auto_annotation(@error_list.last)
       end
       invalid_lat_lon("BS_R0139", sample_name, biosample_data["attributes"]["lat_lon"], line_num)
       invalid_host_organism_name("BS_R0015", sample_name, biosample_data["attributes"]["host_taxid"], biosample_data["attributes"]["host"], line_num)
@@ -330,15 +335,15 @@ class BioSampleValidator < ValidatorBase
         unless attr["culture_collection"].nil?
           invalid_culture_collection_format("BS_R0113", sample_name, attr["culture_collection"], line_num)
           ret = invalid_culture_collection("BS_R0114", sample_name, attr["culture_collection"], @institution_list, attr["attr_no"], line_num)
-          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-            attr["culture_collection"] = CommonUtils::get_auto_annotation(@error_list.last)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+            attr["culture_collection"] = ErrorBuilder.auto_annotation(@error_list.last)
           end
         end
         unless attr["specimen_voucher"].nil?
           invalid_specimen_voucher_format("BS_R0116", sample_name, attr["specimen_voucher"], line_num)
           ret = invalid_specimen_voucher("BS_R0117", sample_name, attr["specimen_voucher"], @institution_list, attr["attr_no"], line_num)
-          if ret == false && !CommonUtils::get_auto_annotation(@error_list.last).nil? #save auto annotation value
-            attr["specimen_voucher"] = CommonUtils::get_auto_annotation(@error_list.last)
+          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? #save auto annotation value
+            attr["specimen_voucher"] = ErrorBuilder.auto_annotation(@error_list.last)
           end
         end
       end
@@ -410,8 +415,7 @@ class BioSampleValidator < ValidatorBase
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name, version: package_version}
-      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attributes_of_package.rq", params)
+      sparql_query = SPARQL[:attributes_of_package].result_with_hash(params)
       result = sparql.query(sparql_query)
       attr_list = []
       result.each do |row|
@@ -467,8 +471,7 @@ class BioSampleValidator < ValidatorBase
     if @cache.nil? || @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name, version: package_version}
-      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/attribute_groups_of_package.rq", params)
+      sparql_query = SPARQL[:attribute_groups_of_package].result_with_hash(params)
       result = sparql.query(sparql_query)
       attr_group_list = []
       result.group_by {|row| row[:group_name] }.each do |group, item|
@@ -738,8 +741,7 @@ class BioSampleValidator < ValidatorBase
     if @cache.nil? || @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
       sparql = SPARQLBase.new(@conf[:sparql_config]["master_endpoint"])
       params = {package_name: package_name, version: package_version}
-      template_dir = File.absolute_path(File.dirname(__FILE__) + "/sparql")
-      sparql_query = CommonUtils::binding_template_with_hash("#{template_dir}/valid_package_name.rq", params)
+      sparql_query = SPARQL[:valid_package_name].result_with_hash(params)
       result = sparql.query(sparql_query)
       @cache.save(ValidatorCache::UNKNOWN_PACKAGE, package_name, result) unless @cache.nil?
     else
@@ -988,7 +990,7 @@ class BioSampleValidator < ValidatorBase
         else
           location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
         end
-        annotation.push(CommonUtils::create_suggested_annotation([replace_value], "Attribute value", location, true));
+        annotation.push(ErrorBuilder.suggested_annotation([replace_value], "Attribute value", location, true));
         add_error(rule_code, annotation, auto_annotation: true)
         result = false
       end
@@ -1083,7 +1085,7 @@ class BioSampleValidator < ValidatorBase
             else
               location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
             end
-            annotation.push(CommonUtils::create_suggested_annotation([ref], "Attribute value", location, true));
+            annotation.push(ErrorBuilder.suggested_annotation([ref], "Attribute value", location, true));
             add_error(rule_code, annotation, auto_annotation: true)
           else #置換候補がないエラー
             add_error(rule_code, annotation)
@@ -1194,7 +1196,7 @@ class BioSampleValidator < ValidatorBase
       else
         location = @xml_convertor.xpath_from_attrname("geo_loc_name", line_num)
       end
-      annotation.push(CommonUtils::create_suggested_annotation([annotated_name], "Attribute value", location, true));
+      annotation.push(ErrorBuilder.suggested_annotation([annotated_name], "Attribute value", location, true));
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
       false
@@ -1260,7 +1262,7 @@ class BioSampleValidator < ValidatorBase
                else
                  @xml_convertor.xpath_from_attrname("lat_lon", line_num)
                end
-    annotation.push(CommonUtils::create_suggested_annotation([insdc_latlon], "Attribute value", location, true));
+    annotation.push(ErrorBuilder.suggested_annotation([insdc_latlon], "Attribute value", location, true));
     add_error(rule_code, annotation, auto_annotation: true)
     false
   end
@@ -1369,7 +1371,7 @@ class BioSampleValidator < ValidatorBase
     if host_name.casecmp("human") == 0
       ret = false
       #"human"は"Homo sapiens"にauto-annotation
-      annotation.push(CommonUtils::create_suggested_annotation(["Homo sapiens"], "host", location, true));
+      annotation.push(ErrorBuilder.suggested_annotation(["Homo sapiens"], "host", location, true));
     else
       host_tax_id_not_integer = false
       begin
@@ -1393,7 +1395,7 @@ class BioSampleValidator < ValidatorBase
         else
           # tax_idからscientifin_nameが拾えればauto-annotation
           if !scientific_name.nil?
-            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true))
+            annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "host", location, true))
           end
           ret = false
         end
@@ -1410,7 +1412,7 @@ class BioSampleValidator < ValidatorBase
           scientific_name = org_ret[:scientific_name]
           #ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
           if scientific_name != host_name
-            annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "host", location, true));
+            annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "host", location, true));
             ret = false
           end
         elsif org_ret[:status] == "no exist"
@@ -1466,7 +1468,7 @@ class BioSampleValidator < ValidatorBase
         else
           location = @xml_convertor.xpath_from_attrname("organism", line_num)
         end
-        annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (organism)", [scientific_name], "organism", location, true))
       end
       annotation.push({key: "taxonomy_id", value: ""})
       if @data_format == "json" || @data_format == "tsv"
@@ -1484,7 +1486,7 @@ class BioSampleValidator < ValidatorBase
       else
         location = @xml_convertor.xpath_from_attrname("taxonomy_id", line_num)
       end
-      annotation.push(CommonUtils::create_suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation_with_key("Suggested value (taxonomy_id)", [ret[:tax_id]], "taxonomy_id", location, true))
     elsif ret[:status] == "multiple exist" #該当するtaxonomy_idが複数あった場合、taxonomy_idを入力を促すメッセージを出力
       msg = "Multiple taxonomies detected with the same organism name. Please provide the taxonomy_id to distinguish the duplicated names."
       annotation.push({key: "Message", value: msg + " taxonomy_id:[#{ret[:tax_id]}]"})
@@ -1563,7 +1565,7 @@ class BioSampleValidator < ValidatorBase
 
     if valid_result[:status] == "error"
       #パッケージに適したルールのエラーメッセージを取得
-      message = CommonUtils::error_msg(@validation_config, valid_result[:error_code], nil)
+      message = ErrorBuilder.error_msg(@validation_config, valid_result[:error_code], nil)
       annotation = [
         {key: "Sample name", value: sample_name},
         {key: "organism", value: organism},
@@ -1830,7 +1832,7 @@ class BioSampleValidator < ValidatorBase
       else
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
-      annotation.push(CommonUtils::create_suggested_annotation([attr_val_result], "Attribute value", location, true));
+      annotation.push(ErrorBuilder.suggested_annotation([attr_val_result], "Attribute value", location, true));
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     else
@@ -1889,7 +1891,7 @@ class BioSampleValidator < ValidatorBase
       else
         location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
       end
-      annotation.push(CommonUtils::create_suggested_annotation([attr_val], "Attribute value", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation([attr_val], "Attribute value", location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     end
@@ -2080,7 +2082,7 @@ class BioSampleValidator < ValidatorBase
       else
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute name", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation([replaced], "Attribute name", location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     elsif target == "attr_value" && replaced != attr_val #属性値のAuto-annotationが必要
@@ -2094,7 +2096,7 @@ class BioSampleValidator < ValidatorBase
       else
         location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
       end
-      annotation.push(CommonUtils::create_suggested_annotation([replaced], "Attribute value", location, true))
+      annotation.push(ErrorBuilder.suggested_annotation([replaced], "Attribute value", location, true))
       add_error(rule_code, annotation, auto_annotation: true)
       result = false
     end
@@ -2509,7 +2511,7 @@ class BioSampleValidator < ValidatorBase
         else
           location = @xml_convertor.xpath_from_attrname("bioproject_id", line_num)
         end
-        annotation.push(CommonUtils::create_suggested_annotation([biosample_accession], "Attribute value", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation([biosample_accession], "Attribute value", location, true))
         add_error(rule_code, annotation, auto_annotation: true)
         result = false
       end
@@ -2648,7 +2650,7 @@ class BioSampleValidator < ValidatorBase
         else
           location = @xml_convertor.xpath_from_attrname(optional_attr, line_num) # TODO attr_no
         end
-        annotation.push(CommonUtils::create_suggested_annotation([""], "Attribute value", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation([""], "Attribute value", location, true))
         add_error(rule_code, annotation)
         result = false
       end
@@ -2756,7 +2758,7 @@ class BioSampleValidator < ValidatorBase
         else
           location = @xml_convertor.xpath_from_attrname_with_index("component_organism", line_num, attr_no)
         end
-        annotation.push(CommonUtils::create_suggested_annotation([scientific_name], "component_organism", location, true));
+        annotation.push(ErrorBuilder.suggested_annotation([scientific_name], "component_organism", location, true));
         ret = false
       end
     elsif org_ret[:status] == "no exist" #該当するtaxonomy_idが無かった場合は単なるエラー
@@ -3070,7 +3072,7 @@ class BioSampleValidator < ValidatorBase
             location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
           end
         end
-        annotation.push(CommonUtils::create_suggested_annotation([replaced_value], "Attribute value", location, true))
+        annotation.push(ErrorBuilder.suggested_annotation([replaced_value], "Attribute value", location, true))
       end
       add_error(rule_code, annotation)
     end
@@ -3098,9 +3100,9 @@ class BioSampleValidator < ValidatorBase
       #パッケージに適したルールのエラーメッセージを取得
       message = ""
       if package_name.downcase == ("sars-cov-2.cl")
-        message = CommonUtils::error_msg(@validation_config, "BS_R0120", nil)
+        message = ErrorBuilder.error_msg(@validation_config, "BS_R0120", nil)
       elsif package_name.downcase == ("sars-cov-2.wwsurv")
-        message = CommonUtils::error_msg(@validation_config, "BS_R0121", nil)
+        message = ErrorBuilder.error_msg(@validation_config, "BS_R0121", nil)
       end
       annotation = [
         {key: "Sample name", value: sample_name},
