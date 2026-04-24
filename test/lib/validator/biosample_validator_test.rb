@@ -512,8 +512,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_geo_loc_name_format
-    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/country_list.json"))
-    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/historical_country_list.json"))
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../fixtures/conf/pub/docs/common/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../fixtures/conf/pub/docs/common/historical_country_list.json"))
     valid_country_list = country_list + historical_country_list
     #ok case
     ret = exec_validator("invalid_geo_loc_name_format", "BS_R0094", "SampleA", "Japan:Kanagawa, Hakone, Lake Ashi", valid_country_list, 1)
@@ -581,8 +581,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_country
-    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/country_list.json"))
-    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../../conf/pub/docs/common/historical_country_list.json"))
+    country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../fixtures/conf/pub/docs/common/country_list.json"))
+    historical_country_list = JSON.parse(File.read(File.dirname(__FILE__) + "/../../fixtures/conf/pub/docs/common/historical_country_list.json"))
     country_list = country_list + historical_country_list
     #ok case
     ret = exec_validator("invalid_country", "BS_R0008", "sampleA", "Japan:Kanagawa, Hakone, Lake Ashi", country_list, 1)
@@ -2019,7 +2019,7 @@ jkl\"  "
   end
 
   def test_invalid_culture_collection
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/coll_dump/coll_dump.txt")
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_culture_collection", "BS_R0114", "SampleA", "ATCC:1234", institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2096,7 +2096,7 @@ jkl\"  "
   end
 
   def test_invalid_specimen_voucher
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/coll_dump/coll_dump.txt")
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_specimen_voucher", "BS_R0117", "SampleA", "UAM:12345", institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2145,7 +2145,7 @@ jkl\"  "
   end
 
   def test_invalid_bio_material
-    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../../conf/coll_dump/coll_dump.txt")
+    institution_list = CommonUtils.new.parse_coll_dump(File.dirname(__FILE__) + "/../../fixtures/conf/coll_dump/coll_dump.txt")
     # ok case
     ret = exec_validator("invalid_bio_material", "BS_R0119", "SampleA", "ABRC:CS22676", institution_list, 1)
     assert_equal true, ret[:result]
