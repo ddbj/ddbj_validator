@@ -61,4 +61,4 @@ jobs:
       # -v で各テスト名を標準出力に流す。どのテストで詰まったかを CI ログから特定できるように
       # pub / coll_dump は test/test_helpers.rb が env 経由で test/fixtures を指すので、
       # ここで conf/pub にステージする必要はない
-      - run: bundle exec ruby test/run_all.rb -v
+      - run: bin/rails test -v
