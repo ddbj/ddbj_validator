@@ -13,9 +13,6 @@ GEM
     date (3.5.1)
     dotenv (3.1.8)
     drb (2.2.3)
-    geocoder (1.8.6)
-      base64 (>= 0.1.0)
-      csv (>= 3.0.0)
     haml (6.3.0)
       temple (>= 0.8.2)
       thor
@@ -114,7 +111,6 @@ PLATFORMS
 DEPENDENCIES
   csv
   dotenv
-  geocoder
   haml
   json-schema
   mail
