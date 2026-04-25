@@ -5,9 +5,6 @@ require 'rails/test_help'
 
 require 'webmock/minitest'
 
-# `require 'validator/foo'` でプロジェクトの lib/ 配下を参照できるよう LOAD_PATH に追加。
-$LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
-
 # localhost (Virtuoso / Postgres) だけ許可して、それ以外の外部 HTTP は全て stub 経由に縛る。
 WebMock.disable_net_connect!(allow_localhost: true)
 

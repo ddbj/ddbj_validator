@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/analysis_validator'
 
 class TestAnalysisValidator < Minitest::Test
   def setup

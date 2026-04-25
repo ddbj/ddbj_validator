@@ -1,6 +1,5 @@
 require 'fileutils'
 require 'test_helper'
-require 'validator/common/coll_dump'
 
 class TestCollDump < Minitest::Test
   def test_parse

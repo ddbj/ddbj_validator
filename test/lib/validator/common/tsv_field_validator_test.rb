@@ -1,6 +1,4 @@
 require 'test_helper'
-require 'validator/common/insdc_nullability'
-require 'validator/common/tsv_field_validator'
 
 class TestTsvFieldValidator < Minitest::Test
   def setup

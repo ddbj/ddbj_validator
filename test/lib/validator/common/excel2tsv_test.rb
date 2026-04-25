@@ -1,7 +1,5 @@
 require 'fileutils'
 require 'test_helper'
-require 'validator/common/insdc_nullability'
-require 'validator/common/excel2tsv'
 
 class TestExcel2Tsv < Minitest::Test
   def setup

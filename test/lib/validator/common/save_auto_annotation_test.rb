@@ -1,6 +1,4 @@
 require 'test_helper'
-require 'validator/biosample_validator'
-require 'validator/common/xml_convertor'
 
 # auto_annotationの補正が効いているかの検証
 # auto_annotationが効いているかを確認するため、補正された上で別の検証メソッドでエラーとなる値を用意し、補正値が使用されているかを確認

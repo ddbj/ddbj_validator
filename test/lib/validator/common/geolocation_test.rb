@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/common/geolocation'
 
 class TestGeolocation < Minitest::Test
   def test_format_insdc_latlon

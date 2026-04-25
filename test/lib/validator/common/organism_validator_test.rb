@@ -1,7 +1,6 @@
 require 'yaml'
 require 'erb'
 require 'test_helper'
-require 'validator/common/organism_validator'
 
 class TestOrganismValidator < Minitest::Test
   def setup

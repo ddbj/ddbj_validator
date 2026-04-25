@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/common/ddbj_db_validator'
 
 class TestDDBJDbValidator < Minitest::Test
   def setup

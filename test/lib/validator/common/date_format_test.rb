@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/common/date_format'
 
 class TestDateFormat < Minitest::Test
   def setup
