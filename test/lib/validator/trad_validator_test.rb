@@ -4,7 +4,6 @@ require 'test_helper'
 
 class TestTradValidator < Minitest::Test
   def setup
-    skip_unless_virtuoso_available
     @validator = TradValidator.new
     @test_file_dir = File.expand_path('../../../data/trad', __FILE__)
 

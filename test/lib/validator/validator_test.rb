@@ -3,7 +3,6 @@ require 'test_helper'
 
 class TestValidator < Minitest::Test
   def setup
-    skip_unless_virtuoso_available
     @validator = Validator.new
     @tmp_file_dir = File.expand_path('../../../data/tmp', __FILE__)
     @bs_test_file_dir = File.expand_path('../../../data/biosample', __FILE__)

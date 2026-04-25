@@ -2,7 +2,6 @@ require 'test_helper'
 
 class TestBioSampleValidator < Minitest::Test
   def setup
-    skip_unless_virtuoso_available
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../data/biosample', __FILE__)

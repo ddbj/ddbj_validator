@@ -27,8 +27,10 @@ development: &dev
 
 test:
   <<: *dev
-  # compose.test.yaml の Postgres は 15432 にバインドする (dev の Postgres と
-  # ぶつからないように port をずらしてある)。test 実行時は常にこちらを向く
+  # compose.test.yaml で立ち上がる Virtuoso / Postgres を必ず指す。
+  # Postgres は dev と port が衝突しないよう 15432 にずらしてある。
+  sparql_endpoint:
+    master_endpoint: http://localhost:8890/sparql
   ddbj_rdb:
     pg_host:    localhost
     pg_port:    15432

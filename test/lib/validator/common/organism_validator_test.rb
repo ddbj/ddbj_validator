@@ -4,7 +4,6 @@ require 'test_helper'
 
 class TestOrganismValidator < Minitest::Test
   def setup
-    skip_unless_virtuoso_available
     setting = Rails.configuration.validator
     @validator = OrganismValidator.new(setting['sparql_endpoint']['master_endpoint'], setting['named_graph_uri']['taxonomy'])
   end
