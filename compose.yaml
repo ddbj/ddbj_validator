@@ -9,7 +9,6 @@ services:
       - ${DDBJ_VALIDATOR_APP_PORT:-18840}:3000
     environment:
       TZ: Asia/Tokyo
-      RUBY_YJIT_ENABLE: "true"
       RAILS_ENV: ${RAILS_ENV}
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       WEB_CONCURRENCY: 4
