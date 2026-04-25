@@ -23,12 +23,14 @@ development: &dev
     pg_pass:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PASSWD'] %>
     pg_timeout: 30
   ddbj_parser:
-    parser_api_url: <%= ENV['DDBJ_PARSER_APP_URL'] %>
+    parser_api_url:
   monitoring:
     ssub_id: SSUB009526
 
 test:
   <<: *dev
+  ddbj_parser:
+    parser_api_url: http://ddbj-parser.stub/validate
 
 staging:
   <<: *default
@@ -44,8 +46,6 @@ staging:
     pg_user:    const
     pg_pass:    <%= Rails.application.credentials.dig(:postgres, :password) %>
     pg_timeout: 30
-  ddbj_parser:
-    parser_api_url:
   monitoring:
     ssub_id: SSUB004022
 
@@ -63,7 +63,5 @@ production:
     pg_user:    const
     pg_pass:    <%= Rails.application.credentials.dig(:postgres, :password) %>
     pg_timeout: 30
-  ddbj_parser:
-    parser_api_url:
   monitoring:
     ssub_id: SSUB004022

@@ -12,9 +12,6 @@ $LOAD_PATH.unshift(File.expand_path('../lib', __dir__))
 # localhost (Virtuoso / Postgres) だけ許可して、それ以外の外部 HTTP は全て stub 経由に縛る。
 WebMock.disable_net_connect!(allow_localhost: true)
 
-# test_ddbj_parser がエンドポイント設定済みの状態を前提にしているので、未設定なら stub URL を差し込む
-ENV['DDBJ_PARSER_APP_URL'] ||= 'http://ddbj-parser.stub/validate'
-
 # trad_validator の file_path_on_log_dir テストが log_dir セット済みを前提にしているので、
 # テストでは明示的に作成する (本番/開発はコンテナで埋まる)。
 ENV['DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR'] ||= File.expand_path('../logs', __dir__)
