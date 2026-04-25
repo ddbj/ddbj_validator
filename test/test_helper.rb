@@ -22,8 +22,6 @@ module DefaultHttpStubs
   def before_setup
     super
 
-    Rails.cache.clear
-
     # DBCLS TM medline: デフォルトは「該当 PubMed ID なし」(空 MedlineCitationSet を返す)
     WebMock.stub_request(:get, %r{\Ahttp://tm\.dbcls\.jp/medline/\d+\.json\z})
       .to_return(status: 200, body: '{"MedlineCitationSet":{}}')

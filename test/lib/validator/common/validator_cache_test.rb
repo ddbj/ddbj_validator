@@ -2,11 +2,18 @@ require 'test_helper'
 require 'validator/biosample_validator'
 
 # BioSampleValidator の各 rule が Rails.cache 経由でキャッシュを効かせていることの確認。
-# キャッシュ実体は memory_store + before_setup で都度 clear するので test 間は独立。
+# test env のデフォルトは :null_store なので、ここだけ MemoryStore に差し替えて検証する。
 class TestValidatorCache < Minitest::Test
   def setup
     skip_unless_virtuoso_available
+    @original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
     @validator = BioSampleValidator.new
+  end
+
+  def teardown
+    Rails.cache = @original_cache
+    super
   end
 
   def test_cache_invalid_host_organism_name
