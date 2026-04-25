@@ -1,4 +1,3 @@
-
 #
 # A class for DRA experiment validation
 #

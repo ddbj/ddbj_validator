@@ -1,4 +1,3 @@
-
 #
 # A class for MetaboBank IDF validation
 #
@@ -81,7 +80,6 @@ class MetaboBankIdfValidator < ValidatorBase
     # 不正な文字のチェック
     invalid_characters('MB_IR0024', idf_data)
   end
-
 
   #
   # rule:MB_IR0024

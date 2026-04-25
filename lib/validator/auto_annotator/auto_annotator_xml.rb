@@ -1,6 +1,5 @@
 require 'fileutils'
 
-
 #
 # A class for Auto-annotation. XML file base.
 #

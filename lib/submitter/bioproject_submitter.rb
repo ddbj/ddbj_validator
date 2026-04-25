@@ -1,4 +1,3 @@
-
 class BioProjectSubmitter < SubmitterBase
   BIOPROJECT_DB_NAME = 'bioproject'
 

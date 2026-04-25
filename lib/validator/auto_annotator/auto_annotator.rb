@@ -1,6 +1,5 @@
 require 'logger'
 
-
 # 元ファイルからAuto annotateしたファイルを生成して返す
 class AutoAnnotator
   def initialize

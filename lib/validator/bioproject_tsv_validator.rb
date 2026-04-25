@@ -1,4 +1,3 @@
-
 #
 # A class for BioProject validation
 #
@@ -94,7 +93,6 @@ class BioProjectTsvValidator < ValidatorBase
       invalid_file_format('BP_R0068', @data_format, ['tsv', 'json']) # baseのメソッドを呼び出し
       return
     end
-
 
     # 余分な記述のチェック
     missing_field_name('BP_R0062', bp_data)
@@ -336,7 +334,6 @@ class BioProjectTsvValidator < ValidatorBase
     add_error(rule_code, annotation)
     false
   end
-
 
   #
   # rule:BP_R0038

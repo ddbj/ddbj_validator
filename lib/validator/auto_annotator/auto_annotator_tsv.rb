@@ -1,6 +1,5 @@
 require 'fileutils'
 
-
 #
 # A class for Auto-annotation. TSV file base.
 #

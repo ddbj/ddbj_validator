@@ -1,4 +1,3 @@
-
 class BioSampleSubmitter < SubmitterBase
   BIOSAMPLE_DB_NAME = 'biosample'
 

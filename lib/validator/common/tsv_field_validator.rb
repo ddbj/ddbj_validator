@@ -1,4 +1,3 @@
-
 # BioProject/MetaboBank(IDF)のような最左列に項目名を記述するTSV(あるいはそれをJSONに変換した)形式を処理するクラス
 class TsvFieldValidator
   def initialize

@@ -1,4 +1,3 @@
-
 #
 # A class for BioProject validation
 #
@@ -26,7 +25,6 @@ class BioProjectValidator < ValidatorBase
       @use_db = false
     end
   end
-
 
   #
   # 各種設定ファイルの読み込み

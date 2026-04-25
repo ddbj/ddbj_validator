@@ -3,7 +3,6 @@ require 'logger'
 require 'yaml'
 require 'fileutils'
 
-
 # Validator main class
 class Validator
     @@filetype = %w[all_db biosample bioproject submission experiment run analysis jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf]

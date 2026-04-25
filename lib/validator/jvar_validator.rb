@@ -1,4 +1,3 @@
-
 #
 # A class for JVar validation
 #

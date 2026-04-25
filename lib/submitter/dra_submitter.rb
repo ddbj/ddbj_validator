@@ -1,4 +1,3 @@
-
 class DraSubmitter < SubmitterBase
   DRA_DB_NAME = 'drmdb'
 

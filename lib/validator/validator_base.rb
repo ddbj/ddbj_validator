@@ -1,4 +1,3 @@
-
 class ValidatorBase
   def initialize
     @conf = read_common_config

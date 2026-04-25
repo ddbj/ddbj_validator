@@ -1,4 +1,3 @@
-
 #
 # A class for MetaboBank SDRF validation
 #
@@ -79,7 +78,6 @@ class MetaboBankSdrfValidator < ValidatorBase
     # 不正な文字のチェック
     invalid_characters('MB_SR0030', sdrf_data)
   end
-
 
   #
   # rule:MB_SR0030
