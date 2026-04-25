@@ -13,7 +13,7 @@ services:
       RAILS_ENV: ${RAILS_ENV}
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       DDBJ_VALIDATOR_APP_UNICORN_PORT: 3000
-    user: ${UID:-0}:${GID:-0}
+    user: 0:0
     volumes:
       - ${PWD}:/usr/src/ddbj_validator
       - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/usr/src/ddbj_validator/shared
@@ -36,7 +36,7 @@ services:
       VIRT_SPARQL_MaxQueryCostEstimationTime: "-1"
     ports:
       - ${DDBJ_VALIDATOR_VIRTUOSO_PORT:-18841}:8890
-    user: ${UID:-0}:${GID:-0}
+    user: 0:0
     volumes:
       - ${PWD}/shared/config/virtuoso:/settings
       - ${PWD}/shared/data/virtuoso:/database
