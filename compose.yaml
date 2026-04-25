@@ -6,7 +6,7 @@ services:
     depends_on:
       - virtuoso
     ports:
-      - ${DDBJ_VALIDATOR_APP_PORT:-18840}:3000
+      - ${DDBJ_VALIDATOR_APP_PORT:-18840}:80
     environment:
       TZ: Asia/Tokyo
       RUBY_YJIT_ENABLE: "true"
