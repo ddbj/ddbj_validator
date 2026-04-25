@@ -547,24 +547,16 @@ class BioSampleValidator < ValidatorBase
   #
   def non_ascii_header_line (rule_code, sample_name, attribute_list, line_num)
     return if attribute_list.nil?
-    result = true
-    invalid_headers = []
-    attribute_list.each do |attr|
-      if !attr.keys.first.ascii_only?
-        invalid_headers.push(attr.keys.first)
-        result = false
-      end
-    end
-    if result
-      result
-    else
-      annotation = [
-        {key: 'Sample name', value: sample_name},
-        {key: 'Attribute names', value: invalid_headers.join(', ')}
-      ]
-      add_error(rule_code, annotation)
-      result
-    end
+
+    invalid_headers = attribute_list.map { it.keys.first }.reject(&:ascii_only?)
+    return true if invalid_headers.empty?
+
+    annotation = [
+      {key: 'Sample name', value: sample_name},
+      {key: 'Attribute names', value: invalid_headers.join(', ')}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -611,30 +603,24 @@ class BioSampleValidator < ValidatorBase
   #
   def multiple_attribute_values (rule_code, sample_name, attribute_list, multiple_attribute_values, line_num)
     return if attribute_list.nil?
-    result = true
 
-    # 属性名でグルーピング
-    # grouped = {"depth"=>[{"depth"=>"1m"}, {"depth"=>"2m"}], "elev"=>[{"elev"=>"-1m"}, {"elev"=>"-2m"}]}
-    grouped = attribute_list.group_by do |attr|
-      attr.keys.first
+    allow_multiple = multiple_attribute_values.select { it[:allow_multiple] == true }.map { it[:attribute_name] }
+
+    # 属性名でグルーピング: {"depth"=>[{"depth"=>"1m"}, {"depth"=>"2m"}], "elev"=>[{"elev"=>"-1m"}, ...]}
+    duplicates = attribute_list.group_by { it.keys.first }.reject {|name, values|
+      values.size < 2 || allow_multiple.include?(name)
+    }
+    return true if duplicates.empty?
+
+    duplicates.each do |name, values|
+      annotation = [
+        {key: 'Sample name', value: sample_name},
+        {key: 'Attribute', value: name},
+        {key: 'Attribute value', value: values.map { it[name] }.join(', ')}
+      ]
+      add_error(rule_code, annotation)
     end
-    allow_multiple_attr_list = multiple_attribute_values.select {|attr| attr[:allow_multiple] == true }.map {|attr| attr[:attribute_name] } # 複数記述を許可する属性名リスト
-    grouped.each do |attr_name, attr_values|
-      if attr_values.size >= 2 && !(allow_multiple_attr_list.include?(attr_name)) # 複数記述され、かつ複数許可許されていない属性
-        all_attr_value = [] # 属性値を列挙するためのリスト ex. ["1m", "2m"]
-        attr_values.each {|attr|
-          attr.each {|k, v| all_attr_value.push(v) if k == attr_name }
-        }
-        annotation = [
-          {key: 'Sample name', value: sample_name},
-          {key: 'Attribute', value: attr_name},
-          {key: 'Attribute value', value: all_attr_value.join(', ')}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
-    end
-    result
+    false
   end
 
   #
@@ -1047,27 +1033,17 @@ class BioSampleValidator < ValidatorBase
   def invalid_bioproject_accession (rule_code, sample_name, bioproject_accession, line_num)
     return nil if InsdcNullability.null_value?(bioproject_accession)
 
-    result = true
-    if bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-      # DDBJ管理の場合にはDBにIDがあるか検証する
-      if bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-        unless @db_validator.valid_bioproject_id?(bioproject_accession)
-          result = false
-        end
-      end
-    else
-      result = false
-    end
+    valid_format = bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
+    ddbj_managed = bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
+    return true if valid_format && (!ddbj_managed || @db_validator.valid_bioproject_id?(bioproject_accession))
 
-    if result == false
-      annotation = [
-          {key: 'Sample name', value: sample_name},
-          {key: 'Attribute', value: 'bioproject_id'},
-          {key: 'Attribute value', value: bioproject_accession}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: 'Sample name', value: sample_name},
+      {key: 'Attribute', value: 'bioproject_id'},
+      {key: 'Attribute value', value: bioproject_accession}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -1244,21 +1220,18 @@ class BioSampleValidator < ValidatorBase
   def invalid_lat_lon (rule_code, sample_name, lat_lon, line_num)
     return nil if InsdcNullability.null_value?(lat_lon)
 
-    result = true
     insdc_latlon = Geolocation.format_insdc_latlon(lat_lon)
     # INSDC の formatに直せなかった場合はnilが返るので、その場合にはエラー
     # BS_R0009でauto-annotationが行われている事が前提なので、このメソッドの入力値のままでなければ(=補正が発生していれば)エラー
-    if insdc_latlon.nil? || lat_lon != insdc_latlon
-      result = false
-      annotation = [
-        {key: 'Sample name', value: sample_name},
-        {key: 'Attribute', value: 'lat_lon'},
-        {key: 'Attribute value', value: lat_lon}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    return true if !insdc_latlon.nil? && lat_lon == insdc_latlon
+
+    annotation = [
+      {key: 'Sample name', value: sample_name},
+      {key: 'Attribute', value: 'lat_lon'},
+      {key: 'Attribute value', value: lat_lon}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -1744,7 +1717,6 @@ class BioSampleValidator < ValidatorBase
     return nil if attr_name == 'collection_date' && (InsdcNullability.null_not_recommended_value?(attr_val))
 
     attr_val_org = attr_val
-    result = true
 
     # DDBJ 日付型へのフォーマットを試みる
     attr_val = @date_format.format_date2ddbj(attr_val)
@@ -1760,22 +1732,21 @@ class BioSampleValidator < ValidatorBase
     end
 
     # 置換が発生した場合だけwarningを出す
-    if attr_val_org != attr_val
-      annotation = [
-        {key: 'Sample name', value: sample_name},
-        {key: 'Attribute', value: attr_name},
-        {key: 'Attribute value', value: attr_val_org}
-      ]
-      if @data_format == 'json' || @data_format == 'tsv'
-        location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
-      else
-        location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-      end
-      annotation.push(ErrorBuilder.suggested_annotation([attr_val], 'Attribute value', location, true))
-      add_error(rule_code, annotation, auto_annotation: true)
-      result = false
-    end
-    result
+    return true if attr_val_org == attr_val
+
+    annotation = [
+      {key: 'Sample name',     value: sample_name},
+      {key: 'Attribute',       value: attr_name},
+      {key: 'Attribute value', value: attr_val_org}
+    ]
+    location = if @data_format == 'json' || @data_format == 'tsv'
+                 auto_annotation_location(@data_format, line_num, attr_name, 'value')
+               else
+                 @xml_convertor.xpath_from_attrname(attr_name, line_num)
+               end
+    annotation.push(ErrorBuilder.suggested_annotation([attr_val], 'Attribute value', location, true))
+    add_error(rule_code, annotation, auto_annotation: true)
+    false
   end
 
   #
@@ -1798,19 +1769,15 @@ class BioSampleValidator < ValidatorBase
     # collection_dateは reporting level term属性なので "n.a." => "missing"への置換が行われない。"n.a."でもチェックスキップする
     return nil if attr_name == 'collection_date' && (InsdcNullability.null_not_recommended_value?(attr_val))
 
-    result = true
-    is_ddbj_format = @date_format.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
-    parsable_date = @date_format.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
-    if !(is_ddbj_format && parsable_date) # DDBJフォーマットであるか
-      result = false
-      annotation = [
-        {key: 'Sample name', value: sample_name},
-        {key: 'Attribute', value: attr_name},
-        {key: 'Attribute value', value: attr_val}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    return true if @date_format.ddbj_date_format?(attr_val) && @date_format.parsable_date_format?(attr_val)
+
+    annotation = [
+      {key: 'Sample name',     value: sample_name},
+      {key: 'Attribute',       value: attr_name},
+      {key: 'Attribute value', value: attr_val}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -1838,7 +1805,6 @@ class BioSampleValidator < ValidatorBase
       return nil
     end
 
-    result  = true
     special_chars.each do |target_val, replace_val|
       pos = 0
       while pos < replaced.length
@@ -1857,25 +1823,26 @@ class BioSampleValidator < ValidatorBase
         end
       end
     end
+
     if target == 'attr_name' && replaced != attr_name
       annotation = [
         {key: 'Sample name', value: sample_name},
-        {key: 'Attribute name', value: attr_name}
+        {key: 'Attribute name', value: attr_name},
+        {key: 'Suggestion', value: replaced}
       ]
-      annotation.push({key: 'Suggestion', value: replaced})
-      add_error(rule_code, annotation)
-      result = false
     elsif target == 'attr_value' && replaced != attr_val
       annotation = [
         {key: 'Sample name', value: sample_name},
         {key: 'Attribute', value: attr_name},
-        {key: 'Attribute value', value: attr_val}
+        {key: 'Attribute value', value: attr_val},
+        {key: 'Suggestion', value: replaced}
       ]
-      annotation.push({key: 'Suggestion', value: replaced})
-      add_error(rule_code, annotation)
-      result = false
+    else
+      return true
     end
-    result
+
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -1944,42 +1911,40 @@ class BioSampleValidator < ValidatorBase
       return nil
     end
 
-    result = true
     # 前後の空白除去 + タブ/改行/連続空白を 1 個の空白に圧縮
     replaced = replaced.squish
     # セル内の最初と最後が ' or " で囲われていたら削除 → 再度 strip
     if (replaced =~ /^"/ && replaced =~ /"$/) || (replaced =~ /^'/ && replaced =~ /'$/)
       replaced = replaced[1..-2].strip
     end
+
     if target == 'attr_name' && replaced != attr_name # 属性名のAuto-annotationが必要
       annotation = [
         {key: 'Sample name', value: sample_name},
         {key: 'Attribute name', value: attr_name}
       ]
-      if @data_format == 'json' || @data_format == 'tsv'
-        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'key')
-      else
-        location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
-      end
-      annotation.push(ErrorBuilder.suggested_annotation([replaced], 'Attribute name', location, true))
-      add_error(rule_code, annotation, auto_annotation: true)
-      result = false
+      location_kind = 'key'
+      suggestion_label = 'Attribute name'
     elsif target == 'attr_value' && replaced != attr_val # 属性値のAuto-annotationが必要
       annotation = [
         {key: 'Sample name', value: sample_name},
         {key: 'Attribute', value: attr_name},
         {key: 'Attribute value', value: attr_val}
       ]
-      if @data_format == 'json' || @data_format == 'tsv'
-        location = auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
-      else
-        location = @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
-      end
-      annotation.push(ErrorBuilder.suggested_annotation([replaced], 'Attribute value', location, true))
-      add_error(rule_code, annotation, auto_annotation: true)
-      result = false
+      location_kind = 'value'
+      suggestion_label = 'Attribute value'
+    else
+      return true
     end
-    result
+
+    location = if @data_format == 'json' || @data_format == 'tsv'
+                 auto_annotation_location_with_index(@data_format, line_num, attr_no, location_kind)
+               else
+                 @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
+               end
+    annotation.push(ErrorBuilder.suggested_annotation([replaced], suggestion_label, location, true))
+    add_error(rule_code, annotation, auto_annotation: true)
+    false
   end
 
   #
@@ -2024,29 +1989,28 @@ class BioSampleValidator < ValidatorBase
   def duplicated_sample_title_in_this_submission (rule_code, biosample_list)
     return nil if biosample_list.blank?
 
-    result = true
-    biosample_list_lite = []
-    biosample_list.each_with_index do |biosample_data, index|
-      index += 1
-      biosample_list_lite.push({
-        sample_name: biosample_data['attributes']['sample_name'],
-        sample_title: biosample_data['attributes']['sample_title'],
-        index: index
-      })
-    end
-    biosample_list_lite.group_by {|row| row[:sample_title] }.each do |sample_title, list|
-      if list.size > 1 # 重複あり
-        list.each do |sample_data|
-          annotation = [
-            {key: 'Sample name', value: sample_data[:sample_name]},
-            {key: 'Title', value: sample_title}
-          ]
-          add_error(rule_code, annotation)
-          result= false
-        end
+    duplicates = biosample_list
+      .map.with_index(1) {|biosample_data, index|
+        {
+          sample_name:  biosample_data['attributes']['sample_name'],
+          sample_title: biosample_data['attributes']['sample_title'],
+          index:        index
+        }
+      }
+      .group_by { it[:sample_title] }
+      .select {|_, rows| rows.size > 1 }
+    return true if duplicates.empty?
+
+    duplicates.each do |sample_title, rows|
+      rows.each do |row|
+        annotation = [
+          {key: 'Sample name', value: row[:sample_name]},
+          {key: 'Title',       value: sample_title}
+        ]
+        add_error(rule_code, annotation)
       end
     end
-    result
+    false
   end
 
   #
@@ -2099,48 +2063,25 @@ class BioSampleValidator < ValidatorBase
   def identical_attributes (rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.empty?
 
-    result = true
     # 同値比較しない基本属性
     keys_excluding = ['sample_name', 'sample_title', 'bioproject_id', 'description']
-    attribute_list = []
-    biosample_list.each do |biosample_data|
-      attribute_list.concat(biosample_data['attributes'].keys).uniq!
-    end
-    check_attribute_list = attribute_list - keys_excluding
-    bs_list = []
-    biosample_list.each_with_index do |biosample_data, current_idx|
-      bs_data = {}
-      check_attr_value_text = check_attribute_list.map {|attr_name|
-        val = biosample_data['attributes'][attr_name]
-        if val.nil?
-          ''
-        else
-          val
-        end
-      }.join(' ')
-      keys_excluding.each do |attr_name|
-        bs_data[attr_name] = biosample_data['attributes'][attr_name]
-      end
-      bs_data['check_attr_value_text'] = check_attr_value_text
-      bs_list.push(bs_data)
-    end
+    check_attribute_list = biosample_list.flat_map { it['attributes'].keys }.uniq - keys_excluding
 
-    group_by = bs_list.group_by {|row| row['check_attr_value_text'] }
-    group_idx = 1
-    group_by.each do |value_text, sample_list|
-      if sample_list.size > 1 # 重複がある
-        sample_list.each do |sample|
-          annotation = [
-            {key: 'Sample name', value: sample['sample_name']},
-            {key: 'Sample group without distinguishing attribute', value: group_idx.to_s}
-          ]
-          add_error(rule_code, annotation)
-        end
-        group_idx += 1
-        result = false
+    duplicates = biosample_list
+      .group_by {|biosample_data| check_attribute_list.map { biosample_data['attributes'][it].to_s }.join(' ') }
+      .select {|_, group| group.size > 1 }
+    return true if duplicates.empty?
+
+    duplicates.each_with_index do |(_, group), idx|
+      group.each do |biosample_data|
+        annotation = [
+          {key: 'Sample name', value: biosample_data['attributes']['sample_name']},
+          {key: 'Sample group without distinguishing attribute', value: (idx + 1).to_s}
+        ]
+        add_error(rule_code, annotation)
       end
     end
-    result
+    false
   end
 
   #
@@ -2216,31 +2157,23 @@ class BioSampleValidator < ValidatorBase
   #
   def duplicate_sample_names(rule_code, biosample_list)
     return nil if biosample_list.blank?
-    result = true
 
     # 同一ファイル内での重複チェック. 同じsubmissionは1ファイル内に列挙されていることを前提とする
-    biosample_list_lite = []
-    biosample_list.each_with_index do |biosample_data, index|
-      index += 1
-      biosample_list_lite.push({
-        sample_name: biosample_data['attributes']['sample_name'],
-        sample_title: biosample_data['attributes']['sample_title'],
-        index: index
-      })
-    end
-    biosample_list_lite.group_by {|row| row[:sample_name] }.each do |sample_name, list|
-      if list.size > 1 # 重複あり
-        list.each do |sample_data|
-          annotation = [
-            {key: 'Sample name', value: sample_name},
-            {key: 'Sample title', value: sample_data[:sample_title]} # sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
-          ]
-          add_error(rule_code, annotation)
-          result= false
-        end
+    duplicates = biosample_list
+      .group_by { it['attributes']['sample_name'] }
+      .select {|_, rows| rows.size > 1 }
+    return true if duplicates.empty?
+
+    duplicates.each do |sample_name, rows|
+      rows.each do |biosample_data|
+        annotation = [
+          {key: 'Sample name',  value: sample_name},
+          {key: 'Sample title', value: biosample_data['attributes']['sample_title']} # sample_nameが同一なので、Titleを個々のサンプルの識別しとして表示する
+        ]
+        add_error(rule_code, annotation)
       end
     end
-    result
+    false
   end
 
   #
@@ -2255,43 +2188,30 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def warning_about_bioproject_increment (rule_code, biosample_list)
-    return nil if biosample_list.nil? || biosample_list.length == 0
-    result = true
-    bioproject_accession_list = []
-    biosample_list.each do |biosample_data|
-      bioproject_accession_list.push(biosample_data['attributes']['bioproject_id'])
-    end
-    compact_list = bioproject_accession_list.compact
-    if bioproject_accession_list.size != compact_list.size # nilが含まれていた場合には連続値ではないものとする
-      result = true
-    elsif biosample_list.size >= 3 # 最低3サンプルから連続値チェック
-      # 前後のサンプルのbioproject_accession(数値部分)の差分を配列に格納する
-      @sub = []
-      i = 0
-      until i >= bioproject_accession_list.length - 1 do
-        if bioproject_accession_list[i] =~ /^PRJDB\d+/ # TODO PRJDNの場合
-          @sub.push(bioproject_accession_list[i + 1].gsub('PRJDB', '').to_i - bioproject_accession_list[i].gsub('PRJDB', '').to_i)
-        elsif bioproject_accession_list[i] =~ /^PSUB\d{6}/
-          @sub.push(bioproject_accession_list[i + 1].gsub('PSUB', '').to_i - bioproject_accession_list[i].gsub('PSUB', '').to_i)
-        end
-        i += 1
-      end
-      @sub.uniq == [1] ? result = false : result = true # 差分が常に1であれば連続値
+    return nil if biosample_list.nil? || biosample_list.empty?
+    return true if biosample_list.size < 3 # 最低3サンプルから連続値チェック
 
-      if result == false
-        # 連続値であれば全てのSample nameとbioproject_accessionを出力する
-        biosample_list.each do |biosample_data|
-          annotation = [
-            {key: 'Sample name', value: biosample_data['attributes']['sample_name']},
-            {key: 'Attribute', value: biosample_data['attributes']['bioproject_id']}
-          ]
-          add_error(rule_code, annotation)
-        end
+    bioproject_accession_list = biosample_list.map { it['attributes']['bioproject_id'] }
+    return true if bioproject_accession_list.any?(&:nil?) # nilが含まれていた場合には連続値ではないものとする
+
+    # 前後のサンプルのbioproject_accession(数値部分)の差分を配列に格納する
+    diffs = bioproject_accession_list.each_cons(2).map {|prev, succ|
+      case prev
+      when /^PRJDB\d+/  then succ.gsub('PRJDB', '').to_i - prev.gsub('PRJDB', '').to_i
+      when /^PSUB\d{6}/ then succ.gsub('PSUB',  '').to_i - prev.gsub('PSUB',  '').to_i
       end
-    else
-      result = true
+    }.compact
+    return true unless diffs.uniq == [1] # 差分が常に1であれば連続値
+
+    # 連続値であれば全てのSample nameとbioproject_accessionを出力する
+    biosample_list.each do |biosample_data|
+      annotation = [
+        {key: 'Sample name', value: biosample_data['attributes']['sample_name']},
+        {key: 'Attribute',   value: biosample_data['attributes']['bioproject_id']}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -2310,33 +2230,25 @@ class BioSampleValidator < ValidatorBase
   #
   def duplicated_locus_tag_prefix (rule_code, sample_name, locus_tag, biosample_list, submission_id, line_num)
     return nil if InsdcNullability.null_value?(locus_tag)
-    result = true
 
-    # 同一ファイル内での重複チェック
-    duplicated = biosample_list.select do |biosample_data|
-      locus_tag == biosample_data['attributes']['locus_tag_prefix']
-    end
+    # 同一ファイル内での重複チェック (自身以外に同一のlocus_tag_prefixをもつサンプルがある)
+    duplicated_in_file = biosample_list.count { it['attributes']['locus_tag_prefix'] == locus_tag } > 1
 
-    result = false if duplicated.length > 1 # 自身以外に同一のlocus_tag_prefixをもつサンプルがある
-
-    # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
+    # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
     all_prefix_list = Rails.cache.fetch(['locus_tag_prefix', 'all']) {
       @db_validator.get_all_locus_tag_prefix()
     }
+    duplicated_in_db = all_prefix_list.any? { it[:locus_tag_prefix] == locus_tag && it[:submission_id] != submission_id }
 
-    # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
-    duplicated_list = all_prefix_list.select {|row| row[:locus_tag_prefix] == locus_tag && row[:submission_id] != submission_id }
-    result = false if duplicated_list.any?
+    return true unless duplicated_in_file || duplicated_in_db
 
-    if result == false
-      annotation = [
-          {key: 'Sample name', value: sample_name},
-          {key: 'Attribute', value: 'locus_tag_prefix'},
-          {key: 'Attribute value', value: locus_tag}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: 'Sample name',     value: sample_name},
+      {key: 'Attribute',       value: 'locus_tag_prefix'},
+      {key: 'Attribute value', value: locus_tag}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
