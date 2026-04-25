@@ -21,5 +21,6 @@ group :development do
 end
 
 group :test do
+  gem 'minitest-mock'
   gem 'webmock'
 end
