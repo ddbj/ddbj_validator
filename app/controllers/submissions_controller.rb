@@ -33,7 +33,19 @@ class SubmissionsController < ApplicationController
   # request.headers['API_KEY'] は underscore を含むキーを HTTP_ プレフィックス変換
   # しないため env を直接参照する。旧 Sinatra 版の headers["HTTP_API_KEY"] と互換。
   def authenticate_curator
-    return if request.env['HTTP_API_KEY'] == 'curator'
+    if request.env['HTTP_API_KEY'] == 'curator'
+      # 外部クライアントが本当にこの認証を使っているか観測するための instrument。
+      # MonitoringController が同一コンテナの自身を叩く経路は 127.0.0.1 / ::1 になるので除外。
+      # Sentry の event を見て 1〜2 ヶ月ヒットがなければ authenticate_curator 自体を撤去予定。
+      unless request.remote_ip.in?(%w[127.0.0.1 ::1])
+        Sentry.capture_message('SubmissionsController authenticated', level: :info, extra: {
+          path:       request.path,
+          remote_ip:  request.remote_ip,
+          user_agent: request.user_agent
+        })
+      end
+      return
+    end
 
     send_file Rails.public_path.join('api/error_unauthorized.json'),
               type: 'application/json', disposition: 'inline', status: :unauthorized
