@@ -134,7 +134,6 @@ Port number for Virtuoso on host. Change the value if the name conflict on the h
 
 ## Development
 ### Unit test
-Unit testing of rules can be done via docker
 ```
-$ docker compose exec app ruby /rails/test/lib/validator/test_biosample_validator.rb
+$ bin/rails test
 ```
