@@ -89,27 +89,21 @@ class MetaboBankIdfValidator < ValidatorBase
   # true/false
   #
   def invalid_characters(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.non_ascii_characters(data)
 
     # 除外項目だけ一旦チェック結果を削除して再度チェック？
-    invalid_list.delete_if {|invalid| invalid[:field_name] == 'Study Description' || invalid[:field_name] == 'Protocol Description' }
-    study_desc_value_list = @tsv_validator.field_value(data, 'Study Description')
-    protocol_desc_value_list = @tsv_validator.field_value(data, 'Protocol Description')
-    invalid_list.concat(invalid_char_on_desc('Study Description', study_desc_value_list))
-    invalid_list.concat(invalid_char_on_desc('Protocol Description', protocol_desc_value_list))
+    invalid_list.reject! { it[:field_name] == 'Study Description' || it[:field_name] == 'Protocol Description' }
+    invalid_list.concat(invalid_char_on_desc('Study Description',    @tsv_validator.field_value(data, 'Study Description')))
+    invalid_list.concat(invalid_char_on_desc('Protocol Description', @tsv_validator.field_value(data, 'Protocol Description')))
+    return true if invalid_list.empty?
 
-    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: 'Field name', value: invalid[:field_name]}]
-      if invalid[:value_idx].nil? # field_nameがNG
-      else  # field_valueがNG
-        annotation.push({key: 'Value', value: invalid[:value]})
-      end
+      annotation.push({key: 'Value', value: invalid[:value]}) unless invalid[:value_idx].nil? # field_value が NG の場合のみ value を出す
       annotation.push({key: 'Invalid Position', value: invalid[:disp_txt]})
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   # メタボバンク用の特殊文字を含んだチェック
