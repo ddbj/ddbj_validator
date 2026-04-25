@@ -7,7 +7,31 @@ class TestTradValidator < Minitest::Test
     skip_unless_virtuoso_available
     @validator = TradValidator.new
     @test_file_dir = File.expand_path('../../../data/trad', __FILE__)
-    @ddbj_db_mode = ServiceAvailability::PG_CONFIGURED
+
+    # 各 test の fixture から拾った「DDBJ DB 上で valid」とされる ID 一覧。
+    # これ以外の ID (例: PRJDB0000 / SAMD00000000) は invalid 扱いとする。
+    valid_bioprojects = %w[PRJDB3490 PRJDB4841 PRJDB5067 PRJDB6348 PRJDB1554]
+    valid_biosamples  = %w[
+      SAMD00025188 SAMD00052344 SAMD00052345 SAMD00060421
+      SAMD00056903 SAMD00056904
+      SAMD00080626 SAMD00080628
+      SAMD00081300 SAMD00081372 SAMD00081395
+      SAMD00090153 SAMD00093579 SAMD00093580 SAMD00093784
+      SAMD00096762
+    ]
+    valid_drrs = %w[DRR060518 DRR060519 DRR101361 DRR101362]
+
+    stub_db_validator(@validator,
+      valid_bioproject_id?:   ->(accession)         { valid_bioprojects.include?(accession) },
+      is_valid_biosample_id?: ->(accession)         { valid_biosamples.include?(accession) },
+      umbrella_project?:      ->(accession)         { accession == 'PRJDB1554' },
+      exist_check_run_ids:    ->(ids)               { ids.map { {accession_id: it, is_exist: valid_drrs.include?(it)} } },
+      get_biosample_metadata: ->(_ids)              { {} },                                                # テスト側で biosample_info を直接渡しているケース大半
+      get_biosample_related_id:    ->(_ids)         { [] },
+      get_bioproject_submitter_ids: ->(_ids)        { {} },
+      get_biosample_submitter_ids:  ->(_ids)        { {} },
+      get_run_submitter_ids:        ->(_ids)        { {} }
+    )
   end
 
   #### テスト用共通メソッド ####
@@ -498,7 +522,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0010
   def test_invalid_bioproject_accession
-    return nil if @ddbj_db_mode == false
     # ok case
     bioproject_list = [{entry: 'COMMON', feature: 'DBLINK', location: '', qualifier: 'project', value: 'PRJDB3490', line_no: 24}]
     ret = exec_validator('invalid_bioproject_accession', 'TR_R0010', bioproject_list)
@@ -533,7 +556,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0011
   def test_invalid_biosample_accession
-    return nil if @ddbj_db_mode == false
     # ok case
     biosample_list = [{entry: 'COMMON', feature: 'DBLINK', location: '', qualifier: 'biosample', value: 'SAMD00025188', line_no: 24}]
     ret = exec_validator('invalid_biosample_accession', 'TR_R0011', biosample_list)
@@ -568,7 +590,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0012
   def test_invalid_drr_accession
-    return nil if @ddbj_db_mode == false
     # ok case
     drr_list = [{entry: 'COMMON', feature: 'DBLINK', location: '', qualifier: 'sequence read archive', value: 'DRR060518', line_no: 24}]
     drr_list.push({entry: 'COMMON', feature: 'DBLINK', location: '', qualifier: 'sequence read archive', value: 'DRR060519', line_no: 24})
@@ -606,7 +627,22 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0013
   def test_invalid_combination_of_accessions
-    return nil if @ddbj_db_mode == false
+    # 各 BioSample が DRA 経由で紐づく BioProjectID / DRRID を返す
+    biosample_dra_links = {
+      'SAMD00052344' => {bioproject_accession_id_list: ['PRJDB4841'], drr_accession_id_list: ['DRR060518']},
+      'SAMD00056903' => {bioproject_accession_id_list: ['PRJDB5067'], drr_accession_id_list: []},
+      'SAMD00056904' => {bioproject_accession_id_list: ['PRJDB5067'], drr_accession_id_list: []},
+      'SAMD00060421' => {bioproject_accession_id_list: [], drr_accession_id_list: []},
+      'SAMD00093579' => {bioproject_accession_id_list: [], drr_accession_id_list: ['DRR101361']},
+      'SAMD00093580' => {bioproject_accession_id_list: [], drr_accession_id_list: ['DRR101362']},
+      'SAMD00093784' => {bioproject_accession_id_list: ['PRJDB6348'], drr_accession_id_list: []}
+    }
+    stub_db_validator(@validator, get_biosample_related_id: ->(ids) {
+      ids.map {|id|
+        {biosample_id: id, **biosample_dra_links.fetch(id, {bioproject_accession_id_list: [], drr_accession_id_list: []})}
+      }
+    })
+
     # ok case
     # #common name
     dblink_list = [
@@ -773,7 +809,15 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0014
   def test_inconsistent_submitter
-    return nil if @ddbj_db_mode == false
+    # ng case で SAMD00000001 だけ別 submitter (other person) が登録、それ以外は hirakawa
+    other_submitter_biosamples = %w[SAMD00000001]
+    submitter_for = ->(id) { other_submitter_biosamples.include?(id) ? 'other person' : 'hirakawa' }
+    stub_db_validator(@validator,
+      get_bioproject_submitter_ids: ->(ids) { ids.map { {bioproject_id: it, submitter_id: submitter_for.call(it)} } },
+      get_biosample_submitter_ids:  ->(ids) { ids.map { {biosample_id:  it, submitter_id: submitter_for.call(it)} } },
+      get_run_submitter_ids:        ->(ids) { ids.map { {run_id:        it, submitter_id: submitter_for.call(it)} } }
+    )
+
     # ok case
     ## all accessions submit by 'hirakawa'
     dblink_list = [
@@ -870,7 +914,20 @@ class TestTradValidator < Minitest::Test
   end
 
   def test_get_biosample_info
-    return nil if @ddbj_db_mode == false
+    # 4 IDs を指定すると DB に存在する 2 件 (SAMD00052344 / SAMD00052345) のみ返る、
+    # SAMD00060421 / SAMD00081372 は note 属性に他 BioSampleID を持つ
+    metadata = {
+      'SAMD00052344' => {attribute_list: []},
+      'SAMD00052345' => {attribute_list: []},
+      'SAMD00060421' => {attribute_list: [{attribute_name: 'note', attribute_value: 'SAMD00056903 SAMD00056904'}]},
+      'SAMD00081372' => {attribute_list: [{attribute_name: 'derived_from', attribute_value: 'SAMD00080626 SAMD00080628'}]},
+      'SAMD00056903' => {attribute_list: []},
+      'SAMD00056904' => {attribute_list: []},
+      'SAMD00080626' => {attribute_list: []},
+      'SAMD00080628' => {attribute_list: []}
+    }
+    stub_db_validator(@validator, get_biosample_metadata: ->(ids) { metadata.slice(*ids) })
+
     ret = @validator.get_biosample_info(['SAMD00052344', 'SAMD00052345', 'SAMD00000000', 'SSUB000000'])
     assert_equal 2, ret.keys.size
 
@@ -882,7 +939,6 @@ class TestTradValidator < Minitest::Test
   end
 
   def test_corresponding_biosample_attr_value
-    return nil if @ddbj_db_mode == false
     # same entry
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'isolate', value: 'BMS3Abin12', line_no: 24}]
     biosample_data_list = [{entry: 'Entry1', feature: 'DBLINK', location: '', qualifier: 'biosample', value: 'SAMD00081372', line_no: 20}]
@@ -1154,7 +1210,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0016
   def test_inconsistent_isolate_with_biosample
-    return nil if @ddbj_db_mode == false
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'isolate', value: 'BMS3Abin12', line_no: 24}]
     all_entry_name_list = ['COMMON', 'Entry1']
@@ -1229,7 +1284,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0017
   def test_inconsistent_isolation_source_with_biosample
-    return nil if @ddbj_db_mode == false
     # ほぼ TR_R0016と同様のためテスト一部省略
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'isolation_source', value: 'Sub-seafloor massive sulfide deposits', line_no: 24}]
@@ -1253,7 +1307,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0018
   def test_inconsistent_collection_date_with_biosample
-    return nil if @ddbj_db_mode == false
     # ほぼ TR_R0016と同様のためテスト一部省略
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'collection_date', value: '2010-06-16', line_no: 24}]
@@ -1277,7 +1330,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0019
   def test_inconsistent_country_with_biosample
-    return nil if @ddbj_db_mode == false
     # ほぼ TR_R0016と同様のためテスト一部省略
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'country', value: 'Japan:Yamanashi, Lake Mizugaki', line_no: 24}]
@@ -1309,7 +1361,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0020
   def test_inconsistent_locus_tag_with_biosample
-    return nil if @ddbj_db_mode == false
     # ほぼ TR_R0016と同様のためテスト一部省略
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'locus_tag', value: 'EFBL_00001', line_no: 24}]
@@ -1508,7 +1559,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0030
   def test_inconsistent_culture_collection_with_biosample
-    return nil if @ddbj_db_mode == false
     # ほぼ TR_R0016と同様のためテスト一部省略
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'culture_collection', value: 'JCM:31738', line_no: 24}]
@@ -1548,7 +1598,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0031
   def test_inconsistent_host_with_biosample
-    return nil if @ddbj_db_mode == false
     # ほぼ TR_R0016と同様のためテスト一部省略
     # ok case
     annotation_line_list = [{entry: 'Entry1', feature: 'source', location: '', qualifier: 'host', value: 'Homo sapiens', line_no: 24}]
@@ -1621,7 +1670,6 @@ class TestTradValidator < Minitest::Test
 
   # rule:TR_R0034
   def test_invalid_bioproject_type
-    return nil if @ddbj_db_mode == false
     # ok case
     bioproject_list = [{entry: 'COMMON', feature: 'DBLINK', location: '', qualifier: 'project', value: 'PRJDB3490', line_no: 24}]
     ret = exec_validator('invalid_bioproject_type', 'TR_R0034', bioproject_list)
