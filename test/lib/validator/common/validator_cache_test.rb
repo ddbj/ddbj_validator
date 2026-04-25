@@ -4,7 +4,6 @@ require 'test_helper'
 # test env のデフォルトは :null_store なので、ここだけ MemoryStore に差し替えて検証する。
 class TestValidatorCache < Minitest::Test
   def setup
-    skip_unless_virtuoso_available
     @original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
     @validator = BioSampleValidator.new

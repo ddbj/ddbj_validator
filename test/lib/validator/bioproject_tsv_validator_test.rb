@@ -2,7 +2,6 @@ require 'test_helper'
 
 class TestBioProjectTsvValidator < Minitest::Test
   def setup
-    skip_unless_virtuoso_available
     @validator = BioProjectTsvValidator.new
     @test_file_dir = File.expand_path('../../../data/bioproject', __FILE__)
   end

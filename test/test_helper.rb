@@ -41,37 +41,6 @@ end
 
 Minitest::Test.include(DefaultHttpStubs)
 
-# 外部サービス (PostgreSQL / Virtuoso) が使えない環境 (CI 等) でテストをスキップするヘルパ。
-#
-#   class TestFoo < Minitest::Test
-#     def setup
-#       skip_unless_virtuoso_available
-#     end
-#   end
-module ServiceAvailability
-  # PostgreSQL は必須前提とする。起動していなければ tests がそのまま fail する
-  # (compose.test.yaml で立ち上げてから走らせる)。Virtuoso は起動コストが大きいので
-  # CI 以外では skip を許容する。
-  VIRTUOSO_REACHABLE = begin
-    endpoint = ENV['DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER'] || 'http://localhost:8890/sparql'
-    uri      = URI.parse(endpoint)
-
-    res = Net::HTTP.start(uri.host, uri.port, open_timeout: 2, read_timeout: 2) {|http|
-      http.request(Net::HTTP::Get.new("#{uri.path}?query=ASK%20%7B%7D&format=application%2Fjson"))
-    }
-
-    res.code.start_with?('2')
-  rescue StandardError
-    false
-  end
-
-  def skip_unless_virtuoso_available
-    skip 'Virtuoso SPARQL endpoint not reachable' unless VIRTUOSO_REACHABLE
-  end
-end
-
-Minitest::Test.include(ServiceAvailability)
-
 # Validator の `@db_validator` を任意の値/Proc を返す fake で差し替える test helper。
 # 引数の Hash は method 名 → 戻り値 (Proc なら呼び出し時に引数を渡して返す)。
 #
