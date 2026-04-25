@@ -10,8 +10,6 @@ class BioProjectTsvValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/bioproject')))
-    @conf[:null_accepted] = @conf[:field_settings]['null_value']['value_list']
-    @nullability = InsdcNullability.new(null_accepted: @conf[:null_accepted], null_not_recommended: @conf[:null_not_recommended])
 
     @error_list = error_list = []
 
@@ -278,7 +276,7 @@ class BioProjectTsvValidator < ValidatorBase
     result = true
 
     unless sample_scope.downcase == 'multiisolate' # multiの場合は無視
-      if organism_name.blank? || @nullability.null_value?(organism_name) # organismの記載がない
+      if organism_name.blank? || InsdcNullability.null_value?(organism_name) # organismの記載がない
         result = false
         annotation = [
           {key: 'organism', value: ''},
