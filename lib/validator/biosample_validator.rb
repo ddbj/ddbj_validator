@@ -30,13 +30,7 @@ class BioSampleValidator < ValidatorBase
     @institution_list = CollDump.parse(@conf[:institution_list_file])
     @tsv_validator = TsvColumnValidator.new()
     @package_version = @conf[:biosample]['package_version']
-    unless @conf[:ddbj_db_config].nil?
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-      @use_db = true
-    else
-      @db_validator = nil
-      @use_db = false
-    end
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
     @cache = ValidatorCache.new
   end
 
@@ -232,11 +226,9 @@ class BioSampleValidator < ValidatorBase
         # 日付属性がDDBJフォーマットであるか(補正後)にチェック
         ret = invalid_datetime('BS_R0007', sample_name, attr_name.to_s, value, @conf[:ts_attr], line_num)
         non_integer_attribute_value('BS_R0093', sample_name, attr_name.to_s, value, @conf[:int_attr], line_num)
-        if @use_db
-          ret = bioproject_submission_id_replacement('BS_R0095', sample_name, biosample_data['attributes']['bioproject_id'], line_num)
-          if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
-            biosample_data['attributes']['bioproject_id'] = value = ErrorBuilder.auto_annotation(@error_list.last)
-          end
+        ret = bioproject_submission_id_replacement('BS_R0095', sample_name, biosample_data['attributes']['bioproject_id'], line_num)
+        if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
+          biosample_data['attributes']['bioproject_id'] = value = ErrorBuilder.auto_annotation(@error_list.last)
         end
       end
 
@@ -270,11 +262,11 @@ class BioSampleValidator < ValidatorBase
       uncultured_organism_name_for_mimag_package biosample_data
 
       ### 特定の属性値に対する検証
-      invalid_bioproject_accession('BS_R0005', sample_name, biosample_data['attributes']['bioproject_id'], line_num) if @use_db
-      bioproject_not_found('BS_R0006', sample_name, biosample_data['attributes']['bioproject_id'], @submitter_id, line_num) if @use_db
-      invalid_bioproject_type('BS_R0070', sample_name, biosample_data['attributes']['bioproject_id'], line_num) if @use_db
+      invalid_bioproject_accession('BS_R0005', sample_name, biosample_data['attributes']['bioproject_id'], line_num)
+      bioproject_not_found('BS_R0006', sample_name, biosample_data['attributes']['bioproject_id'], @submitter_id, line_num)
+      invalid_bioproject_type('BS_R0070', sample_name, biosample_data['attributes']['bioproject_id'], line_num)
       invalid_locus_tag_prefix_format('BS_R0099', sample_name, biosample_data['attributes']['locus_tag_prefix'], line_num)
-      duplicated_locus_tag_prefix('BS_R0091', sample_name, biosample_data['attributes']['locus_tag_prefix'], @biosample_list, @submission_id, line_num) if @use_db
+      duplicated_locus_tag_prefix('BS_R0091', sample_name, biosample_data['attributes']['locus_tag_prefix'], @biosample_list, @submission_id, line_num)
       ret = invalid_geo_loc_name_format('BS_R0094', sample_name, biosample_data['attributes']['geo_loc_name'], @conf[:valid_country_list], line_num)
       if ret == false && !ErrorBuilder.auto_annotation(@error_list.last).nil? # save auto annotation value
         biosample_data['attributes']['geo_loc_name'] = ErrorBuilder.auto_annotation(@error_list.last)
@@ -300,7 +292,7 @@ class BioSampleValidator < ValidatorBase
       invalid_sample_name_format('BS_R0101', sample_name, line_num)
 
       invalid_gisaid_accession('BS_R0122', sample_name, biosample_data['attributes']['gisaid_accession'], line_num)
-      biosample_not_found('BS_R0129', sample_name, biosample_data['attributes']['derived_from'], @submitter_id, line_num) if @use_db
+      biosample_not_found('BS_R0129', sample_name, biosample_data['attributes']['derived_from'], @submitter_id, line_num)
       invalid_strain_value('BS_R0135', sample_name, biosample_data['attributes']['strain'], biosample_data['attributes']['organism'], @conf[:invalid_strain_value], line_num)
 
       ### 値が複数記述される可能性がある項目の検証

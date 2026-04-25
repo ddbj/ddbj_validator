@@ -17,13 +17,7 @@ class BioProjectValidator < ValidatorBase
 
     @validation_config = @conf[:validation_config] # need?
     @org_validator = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
-    unless @conf[:ddbj_db_config].nil?
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-      @use_db = true
-    else
-      @db_validator = nil
-      @use_db = false
-    end
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 
   #
@@ -73,13 +67,13 @@ class BioProjectValidator < ValidatorBase
     # submission_idは任意。Dway経由、DB登録済みデータを取得した場合にのみ取得できることを想定
     @submission_id = @xml_convertor.get_bioproject_submission_id(File.read(data_xml))
 
-    project_names_list = @db_validator.get_bioproject_names_list(@submitter_id) if @use_db
+    project_names_list = @db_validator.get_bioproject_names_list(@submitter_id)
 
     # 各プロジェクト毎の検証
     project_set.each_with_index do |project_node, idx|
       idx += 1
       project_name = get_bioporject_label(project_node, idx)
-      duplicated_project_title_and_description('BP_R0004', project_name, project_node, project_names_list, @submission_id, idx) if @use_db
+      duplicated_project_title_and_description('BP_R0004', project_name, project_node, project_names_list, @submission_id, idx)
       identical_project_title_and_description('BP_R0005', project_name, project_node, idx)
       invalid_publication_identifier('BP_R0014', project_name, project_node, idx)
 
@@ -120,7 +114,7 @@ class BioProjectValidator < ValidatorBase
     link_set = doc.xpath('//PackageSet/Package/ProjectLinks')
     # 各リンク毎の検証
     link_set.each_with_index do |link_node, idx|
-      invalid_umbrella_project('BP_R0016', 'Link', link_node, idx) if @use_db
+      invalid_umbrella_project('BP_R0016', 'Link', link_node, idx)
     end
   end
 

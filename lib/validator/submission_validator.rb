@@ -16,13 +16,7 @@ class SubmissionValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] # need?
-    unless @conf[:ddbj_db_config].nil?
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-      @use_db = true
-    else
-      @db_validator = nil
-      @use_db = false
-    end
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 
   #
@@ -72,7 +66,7 @@ class SubmissionValidator < ValidatorBase
       submission_set.each_with_index do |submission_node, idx|
         idx += 1
         submission_name = get_submission_label(submission_node, idx)
-        invalid_center_name('DRA_R0004', submission_name, submission_node, @submitter_id, idx) if @use_db
+        invalid_center_name('DRA_R0004', submission_name, submission_node, @submitter_id, idx)
         invalid_hold_date('DRA_R0006', submission_name, submission_node, idx)
       end
     end

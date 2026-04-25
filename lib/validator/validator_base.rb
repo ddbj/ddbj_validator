@@ -11,12 +11,9 @@ class ValidatorBase
   def read_common_config
     setting = Rails.configuration.validator
 
-    db = setting['ddbj_rdb']
-    db_configured = db && %w[pg_host pg_port pg_user pg_pass].all? { db[it].to_s != '' }
-
     {
       sparql_config:   setting['sparql_endpoint'],
-      ddbj_db_config:  db_configured ? db : nil,
+      ddbj_db_config:  setting['ddbj_rdb'],
       named_graph_uri: setting['named_graph_uri'],
       biosample:       setting['biosample'],
       log_dir:         setting.dig('api_log', 'path')

@@ -23,13 +23,7 @@ class TradValidator < ValidatorBase
     @error_list = error_list = []
     @validation_config = @conf[:validation_config] # need?
 
-    unless @conf[:ddbj_db_config].nil?
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-      @use_db = true
-    else
-      @db_validator = nil
-      @use_db = false
-    end
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
     @cache = ValidatorCache.new
   end
 
@@ -64,34 +58,32 @@ class TradValidator < ValidatorBase
     unnecessary_wgs_keywords('TR_R0005', annotation_list, anno_by_qual, anno_by_feat, anno_by_ent)
 
     # DBLINKチェック
-    if @use_db
-      missing_dblink('TR_R0009', data_by_feat('DBLINK', anno_by_feat), anno_by_ent)
-      invalid_bioproject_accession('TR_R0010', data_by_feat_qual('DBLINK', 'project', anno_by_qual))
-      invalid_biosample_accession('TR_R0011', data_by_feat_qual('DBLINK', 'biosample', anno_by_qual))
-      invalid_drr_accession('TR_R0012', data_by_feat_qual('DBLINK', 'sequence read archive', anno_by_qual))
-      invalid_bioproject_type('TR_R0034', data_by_feat_qual('DBLINK', 'project', anno_by_qual))
-      # biosampleの情報を取得(note.derived_from属性の参照サンプル含む)
-      biosample_id_list = data_by_feat_qual('DBLINK', 'biosample', anno_by_qual).map {|row| row[:value] }
-      biosample_info_list = get_biosample_info(biosample_id_list)
+    missing_dblink('TR_R0009', data_by_feat('DBLINK', anno_by_feat), anno_by_ent)
+    invalid_bioproject_accession('TR_R0010', data_by_feat_qual('DBLINK', 'project', anno_by_qual))
+    invalid_biosample_accession('TR_R0011', data_by_feat_qual('DBLINK', 'biosample', anno_by_qual))
+    invalid_drr_accession('TR_R0012', data_by_feat_qual('DBLINK', 'sequence read archive', anno_by_qual))
+    invalid_bioproject_type('TR_R0034', data_by_feat_qual('DBLINK', 'project', anno_by_qual))
+    # biosampleの情報を取得(note.derived_from属性の参照サンプル含む)
+    biosample_id_list = data_by_feat_qual('DBLINK', 'biosample', anno_by_qual).map {|row| row[:value] }
+    biosample_info_list = get_biosample_info(biosample_id_list)
 
-      invalid_combination_of_accessions('TR_R0013', data_by_feat('DBLINK', anno_by_feat), biosample_info_list)
+    invalid_combination_of_accessions('TR_R0013', data_by_feat('DBLINK', anno_by_feat), biosample_info_list)
 
-      unless submitter_id.nil? || submitter_id.chomp.strip == ''
-        inconsistent_submitter('TR_R0014', data_by_feat('DBLINK', anno_by_feat), submitter_id)
-      end
-
-      # BioSample整合性チェック
-      all_entry_name_list = anno_by_ent.keys
-      biosample_line = data_by_feat_qual('DBLINK', 'biosample', anno_by_qual)
-      inconsistent_organism_with_biosample('TR_R0015', data_by_qual('organism', anno_by_qual), data_by_qual('strain', anno_by_qual), biosample_line, biosample_info_list)
-      inconsistent_isolate_with_biosample('TR_R0016', data_by_qual('isolate', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_isolation_source_with_biosample('TR_R0017', data_by_qual('isolation_source', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_collection_date_with_biosample('TR_R0018', data_by_qual('collection_date', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_country_with_biosample('TR_R0019', data_by_feat_qual('source', 'country', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_locus_tag_with_biosample('TR_R0020', data_by_qual('locus_tag', anno_by_qual), biosample_line, biosample_info_list)
-      inconsistent_culture_collection_with_biosample('TR_R0030', data_by_qual('culture_collection', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
-      inconsistent_host_with_biosample('TR_R0031', data_by_qual('host', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+    unless submitter_id.nil? || submitter_id.chomp.strip == ''
+      inconsistent_submitter('TR_R0014', data_by_feat('DBLINK', anno_by_feat), submitter_id)
     end
+
+    # BioSample整合性チェック
+    all_entry_name_list = anno_by_ent.keys
+    biosample_line = data_by_feat_qual('DBLINK', 'biosample', anno_by_qual)
+    inconsistent_organism_with_biosample('TR_R0015', data_by_qual('organism', anno_by_qual), data_by_qual('strain', anno_by_qual), biosample_line, biosample_info_list)
+    inconsistent_isolate_with_biosample('TR_R0016', data_by_qual('isolate', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+    inconsistent_isolation_source_with_biosample('TR_R0017', data_by_qual('isolation_source', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+    inconsistent_collection_date_with_biosample('TR_R0018', data_by_qual('collection_date', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+    inconsistent_country_with_biosample('TR_R0019', data_by_feat_qual('source', 'country', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+    inconsistent_locus_tag_with_biosample('TR_R0020', data_by_qual('locus_tag', anno_by_qual), biosample_line, biosample_info_list)
+    inconsistent_culture_collection_with_biosample('TR_R0030', data_by_qual('culture_collection', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
+    inconsistent_host_with_biosample('TR_R0031', data_by_qual('host', anno_by_qual), all_entry_name_list, biosample_line, biosample_info_list)
     other_insdc_partners_accession('TR_R0033', data_by_feat('DBLINK', anno_by_feat))
 
     # locus_tagチェック
@@ -622,12 +614,10 @@ class TradValidator < ValidatorBase
     bioproject_list.each do |bioproject_line|
       bioproject_accession = bioproject_line[:value]
       if bioproject_accession =~ /^PRJD\w?\d{1,}$/
-        unless @db_validator.nil?
-          unless @db_validator.valid_bioproject_id?(bioproject_accession)
-            result = false
-            invalid_id_list.push(bioproject_accession)
-            line_no_list.push(bioproject_line[:line_no].to_s)
-          end
+        unless @db_validator.valid_bioproject_id?(bioproject_accession)
+          result = false
+          invalid_id_list.push(bioproject_accession)
+          line_no_list.push(bioproject_line[:line_no].to_s)
         end
       elsif bioproject_accession =~ /^PRJ(E|N)\w?\d{1,}$/
         # 他極データは無視(TR_R0033でチェックする)
@@ -668,12 +658,10 @@ class TradValidator < ValidatorBase
     biosample_list.each do |biosample_line|
       biosample_accession = biosample_line[:value]
       if biosample_accession =~ /^SAMD\w?\d{1,}$/
-        unless @db_validator.nil?
-          unless @db_validator.is_valid_biosample_id?(biosample_accession)
-            result = false
-            invalid_id_list.push(biosample_accession)
-            line_no_list.push(biosample_line[:line_no].to_s)
-          end
+        unless @db_validator.is_valid_biosample_id?(biosample_accession)
+          result = false
+          invalid_id_list.push(biosample_accession)
+          line_no_list.push(biosample_line[:line_no].to_s)
         end
       elsif biosample_accession =~ /^SAM(E|N)\w?\d{1,}$/
         # 他極データは無視(TR_R0033でチェックする)
@@ -714,9 +702,7 @@ class TradValidator < ValidatorBase
     # DRRは複数記載されるケースがあり、まとめてDBチェックする
     drr_accession_id_list = drr_list.map {|row| row[:value] }
     drr_accession_id_list.delete_if {|run_id| run_id =~ /^(S|E)RR\w?\d{1,}$/ } # 他極データは無視(TR_R0033でチェックする)
-    unless @db_validator.nil?
-      result_run_list = @db_validator.exist_check_run_ids(drr_accession_id_list)
-    end
+    result_run_list = @db_validator.exist_check_run_ids(drr_accession_id_list)
     result_run_list.each do |result_run_id|
       if result_run_id[:is_exist] == false
         invalid_id_list.push(result_run_id[:accession_id])
@@ -785,24 +771,22 @@ class TradValidator < ValidatorBase
   def get_biosample_info(biosample_id_list)
     return {} if biosample_id_list.nil? || biosample_id_list.empty?
 
-    unless @db_validator.nil?
-      ref_biosample_id_list = []
-      biosample_info = @db_validator.get_biosample_metadata(biosample_id_list)
-      biosample_info.each do |biosample_id, biosample_data|
-        biosample_data[:attribute_list].each do |attr|
-          if attr[:attribute_name] == 'note' || attr[:attribute_name] == 'derived_from'
-            ref_list = attr[:attribute_value].scan(/SAMD\w?\d{1,}/)
-            biosample_data[:ref_biosample_list] = [] if biosample_data[:ref_biosample_list].nil?
-            biosample_data[:ref_biosample_list].concat(ref_list).uniq!
-            ref_biosample_id_list.concat(ref_list)
-          end
+    ref_biosample_id_list = []
+    biosample_info = @db_validator.get_biosample_metadata(biosample_id_list)
+    biosample_info.each do |biosample_id, biosample_data|
+      biosample_data[:attribute_list].each do |attr|
+        if attr[:attribute_name] == 'note' || attr[:attribute_name] == 'derived_from'
+          ref_list = attr[:attribute_value].scan(/SAMD\w?\d{1,}/)
+          biosample_data[:ref_biosample_list] = [] if biosample_data[:ref_biosample_list].nil?
+          biosample_data[:ref_biosample_list].concat(ref_list).uniq!
+          ref_biosample_id_list.concat(ref_list)
         end
       end
-      # noteかderived_fromに記載された
-      if ref_biosample_id_list.any?
-        ref_biosample_info = @db_validator.get_biosample_metadata(ref_biosample_id_list.uniq)
-        biosample_info.merge!(ref_biosample_info)
-      end
+    end
+    # noteかderived_fromに記載された
+    if ref_biosample_id_list.any?
+      ref_biosample_info = @db_validator.get_biosample_metadata(ref_biosample_id_list.uniq)
+      biosample_info.merge!(ref_biosample_info)
     end
     biosample_info
   end
@@ -1008,7 +992,6 @@ class TradValidator < ValidatorBase
   def invalid_combination_of_accessions(rule_code, dblink_list, biosample_info)
     return nil if dblink_list.nil? || dblink_list.empty?
     return nil if biosample_info.nil? || biosample_info == {}
-    return nil if @db_validator.nil?
     ret = true
 
     # 他極データは無視
@@ -1120,7 +1103,6 @@ class TradValidator < ValidatorBase
   def inconsistent_submitter(rule_code, dblink_list, submitter_id)
     return nil if dblink_list.nil? || dblink_list.empty?
     return nil if submitter_id.nil? || submitter_id == ''
-    return nil if @db_validator.nil?
     ret = true
 
     # 他極データは無視
@@ -1675,7 +1657,6 @@ class TradValidator < ValidatorBase
   #
   def invalid_bioproject_type(rule_code, bioproject_list)
     return nil if bioproject_list.nil? || bioproject_list.empty?
-    return nil if @db_validator.nil?
 
     ret  = true
     bioproject_list.each do |row|
