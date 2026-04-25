@@ -49,8 +49,9 @@ Minitest::Test.include(DefaultHttpStubs)
 #     end
 #   end
 module ServiceAvailability
-  PG_CONFIGURED = ENV.key?('DDBJ_VALIDATOR_APP_POSTGRES_HOST')
-
+  # PostgreSQL は必須前提とする。起動していなければ tests がそのまま fail する
+  # (compose.test.yaml で立ち上げてから走らせる)。Virtuoso は起動コストが大きいので
+  # CI 以外では skip を許容する。
   VIRTUOSO_REACHABLE = begin
     endpoint = ENV['DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER'] || 'http://localhost:8890/sparql'
     uri      = URI.parse(endpoint)
@@ -62,10 +63,6 @@ module ServiceAvailability
     res.code.start_with?('2')
   rescue StandardError
     false
-  end
-
-  def skip_unless_pg_configured
-    skip 'PostgreSQL not configured (set DDBJ_VALIDATOR_APP_POSTGRES_HOST to enable)' unless PG_CONFIGURED
   end
 
   def skip_unless_virtuoso_available

@@ -14,12 +14,7 @@ jobs:
       # CI の runner からはコンテナに host ネットワーク経由でアクセスするため localhost を使う
       DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER: http://localhost:8890/sparql
 
-      # Postgres fixture (compose.test.yaml の postgres サービス)
-      DDBJ_VALIDATOR_APP_POSTGRES_HOST:    localhost
-      DDBJ_VALIDATOR_APP_POSTGRES_PORT:    '15432'
-      DDBJ_VALIDATOR_APP_POSTGRES_USER:    validator
-      DDBJ_VALIDATOR_APP_POSTGRES_PASSWD:  validator
-      DDBJ_VALIDATOR_APP_POSTGRES_TIMEOUT: '30'
+      # Postgres は config/validator.yml の test セクションに localhost:15432 を直書きしているので env 不要
 
     steps:
       - uses: actions/checkout@v6
