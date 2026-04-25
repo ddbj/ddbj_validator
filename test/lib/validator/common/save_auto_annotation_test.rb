@@ -72,10 +72,9 @@ class TestSaveAutoAnnotation < Minitest::Test
 
   #
   # 4(taxonomy_error_warning)のauto annotationの保存が効いているかの検証
-  # 現状の validator は organism を "Escherchia coli" (入力のまま) として返すため期待値と不一致。
-  # 入力 tax_id にひもづく scientific_name を優先する意図と思われるが、実装が合っていない。要見直し
+  # 入力 organism がミスタイプ ("eschericha coli") でも、tax_id 561 に紐づく
+  # scientific_name "Escherichia" が annotation に出ることを確認する。
   def test_save_annotation_4
-    skip 'BS_R0096 auto-annotation prefers the fuzzy-matched tax (562) over the input tax (561); expected "Escherichia" not produced'
     biosample_set = @validator.validate("#{@test_file_dir}/save_auto_annotation_value_4.xml")
     error_list = @validator.instance_variable_get (:@error_list)
     error =  error_list.find {|error| error[:id] == 'BS_R0096' }

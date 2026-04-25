@@ -2294,17 +2294,21 @@ class BioSampleValidator < ValidatorBase
   # true/false
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, sample_name, taxonomy_id, organism, line_num)
-    return nil if InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
-    result = @org_validator.is_infraspecific_rank(taxonomy_id)
-    if result == false
-      annotation = [
-          {key: 'Sample name', value: sample_name},
-          {key: 'taxonomy_id', value: taxonomy_id},
-          {key: 'organism', value: organism}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    return nil  if InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
+    return true if @org_validator.is_infraspecific_rank(taxonomy_id)
+
+    # 入力 organism よりも tax_id に紐づく scientific_name を優先する。
+    # ユーザがミスタイプ ("eschericha coli" → tax_id 561) でも annotation は正しい属名 ("Escherichia") を示せる。
+    scientific_name = Rails.cache.fetch(['tax_match_organism', taxonomy_id]) {
+      @org_validator.get_organism_name(taxonomy_id)
+    }
+    annotation = [
+      {key: 'Sample name', value: sample_name},
+      {key: 'taxonomy_id', value: taxonomy_id},
+      {key: 'organism',    value: scientific_name || organism}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
