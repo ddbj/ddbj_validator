@@ -108,21 +108,19 @@ class SubmissionValidator < ValidatorBase
   # true/false
   #
   def invalid_center_name (rule_code, submission_label, submission_node, submitter_id, line_num)
-    result = true
     acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    submission_node.xpath('@center_name').each do |center_node|
-      center_name = get_node_text(center_node, '.')
-      if acc_center_name != center_name
-        annotation = [
-          {key: 'Submission name', value: submission_label},
-          {key: 'center name', value: center_name},
-          {key: 'Path', value: '//SUBMISSION/@center_name'}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
+    mismatched = submission_node.xpath('@center_name').map { get_node_text(it, '.') }.reject { it == acc_center_name }
+    return true if mismatched.empty?
+
+    mismatched.each do |center_name|
+      annotation = [
+        {key: 'Submission name', value: submission_label},
+        {key: 'center name',     value: center_name},
+        {key: 'Path',            value: '//SUBMISSION/@center_name'}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -136,31 +134,26 @@ class SubmissionValidator < ValidatorBase
   # true/false
   #
   def invalid_hold_date (rule_code, submission_label, submission_node, line_num)
-    result = true
     data_path = '//SUBMISSION/ACTIONS/ACTION/HOLD/@HoldUntilDate'
-    submission_node.xpath(data_path).each_with_index do |data_node, idx| # 複数出現の可能性あり
-      unless node_blank?(data_node)
-        date_text = get_node_text(data_node)
-        begin
-          hold_until_date = DateTime.parse(date_text)
-          two_years_later = DateTime.now >> 24 # 24months
-          if hold_until_date > two_years_later
-            result = false
-          end
-        rescue ArgumentError # 日付に変換できない形式
-          result = false
-        end
-        # parseで処理しきれない場合
-        unless result
-          annotation = [
-            {key: 'Submission name', value: submission_label},
-            {key: 'HoldUntilDate', value: date_text},
-            {key: 'Path', value: "#{data_path}[#{idx + 1}]"} # 順番を表示
-          ]
-          add_error(rule_code, annotation)
-        end
-      end
+
+    bad = submission_node.xpath(data_path).each_with_index.filter_map {|data_node, idx| # 複数出現の可能性あり
+      next if node_blank?(data_node)
+      date_text = get_node_text(data_node)
+      date = Time.zone.parse(date_text) rescue nil
+      next if date && date <= 2.years.since
+
+      [date_text, idx + 1]
+    }
+    return true if bad.empty?
+
+    bad.each do |date_text, position|
+      annotation = [
+        {key: 'Submission name', value: submission_label},
+        {key: 'HoldUntilDate',   value: date_text},
+        {key: 'Path',            value: "#{data_path}[#{position}]"} # 順番を表示
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 end

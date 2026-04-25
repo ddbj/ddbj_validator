@@ -93,37 +93,22 @@ class CombinationValidator < ValidatorBase
   # true/false
   #
   def multiple_bioprojects_in_a_submission (rule_code, experiment_set, analysis_set)
-    result = true
-    ref_project_list = []
-    unless experiment_set.nil?
-      experiment_node = experiment_set.xpath('//EXPERIMENT')
-      experiment_node.each_with_index do |node, idx|
-        unless node_blank?(node, 'STUDY_REF/@accession')
-          ref_project_list.push(get_node_text(node, 'STUDY_REF/@accession'))
-        else # accession属性がない場合には空文字として扱い記述もれを検知する
-          ref_project_list.push('')
-        end
-      end
-    end
-    unless analysis_set.nil?
-      analysis_node = analysis_set.xpath('//ANALYSIS')
-      analysis_node.each_with_index do |node, idx|
-        unless node_blank?(node, 'STUDY_REF/@accession')
-          ref_project_list.push(get_node_text(node, 'STUDY_REF/@accession'))
-        else # accession属性がない場合には空文字として扱い記述もれを検知する
-          ref_project_list.push('')
-        end
-      end
-    end
-    if ref_project_list.uniq.size > 1
-      annotation = [
-        {key: 'STUDY_REF', value: ref_project_list.to_s},
-        {key: 'Path', value: '//EXPERIMENT/STUDY_REF/@accession, //ANALYSIS/STUDY_REF/@accession'}
-      ]
-      add_error(rule_code, annotation)
-      result = false
-    end
-    result
+    # accession 属性がない場合には空文字として扱い記述もれを検知する
+    collect_refs = ->(set, xpath) {
+      return [] if set.nil?
+      set.xpath(xpath).map {|node|
+        node_blank?(node, 'STUDY_REF/@accession') ? '' : get_node_text(node, 'STUDY_REF/@accession')
+      }
+    }
+    ref_project_list = collect_refs.call(experiment_set, '//EXPERIMENT') + collect_refs.call(analysis_set, '//ANALYSIS')
+    return true if ref_project_list.uniq.size <= 1
+
+    annotation = [
+      {key: 'STUDY_REF', value: ref_project_list.to_s},
+      {key: 'Path',      value: '//EXPERIMENT/STUDY_REF/@accession, //ANALYSIS/STUDY_REF/@accession'}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -137,32 +122,27 @@ class CombinationValidator < ValidatorBase
   # true/false
   #
   def experiment_not_found (rule_code, experiment_set, run_set)
-    result = true
-    experiment_alias_list = [] # experiment id(alias)のリスト
-    experiment_set = experiment_set.xpath('//EXPERIMENT')
-    experiment_set.each_with_index do |experiment_node, idx|
-      unless node_blank?(experiment_node, '@alias')
-        experiment_alias_list.push(get_node_text(experiment_node, '@alias'))
-      end
+    experiment_alias_list = experiment_set.xpath('//EXPERIMENT').reject { node_blank?(it, '@alias') }
+                                          .map { get_node_text(it, '@alias') }
+    refname_path = 'EXPERIMENT_REF/@refname'
+
+    missing = run_set.xpath('//RUN').each_with_index.filter_map {|run_node, idx|
+      next if node_blank?(run_node, refname_path)
+      refname = get_node_text(run_node, refname_path)
+      next if experiment_alias_list.include?(refname)
+
+      [refname, idx + 1]
+    }
+    return true if missing.empty?
+
+    missing.each do |refname, run_idx|
+      annotation = [
+        {key: 'refname', value: refname},
+        {key: 'Path',    value: "//RUN[#{run_idx}]/#{refname_path}"}
+      ]
+      add_error(rule_code, annotation)
     end
-    run_set =  run_set.xpath('//RUN')
-    run_set.each_with_index do |run_node, idx|
-      idx += 1
-      refname_path = 'EXPERIMENT_REF/@refname'
-      unless node_blank?(run_node, refname_path)
-        refname = get_node_text(run_node, refname_path)
-        # 参照idがexperiment id(alias)のリストになければNG
-        if experiment_alias_list.find {|ex_alias| ex_alias == refname }.nil?
-          annotation = [
-            {key: 'refname', value: refname},
-            {key: 'Path', value: "//RUN[#{idx}]/#{refname_path}"}
-          ]
-          add_error(rule_code, annotation)
-          result = false
-        end
-      end
-    end
-    result
+    false
   end
 
   #
@@ -177,33 +157,33 @@ class CombinationValidator < ValidatorBase
   # true/false
   #
   def one_fastq_file_for_paired_library (rule_code, experiment_set, run_set)
-    result = true
-    run_set =  run_set.xpath('//RUN')
-    run_set.each_with_index do |run_node, idx|
-      idx += 1
-      refname_path = 'EXPERIMENT_REF/@refname'
-      unless node_blank?(run_node, refname_path)
-        refname = get_node_text(run_node, refname_path)
-        # 参照experimentを抽出
-        experiment_node = experiment_set.xpath("//EXPERIMENT[@alias='#{refname}']")
-        experiment_node.each do |ex_node|
-          # 参照experimentがpairedであり
-          unless ex_node.xpath('DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED').empty?
-            # fastqまたはgeneric_fastqのファイルが1つしかなければNG
-            if run_node.xpath("DATA_BLOCK/FILES/FILE[@filetype='fastq']").size == 1 \
-             || run_node.xpath("DATA_BLOCK/FILES/FILE[@filetype='generic_fastq']").size == 1
-              annotation = [
-                {key: 'refname', value: refname},
-                {key: 'Path', value: "//RUN[#{idx}]/DATA_BLOCK/FILES/FILE"}
-              ]
-              add_error(rule_code, annotation)
-              result = false
-            end
-          end
-        end
-      end
+    refname_path = 'EXPERIMENT_REF/@refname'
+    bad = run_set.xpath('//RUN').each_with_index.filter_map {|run_node, idx|
+      next if node_blank?(run_node, refname_path)
+      refname = get_node_text(run_node, refname_path)
+
+      paired = experiment_set.xpath("//EXPERIMENT[@alias='#{refname}']").any? {
+        !it.xpath('DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED').empty?
+      }
+      next unless paired
+
+      # fastq または generic_fastq のファイルが 1 つしかなければ NG
+      single_fastq = run_node.xpath("DATA_BLOCK/FILES/FILE[@filetype='fastq']").size == 1 ||
+                     run_node.xpath("DATA_BLOCK/FILES/FILE[@filetype='generic_fastq']").size == 1
+      next unless single_fastq
+
+      [refname, idx + 1]
+    }
+    return true if bad.empty?
+
+    bad.each do |refname, run_idx|
+      annotation = [
+        {key: 'refname', value: refname},
+        {key: 'Path',    value: "//RUN[#{run_idx}]/DATA_BLOCK/FILES/FILE"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -217,34 +197,30 @@ class CombinationValidator < ValidatorBase
   # true/false
   #
   def invalid_PacBio_RS_II_hdf_file_series (rule_code, experiment_set, run_set)
-    result = true
-    experiment_node = experiment_set.xpath('//EXPERIMENT[@alias]')
-    experiment_node.each do |ex_node|
-      if get_node_text(ex_node, 'PLATFORM/PACBIO_SMRT/INSTRUMENT_MODEL') == 'PacBio RS II'
-        refname = get_node_text(ex_node, '@alias')
-        run_set.xpath('//RUN').each_with_index do |run_node, idx|
-          # 参照しているrunであれば
-          unless run_node.xpath("EXPERIMENT_REF[@refname='#{refname}']").empty?
-            # filenameを配列に格納
-            filename_list = []
-            run_node.xpath('DATA_BLOCK/FILES/FILE').each do |file_node|
-              filename_list.push(get_node_text(file_node, '@filename'))
-            end
-            # filenameで*bax.h5が3ファイル, *bas.h5が1ファイルでないとNG
-            unless filename_list.select {|item| item =~ /bax.h5$/ }.size == 3 \
-             && filename_list.select {|item| item =~ /bas.h5$/ }.size == 1
-              annotation = [
-                {key: 'refname', value: refname},
-                {key: 'Path', value: "//RUN[#{idx}]/DATA_BLOCK/FILES/FILE"}
-              ]
-              add_error(rule_code, annotation)
-              result = false
-            end
-          end
-        end
-      end
+    pacbio_aliases = experiment_set.xpath('//EXPERIMENT[@alias]')
+                                   .select { get_node_text(it, 'PLATFORM/PACBIO_SMRT/INSTRUMENT_MODEL') == 'PacBio RS II' }
+                                   .map { get_node_text(it, '@alias') }
+
+    bad = run_set.xpath('//RUN').each_with_index.filter_map {|run_node, idx|
+      refname = pacbio_aliases.find { !run_node.xpath("EXPERIMENT_REF[@refname='#{it}']").empty? }
+      next unless refname
+
+      filenames = run_node.xpath('DATA_BLOCK/FILES/FILE').map { get_node_text(it, '@filename') }
+      # filename で *bax.h5 が 3 ファイル, *bas.h5 が 1 ファイルでないと NG
+      next if filenames.count { it =~ /bax.h5$/ } == 3 && filenames.count { it =~ /bas.h5$/ } == 1
+
+      [refname, idx]
+    }
+    return true if bad.empty?
+
+    bad.each do |refname, run_idx|
+      annotation = [
+        {key: 'refname', value: refname},
+        {key: 'Path',    value: "//RUN[#{run_idx}]/DATA_BLOCK/FILES/FILE"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -258,41 +234,38 @@ class CombinationValidator < ValidatorBase
   # true/false
   #
   def invalid_filetype (rule_code, experiment_set, run_set)
-    result = true
-    experiment_node = experiment_set.xpath('//EXPERIMENT[@alias]')
-    experiment_node.each do |ex_node|
-      platform_node = ex_node.xpath('PLATFORM/*[position() = 1]') # PLATFORMの最初の子要素を取得
-      if platform_node.any?
-        platform_name = platform_node[0].name # 子要素の要素名を取得し、confから該当するplatformの情報を抽出
-        platform_setting = @conf[:platform_filetype].select {|item| item['platform'] == platform_name }
-        if platform_setting.any? # confに記載されたplatform名であれば
-          accept_filetype_list = platform_setting[0]['filetype']
-          refname = get_node_text(ex_node, '@alias')
-          run_set.xpath('//RUN').each_with_index do |run_node, idx|
-            # 参照しているrunであれば
-            unless run_node.xpath("EXPERIMENT_REF[@refname='#{refname}']").empty?
-              # filetypeを配列に格納
-              filetype_list = []
-              run_node.xpath('DATA_BLOCK/FILES/FILE').each do |file_node|
-                filetype_list.push(get_node_text(file_node, '@filetype'))
-              end
-              # 記載されたfiletypeのリストから許容されたfiletypeを除き、他のfiletypeがあればNG
-              unaccept_filetype_list = filetype_list - accept_filetype_list
-              if unaccept_filetype_list.any?
-                annotation = [
-                  {key: 'refname', value: refname},
-                  {key: 'platform', value: platform_name},
-                  {key: 'filetype', value: unaccept_filetype_list.uniq.to_s},
-                  {key: 'Path', value: "//RUN[#{idx}]/DATA_BLOCK/FILES/FILE"}
-                ]
-                add_error(rule_code, annotation)
-                result = false
-              end
-            end
-          end
-        end
-      end
+    bad = experiment_set.xpath('//EXPERIMENT[@alias]').flat_map {|ex_node|
+      platform_name = ex_node.xpath('PLATFORM/*[position() = 1]').first&.name # PLATFORMの最初の子要素名
+      next [] if platform_name.nil?
+
+      platform_setting = @conf[:platform_filetype].find { it['platform'] == platform_name }
+      next [] if platform_setting.nil?
+
+      accept_filetype_list = platform_setting['filetype']
+      refname = get_node_text(ex_node, '@alias')
+
+      run_set.xpath('//RUN').each_with_index.filter_map {|run_node, idx|
+        next if run_node.xpath("EXPERIMENT_REF[@refname='#{refname}']").empty?
+
+        filetype_list = run_node.xpath('DATA_BLOCK/FILES/FILE').map { get_node_text(it, '@filetype') }
+        # 記載された filetype のリストから許容された filetype を除き、他があれば NG
+        unaccept = filetype_list - accept_filetype_list
+        next if unaccept.empty?
+
+        [refname, platform_name, unaccept.uniq, idx]
+      }
+    }
+    return true if bad.empty?
+
+    bad.each do |refname, platform_name, unaccept, run_idx|
+      annotation = [
+        {key: 'refname',  value: refname},
+        {key: 'platform', value: platform_name},
+        {key: 'filetype', value: unaccept.to_s},
+        {key: 'Path',     value: "//RUN[#{run_idx}]/DATA_BLOCK/FILES/FILE"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 end
