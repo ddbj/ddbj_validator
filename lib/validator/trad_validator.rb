@@ -24,7 +24,6 @@ class TradValidator < ValidatorBase
     @validation_config = @conf[:validation_config] # need?
 
     @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-    @cache = ValidatorCache.new
   end
 
   #
@@ -337,14 +336,9 @@ class TradValidator < ValidatorBase
 
       valid_flag = true
       organism_name = line[:value]
-      # あればキャッシュを使用
-      if @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
-        ret_org = @org_validator.suggest_taxid_from_name(organism_name)
-        @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret_org)
-      else
-        puts 'use cache in organism_warning' if $DEBUG
-        ret_org = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
-      end
+      ret_org = Rails.cache.fetch(['exist_organism_name', organism_name]) {
+        @org_validator.suggest_taxid_from_name(organism_name)
+      }
       annotation = [
         {key: 'organism', value: organism_name},
         {key: 'File name', value: @anno_file},

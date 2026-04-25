@@ -29,7 +29,6 @@ class BioSampleValidator < ValidatorBase
     @tsv_validator = TsvColumnValidator.new()
     @package_version = @conf[:biosample]['package_version']
     @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-    @cache = ValidatorCache.new
   end
 
   #
@@ -379,36 +378,18 @@ class BioSampleValidator < ValidatorBase
   #   {...}, ...
   # ]
   def get_attributes_of_package (package_name, package_version)
-    # あればキャッシュを使用
-    if @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name).nil?
+    Rails.cache.fetch(['package_attributes', package_name]) {
       sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:attributes_of_package].result_with_hash(params)
       result = sparql.query(sparql_query)
-      attr_list = []
-      result.each do |row|
-        attr_require = 'other'
-        if row[:require] == 'has_mandatory_attribute'
-          attr_require = 'mandatory'
-        else # has_either_one_mandatory_attribute, has_optional_attribute, has_attribute
-          attr_require = 'optional'
-        end
+      result.map {|row|
+        attr_require = row[:require] == 'has_mandatory_attribute' ? 'mandatory' : 'optional'
         type = row[:require].sub('has_', '')  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
-        if row[:max_cardinality] == '1' || row[:max_cardinality] == 1
-          allow_multiple = false
-        else
-          allow_multiple = true
-        end
-        attr = {attribute_name: row[:attribute], type: type, require: attr_require, allow_multiple: allow_multiple}
-        attr_list.push(attr)
-      end
-      @cache.save(ValidatorCache::PACKAGE_ATTRIBUTES, package_name, attr_list)
-      attr_list
-    else
-      puts 'use cache in get_attributes_of_package' if $DEBUG
-      attr_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTES, package_name)
-      attr_list
-    end
+        allow_multiple = !(row[:max_cardinality] == '1' || row[:max_cardinality] == 1)
+        {attribute_name: row[:attribute], type: type, require: attr_require, allow_multiple: allow_multiple}
+      }
+    }
   end
 
   #
@@ -435,27 +416,15 @@ class BioSampleValidator < ValidatorBase
     # package version 1.4未満ではgroup attributeの定義はない
     return [] if Gem::Version.create(package_version) < Gem::Version.create('1.4.0')
 
-    # あればキャッシュを使用
-    if @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name).nil?
+    Rails.cache.fetch(['package_attribute_groups', package_name]) {
       sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:attribute_groups_of_package].result_with_hash(params)
       result = sparql.query(sparql_query)
-      attr_group_list = []
-      result.group_by {|row| row[:group_name] }.each do |group, item|
-        attribute_set = []
-        item.each do |row|
-          attribute_set.push(row[:attribute_name])
-        end
-        attr_group_list.push({group_name: group, attribute_set: attribute_set})
-      end
-      @cache.save(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name, attr_group_list)
-      attr_group_list
-    else
-      puts 'use cache in get_attribute_groups_of_package' if $DEBUG
-      attr_group_list = @cache.check(ValidatorCache::PACKAGE_ATTRIBUTE_GROUPS, package_name)
-      attr_group_list
-    end
+      result.group_by {|row| row[:group_name] }.map {|group, items|
+        {group_name: group, attribute_set: items.map { it[:attribute_name] }}
+      }
+    }
   end
 
   #
@@ -705,17 +674,12 @@ class BioSampleValidator < ValidatorBase
   def unknown_package (rule_code, sample_name, package_name, package_version, line_num)
     return nil if package_name.blank?
 
-    # あればキャッシュを使用
-    if @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name).nil?
+    result = Rails.cache.fetch(['unknown_package', package_name]) {
       sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:valid_package_name].result_with_hash(params)
-      result = sparql.query(sparql_query)
-      @cache.save(ValidatorCache::UNKNOWN_PACKAGE, package_name, result)
-    else
-      puts 'use cache in unknown_package' if $DEBUG
-      result = @cache.check(ValidatorCache::UNKNOWN_PACKAGE, package_name)
-    end
+      sparql.query(sparql_query)
+    }
     if result.first[:count].to_i <= 0
       annotation = [
         {key: 'Sample name', value: sample_name},
@@ -1021,14 +985,9 @@ class BioSampleValidator < ValidatorBase
       begin
         # check exist ref
         if ref =~ /\d{6,}/ && ref !~ /\./ # pubmed id
-          # あればキャッシュを使用
-          if @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref).nil?
-            exist_pubchem = NcbiEutils.exist_pubmed_id?(ref)
-            @cache.save(ValidatorCache::EXIST_PUBCHEM_ID, ref, exist_pubchem)
-          else
-            puts 'use cache in invalid_publication_identifier(pubchem)' if $DEBUG
-            exist_pubchem = @cache.check(ValidatorCache::EXIST_PUBCHEM_ID, ref)
-          end
+          exist_pubchem = Rails.cache.fetch(['exist_pubchem_id', ref]) {
+            NcbiEutils.exist_pubmed_id?(ref)
+          }
           result = exist_pubchem && result
         elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ # DOI
           # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
@@ -1255,14 +1214,9 @@ class BioSampleValidator < ValidatorBase
 
     lat = iso_latlon[:latitude]
     lon = iso_latlon[:longitude]
-    key = ValidatorCache.create_key(lat, lon)
-    actual_iso = if @cache.has_key(ValidatorCache::COUNTRY_FROM_LATLON, key)
-                   @cache.check(ValidatorCache::COUNTRY_FROM_LATLON, key)
-    else
-                   value = Geolocation.country_at(lat, lon)
-                   @cache.save(ValidatorCache::COUNTRY_FROM_LATLON, key, value)
-                   value
-    end
+    actual_iso = Rails.cache.fetch(['country_from_latlon', lat, lon]) {
+      Geolocation.country_at(lat, lon)
+    }
     return nil if actual_iso.nil?
     return true if actual_iso == expected_iso
 
@@ -1348,14 +1302,9 @@ class BioSampleValidator < ValidatorBase
       end
       if !(host_taxid.nil? || host_taxid.strip == '' || host_tax_id_not_integer) # host_taxid記述あり
         annotation.push({key: 'host_taxid', value: host_taxid})
-        # あればキャッシュを使用
-        if @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid) == false # cache値がnilの可能性があるためhas_keyでチェック
-          scientific_name = @org_validator.get_organism_name(host_taxid)
-          @cache.save(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid, scientific_name)
-        else
-          puts 'use cache in taxonomy_name_from_id' if $DEBG
-          scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, host_taxid)
-        end
+        scientific_name = Rails.cache.fetch(['tax_match_organism', host_taxid]) {
+          @org_validator.get_organism_name(host_taxid)
+        }
         # scientific_nameがあり、ユーザの入力値と一致する
         if !scientific_name.nil? && scientific_name == host_name
           ret = true
@@ -1367,14 +1316,9 @@ class BioSampleValidator < ValidatorBase
           ret = false
         end
       else # host_id記述なしまたは不正
-        # あればキャッシュを使用
-        if @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name).nil?
-          org_ret = @org_validator.suggest_taxid_from_name(host_name)
-          @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, host_name, org_ret)
-        else
-          puts 'use cache EXIST_ORGANISM_NAME' if $DEBUG
-          org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, host_name)
-        end
+        org_ret = Rails.cache.fetch(['exist_organism_name', host_name]) {
+          @org_validator.suggest_taxid_from_name(host_name)
+        }
         if org_ret[:status] == 'exist' # 該当するtaxonomy_idがあった場合
           scientific_name = org_ret[:scientific_name]
           # ユーザ入力のorganism_nameがscientific_nameでない場合や大文字小文字の違いがあった場合に自動補正する
@@ -1413,14 +1357,9 @@ class BioSampleValidator < ValidatorBase
   #
   def taxonomy_error_warning (rule_code, sample_name, organism_name, line_num)
     return nil if InsdcNullability.null_value?(organism_name)
-    # あればキャッシュを使用
-    if @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
-      ret = @org_validator.suggest_taxid_from_name(organism_name)
-      @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret)
-    else
-      puts 'use cache in taxonomy_error_warning' if $DEBUG
-      ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
-    end
+    ret = Rails.cache.fetch(['exist_organism_name', organism_name]) {
+      @org_validator.suggest_taxid_from_name(organism_name)
+    }
     annotation = [
       {key: 'Sample name', value: sample_name},
       {key: 'organism', value: organism_name}
@@ -1479,14 +1418,9 @@ class BioSampleValidator < ValidatorBase
   def taxonomy_name_and_id_not_match (rule_code, sample_name, taxonomy_id, organism_name, line_num)
     return nil if InsdcNullability.null_value?(organism_name) || InsdcNullability.null_value?(taxonomy_id)
 
-    # あればキャッシュを使用
-    if @cache.has_key(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id) == false # cache値がnilの可能性があるためhas_keyでチェック
-      scientific_name = @org_validator.get_organism_name(taxonomy_id)
-      @cache.save(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id, scientific_name)
-    else
-      puts 'use cache in taxonomy_name_from_id' if $DEBG
-      scientific_name = @cache.check(ValidatorCache::TAX_MATCH_ORGANISM, taxonomy_id)
-    end
+    scientific_name = Rails.cache.fetch(['tax_match_organism', taxonomy_id]) {
+      @org_validator.get_organism_name(taxonomy_id)
+    }
     # scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
     if !scientific_name.nil? && scientific_name == organism_name
       true
@@ -1520,15 +1454,9 @@ class BioSampleValidator < ValidatorBase
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
     return nil if package_name.blank? || InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
-    # あればキャッシュを使用
-    cache_key = ValidatorCache.create_key(taxonomy_id, package_name)
-    if @cache.check(ValidatorCache::TAX_VS_PACKAGE, cache_key).nil?
-      valid_result = @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name)
-      @cache.save(ValidatorCache::TAX_VS_PACKAGE, cache_key, valid_result)
-    else
-      puts 'use cache in package_versus_organism' if $DEBUG
-      valid_result = @cache.check(ValidatorCache::TAX_VS_PACKAGE, cache_key)
-    end
+    valid_result = Rails.cache.fetch(['tax_vs_package', taxonomy_id, package_name]) {
+      @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name)
+    }
 
     if valid_result[:status] == 'error'
       # パッケージに適したルールのエラーメッセージを取得
@@ -1567,25 +1495,12 @@ class BioSampleValidator < ValidatorBase
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
     fungi_linages = [OrganismValidator::TAX_FUNGI]
     unless sex == ''
-      # あればキャッシュを使用
-      # bacteria virus linage
-      cache_key_bac_vir = ValidatorCache.create_key(taxonomy_id, bac_vir_linages)
-      if @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir).nil?
-        has_linage_bac_vir = @org_validator.has_linage(taxonomy_id, bac_vir_linages)
-        @cache.save(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir, has_linage_bac_vir)
-      else
-        puts 'use cache in sex_for_bacteria(bacteria virus)' if $DEBUG
-        has_linage_bac_vir = @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_bac_vir)
-      end
-      # fungi linage
-      cache_key_fungi = ValidatorCache.create_key(taxonomy_id, fungi_linages)
-      if @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi).nil?
-        has_linage_fungi = @org_validator.has_linage(taxonomy_id, fungi_linages)
-        @cache.save(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi, has_linage_fungi)
-      else
-        puts 'use cache in sex_for_bacteria(fungi)' if $DEBUG
-        has_linage_fungi = @cache.check(ValidatorCache::TAX_HAS_LINAGE, cache_key_fungi)
-      end
+      has_linage_bac_vir = Rails.cache.fetch(['tax_has_linage', taxonomy_id, bac_vir_linages]) {
+        @org_validator.has_linage(taxonomy_id, bac_vir_linages)
+      }
+      has_linage_fungi = Rails.cache.fetch(['tax_has_linage', taxonomy_id, fungi_linages]) {
+        @org_validator.has_linage(taxonomy_id, fungi_linages)
+      }
 
       if has_linage_bac_vir
         message = "bacterial or viral organisms; did you mean 'host sex'?"
@@ -2152,13 +2067,9 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(bioproject_accession)
     return nil if submitter_id.nil?
 
-    # cache 値が nil の可能性があるため has_key で判定する
-    if !@cache.has_key(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
-      ret = @db_validator.get_bioproject_referenceable_submitter_ids(bioproject_accession)
-      @cache.save(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession, ret)
-    else
-      ret = @cache.check(ValidatorCache::BIOPROJECT_SUBMITTER, bioproject_accession)
-    end
+    ret = Rails.cache.fetch(['bioproject_submitter', bioproject_accession]) {
+      @db_validator.get_bioproject_referenceable_submitter_ids(bioproject_accession)
+    }
 
     # SubmitterID が取得できない or 一致していれば OK
     return true if ret.nil? || ret.include?(submitter_id)
@@ -2248,12 +2159,9 @@ class BioSampleValidator < ValidatorBase
   def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
     return nil if InsdcNullability.null_value?(bioproject_accession)
 
-    if @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession).nil?
-      is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
-      @cache.save(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession, is_umbrella)
-    else
-      is_umbrella = @cache.check(ValidatorCache::IS_UMBRELLA_ID, bioproject_accession)
-    end
+    is_umbrella = Rails.cache.fetch(['is_umbrella_id', bioproject_accession]) {
+      @db_validator.umbrella_project?(bioproject_accession)
+    }
     return true unless is_umbrella
 
     annotation = [
@@ -2412,13 +2320,9 @@ class BioSampleValidator < ValidatorBase
     result = false if duplicated.length > 1 # 自身以外に同一のlocus_tag_prefixをもつサンプルがある
 
     # biosample DB内の同じlocus_tag_prefixが登録されていないかのチェック
-    if @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, 'all').nil?
-      # biosample DBから全locus_tag_prefixのリストを取得
-      all_prefix_list = @db_validator.get_all_locus_tag_prefix()
-      @cache.save(ValidatorCache::LOCUS_TAG_PREFIX, 'all', all_prefix_list)
-    else
-      all_prefix_list = @cache.check(ValidatorCache::LOCUS_TAG_PREFIX, 'all')
-    end
+    all_prefix_list = Rails.cache.fetch(['locus_tag_prefix', 'all']) {
+      @db_validator.get_all_locus_tag_prefix()
+    }
 
     # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
     duplicated_list = all_prefix_list.select {|row| row[:locus_tag_prefix] == locus_tag && row[:submission_id] != submission_id }
@@ -2454,12 +2358,9 @@ class BioSampleValidator < ValidatorBase
     result = true
 
     if /^PSUB/ =~ psub_id
-      if @cache.has_key(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id) == false # cache値がnilの可能性があるためhas_keyでチェック
-        biosample_accession = @db_validator.get_bioproject_accession(psub_id)
-        @cache.save(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id, biosample_accession)
-      else
-        biosample_accession = @cache.check(ValidatorCache::BIOPROJECT_PRJD_ID, psub_id)
-      end
+      biosample_accession = Rails.cache.fetch(['bioproject_prjd_id', psub_id]) {
+        @db_validator.get_bioproject_accession(psub_id)
+      }
 
       annotation = [
           {key: 'Sample name', value: sample_name},
@@ -2704,13 +2605,9 @@ class BioSampleValidator < ValidatorBase
       {key: 'component_organism', value: component_organism}
     ]
 
-    # あればキャッシュを使用
-    if @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism).nil?
-      org_ret = @org_validator.suggest_taxid_from_name(component_organism)
-    else
-      puts 'use cache EXIST_ORGANISM_NAME' if $DEBUG
-      org_ret = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, component_organism)
-    end
+    org_ret = Rails.cache.fetch(['exist_organism_name', component_organism]) {
+      @org_validator.suggest_taxid_from_name(component_organism)
+    }
 
     if org_ret[:status] == 'exist' # 該当するtaxonomy_idがあった場合
       scientific_name = org_ret[:scientific_name]
@@ -2754,30 +2651,22 @@ class BioSampleValidator < ValidatorBase
     ret = true
 
     metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
-    # あればキャッシュを使用
-    cache_key_metage_source = ValidatorCache.create_key(metagenome_source, metagenome_linages)
-    if @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source).nil?
+    has_linage_metagenome = Rails.cache.fetch(['metage_source_lineage', metagenome_source, metagenome_linages]) {
       org_ret = @org_validator.suggest_taxid_from_name(metagenome_source) # metagenome_sourceからtax_idを検索
       if org_ret[:status] == 'exist' # tax_idが1件
         linage_ret = @org_validator.has_linage(org_ret[:tax_id], metagenome_linages)
-        ret = false if linage_ret == false
-        has_linage_metagenome = {tax_id: org_ret[:tax_id], lineage: linage_ret}
+        result = {tax_id: org_ret[:tax_id], lineage: linage_ret}
         unless org_ret[:scientific_name] == metagenome_source
-          has_linage_metagenome[:annotation_name] = org_ret[:scientific_name]
+          result[:annotation_name] = org_ret[:scientific_name]
         end
+        result
       elsif org_ret[:status] == 'multiple exist' # tax_idが複数件ヒット. どれかがmetagenomeならOK
-        has_linage_metagenome = {tax_id: org_ret[:tax_id], lineage: false}
-        org_ret[:tax_id].each do |tax_id|
-          linage_ret = @org_validator.has_linage(tax_id.chomp.strip, metagenome_linages)
-          has_linage_metagenome[:lineage] = true if linage_ret == true
-        end
+        any_metagenome = org_ret[:tax_id].any? { @org_validator.has_linage(it.chomp.strip, metagenome_linages) }
+        {tax_id: org_ret[:tax_id], lineage: any_metagenome}
       else # not exist
-        has_linage_metagenome = {tax_id: nil, lineage: nil}
+        {tax_id: nil, lineage: nil}
       end
-      @cache.save(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source, has_linage_metagenome)
-    else
-      has_linage_metagenome = @cache.check(ValidatorCache::METAGE_SOURCE_LINEAGE, cache_key_metage_source)
-    end
+    }
     if has_linage_metagenome[:tax_id].nil?
       message = 'This metagenome_source name is not in the taxonomy database.'
       ret = false
