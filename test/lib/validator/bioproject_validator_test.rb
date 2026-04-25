@@ -211,7 +211,8 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0016
   def test_invalid_umbrella_project
-    skip_unless_pg_configured
+    # _ok fixture は PRJDB1554 / PSUB001851 を含むので両方 umbrella 扱い、_ng fixture の PRJDB3490 は非 umbrella
+    stub_db_validator(@validator, umbrella_project?: ->(accession) { %w[PRJDB1554 PSUB001851].include?(accession) })
     # ok case
     link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok.xml")
     ret = exec_validator('invalid_umbrella_project', 'BP_R0016', 'Link', link_set.first, 1)
