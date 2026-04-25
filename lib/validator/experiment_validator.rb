@@ -114,21 +114,19 @@ class ExperimentValidator < ValidatorBase
   # true/false
   #
   def invalid_center_name (rule_code, experiment_label, experiment_node, submitter_id, line_num)
-    result = true
     acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    experiment_node.xpath('@center_name').each do |center_node|
-      center_name = get_node_text(center_node, '.')
-      if acc_center_name != center_name
-        annotation = [
-          {key: 'Experiment name', value: experiment_label},
-          {key: 'center name', value: center_name},
-          {key: 'Path', value: '//EXPERIMENT/@center_name'}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
+    mismatched = experiment_node.xpath('@center_name').map { get_node_text(it, '.') }.reject { it == acc_center_name }
+    return true if mismatched.empty?
+
+    mismatched.each do |center_name|
+      annotation = [
+        {key: 'Experiment name', value: experiment_label},
+        {key: 'center name',     value: center_name},
+        {key: 'Path',            value: '//EXPERIMENT/@center_name'}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #

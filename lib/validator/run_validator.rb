@@ -114,21 +114,19 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def invalid_center_name (rule_code, run_label, run_node, submitter_id, line_num)
-    result = true
     acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    run_node.xpath('@center_name').each do |center_node|
-      center_name = get_node_text(center_node, '.')
-      if acc_center_name != center_name
-        annotation = [
-          {key: 'run name', value: run_label},
-          {key: 'center name', value: center_name},
-          {key: 'Path', value: '//RUN/@center_name'}
-        ]
-        add_error(rule_code, annotation)
-        result = false
-      end
+    mismatched = run_node.xpath('@center_name').map { get_node_text(it, '.') }.reject { it == acc_center_name }
+    return true if mismatched.empty?
+
+    mismatched.each do |center_name|
+      annotation = [
+        {key: 'run name',    value: run_label},
+        {key: 'center name', value: center_name},
+        {key: 'Path',        value: '//RUN/@center_name'}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -164,23 +162,23 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def missing_run_filename (rule_code, run_label, run_node, line_num)
-    result = true
-    data_block_path = '//DATA_BLOCK'
-    run_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
-      file_path = 'FILES/FILE'
-      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
-        if node_blank?(file_node, '@filename')
-          annotation = [
-            {key: 'Run name', value: run_label},
-            {key: 'filename', value: ''},
-            {key: 'Path', value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
-          ]
-          add_error(rule_code, annotation)
-          result = false
-        end
-      end
+    missing = run_node.xpath('//DATA_BLOCK').each_with_index.flat_map {|data_block_node, d_idx|
+      data_block_node.xpath('FILES/FILE').each_with_index.filter_map {|file_node, f_idx|
+        next unless node_blank?(file_node, '@filename')
+        [d_idx + 1, f_idx + 1]
+      }
+    }
+    return true if missing.empty?
+
+    missing.each do |d_idx, f_idx|
+      annotation = [
+        {key: 'Run name', value: run_label},
+        {key: 'filename', value: ''},
+        {key: 'Path',     value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx}]/FILES/FILE[#{f_idx}]/@filename"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -194,26 +192,25 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def invalid_run_filename (rule_code, run_label, run_node, line_num)
-    result = true
-    data_block_path = '//DATA_BLOCK'
-    run_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
-      file_path = 'FILES/FILE'
-      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
-        unless node_blank?(file_node, '@filename')
-          filename = get_node_text(file_node, '@filename')
-          unless filename =~ /^[A-Za-z0-9_.-]+$/
-            annotation = [
-              {key: 'Run name', value: run_label},
-              {key: 'filename', value: filename},
-              {key: 'Path', value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@filename"}
-            ]
-            add_error(rule_code, annotation)
-            result = false
-          end
-        end
-      end
+    bad = run_node.xpath('//DATA_BLOCK').each_with_index.flat_map {|data_block_node, d_idx|
+      data_block_node.xpath('FILES/FILE').each_with_index.filter_map {|file_node, f_idx|
+        next if node_blank?(file_node, '@filename')
+        filename = get_node_text(file_node, '@filename')
+        next if filename =~ /^[A-Za-z0-9_.-]+$/
+        [filename, d_idx + 1, f_idx + 1]
+      }
+    }
+    return true if bad.empty?
+
+    bad.each do |filename, d_idx, f_idx|
+      annotation = [
+        {key: 'Run name', value: run_label},
+        {key: 'filename', value: filename},
+        {key: 'Path',     value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx}]/FILES/FILE[#{f_idx}]/@filename"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -227,26 +224,25 @@ class RunValidator < ValidatorBase
   # true/false
   #
   def invalid_run_file_md5_checksum (rule_code, run_label, run_node, line_num)
-    result = true
-    data_block_path = '//DATA_BLOCK'
-    run_node.xpath(data_block_path).each_with_index do |data_block_node, d_idx|
-      file_path = 'FILES/FILE'
-      data_block_node.xpath(file_path).each_with_index do |file_node, f_idx|
-        unless node_blank?(file_node, '@checksum')
-          checksum = get_node_text(file_node, '@checksum')
-          unless checksum =~ /^[A-Za-z0-9]{32}$/
-            annotation = [
-              {key: 'Run name', value: run_label},
-              {key: 'checksum', value: checksum},
-              {key: 'Path', value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx + 1}]/#{file_path}[#{f_idx + 1}]/@checksum"}
-            ]
-            add_error(rule_code, annotation)
-            result = false
-          end
-        end
-      end
+    bad = run_node.xpath('//DATA_BLOCK').each_with_index.flat_map {|data_block_node, d_idx|
+      data_block_node.xpath('FILES/FILE').each_with_index.filter_map {|file_node, f_idx|
+        next if node_blank?(file_node, '@checksum')
+        checksum = get_node_text(file_node, '@checksum')
+        next if checksum =~ /^[A-Za-z0-9]{32}$/
+        [checksum, d_idx + 1, f_idx + 1]
+      }
+    }
+    return true if bad.empty?
+
+    bad.each do |checksum, d_idx, f_idx|
+      annotation = [
+        {key: 'Run name', value: run_label},
+        {key: 'checksum', value: checksum},
+        {key: 'Path',     value: "//RUN[#{line_num}]/DATA_BLOCK[#{d_idx}]/FILES/FILE[#{f_idx}]/@checksum"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
