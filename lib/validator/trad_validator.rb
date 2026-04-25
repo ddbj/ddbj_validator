@@ -346,9 +346,9 @@ class TradValidator < ValidatorBase
       valid_flag = true
       organism_name = line[:value]
       # あればキャッシュを使用
-      if @cache.nil? || @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
+      if @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name).nil?
         ret_org = @org_validator.suggest_taxid_from_name(organism_name)
-        @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret_org) unless @cache.nil?
+        @cache.save(ValidatorCache::EXIST_ORGANISM_NAME, organism_name, ret_org)
       else
         puts 'use cache in organism_warning' if $DEBUG
         ret_org = @cache.check(ValidatorCache::EXIST_ORGANISM_NAME, organism_name)
