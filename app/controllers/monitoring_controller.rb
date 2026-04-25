@@ -6,7 +6,7 @@ class MonitoringController < ApplicationController
   # NG のときは HTTP 503 で返すことで curl --fail probe を失敗させる。
   def show
     submission_id = validator_setting.dig('monitoring', 'ssub_id') || 'SSUB009526'
-    api_url       = "http://localhost:#{ENV.fetch('DDBJ_VALIDATOR_APP_UNICORN_PORT', '3000')}/api/"
+    api_url       = "http://localhost:#{ENV.fetch('PORT', '3000')}/api/"
 
     xml_body = HTTP.headers('API_KEY' => 'curator').get("#{api_url}submission/biosample/#{submission_id}").body.to_s
     raise "Can't get submission xml file. Please check the validation service." unless xml_body.start_with?('<?xml')

@@ -12,7 +12,7 @@ services:
       RUBY_YJIT_ENABLE: "true"
       RAILS_ENV: ${RAILS_ENV}
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
-      DDBJ_VALIDATOR_APP_UNICORN_PORT: 3000
+      WEB_CONCURRENCY: 4
     user: 0:0
     volumes:
       - ${PWD}:/usr/src/ddbj_validator
