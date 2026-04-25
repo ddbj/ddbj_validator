@@ -22,15 +22,11 @@ development: &dev
     pg_user:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_USER'] %>
     pg_pass:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PASSWD'] %>
     pg_timeout: 30
-  ddbj_parser:
-    parser_api_url:
   monitoring:
     ssub_id: SSUB009526
 
 test:
   <<: *dev
-  ddbj_parser:
-    parser_api_url: http://ddbj-parser.stub/validate
 
 staging:
   <<: *default

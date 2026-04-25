@@ -13,7 +13,6 @@ services:
       RAILS_ENV: ${RAILS_ENV}
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
       DDBJ_VALIDATOR_APP_UNICORN_PORT: 3000
-      DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR: /usr/src/ddbj_validator/logs
     user: ${UID:-0}:${GID:-0}
     volumes:
       - ${PWD}:/usr/src/ddbj_validator

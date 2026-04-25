@@ -17,15 +17,12 @@ class ValidatorBase
     db = setting['ddbj_rdb']
     db_configured = db && %w[pg_host pg_port pg_user pg_pass].all? { db[it].to_s != '' }
 
-    parser_url = setting.dig('ddbj_parser', 'parser_api_url').to_s
-
     {
-      sparql_config:       setting['sparql_endpoint'],
-      ddbj_db_config:      db_configured ? db : nil,
-      ddbj_parser_config:  parser_url.empty? ? nil : parser_url,
-      named_graph_uri:     setting['named_graph_uri'],
-      biosample:           setting['biosample'],
-      log_dir:             setting.dig('api_log', 'path')
+      sparql_config:   setting['sparql_endpoint'],
+      ddbj_db_config:  db_configured ? db : nil,
+      named_graph_uri: setting['named_graph_uri'],
+      biosample:       setting['biosample'],
+      log_dir:         setting.dig('api_log', 'path')
     }
   end
 
@@ -44,9 +41,9 @@ class ValidatorBase
   end
 
   #
-  # 既に組み立て済みの rule hash を直接渡す版。trad_validator の ddbj_parser_rule(msg) や
-  # @conf[:validation_parser_config] のように @validation_config 以外から rule を引くケース用。
-  # 戻り値は push したエラー hash (push 後に :external 等を上書きしたい呼び出し元向け)。
+  # 既に組み立て済みの rule hash を直接渡す版。@validation_config 以外から rule を
+  # 引いてくるケース用。戻り値は push したエラー hash (push 後に :external 等を
+  # 上書きしたい呼び出し元向け)。
   #
   def add_raw_error (rule, annotation, auto_annotation: false, source: @data_file)
     error = ErrorBuilder.error_obj(rule, source, annotation, auto_annotation)
