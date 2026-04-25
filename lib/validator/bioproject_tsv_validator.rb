@@ -217,22 +217,20 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_publication_identifier(rule_code, data)
-    result = true
     pubmed_id_list = @tsv_validator.field_value_list(data, 'pubmed_id')
     return true if pubmed_id_list.nil?
-    pubmed_id_list.each do |pubmed_id|
-      unless pubmed_id.blank?
-        unless NcbiEutils.exist_pubmed_id?(pubmed_id.to_s)
-          annotation = [
-           {key: 'Field name', value: 'pubmed_id'},
-           {key: 'Value', value: pubmed_id}
-          ]
-          add_error(rule_code, annotation)
-          result = false
-        end
-      end
+
+    invalid = pubmed_id_list.reject(&:blank?).reject { NcbiEutils.exist_pubmed_id?(it.to_s) }
+    return true if invalid.empty?
+
+    invalid.each do |pubmed_id|
+      annotation = [
+        {key: 'Field name', value: 'pubmed_id'},
+        {key: 'Value',      value: pubmed_id}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -273,29 +271,27 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, taxonomy_id, organism_name, sample_scope)
     return nil if sample_scope.blank?
-    result = true
+    return true if sample_scope.downcase == 'multiisolate' # multi の場合は無視
 
-    unless sample_scope.downcase == 'multiisolate' # multiの場合は無視
-      if organism_name.blank? || InsdcNullability.null_value?(organism_name) # organismの記載がない
-        result = false
-        annotation = [
-          {key: 'organism', value: ''},
-          {key: 'sample_scope', value: sample_scope},
-          {key: 'Message', value: "When sample_scope is '#{sample_scope}', organism is required."}
-        ]
-        add_error(rule_code, annotation)
-      elsif !(taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID)
-        result = @org_validator.is_infraspecific_rank(taxonomy_id)
-        if result == false
-          annotation = [
-            {key: 'organism', value: organism_name},
-            {key: 'taxonomy_id', value: taxonomy_id}
-          ]
-          add_error(rule_code, annotation)
-        end
-      end
+    if organism_name.blank? || InsdcNullability.null_value?(organism_name) # organism の記載がない
+      annotation = [
+        {key: 'organism',     value: ''},
+        {key: 'sample_scope', value: sample_scope},
+        {key: 'Message',      value: "When sample_scope is '#{sample_scope}', organism is required."}
+      ]
+      add_error(rule_code, annotation)
+      return false
     end
-    result
+
+    return true if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
+    return true if @org_validator.is_infraspecific_rank(taxonomy_id)
+
+    annotation = [
+      {key: 'organism',    value: organism_name},
+      {key: 'taxonomy_id', value: taxonomy_id}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -425,28 +421,10 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def missing_mandatory_field(rule_code, data, mandatory_conf, level)
-    result = true
-    invalid_list = {}
-    unless mandatory_conf[level].nil?
-      invalid_list[level] = @tsv_validator.missing_mandatory_field(data, mandatory_conf[level])
+    fetcher = ->(slice) { @tsv_validator.missing_mandatory_field(data, slice) }
+    report_level_errors(rule_code, mandatory_conf, level, fetcher) do |invalid_field|
+      [{key: 'Field name', value: invalid_field}]
     end
-    if level == 'error' && !mandatory_conf['error_internal_ignore'].nil? # errorの場合は、internal_ignore もチェック
-      invalid_list['error_internal_ignore'] = @tsv_validator.missing_mandatory_field(data, mandatory_conf['error_internal_ignore'])
-    end
-
-    invalid_list.each do |level, list|
-      unless list.empty?
-        result = false
-        list.each do |invalid_field|
-          annotation = [
-            {key: 'Field name', value: invalid_field}
-          ]
-          error = add_error(rule_code, annotation)
-          error[:external] = true if level == 'error_internal_ignore'
-        end
-      end
-    end
-    result
   end
 
   #
@@ -461,30 +439,14 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_value_for_controlled_terms(rule_code, data, cv_check_conf, not_allow_null_field_list, null_accepted_list, level)
-    result = true
-    invalid_list = {}
-    unless cv_check_conf[level].nil?
-      invalid_list[level] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf[level], not_allow_null_field_list, null_accepted_list)
+    fetcher = ->(slice) { @tsv_validator.invalid_value_for_controlled_terms(data, slice, not_allow_null_field_list, null_accepted_list) }
+    report_level_errors(rule_code, cv_check_conf, level, fetcher) do |invalid|
+      [
+        {key: 'Field_name', value: invalid[:field_name]},
+        {key: 'Value',      value: invalid[:value]},
+        {key: 'Position',   value: invalid[:field_idx]}
+      ]
     end
-    if level == 'error' && !cv_check_conf['error_internal_ignore'].nil? # errorの場合は、internal_ignore もチェック
-      invalid_list['error_internal_ignore'] = @tsv_validator.invalid_value_for_controlled_terms(data, cv_check_conf['error_internal_ignore'], not_allow_null_field_list, null_accepted_list)
-    end
-
-    invalid_list.each do |level, list|
-      unless list.empty?
-        result = false
-        list.each do |invalid|
-          annotation = [
-            {key: 'Field_name', value: invalid[:field_name]},
-            {key: 'Value', value: invalid[:value]},
-            {key: 'Position', value: invalid[:field_idx]}
-          ]
-          error = add_error(rule_code, annotation)
-          error[:external] = true if level == 'error_internal_ignore'
-        end
-      end
-    end
-    result
   end
 
   #
@@ -498,24 +460,18 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def multiple_values(rule_code, data, allow_multiple_values_conf)
-    result = true
-    invalid_list = []
-    unless allow_multiple_values_conf.nil?
-      invalid_list = @tsv_validator.multiple_values(data, allow_multiple_values_conf)
-    end
+    invalid_list = allow_multiple_values_conf.nil? ? [] : @tsv_validator.multiple_values(data, allow_multiple_values_conf)
+    return true if invalid_list.empty?
 
-    unless invalid_list.empty?
-      result = false
-      invalid_list.each do |invalid|
-        annotation = [
-          {key: 'Field_name', value: invalid[:field_name]},
-          {key: 'Value', value: invalid[:value]},
-          {key: 'Position', value: "#{invalid[:field_idx]}"} # TSVだと++1?
-        ]
-        add_error(rule_code, annotation)
-      end
+    invalid_list.each do |invalid|
+      annotation = [
+        {key: 'Field_name', value: invalid[:field_name]},
+        {key: 'Value',      value: invalid[:value]},
+        {key: 'Position',   value: "#{invalid[:field_idx]}"} # TSVだと++1?
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -530,30 +486,14 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_value_format(rule_code, data, format_check_conf, level)
-    result = true
-    invalid_list = {}
-    unless format_check_conf[level].nil?
-      invalid_list[level] = @tsv_validator.check_field_format(data, format_check_conf[level])
+    fetcher = ->(slice) { @tsv_validator.check_field_format(data, slice) }
+    report_level_errors(rule_code, format_check_conf, level, fetcher) do |invalid|
+      [
+        {key: 'Field_name',  value: invalid[:field_name]},
+        {key: 'Value',       value: invalid[:value]},
+        {key: 'format_type', value: invalid[:format_type]}
+      ]
     end
-    if level == 'error' && !format_check_conf['error_internal_ignore'].nil? # errorの場合は、internal_ignore もチェック
-      invalid_list['error_internal_ignore'] = @tsv_validator.check_field_format(data, format_check_conf['error_internal_ignore'])
-    end
-
-    invalid_list.each do |level, list|
-      unless list.empty?
-        result = false
-        list.each do |invalid|
-          annotation = [
-            {key: 'Field_name', value: invalid[:field_name]},
-            {key: 'Value', value: invalid[:value]},
-            {key: 'format_type', value: invalid[:format_type]}
-          ]
-          error = add_error(rule_code, annotation)
-          error[:external] = true if level == 'error_internal_ignore'
-        end
-      end
-    end
-    result
   end
 
   #
@@ -570,30 +510,15 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def missing_at_least_one_required_fields_in_a_group(rule_code, data, selective_mandatory_conf, field_groups_conf, level)
     return nil if field_groups_conf.nil?
-    result = true
-    invalid_list = {}
-    unless selective_mandatory_conf[level].nil?
-      invalid_list[level] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf[level], field_groups_conf)
-    end
-    if level == 'error' && !selective_mandatory_conf['error_internal_ignore'].nil? # errorの場合は、internal_ignore もチェック
-      invalid_list['error_internal_ignore'] = @tsv_validator.selective_mandatory(data, selective_mandatory_conf['error_internal_ignore'], field_groups_conf)
-    end
 
-    invalid_list.each do |level, list|
-      unless list.empty?
-        result = false
-        list.each do |invalid|
-          annotation = [
-            {key: 'Group name', value: invalid[:field_group_name]},
-            {key: 'Filed names', value: invalid[:field_list].to_s},
-            {key: 'Meesage', value: "At least one of #{invalid[:field_list]} is required for the '#{invalid[:field_group_name]}' field group."}
-          ]
-          error = add_error(rule_code, annotation)
-          error[:external] = true if level == 'error_internal_ignore'
-        end
-      end
+    fetcher = ->(slice) { @tsv_validator.selective_mandatory(data, slice, field_groups_conf) }
+    report_level_errors(rule_code, selective_mandatory_conf, level, fetcher) do |invalid|
+      [
+        {key: 'Group name',  value: invalid[:field_group_name]},
+        {key: 'Filed names', value: invalid[:field_list].to_s},
+        {key: 'Meesage',     value: "At least one of #{invalid[:field_list]} is required for the '#{invalid[:field_group_name]}' field group."}
+      ]
     end
-    result
   end
 
   #
@@ -609,31 +534,16 @@ class BioProjectTsvValidator < ValidatorBase
   #
   def missing_required_fields_in_a_group(rule_code, data, mandatory_fields_in_a_group_conf, field_groups_conf, level)
     return nil if field_groups_conf.nil?
-    result = true
-    invalid_list = {}
-    unless mandatory_fields_in_a_group_conf[level].nil?
-      invalid_list[level] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf[level], field_groups_conf)
-    end
-    if level == 'error' && !mandatory_fields_in_a_group_conf['error_internal_ignore'].nil? # errorの場合は、internal_ignore もチェック
-      invalid_list['error_internal_ignore'] = @tsv_validator.mandatory_fields_in_a_group(data, mandatory_fields_in_a_group_conf['error_internal_ignore'], field_groups_conf)
-    end
 
-    invalid_list.each do |level, list|
-      unless list.empty?
-        result = false
-        list.each do |invalid|
-          annotation = [
-            {key: 'Group name', value: invalid[:field_group_name]},
-            {key: 'Filed names', value: invalid[:missing_fields].to_s},
-            {key: 'Position(value)', value: invalid[:value_idx]},
-            {key: 'Meesage', value: "#{invalid[:missing_fields]} is required for the '#{invalid[:field_group_name]}' field group."}
-          ]
-          error = add_error(rule_code, annotation)
-          error[:external] = true if level == 'error_internal_ignore'
-        end
-      end
+    fetcher = ->(slice) { @tsv_validator.mandatory_fields_in_a_group(data, slice, field_groups_conf) }
+    report_level_errors(rule_code, mandatory_fields_in_a_group_conf, level, fetcher) do |invalid|
+      [
+        {key: 'Group name',      value: invalid[:field_group_name]},
+        {key: 'Filed names',     value: invalid[:missing_fields].to_s},
+        {key: 'Position(value)', value: invalid[:value_idx]},
+        {key: 'Meesage',         value: "#{invalid[:missing_fields]} is required for the '#{invalid[:field_group_name]}' field group."}
+      ]
     end
-    result
   end
 
   #
@@ -650,28 +560,13 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def null_value_is_not_allowed(rule_code, data, not_allow_null_value_conf, null_accepted_list, null_not_recommended_list, level)
-    result = true
-    invalid_list = {}
-    unless not_allow_null_value_conf[level].nil?
-      invalid_list[level] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf[level], null_accepted_list, null_not_recommended_list)
+    fetcher = ->(slice) { @tsv_validator.null_value_is_not_allowed(data, slice, null_accepted_list, null_not_recommended_list) }
+    report_level_errors(rule_code, not_allow_null_value_conf, level, fetcher) do |invalid|
+      [
+        {key: 'Field name', value: invalid[:field_name]},
+        {key: 'Value',      value: invalid[:value]}
+      ]
     end
-    if level == 'error' && not_allow_null_value_conf['error_internal_ignore'] # errorの場合は、internal_ignore もチェック
-      invalid_list['error_internal_ignore'] = @tsv_validator.null_value_is_not_allowed(data, not_allow_null_value_conf['error_internal_ignore'], null_accepted_list, null_not_recommended_list)
-    end
-    invalid_list.each do |level, list|
-      unless list.empty?
-        result = false
-        list.each do |invalid|
-          annotation = [
-            {key: 'Field name', value: invalid[:field_name]},
-            {key: 'Value', value: invalid[:value]}
-          ]
-          error = add_error(rule_code, annotation)
-          error[:external] = true if level == 'error_internal_ignore'
-        end
-      end
-    end
-    result
   end
 
   #
@@ -685,23 +580,22 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_data_format(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.invalid_data_format(data)
+    return true if invalid_list.empty?
 
-    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: 'Field name', value: invalid[:field_name]}]
-      if invalid[:value_idx].nil? # field_nameの補正
+      if invalid[:value_idx].nil? # field_name の補正
         location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx])
         annotation.push(ErrorBuilder.suggested_annotation([invalid[:replace_value]], 'Field name', location, true))
-      else  # field_valueの補正
+      else  # field_value の補正
         annotation.push({key: 'Value', value: invalid[:value]})
         location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
         annotation.push(ErrorBuilder.suggested_annotation([invalid[:replace_value]], 'Value', location, true))
       end
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -715,20 +609,16 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def non_ascii_characters(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.non_ascii_characters(data)
+    return true if invalid_list.empty?
 
-    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: 'Field name', value: invalid[:field_name]}]
-      if invalid[:value_idx].nil? # field_nameがNG
-      else  # field_valueがNG
-        annotation.push({key: 'Value', value: invalid[:value]})
-      end
+      annotation.push({key: 'Value', value: invalid[:value]}) unless invalid[:value_idx].nil? # field_value が NG の場合のみ value を出す
       annotation.push({key: 'Invalid Position', value: invalid[:disp_txt]})
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -743,20 +633,19 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def invalid_value_for_null(rule_code, data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
-    result = true
     invalid_list = @tsv_validator.invalid_value_for_null(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    return true if invalid_list.empty?
 
-    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: 'Field name', value: invalid[:field_name]},
-        {key: 'Value', value: invalid[:value]}
+        {key: 'Value',      value: invalid[:value]}
       ]
       location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
       annotation.push(ErrorBuilder.suggested_annotation([invalid[:replace_value]], 'Value', location, true))
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -770,22 +659,21 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def missing_field_name(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.invalid_value_input(data)
-    result = false unless invalid_list.empty?
+    return true if invalid_list.empty?
+
     invalid_list.each do |invalid|
       annotation = [
         {key: 'Field name', value: invalid[:field_name]},
-        {key: 'Values', value: invalid[:value]}
+        {key: 'Values',     value: invalid[:value]}
       ]
-      if @file_format == 'tsv'
-        annotation.push({key: 'Potision', value: "Row number: [#{invalid[:field_idx]+1}]"})
-      elsif @file_format == 'json'
-        annotation.push({key: 'Potision', value: invalid[:field_idx]})
+      case @file_format
+      when 'tsv'  then annotation.push({key: 'Potision', value: "Row number: [#{invalid[:field_idx] + 1}]"})
+      when 'json' then annotation.push({key: 'Potision', value: invalid[:field_idx]})
       end
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -800,20 +688,19 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def null_value_in_optional_field(rule_code, data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
-    result = true
     invalid_list = @tsv_validator.null_value_in_optional_field(data, mandatory_field_list, null_accepted_list, null_not_recommended_list)
+    return true if invalid_list.empty?
 
-    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [
         {key: 'Field name', value: invalid[:field_name]},
-        {key: 'Value', value: invalid[:value]}
+        {key: 'Value',      value: invalid[:value]}
       ]
       location = @tsv_validator.auto_annotation_location(@data_format, invalid[:field_idx], invalid[:value_idx])
       annotation.push(ErrorBuilder.suggested_annotation([invalid[:replace_value]], 'Value', location, true))
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -827,19 +714,13 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def not_predefined_field_name(rule_code, data, predefined_field_name_conf)
-    result = true
-    invalid_list = []
-    unless predefined_field_name_conf.nil?
-      invalid_list = @tsv_validator.not_predefined_field_name(data, predefined_field_name_conf)
-    end
-    result = false unless invalid_list.empty?
+    invalid_list = predefined_field_name_conf.nil? ? [] : @tsv_validator.not_predefined_field_name(data, predefined_field_name_conf)
+    return true if invalid_list.empty?
+
     invalid_list.each do |invalid|
-      annotation = [
-        {key: 'Field name', value: invalid[:field_name]}
-      ]
-      add_error(rule_code, annotation)
+      add_error(rule_code, [{key: 'Field name', value: invalid[:field_name]}])
     end
-    result
+    false
   end
 
   #
@@ -853,16 +734,13 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def duplicated_field_name(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.duplicated_field_name(data)
-    result = false unless invalid_list.empty?
+    return true if invalid_list.empty?
+
     invalid_list.each do |invalid|
-      annotation = [
-        {key: 'Field name', value: invalid[:field_name]}
-      ]
-      add_error(rule_code, annotation)
+      add_error(rule_code, [{key: 'Field name', value: invalid[:field_name]}])
     end
-    result
+    false
   end
 
   #
@@ -876,22 +754,21 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def value_in_comment_line(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.invalid_value_input(data, 'comment_line')
-    result = false unless invalid_list.empty?
+    return true if invalid_list.empty?
+
     invalid_list.each do |invalid|
       annotation = [
         {key: 'Field name', value: invalid[:field_name]},
-        {key: 'Values', value: invalid[:value]}
+        {key: 'Values',     value: invalid[:value]}
       ]
-      if @file_format == 'tsv'
-        annotation.push({key: 'Position', value: "Row number: [#{invalid[:field_idx]+1}]"})
-      elsif @file_format == 'json'
-        annotation.push({key: 'Position', value: invalid[:field_idx]})
+      case @file_format
+      when 'tsv'  then annotation.push({key: 'Position', value: "Row number: [#{invalid[:field_idx] + 1}]"})
+      when 'json' then annotation.push({key: 'Position', value: invalid[:field_idx]})
       end
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -905,21 +782,35 @@ class BioProjectTsvValidator < ValidatorBase
   # true/false
   #
   def missing_mandatory_field_name(rule_code, data, mandatory_field_names_conf)
-    result = true
-    invalid_list = []
-    unless mandatory_field_names_conf.nil?
-      invalid_list = @tsv_validator.missing_mandatory_field_name(data, mandatory_field_names_conf)
-    end
+    invalid_list = mandatory_field_names_conf.nil? ? [] : @tsv_validator.missing_mandatory_field_name(data, mandatory_field_names_conf)
+    return true if invalid_list.empty?
 
-    unless invalid_list.empty?
-      result = false
-      invalid_list.each do |invalid|
-        annotation = [
-          {key: 'Missing field names', value: invalid[:field_names]}
-        ]
-        add_error(rule_code, annotation)
+    invalid_list.each do |invalid|
+      add_error(rule_code, [{key: 'Missing field names', value: invalid[:field_names]}])
+    end
+    false
+  end
+
+  private
+
+  # 各 level (error / warning / error_internal_ignore) について fetcher に config slice を
+  # 渡して invalid item リストを取り、それぞれに annotation を作って add_error する。
+  # error_internal_ignore で出した error には external フラグを立てる。
+  # 全 level で空ならエラーは出さず true を返す。
+  def report_level_errors(rule_code, conf, level, fetcher)
+    invalid_pairs = []
+    invalid_pairs << [level, fetcher.call(conf[level])] if conf[level]
+    if level == 'error' && conf['error_internal_ignore']
+      invalid_pairs << ['error_internal_ignore', fetcher.call(conf['error_internal_ignore'])]
+    end
+    return true if invalid_pairs.all? { it.last.empty? }
+
+    invalid_pairs.each do |key, list|
+      list.each do |invalid|
+        error = add_error(rule_code, yield(invalid))
+        error[:external] = true if key == 'error_internal_ignore'
       end
     end
-    result
+    false
   end
 end
