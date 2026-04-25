@@ -1,7 +1,5 @@
 require 'erb'
 require 'logger'
-require_relative '../validator/common/sparql_base'
-require_relative '../validator/common/insdc_nullability'
 
 class Package < SPARQLBase
   # クラス読み込み時に sparql/*.rq を全部 ERB コンパイルしてキャッシュする。

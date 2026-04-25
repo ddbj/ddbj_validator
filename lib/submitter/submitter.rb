@@ -1,8 +1,5 @@
 require 'logger'
 require 'yaml'
-require_relative 'biosample_submitter'
-require_relative 'bioproject_submitter'
-require_relative 'dra_submitter'
 
 class Submitter
   def initialize

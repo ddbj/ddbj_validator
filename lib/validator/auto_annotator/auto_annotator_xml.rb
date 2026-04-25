@@ -1,7 +1,5 @@
 require 'fileutils'
 
-require_relative 'base'
-
 #
 # A class for Auto-annotation. XML file base.
 #

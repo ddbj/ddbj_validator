@@ -1,8 +1,3 @@
-require_relative 'base'
-require_relative 'common/insdc_nullability'
-require_relative 'common/tsv_field_validator'
-require_relative 'common/file_parser'
-
 #
 # A class for MetaboBank IDF validation
 #
@@ -85,7 +80,6 @@ class MetaboBankIdfValidator < ValidatorBase
     # 不正な文字のチェック
     invalid_characters('MB_IR0024', idf_data)
   end
-
 
   #
   # rule:MB_IR0024

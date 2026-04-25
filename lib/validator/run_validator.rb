@@ -1,7 +1,3 @@
-require_relative 'base'
-require_relative 'common/insdc_nullability'
-require_relative 'common/ddbj_db_validator'
-
 #
 # A class for DRA run validation
 #

@@ -1,5 +1,3 @@
-require_relative '../base'
-
 #
 # XMLの変換処理を行うクラス
 #

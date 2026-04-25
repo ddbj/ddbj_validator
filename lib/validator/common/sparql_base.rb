@@ -1,5 +1,3 @@
-require_relative 'sparql'
-
 # A class for execute sparql query
 #
 class SPARQLBase

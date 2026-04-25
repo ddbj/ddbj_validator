@@ -1,5 +1,4 @@
 require 'fileutils'
-require_relative 'base'
 
 #
 # A class for Auto-annotation. JSON file base.

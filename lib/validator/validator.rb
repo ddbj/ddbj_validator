@@ -3,16 +3,6 @@ require 'logger'
 require 'yaml'
 require 'fileutils'
 
-require_relative 'common/excel2tsv'
-require_relative 'common/file_parser'
-require_relative 'biosample_validator'
-require_relative 'bioproject_validator'
-require_relative 'bioproject_tsv_validator'
-require_relative 'jvar_validator'
-require_relative 'trad_validator'
-require_relative 'metabobank_idf_validator'
-require_relative 'metabobank_sdrf_validator'
-
 # Validator main class
 class Validator
     @@filetype = %w[all_db biosample bioproject submission experiment run analysis jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf]

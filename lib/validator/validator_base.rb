@@ -1,6 +1,3 @@
-require_relative 'common/error_builder'
-require_relative 'common/ncbi_eutils'
-
 class ValidatorBase
   def initialize
     @conf = read_common_config

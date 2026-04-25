@@ -1,8 +1,3 @@
-require_relative 'base'
-require_relative 'common/insdc_nullability'
-require_relative 'common/ddbj_db_validator'
-require_relative 'common/organism_validator'
-
 #
 # A class for BioProject validation
 #
@@ -30,7 +25,6 @@ class BioProjectValidator < ValidatorBase
       @use_db = false
     end
   end
-
 
   #
   # 各種設定ファイルの読み込み
