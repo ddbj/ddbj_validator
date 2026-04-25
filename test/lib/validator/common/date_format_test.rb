@@ -4,11 +4,10 @@ require 'validator/common/date_format'
 class TestDateFormat < Minitest::Test
   def setup
     conf_dir = File.expand_path('../../../../../conf/biosample', __FILE__)
-    @df = DateFormat.new
-    config_obj = {}
-    config_obj[:convert_date_format] = JSON.parse(File.read("#{conf_dir}/convert_date_format.json"))
-    config_obj[:ddbj_date_format] = JSON.parse(File.read("#{conf_dir}/ddbj_date_format.json"))
-    DateFormat.set_config (config_obj)
+    @df = DateFormat.new(
+      convert_date_format: JSON.parse(File.read("#{conf_dir}/convert_date_format.json")),
+      ddbj_date_format:    JSON.parse(File.read("#{conf_dir}/ddbj_date_format.json"))
+    )
   end
 
   def test_format_date2ddbj
