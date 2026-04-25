@@ -1,14 +1,14 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# 本番向け Dockerfile。compose.yaml が host のソースを WORKDIR に bind mount するので、
-# 最終 image にコードを焼き付けない (ビルド時のキャッシュ用に COPY はしている)。
-# Rails 8 の scaffold Dockerfile に倣い multi-stage / slim base / jemalloc を採用。
+# 本番向け Dockerfile。Rails 8 の scaffold Dockerfile に倣い multi-stage /
+# slim base / jemalloc / bootsnap precompile を採用。
+# `bin/deploy*` で staging/production に build & push する。
 
 ARG RUBY_VERSION=4.0.3
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
-WORKDIR /usr/src/ddbj_validator
+WORKDIR /rails
 
 # Install base packages (libpq for pg gem, libjemalloc2 for memory allocator)
 RUN apt-get update -qq && \
@@ -35,10 +35,17 @@ RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     bundle exec bootsnap precompile -j 1 --gemfile
 
+# Copy application code
+COPY . .
+
+# Precompile bootsnap code for faster boot times.
+RUN bundle exec bootsnap precompile -j 1 app/ lib/
+
 # Final stage for app image
 FROM base
 
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
+COPY --from=build /rails /rails
 
 EXPOSE 3000
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

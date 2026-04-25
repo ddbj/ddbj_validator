@@ -31,7 +31,7 @@ test:
 staging:
   <<: *default
   api_log:
-    path: /usr/src/ddbj_validator/logs
+    path: /rails/logs
   sparql_endpoint:
     master_endpoint: http://virtuoso:8890/sparql
   named_graph_uri:
@@ -48,7 +48,7 @@ staging:
 production:
   <<: *default
   api_log:
-    path: /usr/src/ddbj_validator/logs
+    path: /rails/logs
   sparql_endpoint:
     master_endpoint: http://virtuoso:8890/sparql
   named_graph_uri:

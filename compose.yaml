@@ -15,13 +15,12 @@ services:
       WEB_CONCURRENCY: 4
     user: 0:0
     volumes:
-      - ${PWD}:/usr/src/ddbj_validator
-      - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/usr/src/ddbj_validator/shared
+      - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/rails/shared
       # staging1/2 はどちらも staging1 配下、production1/2 はどちらも production1 配下に
       # ログを集約する運用なので、env 名から動的に決める。
-      - /data1/w3sabi/DDBJValidator/ddbj_validator_${RAILS_ENV:-production}1/logs:/usr/src/ddbj_validator/logs
-      - /home/ddbjshare/public/mirror_database/ftp.ncbi.nih.gov/ncbi_taxonomy/taxonomydb:/usr/src/ddbj_validator/conf/coll_dump
-      - /lustre9/open/shared_data/db/config:/usr/src/ddbj_validator/conf/pub
+      - /data1/w3sabi/DDBJValidator/ddbj_validator_${RAILS_ENV:-production}1/logs:/rails/logs
+      - /home/ddbjshare/public/mirror_database/ftp.ncbi.nih.gov/ncbi_taxonomy/taxonomydb:/rails/conf/coll_dump
+      - /lustre9/open/shared_data/db/config:/rails/conf/pub
 
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
