@@ -2,7 +2,6 @@ require 'test_helper'
 
 class TestDDBJDbValidator < Minitest::Test
   def setup
-    skip_unless_pg_configured
     @db_validator = DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])
   end
 

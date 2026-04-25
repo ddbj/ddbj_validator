@@ -27,6 +27,14 @@ development: &dev
 
 test:
   <<: *dev
+  # compose.test.yaml の Postgres は 15432 にバインドする (dev の Postgres と
+  # ぶつからないように port をずらしてある)。test 実行時は常にこちらを向く
+  ddbj_rdb:
+    pg_host:    localhost
+    pg_port:    15432
+    pg_user:    validator
+    pg_pass:    validator
+    pg_timeout: 30
 
 staging:
   <<: *default
