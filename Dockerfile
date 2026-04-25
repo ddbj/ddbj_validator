@@ -47,5 +47,5 @@ FROM base
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
-EXPOSE 3000
-CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
+EXPOSE 80
+CMD ["bin/thrust", "bundle", "exec", "puma", "-C", "config/puma.rb"]
