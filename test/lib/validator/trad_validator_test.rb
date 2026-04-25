@@ -1,8 +1,6 @@
 require 'date'
 require 'fileutils'
 require 'test_helper'
-require 'validator/trad_validator'
-require 'validator/common/insdc_nullability'
 
 class TestTradValidator < Minitest::Test
   def setup

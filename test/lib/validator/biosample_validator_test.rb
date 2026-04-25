@@ -1,8 +1,4 @@
 require 'test_helper'
-require 'validator/biosample_validator'
-require 'validator/common/coll_dump'
-require 'validator/common/insdc_nullability'
-require 'validator/common/xml_convertor'
 
 class TestBioSampleValidator < Minitest::Test
   def setup

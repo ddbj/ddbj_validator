@@ -1,7 +1,5 @@
 require 'fileutils'
 require 'test_helper'
-require 'validator/jvar_validator'
-require 'validator/common/insdc_nullability'
 
 class TestJVarValidator < Minitest::Test
   def setup

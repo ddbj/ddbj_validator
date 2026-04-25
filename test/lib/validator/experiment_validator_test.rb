@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/experiment_validator'
 
 class TestExperimentValidator < Minitest::Test
   def setup

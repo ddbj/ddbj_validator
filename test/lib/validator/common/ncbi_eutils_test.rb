@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/common/ncbi_eutils'
 
 class TestNcbiEutils < Minitest::Test
   def test_exist_pubmed_id?

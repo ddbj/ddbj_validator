@@ -1,6 +1,4 @@
 require 'test_helper'
-require 'validator/common/file_parser'
-require 'validator/auto_annotator/auto_annotator_tsv'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
 #

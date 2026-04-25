@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/common/xml_convertor'
 
 class TestXmlConvertor < Minitest::Test
   def setup

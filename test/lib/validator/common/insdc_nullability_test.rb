@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/common/insdc_nullability'
 
 class TestInsdcNullability < Minitest::Test
   def test_null_value?

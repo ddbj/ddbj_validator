@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/biosample_validator'
 
 # BioSampleValidator の各 rule が Rails.cache 経由でキャッシュを効かせていることの確認。
 # test env のデフォルトは :null_store なので、ここだけ MemoryStore に差し替えて検証する。

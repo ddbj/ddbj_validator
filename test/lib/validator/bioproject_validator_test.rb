@@ -1,7 +1,4 @@
 require 'test_helper'
-require 'validator/bioproject_validator'
-require 'validator/common/insdc_nullability'
-require 'validator/common/organism_validator'
 
 class TestBioProjectValidator < Minitest::Test
   def setup

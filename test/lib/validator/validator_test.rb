@@ -1,6 +1,5 @@
 require 'fileutils'
 require 'test_helper'
-require 'validator/validator'
 
 class TestValidator < Minitest::Test
   def setup

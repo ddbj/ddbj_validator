@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'validator/run_validator'
 
 class TestRunValidator < Minitest::Test
   def setup
