@@ -16,13 +16,6 @@ class CombinationValidator < ValidatorBase
     @error_list = error_list = []
 
     @validation_config = @conf[:validation_config] # need?
-    unless @conf[:ddbj_db_config].nil?
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-      @use_db = true
-    else
-      @db_validator = nil
-      @use_db = false
-    end
   end
 
   #

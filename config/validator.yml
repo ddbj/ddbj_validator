@@ -17,10 +17,10 @@ development: &dev
   named_graph_uri:
     taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy
   ddbj_rdb:
-    pg_host:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_HOST'] %>
-    pg_port:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PORT'] %>
-    pg_user:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_USER'] %>
-    pg_pass:    <%= ENV['DDBJ_VALIDATOR_APP_POSTGRES_PASSWD'] %>
+    pg_host:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_HOST', 'localhost') %>
+    pg_port:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_PORT', 5432) %>
+    pg_user:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_USER', 'validator') %>
+    pg_pass:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_PASSWD', 'validator') %>
     pg_timeout: 30
   monitoring:
     ssub_id: SSUB009526

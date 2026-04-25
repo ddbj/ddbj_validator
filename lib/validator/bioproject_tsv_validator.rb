@@ -20,13 +20,7 @@ class BioProjectTsvValidator < ValidatorBase
     @json_schema = JSON.parse(File.read(File.absolute_path(File.dirname(__FILE__) + '/../../conf/bioproject/schema.json')))
     @tsv_validator = TsvFieldValidator.new()
     @org_validator = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
-    unless @conf[:ddbj_db_config].nil?
-      @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-      @use_db = true
-    else
-      @db_validator = nil
-      @use_db = false
-    end
+    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
   end
 
   #
