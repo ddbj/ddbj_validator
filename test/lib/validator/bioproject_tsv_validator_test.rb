@@ -99,7 +99,7 @@ class TestBioProjectTsvValidator < Minitest::Test
 
   # BP_R0016
   def test_invalid_umbrella_project
-    skip_unless_pg_configured
+    stub_db_validator(@validator, umbrella_project?: ->(accession) { %w[PRJDB1893 PSUB002342].include?(accession) })
     # ok case
     data = [{'key' => 'umbrella_bioproject_accession', 'values' => ['PRJDB1893']}] # accession_id
     ret = exec_validator('invalid_umbrella_project', 'BP_R0016', data)

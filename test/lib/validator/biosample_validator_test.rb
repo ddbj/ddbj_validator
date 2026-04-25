@@ -6,7 +6,6 @@ class TestBioSampleValidator < Minitest::Test
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
     @test_file_dir = File.expand_path('../../../data/biosample', __FILE__)
-    @ddbj_db_mode = ServiceAvailability::PG_CONFIGURED
     @package_version = Rails.configuration.validator['biosample']['package_version']
   end
 
@@ -745,7 +744,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_bioproject_submission_id_replacement
-    skip unless @ddbj_db_mode
+    stub_db_validator(@validator, get_bioproject_accession: ->(psub) { psub == 'PSUB004142' ? 'PRJDB3849' : nil })
 
     # ok case
     ## not psub_id
@@ -774,7 +773,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_bioproject_accession
-    skip unless @ddbj_db_mode
+    # PRJDB1 のみ DB に存在する
+    stub_db_validator(@validator, valid_bioproject_id?: ->(accession) { accession == 'PRJDB1' || accession == 'PSUB004142' })
 
     # ok case
     ## ncbi
@@ -1580,7 +1580,9 @@ jkl\"  "
   end
 
   def test_bioproject_not_found
-    skip unless @ddbj_db_mode
+    # PSUB004388 と PRJDB3595 は hirakawa が submitter として参照可能。それ以外 (PRJDB0000 等) は誰も参照不可
+    referenceable = {'PSUB004388' => ['hirakawa'], 'PRJDB3595' => ['hirakawa']}
+    stub_db_validator(@validator, get_bioproject_referenceable_submitter_ids: ->(accession) { referenceable.fetch(accession, []) })
 
     # ok case (given submitter_id matches DB response submitter_id)
     ## valid data
@@ -1667,7 +1669,8 @@ jkl\"  "
   end
 
   def test_invalid_bioproject_type
-    skip unless @ddbj_db_mode
+    # PSUB001851 / PRJDB1554 は umbrella project (NG)、それ以外 (PSUB004142 / PRJDB3490) は通常 project
+    stub_db_validator(@validator, umbrella_project?: ->(accession) { %w[PSUB001851 PRJDB1554].include?(accession) })
 
     # ok case
     # PSUB
@@ -1724,7 +1727,11 @@ jkl\"  "
   end
 
   def test_duplicated_locus_tag_prefix
-    skip unless @ddbj_db_mode
+    # DB 内の prefix 一覧: 'PP14' は SSUB005454 で使用、'RR1' は別 SSUB005462 で使用
+    stub_db_validator(@validator, get_all_locus_tag_prefix: [
+      {locus_tag_prefix: 'PP14', submission_id: 'SSUB005454'},
+      {locus_tag_prefix: 'RR1',  submission_id: 'SSUB005462'}
+    ])
 
     # ok case
     xml_data = File.read("#{@test_file_dir}/91_duplicated_locus_tag_prefix_SSUB005454_ok.xml")
@@ -2347,7 +2354,9 @@ jkl\"  "
   end
 
   def test_biosample_not_found
-    skip unless @ddbj_db_mode
+    # SAMD00032107-SAMD00032157 は hirotoju 配下で valid。SAMD00099999 は invalid
+    valid_range = (32107..32157).map { 'SAMD%08d' % it }
+    stub_db_validator(@validator, get_valid_sample_id_list: ->(ids, _submitter) { ids & valid_range })
 
     # ok case
     ret = exec_validator('biosample_not_found', 'BS_R0129', 'SampleA', 'SAMD00032107, SAMD00032108-SAMD00032156, SAMD00032157', 'hirotoju', 1)

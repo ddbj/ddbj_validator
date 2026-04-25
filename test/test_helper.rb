@@ -74,3 +74,23 @@ module ServiceAvailability
 end
 
 Minitest::Test.include(ServiceAvailability)
+
+# Validator の `@db_validator` を任意の値/Proc を返す fake で差し替える test helper。
+# 引数の Hash は method 名 → 戻り値 (Proc なら呼び出し時に引数を渡して返す)。
+#
+#   stub_db_validator(@validator,
+#     get_submitter_center_name: ->(id) { id == 'test01' ? 'NIG' : nil }
+#   )
+module DBValidatorStubs
+  def stub_db_validator(validator, **stubs)
+    fake = Object.new
+    stubs.each do |method, value|
+      fake.define_singleton_method(method) {|*args|
+        value.respond_to?(:call) ? value.call(*args) : value
+      }
+    end
+    validator.instance_variable_set(:@db_validator, fake)
+  end
+end
+
+Minitest::Test.include(DBValidatorStubs)

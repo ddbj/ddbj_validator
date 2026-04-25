@@ -45,7 +45,7 @@ class TestExperimentValidator < Minitest::Test
 
   # rule:DRA_R0004
   def test_invalid_center_name
-    skip_unless_pg_configured
+    stub_db_validator(@validator, get_submitter_center_name: ->(id) { id == 'test01' ? 'National Institute of Genetics' : nil })
     # ok case
     experiment_set = get_experiment_set_node("#{@test_file_dir}/4_invalid_center_name_experiment_ok.xml")
     ret = exec_validator('invalid_center_name', 'DRA_R0004', 'experiment name', experiment_set.first, 'test01', 1)
