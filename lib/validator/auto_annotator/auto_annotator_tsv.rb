@@ -1,6 +1,6 @@
 require 'fileutils'
 
-require_relative 'base'
+require_relative 'auto_annotator_base'
 
 #
 # A class for Auto-annotation. TSV file base.

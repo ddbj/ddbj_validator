@@ -1,4 +1,4 @@
-require_relative 'base'
+require_relative 'submitter_base'
 
 class DraSubmitter < SubmitterBase
   DRA_DB_NAME = 'drmdb'

@@ -1,6 +1,6 @@
 require 'erb'
 require 'date'
-require_relative 'base'
+require_relative 'validator_base'
 require_relative 'common/insdc_nullability'
 require_relative 'common/coll_dump'
 require_relative 'common/date_format'

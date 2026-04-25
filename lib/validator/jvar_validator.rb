@@ -1,4 +1,4 @@
-require_relative 'base'
+require_relative 'validator_base'
 require_relative 'common/date_format'
 require_relative 'common/ddbj_db_validator'
 require_relative 'common/organism_validator'

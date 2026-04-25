@@ -1,4 +1,4 @@
-require_relative 'base'
+require_relative 'submitter_base'
 
 class BioProjectSubmitter < SubmitterBase
   BIOPROJECT_DB_NAME = 'bioproject'
