@@ -15,7 +15,6 @@ services:
       WEB_CONCURRENCY: 4
     user: 0:0
     volumes:
-      - ${PWD}:/rails
       - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/rails/shared
       # staging1/2 はどちらも staging1 配下、production1/2 はどちらも production1 配下に
       # ログを集約する運用なので、env 名から動的に決める。
