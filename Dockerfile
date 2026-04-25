@@ -8,7 +8,7 @@
 ARG RUBY_VERSION=4.0.3
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
-WORKDIR /usr/src/ddbj_validator
+WORKDIR /rails
 
 # Install base packages (libpq for pg gem, libjemalloc2 for memory allocator)
 RUN apt-get update -qq && \
