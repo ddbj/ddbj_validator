@@ -34,6 +34,7 @@ class Submitter
       trace = ex.backtrace.map {|row| row }.join("\n")
       @log.error(trace)
       ret[:status] = 'error'
+      ret
     end
   end
 
