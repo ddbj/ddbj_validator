@@ -1,9 +1,9 @@
 require 'date'
 
 class DateFormat
-  def self.set_config (config_obj)
-    @@convert_date_format = config_obj[:convert_date_format]
-    @@ddbj_date_format = config_obj[:ddbj_date_format]
+  def initialize(config_obj)
+    @convert_date_format = config_obj[:convert_date_format]
+    @ddbj_date_format = config_obj[:ddbj_date_format]
   end
 
   #
@@ -265,7 +265,7 @@ class DateFormat
   # returns: 置換後の文字列 "2014-03-02"
   #
   def format_delimiter_single_date(date_text, date_text_org)
-    @@convert_date_format.each do |format|
+    @convert_date_format.each do |format|
       regex = Regexp.new(format['regex'])
       ## single date format  e.g.) YYYY-MM-DD
       if regex.match(date_text)
@@ -297,7 +297,7 @@ class DateFormat
   # returns: 置換後の文字列 "2014-10-24/2014-10-25"
   #
   def format_delimiter_range_date(date_text, date_text_org)
-    @@convert_date_format.each do |format|
+    @convert_date_format.each do |format|
       ## range date format  e.g.) YYYY-MM-DD / YYYY-MM-DD
       range_format = format['regex'][1..-2] # 行末行頭の^と$を除去
       range_regex = Regexp.new("(?<start>#{range_format})\s*/\s*(?<end>#{range_format})") # "/"で連結
@@ -342,7 +342,7 @@ class DateFormat
   def parsable_date_format?(date_text)
     return false if date_text.nil?
     parsable_date = true
-    @@ddbj_date_format.each do |format|
+    @ddbj_date_format.each do |format|
       regex_simple = Regexp.new(format['regex']) # 範囲ではない
       regex_range = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") # 範囲での記述
       begin
@@ -382,7 +382,7 @@ class DateFormat
   def ddbj_date_format? (date_text)
     return nil if date_text.nil?
     result = false
-    @@ddbj_date_format.each do |format|
+    @ddbj_date_format.each do |format|
       ## single date format
       regex = Regexp.new(format['regex'])
       if date_text =~ regex
@@ -446,7 +446,7 @@ class DateFormat
   # returns UTCに直した日付表現 "2016-07-10T09:00:01Z", "2016-07-10T09:00:01+09:00/2016-07-10T10:00:01+09:00"
   #
   def convert2utc(date_text)
-    @@ddbj_date_format.each do |format|
+    @ddbj_date_format.each do |format|
       regex_simple = Regexp.new(format['regex']) # 範囲ではない
       regex_range = Regexp.new("(?<start>#{format["regex"][1..-2]})\s*/\s*(?<end>#{format["regex"][1..-2]})") # 範囲での記述
       if date_text =~ regex_simple

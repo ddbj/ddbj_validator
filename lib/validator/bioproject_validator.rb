@@ -10,8 +10,6 @@ class BioProjectValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/bioproject')))
-    InsdcNullability.null_accepted        = @conf[:null_accepted]
-    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
 
     @error_list = error_list = []
 

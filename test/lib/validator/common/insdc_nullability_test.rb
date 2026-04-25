@@ -2,12 +2,6 @@ require 'test_helper'
 require 'validator/common/insdc_nullability'
 
 class TestInsdcNullability < Minitest::Test
-  def setup
-    conf_dir = File.expand_path('../../../../../conf/biosample', __FILE__)
-    InsdcNullability.null_accepted        = JSON.parse(File.read("#{conf_dir}/null_accepted.json"))
-    InsdcNullability.null_not_recommended = JSON.parse(File.read("#{conf_dir}/null_not_recommended.json"))
-  end
-
   def test_null_value?
     assert_equal true,  InsdcNullability.null_value?(nil)
     assert_equal true,  InsdcNullability.null_value?('')

@@ -64,7 +64,7 @@ class TsvFieldValidator
     data.each_with_index do |row, field_idx|
       next unless mandatory_field_list.include?(row['key']) # ここではmandatory fieldのみ置換する。optional fieldは空白に置換されるため
       row['values'].each_with_index do |value, value_idx|
-        next if InsdcNullability.null_value?(value) # 既に推奨NULL表現
+        next if value.blank? || null_accepted_list.any? { value =~ /^(#{it})$/i } # 既に推奨NULL表現
         replace_value = ''
         # 推奨されている NULL 値の表記を揃える(小文字表記へ)
         null_accepted_list.each do |null_accepted|

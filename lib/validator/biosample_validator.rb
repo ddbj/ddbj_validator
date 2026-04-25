@@ -18,9 +18,7 @@ class BioSampleValidator < ValidatorBase
   def initialize
     super()
     @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/biosample')))
-    InsdcNullability.null_accepted        = @conf[:null_accepted]
-    InsdcNullability.null_not_recommended = @conf[:null_not_recommended]
-    DateFormat.set_config(@conf)
+    @date_format = DateFormat.new(@conf)
 
     @error_list = error_list = []
 
@@ -1692,8 +1690,7 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(collection_date) || InsdcNullability.null_not_recommended_value?(collection_date)
     result = nil
     # DDBJ 日付型へのフォーマットを試みる
-    df = DateFormat.new
-    collection_date = df.format_date2ddbj(collection_date)
+    collection_date = @date_format.format_date2ddbj(collection_date)
     @conf[:ddbj_date_format].each do |format|
       parse_format = format['parse_date_format']
 
@@ -1835,17 +1832,16 @@ class BioSampleValidator < ValidatorBase
     result = true
 
     # DDBJ 日付型へのフォーマットを試みる
-    df = DateFormat.new
-    attr_val = df.format_date2ddbj(attr_val)
+    attr_val = @date_format.format_date2ddbj(attr_val)
 
     # 補正後の値が妥当な日付、フォーマットであるかチェックする
-    is_ddbj_format = df.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
-    parsable_date = df.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
+    is_ddbj_format = @date_format.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
+    parsable_date = @date_format.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
 
     if !is_ddbj_format || !parsable_date # 無効なフォーマットであれば中途半端な補正はせず元の入力値に戻す
       attr_val = attr_val_org
     else # timezoneをUTC時間に変更
-      attr_val = df.convert2utc(attr_val)
+      attr_val = @date_format.convert2utc(attr_val)
     end
 
     # 置換が発生した場合だけwarningを出す
@@ -1888,9 +1884,8 @@ class BioSampleValidator < ValidatorBase
     return nil if attr_name == 'collection_date' && (InsdcNullability.null_not_recommended_value?(attr_val))
 
     result = true
-    df = DateFormat.new
-    is_ddbj_format = df.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
-    parsable_date = df.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
+    is_ddbj_format = @date_format.ddbj_date_format?(attr_val) # DDBJフォーマットであるか
+    parsable_date = @date_format.parsable_date_format?(attr_val) # 妥当な日付であるか(2018/13/34 => false)
     if !(is_ddbj_format && parsable_date) # DDBJフォーマットであるか
       result = false
       annotation = [
