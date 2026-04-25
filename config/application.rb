@@ -18,9 +18,5 @@ module DdbjValidator
     config.api_only = true
 
     config.time_zone = 'Tokyo'
-
-    # SPARQL / PG レスポンスの per-worker in-process キャッシュ用途のみ。
-    # ファイル persistence や cross-worker 共有は不要なので memory_store。
-    config.cache_store = :memory_store
   end
 end

@@ -37,8 +37,9 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # Replace the default in-process memory cache store with a durable alternative.
-  # config.cache_store = :mem_cache_store
+  # SPARQL / PG レスポンスの per-worker in-process キャッシュ用途のみ。
+  # 永続化や cross-worker 共有が必要なら :solid_cache_store / :mem_cache_store に切り替える。
+  config.cache_store = :memory_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # config.active_job.queue_adapter = :resque
