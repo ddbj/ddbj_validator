@@ -14,6 +14,7 @@ gem 'pg'
 gem 'puma'
 gem 'rack-cors'
 gem 'roo'
+gem 'sentry-rails'
 
 group :development do
   gem 'rubocop-rails-omakase', require: false
