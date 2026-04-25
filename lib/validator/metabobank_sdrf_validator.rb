@@ -88,20 +88,18 @@ class MetaboBankSdrfValidator < ValidatorBase
   # true/false
   #
   def invalid_characters(rule_code, data)
-    result = true
     invalid_list = @tsv_validator.non_ascii_characters(data)
+    return true if invalid_list.empty?
 
-    result = false unless invalid_list.empty?
     invalid_list.each do |invalid|
       annotation = [{key: 'column name', value: invalid[:column_name]}]
-      if invalid[:row_idx].nil? # ヘッダーがNG
-      else # 値がNG
+      unless invalid[:row_idx].nil? # 値が NG の場合のみ row/value を出す
         annotation.push({key: 'Row number', value: @tsv_validator.offset_row_idx(invalid[:row_idx])})
-        annotation.push({key: 'Value', value: invalid[:value]})
+        annotation.push({key: 'Value',      value: invalid[:value]})
       end
       annotation.push({key: 'Invalid Position', value: invalid[:disp_txt]})
       add_error(rule_code, annotation)
     end
-    result
+    false
   end
 end

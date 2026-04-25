@@ -535,58 +535,47 @@ class TradValidator < ValidatorBase
   # true/false
   #
   def missing_dblink(rule_code, dblink_list, anno_by_ent)
-    result = true
-    message = ''
+    has_required = ->(rows) {
+      qualifiers = rows.map { it[:qualifier] }
+      qualifiers.include?('project') && qualifiers.include?('biosample')
+    }
 
-    # COMMON entryにDBLINKがあるか
-    common_dblink_exist = false
-    common_dblink = dblink_list.select {|row| row[:entry] == 'COMMON' }
-    if common_dblink.any?
-      qual_list = common_dblink.map {|row| row[:qualifier] }
-      if qual_list.include?('project') && qual_list.include?('biosample')
-        common_dblink_exist = true
-      else
-        result = false
-        message = "COMMON entry requires both 'project' and 'biosample' for DBLINK."
-      end
-    end
+    # COMMON entry に DBLINK があるか、あった場合に project/biosample が揃っているか
+    common_dblink = dblink_list.select { it[:entry] == 'COMMON' }
+    common_dblink_exist = common_dblink.any? && has_required.call(common_dblink)
+    common_message = common_dblink.any? && !common_dblink_exist ? "COMMON entry requires both 'project' and 'biosample' for DBLINK." : nil
 
-    # 各entry(COMMON)に記載があるか、あった場合にproject/biosampleが揃っているか
-    missing_dblink_entry_list = []
+    # 各 entry (非 COMMON) に記載があるか、あった場合に project/biosample が揃っているか
+    entry_messages = []
+    missing_entries = []
     entry_dblink_count = 0
-    anno_by_ent.each do |entry_name, data|
+    anno_by_ent.each do |entry_name, _data|
       next if entry_name == 'COMMON'
-      entry_dblink = dblink_list.select {|row| row[:entry] == entry_name }
+      entry_dblink = dblink_list.select { it[:entry] == entry_name }
       if entry_dblink.any?
         entry_dblink_count += entry_dblink.size
-        qual_list = entry_dblink.map {|row| row[:qualifier] }
-        unless qual_list.include?('project') && qual_list.include?('biosample')
-          message += "#{entry_name} entry requires both 'project' and 'biosample' for DBLINK.."
-          missing_dblink_entry_list.push(entry_name)
-          result = false
+        unless has_required.call(entry_dblink)
+          entry_messages << "#{entry_name} entry requires both 'project' and 'biosample' for DBLINK.."
+          missing_entries << entry_name
         end
       elsif !common_dblink_exist
-        missing_dblink_entry_list.push(entry_name)
-        result = false
+        missing_entries << entry_name
       end
     end
 
-    # COMMONを除くentryにDBLINKに記載がなく、かつCOMMONにも記載がない
-    if entry_dblink_count == 0  && !common_dblink_exist
-      result = false
-    end
+    # COMMON を除く entry に DBLINK 記載がなく、かつ COMMON にも記載がない場合も NG
+    nothing_anywhere = entry_dblink_count.zero? && !common_dblink_exist
 
-    if result == false
-      entry_name = missing_dblink_entry_list.any? ? missing_dblink_entry_list.join(', ') : 'COMMON'
-      annotation = [
-        {key: 'entry', value: entry_name},
-        {key: 'File name', value: @anno_file}
-      ]
-      annotation.push({key: 'Message', value: message}) unless message == ''
-      add_error(rule_code, annotation)
-    end
+    return true if common_message.nil? && missing_entries.empty? && !nothing_anywhere
 
-    result
+    annotation = [
+      {key: 'entry',     value: missing_entries.any? ? missing_entries.join(', ') : 'COMMON'},
+      {key: 'File name', value: @anno_file}
+    ]
+    message = [common_message, *entry_messages].compact.join
+    annotation.push({key: 'Message', value: message}) unless message.empty?
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -602,35 +591,26 @@ class TradValidator < ValidatorBase
   def invalid_bioproject_accession(rule_code, bioproject_list)
     return nil if bioproject_list.nil? || bioproject_list.empty?
 
-    result = true
-    invalid_id_list = []
-    line_no_list = []
-    bioproject_list.each do |bioproject_line|
-      bioproject_accession = bioproject_line[:value]
-      if bioproject_accession =~ /^PRJD\w?\d{1,}$/
-        unless @db_validator.valid_bioproject_id?(bioproject_accession)
-          result = false
-          invalid_id_list.push(bioproject_accession)
-          line_no_list.push(bioproject_line[:line_no].to_s)
-        end
-      elsif bioproject_accession =~ /^PRJ(E|N)\w?\d{1,}$/
-        # 他極データは無視(TR_R0033でチェックする)
-      else # submission id(/^PSUB\d{6}$/)も認めない
-        result = false
-        invalid_id_list.push(bioproject_accession)
-        line_no_list.push(bioproject_line[:line_no].to_s)
+    invalid = bioproject_list.filter_map {|bioproject_line|
+      accession = bioproject_line[:value]
+      case accession
+      when /^PRJD\w?\d{1,}$/
+        next if @db_validator.valid_bioproject_id?(accession)
+      when /^PRJ(E|N)\w?\d{1,}$/
+        next # 他極データは無視 (TR_R0033 でチェック)
       end
-    end
+      # submission id (^PSUB\d{6}$) や上記でマッチしないものは NG
+      [accession, bioproject_line[:line_no].to_s]
+    }
+    return true if invalid.empty?
 
-    if result == false
-      annotation = [
-        {key: 'DBLINK/project', value: invalid_id_list.join(', ')},
-        {key: 'File name', value: @anno_file},
-        {key: 'Location', value: "Line: #{line_no_list.join(", ")}"}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: 'DBLINK/project', value: invalid.map(&:first).join(', ')},
+      {key: 'File name',      value: @anno_file},
+      {key: 'Location',       value: "Line: #{invalid.map(&:last).join(', ')}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -646,35 +626,26 @@ class TradValidator < ValidatorBase
   def invalid_biosample_accession(rule_code, biosample_list)
     return nil if biosample_list.nil? || biosample_list.empty?
 
-    result = true
-    invalid_id_list = []
-    line_no_list = []
-    biosample_list.each do |biosample_line|
-      biosample_accession = biosample_line[:value]
-      if biosample_accession =~ /^SAMD\w?\d{1,}$/
-        unless @db_validator.is_valid_biosample_id?(biosample_accession)
-          result = false
-          invalid_id_list.push(biosample_accession)
-          line_no_list.push(biosample_line[:line_no].to_s)
-        end
-      elsif biosample_accession =~ /^SAM(E|N)\w?\d{1,}$/
-        # 他極データは無視(TR_R0033でチェックする)
-      else # submission id(/^SSUB\d{6}$/)も認めない
-        result = false
-        invalid_id_list.push(biosample_accession)
-        line_no_list.push(biosample_line[:line_no].to_s)
+    invalid = biosample_list.filter_map {|biosample_line|
+      accession = biosample_line[:value]
+      case accession
+      when /^SAMD\w?\d{1,}$/
+        next if @db_validator.is_valid_biosample_id?(accession)
+      when /^SAM(E|N)\w?\d{1,}$/
+        next # 他極データは無視 (TR_R0033 でチェック)
       end
-    end
+      # submission id (^SSUB\d{6}$) や上記でマッチしないものは NG
+      [accession, biosample_line[:line_no].to_s]
+    }
+    return true if invalid.empty?
 
-    if result == false
-      annotation = [
-        {key: 'DBLINK/biosample', value: invalid_id_list.join(', ')},
-        {key: 'File name', value: @anno_file},
-        {key: 'Location', value: "Line: #{line_no_list.join(", ")}"}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: 'DBLINK/biosample', value: invalid.map(&:first).join(', ')},
+      {key: 'File name',        value: @anno_file},
+      {key: 'Location',         value: "Line: #{invalid.map(&:last).join(', ')}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -690,31 +661,21 @@ class TradValidator < ValidatorBase
   def invalid_drr_accession(rule_code, drr_list)
     return nil if drr_list.nil? || drr_list.empty?
 
-    result = true
-    invalid_id_list = []
-    line_no_list = []
-    # DRRは複数記載されるケースがあり、まとめてDBチェックする
-    drr_accession_id_list = drr_list.map {|row| row[:value] }
-    drr_accession_id_list.delete_if {|run_id| run_id =~ /^(S|E)RR\w?\d{1,}$/ } # 他極データは無視(TR_R0033でチェックする)
-    result_run_list = @db_validator.exist_check_run_ids(drr_accession_id_list)
-    result_run_list.each do |result_run_id|
-      if result_run_id[:is_exist] == false
-        invalid_id_list.push(result_run_id[:accession_id])
-        lines = drr_list.select {|row| row[:value] == result_run_id[:accession_id] }
-        line_no_list.concat(lines.map {|row| row[:line_no] })
-        result = false
-      end
-    end
+    # DRR は複数記載されるケースがあり、まとめて DB チェックする。
+    # 他極データ (S|ERR) は無視 (TR_R0033 でチェック)
+    drr_ids = drr_list.map { it[:value] }.reject { it =~ /^(S|E)RR\w?\d{1,}$/ }
+    not_exist = @db_validator.exist_check_run_ids(drr_ids).reject { it[:is_exist] }
+    return true if not_exist.empty?
 
-    if result == false
-      annotation = [
-        {key: 'DBLINK/sequence read archive', value: invalid_id_list.join(', ')},
-        {key: 'File name', value: @anno_file},
-        {key: 'Location', value: "Line: #{line_no_list.join(", ")}"}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    invalid_ids = not_exist.map { it[:accession_id] }
+    line_nos = invalid_ids.flat_map {|id| drr_list.select { it[:value] == id }.map { it[:line_no] } }
+    annotation = [
+      {key: 'DBLINK/sequence read archive', value: invalid_ids.join(', ')},
+      {key: 'File name',                    value: @anno_file},
+      {key: 'Location',                     value: "Line: #{line_nos.join(', ')}"}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #

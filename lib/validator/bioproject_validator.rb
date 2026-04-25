@@ -164,34 +164,26 @@ class BioProjectValidator < ValidatorBase
   #
   def duplicated_project_title_and_description (rule_code, project_label, project_node, project_names_list, submission_id, line_num)
     return if project_names_list.nil?
-    result = true
+
     title_path = '//Project/ProjectDescr/Title'
-    desc_path = '//Project/ProjectDescr/Description'
+    desc_path  = '//Project/ProjectDescr/Description'
+    title       = project_node.xpath(title_path).empty? ? '' : get_node_text(project_node, title_path)
+    description = project_node.xpath(desc_path).empty?  ? '' : get_node_text(project_node, desc_path)
 
-    title = description = ''
-    if !project_node.xpath(title_path).empty? # 要素あり
-      title = get_node_text(project_node, title_path)
-    end
-    if !project_node.xpath(desc_path).empty? # 要素あり
-      description = get_node_text(project_node, desc_path)
-    end
+    duplicated = project_names_list.count { it[:bioproject_title] == title && it[:public_description] == description }
+    # submission_id がなければ DB から取得していないため、DB 内に 1 つでも同じ title&desc があると NG
+    # submission_id があれば DB から取得しており同一が 1 つ含まれる前提なので、2 つ以上で NG
+    threshold = submission_id.nil? ? 1 : 2
+    return true if duplicated < threshold
 
-    duplicated_submission = project_names_list.select {|item| item[:bioproject_title] == title && item[:public_description] == description }
-    # submission_idがなければDBから取得したデータではないため、DB内に一つでも同じtitle&descがあるとNG
-    result = false if submission_id.nil? && duplicated_submission.any?
-    # submission_idがあればDBから取得したデータであり、DB内に同一データが1つある。2つ以上あるとNG
-    result = false if !submission_id.nil? && duplicated_submission.size >= 2
-
-    if result == false
-      annotation = [
-        {key: 'Project name', value: project_label},
-        {key: 'Title', value: title},
-        {key: 'Description', value: description},
-        {key: 'Path', value: [title_path, desc_path]}
-      ]
-      add_error(rule_code, annotation)
-    end
-    result
+    annotation = [
+      {key: 'Project name', value: project_label},
+      {key: 'Title',        value: title},
+      {key: 'Description',  value: description},
+      {key: 'Path',         value: [title_path, desc_path]}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
@@ -235,46 +227,40 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def invalid_publication_identifier (rule_code, project_label, project_node, line_num)
-    result = true
     pub_path = '//Project/ProjectDescr/Publication'
-    project_node.xpath(pub_path).each_with_index do |pub_node, idx| # 複数出現の可能性あり
-      valid = true
+    bad = project_node.xpath(pub_path).each_with_index.filter_map {|pub_node, idx| # 複数出現の可能性あり
+      id = get_node_text(pub_node, '@id')
       db_type = ''
-      id =  get_node_text(pub_node, '@id')
+      message = nil
       begin
         if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !NcbiEutils.exist_pubmed_id?(id)
-          result = valid = false
           db_type = 'ePubmed'
         elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
-          # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
-        elsif !pub_node.xpath("DbType[text()='ePMC']").empty?  && !NcbiEutils.exist_pmc_id?(id)
-          result = valid = false
+          # DOI の場合はチェックをしない https://github.com/ddbj/ddbj_validator/issues/18
+          next
+        elsif !pub_node.xpath("DbType[text()='ePMC']").empty? && !NcbiEutils.exist_pmc_id?(id)
           db_type = 'ePMC'
+        else
+          next
         end
-
-        if !valid
-          annotation = [
-            {key: 'Project name', value: project_label},
-            {key: 'DbType', value: db_type},
-            {key: 'ID', value: id},
-            {key: 'Path', value: "#{pub_path}[#{idx + 1}]/@id"} # 順番を表示
-          ]
-          add_error(rule_code, annotation)
-          result = false
-        end
-      rescue => ex # NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
-        annotation = [
-          {key: 'Project name', value: project_label},
-          {key: 'DbType', value: db_type},
-          {key: 'ID', value: id},
-          {key: 'Path', value: "#{pub_path}[#{idx + 1}]/@id"}, # 順番を表示
-          {key: 'Message', value: 'Validation processing failed because connection to NCBI service failed.'}
-        ]
-        add_error(rule_code, annotation)
-        result = false
+      rescue # NCBI 問合せ中のシステムエラー
+        message = 'Validation processing failed because connection to NCBI service failed.'
       end
+      [db_type, id, idx + 1, message]
+    }
+    return true if bad.empty?
+
+    bad.each do |db_type, id, position, message|
+      annotation = [
+        {key: 'Project name', value: project_label},
+        {key: 'DbType',       value: db_type},
+        {key: 'ID',           value: id},
+        {key: 'Path',         value: "#{pub_path}[#{position}]/@id"} # 順番を表示
+      ]
+      annotation.push({key: 'Message', value: message}) if message
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -288,27 +274,26 @@ class BioProjectValidator < ValidatorBase
   # true/false
   #
   def invalid_umbrella_project (rule_code, link_label, link_node, line_num)
-    result = true
-    hierar_path = "Link/Hierarchical[@type='TopAdmin']"
-    link_node.xpath(hierar_path).each_with_index do |hierar_node, idx_h|
-      member_path = 'MemberID/@accession'
-      hierar_node.xpath(member_path).each_with_index do |acs_attr_node, idx_m|
-        unless node_blank?(acs_attr_node)
-          bioproject_accession = get_node_text(acs_attr_node)
-          is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
-          if !is_umbrella
-            annotation = [
-             {key: 'Project name', value: 'None'},
-             {key: 'BioProject accession', value: bioproject_accession},
-             {key: 'Path', value: "//Link/Hierarchical[#{idx_h + 1}]/#{member_path}[#{idx_m + 1}]"}
-            ]
-            add_error(rule_code, annotation)
-            result = false
-          end
-        end
-      end
+    member_path = 'MemberID/@accession'
+    bad = link_node.xpath("Link/Hierarchical[@type='TopAdmin']").each_with_index.flat_map {|hierar_node, idx_h|
+      hierar_node.xpath(member_path).each_with_index.filter_map {|acs_attr_node, idx_m|
+        next if node_blank?(acs_attr_node)
+        bioproject_accession = get_node_text(acs_attr_node)
+        next if @db_validator.umbrella_project?(bioproject_accession)
+        [bioproject_accession, idx_h + 1, idx_m + 1]
+      }
+    }
+    return true if bad.empty?
+
+    bad.each do |accession, idx_h, idx_m|
+      annotation = [
+        {key: 'Project name',         value: 'None'},
+        {key: 'BioProject accession', value: accession},
+        {key: 'Path',                 value: "//Link/Hierarchical[#{idx_h}]/#{member_path}[#{idx_m}]"}
+      ]
+      add_error(rule_code, annotation)
     end
-    result
+    false
   end
 
   #
@@ -327,22 +312,21 @@ class BioProjectValidator < ValidatorBase
   #
   def taxonomy_at_species_or_infraspecific_rank (rule_code, project_label, taxonomy_id, organism_name, project_node, line_num)
     return nil if taxonomy_id.blank? || taxonomy_id == OrganismValidator::TAX_INVALID
-    result = true
+
     primary_taxid = project_node.xpath('//Project/ProjectType/ProjectTypeSubmission')
-    multispecies = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eMultispecies']")
-    unless primary_taxid.empty? || !multispecies.empty? # Primary BioProjectではない場合と、eMultispeciesである場合はスキップ
-      result = @org_validator.is_infraspecific_rank(taxonomy_id)
-      if result == false
-        annotation = [
-          {key: 'Project name', value: project_label},
-          {key: 'Path', value: [@taxid_path, @orgname_path]},
-          {key: 'OrganismName', value: organism_name},
-          {key: 'taxID', value: taxonomy_id}
-        ]
-        add_error(rule_code, annotation)
-      end
-    end
-    result
+    multispecies  = project_node.xpath("//Project/ProjectType/ProjectTypeSubmission/Target[@sample_scope='eMultispecies']")
+    return true if primary_taxid.empty? || !multispecies.empty? # Primary BioProject ではない or eMultispecies はスキップ
+
+    return true if @org_validator.is_infraspecific_rank(taxonomy_id)
+
+    annotation = [
+      {key: 'Project name', value: project_label},
+      {key: 'Path',         value: [@taxid_path, @orgname_path]},
+      {key: 'OrganismName', value: organism_name},
+      {key: 'taxID',        value: taxonomy_id}
+    ]
+    add_error(rule_code, annotation)
+    false
   end
 
   #
