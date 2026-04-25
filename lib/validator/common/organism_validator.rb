@@ -1,6 +1,4 @@
 require 'erb'
-require_relative 'sparql_base'
-require_relative 'insdc_nullability'
 
 #
 # A class for BioSample validation that is relevant organism

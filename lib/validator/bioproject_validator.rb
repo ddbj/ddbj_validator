@@ -1,7 +1,3 @@
-require_relative 'validator_base'
-require_relative 'common/insdc_nullability'
-require_relative 'common/ddbj_db_validator'
-require_relative 'common/organism_validator'
 
 #
 # A class for BioProject validation

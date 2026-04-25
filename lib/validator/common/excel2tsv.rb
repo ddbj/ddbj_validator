@@ -1,5 +1,4 @@
 require 'fileutils'
-require_relative 'insdc_nullability'
 
 #
 # A class for convert from excel sheet to tsv files

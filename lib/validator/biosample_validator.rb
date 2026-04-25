@@ -1,17 +1,5 @@
 require 'erb'
 require 'date'
-require_relative 'validator_base'
-require_relative 'common/insdc_nullability'
-require_relative 'common/coll_dump'
-require_relative 'common/date_format'
-require_relative 'common/geolocation'
-require_relative 'common/ddbj_db_validator'
-require_relative 'common/organism_validator'
-require_relative 'common/sparql_base'
-require_relative 'common/validator_cache'
-require_relative 'common/xml_convertor'
-require_relative 'common/file_parser'
-require_relative 'common/tsv_column_validator'
 
 #
 # A class for BioSample validation

@@ -1,7 +1,3 @@
-require_relative 'validator_base'
-require_relative 'common/insdc_nullability'
-require_relative 'common/tsv_field_validator'
-require_relative 'common/file_parser'
 
 #
 # A class for MetaboBank IDF validation

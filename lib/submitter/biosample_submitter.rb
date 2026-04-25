@@ -1,4 +1,3 @@
-require_relative 'submitter_base'
 
 class BioSampleSubmitter < SubmitterBase
   BIOSAMPLE_DB_NAME = 'biosample'

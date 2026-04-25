@@ -1,10 +1,5 @@
 require 'logger'
 
-require_relative 'auto_annotator_xml'
-require_relative 'auto_annotator_tsv'
-require_relative 'auto_annotator_json'
-require_relative '../common/file_parser'
-require_relative '../common/tsv_field_validator'
 
 # 元ファイルからAuto annotateしたファイルを生成して返す
 class AutoAnnotator

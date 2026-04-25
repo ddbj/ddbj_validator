@@ -1,4 +1,3 @@
-require_relative '../validator_base'
 
 #
 # XMLの変換処理を行うクラス

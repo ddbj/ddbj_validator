@@ -13,9 +13,7 @@ module DdbjValidator
   class Application < Rails::Application
     config.load_defaults 8.1
 
-    # lib/validator, lib/submitter, lib/package は Zeitwerk 命名に揃っていないので
-    # autoload 対象から外す。各ファイルは require_relative で読み込まれる。
-    config.autoload_lib(ignore: %w[validator submitter package])
+    config.autoload_lib(ignore: %w[assets tasks])
 
     config.api_only = true
 
