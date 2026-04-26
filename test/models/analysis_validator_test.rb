@@ -37,10 +37,6 @@ class TestAnalysisValidator < ActiveSupport::TestCase
 
   ####
 
-  def test_get_analysis_label
-    # TODO
-  end
-
   #### 各validationメソッドのユニットテスト ####
 
   # rule:DRA_R0004

@@ -37,10 +37,6 @@ class TestExperimentValidator < ActiveSupport::TestCase
 
   ####
 
-  def test_get_experiment_label
-    # TODO
-  end
-
   #### 各validationメソッドのユニットテスト ####
 
   # rule:DRA_R0004

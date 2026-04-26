@@ -168,10 +168,6 @@ class TestDDBJDbValidator < ActiveSupport::TestCase
     assert_equal false, ret
   end
 
-  def test_get_all_locus_tag_prefix
-    ret = @db_validator.get_all_locus_tag_prefix()
-  end
-
   def test_get_submitter_organization
     # exist id
     ret = @db_validator.get_submitter_organization('test01')

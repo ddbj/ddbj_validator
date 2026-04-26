@@ -6,18 +6,6 @@ class TestTsvFieldValidator < ActiveSupport::TestCase
   end
 
   ## COMMON method start
-  def test_tsv2ojb
-  end
-
-  def test_is_ignore_line
-  end
-
-  def test_field_value
-  end
-
-  def test_field_value_list
-  end
-
   def test_field_value_with_position
     # not described field
     data = [{'key' => 'title', 'values' => ['My Project Title', '']}, {'key' => 'description', 'values' => ['My Project Description', nil]}]
@@ -259,56 +247,5 @@ class TestTsvFieldValidator < ActiveSupport::TestCase
     assert_equal '9606', data.last['values'].first
   end
 
-  def test_convert_json2tsv
-  end
-
-  def test_convert_tsv2json
-  end
-
   ## COMMON method end
-
-  def test_invalid_value_input
-  end
-
-  def test_invalid_value_for_null
-  end
-
-  def test_null_value_in_optional_field
-  end
-
-  def test_null_value_is_not_allowed
-  end
-
-  def test_invalid_data_format
-  end
-
-  def test_non_ascii_characters
-  end
-
-  def test_replace_invalid_data
-  end
-
-  def test_missing_mandatory_field
-  end
-
-  def test_invalid_value_for_controlled_terms
-  end
-
-  def test_multiple_values
-  end
-
-  def test_duplicated_field_name
-  end
-
-  def test_not_predefined_field_name
-  end
-
-  def test_check_field_format
-  end
-
-  def test_selective_mandatory
-  end
-
-  def test_mandatory_fields_in_a_group
-  end
 end#

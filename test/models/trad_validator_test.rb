@@ -80,10 +80,6 @@ class TestTradValidator < ActiveSupport::TestCase
     end
   end
 
-  def test_anno_tsv2obj
-    # TODO test
-  end
-
   def test_data_by_feat
     annotation_list = @validator.anno_tsv2obj("#{@test_file_dir}/CDS.ann")
     anno_by_feat = annotation_list.group_by {|row| row[:feature] }

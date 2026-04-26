@@ -37,10 +37,6 @@ class TestRunValidator < ActiveSupport::TestCase
 
   ####
 
-  def test_get_run_label
-    # TODO
-  end
-
   #### 各validationメソッドのユニットテスト ####
 
   # rule:DRA_R0004
