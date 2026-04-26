@@ -1,0 +1,626 @@
+require 'test_helper'
+
+class TestBioProjectValidator < Minitest::Test
+  def setup
+    @validator = BioProjectValidator.new
+    @test_file_dir = File.expand_path('../../data/bioproject', __FILE__)
+  end
+
+  #### テスト用共通メソッド ####
+
+  #
+  # Executes validation method
+  #
+  # ==== Args
+  # method_name ex."MIGS.ba.soil"
+  # *args method paramaters
+  #
+  # ==== Return
+  # An Hash of valitation result.
+  # {
+  #   :ret=>true/false/nil,
+  #   :error_list=>{error_object} #if exist
+  # }
+  #
+  def exec_validator (method_name, *args)
+    @validator.instance_variable_set :@error_list, [] # clear
+    ret = @validator.send(method_name, *args)
+    error_list = @validator.instance_variable_get (:@error_list)
+    {result: ret, error_list: error_list}
+  end
+
+  def get_project_set_node (xml_file_path)
+    xml_data = File.read(xml_file_path)
+    doc = Nokogiri::XML(xml_data)
+    doc.xpath('//PackageSet/Package/Project')
+  end
+
+  def get_link_set_node (xml_file_path)
+    xml_data = File.read(xml_file_path)
+    doc = Nokogiri::XML(xml_data)
+    doc.xpath('//PackageSet/Package/ProjectLinks')
+  end
+
+  def get_input_taxid (project_node)
+    taxonomy_id = OrganismValidator::TAX_INVALID
+    input_taxid = @validator.get_node_text(project_node,  '//Organism/@taxID')
+    unless input_taxid.blank? # taxonomy_idの記述があれば
+      taxonomy_id = input_taxid
+    end
+    taxonomy_id
+  end
+
+  def get_input_organism_name (project_node)
+    organism_name = ''
+    input_oganism_name = @validator.get_node_text(project_node,  '//Organism/OrganismName')
+    unless input_oganism_name.blank? # organism_nameの記述があれば
+      organism_name = input_oganism_name
+    end
+    organism_name
+  end
+
+  ####
+
+  def test_get_bioporject_label
+    # name
+    project_set = get_project_set_node("#{@test_file_dir}/get_bioporject_label_name.xml")
+    ret = @validator.send('get_bioporject_label', project_set.first, 1)
+    assert_equal 'Project Name', ret
+    # title
+    project_set = get_project_set_node("#{@test_file_dir}/get_bioporject_label_title.xml")
+    ret = @validator.send('get_bioporject_label', project_set.first, 1)
+    assert_equal 'Project Title', ret
+    # name
+    project_set = get_project_set_node("#{@test_file_dir}/get_bioporject_label_accession.xml")
+    ret = @validator.send('get_bioporject_label', project_set.first, 1)
+    assert_equal 'PRJDBXXXX', ret
+    # number
+    project_set = get_project_set_node("#{@test_file_dir}/get_bioporject_label_number.xml")
+    ret = @validator.send('get_bioporject_label', project_set.first, 1)
+    assert_equal '1st project', ret
+    ret = @validator.send('get_bioporject_label', project_set.first, 11)
+    assert_equal '11th project', ret
+    ret = @validator.send('get_bioporject_label', project_set.first, 32)
+    assert_equal '32nd project', ret
+  end
+
+  #### 各validationメソッドのユニットテスト ####
+  # rule:BP_R0001
+  def test_not_well_format_xml
+    # ok case
+    xml_file = "#{@test_file_dir}/1_not_well_format_xml_ok.xml"
+    ret = exec_validator('not_well_format_xml', 'BP_R0001', xml_file)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    xml_file = "#{@test_file_dir}/1_not_well_format_xml_ng.xml"
+    ret = exec_validator('not_well_format_xml', 'BP_R0001', xml_file)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0002
+  def test_xml_data_schema
+    xsd_file_path = File.dirname(__FILE__) + '/../../conf/bioproject/xsd/Package.xsd'
+    # ok case
+    xml_file = "#{@test_file_dir}/2_xml_data_schema_ok.xml"
+    ret = exec_validator('xml_data_schema', 'BP_R0002', xml_file, xsd_file_path)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    xml_file = "#{@test_file_dir}/2_xml_data_schema_ng.xml"
+    ret = exec_validator('xml_data_schema', 'BP_R0002', xml_file, xsd_file_path)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0004
+  def test_duplicated_project_title_and_description
+    # ok case
+    project_title_desc_list = [
+      {submission_id: 'PSUBxxx', project_name: 'project name1', bioproject_title: 'Title text 1', public_description:  'Description text 1'},
+      {submission_id: 'PSUBxxx', project_name: 'project name2', bioproject_title: 'Title text 2', public_description:  'Description text 2'}
+    ]
+    ## without submission_id (is new text)
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok1.xml")
+    ret = exec_validator('duplicated_project_title_and_description', 'BP_R0004', 'project name', project_set.first, project_title_desc_list, nil, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## with submission_id  (has 1 entity in DB, but allows with submission_id)
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ok2.xml")
+    ret = exec_validator('duplicated_project_title_and_description', 'BP_R0004', 'project name', project_set.first, project_title_desc_list, 'psub', 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    ## without submission_id (has 1 entity in DB, not allow without submission_id)
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng1.xml")
+    ret = exec_validator('duplicated_project_title_and_description', 'BP_R0004', 'project name', project_set.first, project_title_desc_list, nil, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## with submission_id (already duplicate in DB)
+    project_title_desc_list = [
+      {submission_id: 'PSUBxxx', project_name: 'project name1', bioproject_title: 'Title text 1', public_description:  'Description text 1'},
+      {submission_id: 'PSUBxxx', project_name: 'project name2', bioproject_title: 'Title text 2', public_description:  'Description text 2'},
+      {submission_id: 'PSUBxxx', project_name: 'project name2', bioproject_title: 'Title text 2', public_description:  'Description text 2'}
+    ]
+    project_set = get_project_set_node("#{@test_file_dir}/4_duplicated_project_title_and_description_ng2.xml")
+    ret = exec_validator('duplicated_project_title_and_description', 'BP_R0004', 'project name', project_set.first, project_title_desc_list, 'psub', 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0005
+  def test_identical_project_title_and_description
+    # ok case
+    project_set = get_project_set_node("#{@test_file_dir}/5_identical_project_title_and_description_ok.xml")
+    ret = exec_validator('identical_project_title_and_description', 'BP_R0005', 'project name', project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not use Description element
+    project_set = get_project_set_node("#{@test_file_dir}/5_identical_project_title_and_description_ok2.xml")
+    ret = exec_validator('identical_project_title_and_description', 'BP_R0005', 'project name', project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    project_set = get_project_set_node("#{@test_file_dir}/5_identical_project_title_and_description_ng.xml")
+    ret = exec_validator('identical_project_title_and_description', 'BP_R0005', 'project name', project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0014
+  def test_invalid_publication_identifier
+    # ok case
+    ## valid PubMed id
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## valid PMC id
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok2.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    ## nod ePMC ePubmed
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ok2.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal true, ret[:result]
+    # ng case
+    # PubMed id is blank
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng1.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    # invalid PubMed
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng2.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple Publication node,  one of these has error
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng3.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## multiple Publication node,  two of these have error
+    project_set = get_project_set_node("#{@test_file_dir}/14_invalid_publication_identifier_ng4.xml")
+    ret = exec_validator('invalid_publication_identifier', 'BP_R0014', 'project name', project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 2, ret[:error_list].size # twice
+  end
+
+  # rule:BP_R0016
+  def test_invalid_umbrella_project
+    # _ok fixture は PRJDB1554 / PSUB001851 を含むので両方 umbrella 扱い、_ng fixture の PRJDB3490 は非 umbrella
+    stub_db_validator(@validator, umbrella_project?: ->(accession) { %w[PRJDB1554 PSUB001851].include?(accession) })
+    # ok case
+    link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok.xml")
+    ret = exec_validator('invalid_umbrella_project', 'BP_R0016', 'Link', link_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not exist node
+    link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok2.xml")
+    ret = exec_validator('invalid_umbrella_project', 'BP_R0016', 'Link', link_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # attribute blank
+    link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ok3.xml")
+    ret = exec_validator('invalid_umbrella_project', 'BP_R0016', 'Link', link_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case(not umbrella id)
+    link_set = get_link_set_node("#{@test_file_dir}/16_invalid_umbrella_project_ng.xml")
+    ret = exec_validator('invalid_umbrella_project', 'BP_R0016', 'Link', link_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0018
+  def test_taxonomy_at_species_or_infraspecific_rank
+    # ok case
+    # exist tax_id
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok.xml")
+    ret = exec_validator('taxonomy_at_species_or_infraspecific_rank', 'BP_R0018', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist only organism name
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok2.xml")
+    ret = exec_validator('taxonomy_at_species_or_infraspecific_rank', 'BP_R0018', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok3.xml")
+    ret = exec_validator('taxonomy_at_species_or_infraspecific_rank', 'BP_R0018', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not infraspecific_rank, but sample_scope = eMultispecies. validation =>  ok
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok4.xml")
+    ret = exec_validator('taxonomy_at_species_or_infraspecific_rank', 'BP_R0018', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not infraspecific_rank, but not primary project. validation =>  ok
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ok5.xml")
+    ret = exec_validator('taxonomy_at_species_or_infraspecific_rank', 'BP_R0018', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    project_set = get_project_set_node("#{@test_file_dir}/18_taxonomy_at_species_or_infraspecific_rank_ng.xml")
+    ret = exec_validator('taxonomy_at_species_or_infraspecific_rank', 'BP_R0018', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0020
+  def test_metagenome_or_environmental
+    # ok case
+    # exist tax_id
+    project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok.xml")
+    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist only organism name
+    project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok2.xml")
+    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # exist invalid organism name. it can't get tax_id, then no check this rule. validation =>  ok
+    project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok3.xml")
+    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # not metagenome tax_id, but sample_scope is not eEnvironment. validation =>  ok
+    project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ok4.xml")
+    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    project_set = get_project_set_node("#{@test_file_dir}/20_metagenome_or_environmental_ng.xml")
+    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set.first, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0038
+  def test_taxonomy_name_and_id_not_match
+    # ok case
+    # exact match
+    project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ok.xml")
+    ret = exec_validator('taxonomy_name_and_id_not_match', 'BP_R0038', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal true, ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # taxid blank
+    project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ok2.xml")
+    ret = exec_validator('taxonomy_name_and_id_not_match', 'BP_R0038', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
+    assert_nil ret[:result]
+    assert_equal 0, ret[:error_list].size
+    # ng case
+    project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng1.xml")
+    ret = exec_validator('taxonomy_name_and_id_not_match', 'BP_R0038', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil ErrorBuilder.auto_annotation(ret[:error_list].first)
+    # organism name blank
+    project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng2.xml")
+    ret = exec_validator('taxonomy_name_and_id_not_match', 'BP_R0038', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    assert_nil ErrorBuilder.auto_annotation(ret[:error_list].first)
+    # not exist taxid
+    project_set = get_project_set_node("#{@test_file_dir}/38_taxonomy_name_and_id_not_match_ng3.xml")
+    ret = exec_validator('taxonomy_name_and_id_not_match', 'BP_R0038', 'project name', get_input_taxid(project_set.first), get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  # rule:BP_R0039
+  def test_taxonomy_error_warning
+    # このメソッドではokになるケースはない
+    # ng case
+    ## exist
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng1.xml")
+    ret = exec_validator('taxonomy_error_warning', 'BP_R0039', 'project name', get_input_organism_name(project_set.first), project_set, 1)
+    expect_taxid_annotation = '103690'
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxID')
+    assert_equal expect_taxid_annotation, suggest_value
+    # #exist but not correct as scientific name ("Anabaena sp. PCC 7120"=>"Nostoc sp. PCC 7120")
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng2.xml")
+    ret = exec_validator('taxonomy_error_warning', 'BP_R0039', 'project name', get_input_organism_name(project_set.first), project_set, 1)
+    expect_taxid_annotation = '103690'
+    # Virtuoso taxonomy データ上の scientific name (= 末尾に strain 番号が付くフル表記)
+    expect_organism_annotation = 'Nostoc sp. PCC 7120 = FACHB-418'
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxID')
+    assert_equal expect_taxid_annotation, suggest_value
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'OrganismName')
+    assert_equal expect_organism_annotation, suggest_value
+    ## exist but not correct caracter case ("nostoc sp. pcc 7120" => "Nostoc sp. PCC 7120")
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng3.xml")
+    ret = exec_validator('taxonomy_error_warning', 'BP_R0039', 'project name', get_input_organism_name(project_set.first), project_set, 1)
+    expect_taxid_annotation = '103690'
+    # Virtuoso taxonomy データ上の scientific name (= 末尾に strain 番号が付くフル表記)
+    expect_organism_annotation = 'Nostoc sp. PCC 7120 = FACHB-418'
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxID')
+    assert_equal expect_taxid_annotation, suggest_value
+    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'OrganismName')
+    assert_equal expect_organism_annotation, suggest_value
+    ## multiple exist
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng4.xml")
+    ret = exec_validator('taxonomy_error_warning', 'BP_R0039', 'project name', get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## not exist
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng5.xml")
+    ret = exec_validator('taxonomy_error_warning', 'BP_R0039', 'project name', get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+    ## organism name is blank
+    project_set = get_project_set_node("#{@test_file_dir}/39_taxonomy_error_warning_ng6.xml")
+    ret = exec_validator('taxonomy_error_warning', 'BP_R0039', 'project name', get_input_organism_name(project_set.first), project_set, 1)
+    assert_equal false, ret[:result]
+    assert_equal 1, ret[:error_list].size
+  end
+
+  def test_node_blank?
+    # element
+    # #has text element
+    project_set = get_project_set_node("#{@test_file_dir}/node_blank_test.xml")
+    xpath = '//Project/Element/Description'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+    xpath = '//Project/Element/Description/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+
+    ## not exist element
+    xpath = '//Project/Element/NotExist'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = '//Project/Element/NotExist/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## blank text element
+    xpath = '//Project/Element/Blank'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = '//Project/Element/Blank/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## only space element
+    xpath = '//Project/Element/OnlySpace'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = '//Project/Element/OnlySpace/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## only child node has text
+    xpath = '//Project/Element/ChildHasText'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = '//Project/Element/ChildHasText/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+
+    # attribute
+    ## has text attribute
+    xpath = '//Project/Attribute/Description/@attr'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+
+    ## not exist attribute
+    xpath = '//Project/Attribute/NotExist/@attr'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## blank text element
+    xpath = '//Project/Attribute/Blank/@attr'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+    ## only space element
+    xpath = '//Project/Attribute/OnlySpace/@attr'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+
+    # multi data
+    # #has text attribute
+    xpath = '//Project/MultiData/Description'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+    xpath = '//Project/MultiData/Description/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal false, ret
+
+    ## blank text element
+    xpath = '//Project/Element/Blank'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+    xpath = '//Project/Element/Blank/text()'
+    ret = @validator.node_blank?(project_set, xpath)
+    assert_equal true, ret
+
+
+    # check root node of xpath is blank?
+    ## has text element
+    desc_nodes = project_set.xpath('//Project/Element/Description')
+    ret = @validator.node_blank?(desc_nodes, '.')
+    assert_equal false, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal false, ret
+    desc_nodes = project_set.xpath('//Project/Element/Description/text()')
+    ret = @validator.node_blank?(desc_nodes, '.')
+    assert_equal false, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal false, ret
+    ## not exist element
+    desc_nodes = project_set.xpath('//Project/Element/NotExist')
+    ret = @validator.node_blank?(desc_nodes, '.')
+    assert_equal true, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal true, ret
+    desc_nodes = project_set.xpath('//Project/Element/NotExist/text()')
+    ret = @validator.node_blank?(desc_nodes, '.')
+    assert_equal true, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal true, ret
+    ## has text attribute
+    desc_nodes = project_set.xpath('//Project/Attribute/Description/@attr')
+    ret = @validator.node_blank?(desc_nodes, '.')
+    assert_equal false, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal false, ret
+    desc_nodes = project_set.xpath('//Project/Attribute/NotExist/@attr')
+    ret = @validator.node_blank?(desc_nodes, '.')
+    assert_equal true, ret
+    ret = @validator.node_blank?(desc_nodes)
+    assert_equal true, ret
+  end
+
+  def test_get_node_text
+    # element
+    # #has text element
+    project_set = get_project_set_node("#{@test_file_dir}/node_blank_test.xml")
+    xpath = '//Project/Element/Description'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal 'Description text', ret
+    xpath = '//Project/Element/Description/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal 'Description text', ret
+
+    ## not exist element
+    xpath = '//Project/Element/NotExist'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+    xpath = '//Project/Element/NotExist/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+    ## blank text element
+    xpath = '//Project/Element/Blank'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+    xpath = '//Project/Element/Blank/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+    ## only space element
+    xpath = '//Project/Element/OnlySpace'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+    xpath = '//Project/Element/OnlySpace/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+    ## only child node has text
+    xpath = '//Project/Element/ChildHasText'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+    xpath = '//Project/Element/ChildHasText/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+
+    # attribute
+    ## has text attribute
+    xpath = '//Project/Attribute/Description/@attr'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal 'attr text', ret
+
+    ## not exist attribute
+    xpath = '//Project/Attribute/NotExist/@attr'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+    ## blank text element
+    xpath = '//Project/Attribute/Blank/@attr'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+    ## only space element
+    xpath = '//Project/Attribute/OnlySpace/@attr'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+
+    # multi data
+    # #has text attribute
+    xpath = '//Project/MultiData/Description'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal 'Description text', ret
+    xpath = '//Project/MultiData/Description/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal 'Description text', ret
+
+    ## blank text element
+    xpath = '//Project/Element/Blank'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+    xpath = '//Project/Element/Blank/text()'
+    ret = @validator.get_node_text(project_set, xpath)
+    assert_equal '', ret
+
+
+    # check root node of xpath is blank?
+    ## has text element
+    desc_nodes = project_set.xpath('//Project/Element/Description')
+    ret = @validator.get_node_text(desc_nodes, '.')
+    assert_equal 'Description text', ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal 'Description text', ret
+    desc_nodes = project_set.xpath('//Project/Element/Description/text()')
+    ret = @validator.get_node_text(desc_nodes, '.')
+    assert_equal 'Description text', ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal 'Description text', ret
+    ## not exist element
+    desc_nodes = project_set.xpath('//Project/Element/NotExist')
+    ret = @validator.get_node_text(desc_nodes, '.')
+    assert_equal '', ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal '', ret
+    desc_nodes = project_set.xpath('//Project/Element/NotExist/text()')
+    ret = @validator.get_node_text(desc_nodes, '.')
+    assert_equal '', ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal '', ret
+    ## has text attribute
+    desc_nodes = project_set.xpath('//Project/Attribute/Description/@attr')
+    ret = @validator.get_node_text(desc_nodes, '.')
+    assert_equal 'attr text', ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal 'attr text', ret
+    desc_nodes = project_set.xpath('//Project/Attribute/NotExist/@attr')
+    ret = @validator.get_node_text(desc_nodes, '.')
+    assert_equal '', ret
+    ret = @validator.get_node_text(desc_nodes)
+    assert_equal '', ret
+  end
+end

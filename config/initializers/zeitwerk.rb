@@ -1,21 +1,6 @@
-# lib/ 配下を Zeitwerk autoload に乗せるための調整。
-#
-# - collapse: ディレクトリを namespace にせず、全ファイルが top-level 定数を
-#   定義する現状の構造をそのまま許容する。将来 app/models 等に移すタイミング
-#   で proper namespace 化する。
-# - inflect: ファイル名と定数名がデフォルト規則で一致しない箇所を明示する
-#   (acronym, BioSample/BioProject の camel hump 等)。
-loader = Rails.autoloaders.main
-
-loader.collapse(
-  Rails.root.join('lib/validator'),
-  Rails.root.join('lib/validator/common'),
-  Rails.root.join('lib/validator/auto_annotator'),
-  Rails.root.join('lib/submitter'),
-  Rails.root.join('lib/package')
-)
-
-loader.inflector.inflect(
+# app/models/ 配下はフラット (BioSampleValidator など top-level 定数のみ) なので、
+# ファイル名と定数名がデフォルト規則で一致しない箇所だけ inflector に明示する。
+Rails.autoloaders.main.inflector.inflect(
   'biosample_validator'       => 'BioSampleValidator',
   'biosample_submitter'       => 'BioSampleSubmitter',
   'bioproject_validator'      => 'BioProjectValidator',

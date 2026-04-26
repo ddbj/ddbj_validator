@@ -11,7 +11,7 @@ class ValidationsController < ApplicationController
     validation_params = {params: {'file_format' => {}}}
 
     # analysis は 2021-01-17 (d1566c0 "accept jvar excel input") に typo 化 ('analysisx') して
-    # 入口を塞いだ状態が続いている。lib/validator/analysis_validator.rb 自体は残っているので
+    # 入口を塞いだ状態が続いている。app/models/analysis_validator.rb 自体は残っているので
     # 再開するときはここに 'analysis' を足す。
     %w[all_db biosample bioproject submission experiment run jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf].each do |category|
       next unless params[category]
