@@ -50,27 +50,23 @@ class ValidationsController < ApplicationController
     status_file_path = File.join(save_dir, 'status.json')
     output_file_path = File.join(save_dir, 'result.json')
 
-    if File.exist?(output_file_path) && File.exist?(status_file_path)
-      result = JSON.parse(File.read(output_file_path))
+    status_json = JSON.parse(File.read(status_file_path))
+    result      = JSON.parse(File.read(output_file_path)) if File.exist?(output_file_path)
 
-      if result['status'] == 'error'
-        head :internal_server_error
+    if result.nil?
+      if status_json['status'] == 'running'
+        render_error('Validation process has not finished yet', status: :bad_request)
       else
-        status_json = JSON.parse(File.read(status_file_path))
-        result      = Validator.new.grouped_message(result) if params.key?('grouped_messages')
-
-        render json: status_json.merge('result' => result)
+        render_error('Validation not found', status: :not_found)
       end
+    elsif result['status'] == 'error'
+      head :internal_server_error
     else
-      message =
-        if File.exist?(status_file_path) && JSON.parse(File.read(status_file_path))['status'] == 'running'
-          'Validation process has not finished yet'
-        else
-          'Invalid uuid'
-        end
-
-      render_error(message, status: :bad_request)
+      result = Validator.new.grouped_message(result) if params.key?('grouped_messages')
+      render json: status_json.merge('result' => result)
     end
+  rescue Errno::ENOENT
+    render_error('Validation not found', status: :not_found)
   end
 
   def status
@@ -79,7 +75,7 @@ class ValidationsController < ApplicationController
     if File.exist?(status_file_path)
       send_file status_file_path, type: 'application/json', disposition: 'inline'
     else
-      render_error('Invalid uuid', status: :bad_request)
+      render_error('Validation not found', status: :not_found)
     end
   end
 
@@ -92,7 +88,7 @@ class ValidationsController < ApplicationController
     elsif file_list.size == 1
       send_file file_list.first, filename: File.basename(file_list.first), type: 'application/xml'
     else
-      render_error('Invalid uuid or filetype', status: :bad_request)
+      render_error('Validation file not found', status: :not_found)
     end
   end
 
@@ -102,7 +98,7 @@ class ValidationsController < ApplicationController
     org_file_list = Dir.glob(File.join(save_dir, params[:filetype], '*'))
 
     unless File.exist?(result_file) && org_file_list.size == 1
-      render_error('Invalid uuid or filetype, or the auto-correct data is not exist of the uuid specified', status: :bad_request)
+      render_error('Auto-correct data not found for the given uuid / filetype', status: :not_found)
       return
     end
 
