@@ -5,7 +5,7 @@ require 'test_helper'
 class TestTradValidator < Minitest::Test
   def setup
     @validator = TradValidator.new
-    @test_file_dir = File.expand_path('../../data/trad', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/trad')
 
     # 各 test の fixture から拾った「DDBJ DB 上で valid」とされる ID 一覧。
     # これ以外の ID (例: PRJDB0000 / SAMD00000000) は invalid 扱いとする。

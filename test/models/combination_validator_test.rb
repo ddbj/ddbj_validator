@@ -3,7 +3,7 @@ require 'test_helper'
 class TestCombinationValidator < Minitest::Test
   def setup
     @validator = CombinationValidator.new
-    @test_file_dir = File.expand_path('../../data/combination', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/combination')
   end
 
   #### テスト用共通メソッド ####

@@ -4,7 +4,7 @@ require 'test_helper'
 class TestExcel2Tsv < Minitest::Test
   def setup
     @excel2tsv = Excel2Tsv.new
-    @test_file_dir = File.expand_path('../../data/all_data', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/all_data')
   end
 
   def test_split_sheet

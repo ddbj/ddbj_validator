@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestDateFormat < Minitest::Test
   def setup
-    conf_dir = File.expand_path('../../../conf/biosample', __FILE__)
+    conf_dir = Rails.root.join('conf/biosample')
     @df = DateFormat.new(
       convert_date_format: JSON.parse(File.read("#{conf_dir}/convert_date_format.json")),
       ddbj_date_format:    JSON.parse(File.read("#{conf_dir}/ddbj_date_format.json"))

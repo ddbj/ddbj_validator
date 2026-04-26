@@ -3,7 +3,7 @@ require 'test_helper'
 class TestBioProjectValidator < Minitest::Test
   def setup
     @validator = BioProjectValidator.new
-    @test_file_dir = File.expand_path('../../data/bioproject', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/bioproject')
   end
 
   #### テスト用共通メソッド ####
@@ -101,7 +101,7 @@ class TestBioProjectValidator < Minitest::Test
 
   # rule:BP_R0002
   def test_xml_data_schema
-    xsd_file_path = File.dirname(__FILE__) + '/../../conf/bioproject/xsd/Package.xsd'
+    xsd_file_path = Rails.root.join('conf/bioproject/xsd/Package.xsd').to_s
     # ok case
     xml_file = "#{@test_file_dir}/2_xml_data_schema_ok.xml"
     ret = exec_validator('xml_data_schema', 'BP_R0002', xml_file, xsd_file_path)

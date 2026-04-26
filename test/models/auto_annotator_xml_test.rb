@@ -5,7 +5,7 @@ require 'test_helper'
 class TestAutoAnnotatorXml < Minitest::Test
   def setup
     @auto_annotater = AutoAnnotatorXml.new
-    @test_file_dir = File.expand_path('../../data/auto_annotator', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/auto_annotator')
   end
 
   def test_create_annotated_file

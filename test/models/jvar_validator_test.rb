@@ -4,7 +4,7 @@ require 'test_helper'
 class TestJVarValidator < Minitest::Test
   def setup
     @validator = JVarValidator.new
-    @test_file_dir = File.expand_path('../../data/jvar', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/jvar')
   end
 
   #### テスト用共通メソッド ####

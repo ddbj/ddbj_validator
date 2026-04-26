@@ -4,10 +4,10 @@ require 'test_helper'
 class TestValidator < Minitest::Test
   def setup
     @validator = Validator.new
-    @tmp_file_dir = File.expand_path('../../data/tmp', __FILE__)
-    @bs_test_file_dir = File.expand_path('../../data/biosample', __FILE__)
-    @bp_test_file_dir = File.expand_path('../../data/bioproject', __FILE__)
-    @all_test_file_dir = File.expand_path('../../data/all_data', __FILE__)
+    @tmp_file_dir = Rails.root.join('test/data/tmp')
+    @bs_test_file_dir = Rails.root.join('test/data/biosample')
+    @bp_test_file_dir = Rails.root.join('test/data/bioproject')
+    @all_test_file_dir = Rails.root.join('test/data/all_data')
 
     FileUtils.mkdir_p(@tmp_file_dir)
   end

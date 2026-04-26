@@ -7,7 +7,7 @@ class TestSaveAutoAnnotation < Minitest::Test
   def setup
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new
-    @test_file_dir = File.expand_path('../../data/biosample', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/biosample')
   end
 
   #

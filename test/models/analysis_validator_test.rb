@@ -3,7 +3,7 @@ require 'test_helper'
 class TestAnalysisValidator < Minitest::Test
   def setup
     @validator = AnalysisValidator.new
-    @test_file_dir = File.expand_path('../../data/dra', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/dra')
   end
 
   #### テスト用共通メソッド ####

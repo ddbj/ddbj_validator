@@ -3,7 +3,7 @@ require 'test_helper'
 class TestBioProjectTsvValidator < Minitest::Test
   def setup
     @validator = BioProjectTsvValidator.new
-    @test_file_dir = File.expand_path('../../data/bioproject', __FILE__)
+    @test_file_dir = Rails.root.join('test/data/bioproject')
   end
 
   #### テスト用共通メソッド ####
@@ -817,7 +817,7 @@ class TestBioProjectTsvValidator < Minitest::Test
 
   # BP_R0067
   def test_invalid_json_structure
-    json_schema = JSON.parse(File.read(File.absolute_path(File.dirname(__FILE__) + '/../../conf/bioproject/schema.json')))
+    json_schema = JSON.parse(File.read(Rails.root.join('conf/bioproject/schema.json')))
     # ok case
     data = [{'key' => 'first_name', 'values' => ['my Name']}]
     ret = exec_validator('invalid_json_structure', 'BP_R0067', data, json_schema)
