@@ -14,16 +14,13 @@ class AutoAnnotator
   # @param org_file 元ファイル(Validateしたファイル)
   # @param result_file Validator結果のJSON
   # @param annotated_file_path出力ファイルパス
-  # @accept_header Accept headerのリスト.ユーザ希望の出力形式  e.g.{"HTTP_ACCEPT"=>"text/html,text/tab-separated-values"}
+  # @accept_header Accept ヘッダ値. ユーザ希望の出力形式 e.g. "text/html,text/tab-separated-values"
   # @return result  {status: "succeed", file: annotated_file_path} or {status: "error", message: message}
   def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_header)
     info = {orginal_file: org_file.to_s, output_file: annotated_file_path}
     @log.info("execute auto_annotation: #{info}")
     begin
-      accept_header_list = []
-      unless accept_header.nil? || accept_header['HTTP_ACCEPT'].nil?
-        accept_header_list = accept_header['HTTP_ACCEPT'].split(',').map {|item| item.chomp.strip }
-      end
+      accept_header_list = accept_header.to_s.split(',').map(&:strip)
       input_file_format = ''
       return_file_format = ''
       if filetype == 'biosample'

@@ -181,13 +181,8 @@ class Package < SPARQLBase
       end
 
       # accept header から希望ファイル形式を決める
-      unless accept_header.nil? || accept_header['HTTP_ACCEPT'].nil?
-        accept_header_list = accept_header['HTTP_ACCEPT'].split(',').map {|item| item.chomp.strip }
-      end
-      return_file_format = 'excel' # default format
-      if accept_header_list.include?('text/tab-separated-values')
-        return_file_format = 'tsv'
-      end
+      accept_header_list = accept_header.to_s.split(',').map(&:strip)
+      return_file_format = accept_header_list.include?('text/tab-separated-values') ? 'tsv' : 'excel'
       template_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../public/template')
       puts template_file_dir
       file_path = ''
