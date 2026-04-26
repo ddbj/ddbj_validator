@@ -10,20 +10,15 @@ class TradValidator < ValidatorBase
   # Initializer
   #
   def initialize
-    super()
-    config_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../conf/trad')
+    super
+    @conf[:validation_config]          = JSON.parse(Rails.root.join('conf/trad/rule_config_trad.json').read)
+    @conf[:locus_tag_require_features] = JSON.parse(Rails.root.join('conf/trad/locus_tag_require_features.json').read)
+    @conf[:bs_null_accepted]           = JSON.parse(Rails.root.join('conf/biosample/null_accepted.json').read)
 
-    @conf[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_trad.json'))
-    @conf[:locus_tag_require_features] = JSON.parse(File.read(config_file_dir + '/locus_tag_require_features.json'))
-
-    bs_config_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../conf/biosample')
-    @conf[:bs_null_accepted] = JSON.parse(File.read(bs_config_file_dir + '/null_accepted.json'))
-
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
-    @error_list = error_list = []
-    @validation_config = @conf[:validation_config] # need?
-
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @validation_config = @conf[:validation_config]
+    @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
+    @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @error_list        = []
   end
 
   #

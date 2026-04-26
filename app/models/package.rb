@@ -183,7 +183,7 @@ class Package < SPARQLBase
       # accept header から希望ファイル形式を決める
       accept_header_list = accept_header.to_s.split(',').map(&:strip)
       return_file_format = accept_header_list.include?('text/tab-separated-values') ? 'tsv' : 'excel'
-      template_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../public/template')
+      template_file_dir = Rails.root.join('public/template')
       file_path = ''
       if return_file_format == 'tsv'
         file_path = "#{template_file_dir}/#{version}/bs/tsv/#{package_id}.tsv"
