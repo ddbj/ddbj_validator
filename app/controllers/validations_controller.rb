@@ -51,15 +51,19 @@ class ValidationsController < ApplicationController
     output_file_path = File.join(save_dir, 'result.json')
 
     status_json = JSON.parse(File.read(status_file_path))
-    result      = JSON.parse(File.read(output_file_path)) if File.exist?(output_file_path)
 
-    if result.nil?
+    begin
+      result = JSON.parse(File.read(output_file_path))
+    rescue Errno::ENOENT
       if status_json['status'] == 'running'
         render_error('Validation process has not finished yet', status: :bad_request)
       else
         render_error('Validation not found', status: :not_found)
       end
-    elsif result['status'] == 'error'
+      return
+    end
+
+    if result['status'] == 'error'
       head :internal_server_error
     else
       result = Validator.new.grouped_message(result) if params.key?('grouped_messages')
@@ -211,7 +215,11 @@ class ValidationsController < ApplicationController
     nil
   end
 
+  # status.json は web リクエストと validator スレッドが同時に読み書きするため、
+  # 部分書き込みを掴ませないよう temp + rename でアトミックに置き換える。
   def write_status_file (path, payload)
-    File.write(path, JSON.generate(payload))
+    tmp = "#{path}.#{Process.pid}.#{SecureRandom.hex(4)}.tmp"
+    File.write(tmp, JSON.generate(payload))
+    File.rename(tmp, path)
   end
 end

@@ -1,5 +1,6 @@
 require 'optparse'
 require 'logger'
+require 'securerandom'
 require 'yaml'
 require 'fileutils'
 
@@ -128,9 +129,7 @@ class Validator
         ret = {status: 'error', message: ex.message}
       end
 
-      File.open(params[:output], 'w') do |file|
-        file.puts(JSON.generate(ret))
-      end
+      atomic_write(params[:output], JSON.generate(ret))
       FileUtils.rm(running_file)
       JSON.generate(ret)
     end
@@ -205,9 +204,7 @@ class Validator
         ret['stats'] = stats
         ret['messages'] = split_result[:error_list]
         @log.info('validation result: ' + 'fail')
-        File.open(params[:output], 'w') do |file|
-          file.puts(JSON.generate(ret))
-        end
+        atomic_write(params[:output], JSON.generate(ret))
       else # 正常に変換できた場合は、Excelに含まれていたfiletypeと出力TSVのファイルパスを返す
         result = split_result[:filetypes]
       end
@@ -362,6 +359,14 @@ class Validator
         body     "#{body_text}"
       end
       mail.deliver!
+    end
+
+    # result.json は web リクエストとこのスレッドが同時に読み書きするため、
+    # 部分書き込みを掴ませないよう temp + rename でアトミックに置き換える。
+    def atomic_write(path, content)
+      tmp = "#{path}.#{Process.pid}.#{SecureRandom.hex(4)}.tmp"
+      File.write(tmp, content)
+      File.rename(tmp, path)
     end
 
     private_class_method :create_command_parser
