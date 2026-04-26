@@ -1,4 +1,3 @@
-require 'fileutils'
 require 'test_helper'
 
 class TestValidator < Minitest::Test
@@ -9,7 +8,7 @@ class TestValidator < Minitest::Test
     @bp_test_file_dir = Rails.root.join('test/data/bioproject')
     @all_test_file_dir = Rails.root.join('test/data/all_data')
 
-    FileUtils.mkdir_p(@tmp_file_dir)
+    @tmp_file_dir.mkpath
   end
 
   def test_json

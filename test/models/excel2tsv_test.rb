@@ -10,12 +10,12 @@ class TestExcel2Tsv < Minitest::Test
   def test_split_sheet
     # ok case
     excel_file = "#{@test_file_dir}/bpbs_test_warning.xlsx"
-    base_dir = "#{@test_file_dir}/output"
+    base_dir = @test_file_dir.join('output')
     # 出力ディレクトの初期化
     if File.exist?(base_dir)
       FileUtils.rm_rf(base_dir)
     end
-    FileUtils.mkdir_p(base_dir)
+    base_dir.mkpath
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     assert File.exist?("#{base_dir}/bioproject/bpbs_test_warning_bioproject.tsv")
@@ -25,12 +25,12 @@ class TestExcel2Tsv < Minitest::Test
 
     # ng base
     excel_file = "#{@test_file_dir}/invalid_excel.xlsx" # 中身はただのTextファイル
-    base_dir = "#{@test_file_dir}/output"
+    base_dir = @test_file_dir.join('output')
     # 出力ディレクトの初期化
     if File.exist?(base_dir)
       FileUtils.rm_rf(base_dir)
     end
-    FileUtils.mkdir_p(base_dir)
+    base_dir.mkpath
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     assert_equal 'failed', ret[:status]
@@ -41,12 +41,12 @@ class TestExcel2Tsv < Minitest::Test
 
     # 関数とセル結合のあるファイルがパースできるか
     excel_file = "#{@test_file_dir}/bioproject_test_merge_cells.xlsx"
-    base_dir = "#{@test_file_dir}/output"
+    base_dir = @test_file_dir.join('output')
     # 出力ディレクトの初期化
     if File.exist?(base_dir)
       FileUtils.rm_rf(base_dir)
     end
-    FileUtils.mkdir_p(base_dir)
+    base_dir.mkpath
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     tsv_file = "#{base_dir}/bioproject/bioproject_test_merge_cells_bioproject.tsv"
@@ -74,12 +74,12 @@ class TestExcel2Tsv < Minitest::Test
 
     # macro付きExcelがパース出来、かつmacroが実行されないか
     excel_file = "#{@test_file_dir}/bioproject_test_with_macro.xlsm"
-    base_dir = "#{@test_file_dir}/output"
+    base_dir = @test_file_dir.join('output')
     # 出力ディレクトの初期化
     if File.exist?(base_dir)
       FileUtils.rm_rf(base_dir)
     end
-    FileUtils.mkdir_p(base_dir)
+    base_dir.mkpath
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     tsv_file = "#{base_dir}/bioproject/bioproject_test_with_macro_bioproject.tsv"
