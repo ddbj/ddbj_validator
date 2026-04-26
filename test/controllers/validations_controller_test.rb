@@ -38,6 +38,11 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
     assert_match 'Auto-correct data not found', JSON.parse(response.body)['message']
   end
 
+  test 'GET /api/validation/:uuid/:filetype rejects traversal in filetype' do
+    get '/api/validation/00000000-0000-0000-0000-000000000000/..%2F'
+    assert_response :not_found
+  end
+
   test 'POST /api/validation accepts a biosample submission and returns the uuid' do
     fake_validator = Object.new
     def fake_validator.execute(params)

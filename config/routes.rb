@@ -10,11 +10,11 @@ Rails.application.routes.draw do
     post 'validation'                             => 'validations#create'
     get  'validation/:uuid'                       => 'validations#show',        constraints: {uuid: /[0-9a-f-]+/}
     get  'validation/:uuid/status'                => 'validations#status',      constraints: {uuid: /[0-9a-f-]+/}
-    get  'validation/:uuid/:filetype'             => 'validations#file',        constraints: {uuid: /[0-9a-f-]+/}
-    get  'validation/:uuid/:filetype/autocorrect' => 'validations#autocorrect', constraints: {uuid: /[0-9a-f-]+/}
+    get  'validation/:uuid/:filetype'             => 'validations#file',        constraints: {uuid: /[0-9a-f-]+/, filetype: /[a-z][a-z_]*/}
+    get  'validation/:uuid/:filetype/autocorrect' => 'validations#autocorrect', constraints: {uuid: /[0-9a-f-]+/, filetype: /[a-z][a-z_]*/}
 
-    get  'submission/ids/:filetype'            => 'submissions#ids'
-    get  'submission/:filetype/:submission_id' => 'submissions#show', submission_id: /[^\/]+/
+    get  'submission/ids/:filetype'            => 'submissions#ids', constraints: {filetype: /[a-z][a-z_]*/}
+    get  'submission/:filetype/:submission_id' => 'submissions#show', constraints: {filetype: /[a-z][a-z_]*/, submission_id: /[^\/]+/}
 
     get  'monitoring' => 'monitoring#show'
 

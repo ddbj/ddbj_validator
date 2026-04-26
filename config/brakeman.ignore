@@ -159,7 +159,7 @@
       "cwe_id": [
         22
       ],
-      "note": "params[:uuid] is constrained by the route. params[:filetype] is unconstrained but bounded to data_dir/<prefix>/<uuid>/, and the action returns 400 unless exactly one file matches."
+      "note": "Both params[:uuid] (/[0-9a-f-]+/) and params[:filetype] (/[a-z][a-z_]*/) are constrained by the route, and the action returns 404 unless exactly one file matches."
     },
     {
       "warning_type": "File Access",
