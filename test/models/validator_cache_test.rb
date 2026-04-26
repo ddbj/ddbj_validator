@@ -52,7 +52,7 @@ class TestValidatorCache < Minitest::Test
   end
 
   def test_cache_invalid_publication_identifier
-    ref_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/reference_attributes.json')))
+    ref_attr = JSON.parse(Rails.root.join('conf/biosample/reference_attributes.json').read)
     pubchem_id = '27148491'
     ret1 = @validator.send('invalid_publication_identifier', 'BS_R0011', 'SampleA', 'ref_biomaterial', pubchem_id, ref_attr, 1)
     assert Rails.cache.exist?(['exist_pubchem_id', pubchem_id])

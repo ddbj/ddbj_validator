@@ -375,7 +375,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_attribute_value_not_in_controlled_terms
-    cv_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/controlled_terms.json')))
+    cv_attr = JSON.parse(Rails.root.join('conf/biosample/controlled_terms.json').read)
     # ok case
     ret = exec_validator('attribute_value_not_in_controlled_terms', 'BS_R0002', 'sampleA', 'rel_to_oxygen', 'aerobe', cv_attr, 1)
     assert_equal true, ret[:result]
@@ -420,7 +420,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_attribute_value_for_controlled_terms
-    cv_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/controlled_terms.json')))
+    cv_attr = JSON.parse(Rails.root.join('conf/biosample/controlled_terms.json').read)
     # ok case
     ret = exec_validator('invalid_attribute_value_for_controlled_terms', 'BS_R0138', 'sampleA', 'rel_to_oxygen', 'aerobe', cv_attr, 1)
     assert_equal true, ret[:result]
@@ -461,7 +461,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_publication_identifier
-    ref_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/reference_attributes.json')))
+    ref_attr = JSON.parse(Rails.root.join('conf/biosample/reference_attributes.json').read)
     # ok case
     # #pubmed id
     ret = exec_validator('invalid_publication_identifier', 'BS_R0011', 'SampleA', 'ref_biomaterial', '27148491', ref_attr, 1)
@@ -499,8 +499,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_geo_loc_name_format
-    country_list = JSON.parse(File.read(Rails.root.join('test/fixtures/conf/pub/docs/common/country_list.json')))
-    historical_country_list = JSON.parse(File.read(Rails.root.join('test/fixtures/conf/pub/docs/common/historical_country_list.json')))
+    country_list = JSON.parse(Rails.root.join('test/fixtures/conf/pub/docs/common/country_list.json').read)
+    historical_country_list = JSON.parse(Rails.root.join('test/fixtures/conf/pub/docs/common/historical_country_list.json').read)
     valid_country_list = country_list + historical_country_list
     # ok case
     ret = exec_validator('invalid_geo_loc_name_format', 'BS_R0094', 'SampleA', 'Japan:Kanagawa, Hakone, Lake Ashi', valid_country_list, 1)
@@ -568,8 +568,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_country
-    country_list = JSON.parse(File.read(Rails.root.join('test/fixtures/conf/pub/docs/common/country_list.json')))
-    historical_country_list = JSON.parse(File.read(Rails.root.join('test/fixtures/conf/pub/docs/common/historical_country_list.json')))
+    country_list = JSON.parse(Rails.root.join('test/fixtures/conf/pub/docs/common/country_list.json').read)
+    historical_country_list = JSON.parse(Rails.root.join('test/fixtures/conf/pub/docs/common/historical_country_list.json').read)
     country_list = country_list + historical_country_list
     # ok case
     ret = exec_validator('invalid_country', 'BS_R0008', 'sampleA', 'Japan:Kanagawa, Hakone, Lake Ashi', country_list, 1)
@@ -1092,8 +1092,8 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_missing_value
-    null_accepted = JSON.parse(File.read(Rails.root.join('conf/biosample/null_accepted.json')))
-    null_not_recommended = JSON.parse(File.read(Rails.root.join('conf/biosample/null_not_recommended.json')))
+    null_accepted = JSON.parse(Rails.root.join('conf/biosample/null_accepted.json').read)
+    null_not_recommended = JSON.parse(Rails.root.join('conf/biosample/null_not_recommended.json').read)
     package_attr_list = @validator.get_attributes_of_package('MIMS.me.microbial', @package_version)
     # ok case
     ret = exec_validator('invalid_missing_value', 'BS_R0001', 'sampleA', 'depth', '10m', null_accepted, null_not_recommended, package_attr_list, 1, 1)
@@ -1170,7 +1170,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_datetime_format
-    ts_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/timestamp_attributes.json')))
+    ts_attr = JSON.parse(Rails.root.join('conf/biosample/timestamp_attributes.json').read)
     # ok case
     ret = exec_validator('invalid_datetime_format', 'BS_R0136', 'SampleA', 'collection_date', '2016-01-01', ts_attr,  1)
     assert_equal true, ret[:result]
@@ -1378,7 +1378,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_invalid_datetime
-    ts_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/timestamp_attributes.json')))
+    ts_attr = JSON.parse(Rails.root.join('conf/biosample/timestamp_attributes.json').read)
     # ok case
     ret = exec_validator('invalid_datetime', 'BS_R0007', 'SampleA', 'collection_date', '2016-01-01', ts_attr,  1)
     assert_equal true, ret[:result]
@@ -1466,7 +1466,7 @@ class TestBioSampleValidator < Minitest::Test
   end
 
   def test_special_character_included
-    special_chars = JSON.parse(File.read(Rails.root.join('conf/biosample/special_characters.json')))
+    special_chars = JSON.parse(Rails.root.join('conf/biosample/special_characters.json').read)
     ### attribute name
     # ok case
     ret = exec_validator('special_character_included', 'BS_R0012', 'SampleA', 'temperature', 'value', special_chars, 'attr_name', 1)
@@ -1637,7 +1637,7 @@ jkl\"  "
   end
 
   def test_non_integer_attribute_value
-    int_attr = JSON.parse(File.read(Rails.root.join('conf/biosample/integer_attributes.json')))
+    int_attr = JSON.parse(Rails.root.join('conf/biosample/integer_attributes.json').read)
     # ok case
     ret = exec_validator('non_integer_attribute_value', 'BS_R0093', 'sampleA', 'host_taxid', '9606', int_attr, 1)
     assert_equal true, ret[:result]
@@ -1855,8 +1855,8 @@ jkl\"  "
   end
 
   def test_missing_values_provided_for_optional_attributes
-    null_accepted = JSON.parse(File.read(Rails.root.join('conf/biosample/null_accepted.json')))
-    null_not_recommended = JSON.parse(File.read(Rails.root.join('conf/biosample/null_not_recommended.json')))
+    null_accepted = JSON.parse(Rails.root.join('conf/biosample/null_accepted.json').read)
+    null_not_recommended = JSON.parse(Rails.root.join('conf/biosample/null_not_recommended.json').read)
     # ok case
     xml_data = File.read("#{@test_file_dir}/100_missing_values_provided_for_optional_attributes_SSUB000019_ok.xml")
     biosample_data = @xml_convertor.xml2obj(xml_data, 'biosample')
@@ -2210,7 +2210,7 @@ jkl\"  "
   end
 
   def test_invalid_json_structure
-    json_schema = JSON.parse(File.read(Rails.root.join('conf/biosample/schema.json')))
+    json_schema = JSON.parse(Rails.root.join('conf/biosample/schema.json').read)
     # ok case
     data = [[{'key' => '_package', 'value' => 'MIGS.vi'}, {'key' => 'sample_name', 'value' => 'My Sample'}]]
     ret = exec_validator('invalid_json_structure', 'BS_R0123', data, json_schema)
