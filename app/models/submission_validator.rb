@@ -9,32 +9,13 @@ class SubmissionValidator < ValidatorBase
   #
   def initialize
     super
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/dra')))
+    conf_dir = Rails.root.join('conf/dra')
+    @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_dra.json').read)
+    @conf[:xsd_path]          = conf_dir.join('xsd/SRA.submission.xsd').to_s
 
-    @error_list = error_list = []
-
-    @validation_config = @conf[:validation_config] # need?
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-  end
-
-  #
-  # 各種設定ファイルの読み込み
-  #
-  # ==== Args
-  # config_file_dir: 設定ファイル設置ディレクトリ
-  #
-  #
-  def read_config (config_file_dir)
-    config = {}
-    begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_dra.json')) # TODO auto update when genereted
-      config[:xsd_path] = File.absolute_path(config_file_dir + '/xsd/SRA.submission.xsd')
-      config
-    rescue => ex
-      message = "Failed to parse the setting file. Please check the config file below.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    end
+    @validation_config = @conf[:validation_config]
+    @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @error_list        = []
   end
 
   #
