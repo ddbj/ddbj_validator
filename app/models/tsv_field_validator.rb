@@ -147,28 +147,14 @@ class TsvFieldValidator
     data.each_with_index do |row, field_idx|
       next if !ignore_field_list.nil? && ignore_field_list.include?(row['key']) # 除外fieldはスキップ
       unless row['key'].ascii_only? # Field名のチェック
-        disp_txt = '' # 名前のどこにnon ascii文字があるか示すメッセージを作成
-        row['key'].each_char do |ch|
-          if ch.ascii_only?
-            disp_txt << ch.to_s
-          else
-            disp_txt << '[### Non-ASCII character ###]'
-          end
-        end
+        disp_txt = row['key'].each_char.map {|ch| ch.ascii_only? ? ch : '[### Non-ASCII character ###]' }.join
         invalid_list.push({field_name: row['key'],  disp_txt: disp_txt, field_idx: field_idx})
       end
       next if row['values'].nil?
       row['values'].each_with_index do |value, value_idx|  # Field値のチェック
         next if value.nil?
         next if value.ascii_only?
-        disp_txt = '' # 値のどこにnon ascii文字があるか示すメッセージを作成
-        value.each_char do |ch|
-          if ch.ascii_only?
-            disp_txt << ch.to_s
-          else
-            disp_txt << '[### Non-ASCII character ###]'
-          end
-        end
+        disp_txt = value.each_char.map {|ch| ch.ascii_only? ? ch : '[### Non-ASCII character ###]' }.join
         invalid_list.push({field_name: row['key'], value: value, disp_txt: disp_txt, field_idx: field_idx, value_idx: value_idx})
       end
     end

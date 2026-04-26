@@ -207,7 +207,7 @@ class DateFormat
     # https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s07.html#I_programlisting4_d1e23455
     # ここでは一旦Zを消して、UTC変換メソッドで時差調整した上でZを再付与する
     if timezone_text.include?('Z') && ['+', '-'].any? {|c| timezone_text.include?(c) }
-      timezone_text.gsub!('Z', '')
+      timezone_text = timezone_text.delete('Z')
     end
     if timezone_text.chomp.strip.upcase == 'Z' # "z(local time)"や"Z"は"Z"で返す
       return 'Z'
