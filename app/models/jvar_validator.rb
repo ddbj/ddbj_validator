@@ -8,16 +8,14 @@ class JVarValidator < ValidatorBase
   # Initializer
   #
   def initialize
-    super()
-    config_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../conf/jvar')
-    xlsx_error_log = File.absolute_path(@conf[:log_dir] + '/excel_error.log')
+    super
+    conf_dir = Rails.root.join('conf/jvar')
+    @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_jvar.json').read)
+    @conf[:sheet_list]        = JSON.parse(conf_dir.join('sheet_list.json').read)
 
-    @log = Logger.new(xlsx_error_log)
-    @conf[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_jvar.json'))
-    @conf[:sheet_list] = JSON.parse(File.read(config_file_dir + '/sheet_list.json'))
-
-    @error_list = error_list = []
-    @validation_config = @conf[:validation_config] # need?
+    @log               = Logger.new(File.join(@conf[:log_dir], 'excel_error.log'))
+    @validation_config = @conf[:validation_config]
+    @error_list        = []
   end
 
   #
