@@ -1160,9 +1160,9 @@ class BioSampleValidator < ValidatorBase
       {key: 'Attribute value', value: lat_lon}
     ]
     location = if @data_format == 'json' || @data_format == 'tsv'
-                 auto_annotation_location(@data_format, line_num, 'lat_lon', 'value')
+      auto_annotation_location(@data_format, line_num, 'lat_lon', 'value')
     else
-                 @xml_convertor.xpath_from_attrname('lat_lon', line_num)
+      @xml_convertor.xpath_from_attrname('lat_lon', line_num)
     end
     annotation.push(ErrorBuilder.suggested_annotation([insdc_latlon], 'Attribute value', location, true))
     add_error(rule_code, annotation, auto_annotation: true)
@@ -1677,9 +1677,9 @@ class BioSampleValidator < ValidatorBase
       {key: 'Attribute value', value: attr_val}
     ]
     location = if @data_format == 'json' || @data_format == 'tsv'
-                 auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
+      auto_annotation_location_with_index(@data_format, line_num, attr_no, 'value')
     else
-                 @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
+      @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
     end
     annotation.push(ErrorBuilder.suggested_annotation([attr_val_result], 'Attribute value', location, true))
     add_error(rule_code, annotation, auto_annotation: true)
@@ -1731,9 +1731,9 @@ class BioSampleValidator < ValidatorBase
       {key: 'Attribute value', value: attr_val_org}
     ]
     location = if @data_format == 'json' || @data_format == 'tsv'
-                 auto_annotation_location(@data_format, line_num, attr_name, 'value')
+      auto_annotation_location(@data_format, line_num, attr_name, 'value')
     else
-                 @xml_convertor.xpath_from_attrname(attr_name, line_num)
+      @xml_convertor.xpath_from_attrname(attr_name, line_num)
     end
     annotation.push(ErrorBuilder.suggested_annotation([attr_val], 'Attribute value', location, true))
     add_error(rule_code, annotation, auto_annotation: true)
@@ -1929,9 +1929,9 @@ class BioSampleValidator < ValidatorBase
     end
 
     location = if @data_format == 'json' || @data_format == 'tsv'
-                 auto_annotation_location_with_index(@data_format, line_num, attr_no, location_kind)
+      auto_annotation_location_with_index(@data_format, line_num, attr_no, location_kind)
     else
-                 @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
+      @xml_convertor.xpath_from_attrname_with_index(attr_name, line_num, attr_no)
     end
     annotation.push(ErrorBuilder.suggested_annotation([replaced], suggestion_label, location, true))
     add_error(rule_code, annotation, auto_annotation: true)
@@ -2271,9 +2271,9 @@ class BioSampleValidator < ValidatorBase
       {key: 'Attribute value', value: psub_id}
     ]
     location = if @data_format == 'json' || @data_format == 'tsv'
-                 auto_annotation_location(@data_format, line_num, 'bioproject_id', 'value')
+      auto_annotation_location(@data_format, line_num, 'bioproject_id', 'value')
     else
-                 @xml_convertor.xpath_from_attrname('bioproject_id', line_num)
+      @xml_convertor.xpath_from_attrname('bioproject_id', line_num)
     end
     annotation.push(ErrorBuilder.suggested_annotation([biosample_accession], 'Attribute value', location, true))
     add_error(rule_code, annotation, auto_annotation: true)
@@ -2406,9 +2406,9 @@ class BioSampleValidator < ValidatorBase
         {key: 'Attribute value', value: sample_attr[optional_attr]}
       ]
       location = if @data_format == 'json' || @data_format == 'tsv'
-                   auto_annotation_location(@data_format, line_num, optional_attr, 'value') # TODO attr_no
+        auto_annotation_location(@data_format, line_num, optional_attr, 'value') # TODO attr_no
       else
-                   @xml_convertor.xpath_from_attrname(optional_attr, line_num) # TODO attr_no
+        @xml_convertor.xpath_from_attrname(optional_attr, line_num) # TODO attr_no
       end
       annotation.push(ErrorBuilder.suggested_annotation([''], 'Attribute value', location, true))
       add_error(rule_code, annotation)
