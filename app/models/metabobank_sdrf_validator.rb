@@ -8,33 +8,14 @@ class MetaboBankSdrfValidator < ValidatorBase
   # Initializer
   #
   def initialize
-    super()
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/metabobank_sdrf')))
+    super
+    conf_dir = Rails.root.join('conf/metabobank_sdrf')
+    @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_metabobank_sdrf.json').read)
 
-    @error_list = error_list = []
-
-    @validation_config = @conf[:validation_config] # need?
-    @json_schema = JSON.parse(File.read(File.absolute_path(File.dirname(__FILE__) + '/../../conf/metabobank_sdrf/schema.json')))
-    @tsv_validator = TsvColumnValidator.new()
-  end
-
-  #
-  # 各種設定ファイルの読み込み
-  #
-  # ==== Args
-  # config_file_dir: 設定ファイル設置ディレクトリ
-  #
-  #
-  def read_config (config_file_dir)
-    config = {}
-    begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_metabobank_sdrf.json')) # TODO auto update when genereted
-      config
-    rescue => ex
-      message = "Failed to parse the setting file. Please check the config file below.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    end
+    @validation_config = @conf[:validation_config]
+    @json_schema       = JSON.parse(conf_dir.join('schema.json').read)
+    @tsv_validator     = TsvColumnValidator.new
+    @error_list        = []
   end
 
   #

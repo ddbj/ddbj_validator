@@ -16,58 +16,41 @@ class BioSampleValidator < ValidatorBase
   # Initializer
   #
   def initialize
-    super()
-    @conf.merge!(read_config(File.absolute_path(File.dirname(__FILE__) + '/../../conf/biosample')))
-    @date_format = DateFormat.new(@conf)
+    super
+    conf_dir = Rails.root.join('conf/biosample')
 
-    @error_list = error_list = []
+    # pub リポジトリ (github.com/ddbj/pub) と coll_dump は本番ではそれぞれ外部ディレクトリが
+    # conf/pub / conf/coll_dump にバインドマウントされる。テストで本物のマウントを用意する代わりに、
+    # env で test/fixtures/ 配下のスナップショットを指せるようにしておく
+    pub_dir        = ENV['DDBJ_VALIDATOR_APP_PUB_DIR']        || conf_dir.join('../pub').to_s
+    coll_dump_file = ENV['DDBJ_VALIDATOR_APP_COLL_DUMP_FILE'] || conf_dir.join('../coll_dump/coll_dump.txt').to_s
 
-    @validation_config = @conf[:validation_config] # need?
-    @xml_convertor = XmlConvertor.new
-    @org_validator = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
-    @institution_list = CollDump.parse(@conf[:institution_list_file])
-    @tsv_validator = TsvColumnValidator.new()
-    @package_version = @conf[:biosample]['package_version']
-    @db_validator = DDBJDbValidator.new(@conf[:ddbj_db_config])
-  end
+    @conf[:validation_config]       = JSON.parse(conf_dir.join('rule_config_biosample.json').read)
+    @conf[:null_accepted]           = JSON.parse(conf_dir.join('null_accepted.json').read)
+    @conf[:null_not_recommended]    = JSON.parse(conf_dir.join('null_not_recommended.json').read)
+    @conf[:cv_attr]                 = JSON.parse(conf_dir.join('controlled_terms.json').read)
+    @conf[:ref_attr]                = JSON.parse(conf_dir.join('reference_attributes.json').read)
+    @conf[:ts_attr]                 = JSON.parse(conf_dir.join('timestamp_attributes.json').read)
+    @conf[:int_attr]                = JSON.parse(conf_dir.join('integer_attributes.json').read)
+    @conf[:special_chars]           = JSON.parse(conf_dir.join('special_characters.json').read)
+    @conf[:country_list]            = JSON.parse(File.read("#{pub_dir}/docs/common/country_list.json"))
+    @conf[:historical_country_list] = JSON.parse(File.read("#{pub_dir}/docs/common/historical_country_list.json"))
+    @conf[:valid_country_list]      = @conf[:country_list] + @conf[:historical_country_list]
+    @conf[:convert_date_format]     = JSON.parse(conf_dir.join('convert_date_format.json').read)
+    @conf[:ddbj_date_format]        = JSON.parse(conf_dir.join('ddbj_date_format.json').read)
+    @conf[:invalid_strain_value]    = JSON.parse(conf_dir.join('invalid_strain_value.json').read)
+    @conf[:json_schema]             = JSON.parse(conf_dir.join('schema.json').read)
+    @conf[:institution_list_file]   = coll_dump_file
 
-  #
-  # 各種設定ファイルの読み込み
-  #
-  # ==== Args
-  # config_file_dir: 設定ファイル設置ディレクトリ
-  #
-  #
-  def read_config (config_file_dir)
-    config = {}
-    begin
-      config[:validation_config] = JSON.parse(File.read(config_file_dir + '/rule_config_biosample.json')) # TODO auto update when genereted
-      config[:null_accepted] = JSON.parse(File.read(config_file_dir + '/null_accepted.json'))
-      config[:null_not_recommended] = JSON.parse(File.read(config_file_dir + '/null_not_recommended.json'))
-      config[:cv_attr] = JSON.parse(File.read(config_file_dir + '/controlled_terms.json'))
-      config[:ref_attr] = JSON.parse(File.read(config_file_dir + '/reference_attributes.json'))
-      config[:ts_attr] = JSON.parse(File.read(config_file_dir + '/timestamp_attributes.json'))
-      config[:int_attr] = JSON.parse(File.read(config_file_dir + '/integer_attributes.json'))
-      config[:special_chars] = JSON.parse(File.read(config_file_dir + '/special_characters.json'))
-      # pub リポジトリ (github.com/ddbj/pub) と coll_dump は本番ではそれぞれ外部ディレクトリが
-      # conf/pub / conf/coll_dump にバインドマウントされる。テストで本物のマウントを用意する代わりに、
-      # env で test/fixtures/ 配下のスナップショットを指せるようにしておく
-      pub_dir        = ENV.fetch('DDBJ_VALIDATOR_APP_PUB_DIR')        { config_file_dir + '/../pub' }
-      coll_dump_file = ENV.fetch('DDBJ_VALIDATOR_APP_COLL_DUMP_FILE') { config_file_dir + '/../coll_dump/coll_dump.txt' }
-      config[:country_list] = JSON.parse(File.read(pub_dir + '/docs/common/country_list.json'))
-      config[:historical_country_list] = JSON.parse(File.read(pub_dir + '/docs/common/historical_country_list.json'))
-      config[:valid_country_list] = config[:country_list] + config[:historical_country_list]
-      config[:convert_date_format] = JSON.parse(File.read(config_file_dir + '/convert_date_format.json'))
-      config[:ddbj_date_format] = JSON.parse(File.read(config_file_dir + '/ddbj_date_format.json'))
-      config[:invalid_strain_value] = JSON.parse(File.read(config_file_dir + '/invalid_strain_value.json'))
-      config[:json_schema] = JSON.parse(File.read(config_file_dir + '/schema.json'))
-      config[:institution_list_file] = coll_dump_file
-      config
-    rescue => ex
-      message = "Failed to parse the setting file. Please check the config file below.\n"
-      message += "#{ex.message} (#{ex.class})"
-      raise StandardError, message, ex.backtrace
-    end
+    @date_format       = DateFormat.new(@conf)
+    @validation_config = @conf[:validation_config]
+    @xml_convertor     = XmlConvertor.new
+    @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
+    @institution_list  = CollDump.parse(@conf[:institution_list_file])
+    @tsv_validator     = TsvColumnValidator.new
+    @package_version   = @conf[:biosample]['package_version']
+    @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
+    @error_list        = []
   end
 
   #
