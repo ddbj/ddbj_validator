@@ -1,0 +1,282 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ec539e11d5b04faf40deb9564075e2e93a80aabe099f191ea121f2502d129a6d",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/packages_controller.rb",
+      "line": 22,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)[:file_path], :filename => \"template.tsv\", :type => \"text/tab-separated-values\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PackagesController",
+        "method": "attribute_template"
+      },
+      "user_input": "Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)[:file_path]",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "Package#attribute_template_file builds the path from the configured template root + a known package_id; mismatch returns :fail before send_file."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "3c346d90ee2eb21ca3ae7887e26d0d942f3d1f9a361872571f2ba68dbc6bcb76",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/packages_controller.rb",
+      "line": 24,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)[:file_path], :filename => \"template.xlsx\", :type => \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "PackagesController",
+        "method": "attribute_template"
+      },
+      "user_input": "Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)[:file_path]",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "Package#attribute_template_file builds the path from the configured template root + a known package_id; mismatch returns :fail before send_file."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "e3fce32095d3504af594bf677eca2367d13d97fda2072c7269380662d8c9f3b2",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/submissions_controller.rb",
+      "line": 25,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Submitter.new.submission_xml(params[:filetype], params[:submission_id], File.join(data_dir, \"submission_xml\", SecureRandom.uuid[(0..1)], SecureRandom.uuid))[:file_path], :filename => File.basename(Submitter.new.submission_xml(params[:filetype], params[:submission_id], File.join(data_dir, \"submission_xml\", SecureRandom.uuid[(0..1)], SecureRandom.uuid))[:file_path]), :type => \"application/xml\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionsController",
+        "method": "show"
+      },
+      "user_input": "Submitter.new.submission_xml(params[:filetype], params[:submission_id], File.join(data_dir, \"submission_xml\", SecureRandom.uuid[(0..1)], SecureRandom.uuid))[:file_path]",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "Submitter#submission_xml writes XML into a fresh data_dir/submission_xml/<random_uuid>/, then returns the absolute path it wrote."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "fb01c16579fccc5fcc96a0085868ef74fd78b838d4dfcb6ed5c3bfb98dfea4ba",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 48,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"status.json\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "show"
+      },
+      "user_input": "params[:uuid]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "params[:uuid] is constrained by the route to /[0-9a-f-]+/, so no path traversal via uuid."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "356d8c97444eb89a8b778e5078960c7ed0eab31dc680fd868f67c01cd3dc9f14",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 51,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"result.json\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "show"
+      },
+      "user_input": "params[:uuid]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "params[:uuid] is constrained by the route to /[0-9a-f-]+/, so no path traversal via uuid."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "84e8e92c0a1013c392101dcd24161cefaf4ccfedd7ffedaf159b8b23a7c4483f",
+      "check_name": "SendFile",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 75,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(File.join(data_dir, params[:uuid][(0..1)], params[:uuid], \"status.json\"), :type => \"application/json\", :disposition => \"inline\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "status"
+      },
+      "user_input": "params[:uuid]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "params[:uuid] is constrained by the route to /[0-9a-f-]+/, so no path traversal via uuid."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "94d8d8b51553ca8e17a881186aa55e302c68c2dfbf738757c3a4d1537cd750c5",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 83,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "file"
+      },
+      "user_input": "params[:filetype]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "params[:uuid] is constrained by the route. params[:filetype] is unconstrained but bounded to data_dir/<prefix>/<uuid>/, and the action returns 400 unless exactly one file matches."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ff2c6ad7cfc17583d6615a403da207db6e4e5127247c43dc83f779c1a0a793d2",
+      "check_name": "SendFile",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 88,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, :filename => File.basename(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first), :type => \"application/xml\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "file"
+      },
+      "user_input": "params[:filetype]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "Same as line 83 — file_list.size == 1 guard limits the disclosure."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "ee87935d7bd263bfa017f15a6fcf2bdf10280be93408aaf56fb4a58ad3c28d8b",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 97,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "autocorrect"
+      },
+      "user_input": "params[:filetype]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "Same as line 83 — autocorrect path is gated by File.exist?(result_file) && org_file_list.size == 1."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "086c0cc8f42d2a854d7b971bdc342fa6e84b2b909b09ccc3faaf61002a9ce1d1",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 109,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "FileUtils.mkdir_p(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"autoannotated\", params[:filetype]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "autocorrect"
+      },
+      "user_input": "params[:filetype]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "mkdir_p of an autoannotated dir under the same uuid namespace; nothing is sent yet at this point."
+    },
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "50cc65280367bf385e899b533ac7fd7ff8b3580c4128113341f7ba5841958bc1",
+      "check_name": "SendFile",
+      "message": "Model attribute used in file name",
+      "file": "app/controllers/validations_controller.rb",
+      "line": 116,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "send_file(AutoAnnotator.new.create_annotated_file(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"result.json\"), File.join(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"autoannotated\", params[:filetype]), \"#{File.basename(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, \".*\")}_annotated#{File.extname(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first)}\"), params[:filetype], accept_header)[:file_path], :filename => File.basename(AutoAnnotator.new.create_annotated_file(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"result.json\"), File.join(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"autoannotated\", params[:filetype]), \"#{File.basename(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, \".*\")}_annotated#{File.extname(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first)}\"), params[:filetype], accept_header)[:file_path]), :type => autocorrect_mime(AutoAnnotator.new.create_annotated_file(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"result.json\"), File.join(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"autoannotated\", params[:filetype]), \"#{File.basename(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, \".*\")}_annotated#{File.extname(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first)}\"), params[:filetype], accept_header)[:file_type]))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ValidationsController",
+        "method": "autocorrect"
+      },
+      "user_input": "AutoAnnotator.new.create_annotated_file(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"result.json\"), File.join(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), \"autoannotated\", params[:filetype]), \"#{File.basename(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first, \".*\")}_annotated#{File.extname(Dir.glob(File.join(File.join(data_dir, params[:uuid][(0..1)], params[:uuid]), params[:filetype], \"*\")).first)}\"), params[:filetype], accept_header)[:file_path]",
+      "confidence": "Medium",
+      "cwe_id": [
+        22
+      ],
+      "note": "AutoAnnotator returns nil :file_path for invalid input, the controller short-circuits with :error before send_file."
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "04a72d23452e8cbd1caecbfd9d1b2eb159c1b9341df7df2213d7594e33b64b2d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/validator.rb",
+      "line": 291,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "from(\"#{setting[\"from\"]}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Validator",
+        "method": "send_notification_mail"
+      },
+      "user_input": "setting[\"from\"]",
+      "confidence": "Medium",
+      "cwe_id": [
+        89
+      ],
+      "note": "False positive: Mail.new builder block, not ActiveRecord. `from` is the Mail DSL setter."
+    }
+  ],
+  "updated": "2026-04-26 17:21:34 +0900",
+  "brakeman_version": "8.0.4"
+}
