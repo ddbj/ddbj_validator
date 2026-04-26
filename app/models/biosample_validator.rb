@@ -8,8 +8,8 @@ class BioSampleValidator < ValidatorBase
   attr_reader :error_list
   attr_reader :conf
 
-  # クラス読み込み時に templates/sparql/biosample/*.rq を ERB コンパイルしてキャッシュする。
-  SPARQL = Rails.root.glob('templates/sparql/biosample/*.rq').to_h {|path|
+  # クラス読み込み時に app/sparql/biosample/*.rq を ERB コンパイルしてキャッシュする。
+  SPARQL = Rails.root.glob('app/sparql/biosample/*.rq').to_h {|path|
     [path.basename('.rq').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
   #

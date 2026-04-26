@@ -4,7 +4,7 @@ require 'logger'
 class Package < SPARQLBase
   # クラス読み込み時に sparql/*.rq を全部 ERB コンパイルしてキャッシュする。
   # 呼び出し側は SPARQL[:package_list].result_with_hash(params) だけで済む。
-  SPARQL = Rails.root.glob('templates/sparql/package/*.rq').to_h {|path|
+  SPARQL = Rails.root.glob('app/sparql/package/*.rq').to_h {|path|
     [path.basename('.rq').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
 
