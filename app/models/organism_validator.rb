@@ -4,9 +4,9 @@ require 'erb'
 # A class for BioSample validation that is relevant organism
 #
 class OrganismValidator < SPARQLBase
-  # クラス読み込み時に templates/sparql/biosample/*.rq を ERB コンパイルしてキャッシュする。
-  SPARQL = Rails.root.glob('templates/sparql/biosample/*.rq').to_h {|path|
-    [path.basename('.rq').to_s.to_sym, ERB.new(path.read).freeze]
+  # クラス読み込み時に app/sparql/biosample/*.rq.erb を ERB コンパイルしてキャッシュする。
+  SPARQL = Rails.root.glob('app/sparql/biosample/*.rq.erb').to_h {|path|
+    [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
 
   TAX_GRAPH_URI = 'http://ddbj.nig.ac.jp/ontologies/taxonomy'
