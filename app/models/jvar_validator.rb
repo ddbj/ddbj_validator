@@ -60,7 +60,9 @@ class JVarValidator < ValidatorBase
     xlsx = nil
     begin
       # 結合セルは対象セルの全てに同じ値を埋めるモード
-      xlsx = Roo::Excelx.new(data_xlsx, {expand_merged_ranges: true})
+      # file_warning: :ignore — Roo の拡張子チェックで warn が出るのを抑える。
+      # 中身がパースできない場合は後段で例外が上がるので、ここで弾く必要はない。
+      xlsx = Roo::Excelx.new(data_xlsx, expand_merged_ranges: true, file_warning: :ignore)
     rescue => ex
       annotation = [
         {key: 'Excel file', value: @data_file},
