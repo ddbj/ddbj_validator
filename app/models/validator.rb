@@ -1,5 +1,6 @@
 require 'logger'
 require 'securerandom'
+require 'tempfile'
 require 'yaml'
 require 'fileutils'
 
@@ -25,8 +26,8 @@ class Validator
     def execute(params)
       begin
         @log.info('execute validation:' + params.to_s)
-        running_file = "#{@running_dir}/#{Time.now.strftime('%Y%m%d%H%M%S%L')}-#{Process.pid}-#{SecureRandom.hex(4)}.tmp"
-        FileUtils.touch(running_file)
+        running_file = Tempfile.new(['validator-', '.tmp'], @running_dir)
+        running_file.close
 
         # get absolute file path and check permission
         permission_error_list = []
@@ -65,7 +66,7 @@ class Validator
           @log.error("File not found or permision denied: #{permission_error_list.join(', ')}")
           ret = {status: 'error', format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
           JSON.generate(ret)
-          FileUtils.rm(running_file)
+          running_file.unlink
           return
         end
 
@@ -111,7 +112,7 @@ class Validator
       end
 
       atomic_write(params[:output], JSON.generate(ret))
-      FileUtils.rm(running_file)
+      running_file.unlink
       JSON.generate(ret)
     end
 
