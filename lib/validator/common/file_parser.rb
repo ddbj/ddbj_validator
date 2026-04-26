@@ -70,7 +70,7 @@ class FileParser
           rescue => ex
             @log.warn('Fail to parse a file as JSON/XML/TSV.')
             @log.warn(ex.message)
-            trace = ex.backtrace.map {|row| row }.join("\n")
+            trace = ex.backtrace.join("\n")
             @log.warn(trace)
             return {format: 'unknown', message: ex.message, data: nil}
           end

@@ -1,2 +1,0 @@
-web: bin/rails server
-virtuoso: docker run --volume ./shared/data/virtuoso:/database --publish 8890:8890 openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c

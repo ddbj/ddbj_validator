@@ -5,7 +5,7 @@ require 'fileutils'
 
 # Validator main class
 class Validator
-    @@filetype = %w[all_db biosample bioproject submission experiment run analysis jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf]
+    FILETYPES = %w[all_db biosample bioproject submission experiment run analysis jvar trad_anno trad_seq trad_agp metabobank_idf metabobank_sdrf].freeze
 
     # Runs validator from command line
     # @param [Array] argv command line parameters
@@ -116,7 +116,7 @@ class Validator
       rescue => ex
         @log.info('validation result: ' + 'error')
         @log.error(ex.message)
-        trace = ex.backtrace.map {|row| row }.join("\n")
+        trace = ex.backtrace.join("\n")
         @log.error(trace)
         ex.message
 
@@ -323,7 +323,7 @@ class Validator
 
       autocorrect = {}
       # autocorrectできるfileかどうかをのフラグを立てる
-      @@filetype.each do |filetype|
+      FILETYPES.each do |filetype|
         autocorrect_item = error_list.select {|item|
           item[:method].casecmp(filetype) == 0 \
            && item[:annotation].any? {|anno| anno[:is_auto_annotation] == true }

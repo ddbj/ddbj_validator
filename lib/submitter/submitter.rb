@@ -31,7 +31,7 @@ class Submitter
       ret
     rescue => ex
       @log.error(ex.message)
-      trace = ex.backtrace.map {|row| row }.join("\n")
+      trace = ex.backtrace.join("\n")
       @log.error(trace)
       ret[:status] = 'error'
       ret
@@ -63,7 +63,7 @@ class Submitter
       end
     rescue => ex
       @log.error(ex.message)
-      trace = ex.backtrace.map {|row| row }.join("\n")
+      trace = ex.backtrace.join("\n")
       @log.error(trace)
       {status: 'error', message: ex.message}
     end
