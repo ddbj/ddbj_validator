@@ -55,7 +55,7 @@ class ValidatorBase
   def output_exception_log(ex, message)
     message += "#{ex.message} (#{ex.class})"
     @log.error(message)
-    trace = ex.backtrace.map {|row| row }.join("\n")
+    trace = ex.backtrace.join("\n")
     @log.error(trace)
   end
 

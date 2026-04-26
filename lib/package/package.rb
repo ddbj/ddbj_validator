@@ -23,7 +23,7 @@ class Package < SPARQLBase
 
   def output_log(ex)
     @log.error(ex.message)
-    trace = ex.backtrace.map {|row| row }.join("\n")
+    trace = ex.backtrace.join("\n")
     @log.error(trace)
   end
 
@@ -173,7 +173,7 @@ class Package < SPARQLBase
     end
   end
 
-  def attribute_template_file (version, package_id, only_biosample_sheet, accept_heder)
+  def attribute_template_file (version, package_id, only_biosample_sheet, accept_header)
     begin
       params = {version: version, package_id: package_id}
       unless version.split('.')[0..1].join('.').to_f >= 1.4 # 1.4以上でなければ
@@ -181,11 +181,11 @@ class Package < SPARQLBase
       end
 
       # accept header から希望ファイル形式を決める
-      unless accept_heder.nil? || accept_heder['HTTP_ACCEPT'].nil?
-        accept_heder_list = accept_heder['HTTP_ACCEPT'].split(',').map {|item| item.chomp.strip }
+      unless accept_header.nil? || accept_header['HTTP_ACCEPT'].nil?
+        accept_header_list = accept_header['HTTP_ACCEPT'].split(',').map {|item| item.chomp.strip }
       end
       return_file_format = 'excel' # default format
-      if accept_heder_list.include?('text/tab-separated-values')
+      if accept_header_list.include?('text/tab-separated-values')
         return_file_format = 'tsv'
       end
       template_file_dir = File.absolute_path(File.dirname(__FILE__) + '/../../public/template')

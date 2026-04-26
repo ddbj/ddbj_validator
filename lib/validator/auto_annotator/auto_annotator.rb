@@ -14,15 +14,15 @@ class AutoAnnotator
   # @param org_file 元ファイル(Validateしたファイル)
   # @param result_file Validator結果のJSON
   # @param annotated_file_path出力ファイルパス
-  # @accept_heder Accept headerのリスト.ユーザ希望の出力形式  e.g.{"HTTP_ACCEPT"=>"text/html,text/tab-separated-values"}
+  # @accept_header Accept headerのリスト.ユーザ希望の出力形式  e.g.{"HTTP_ACCEPT"=>"text/html,text/tab-separated-values"}
   # @return result  {status: "succeed", file: annotated_file_path} or {status: "error", message: message}
-  def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_heder)
+  def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_header)
     info = {orginal_file: org_file.to_s, output_file: annotated_file_path}
     @log.info("execute auto_annotation: #{info}")
     begin
-      accept_heder_list = []
-      unless accept_heder.nil? || accept_heder['HTTP_ACCEPT'].nil?
-        accept_heder_list = accept_heder['HTTP_ACCEPT'].split(',').map {|item| item.chomp.strip }
+      accept_header_list = []
+      unless accept_header.nil? || accept_header['HTTP_ACCEPT'].nil?
+        accept_header_list = accept_header['HTTP_ACCEPT'].split(',').map {|item| item.chomp.strip }
       end
       input_file_format = ''
       return_file_format = ''
@@ -37,12 +37,12 @@ class AutoAnnotator
             input_file_format = 'tsv'
             annotator = AutoAnnotatorTsv.new
             return_file_format = 'tsv' # 基本はTSVで返す
-            return_file_format = 'json' if accept_heder_list.include?('application/json')
+            return_file_format = 'json' if accept_header_list.include?('application/json')
           elsif file_info[:format] == 'json'
             input_file_format = 'json'
             annotator = AutoAnnotatorJson.new
             return_file_format = 'json' # 基本はJSONで返す
-            return_file_format = 'tsv' if accept_heder_list.include?('text/tab-separated-values')
+            return_file_format = 'tsv' if accept_header_list.include?('text/tab-separated-values')
           elsif file_info[:format] == 'unknown'
             raise "Can't parse bioproject original file type. #{org_file}"
           end
@@ -60,12 +60,12 @@ class AutoAnnotator
             input_file_format = 'tsv'
             annotator = AutoAnnotatorTsv.new
             return_file_format = 'tsv' # 基本はTSVで返す
-            return_file_format = 'json' if accept_heder_list.include?('application/json')
+            return_file_format = 'json' if accept_header_list.include?('application/json')
           elsif file_info[:format] == 'json'
             input_file_format = 'json'
             annotator = AutoAnnotatorJson.new
             return_file_format = 'json' # 基本はJSONで返す
-            return_file_format = 'tsv' if accept_heder_list.include?('text/tab-separated-values')
+            return_file_format = 'tsv' if accept_header_list.include?('text/tab-separated-values')
           elsif file_info[:format] == 'unknown'
             raise "Can't parse bioproject original file type. #{org_file}"
           end
@@ -94,7 +94,7 @@ class AutoAnnotator
     rescue => ex
       @log.info('auto annotator result: ' + 'error')
       @log.error(ex.message)
-      trace = ex.backtrace.map {|row| row }.join("\n")
+      trace = ex.backtrace.join("\n")
       @log.error(trace)
       return_message = ex.message.size < 250 ? ex.message : ex.message.split(/\.|\n/).first # 長過ぎる場合は最初の一行を返す
       {status: 'error', message: "Failed to output annotated file. #{return_message}"}
