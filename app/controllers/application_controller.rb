@@ -6,7 +6,7 @@ class ApplicationController < ActionController::API
   end
 
   def biosample_package_version
-    BioSampleValidator::DEFAULT_PACKAGE_VERSION
+    Rails.configuration.validator['biosample']['package_version']
   end
 
   def data_dir
