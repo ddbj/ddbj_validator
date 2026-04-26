@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestAnalysisValidator < Minitest::Test
+class TestAnalysisValidator < ActiveSupport::TestCase
   def setup
     @validator = AnalysisValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')

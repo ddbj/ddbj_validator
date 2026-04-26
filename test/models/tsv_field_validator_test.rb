@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestTsvFieldValidator < Minitest::Test
+class TestTsvFieldValidator < ActiveSupport::TestCase
   def setup
     @validator = TsvFieldValidator.new
   end

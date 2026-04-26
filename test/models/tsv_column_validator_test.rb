@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestTsvColumnValidator < Minitest::Test
+class TestTsvColumnValidator < ActiveSupport::TestCase
   def setup
     @validator = TsvColumnValidator.new
   end

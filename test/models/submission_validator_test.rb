@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestSubmissionValidator < Minitest::Test
+class TestSubmissionValidator < ActiveSupport::TestCase
   def setup
     @validator = SubmissionValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')

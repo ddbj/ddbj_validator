@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestBioProjectTsvValidator < Minitest::Test
+class TestBioProjectTsvValidator < ActiveSupport::TestCase
   def setup
     @validator = BioProjectTsvValidator.new
     @test_file_dir = Rails.root.join('test/data/bioproject')

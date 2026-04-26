@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestDDBJDbValidator < Minitest::Test
+class TestDDBJDbValidator < ActiveSupport::TestCase
   def setup
     @db_validator = DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])
   end

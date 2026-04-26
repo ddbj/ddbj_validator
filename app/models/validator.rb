@@ -25,7 +25,7 @@ class Validator
     def execute(params)
       begin
         @log.info('execute validation:' + params.to_s)
-        running_file = @running_dir + '/' + Time.now.strftime('%Y%m%d%H%M%S%L.tmp')
+        running_file = "#{@running_dir}/#{Time.now.strftime('%Y%m%d%H%M%S%L')}-#{Process.pid}-#{SecureRandom.hex(4)}.tmp"
         FileUtils.touch(running_file)
 
         # get absolute file path and check permission

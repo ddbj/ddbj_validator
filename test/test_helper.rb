@@ -60,3 +60,7 @@ module DBValidatorStubs
 end
 
 Minitest::Test.include(DBValidatorStubs)
+
+class ActiveSupport::TestCase
+  parallelize(workers: :number_of_processors)
+end

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestCombinationValidator < Minitest::Test
+class TestCombinationValidator < ActiveSupport::TestCase
   def setup
     @validator = CombinationValidator.new
     @test_file_dir = Rails.root.join('test/data/combination')

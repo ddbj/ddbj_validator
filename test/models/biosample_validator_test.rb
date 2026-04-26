@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestBioSampleValidator < Minitest::Test
+class TestBioSampleValidator < ActiveSupport::TestCase
   def setup
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new

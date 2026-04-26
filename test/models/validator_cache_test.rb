@@ -2,7 +2,7 @@ require 'test_helper'
 
 # BioSampleValidator の各 rule が Rails.cache 経由でキャッシュを効かせていることの確認。
 # test env のデフォルトは :null_store なので、ここだけ MemoryStore に差し替えて検証する。
-class TestValidatorCache < Minitest::Test
+class TestValidatorCache < ActiveSupport::TestCase
   def setup
     @original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new

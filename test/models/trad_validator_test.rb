@@ -2,7 +2,7 @@ require 'date'
 require 'fileutils'
 require 'test_helper'
 
-class TestTradValidator < Minitest::Test
+class TestTradValidator < ActiveSupport::TestCase
   def setup
     @validator = TradValidator.new
     @test_file_dir = Rails.root.join('test/data/trad')
