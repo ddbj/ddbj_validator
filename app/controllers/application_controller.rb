@@ -14,7 +14,7 @@ class ApplicationController < ActionController::API
   end
 
   def accept_header
-    request.env.select {|k, _| k.start_with?('HTTP_ACCEPT') }.presence || []
+    request.headers['Accept'].to_s
   end
 
   def render_error (message, status:)

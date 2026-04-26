@@ -127,7 +127,7 @@ class ValidationsController < ApplicationController
   # jvar の結果は元ファイルが Excel だが変換された JSON を返すケースもあるので、
   # Accept ヘッダで xlsx / json を切り替える。
   def send_jvar_file (file_list)
-    if accept_header.to_s.include?('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    if accept_header.include?('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       file = file_list.find {|f| f.end_with?('.xlsx') }
       type = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
     else

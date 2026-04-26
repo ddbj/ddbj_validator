@@ -10,7 +10,7 @@ class TestAutoAnnotator < Minitest::Test
   def test_create_annotated_file
     # OK case biosample
     # biosample (input:xml, output: any)
-    http_accept = {'HTTP_ACCEPT'=>'*/*'}
+    http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
@@ -21,7 +21,7 @@ class TestAutoAnnotator < Minitest::Test
 
     # OK case bioproject
     ## bioproject(input:tsv, output:tsv)
-    http_accept = {'HTTP_ACCEPT'=>'*/*, text/tab-separated-values'}
+    http_accept = '*/*, text/tab-separated-values'
     input_file = "#{@test_file_dir}/bioproject_test_warning.tsv"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.tsv"
@@ -31,7 +31,7 @@ class TestAutoAnnotator < Minitest::Test
     assert_equal 'tsv', ret[:file_type]
 
     ## bioproject(input:json, output:json)
-    http_accept = {'HTTP_ACCEPT'=>'application/json'}
+    http_accept = 'application/json'
     input_file = "#{@test_file_dir}/bioproject_test_warning.tsv"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated_from_tsv.tsv"
@@ -41,7 +41,7 @@ class TestAutoAnnotator < Minitest::Test
     assert_equal 'json', ret[:file_type]
 
     ## bioproject(input:tsv, output:json)
-    http_accept = {'HTTP_ACCEPT'=>'*/*'} # default format is json
+    http_accept = '*/*' # default format is json
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.json"
@@ -51,7 +51,7 @@ class TestAutoAnnotator < Minitest::Test
     assert_equal 'json', ret[:file_type]
 
     ## bioproject(input:json, output:tsv)
-    http_accept = {'HTTP_ACCEPT'=>'*/*, text/tab-separated-values'}
+    http_accept = '*/*, text/tab-separated-values'
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated_from_json.json"
@@ -63,7 +63,7 @@ class TestAutoAnnotator < Minitest::Test
 
     # NG case biosample
     ## biosample not exist original xml file
-    http_accept = {'HTTP_ACCEPT'=>'*/*'}
+    http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning_not_exist.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
@@ -74,7 +74,7 @@ class TestAutoAnnotator < Minitest::Test
     assert ret[:message].include?("Can't parse")
 
     ## biosample invalid original file format (xml => json)
-    http_accept = {'HTTP_ACCEPT'=>'*/*'}
+    http_accept = '*/*'
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
@@ -83,7 +83,7 @@ class TestAutoAnnotator < Minitest::Test
     assert ret[:message].include?('Failed to output annotated file')
 
     ## biosample not exist validator result json file
-    http_accept = {'HTTP_ACCEPT'=>'*/*'}
+    http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result_not_exist.json"
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
@@ -92,7 +92,7 @@ class TestAutoAnnotator < Minitest::Test
     assert ret[:message].include?('Validation result file is not found.')
 
     ## biosample 'broken' validator result json file
-    http_accept = {'HTTP_ACCEPT'=>'*/*'}
+    http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result_broken.json"
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
@@ -103,7 +103,7 @@ class TestAutoAnnotator < Minitest::Test
 
     # NG case bioproject
     ## bioproject not exist original tsv file
-    http_accept = {'HTTP_ACCEPT'=>'*/*, text/tab-separated-values'}
+    http_accept = '*/*, text/tab-separated-values'
     input_file = "#{@test_file_dir}/bioproject_test_warning_not_exist.tsv"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.tsv"
@@ -112,7 +112,7 @@ class TestAutoAnnotator < Minitest::Test
     assert ret[:message]
 
     ## bioproject 'broken' original json file
-    http_accept = {'HTTP_ACCEPT'=>'application/json'}
+    http_accept = 'application/json'
     input_file = "#{@test_file_dir}/bioproject_test_warning_broken.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.json"
