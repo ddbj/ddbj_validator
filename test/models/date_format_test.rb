@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestDateFormat < Minitest::Test
+class TestDateFormat < ActiveSupport::TestCase
   def setup
     conf_dir = Rails.root.join('conf/biosample')
     @df = DateFormat.new(

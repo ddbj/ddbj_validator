@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestDDBJDbValidator < Minitest::Test
+class TestDDBJDbValidator < ActiveSupport::TestCase
   def setup
     @db_validator = DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])
   end
@@ -166,10 +166,6 @@ class TestDDBJDbValidator < Minitest::Test
     ## status 5700(deleted?)
     ret = @db_validator.is_valid_biosample_id?('SSUB000001')
     assert_equal false, ret
-  end
-
-  def test_get_all_locus_tag_prefix
-    ret = @db_validator.get_all_locus_tag_prefix()
   end
 
   def test_get_submitter_organization

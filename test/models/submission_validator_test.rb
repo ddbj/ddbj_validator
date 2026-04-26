@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestSubmissionValidator < Minitest::Test
+class TestSubmissionValidator < ActiveSupport::TestCase
   def setup
     @validator = SubmissionValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')
@@ -36,10 +36,6 @@ class TestSubmissionValidator < Minitest::Test
   end
 
   ####
-
-  def test_get_submission_label
-    # TODO
-  end
 
   #### 各validationメソッドのユニットテスト ####
 

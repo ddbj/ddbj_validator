@@ -2,7 +2,7 @@ require 'date'
 require 'fileutils'
 require 'test_helper'
 
-class TestTradValidator < Minitest::Test
+class TestTradValidator < ActiveSupport::TestCase
   def setup
     @validator = TradValidator.new
     @test_file_dir = Rails.root.join('test/data/trad')
@@ -78,10 +78,6 @@ class TestTradValidator < Minitest::Test
       end
       ret
     end
-  end
-
-  def test_anno_tsv2obj
-    # TODO test
   end
 
   def test_data_by_feat

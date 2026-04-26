@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'test_helper'
 
-class TestExcel2Tsv < Minitest::Test
+class TestExcel2Tsv < ActiveSupport::TestCase
   def setup
     @excel2tsv = Excel2Tsv.new
     @test_file_dir = Rails.root.join('test/data/all_data')

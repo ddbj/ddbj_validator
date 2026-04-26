@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestExperimentValidator < Minitest::Test
+class TestExperimentValidator < ActiveSupport::TestCase
   def setup
     @validator = ExperimentValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')
@@ -36,10 +36,6 @@ class TestExperimentValidator < Minitest::Test
   end
 
   ####
-
-  def test_get_experiment_label
-    # TODO
-  end
 
   #### 各validationメソッドのユニットテスト ####
 

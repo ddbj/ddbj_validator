@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'test_helper'
 
-class TestJVarValidator < Minitest::Test
+class TestJVarValidator < ActiveSupport::TestCase
   def setup
     @validator = JVarValidator.new
     @test_file_dir = Rails.root.join('test/data/jvar')

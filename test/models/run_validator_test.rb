@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestRunValidator < Minitest::Test
+class TestRunValidator < ActiveSupport::TestCase
   def setup
     @validator = RunValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')
@@ -36,10 +36,6 @@ class TestRunValidator < Minitest::Test
   end
 
   ####
-
-  def test_get_run_label
-    # TODO
-  end
 
   #### 各validationメソッドのユニットテスト ####
 

@@ -2,7 +2,7 @@ require 'test_helper'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
 #
-class TestAutoAnnotatorXml < Minitest::Test
+class TestAutoAnnotatorXml < ActiveSupport::TestCase
   def setup
     @auto_annotater = AutoAnnotatorXml.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')

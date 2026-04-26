@@ -2,7 +2,7 @@ require 'yaml'
 require 'erb'
 require 'test_helper'
 
-class TestOrganismValidator < Minitest::Test
+class TestOrganismValidator < ActiveSupport::TestCase
   def setup
     setting = Rails.configuration.validator
     @validator = OrganismValidator.new(setting['sparql_endpoint']['master_endpoint'], setting['named_graph_uri']['taxonomy'])

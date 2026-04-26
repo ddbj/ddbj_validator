@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestGeolocation < Minitest::Test
+class TestGeolocation < ActiveSupport::TestCase
   def test_format_insdc_latlon
     # ok case
     ret = Geolocation.format_insdc_latlon('37.4435 N 6.254 W')

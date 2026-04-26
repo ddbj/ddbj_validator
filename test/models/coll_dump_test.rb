@@ -1,7 +1,7 @@
 require 'fileutils'
 require 'test_helper'
 
-class TestCollDump < Minitest::Test
+class TestCollDump < ActiveSupport::TestCase
   def test_parse
     file_name = 'coll_dump.txt'
     # get file (first run downloads from NCBI)

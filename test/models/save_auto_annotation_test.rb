@@ -3,7 +3,7 @@ require 'test_helper'
 # auto_annotationの補正が効いているかの検証
 # auto_annotationが効いているかを確認するため、補正された上で別の検証メソッドでエラーとなる値を用意し、補正値が使用されているかを確認
 #
-class TestSaveAutoAnnotation < Minitest::Test
+class TestSaveAutoAnnotation < ActiveSupport::TestCase
   def setup
     @validator = BioSampleValidator.new
     @xml_convertor = XmlConvertor.new

@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestXmlConvertor < Minitest::Test
+class TestXmlConvertor < ActiveSupport::TestCase
   def setup
     @convertor = XmlConvertor.new
     @test_file_dir = Rails.root.join('test/data/biosample')

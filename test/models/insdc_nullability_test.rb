@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestInsdcNullability < Minitest::Test
+class TestInsdcNullability < ActiveSupport::TestCase
   def test_null_value?
     assert_equal true,  InsdcNullability.null_value?(nil)
     assert_equal true,  InsdcNullability.null_value?('')

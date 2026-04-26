@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestAnalysisValidator < Minitest::Test
+class TestAnalysisValidator < ActiveSupport::TestCase
   def setup
     @validator = AnalysisValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')
@@ -36,10 +36,6 @@ class TestAnalysisValidator < Minitest::Test
   end
 
   ####
-
-  def test_get_analysis_label
-    # TODO
-  end
 
   #### 各validationメソッドのユニットテスト ####
 

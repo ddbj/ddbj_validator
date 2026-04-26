@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestNcbiEutils < Minitest::Test
+class TestNcbiEutils < ActiveSupport::TestCase
   def test_exist_pubmed_id?
     # ok
     ret = NcbiEutils.exist_pubmed_id?('27148491')

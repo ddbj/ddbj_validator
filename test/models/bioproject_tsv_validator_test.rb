@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class TestBioProjectTsvValidator < Minitest::Test
+class TestBioProjectTsvValidator < ActiveSupport::TestCase
   def setup
     @validator = BioProjectTsvValidator.new
     @test_file_dir = Rails.root.join('test/data/bioproject')
@@ -54,10 +54,6 @@ class TestBioProjectTsvValidator < Minitest::Test
   end
 
   # BP_R0004
-  def test_duplicated_project_title_and_description
-    # 未実装ルール
-  end
-
   # BP_R0005
   def test_identical_project_title_and_description
     # ok case
