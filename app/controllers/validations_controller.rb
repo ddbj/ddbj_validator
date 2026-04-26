@@ -2,11 +2,6 @@ require 'securerandom'
 
 class ValidationsController < ApplicationController
   def create
-    unless valid_file_combination?
-      render_error('Invalid file combination', status: :bad_request)
-      return
-    end
-
     uuid       = SecureRandom.uuid
     save_dir   = File.join(data_dir, uuid[0..1], uuid)
     start_time = Time.now
@@ -148,33 +143,6 @@ class ValidationsController < ApplicationController
     when 'tsv'  then 'text/tab-separated-values'
     else             'application/xml'
     end
-  end
-
-  # Rack 3 で rack.request.form_input は multipart 時でも nil になり得るため、
-  # rack.input から直接読んで name フィールドの重複とセット要件をチェックする。
-  def valid_file_combination?
-    input = request.env['rack.input']
-    input.rewind if input.respond_to?(:rewind)
-    form_vars = input.read
-    input.rewind if input.respond_to?(:rewind)
-
-    req_params  = Rack::Utils.parse_query(Rack::Utils.escape(form_vars))
-    param_names = req_params['name']
-
-    return true unless param_names.is_a?(Array)
-
-    %w[biosample bioproject submission experiment run analysis].each do |kind|
-      return false if param_names.count {|n| n == %("#{kind}") } > 1
-    end
-
-    dra_types = %w[submission experiment run analysis]
-    sent      = params.keys
-
-    if dra_types.any? { sent.include?(it) }
-      return false unless sent.include?('submission') && sent.include?('experiment') && sent.include?('run')
-    end
-
-    true
   end
 
   def save_uploaded_file (output_dir, category)
