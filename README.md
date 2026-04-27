@@ -28,109 +28,53 @@ $ curl -o conf/coll_dump/coll_dump.txt "https://ftp.ncbi.nlm.nih.gov/pub/taxonom
 $ git clone https://github.com/ddbj/pub.git conf/pub
 ```
 
-### Prepare .env file (optional)
-All environment variables used by `compose.yaml` have sensible defaults, so the container starts without any configuration. If you need to override anything (e.g. the host port), create a `.env` file at the repo root. See the "Environment Variables" section below for the full list. Production/staging secrets live in `config/credentials/<env>.yml.enc`; pass `RAILS_MASTER_KEY` through `.env` to decrypt.
-
 ## Start containers
+`RAILS_ENV` (`development` / `staging` / `production`) and `RAILS_MASTER_KEY` (decrypts `config/credentials/<env>.yml.enc`) must be present in the environment for the staging/production sections of `config/validator.yml`. Everything else has a sensible default in `compose.yaml`.
+
 ```
-$ podman-compose up -d
+$ RAILS_ENV=production RAILS_MASTER_KEY=... podman-compose up -d
 ```
 
 ## How to use
-Specify a file to validate and request to the port specified by `DDBJ_VALIDATOR_APP_PORT` (default: 18840). Then the uuid will be returned.
+Specify a file to validate and POST it to the port specified by `DDBJ_VALIDATOR_APP_PORT` (default: 18840). The response includes the uuid.
 ```
 $ curl -F "biosample=@test/data/biosample/105_taxonomy_warning_ng.xml" "http://localhost:18840/api/validation"
 {"uuid":"17521682-5890-4acc-ad5d-15891ea3c46e","status":"accepted","start_time":"2021-06-08 20:40:58 +0900"}
 ```
-Request with the returned uuid as a parameter.
+Then poll the uuid:
 ```
 $ curl "http://localhost:18840/api/validation/17521682-5890-4acc-ad5d-15891ea3c46e"
 ```
-See also API Spec  
-* https://localhost:18840/api/apispec/index.html
+See also:
+* http://localhost:18840/api/apispec/index.html
 * https://github.com/ddbj/ddbj_validator/wiki/ValidationAPI%E4%BB%95%E6%A7%98
 
 ### From Web app
 ```
 http://localhost:18840/api/client/index
 ```
+
 ## Environment Variables
-Environment variables to be written in `.env` files
 
-`UID`  
-User ID in the container. You can use `$id` to find out. If it is not changed, then it will run on ROOT.
+Read by `compose.yaml`:
 
-`GID`  
-Group ID in the container. You can use `$id` to find out. If it is not changed, then it will run on ROOT.
+| Variable | Default | Purpose |
+|---|---|---|
+| `RAILS_ENV` | — | Rails environment (`development` / `staging` / `production`). |
+| `RAILS_MASTER_KEY` | — | Decrypts `config/credentials/<env>.yml.enc` for staging/production. |
+| `DDBJ_VALIDATOR_APP_PORT` | `18840` | Host port mapped to the app container. |
+| `DDBJ_VALIDATOR_APP_SHARED_HOST_DIR` | `./shared` | Host directory mounted at `/rails/shared` (validation results, etc.). |
+| `DDBJ_VALIDATOR_VIRTUOSO_PORT` | `18841` | Host port mapped to the Virtuoso container. |
 
-`DDBJ_NETWORK_NAME`  
-Docker network name. Change the value if the name conflict on the host or if you want to link it with other containers.
+Read by `config/validator.yml` in development only (staging / production hardcode these or pull them from credentials):
 
-`DDBJ_VALIDATOR_APP_CONTAINER_NAME`  
-Container name for web app. Change the value if the name conflict on the host.  
-
-`DDBJ_VALIDATOR_APP_IMAGE_NAME`  
-Image name for web app. Change the value if the name conflict on the host.  
-
-`DDBJ_VALIDATOR_APP_PORT`  
-Port number for web app on host. Change the value if the name conflict on the host.  
-
-`DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER`  
-SPARQL endpoiint url.  By default, the endpoint url of the virutoso container specified by the variable `DDBJ_VALIDATOR_VIRTUOSO_CONTAINER_NAME`.  
-
-`DDBJ_VALIDATOR_APP_NAMED_GRAPHE_URI_TAXONOMY`  
-The namedgraph name that contains the taxonomy in the SPARQL endpoint.
-
-**`PostgreSQL`**  
-Some validation rules refer to PostgreSQL data in DDBJ.  By default, it is commented out and the rules that use PostgreSQL will be skipped. Specify these environment variables when PostgreSQL is available.
-
-`DDBJ_VALIDATOR_APP_POSTGRES_HOST`  
-Host name or ip address for PostgreSQL. Cannot specify postgresql on localhost from the container.
-`DDBJ_VALIDATOR_APP_POSTGRES_PORT`  
-Port number for PostgreSQL.
-
-`DDBJ_VALIDATOR_APP_POSTGRES_USER`  
-User name for PostgreSQL.
-
-`DDBJ_VALIDATOR_APP_POSTGRES_PASSWD`  
-Password for PostgreSQL.
-
-`DDBJ_VALIDATOR_APP_POSTGRES_TIMEOUT`  
-Setting of request timeout for PostgreSQL. 30 seconds unless otherwise specified.
-
-`DDBJ_VALIDATOR_APP_BIOSAMPLE_PACKAGE_VERSION`  
-Versions of BioSample attributes and package definition information. ,Currently, `1.4.0`, `1.4.1`, `1.5.0` can be specified.
-
-`DDBJ_VALIDATOR_APP_GOOGLE_API_KEY`  
-(Deprecated) Previously used by [BS_R0041] (Latlon versus country) via the Google Geocoding API. The rule is now disabled and there is no plan to use Google Geocoding again; a future replacement will be built on an offline geographic dataset such as Natural Earth. See [VALIDATOR-284](https://ddbj-dev.atlassian.net/browse/VALIDATOR-284).
-
-`DDBJ_VALIDATOR_APP_EUTILS_API_KEY`  
-API key for NCBI E-utilities. Without this specification, some rules using NCBI data (e.g. [BP_R0014]PMC ID validity) will be ignored, even if the value is wrong. See https://ncbiinsights.ncbi.nlm.nih.gov/2017/11/02/new-api-keys-for-the-e-utilities/
-
-`DDBJ_VALIDATOR_APP_VALIDATOR_LOG_DIR`  
-Log directory path. Specify if you want to change from the default location.
-
-`DDBJ_VALIDATOR_APP_SHARED_HOST_DIR`  
-The directory path on the host to mount the validation log directory(e.g. validation results) in the container on the host.
-
-`DDBJ_VALIDATOR_APP_VALIDATOR_LOG_HOST_DIR`  
-The directory path on the host to mount the `shared` directory(e.g. unicorn's log) in the container on the host.
-
-`DDBJ_VALIDATOR_APP_COLL_DUMP_DIR`  
-The directory path on the host to mount the coll_dump directory. coll_dump.txt should includes in this directory.
-
-`DDBJ_VALIDATOR_APP_PUB_REPOSITORY_DIR`
-The directory path on the host to mount the pub repository directory. This is the directory created by `git clone https://github.com/ddbj/pub.git`.
-
-`DDBJ_VALIDATOR_APP_MONITORING_SSUB_ID`  
-For administration. No changes required.
-
-`DDBJ_VALIDATOR_VIRTUOSO_CONTAINER_NAME`  
-Container name for web app. Change the value if the name conflict on the host.
-
-`DDBJ_VALIDATOR_VIRTUOSO_PORT`  
-Port number for Virtuoso on host. Change the value if the name conflict on the host.
-
+| Variable | Default | Purpose |
+|---|---|---|
+| `DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER` | `http://localhost:8890/sparql` | SPARQL endpoint URL. |
+| `DDBJ_VALIDATOR_APP_POSTGRES_HOST` | `localhost` | DDBJ PostgreSQL host. |
+| `DDBJ_VALIDATOR_APP_POSTGRES_PORT` | `5432` | DDBJ PostgreSQL port. |
+| `DDBJ_VALIDATOR_APP_POSTGRES_USER` | `validator` | DDBJ PostgreSQL user. |
+| `DDBJ_VALIDATOR_APP_POSTGRES_PASSWD` | `validator` | DDBJ PostgreSQL password. |
 
 ## Development
 ### Unit test
