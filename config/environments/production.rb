@@ -18,11 +18,14 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Nginx が TLS を終端してコンテナへは HTTP でプロキシするので、app 層には
-  # assume_ssl = true で SSL 扱いを伝える。force_ssl は HSTS 付与 + 非 SSL
-  # リクエストを HTTPS にリダイレクトする Rails 既定挙動を維持。
-  config.assume_ssl = true
-  config.force_ssl  = true
+  # Assume all access to the app is happening through a SSL-terminating reverse proxy.
+  # config.assume_ssl = true
+
+  # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
+  # config.force_ssl = true
+
+  # Skip http-to-https redirect for the default health check endpoint.
+  # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [:request_id]
@@ -37,9 +40,8 @@ Rails.application.configure do
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
-  # SPARQL / PG レスポンスの per-worker in-process キャッシュ用途のみ。
-  # 永続化や cross-worker 共有が必要なら :solid_cache_store / :mem_cache_store に切り替える。
-  config.cache_store = :memory_store
+  # Replace the default in-process memory cache store with a durable alternative.
+  # config.cache_store = :mem_cache_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # config.active_job.queue_adapter = :resque
@@ -47,4 +49,23 @@ Rails.application.configure do
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
+
+  # Enable DNS rebinding protection and other `Host` header attacks.
+  # config.hosts = [
+  #   "example.com",     # Allow requests from example.com
+  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
+  # ]
+  #
+  # Skip DNS rebinding protection for the default health check endpoint.
+  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+
+  # Nginx が TLS を終端してコンテナへは HTTP でプロキシするので、app 層には
+  # assume_ssl = true で SSL 扱いを伝える。force_ssl は HSTS 付与 + 非 SSL
+  # リクエストを HTTPS にリダイレクトする Rails 既定挙動を維持。
+  config.assume_ssl = true
+  config.force_ssl  = true
+
+  # SPARQL / PG レスポンスの per-worker in-process キャッシュ用途のみ。
+  # 永続化や cross-worker 共有が必要なら :solid_cache_store / :mem_cache_store に切り替える。
+  config.cache_store = :memory_store
 end
