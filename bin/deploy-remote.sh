@@ -14,7 +14,7 @@ read_env() {
   [[ -f .env ]] || return 0
   grep -E "^$1=" .env | tail -1 | cut -d= -f2-
 }
-DDBJ_VALIDATOR_APP_PORT="$(read_env DDBJ_VALIDATOR_APP_PORT)"
+APP_PORT="$(read_env APP_PORT)"
 
 log "HEAD $(git log -1 --format='%h %s')"
 
@@ -63,8 +63,8 @@ fi
 #   puma is still booting) and HTTP 4xx/5xx when paired with --fail.
 # --retry-max-time bounds total wall-clock across retries; --max-time caps
 #   one attempt so a hung worker can't swallow the entire window.
-if [[ -n "$DDBJ_VALIDATOR_APP_PORT" ]]; then
-  url="http://localhost:$DDBJ_VALIDATOR_APP_PORT/api/monitoring"
+if [[ -n "$APP_PORT" ]]; then
+  url="http://localhost:$APP_PORT/api/monitoring"
   log "probing $url"
   if code=$(curl --fail --silent --output /dev/null --write-out '%{http_code}' \
                 --max-time 90 --retry 10 --retry-all-errors --retry-delay 2 --retry-max-time 180 \

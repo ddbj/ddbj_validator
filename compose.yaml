@@ -6,7 +6,7 @@ services:
     depends_on:
       - virtuoso
     ports:
-      - ${DDBJ_VALIDATOR_APP_PORT:-18840}:80
+      - ${APP_PORT:-18840}:80
     environment:
       TZ: Asia/Tokyo
       RAILS_ENV: ${RAILS_ENV}
@@ -14,7 +14,7 @@ services:
       WEB_CONCURRENCY: 4
     user: 0:0
     volumes:
-      - ${DDBJ_VALIDATOR_APP_SHARED_HOST_DIR:-./shared}:/rails/shared
+      - ${SHARED_HOST_DIR:-./shared}:/rails/shared
       # staging1/2 はどちらも staging1 配下、production1/2 はどちらも production1 配下に
       # ログを集約する運用なので、env 名から動的に決める。
       - /data1/w3sabi/DDBJValidator/ddbj_validator_${RAILS_ENV:-production}1/logs:/rails/logs
@@ -35,7 +35,7 @@ services:
       VIRT_SPARQL_MaxQueryExecutionTime: "300"
       VIRT_SPARQL_MaxQueryCostEstimationTime: "-1"
     ports:
-      - ${DDBJ_VALIDATOR_VIRTUOSO_PORT:-18841}:8890
+      - ${VIRTUOSO_PORT:-18841}:8890
     user: 0:0
     volumes:
       - ${PWD}/shared/config/virtuoso:/settings

@@ -3,8 +3,8 @@
 # tax_id + その祖先 + スキーマ定義だけを抽出した最小の taxonomy.ttl を生成する
 #
 # 使い方:
-#   DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER=http://localhost:8890/sparql \
-#   DDBJ_VALIDATOR_APP_NAMED_GRAPHE_URI_TAXONOMY=http://ddbj.nig.ac.jp/ontologies/taxonomy-private \
+#   VIRTUOSO_ENDPOINT_MASTER=http://localhost:8890/sparql \
+#   NAMED_GRAPH_URI_TAXONOMY=http://ddbj.nig.ac.jp/ontologies/taxonomy-private \
 #     ruby test/fixtures/virtuoso/extract_taxonomy.rb > test/fixtures/virtuoso/taxonomy.ttl
 
 require 'net/http'
@@ -12,8 +12,8 @@ require 'uri'
 require 'set'
 require 'json'
 
-ENDPOINT = ENV.fetch('DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql')
-GRAPH    = ENV.fetch('DDBJ_VALIDATOR_APP_NAMED_GRAPHE_URI_TAXONOMY', 'http://ddbj.nig.ac.jp/ontologies/taxonomy')
+ENDPOINT = ENV.fetch('VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql')
+GRAPH    = ENV.fetch('NAMED_GRAPH_URI_TAXONOMY', 'http://ddbj.nig.ac.jp/ontologies/taxonomy')
 
 # テストコードと fixture から拾った tax_id (数値としてあり得ない 1111111111111 等は除外済み)
 SEED_TAX_IDS = %w[
