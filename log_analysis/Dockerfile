@@ -1,11 +1,7 @@
 FROM ruby:4.0.3
 
-RUN mkdir -p /usr/src/ddbj_validator/logs
-RUN mkdir -p /usr/src/ddbj_validator/shared
-RUN mkdir -p /usr/src/ddbj_validator/lib
-COPY ./create_log_pg.rb /usr/src/log_analysis/
-COPY ./Gemfile /usr/src/log_analysis/
-COPY ./Gemfile.lock /usr/src/log_analysis/
-WORKDIR /usr/src/log_analysis/
-
+# bundle install 用に Gemfile/Gemfile.lock だけ build 時にコピーする。スクリプト本体
+# (create_log_pg.rb) は実行時に compose の bind mount (/rails/log_analysis) で見える。
+COPY ./Gemfile ./Gemfile.lock /tmp/log_analysis/
+WORKDIR /tmp/log_analysis
 RUN bundle install

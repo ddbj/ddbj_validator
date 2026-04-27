@@ -8,9 +8,9 @@ require 'pg'
 require_relative '../app/models/xml_convertor'
 
 class CreateLogIndex
-  ACCESS_LOG_DIR = "/usr/src/ddbj_validator/shared/log"
-  LOG_DIR = "/usr/src/ddbj_validator/logs"
-  TSV_DIR = "/usr/src/ddbj_validator/logs/tsv"
+  ACCESS_LOG_DIR = "/rails/shared/log"
+  LOG_DIR = "/rails/logs"
+  TSV_DIR = "/rails/logs/tsv"
   @target_date = ""
   def initialize(target_date = nil)
     if target_date.nil?

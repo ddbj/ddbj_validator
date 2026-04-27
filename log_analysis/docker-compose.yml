@@ -15,14 +15,12 @@ services:
       PGUSER: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_USER:-postgres}
       PGPASSWORD: ${DDBJ_VALIDATOR_LOG_ANALYSIS_POSTGRES_PASSWORD:-pdb}
     user: ${UID:-0}:${DOCKER_GID:-0}
+    working_dir: /rails/log_analysis
     volumes:
       - /cm/local/apps/docker/current/bin/docker:/usr/bin/docker
       - /var/lib/docker:/var/lib/docker
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${PWD}:/usr/src/log_analysis
-      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_LOGS_DIR}:/usr/src/ddbj_validator/logs
-      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_SHARED_DIR}:/usr/src/ddbj_validator/shared
-      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}:/usr/src/ddbj_validator
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}:/rails
 
   postgres:
     image: postgres:9.4
@@ -40,7 +38,9 @@ services:
     volumes:
       - ${PWD}/data:/var/lib/postgresql/data
       - ${PWD}/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
-      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_LOGS_DIR}:/usr/src/ddbj_validator/logs
+      # tsv ロード用 SQL は host 側 logs/tsv/ に書かれる。psql が docker exec 経由で
+      # この postgres コンテナ内で動くので、同じパスで読めるようにマウントする。
+      - ${DDBJ_VALIDATOR_LOG_ANALYSIS_RUBY_VALIDATOR_DIR}/logs:/rails/logs
 
 networks:
   ddbj:
