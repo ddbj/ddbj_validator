@@ -20,10 +20,6 @@ Rails.application.configure do
 
   # Show full error reports.
   config.consider_all_requests_local = true
-
-  # 大半のテストではキャッシュを介在させない方が原因切り分けしやすい。
-  # 個別に必要なテストは setup で `Rails.cache = ActiveSupport::Cache::MemoryStore.new`
-  # に差し替える (validator_cache_test.rb 参照)。
   config.cache_store = :null_store
 
   # Render exception templates for rescuable exceptions and raise for other exceptions.

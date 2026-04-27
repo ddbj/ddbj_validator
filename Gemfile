@@ -18,6 +18,7 @@ gem 'thruster', require: false
 
 group :development do
   gem 'brakeman', require: false
+  gem 'bundler-audit', require: false
   gem 'rubocop-rails-omakase', require: false
 end
 
