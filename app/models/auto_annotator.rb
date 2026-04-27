@@ -1,11 +1,7 @@
-require 'logger'
-
 # 元ファイルからAuto annotateしたファイルを生成して返す
 class AutoAnnotator
   def initialize
     @setting = Rails.configuration.validator
-    @log_file = @setting['api_log']['path'] + '/validator.log'
-    @log = Logger.new(@log_file)
   end
 
   # Executes auto annotation
@@ -18,7 +14,7 @@ class AutoAnnotator
   # @return result  {status: "succeed", file: annotated_file_path} or {status: "error", message: message}
   def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_header)
     info = {orginal_file: org_file.to_s, output_file: annotated_file_path}
-    @log.info("execute auto_annotation: #{info}")
+    Rails.logger.info("execute auto_annotation: #{info}")
     begin
       accept_header_list = accept_header.to_s.split(',').map(&:strip)
       input_file_format = ''
@@ -75,24 +71,17 @@ class AutoAnnotator
       annotator.create_annotated_file(org_file, result_file, annotated_file_path, filetype)
 
       if File.exist?(annotated_file_path)
-        @log.info('auto annotation result: ' + 'success')
         # 変換の必要があればここで変換する？というか変換後のファイルパスを返す？
         if return_file_format != input_file_format # 元データと異なるファイル形式で返す必要がある
-          @log.info("convert output file format. from #{input_file_format} to #{return_file_format}.")
           output_file_path = file_convert(filetype, annotated_file_path, input_file_format, return_file_format)
         else
           output_file_path = annotated_file_path
         end
         {status: 'succeed', file_path: output_file_path, file_type: return_file_format}
       else
-        @log.info('auto annotator result: ' + 'error')
         {status: 'error', message: 'Failed to output annotated file.'}
       end
     rescue => ex
-      @log.info('auto annotator result: ' + 'error')
-      @log.error(ex.message)
-      trace = ex.backtrace.join("\n")
-      @log.error(trace)
       return_message = ex.message.size < 250 ? ex.message : ex.message.split(/\.|\n/).first # 長過ぎる場合は最初の一行を返す
       {status: 'error', message: "Failed to output annotated file. #{return_message}"}
     end

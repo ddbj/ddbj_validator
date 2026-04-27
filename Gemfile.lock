@@ -302,7 +302,6 @@ DEPENDENCIES
   http
   json
   json-schema
-  mail
   minitest-mock
   net-ftp
   nokogiri

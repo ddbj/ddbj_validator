@@ -1,4 +1,3 @@
-require 'logger'
 require 'securerandom'
 require 'tempfile'
 require 'yaml'
@@ -13,10 +12,8 @@ class Validator
       @version = YAML.load(ERB.new(File.read(File.expand_path('../../conf/version.yml', __dir__))).result)
       @latest_version = @version['version']['validator']
       @setting = Rails.configuration.validator
-      @log_file = @setting['api_log']['path'] + '/validator.log'
       @running_dir = @setting['api_log']['path'] + '/running/'
       FileUtils.mkdir_p(@running_dir)
-      @log = Logger.new(@log_file)
     end
 
     # Executes validation
@@ -25,7 +22,7 @@ class Validator
     # @return [void]
     def execute(params)
       begin
-        @log.info('execute validation:' + params.to_s)
+        Rails.logger.info('execute validation:' + params.to_s)
         running_file = Tempfile.new(['validator-', '.tmp'], @running_dir)
         running_file.close
 
@@ -39,7 +36,7 @@ class Validator
             return
           else # TSVに変換された場合はそのTSVファイルを validator 実行対象として加える(paramsにmerge)
             filetypes.each do |filetype, path|
-              @log.info("splitted sheet validation: #{filetype} => #{path}")
+              Rails.logger.info("splitted sheet validation: #{filetype} => #{path}")
             end
             params.merge!(filetypes)
           end
@@ -63,7 +60,7 @@ class Validator
           end
         end
         if permission_error_list.any?
-          @log.error("File not found or permision denied: #{permission_error_list.join(', ')}")
+          Rails.logger.error("File not found or permision denied: #{permission_error_list.join(', ')}")
           ret = {status: 'error', format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
           JSON.generate(ret)
           running_file.unlink
@@ -86,7 +83,7 @@ class Validator
           ret = {version: @latest_version, validity: true}
           ret['stats']  = get_result_stats(error_list)
           ret['messages'] = []
-          @log.info('validation result: ' + 'success')
+          Rails.logger.info('validation result: ' + 'success')
         else
           ret = {version: @latest_version, validity: true}
 
@@ -94,20 +91,11 @@ class Validator
           ret[:validity] = false if stats[:error_count] > 0
           ret['stats'] = stats
           ret['messages'] = error_list
-          @log.info('validation result: ' + 'fail')
+          Rails.logger.info('validation result: ' + 'fail')
         end
       rescue => ex
-        @log.info('validation result: ' + 'error')
-        @log.error(ex.message)
-        trace = ex.backtrace.join("\n")
-        @log.error(trace)
-        ex.message
-
-        # エラー時のメール送信設定があれば送る
-        unless @setting['notification_mail'].nil?
-          send_notification_mail(@setting['notification_mail'], ex.message)
-        end
-
+        Rails.logger.info('validation result: error')
+        Rails.error.report(ex)
         ret = {status: 'error', message: ex.message}
       end
 
@@ -185,7 +173,7 @@ class Validator
         ret[:validity] = false if stats[:error_count] > 0
         ret['stats'] = stats
         ret['messages'] = split_result[:error_list]
-        @log.info('validation result: ' + 'fail')
+        Rails.logger.info('validation result: ' + 'fail')
         atomic_write(params[:output], JSON.generate(ret))
       else # 正常に変換できた場合は、Excelに含まれていたfiletypeと出力TSVのファイルパスを返す
         result = split_result[:filetypes]
@@ -267,33 +255,6 @@ class Validator
         end
       end
       {error_count: error_count, warning_count: warning_count, error_type_count: error_type_count, autocorrect: autocorrect}
-    end
-
-    #### Error mail
-    def send_notification_mail (setting, message)
-      smtp_host  = setting['smtp_host']
-      smtp_port  = setting['smtp_port']
-      to  = setting['to']
-      from  = setting['from']
-
-      options = {
-        address: smtp_host,
-        port: smtp_port
-      }
-      Mail.defaults do
-        delivery_method :smtp, options
-      end
-
-      body_text = "An error occurred during the validation process. Please check the following message and log file: #{@log_file}\n\n"
-      body_text += message
-
-      mail = Mail.new do
-        from     "#{from}"
-        to       "#{to.join(", ")}"
-        subject  'DDBJ validator API error notification'
-        body     "#{body_text}"
-      end
-      mail.deliver!
     end
 
     # result.json は web リクエストとこのスレッドが同時に読み書きするため、
