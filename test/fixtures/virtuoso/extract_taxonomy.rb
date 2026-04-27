@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-# 本番 (あるいは dev/compose.dev.yaml で起動中) の Virtuoso から、テストが参照する
+# 本番 Virtuoso (踏み台 / SSH トンネル経由) から、テストが参照する
 # tax_id + その祖先 + スキーマ定義だけを抽出した最小の taxonomy.ttl を生成する
 #
 # 使い方:
