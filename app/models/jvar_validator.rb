@@ -67,10 +67,8 @@ class JVarValidator < ValidatorBase
         {key: 'Error message', value: ex.message}
       ]
       add_error(rule_code, annotation)
-      message = "Failed to load the Excel file.: Please check the files: '#{data_xlsx}'.\n"
-      message += "#{ex.message} (#{ex.class})"
-      @log.warn('An Excel(Roo::Excelx) loading error has occurred.')
-      output_exception_log(ex, message)
+      @log.error("Failed to load Excel file: #{data_xlsx}")
+      @log.error(ex)
     end
     xlsx
   end
@@ -130,10 +128,8 @@ class JVarValidator < ValidatorBase
         {key: 'Error message', value: ex.message}
       ]
       add_error(rule_code, annotation)
-      message = "Failed to load the Excel file.: Please check the files: '#{@data_file}'.\n"
-      message += "#{ex.message} (#{ex.class})"
-      @log.warn('An Excel(Roo::Excelx) sheet loading error has occurred.')
-      output_exception_log(ex, message)
+      @log.error("Failed to load sheet '#{sheet_name}' in Excel file: #{@data_file}")
+      @log.error(ex)
     end
     sheet
   end

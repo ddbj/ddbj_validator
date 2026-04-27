@@ -252,31 +252,8 @@
         22
       ],
       "note": "AutoAnnotator returns nil :file_path for invalid input, the controller short-circuits with :error before send_file."
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "04a72d23452e8cbd1caecbfd9d1b2eb159c1b9341df7df2213d7594e33b64b2d",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/models/validator.rb",
-      "line": 291,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "from(\"#{setting[\"from\"]}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Validator",
-        "method": "send_notification_mail"
-      },
-      "user_input": "setting[\"from\"]",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "False positive: Mail.new builder block, not ActiveRecord. `from` is the Mail DSL setter."
     }
   ],
-  "updated": "2026-04-26 17:21:34 +0900",
+  "updated": "2026-04-27 11:46:51 +0900",
   "brakeman_version": "8.0.4"
 }

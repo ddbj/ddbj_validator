@@ -46,20 +46,6 @@ class ValidatorBase
   end
 
   #
-  # Exception発生時のlog出力(backtraceを含む)
-  #
-  # ==== Args
-  # ex: Exception class
-  # message: 追加メッセージ
-  #
-  def output_exception_log(ex, message)
-    message += "#{ex.message} (#{ex.class})"
-    @log.error(message)
-    trace = ex.backtrace.join("\n")
-    @log.error(trace)
-  end
-
-  #
   # 正しいXML文書であるかの検証
   #
   # ==== Args

@@ -1,10 +1,6 @@
-require 'logger'
-
 class FileParser
   def initialize
     @setting = Rails.configuration.validator
-    @log_file = @setting['api_log']['path'] + '/validator.log'
-    @log = Logger.new(@log_file)
   end
   #
   # ファイルからフォーマットを判定してパースしたデータを返す
@@ -68,10 +64,8 @@ class FileParser
               return {format: 'tsv', data: ret[:data]}
             end
           rescue => ex
-            @log.warn('Fail to parse a file as JSON/XML/TSV.')
-            @log.warn(ex.message)
-            trace = ex.backtrace.join("\n")
-            @log.warn(trace)
+            Rails.logger.warn('Fail to parse a file as JSON/XML/TSV.')
+            Rails.logger.warn(ex)
             return {format: 'unknown', message: ex.message, data: nil}
           end
         end
@@ -95,16 +89,12 @@ class FileParser
         begin
           tsv_data = CSV.read(file_path, encoding: encoding, col_sep: col_sep, row_sep: "\r\n")
         rescue => ex2
-          @log.warn('Fail to parse a file as TSV file. Invalid encoding or newline char.')
-          @log.warn(ex2.message)
-          trace = ex2.backtrace.map {|row| row }.join("\n")
-          @log.warn(trace)
+          Rails.logger.warn('Fail to parse a file as TSV file. Invalid encoding or newline char.')
+          Rails.logger.warn(ex2)
         end
       else # 文字コードに関係ないエラー
-        @log.warn('Fail to parse a file as TSV file.')
-        @log.warn(ex1.message)
-        trace = ex1.backtrace.map {|row| row }.join("\n")
-        @log.warn(trace)
+        Rails.logger.warn('Fail to parse a file as TSV file.')
+        Rails.logger.warn(ex1)
         message = ex1.message
       end
     end
