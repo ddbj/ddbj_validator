@@ -17,14 +17,10 @@ logs
 *.swp
 *.log
 
-shared/log
-shared/tmp
 deploy_tools/log
 conf/coll_dump
 conf/pub
 data/
-
-log_analysis/data/
 
 !.gitkeep
 
