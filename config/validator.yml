@@ -13,14 +13,14 @@ development: &dev
   api_log:
     path: logs
   sparql_endpoint:
-    master_endpoint: <%= ENV.fetch('DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql') %>
+    master_endpoint: <%= ENV.fetch('VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql') %>
   named_graph_uri:
     taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy
   ddbj_rdb:
-    pg_host:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_HOST', 'localhost') %>
-    pg_port:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_PORT', 5432) %>
-    pg_user:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_USER', 'validator') %>
-    pg_pass:    <%= ENV.fetch('DDBJ_VALIDATOR_APP_POSTGRES_PASSWD', 'validator') %>
+    pg_host:    <%= ENV.fetch('PGHOST', 'localhost') %>
+    pg_port:    <%= ENV.fetch('PGPORT', 5432) %>
+    pg_user:    <%= ENV.fetch('PGUSER', 'validator') %>
+    pg_pass:    <%= ENV.fetch('PGPASSWORD', 'validator') %>
     pg_timeout: 30
   monitoring:
     ssub_id: SSUB009526

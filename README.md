@@ -13,7 +13,7 @@ $ cd ddbj_validator
 ## Prepare
 ### Download db file
 If you prepare SPARQL endpoint as a container on your host, download the latest database file.  
-If a SPARQL endpoint is provided separately, you do not need to do this, just modify the value of the environment variable `DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER`.
+If a SPARQL endpoint is provided separately, you do not need to do this, just modify the value of the environment variable `VIRTUOSO_ENDPOINT_MASTER`.
 ```
 $ curl -Lo "./shared/data/virtuoso/virtuoso.db" "http://ddbj.nig.ac.jp/ontologies/virtuoso.db"
 ```
@@ -36,7 +36,7 @@ $ RAILS_ENV=production RAILS_MASTER_KEY=... podman-compose up -d
 ```
 
 ## How to use
-Specify a file to validate and POST it to the port specified by `DDBJ_VALIDATOR_APP_PORT` (default: 18840). The response includes the uuid.
+Specify a file to validate and POST it to the port specified by `APP_PORT` (default: 18840). The response includes the uuid.
 ```
 $ curl -F "biosample=@test/data/biosample/105_taxonomy_warning_ng.xml" "http://localhost:18840/api/validation"
 {"uuid":"17521682-5890-4acc-ad5d-15891ea3c46e","status":"accepted","start_time":"2021-06-08 20:40:58 +0900"}
@@ -62,19 +62,19 @@ Read by `compose.yaml`:
 |---|---|---|
 | `RAILS_ENV` | — | Rails environment (`development` / `staging` / `production`). |
 | `RAILS_MASTER_KEY` | — | Decrypts `config/credentials/<env>.yml.enc` for staging/production. |
-| `DDBJ_VALIDATOR_APP_PORT` | `18840` | Host port mapped to the app container. |
-| `DDBJ_VALIDATOR_APP_SHARED_HOST_DIR` | `./shared` | Host directory mounted at `/rails/shared` (validation results, etc.). |
-| `DDBJ_VALIDATOR_VIRTUOSO_PORT` | `18841` | Host port mapped to the Virtuoso container. |
+| `APP_PORT` | `18840` | Host port mapped to the app container. |
+| `SHARED_HOST_DIR` | `./shared` | Host directory mounted at `/rails/shared` (validation results, etc.). |
+| `VIRTUOSO_PORT` | `18841` | Host port mapped to the Virtuoso container. |
 
 Read by `config/validator.yml` in development only (staging / production hardcode these or pull them from credentials):
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `DDBJ_VALIDATOR_APP_VIRTUOSO_ENDPOINT_MASTER` | `http://localhost:8890/sparql` | SPARQL endpoint URL. |
-| `DDBJ_VALIDATOR_APP_POSTGRES_HOST` | `localhost` | DDBJ PostgreSQL host. |
-| `DDBJ_VALIDATOR_APP_POSTGRES_PORT` | `5432` | DDBJ PostgreSQL port. |
-| `DDBJ_VALIDATOR_APP_POSTGRES_USER` | `validator` | DDBJ PostgreSQL user. |
-| `DDBJ_VALIDATOR_APP_POSTGRES_PASSWD` | `validator` | DDBJ PostgreSQL password. |
+| `VIRTUOSO_ENDPOINT_MASTER` | `http://localhost:8890/sparql` | SPARQL endpoint URL. |
+| `PGHOST` | `localhost` | DDBJ PostgreSQL host. |
+| `PGPORT` | `5432` | DDBJ PostgreSQL port. |
+| `PGUSER` | `validator` | DDBJ PostgreSQL user. |
+| `PGPASSWORD` | `validator` | DDBJ PostgreSQL password. |
 
 ## Development
 ### Unit test

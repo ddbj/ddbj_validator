@@ -22,8 +22,8 @@ class BioSampleValidator < ValidatorBase
     # pub リポジトリ (github.com/ddbj/pub) と coll_dump は本番ではそれぞれ外部ディレクトリが
     # conf/pub / conf/coll_dump にバインドマウントされる。テストで本物のマウントを用意する代わりに、
     # env で test/fixtures/ 配下のスナップショットを指せるようにしておく
-    pub_dir        = ENV['DDBJ_VALIDATOR_APP_PUB_DIR']        || conf_dir.join('../pub').to_s
-    coll_dump_file = ENV['DDBJ_VALIDATOR_APP_COLL_DUMP_FILE'] || conf_dir.join('../coll_dump/coll_dump.txt').to_s
+    pub_dir        = ENV['PUB_DIR']        || conf_dir.join('../pub').to_s
+    coll_dump_file = ENV['COLL_DUMP_FILE'] || conf_dir.join('../coll_dump/coll_dump.txt').to_s
 
     @conf[:validation_config]       = JSON.parse(conf_dir.join('rule_config_biosample.json').read)
     @conf[:null_accepted]           = JSON.parse(conf_dir.join('null_accepted.json').read)
