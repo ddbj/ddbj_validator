@@ -1,14 +1,10 @@
-# テスト用の Virtuoso (fixture 読み込み済み)
-#
-# 本番データに依存せずテストを走らせるための最小構成。
-# dev 用 compose.dev.yaml とは別に動かすので、ボリュームや graph は独立。
+# テスト/開発用の Virtuoso + Postgres (fixture 読み込み済み)。
+# 本番用 compose.yaml とは別の volume / graph で動く。
 #
 # 使い方:
 #   docker compose -f compose.test.yaml up -d
-#   docker compose -f compose.test.yaml exec virtuoso isql -U dba -P dba exec="LOAD /fixtures/load.sql;"
-#   # (初回のみ) fixture のロード完了を待つ
-#   bundle exec rake test
-#   docker compose -f compose.test.yaml down
+#   docker compose -f compose.test.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
+#   bin/rails test    # or  bin/rails server
 services:
   virtuoso:
     image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
