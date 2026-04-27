@@ -1,7 +1,6 @@
 ---
-# data_updater/ は ddbj-ontologies submodule の owl 変換スクリプト、
-# log_analysis/ は別コンテナで動くスクリプト群で、いずれも Rails app の attack surface ではない。
+# data_updater/ は ddbj-ontologies submodule の owl 変換スクリプトで、
+# Rails app の attack surface ではない。
 :skip_files:
   - data_updater/
-  - log_analysis/
 :ignore_file: config/brakeman.ignore
