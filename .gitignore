@@ -1,16 +1,7 @@
 *.iml
 .idea/
-idea/*
-memo/*
-memo/
-db_conf/*
-db_conf
 tmp/
-memo
-node_modules/*
-*_test_.*
 .DS_Store
-*_back_*
 vendor
 logs
 .bundle
@@ -20,7 +11,6 @@ logs
 deploy_tools/log
 conf/coll_dump
 conf/pub
-data/
 
 !.gitkeep
 
@@ -36,9 +26,5 @@ data_updater/dbfile
 # Rails
 /log/*
 !/log/.keep
-/storage/*
-!/storage/.keep
 /config/master.key
 /config/credentials/*.key
-.byebug_history
-
