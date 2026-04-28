@@ -46,7 +46,7 @@ jobs:
           bundler-cache: true
 
       - name: Start Virtuoso & Postgres with fixtures
-        run: docker compose -f compose.test.yaml up -d
+        run: docker compose -f compose.dev.yaml up -d
 
       - name: Wait for Virtuoso to accept SPARQL
         run: |
@@ -64,11 +64,11 @@ jobs:
             sleep 2
           done
           echo 'Postgres did not become ready' >&2
-          docker compose -f compose.test.yaml logs postgres | tail -40 >&2
+          docker compose -f compose.dev.yaml logs postgres | tail -40 >&2
           exit 1
 
       - name: Load taxonomy / biosample fixture
-        run: docker compose -f compose.test.yaml exec -T virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
+        run: docker compose -f compose.dev.yaml exec -T virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 
       # -v で各テスト名を標準出力に流す。どのテストで詰まったかを CI ログから特定できるように
       # pub / coll_dump は test/test_helpers.rb が env 経由で test/fixtures を指すので、

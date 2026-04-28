@@ -27,7 +27,7 @@ development: &dev
 
 test:
   <<: *dev
-  # compose.test.yaml で立ち上がる Virtuoso / Postgres を必ず指す。
+  # compose.dev.yaml で立ち上がる Virtuoso / Postgres を必ず指す。
   # Postgres は dev と port が衝突しないよう 15432 にずらしてある。
   sparql_endpoint:
     master_endpoint: http://localhost:8890/sparql

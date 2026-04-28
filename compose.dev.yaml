@@ -2,8 +2,8 @@
 # 本番用 compose.yaml とは別の volume / graph で動く。
 #
 # 使い方:
-#   docker compose -f compose.test.yaml up -d
-#   docker compose -f compose.test.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
+#   docker compose -f compose.dev.yaml up -d
+#   docker compose -f compose.dev.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 #   bin/rails test    # or  bin/rails server
 services:
   virtuoso:
