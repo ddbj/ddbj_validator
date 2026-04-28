@@ -14,7 +14,7 @@ DDBJ Validator is a Rails 8 API that checks DDBJ submission files (BioSample / B
 ### Prerequisites
 
 - Ruby 4.0.3 (see `.ruby-version`)
-- podman (or docker) to run `compose.test.yaml`, which provides Virtuoso + PostgreSQL with fixtures
+- podman (or docker) to run `compose.dev.yaml`, which provides Virtuoso + PostgreSQL with fixtures
 
 ### Setup
 
@@ -22,17 +22,20 @@ DDBJ Validator is a Rails 8 API that checks DDBJ submission files (BioSample / B
 git clone https://github.com/ddbj/ddbj_validator.git
 cd ddbj_validator
 bundle install
-docker compose -f compose.test.yaml up -d
-docker compose -f compose.test.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
+docker compose -f compose.dev.yaml up -d
+docker compose -f compose.dev.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
+docker compose -f compose.dev.yaml down
 ```
+
+The Virtuoso `LOAD` step is one-time (the fixture data persists in the container's volume). After that, `bin/dev` brings everything up together.
 
 ### Running the server
 
 ```sh
-bin/rails server
+bin/dev
 ```
 
-Posts go to `http://localhost:3000/api/validation`. `config/validator.yml`'s `development` section reads the standard libpq vars (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`) and `VIRTUOSO_ENDPOINT_MASTER`, all with sensible defaults that match `compose.test.yaml`.
+`bin/dev` runs `Procfile.dev` via foreman: the Rails server on `:3000` plus `compose.dev.yaml` (Virtuoso + Postgres) in the foreground. Stop with Ctrl-C and both processes shut down. `config/validator.yml`'s `development` section reads the standard libpq vars (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`) and `VIRTUOSO_ENDPOINT_MASTER`, all with defaults that match `compose.dev.yaml`.
 
 ### Tests
 
@@ -40,7 +43,7 @@ Posts go to `http://localhost:3000/api/validation`. `config/validator.yml`'s `de
 bin/rails test
 ```
 
-PostgreSQL (port 15432) and Virtuoso (port 8890) from `compose.test.yaml` are required — there is no skip path. The suite runs in parallel (`workers: :number_of_processors`).
+PostgreSQL (port 15432) and Virtuoso (port 8890) from `compose.dev.yaml` are required — there is no skip path. Run `bin/dev` (or `docker compose -f compose.dev.yaml up -d`) first. The suite runs in parallel (`workers: :number_of_processors`).
 
 ### Lint / security scan
 
