@@ -13,7 +13,7 @@ DDBJ Validator is a Rails 8 API that checks DDBJ submission files (BioSample / B
 
 ### Prerequisites
 
-- Ruby 4.0.3 (see `.ruby-version`)
+- Ruby 4.0.4 (see `.ruby-version`)
 - podman (or docker) to run `compose.dev.yaml`, which provides Virtuoso + PostgreSQL with fixtures
 
 ### Setup
