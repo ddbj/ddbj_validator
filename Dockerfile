@@ -5,7 +5,7 @@
 # slim base / jemalloc / bootsnap precompile を採用。
 # `bin/deploy*` で staging/production に build & push する。
 
-ARG RUBY_VERSION=4.0.5
+ARG RUBY_VERSION=4.0.6
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
 WORKDIR /rails
