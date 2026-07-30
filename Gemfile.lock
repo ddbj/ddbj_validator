@@ -94,7 +94,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.7)
-    csv (3.3.5)
+    csv (3.3.6)
     date (3.5.1)
     domain_name (0.6.20240107)
     drb (2.2.3)
