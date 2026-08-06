@@ -57,16 +57,23 @@ ActiveRecord は 1 箇所も使っていない（中央 PG は生の `pg`）。R
 ## 例外の型
 
 ```ruby
-DDBJValidator::Error
-├ EndpointUnavailable  # 設備に届かなかった。データについては何も言っていない
-└ QueryFailed          # 届いて断られた。リトライしても無駄
+DDBJValidator::Error     # 検証できなかった。設備の話ですらない場合もここ
+├ EndpointUnavailable    # 設備に届かなかった。データについては何も言っていない
+└ QueryFailed            # 届いて断られた。リトライしても無駄
 ```
 
 **新しい `rescue` を書くときの判断:**
 
 - **設備に届かなかった** → `EndpointUnavailable`。ホストは `retry_on` する
 - **届いて断られた** → `QueryFailed`
+- **どちらでもないが検証は成立しなかった** → `Error`。投稿ファイルが読めない、
+  RDB から読んだ内容が XML に組み立たない等。**接続失敗として上げてはいけない** —
+  決定的に失敗するものをホストが永久にリトライする
 - **データが期待した形でない** → finding。**これだけが検証結果**
+
+`Validator#execute` は `DDBJValidator::Error` を素通りさせる。**握って
+`{status: 'error'}` に丸めると、型を分けた意味がそこで消える**（実際に消えていた）。
+Rails ラッパは `EndpointUnavailable` だけ 503、他は 500 で返す。
 
 背景と残作業は `docs/silent-fallbacks.md`。要点は、NCBI が落ちている間
 「connection to NCBI service failed」が**投稿者のファイルへの指摘**として並び、
@@ -78,12 +85,23 @@ validity を invalid にしていたこと。設備障害を検証結果に化�
 
 ```sh
 docker compose -f compose.dev.yaml up -d
+docker compose -f compose.dev.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 ```
+
+**2 行目を忘れると Virtuoso は空のまま上がる。** PostgreSQL は `init.sh` が
+`docker-entrypoint-initdb.d` から自動で走って 4 DB と seed まで入るが、Virtuoso には
+同等の仕組みがないので `load.sql` を手で流す。入ったかどうかはグラフを数えれば分かる
+（taxonomy 5347 / biosample-1.5.0 約 209 万。`up -d` 直後は 2499 = システムトリプルのみ）。
+`compose.dev.yaml` の virtuoso に named volume は無いので、消えたらやり直し。
+
+**実データは要らない。** `test_helper.rb` が `PUB_DIR` / `COLL_DUMP_FILE` を
+`test/fixtures/conf/` のスナップショットに向け、外部 HTTP は WebMock が
+`allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub` (174MB) も coll_dump も不要。
 
 | | runs | assertions | failures | errors | 時間 |
 |---|---|---|---|---|---|
-| **services 起動時** | 321 | 2639 | 0 | 0 | 11.6s |
-| services 未起動時 | 321 | 2036 | 3 | 93 | 54s |
+| **services 起動時** | 327 | 2651 | 0 | 0 | 11.1s |
+| services 未起動時 | 327 | 2049 | 3 | 93 | 54s |
 
 **未起動でも「変更前と同じテストが落ちるか」は見られるが、それだけでは
 Virtuoso と中央 DB を通る経路が一度も実行されない。** SPARQL や RDB の呼び出しに
@@ -105,7 +123,13 @@ comm -23 /tmp/after.txt /tmp/before.txt   # 新しく落ちたもの
 
 - **`Bundler.require` は Gemfile の記載を require する。** gemspec の依存に移した
   gem は誰も require しない。**gem は自分の依存を自分で require する**
-  （roo / pg / net-ftp / http が抜けて、握り潰された例外が「出力なし」に化けた）
+  （roo / pg / net-ftp / http が抜けて、握り潰された例外が「出力なし」に化けた）。
+  **`require` しているものは gemspec にも宣言する** — rubyzip は roo 経由で入って
+  いるだけだった。依存が変わった日に `rescue Zip::Error` が黙って効かなくなる
+- **roo の例外はひとつの系統になっていない。** `ExceedsMaxError` は `Roo::Error`
+  ですらなく、拡張子違いは `TypeError`（`file_warning: :ignore` を渡さない場合）。
+  `rescue Roo::Error` だけでは足りないので `DDBJValidator::SPREADSHEET_ERRORS` を使う。
+  漏らすと投稿者は「読めない Excel」の指摘ではなく 500 を受け取る
 - **Rails は `lib/` を autoload しない**（`config.autoload_lib` を外してある）。
   gem 自身の Zeitwerk ローダが管理する。2 つのローダが同じディレクトリを管理すると
   Zeitwerk が拒否する

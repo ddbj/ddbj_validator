@@ -135,8 +135,58 @@ A・B とも対応済み。`Error` / `EndpointUnavailable` / `QueryFailed` を�
 NCBI・DDBJ RDB・Virtuoso・NCBI FTP の接続失敗が rule を素通りするようにした
 (`DDBJValidator.connection_error?` が socket / PG レベルの失敗を判定する)。
 
+### 入り口で潰さない — **対応済み**
+
+型を用意しただけでは足りなかった。`Validator#execute` の `rescue => ex` が
+`EndpointUnavailable` ごと `{status: 'error', message:}` に丸めて result.json に
+書いていたので、**呼び出し側からは依然として区別が付かなかった**。この型を
+`rescue` している箇所はコードベースに 1 つも無い、という状態だった。
+
+`rescue DDBJValidator::Error` で素通りさせ、gem の契約を「検証結果を返すか、
+検証できなければ上げるか」にした。同時に、permission error のパスが result.json を
+書かずに `return` していたのも直した（`ARGV[1]` を読む CLI 時代の名残つき）。
+
+Rails ラッパ側は `ValidationsController#run_validation` で受けて status.json を
+`error` にする。ここで握らないと status は `running` のまま残り、クライアントは
+終わらない検証をポーリングし続ける。`GET /api/validation/:uuid` は status が
+`error` なら 500、`EndpointUnavailable` だったなら 503 を返す（result.json が
+無いことがあるので、その有無では判断しない）。例外の型は HTTP 越しには渡せないので、
+status.json に載せるのは `retryable` の真偽だけにしてある — `ex.message` には
+SPARQL クエリ全文や絶対パスが入るうえ、status エンドポイントはファイルをそのまま返す。
+
+### 型を間違えると永久にリトライされる — **対応済み**
+
+`EndpointUnavailable` は「あとで聞き直せ」という意味なので、**決定的に失敗する
+ものに付けるとホストが永久にリトライする**。素通りさせたあとで、逆向きに間違って
+いる箇所が残っていた:
+
+- `ncbi_eutils.rb` の catch-all が**何でも** `EndpointUnavailable` にしていた
+  （応答の形が違うことによる `NoMethodError` まで）。`connection_error?` で分けた
+- `{biosample,bioproject}_submitter.rb` の 4 箇所は Nokogiri の組み立てと
+  `File.open` を囲っていて、設備には触れていない。接続失敗として上げると、壊れた
+  レコード 1 件でリトライが終わらない。`DDBJValidator::Error` にした
+- `validator.rb` の permission error も同様。加えて**出力先が書けない場合がある**
+  ので、result.json に書いて伝えることもできない。上げるのが唯一正しい
+
+逆に、届いていないのに `QueryFailed`（リトライ無意味）にしていたものもあった:
+
+- `sparql_base.rb` は応答を自分で `JSON.parse` する。**日次の `virtuoso.db`
+  差し替え中に返るプロキシの 502 や切れた応答**は `JSON::ParserError` になり、
+  接続エラーではないので `QueryFailed` に落ちていた。まさに retry させたい状況
+- `HTTP::ConnectionError` が `CONNECTION_ERRORS` に無かった。http gem は socket
+  例外をこれに包むので、ルールコードが素の `Errno::*` を見ることはない
+- `coll_dump.rb` は転送先に直接書いていた。途中で切れると**打ち切られたファイルが
+  残り**、リトライで「もうある」と見なされて正典になる。`.part` に落として rename
+
 新しい `rescue` を書くときの判断:
 
 - **設備に届かなかった** → `EndpointUnavailable`。データについては何も言わない
 - **届いて断られた** → `QueryFailed`。リトライしても無駄
+- **どちらでもないが検証は成立しなかった** → `Error`
 - **データが期待した形でない** → finding。これだけが検証結果
+
+最後のひとつには、ライブラリの都合で例外が散らばっているものも含まれる。roo は
+「読めない spreadsheet」を `Roo::Error` / `Zip::Error` / `ExceedsMaxError`（これは
+`Roo::Error` ですらない）/ `TypeError` に分けて上げるので、まとめて
+`DDBJValidator::SPREADSHEET_ERRORS` にしてある。取りこぼすと finding になるはずの
+ものが 500 になる。
