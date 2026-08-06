@@ -2,15 +2,24 @@
 
 require 'logger'
 require 'pathname'
+# Everything the rules use. They were getting these for free from the
+# Rails app's `Bundler.require`, which requires what the Gemfile lists —
+# a gem has to ask for its own.
 require 'csv'
+require 'http'
 require 'json'
 require 'json-schema'
+require 'net/ftp'
+require 'net/http'
 require 'nokogiri'
+require 'pg'
+require 'roo'
 
 # ActiveSupport, for `blank?` / `present?` and friends — the rule code
 # leans on them throughout. Core extensions only: no framework, no
 # autoloading, no railtie.
 require 'active_support/all'
+require 'zeitwerk'
 
 # The five things the rule code needs from its host.
 #
@@ -63,6 +72,25 @@ module DDBJValidator
 
     def root = ROOT
 
+    # Where the rules read their data from, named separately because they
+    # are not all the same kind of thing once this is a gem.
+    #
+    # `conf_dir` holds the rule configuration that ships with the rules —
+    # and, mounted underneath it in a deployment, the two reference
+    # corpora that do not (`conf/pub`, `conf/coll_dump`; both are
+    # gitignored and both are already overridable per-call through
+    # PUB_DIR / COLL_DUMP_FILE).
+    #
+    # `template_dir` is the downloadable attribute templates, which are a
+    # web concern rather than a rule one — `Package#attribute_template_file`
+    # is reached only from the API. A host that never serves them never
+    # needs to set it.
+    attr_writer :conf_dir, :sparql_dir, :template_dir
+
+    def conf_dir     = resolve(@conf_dir)     { ROOT.join('conf') }
+    def sparql_dir   = resolve(@sparql_dir)   { ROOT.join('lib/ddbj_validator/sparql') }
+    def template_dir = resolve(@template_dir) { ROOT.join('public/template') }
+
     # Endpoints, credentials and per-database settings — the shape
     # `config/validator.yml` produces. Required: the host has to say where
     # Virtuoso and the DDBJ RDB are, and there is no sensible default for
@@ -83,21 +111,43 @@ module DDBJValidator
     end
   end
 
-  def self.load_rules!
-    pending = DDBJValidator.root.glob('app/models/*.rb').map(&:to_s)
+  # File names to constant names, for the handful the default rule does
+  # not produce. Moved here from the Rails app's zeitwerk initializer: the
+  # rules name their own constants, and a host should not have to be told
+  # how to spell them.
+  INFLECTIONS = {
+    'biosample_validator'       => 'BioSampleValidator',
+    'biosample_submitter'       => 'BioSampleSubmitter',
+    'bioproject_validator'      => 'BioProjectValidator',
+    'bioproject_tsv_validator'  => 'BioProjectTsvValidator',
+    'bioproject_submitter'      => 'BioProjectSubmitter',
+    'jvar_validator'            => 'JVarValidator',
+    'metabobank_idf_validator'  => 'MetaboBankIdfValidator',
+    'metabobank_sdrf_validator' => 'MetaboBankSdrfValidator',
+    'ddbj_db_validator'         => 'DDBJDbValidator',
+    'sparql'                    => 'SPARQL',
+    'sparql_base'               => 'SPARQLBase',
+    'excel2tsv'                 => 'Excel2Tsv'
+  }.freeze
 
-    until pending.empty?
-      failed = []
+  # The rules are autoloaded, by the library rather than by whatever
+  # happens to be hosting it. They still define top-level constants —
+  # namespacing 40 of them is a separate change — so the directory is
+  # pushed as its own root rather than as `DDBJValidator::Rules`.
+  def self.loader
+    @loader ||= Zeitwerk::Loader.new.tap {|loader|
+      loader.inflector = Class.new(Zeitwerk::Inflector) {
+        def camelize(basename, abspath) = INFLECTIONS.fetch(basename) { super }
+      }.new
 
-      pending.each do |path|
-        require path
-      rescue NameError
-        failed << path
-      end
-
-      raise "cannot resolve: #{failed.join(', ')}" if failed.size == pending.size
-
-      pending = failed
-    end
+      loader.push_dir(ROOT.join('lib/ddbj_validator/rules').to_s)
+      loader.setup
+    }
   end
+
+  def self.eager_load! = loader.eager_load
 end
+
+# Set up on require, the way a gem with its own loader is expected to:
+# a host that has bundled it should not also have to be told to start it.
+DDBJValidator.loader

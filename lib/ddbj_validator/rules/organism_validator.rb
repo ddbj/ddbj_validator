@@ -5,7 +5,7 @@ require 'erb'
 #
 class OrganismValidator < SPARQLBase
   # クラス読み込み時に app/sparql/biosample/*.rq.erb を ERB コンパイルしてキャッシュする。
-  SPARQL = DDBJValidator.root.glob('app/sparql/biosample/*.rq.erb').to_h {|path|
+  SPARQL = DDBJValidator.sparql_dir.glob('biosample/*.rq.erb').to_h {|path|
     [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
 

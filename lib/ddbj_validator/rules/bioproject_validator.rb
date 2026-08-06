@@ -9,7 +9,7 @@ class BioProjectValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = DDBJValidator.root.join('conf/bioproject')
+    conf_dir = DDBJValidator.conf_dir.join('bioproject')
     @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_bioproject.json').read)
     @conf[:xsd_path]          = conf_dir.join('xsd/Package.xsd').to_s
 

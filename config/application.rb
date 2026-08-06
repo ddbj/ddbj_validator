@@ -23,10 +23,10 @@ module DdbjValidator
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
-    # Please, add to the `ignore` list any other `lib` subdirectories that do
-    # not contain `.rb` files, or that should not be reloaded or eager loaded.
-    # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks])
+    # lib/ は autoload しない。中身は同一リポジトリの ddbj_validator gem で、
+    # Bundler が読み込み、gem 自身の Zeitwerk ローダが面倒を見る
+    # (lib/ddbj_validator.rb)。Rails 側が同じディレクトリを管理しようとすると
+    # 二重管理になって Zeitwerk が拒否する。
 
     # Configuration for the application, engines, and railties goes here.
     #

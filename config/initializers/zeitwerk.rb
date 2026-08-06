@@ -1,20 +1,2 @@
-# app/models/ 配下はフラット (BioSampleValidator など top-level 定数のみ) なので、
-# ファイル名と定数名がデフォルト規則で一致しない箇所だけ inflector に明示する。
-Rails.autoloaders.main.inflector.inflect(
-  'biosample_validator'       => 'BioSampleValidator',
-  'biosample_submitter'       => 'BioSampleSubmitter',
-  'bioproject_validator'      => 'BioProjectValidator',
-  'bioproject_tsv_validator'  => 'BioProjectTsvValidator',
-  'bioproject_submitter'      => 'BioProjectSubmitter',
-  'jvar_validator'            => 'JVarValidator',
-  'metabobank_idf_validator'  => 'MetaboBankIdfValidator',
-  'metabobank_sdrf_validator' => 'MetaboBankSdrfValidator',
-  'ddbj_db_validator'         => 'DDBJDbValidator',
-  'sparql'                    => 'SPARQL',
-  'sparql_base'               => 'SPARQLBase',
-  'excel2tsv'                 => 'Excel2Tsv',
-
-  # lib/ddbj_validator.rb — the host shim the rules read their settings,
-  # cache, logger and error reporter from.
-  'ddbj_validator'            => 'DDBJValidator'
-)
+# ルールの inflection は gem 側 (DDBJValidator::INFLECTIONS) に移した。
+# app/ 配下に残っているのは controllers だけで、既定の規則で足りる。

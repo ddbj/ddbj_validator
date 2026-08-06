@@ -9,7 +9,7 @@ class BioSampleValidator < ValidatorBase
   attr_reader :conf
 
   # クラス読み込み時に app/sparql/biosample/*.rq.erb を ERB コンパイルしてキャッシュする。
-  SPARQL = DDBJValidator.root.glob('app/sparql/biosample/*.rq.erb').to_h {|path|
+  SPARQL = DDBJValidator.sparql_dir.glob('biosample/*.rq.erb').to_h {|path|
     [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
   #
@@ -17,7 +17,7 @@ class BioSampleValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = DDBJValidator.root.join('conf/biosample')
+    conf_dir = DDBJValidator.conf_dir.join('biosample')
 
     # pub リポジトリ (github.com/ddbj/pub) と coll_dump は本番ではそれぞれ外部ディレクトリが
     # conf/pub / conf/coll_dump にバインドマウントされる。テストで本物のマウントを用意する代わりに、

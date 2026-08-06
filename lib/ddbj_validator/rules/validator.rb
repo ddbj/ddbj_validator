@@ -9,7 +9,7 @@ class Validator
 
     # constructor
     def initialize
-      @version = YAML.load(ERB.new(File.read(File.expand_path('../../conf/version.yml', __dir__))).result)
+      @version = YAML.load(ERB.new(DDBJValidator.conf_dir.join('version.yml').read).result)
       @latest_version = @version['version']['validator']
       @setting = DDBJValidator.config
       @running_dir = @setting['api_log']['path'] + '/running/'

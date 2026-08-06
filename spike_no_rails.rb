@@ -8,7 +8,7 @@ DDBJValidator.config = {
   'biosample'       => {'package_version' => '1.5.0'}
 }
 
-DDBJValidator.load_rules!
+DDBJValidator.loader
 
 v = BioProjectTsvValidator.new
 

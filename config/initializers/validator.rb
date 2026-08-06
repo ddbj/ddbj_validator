@@ -14,8 +14,16 @@ end
 # logger など)。起動時のオブジェクトを掴むと、差し替え後も古い方を使い続けて
 # しまい、しかもキャッシュは外れても答えは正しいので気付けない。
 Rails.application.config.after_initialize do
+  DDBJValidator.template_dir = Rails.root.join('public/template')
+
   DDBJValidator.config = -> { Rails.configuration.validator }
   DDBJValidator.cache  = -> { Rails.cache }
   DDBJValidator.logger = -> { Rails.logger }
   DDBJValidator.error  = -> { Rails.error }
+end
+
+# 本番は Rails 同様に事前ロードする。gem 側のローダは Rails のものとは別なので
+# 明示的に呼ぶ必要がある。
+Rails.application.config.after_initialize do
+  DDBJValidator.eager_load! if Rails.application.config.eager_load
 end

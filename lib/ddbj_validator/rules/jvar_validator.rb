@@ -9,7 +9,7 @@ class JVarValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = DDBJValidator.root.join('conf/jvar')
+    conf_dir = DDBJValidator.conf_dir.join('jvar')
     @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_jvar.json').read)
     @conf[:sheet_list]        = JSON.parse(conf_dir.join('sheet_list.json').read)
 

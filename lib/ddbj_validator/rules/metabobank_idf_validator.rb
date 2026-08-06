@@ -9,7 +9,7 @@ class MetaboBankIdfValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = DDBJValidator.root.join('conf/metabobank_idf')
+    conf_dir = DDBJValidator.conf_dir.join('metabobank_idf')
     @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_metabobank_idf.json').read)
     @conf[:field_settings]    = JSON.parse(conf_dir.join('field_settings.json').read)
 

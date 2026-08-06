@@ -1,18 +1,15 @@
 source 'https://rubygems.org'
 
+# 同一リポジトリの gem。ルール本体・conf・SPARQL クエリは lib/ 配下にあり、
+# app/ と config/ はその HTTP ラッパ。
+gemspec
+
+
 gem 'rails', '~> 8.1.3'
 
 gem 'bootsnap', require: false
-gem 'csv'
-gem 'http'
-gem 'json'
-gem 'json-schema'
-gem 'net-ftp'
-gem 'nokogiri'
-gem 'pg'
 gem 'puma'
 gem 'rack-cors'
-gem 'roo'
 gem 'sentry-rails'
 gem 'thruster', require: false
 

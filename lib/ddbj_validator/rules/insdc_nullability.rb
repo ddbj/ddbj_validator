@@ -5,7 +5,7 @@ require 'active_support/core_ext/object/blank'
 # `conf/biosample/null_not_recommended.json` をクラスロード時に一度だけ読み込み、
 # frozen 配列で保持する (起動後は read-only なので thread safe)。
 module InsdcNullability
-  CONF_DIR             = DDBJValidator.root.join('conf/biosample').freeze
+  CONF_DIR             = DDBJValidator.conf_dir.join('biosample').freeze
   NULL_ACCEPTED        = JSON.parse(File.read(CONF_DIR.join('null_accepted.json'))).freeze
   NULL_NOT_RECOMMENDED = JSON.parse(File.read(CONF_DIR.join('null_not_recommended.json'))).freeze
 

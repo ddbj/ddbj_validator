@@ -11,9 +11,9 @@ class TradValidator < ValidatorBase
   #
   def initialize
     super
-    @conf[:validation_config]          = JSON.parse(DDBJValidator.root.join('conf/trad/rule_config_trad.json').read)
-    @conf[:locus_tag_require_features] = JSON.parse(DDBJValidator.root.join('conf/trad/locus_tag_require_features.json').read)
-    @conf[:bs_null_accepted]           = JSON.parse(DDBJValidator.root.join('conf/biosample/null_accepted.json').read)
+    @conf[:validation_config]          = JSON.parse(DDBJValidator.conf_dir.join('trad/rule_config_trad.json').read)
+    @conf[:locus_tag_require_features] = JSON.parse(DDBJValidator.conf_dir.join('trad/locus_tag_require_features.json').read)
+    @conf[:bs_null_accepted]           = JSON.parse(DDBJValidator.conf_dir.join('biosample/null_accepted.json').read)
 
     @validation_config = @conf[:validation_config]
     @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
