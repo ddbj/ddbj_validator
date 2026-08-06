@@ -209,7 +209,7 @@ taxonomy がファイルになって「今どれを読んでいるか」が言�
 | 出所 | 件数 | 変わるタイミング | キー |
 |---|---|---|---|
 | taxonomy（SQLite） | 11 | 日次の差し替え | `exist_organism_name` ×4 / `tax_match_organism` ×3 / `tax_has_linage` ×2 / `tax_vs_package` / `metage_source_lineage` |
-| **DDBJ 中央 PostgreSQL** | 4 | **随時**（キュレータが動かす） | `is_umbrella_id` / `bioproject_submitter` / `bioproject_prjd_id` / `locus_tag_prefix` |
+| ~~DDBJ 中央 PostgreSQL~~ | 0 | — | **ホストのキャッシュから外した**（下記） |
 | gem 同梱データ | 4 | gem の版と一緒 | `package_attributes` / `package_attribute_groups` / `country_from_latlon` / （`unknown_package` は不要になり削除） |
 | 外部 | 1 | 実質不変 | `exist_pubchem_id`（NCBI） |
 
@@ -217,10 +217,22 @@ taxonomy がファイルになって「今どれを読んでいるか」が言�
 返し、11 箇所すべてのキーに混ぜてある（`[:taxonomy, digest, 'exist_organism_name', name]`）。
 差し替えれば digest が変わり、古い答えは参照されなくなる。
 
-**中央 DB の 4 件は別のバグ。** 随時変わるデータを無期限にキャッシュしている。
-BioProject が umbrella になっても submitter が変わっても、プロセスが生きている限り
-古い答えを返す。**グラフの版を混ぜても直らない** — キュレータが umbrella フラグを
-立てた日にグラフの版は変わらないので。
+### 中央 DB の 4 件は寿命が違った — **対応済み**
+
+随時変わるデータを無期限にキャッシュしていた。BioProject が umbrella になっても
+submitter が変わっても、プロセスが生きている限り古い答えを返す（本番のアプリは
+3 週間動きっぱなしだった）。**版を混ぜても直らない** — キュレータが umbrella フラグを
+立てた日に taxonomy の版は変わらない。
+
+効いていたのは**検証 1 回の中の重複除去**だけだった。1000 サンプルが同じ BioProject を
+参照していれば問い合わせは 1 回で済む。またいで持ち越す理由は無い。
+
+validator は検証ごとに `new` されるので、`ValidatorBase#within_run` がそのままその
+スコープになる。**ホストのキャッシュには載せない。**
+
+```ruby
+within_run(:is_umbrella_id, accession) { @db_validator.umbrella_project?(accession) }
+```
 
 ### 分担
 
@@ -233,9 +245,9 @@ cache.fetch([:rdb,      'is_umbrella_id', accession])                         { 
 cache.fetch([:static,   'country_from_latlon', lat, lon])                     { ... }
 ```
 
-**ホスト側**: 群ごとの方針を決める。taxonomy 群は版で無効化、rdb 群は短い TTL か
-キャッシュしない、static 群は無期限。ストアの選択でも、単一の名前空間を被せることでも
-ない — **1 つの名前空間では 3 群を区別できない**。
+**ホスト側**: 残る 2 群の方針を決める。taxonomy 群は版で無効化（対応済み）、static 群は
+無期限。rdb 群はホストに渡さず gem 側で検証 1 回に閉じたので、ホストが考えることは
+減った。
 
 ## Virtuoso に何が入っていたか
 
@@ -289,9 +301,8 @@ taxdump が親子関係を直接持っている。`search_taxid_from_fuzzy_name`
 
 未決:
 
-- **キャッシュの 3 群分け**（上記）。gem 側で出所を鍵に出し、ホストが群ごとの方針を
-  決める。**taxonomy 群は対応済み**。中央 DB 群（随時変わるものを無期限にキャッシュ
-  している）は今すぐにでも直せる
+- **キャッシュの群分け**（上記）。taxonomy 群と中央 DB 群は対応済み。残るのは
+  static 群（実質不変なので急がない）と、ホスト側にどのストアを使わせるか
 - 中央 PostgreSQL への接続を repository が持つ是非
 - validator が使わなくなった `generate_validator_dbfile.sh` の日次 Virtuoso ビルドを
   廃止できるか（**他の利用者の確認が先**）。crontab から taxonomy 側

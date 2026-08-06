@@ -1986,7 +1986,7 @@ module DDBJValidator
       return nil if InsdcNullability.null_value?(bioproject_accession)
       return nil if submitter_id.nil?
 
-      ret = DDBJValidator.cache.fetch(['bioproject_submitter', bioproject_accession]) {
+      ret = within_run(:bioproject_submitter, bioproject_accession) {
         @db_validator.get_bioproject_referenceable_submitter_ids(bioproject_accession)
       }
 
@@ -2055,7 +2055,7 @@ module DDBJValidator
     def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
       return nil if InsdcNullability.null_value?(bioproject_accession)
 
-      is_umbrella = DDBJValidator.cache.fetch(['is_umbrella_id', bioproject_accession]) {
+      is_umbrella = within_run(:is_umbrella_id, bioproject_accession) {
         @db_validator.umbrella_project?(bioproject_accession)
       }
       return true unless is_umbrella
@@ -2190,7 +2190,7 @@ module DDBJValidator
       duplicated_in_file = biosample_list.count { it['attributes']['locus_tag_prefix'] == locus_tag } > 1
 
       # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
-      all_prefix_list = DDBJValidator.cache.fetch(['locus_tag_prefix', 'all']) {
+      all_prefix_list = within_run(:locus_tag_prefix) {
         @db_validator.get_all_locus_tag_prefix()
       }
       duplicated_in_db = all_prefix_list.any? { it[:locus_tag_prefix] == locus_tag && it[:submission_id] != submission_id }
@@ -2224,7 +2224,7 @@ module DDBJValidator
       return nil  if InsdcNullability.null_value?(psub_id)
       return true unless /^PSUB/ =~ psub_id
 
-      biosample_accession = DDBJValidator.cache.fetch(['bioproject_prjd_id', psub_id]) {
+      biosample_accession = within_run(:bioproject_prjd_id, psub_id) {
         @db_validator.get_bioproject_accession(psub_id)
       }
       return true if biosample_accession.nil? # Auto-annotation できない

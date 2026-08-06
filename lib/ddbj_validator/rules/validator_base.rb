@@ -3,6 +3,22 @@ module DDBJValidator
     def initialize
       @conf = read_common_config
       @validation_config = {}
+      @within_run = {}
+    end
+
+    #
+    # 中央 PostgreSQL から引いた答えを、**この検証のあいだだけ**持つ。
+    #
+    # 効いているのは 1 回の検証の中での重複除去で、1000 サンプルが同じ BioProject を
+    # 参照していれば 1000 回の問い合わせが 1 回になる。検証をまたいで持ち越す理由は
+    # 無い — キュレータが umbrella フラグを立てても submitter を変えても随時変わる
+    # データで、DDBJValidator.cache に載せるとプロセスが生きているあいだ古い答えを
+    # 返し続ける（本番のアプリは 3 週間動きっぱなしだった）。
+    #
+    # validator は検証ごとに new されるので、インスタンス変数がそのままこのスコープになる。
+    #
+    def within_run (*key)
+      @within_run.fetch(key) { @within_run[key] = yield }
     end
 
     #
