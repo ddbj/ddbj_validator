@@ -177,10 +177,10 @@ module DDBJValidator
 
     # NCBI taxdump から作った SQLite の置き場所。337 万件あって日次で入れ替わるので
     # gem には同梱せず、ホストが配置したものを読む (`conf/pub` と同じ扱い)。
-    # 作り方は data_updater/taxonomy/。
+    # 作るのは gem の実行ファイル ddbj-validator-build-taxonomy。
     attr_writer :taxonomy_db
 
-    def taxonomy_db = resolve(@taxonomy_db) { raise 'DDBJValidator.taxonomy_db is not set — see data_updater/taxonomy/' }
+    def taxonomy_db = resolve(@taxonomy_db) { raise 'DDBJValidator.taxonomy_db is not set — build one with ddbj-validator-build-taxonomy' }
 
     # Endpoints, credentials and per-database settings — the shape
     # `config/validator.yml` produces. Required: the host has to say where

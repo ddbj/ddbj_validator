@@ -24,8 +24,18 @@ mkdir -p "$WORK_DIR" "$OUT_DIR"
 LOG 'extract taxdump'
 tar xzf "$TAXDUMP" -C "$WORK_DIR" nodes.dmp names.dmp
 
+# cron の PATH には gem の bin が入っていないことが多い。実行ファイルの場所は
+# gem に聞く — インストールされていなければここで止まる方がよい (先へ進むと
+# 「今日は更新されなかった」ことに気付けない)
+BUILD=$(gem contents ddbj_validator 2>/dev/null | grep '/exe/ddbj-validator-build-taxonomy$' || true)
+
+if [ -z "$BUILD" ]; then
+  LOG 'ddbj-validator-build-taxonomy not found — gem install ddbj_validator'
+  exit 1
+fi
+
 LOG 'generate sqlite'
-ddbj-validator-build-taxonomy "$WORK_DIR" "$WORK_DIR/taxonomy.sqlite3"
+ruby "$BUILD" "$WORK_DIR" "$WORK_DIR/taxonomy.sqlite3"
 
 # 出来上がってから置く。作りかけのファイルを配布側に見せない
 LOG 'publish'

@@ -141,7 +141,7 @@ WebMock が `allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub`
 
 | データ | 作り方 | 更新 | 置き場所 |
 |---|---|---|---|
-| **taxonomy** | `data_updater/taxonomy/generate.rb`（taxdump → SQLite） | 日次 | ホストが配置（`taxonomy_db`） |
+| **taxonomy** | `ddbj-validator-build-taxonomy`（gem の実行ファイル） | 日次 | ホストが配置（`taxonomy_db`） |
 | BioSample パッケージ定義 | `data_updater/package_definitions/`（下記） | 版が増えたとき | gem に同梱 |
 | `conf/pub` / `conf/coll_dump` | 外部 | — | bind mount |
 
@@ -168,19 +168,32 @@ bin/deploy_tools/update_taxonomy_db_staging1.sh                 # 各インス�
 `DDBJValidator::Error`（作り直しが要る＝リトライしても直らない）で落ちる。
 
 `build.sh` はサイト固有のパスを与えるラッパで、共有ディスクのどこに taxdump があるかは
-`data_updater/paths.sh` に書いてある。**チェックアウトすればそのまま動く**（以前は `.env`
-を作る必要があった）。パッケージ定義の生成器は gem に入れていない — あちらが作るのは
-gem に同梱される中身そのもので、走らせるのはこのリポジトリの管理者だけ。
+`data_updater/paths.sh` に書いてある（以前は `.env` を作る必要があった）。
+**ただし a012 には gem のインストールが要る** — 生成そのものは実行ファイルがやるので、
+チェックアウトだけでは動かない。`build.sh` は `gem contents` で場所を引き、見つからなければ
+そこで止まる（先へ進むと「今日は更新されなかった」ことに気付けない）。
 
-`build.sh` は `generate.rb`（約 8 分・1.1GB）を包んで、出来上がってから置く。配布側の
+パッケージ定義の生成器は gem に入れていない — あちらが作るのは gem に同梱される中身
+そのもので、走らせるのはこのリポジトリの管理者だけ。
+
+`build.sh` は実行ファイル（約 8 分・1.1GB）を包んで、出来上がってから置く。配布側の
 `update_taxonomy_db` は **コンテナを止めない** — copy して mv するだけ。同一ファイル
 システム内なので切り替えは atomic で、検証中のプロセスは古い inode を掴んだまま最後まで
 一貫した taxonomy を見て、次の検証から新しい方を開く。
 
-`verify.rb` は NCBI が別途配っている `taxidlineage.dmp` / `rankedlineage.dmp` と
-突き合わせる（674 万件）。**同じ計算を二度するのではなく、NCBI の答えと比べている**
-のが要点。new_taxdump は検証にしか使わない — 祖先は親子関係から計算できるので、
-運用側が取得するファイルを増やす理由がない。
+`ddbj-validator-verify-taxonomy` は NCBI が別途配っている `taxidlineage.dmp` /
+`rankedlineage.dmp` と突き合わせる。**同じ計算を二度するのではなく、NCBI の答えと
+比べている**のが要点。new_taxdump は検証にしか使わない — 祖先は親子関係から計算できる
+ので、運用側が取得するファイルを増やす理由がない。
+
+**taxdump に有って DB に無い taxon は既定で失敗にする。** 黙って飛ばすと、public 版で
+作った DB を private 版と突き合わせたときに、足りない 45 万件が全部「対象外」になって
+OK が出てしまう — この検証が捕まえるべき事故そのもの。テスト用の部分集合を確かめる
+ときだけ `--subset` を付ける。
+
+配布側 (`update_taxonomy_db`) も置く前に `meta.schema_version` を照合する。読む側の
+確認は開くときなので、そこで弾かれると**配った後**に全検証が落ちる（作り直しが要るので
+`retry_on` も効かない）。古いままの方がまだ答えられる。
 
 **差し替えは新しいファイルを開くだけ。停止も再起動も要らない。** 以前は
 `virtuoso.db` を日次でビルドして 2 系統を順に再起動しており、そのたびに窓ができていた。
@@ -298,8 +311,8 @@ taxdump が親子関係を直接持っている。`search_taxid_from_fuzzy_name`
 ### パッケージ定義の作り直し
 
 `data_updater/package_definitions/` に生成・検証・使い捨て Virtuoso 一式がある。
-新しい版が出たら `.ttl.gz` を足して `generate.rb` → `verify.rb`。**実行時に Virtuoso は
-要らない。**
+新しい版が出たら `.ttl.gz` を足して `generate.rb` → `verify.rb`（こちらは gem に入れて
+いないのでリポジトリ内で走らせる）。**実行時に Virtuoso は要らない。**
 
 1.2.1 以前の 6 版は**別世代のオントロジー**（識別子が `Generic_v1.1`、`envPackage` や
 `display_order` を持たない）で、`package_list` 以下すべてが 0 行を返す。同梱対象は

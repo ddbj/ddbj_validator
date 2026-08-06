@@ -8,8 +8,8 @@ module DDBJValidator
   # ではなかった。ファイルにしたことで、差し替えは「新しいファイルを開く」で済み、
   # 停止も再起動も要らなくなった (経緯は CLAUDE.md)。
   #
-  # 作り方は data_updater/taxonomy/。ホストが配置したファイルのパスを
-  # DDBJValidator.taxonomy_db に渡す。
+  # 作り方は gem の実行ファイル ddbj-validator-build-taxonomy。ホストが配置した
+  # ファイルのパスを DDBJValidator.taxonomy_db に渡す。
   class TaxonomyDb
     # 表の定義は読む側と同じ場所に置く。作るのは exe/ddbj-validator-build-taxonomy で、
     # 同じ gem に入っているので、書いた形と読む形がずれない。
@@ -167,6 +167,8 @@ module DDBJValidator
         found = opened.get_first_value("SELECT value FROM meta WHERE key = 'schema_version'")
 
         unless found == SCHEMA_VERSION
+          opened.close
+
           raise DDBJValidator::Error,
                 "taxonomy database was built for schema #{found.inspect}, this gem reads #{SCHEMA_VERSION.inspect}: #{@path}"
         end

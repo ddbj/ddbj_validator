@@ -1,19 +1,29 @@
 #!/usr/bin/env ruby
-# generate.rb が作った SQLite を、NCBI が別途配っている答えと突き合わせる。
+# ddbj-validator-build-taxonomy が作った SQLite を、NCBI が別途配っている答えと
+# 突き合わせる。
 #
-#   ddbj-validator-verify-taxonomy <taxonomy.sqlite3> <new_taxdump-dir>
+#   ddbj-validator-verify-taxonomy <taxonomy.sqlite3> <new_taxdump-dir> [--subset]
 #
 # new_taxdump には taxidlineage.dmp があり、各 tax_id の祖先が展開済みで入っている。
 # こちらは nodes.dmp の親子関係から祖先を辿るので、両者が一致すれば「辿り方」に
 # 誤りが無いと言える — 同じ計算を二度するのではなく、NCBI の計算結果と比べている。
 #
 # rankedlineage.dmp があれば scientific_name の突き合わせにも使う。
+#
+# **既定では取りこぼしを失敗として扱う。** taxdump に有って DB に無い taxon を
+# 「対象外」として黙って飛ばすと、この検証の主目的が消える — public 版で作った DB を
+# private 版の new_taxdump と突き合わせれば、足りない 45 万件が全部「対象外」になって
+# OK が出てしまう。それはまさにこの検証が捕まえるべき事故。
+#
+# テスト用に切り出した部分集合を確かめたいときだけ --subset を付ける。
 require 'set'
 require 'sqlite3'
 
+subset = ARGV.delete('--subset')
+
 database, new_taxdump_dir = ARGV
 
-abort "usage: #{$0} <taxonomy.sqlite3> <new_taxdump-dir>" unless database && new_taxdump_dir
+abort "usage: #{$0} <taxonomy.sqlite3> <new_taxdump-dir> [--subset]" unless database && new_taxdump_dir
 
 lineage_dmp = File.join(new_taxdump_dir, 'taxidlineage.dmp')
 ranked_dmp  = File.join(new_taxdump_dir, 'rankedlineage.dmp')
@@ -37,7 +47,7 @@ exists    = db.prepare('SELECT 1 FROM taxa WHERE tax_id = ?')
 
 lineage_checked = 0
 name_checked    = 0
-skipped         = 0
+absent          = Set.new
 mismatched      = []
 
 warn 'taxidlineage.dmp と祖先を突き合わせ中'
@@ -46,9 +56,9 @@ File.foreach(lineage_dmp) do |line|
   tax_id, lineage = line.delete_suffix("\t|\n").split("\t|\t")
 
   # このファイルに無い tax_id は比べようがない。取得時点が違えば片方にしか無いものが
-  # 出るし、テスト用に切り出した部分集合を確かめることもある。数えて見えるようにする
+  # 出る。ただし黙って飛ばすと取りこぼしを見逃すので、最後に数で判断する
   if exists.execute(tax_id.to_i).first.nil?
-    skipped += 1
+    absent << tax_id.to_i
     next
   end
 
@@ -65,7 +75,6 @@ File.foreach(lineage_dmp) do |line|
 end
 
 statement.close
-exists.close
 
 if File.exist?(ranked_dmp)
   warn 'rankedlineage.dmp と scientific_name を突き合わせ中'
@@ -75,12 +84,14 @@ if File.exist?(ranked_dmp)
   File.foreach(ranked_dmp) do |line|
     tax_id, name, * = line.delete_suffix("\t|\n").split("\t|\t")
 
-    stored = select.execute(tax_id.to_i).first&.first
-
-    if stored.nil?
-      skipped += 1
+    # 行が無いのと、行はあるが scientific_name が NULL なのは別。後者は names.dmp が
+    # 途中で切れたときに起きる、まさに捕まえたい壊れ方なので不一致として扱う
+    if exists.execute(tax_id.to_i).first.nil?
+      absent << tax_id.to_i
       next
     end
+
+    stored = select.execute(tax_id.to_i).first&.first
 
     name_checked += 1
 
@@ -90,12 +101,26 @@ if File.exist?(ranked_dmp)
   select.close
 end
 
+exists.close
+
 db.close
 
+# 取りこぼしの許容量。取得時点の差で片方にしか無いものは出るが、それは数百件の桁。
+# 45 万件が欠けるような取り違えはここで止める
+ALLOWED_ABSENT_RATIO = 0.001
+
+total   = lineage_checked + absent.size
+allowed = subset || absent.size <= total * ALLOWED_ABSENT_RATIO
+
+unless allowed
+  mismatched << format('taxdump に有って DB に無い taxon が %d 件 (%.1f%%) — 別の taxdump から作られた可能性がある。部分集合を確かめるなら --subset',
+                       absent.size, 100.0 * absent.size / total)
+end
+
 if mismatched.empty?
-  warn "OK: 祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件が一致 (このファイルに無い #{skipped} 件は対象外)"
+  warn "OK: 祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件が一致 (DB に無い #{absent.size} 件は対象外)"
 else
-  warn "NG: #{mismatched.size} 件 (祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件を確認、#{skipped} 件は対象外)"
+  warn "NG: #{mismatched.size} 件 (祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件を確認、DB に無い #{absent.size} 件)"
   mismatched.first(20).each { warn "  #{it}" }
   exit 1
 end

@@ -5,7 +5,7 @@
 #
 # 元は本番 Virtuoso から SSH トンネル越しに TTL を抜いていた (旧
 # test/fixtures/virtuoso/extract_taxonomy.rb)。taxonomy がファイルになったので、
-# data_updater/taxonomy/generate.rb が作ったものから切り出すだけで済む。
+# ddbj-validator-build-taxonomy が作ったものから切り出すだけで済む。
 require 'set'
 require 'sqlite3'
 

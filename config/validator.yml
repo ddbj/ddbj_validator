@@ -12,7 +12,7 @@ development: &dev
   <<: *default
   api_log:
     path: logs
-  # NCBI taxdump から作った SQLite (data_updater/taxonomy/generate.rb)。
+  # NCBI taxdump から作った SQLite (ddbj-validator-build-taxonomy)。
   # 337 万件・日次更新なので gem には同梱せず、ホストが配置したものを読む
   taxonomy_db: <%= ENV.fetch('TAXONOMY_DB', 'tmp/taxonomy.sqlite3') %>
   ddbj_rdb:

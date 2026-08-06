@@ -26,6 +26,17 @@ if [ ! -f "$SOURCE" ]; then
   exit 1
 fi
 
+# 読む側は開くときにスキーマの版を確かめるが、そこで弾かれると**配った後**に全ての検証が
+# 落ちる (作り直しが要るので retry_on も効かない)。配る前に確かめれば、古いままの方が
+# まだ答えられる
+EXPECTED=$(ruby -e 'require "ddbj_validator"; print DDBJValidator::TaxonomyDb::SCHEMA_VERSION')
+FOUND=$(sqlite3 "$SOURCE" "SELECT value FROM meta WHERE key = 'schema_version'")
+
+if [ "$FOUND" != "$EXPECTED" ]; then
+  LOG "schema mismatch: built for '$FOUND', this gem reads '$EXPECTED' — not publishing"
+  exit 1
+fi
+
 # 途中まで書かれたファイルを DEST に見せないよう、コピーしてから rename する
 LOG 'copy'
 cp "$SOURCE" "$DEST.new"

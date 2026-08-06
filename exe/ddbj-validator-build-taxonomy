@@ -20,6 +20,7 @@
 # (詳細は CLAUDE.md)。1 日 1 回まとめて入れ替えて以降は読むだけ、という形は
 # SQLite のファイル 1 つで足りる。
 require 'digest'
+require 'sqlite3' # gem 本体を require すれば入るが、それは他の gem 経由の偶然に依存する
 
 require 'ddbj_validator'
 
