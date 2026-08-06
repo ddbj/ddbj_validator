@@ -12,10 +12,9 @@ development: &dev
   <<: *default
   api_log:
     path: logs
-  sparql_endpoint:
-    master_endpoint: <%= ENV.fetch('VIRTUOSO_ENDPOINT_MASTER', 'http://localhost:8890/sparql') %>
-  named_graph_uri:
-    taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy
+  # NCBI taxdump から作った SQLite (data_updater/taxonomy/generate.rb)。
+  # 337 万件・日次更新なので gem には同梱せず、ホストが配置したものを読む
+  taxonomy_db: <%= ENV.fetch('TAXONOMY_DB', 'tmp/taxonomy.sqlite3') %>
   ddbj_rdb:
     pg_host:    <%= ENV.fetch('PGHOST', 'localhost') %>
     pg_port:    <%= ENV.fetch('PGPORT', 5432) %>
@@ -27,10 +26,8 @@ development: &dev
 
 test:
   <<: *dev
-  # compose.dev.yaml で立ち上がる Virtuoso / Postgres を必ず指す。
-  # Postgres は dev と port が衝突しないよう 15432 にずらしてある。
-  sparql_endpoint:
-    master_endpoint: http://localhost:8890/sparql
+  # compose.dev.yaml で立ち上がる Postgres を必ず指す。dev と port が衝突しないよう
+  # 15432 にずらしてある。taxonomy は test_helper が fixture を指す
   ddbj_rdb:
     pg_host:    localhost
     pg_port:    15432
@@ -42,10 +39,7 @@ staging:
   <<: *default
   api_log:
     path: /rails/logs
-  sparql_endpoint:
-    master_endpoint: http://virtuoso:8890/sparql
-  named_graph_uri:
-    taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy-private
+  taxonomy_db: /rails/shared/taxonomy.sqlite3
   ddbj_rdb:
     pg_host:    172.19.15.12
     pg_port:    54301
@@ -59,10 +53,7 @@ production:
   <<: *default
   api_log:
     path: /rails/logs
-  sparql_endpoint:
-    master_endpoint: http://virtuoso:8890/sparql
-  named_graph_uri:
-    taxonomy: http://ddbj.nig.ac.jp/ontologies/taxonomy-private
+  taxonomy_db: /rails/shared/taxonomy.sqlite3
   ddbj_rdb:
     pg_host:    172.19.15.11
     pg_port:    54301

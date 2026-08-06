@@ -15,6 +15,7 @@ end
 # しまい、しかもキャッシュは外れても答えは正しいので気付けない。
 Rails.application.config.after_initialize do
   DDBJValidator.template_dir = Rails.root.join('public/template')
+  DDBJValidator.taxonomy_db  = -> { Rails.configuration.validator['taxonomy_db'] }
 
   DDBJValidator.config = -> { Rails.configuration.validator }
   DDBJValidator.cache  = -> { Rails.cache }

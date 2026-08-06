@@ -42,7 +42,7 @@ module DDBJValidator
       @date_format       = DateFormat.new(@conf)
       @validation_config = @conf[:validation_config]
       @xml_convertor     = XmlConvertor.new
-      @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
+      @org_validator     = OrganismValidator.new
       @institution_list  = CollDump.parse(@conf[:institution_list_file])
       @tsv_validator     = TsvColumnValidator.new
       @package_defs      = PackageDefinitions.new

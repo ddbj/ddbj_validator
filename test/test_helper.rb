@@ -13,6 +13,10 @@ WebMock.disable_net_connect!(allow_localhost: true)
 ENV['PUB_DIR']        ||= File.expand_path('fixtures/conf/pub',                   __dir__)
 ENV['COLL_DUMP_FILE'] ||= File.expand_path('fixtures/conf/coll_dump/coll_dump.txt', __dir__)
 
+# taxonomy はホストが配置する 1GB のファイル。テストではテスト用の tax_id とその祖先だけを
+# 抜き出した小さなものを見る (test/fixtures/taxonomy/extract.rb が作る)
+DDBJValidator.taxonomy_db = File.expand_path('fixtures/taxonomy/taxonomy.sqlite3', __dir__)
+
 # webmock/minitest は各テスト完了後に stub を reset するので、default stub を
 # 個別 setup 前に都度貼り直すモジュールを Minitest::Test に挟み込む
 module DefaultHttpStubs

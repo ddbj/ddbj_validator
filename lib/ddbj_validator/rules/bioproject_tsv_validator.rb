@@ -17,7 +17,7 @@ module DDBJValidator
       @validation_config = @conf[:validation_config]
       @json_schema       = JSON.parse(conf_dir.join('schema.json').read)
       @tsv_validator     = TsvFieldValidator.new
-      @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
+      @org_validator     = OrganismValidator.new
       @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @error_list        = []
     end

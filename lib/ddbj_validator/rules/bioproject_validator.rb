@@ -15,7 +15,7 @@ module DDBJValidator
       @conf[:xsd_path]          = conf_dir.join('xsd/Package.xsd').to_s
 
       @validation_config = @conf[:validation_config]
-      @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
+      @org_validator     = OrganismValidator.new
       @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @error_list        = []
     end

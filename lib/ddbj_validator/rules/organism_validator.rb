@@ -1,17 +1,11 @@
-require 'erb'
-
 module DDBJValidator
   #
   # A class for BioSample validation that is relevant organism
   #
-  class OrganismValidator < SPARQLBase
-    # クラス読み込み時に app/sparql/biosample/*.rq.erb を ERB コンパイルしてキャッシュする。
-    SPARQL = DDBJValidator.sparql_dir.glob('biosample/*.rq.erb').to_h {|path|
-      [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
-    }.freeze
-
-    TAX_GRAPH_URI = 'http://ddbj.nig.ac.jp/ontologies/taxonomy'
-
+  # taxonomy の問い合わせは TaxonomyDb (NCBI taxdump から作った SQLite) が受ける。
+  # 以前は Virtuoso に SPARQL を投げていた。
+  #
+  class OrganismValidator
     TAX_INVALID = '-1' # invalid id
     TAX_ROOT = '1' # root
     TAX_BACTERIA = '2' # bacteria
@@ -37,9 +31,8 @@ module DDBJValidator
     # ==== Args
     # endpoint: endpoint url
     #
-    def initialize (endpoint, tax_graph_uri = nil)
-      super(endpoint)
-      @tax_graph_uri = tax_graph_uri || TAX_GRAPH_URI
+    def initialize (taxonomy = TaxonomyDb.new)
+      @taxonomy = taxonomy
     end
 
     #
@@ -51,10 +44,7 @@ module DDBJValidator
     # true/false
     #
     def exist_organism_name? (organism_name)
-      params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:get_taxid_from_name].result_with_hash(params)
-      result = query(sparql_query)
-      !result.empty?
+      @taxonomy.taxids_of_scientific_name(organism_name).any?
     end
 
     #
@@ -67,12 +57,7 @@ module DDBJValidator
     # if the parameter value isn't exist as synonym, returns the empty array.
     #
     def organism_name_of_synonym (synonym)
-      params = {synonym: synonym, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:organism_name_of_synonym].result_with_hash(params)
-      result = query(sparql_query)
-      result.map do |row|
-        row[:organism_name]
-      end
+      @taxonomy.scientific_names_of_other_name(synonym)
     end
 
     #
@@ -85,12 +70,7 @@ module DDBJValidator
     # if the parameter value isn't exist as organism(scientific) name, returns the empty array.
     #
     def get_taxid_from_name (organism_name)
-      params = {organism_name: organism_name, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:get_taxid_from_name].result_with_hash(params)
-      result = query(sparql_query)
-      result.map do |row|
-        row[:tax_no]
-      end
+      @taxonomy.taxids_of_scientific_name(organism_name)
     end
 
     #
@@ -103,14 +83,7 @@ module DDBJValidator
     # if the tax_id hasn't scientific name, returns nil
     #
     def get_organism_name(tax_id)
-      params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:get_organism_name].result_with_hash(params)
-      result = query(sparql_query)
-      if result.empty?
-        nil
-      else
-        result.first[:organism_name]
-      end
+      @taxonomy.scientific_name(tax_id)
     end
 
     #
@@ -128,13 +101,10 @@ module DDBJValidator
     # *tax_type: "taxon" or "dummy taxon"
     #
     def search_tax_from_name_ignore_case(organism_name)
-      # 特殊文字のエスケープ https://www.w3.org/TR/sparql11-query/#grammarEscapes
-      organism_name = organism_name.gsub("\t", '\\t').gsub("\n", '\\n').gsub("\r", '\\r').gsub("\b", '\\b').gsub("\f", '\\f')
-      organism_name_txt_search = organism_name.gsub("'", "\\\\'").gsub('"', '').gsub('*', '')
-      organism_name = organism_name.gsub("'", "\\\\'").gsub('"', '\\\\\\\\\"')
-      params = {organism_name: organism_name, organism_name_txt_search: organism_name_txt_search, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:search_taxid_from_fuzzy_name].result_with_hash(params)
-      result = query(sparql_query)
+      # ここにあった特殊文字のエスケープは、検索語を SPARQL のクエリ文字列に埋め込んで
+      # いたためのもの。引用符やタブを含む名前は、埋め込む前に書き換えられていたので
+      # そもそも一致しようがなかった。今は値として束縛するので、渡すのは投稿された文字列そのまま
+      @taxonomy.search_ignoring_case(organism_name)
     end
 
     #
@@ -184,13 +154,7 @@ module DDBJValidator
     # returns true if tax_id has the linage specified
     #
     def has_linage(tax_id, linages)
-      parent_tax_id = linages.map {|linage|
-        'id-tax:' + linage
-      }.join(' ')
-      params = {tax_id: tax_id, parent_tax_id: parent_tax_id, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:has_linage].result_with_hash(params)
-      result = query(sparql_query)
-      result.any?
+      @taxonomy.descendant_of?(tax_id, linages)
     end
 
     #
@@ -203,16 +167,8 @@ module DDBJValidator
     #
     def is_infraspecific_rank (tax_id)
       infraspecific_rank = ['Species', 'Subspecies', 'Varietas', 'Forma']
-      params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
       # いずれかのランク以下であるかを検証
-      result = []
-      infraspecific_rank.each do |rank|
-        params[:rank] = rank
-        sparql_query = SPARQL[:get_parent_rank].result_with_hash(params)
-        result = query(sparql_query)
-        break if result.any?
-      end
-      result.any?
+      infraspecific_rank.any? { @taxonomy.ancestor_of_rank(tax_id, it) }
     end
 
     #

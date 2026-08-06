@@ -13,9 +13,7 @@ module DDBJValidator
       setting = DDBJValidator.config
 
       {
-        sparql_config:   setting['sparql_endpoint'],
         ddbj_db_config:  setting['ddbj_rdb'],
-        named_graph_uri: setting['named_graph_uri'],
         biosample:       setting['biosample'],
         log_dir:         setting.dig('api_log', 'path')
       }

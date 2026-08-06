@@ -1,23 +1,12 @@
-# テスト/開発用の Virtuoso + Postgres (fixture 読み込み済み)。
-# 本番用 compose.yaml とは別の volume / graph で動く。
+# テスト/開発用の Postgres (fixture 読み込み済み)。
 #
 # 使い方:
 #   docker compose -f compose.dev.yaml up -d
-#   docker compose -f compose.dev.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 #   bin/rails test    # or  bin/rails server
+#
+# taxonomy は Virtuoso ではなく SQLite のファイルになったので、ここには無い
+# (テストは test/fixtures/taxonomy/ を見る)。
 services:
-  virtuoso:
-    image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
-    ports:
-      - '127.0.0.1:8890:8890'
-    environment:
-      DBA_PASSWORD: dba
-      VIRT_Parameters_DirsAllowed: '., /fixtures'
-      VIRT_Parameters_NumberOfBuffers: '170000'
-      VIRT_Parameters_MaxDirtyBuffers: '130000'
-    volumes:
-      - ./test/fixtures/virtuoso:/fixtures:ro
-
   postgres:
     image: postgres:18.3
     ports:

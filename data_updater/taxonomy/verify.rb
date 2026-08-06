@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+# generate.rb が作った SQLite を、NCBI が別途配っている答えと突き合わせる。
+#
+#   ruby data_updater/taxonomy/verify.rb <taxonomy.sqlite3> <new_taxdump-dir>
+#
+# new_taxdump には taxidlineage.dmp があり、各 tax_id の祖先が展開済みで入っている。
+# こちらは nodes.dmp の親子関係から祖先を辿るので、両者が一致すれば「辿り方」に
+# 誤りが無いと言える — 同じ計算を二度するのではなく、NCBI の計算結果と比べている。
+#
+# rankedlineage.dmp があれば scientific_name の突き合わせにも使う。
+require 'set'
+require 'sqlite3'
+
+database, new_taxdump_dir = ARGV
+
+abort "usage: #{$0} <taxonomy.sqlite3> <new_taxdump-dir>" unless database && new_taxdump_dir
+
+lineage_dmp = File.join(new_taxdump_dir, 'taxidlineage.dmp')
+ranked_dmp  = File.join(new_taxdump_dir, 'rankedlineage.dmp')
+
+abort "not found: #{lineage_dmp}" unless File.exist?(lineage_dmp)
+
+db = SQLite3::Database.new(database, readonly: true)
+
+# 親を辿って根までの祖先を返す。has_linage / get_parent_rank が使う辿り方そのもの
+ANCESTORS = <<~SQL
+  WITH RECURSIVE ancestor(tax_id) AS (
+    SELECT parent_tax_id FROM taxa WHERE tax_id = ?
+    UNION ALL
+    SELECT t.parent_tax_id FROM taxa t JOIN ancestor a ON t.tax_id = a.tax_id WHERE t.tax_id != 1
+  )
+  SELECT tax_id FROM ancestor
+SQL
+
+statement = db.prepare(ANCESTORS)
+
+checked    = 0
+mismatched = []
+
+warn 'taxidlineage.dmp と祖先を突き合わせ中'
+
+File.foreach(lineage_dmp) do |line|
+  tax_id, lineage = line.delete_suffix("\t|\n").split("\t|\t")
+
+  # NCBI の並びは根から順。こちらは自分の親から根へ遡るので、集合で比べる。
+  # 根 (1) は NCBI 側の一覧に含まれないので落とす
+  expected = lineage.to_s.split.map(&:to_i).reject { it == 1 }.to_set
+  actual   = statement.execute(tax_id.to_i).map { it.first }.reject { it == 1 }.to_set
+
+  checked += 1
+
+  next if expected == actual
+
+  mismatched << "#{tax_id}: NCBI のみ #{(expected - actual).to_a.first(5).inspect} / こちらのみ #{(actual - expected).to_a.first(5).inspect}"
+end
+
+statement.close
+
+if File.exist?(ranked_dmp)
+  warn 'rankedlineage.dmp と scientific_name を突き合わせ中'
+
+  select = db.prepare('SELECT scientific_name FROM taxa WHERE tax_id = ?')
+
+  File.foreach(ranked_dmp) do |line|
+    tax_id, name, * = line.delete_suffix("\t|\n").split("\t|\t")
+
+    stored = select.execute(tax_id.to_i).first&.first
+
+    checked += 1
+
+    mismatched << "#{tax_id}: scientific_name が #{name.inspect} でなく #{stored.inspect}" unless stored == name
+  end
+
+  select.close
+end
+
+db.close
+
+if mismatched.empty?
+  warn "OK: #{checked} 件が一致"
+else
+  warn "NG: #{mismatched.size} 件 (確認 #{checked} 件)"
+  mismatched.first(20).each { warn "  #{it}" }
+  exit 1
+end

@@ -170,11 +170,17 @@ module DDBJValidator
     # web concern rather than a rule one — `Package#attribute_template_file`
     # is reached only from the API. A host that never serves them never
     # needs to set it.
-    attr_writer :conf_dir, :sparql_dir, :template_dir
+    attr_writer :conf_dir, :template_dir
 
     def conf_dir     = resolve(@conf_dir)     { ROOT.join('conf') }
-    def sparql_dir   = resolve(@sparql_dir)   { ROOT.join('lib/ddbj_validator/sparql') }
     def template_dir = resolve(@template_dir) { ROOT.join('public/template') }
+
+    # NCBI taxdump から作った SQLite の置き場所。337 万件あって日次で入れ替わるので
+    # gem には同梱せず、ホストが配置したものを読む (`conf/pub` と同じ扱い)。
+    # 作り方は data_updater/taxonomy/。
+    attr_writer :taxonomy_db
+
+    def taxonomy_db = resolve(@taxonomy_db) { raise 'DDBJValidator.taxonomy_db is not set — see data_updater/taxonomy/' }
 
     # Endpoints, credentials and per-database settings — the shape
     # `config/validator.yml` produces. Required: the host has to say where
@@ -210,8 +216,6 @@ module DDBJValidator
     'metabobank_idf_validator'  => 'MetaboBankIdfValidator',
     'metabobank_sdrf_validator' => 'MetaboBankSdrfValidator',
     'ddbj_db_validator'         => 'DDBJDbValidator',
-    'sparql'                    => 'SPARQL',
-    'sparql_base'               => 'SPARQLBase',
     'excel2tsv'                 => 'Excel2Tsv'
   }.freeze
 

@@ -1,0 +1,134 @@
+#!/usr/bin/env ruby
+# NCBI taxdump から taxonomy の SQLite を作る。
+#
+#   ruby data_updater/taxonomy/generate.rb <taxdump-dir> <output.sqlite3>
+#
+# taxdump-dir には nodes.dmp と names.dmp があればよい。**public 版ではなく
+# private FTP 版を使うこと** — 未公開の生物種を含むぶん 45 万件多く、本番の
+# グラフ (3,370,787 taxa) はそちらから作られている。
+#
+# これまで taxonomy は日次でビルドした virtuoso.db として配られ、利用側は差し替えの
+# たびに Virtuoso を止めて再起動していた。中身は NCBI taxdump の再エンコードで、
+# 検証が投げる 6 本のクエリが聞いているのは taxdump の列そのものだった
+# (詳細は CLAUDE.md)。1 日 1 回まとめて入れ替えて以降は読むだけ、という形は
+# SQLite のファイル 1 つで足りる。
+require 'digest'
+require 'sqlite3'
+
+SCHEMA = <<~SQL
+  CREATE TABLE taxa (
+    tax_id          INTEGER PRIMARY KEY,
+    parent_tax_id   INTEGER NOT NULL,
+    rank            TEXT    NOT NULL,
+    scientific_name TEXT
+  );
+
+  CREATE TABLE names (
+    tax_id     INTEGER NOT NULL,
+    name       TEXT    NOT NULL,
+    name_class TEXT    NOT NULL,
+    -- 大文字小文字を無視した一致は Ruby の downcase で畳んだ列を引く。SQLite の
+    -- NOCASE は ASCII しか畳まないので、照合順序に任せると読み書きで規則がずれる
+    name_lower TEXT    NOT NULL
+  );
+
+  -- ファイル自身が「どの taxdump から作られたか」を持つ。アプリから見て今どの
+  -- taxonomy を読んでいるのかが分かるので、キャッシュのキーに混ぜられる
+  CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+SQL
+
+INDEXES = [
+  'CREATE INDEX names_on_name       ON names (name)',
+  'CREATE INDEX names_on_name_lower ON names (name_lower)',
+  'CREATE INDEX names_on_tax_id     ON names (tax_id)'
+].freeze
+
+# taxdump の rank ("species group") を、これまで RDF 側で使っていた語彙
+# ("SpeciesGroup") に合わせる。検証側は 'Species' のような形で問い合わせる。
+#
+# taxdump2owl は 45 件の対応表を持っていたが、単語ごとに capitalize して連結する
+# 規則が 45 件すべてを再現する。表を写さず規則にしてあるのは、NCBI が後から足した
+# rank (domain / realm / cellular root / acellular root) が表から漏れていて、
+# RDF 側ではそれらが壊れた URI になっていたため
+def rank_class (rank) = rank.split(' ').map(&:capitalize).join
+
+def each_dmp_row (path)
+  File.foreach(path) do |line|
+    yield line.delete_suffix("\t|\n").split("\t|\t")
+  end
+end
+
+taxdump_dir, output = ARGV
+
+abort "usage: #{$0} <taxdump-dir> <output.sqlite3>" unless taxdump_dir && output
+
+nodes = File.join(taxdump_dir, 'nodes.dmp')
+names = File.join(taxdump_dir, 'names.dmp')
+
+[nodes, names].each { abort "not found: #{it}" unless File.exist?(it) }
+
+File.delete(output) if File.exist?(output)
+
+db = SQLite3::Database.new(output)
+
+# 作っている間だけの設定。読む側には関係がない
+db.execute_batch(<<~SQL)
+  PRAGMA journal_mode = OFF;
+  PRAGMA synchronous  = OFF;
+  PRAGMA cache_size   = -200000;
+SQL
+
+db.execute_batch(SCHEMA)
+
+warn 'nodes.dmp'
+
+db.transaction do
+  insert = db.prepare('INSERT INTO taxa (tax_id, parent_tax_id, rank) VALUES (?, ?, ?)')
+
+  each_dmp_row(nodes) do |tax_id, parent_tax_id, rank, *|
+    insert.execute(tax_id.to_i, parent_tax_id.to_i, rank_class(rank))
+  end
+
+  insert.close
+end
+
+warn 'names.dmp'
+
+db.transaction do
+  insert = db.prepare('INSERT INTO names (tax_id, name, name_class, name_lower) VALUES (?, ?, ?, ?)')
+
+  each_dmp_row(names) do |tax_id, name, _unique_name, name_class|
+    insert.execute(tax_id.to_i, name, name_class, name.downcase)
+  end
+
+  insert.close
+end
+
+# 索引を先に作る。次の UPDATE は taxa の各行から names を引く相関サブクエリなので、
+# 索引が無いと 337 万回 × 540 万行の全走査になり、事実上終わらない
+warn 'indexes'
+
+INDEXES.each { db.execute(it) }
+
+# scientific name は tax_id ごとに 1 つで、引く頻度が高い。names を経由せず
+# 主キー引きで取れるようにしておく
+warn 'scientific_name'
+
+db.execute(<<~SQL)
+  UPDATE taxa
+  SET scientific_name = (SELECT name FROM names WHERE names.tax_id = taxa.tax_id AND name_class = 'scientific name')
+SQL
+
+# 入力の内容そのものから決まる id。日付ではなく中身に紐付くので、同じ taxdump から
+# 作り直せば同じ値になる
+digest = Digest::SHA256.new
+[nodes, names].sort.each {|path| File.open(path) {|f| digest << f.read(1 << 20) until f.eof? } }
+
+db.execute('INSERT INTO meta (key, value) VALUES (?, ?)', ['source_digest', digest.hexdigest])
+db.execute('INSERT INTO meta (key, value) VALUES (?, ?)', ['taxa_count', db.get_first_value('SELECT COUNT(*) FROM taxa').to_s])
+db.execute('INSERT INTO meta (key, value) VALUES (?, ?)', ['names_count', db.get_first_value('SELECT COUNT(*) FROM names').to_s])
+
+db.execute('VACUUM')
+db.close
+
+warn "wrote #{output} (#{(File.size(output) / 1024.0 / 1024).round(1)} MB)"

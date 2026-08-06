@@ -36,6 +36,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'pg'
   spec.add_dependency 'roo'
+  # taxonomy は日次で入れ替わる 337 万件で、gem には同梱しない。ホストが配置した
+  # ファイルを読むだけなので、必要なのは読み取り専用の SQLite クライアント
+  spec.add_dependency 'sqlite3'
   # roo 経由でしか入っていなかった。壊れた xlsx に対して上がるのは Zip::Error なので、
   # ここで宣言していないと roo の依存が変わった日に rescue が黙って効かなくなる
   spec.add_dependency 'rubyzip'

@@ -4,8 +4,7 @@ require 'test_helper'
 
 class TestOrganismValidator < ActiveSupport::TestCase
   def setup
-    setting = Rails.configuration.validator
-    @validator = DDBJValidator::OrganismValidator.new(setting['sparql_endpoint']['master_endpoint'], setting['named_graph_uri']['taxonomy'])
+    @validator = DDBJValidator::OrganismValidator.new
   end
 
   def test_get_organism_name

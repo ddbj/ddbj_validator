@@ -17,7 +17,7 @@ module DDBJValidator
       @conf[:bs_null_accepted]           = JSON.parse(DDBJValidator.conf_dir.join('biosample/null_accepted.json').read)
 
       @validation_config = @conf[:validation_config]
-      @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
+      @org_validator     = OrganismValidator.new
       @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @error_list        = []
     end
