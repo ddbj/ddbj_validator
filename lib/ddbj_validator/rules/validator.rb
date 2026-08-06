@@ -18,30 +18,31 @@ module DDBJValidator
       end
 
       # Executes validation
-      # エラーが発生した場合はエラーメッセージを表示して終了する
       # @param [Hash] params {biosample:"XXXX.xml", bioproject:"YYYY.xml", .., output:"ZZZZ.json"}
-      # @return [void]
+      # @return [String, nil] 結果JSON。検証できなかった場合は DDBJValidator::Error を上げる
       def execute(params)
+        # running/ 配下のファイル数が実行中の検証の数になる。例外で抜けたぶんを残さないよう ensure で消す
+        running_file = Tempfile.new(['validator-', '.tmp'], @running_dir)
+        running_file.close
+
         begin
           DDBJValidator.logger.info('execute validation:' + params.to_s)
-          running_file = Tempfile.new(['validator-', '.tmp'], @running_dir)
-          running_file.close
-
-          # get absolute file path and check permission
-          permission_error_list = []
 
           # excelファイルの場合は各シートをTSVに出力してからValidation実行
           unless params[:all_db].nil?
             filetypes = split_excel_sheet(params) # 分割されたfiletype(biosample/bioproject等)のリストを取得
-            if filetypes.nil? # ルール違反があった場合は結果JSONが出力されているのでそのまま返す
-              return
-            else # TSVに変換された場合はそのTSVファイルを validator 実行対象として加える(paramsにmerge)
-              filetypes.each do |filetype, path|
-                DDBJValidator.logger.info("splitted sheet validation: #{filetype} => #{path}")
-              end
-              params.merge!(filetypes)
+            return if filetypes.nil? # ルール違反があった場合は結果JSONが出力されているのでそのまま返す
+
+            # TSVに変換された場合はそのTSVファイルを validator 実行対象として加える(paramsにmerge)
+            filetypes.each do |filetype, path|
+              DDBJValidator.logger.info("splitted sheet validation: #{filetype} => #{path}")
             end
+
+            params.merge!(filetypes)
           end
+
+          # get absolute file path and check permission
+          permission_error_list = []
 
           params.each do |k, v|
             case k.to_s
@@ -60,40 +61,42 @@ module DDBJValidator
               end
             end
           end
+
           if permission_error_list.any?
-            DDBJValidator.logger.error("File not found or permision denied: #{permission_error_list.join(', ')}")
-            ret = {status: 'error', format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
-            JSON.generate(ret)
-            running_file.unlink
-            return
-          end
+            # 投稿ファイルはホストが保存したもの。読めない (または出力先に書けない) のは
+            # ホスト側の問題であって投稿者への指摘ではないので、検証結果にはしない。
+            # 出力先が書けないケースがあるので result.json に書くこともできない
+            message = "File not found or permission denied: #{permission_error_list.join(', ')}"
 
-          # validate
-          ret = {}
-          error_list = []
-          error_list.concat(validate('biosample', params)) if !params[:biosample].nil?
-          error_list.concat(validate('bioproject', params)) if !params[:bioproject].nil?
-          error_list.concat(validate('jvar', params)) if !params[:jvar].nil?
-          error_list.concat(validate('trad', params)) if params[:trad_anno] || params[:trad_seq] || params[:trad_agp]
-          error_list.concat(validate('metabobank_idf', params)) if !params[:metabobank_idf].nil?
-          error_list.concat(validate('metabobank_sdrf', params)) if !params[:metabobank_sdrf].nil?
-          # error_list.concat(validate("combination", params))
-          # TODO dra validator
+            DDBJValidator.logger.error(message)
 
-          if error_list.empty?
-            ret = {version: @latest_version, validity: true}
-            ret['stats']  = get_result_stats(error_list)
-            ret['messages'] = []
-            DDBJValidator.logger.info('validation result: ' + 'success')
+            raise DDBJValidator::Error, message
           else
-            ret = {version: @latest_version, validity: true}
+            error_list = []
+            error_list.concat(validate('biosample', params)) if !params[:biosample].nil?
+            error_list.concat(validate('bioproject', params)) if !params[:bioproject].nil?
+            error_list.concat(validate('jvar', params)) if !params[:jvar].nil?
+            error_list.concat(validate('trad', params)) if params[:trad_anno] || params[:trad_seq] || params[:trad_agp]
+            error_list.concat(validate('metabobank_idf', params)) if !params[:metabobank_idf].nil?
+            error_list.concat(validate('metabobank_sdrf', params)) if !params[:metabobank_sdrf].nil?
+            # error_list.concat(validate("combination", params))
+            # TODO dra validator
 
             stats = get_result_stats(error_list)
-            ret[:validity] = false if stats[:error_count] > 0
-            ret['stats'] = stats
+
+            ret = {version: @latest_version, validity: true}
+            ret[:validity]  = false if stats[:error_count] > 0
+            ret['stats']    = stats
             ret['messages'] = error_list
-            DDBJValidator.logger.info('validation result: ' + 'fail')
+
+            DDBJValidator.logger.info('validation result: ' + (error_list.empty? ? 'success' : 'fail'))
           end
+        rescue DDBJValidator::Error
+          # 設備に届かなかった、あるいは届いて断られた。データについては何も言っていないので
+          # result.json には書かず、そのまま呼び出し側へ渡す。ホストは EndpointUnavailable を
+          # retry_on し、QueryFailed は失敗として扱う
+          DDBJValidator.logger.error('validation aborted: the validation never ran')
+          raise
         rescue => ex
           DDBJValidator.logger.info('validation result: error')
           DDBJValidator.error.report(ex)
@@ -101,8 +104,10 @@ module DDBJValidator
         end
 
         atomic_write(params[:output], JSON.generate(ret))
-        running_file.unlink
         JSON.generate(ret)
+      ensure
+        # Tempfile.new 自体が失敗していれば nil。ここで NoMethodError を上げると本当の原因が隠れる
+        running_file&.unlink
       end
 
       def validate(object_type, params)

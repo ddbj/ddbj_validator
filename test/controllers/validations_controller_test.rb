@@ -7,9 +7,15 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
     @data_dir = Dir.mktmpdir('validator_data_test')
     @original_path = Rails.configuration.validator['api_log']['path']
     Rails.configuration.validator['api_log']['path'] = @data_dir
+
+    # 検証を同期実行に差し替える。detached thread のままだと teardown の rm_rf と競合して
+    # 結果を観測できず、スレッドの例外がテスト出力に漏れる
+    @original_runner = ValidationsController.background_runner
+    ValidationsController.background_runner = ->(&block) { block.call }
   end
 
   teardown do
+    ValidationsController.background_runner = @original_runner
     Rails.configuration.validator['api_log']['path'] = @original_path
     FileUtils.rm_rf(@data_dir)
   end
@@ -60,8 +66,47 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
     assert body['start_time']
 
     save_dir = File.join(@data_dir, body['uuid'][0..1], body['uuid'])
-    assert File.exist?(File.join(save_dir, 'status.json'))
     assert File.exist?(File.join(save_dir, 'biosample', 'biosample'))
+    assert_equal 'finished', JSON.parse(File.read(File.join(save_dir, 'status.json')))['status']
+  end
+
+  test 'POST /api/validation marks the status as error when the validation could not run' do
+    fake_validator = Object.new
+    def fake_validator.execute(_params)
+      raise DDBJValidator::EndpointUnavailable, 'Virtuoso is down'
+    end
+
+    DDBJValidator::Validator.stub :new, fake_validator do
+      post '/api/validation', params: {biosample: '<BioSampleSet/>'}
+    end
+
+    assert_response :success
+
+    uuid        = JSON.parse(response.body)['uuid']
+    status_json = JSON.parse(File.read(File.join(@data_dir, uuid[0..1], uuid, 'status.json')))
+
+    # running のまま残すとクライアントは終わらない検証をポーリングし続ける
+    assert_equal 'error', status_json['status']
+    assert_equal true, status_json['retryable']
+    # 例外メッセージには SPARQL クエリ全文や絶対パスが入るので外には出さない
+    refute status_json.key?('message')
+  end
+
+  test 'POST /api/validation marks a bug as not retryable' do
+    fake_validator = Object.new
+    def fake_validator.execute(_params)
+      raise DDBJValidator::QueryFailed, 'malformed query'
+    end
+
+    DDBJValidator::Validator.stub :new, fake_validator do
+      post '/api/validation', params: {biosample: '<BioSampleSet/>'}
+    end
+
+    uuid        = JSON.parse(response.body)['uuid']
+    status_json = JSON.parse(File.read(File.join(@data_dir, uuid[0..1], uuid, 'status.json')))
+
+    assert_equal 'error', status_json['status']
+    assert_equal false, status_json['retryable']
   end
 
   test 'GET /api/validation/:uuid returns the merged status + result' do
@@ -82,6 +127,23 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :bad_request
     assert_equal 'Validation process has not finished yet', JSON.parse(response.body)['message']
+  end
+
+  test 'GET /api/validation/:uuid returns 500 when the validation could not run' do
+    # 設備障害で中断した場合は result.json 自体が無い
+    uuid = stage_validation(status: 'error')
+
+    get "/api/validation/#{uuid}"
+
+    assert_response :internal_server_error
+  end
+
+  test 'GET /api/validation/:uuid returns 503 when the validation can be retried' do
+    uuid = stage_validation(status: 'error', retryable: true)
+
+    get "/api/validation/#{uuid}"
+
+    assert_response :service_unavailable
   end
 
   test 'GET /api/validation/:uuid/status returns the status JSON' do
@@ -129,12 +191,12 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
-  def stage_validation(status:, result: nil)
+  def stage_validation(status:, result: nil, retryable: nil)
     uuid     = SecureRandom.uuid
     save_dir = File.join(@data_dir, uuid[0..1], uuid)
     FileUtils.mkdir_p(save_dir)
     File.write(File.join(save_dir, 'status.json'),
-               JSON.generate({uuid: uuid, status: status, start_time: Time.now}))
+               JSON.generate({uuid: uuid, status: status, retryable: retryable, start_time: Time.now}))
     File.write(File.join(save_dir, 'result.json'), JSON.generate(result)) if result
     uuid
   end

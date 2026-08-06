@@ -1,6 +1,10 @@
 require 'securerandom'
 
 class ValidationsController < ApplicationController
+  # 検証は uuid を即返してバックグラウンドで走らせる。差し替え可能にしてあるのはテストが
+  # 同期実行するため — detached thread のままだと teardown と競合して結果を観測できない。
+  cattr_accessor :background_runner, default: ->(&block) { Thread.new(&block) }
+
   def create
     uuid       = SecureRandom.uuid
     save_dir   = File.join(data_dir, uuid[0..1], uuid)
@@ -30,12 +34,9 @@ class ValidationsController < ApplicationController
 
     write_status_file(status_file_path, {uuid: uuid, status: 'running', start_time: start_time})
 
-    Thread.new {
-      DDBJValidator::Validator.new.execute(validation_params)
-      result = JSON.parse(File.read(output_file_path))
-      final  = result['status'] == 'error' ? 'error' : 'finished'
-      write_status_file(status_file_path, {uuid: uuid, status: final, start_time: start_time, end_time: Time.now})
-    }
+    background_runner.call do
+      run_validation(validation_params, status_file_path, uuid: uuid, start_time: start_time)
+    end
 
     render json: {uuid: uuid, status: 'accepted', start_time: start_time}
   end
@@ -47,21 +48,19 @@ class ValidationsController < ApplicationController
 
     status_json = JSON.parse(File.read(status_file_path))
 
-    begin
-      result = JSON.parse(File.read(output_file_path))
-    rescue Errno::ENOENT
-      if status_json['status'] == 'running'
-        render_error('Validation process has not finished yet', status: :bad_request)
-      else
-        render_error('Validation not found', status: :not_found)
-      end
-      return
-    end
-
-    if result['status'] == 'error'
-      head :internal_server_error
+    case status_json['status']
+    when 'running'
+      # まだ終わっていないだけ。結果がないことは異常ではない
+      render_error('Validation process has not finished yet', status: :bad_request)
+    when 'error'
+      # 検証を実行できなかった。設備障害で中断した場合は result.json 自体が無い。
+      # 例外の型は HTTP 越しには渡せないので、あとで聞き直せるかどうかだけを
+      # ステータスコードで伝える (gem 側の EndpointUnavailable / それ以外に対応)
+      head status_json['retryable'] ? :service_unavailable : :internal_server_error
     else
+      result = JSON.parse(File.read(output_file_path))
       result = DDBJValidator::Validator.new.grouped_message(result) if params.key?('grouped_messages')
+
       render json: status_json.merge('result' => result)
     end
   rescue Errno::ENOENT
@@ -118,6 +117,29 @@ class ValidationsController < ApplicationController
   end
 
   private
+
+  # 検証を実行し、status.json を終端状態 (finished / error) に更新する。
+  #
+  # ここで例外を握らずに抜けると status.json は running のまま残り、クライアントは
+  # 終わらない検証をポーリングし続ける。設備障害 (DDBJValidator::EndpointUnavailable)
+  # はまさにここへ届くので、検証できなかったことを status に書き切る。
+  def run_validation (validation_params, status_file_path, uuid:, start_time:)
+    DDBJValidator::Validator.new.execute(validation_params)
+
+    result = JSON.parse(File.read(validation_params[:output]))
+    status = result['status'] == 'error' ? 'error' : 'finished'
+
+    write_status_file(status_file_path, {uuid: uuid, status: status, start_time: start_time, end_time: Time.now})
+  rescue => ex
+    DDBJValidator.error.report(ex)
+
+    # ex.message は status エンドポイントがそのまま返すファイルに載る。SPARQL クエリ全文や
+    # 絶対パス、エンドポイント URL が入っているので、外に出すのはリトライ可否だけにする。
+    # 中身はログと Sentry にある
+    retryable = ex.is_a?(DDBJValidator::EndpointUnavailable)
+
+    write_status_file(status_file_path, {uuid: uuid, status: 'error', retryable: retryable, start_time: start_time, end_time: Time.now})
+  end
 
   # jvar の結果は元ファイルが Excel だが変換された JSON を返すケースもあるので、
   # Accept ヘッダで xlsx / json を切り替える。

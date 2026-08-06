@@ -1,4 +1,5 @@
 require 'test_helper'
+require 'minitest/mock'
 
 class TestValidator < ActiveSupport::TestCase
   def setup
@@ -88,6 +89,26 @@ class TestValidator < ActiveSupport::TestCase
     FileUtils.rm("#{@bs_test_file_dir}/bpbs_test_error_biosample.tsv")
 
     FileUtils.rm(output_file_path)
+  end
+
+  # 設備に届かなかったことは投稿ファイルについて何も言っていないので、検証結果として
+  # 書き出さずに呼び出し側へ渡す。ホストはこれを見て retry_on する
+  def test_endpoint_failure_is_not_written_as_a_result
+    output_file_path = "#{@tmp_file_dir}/endpoint_failure.json"
+    file_path        = "#{@bs_test_file_dir}/json/biosample_test_ok.json"
+
+    unavailable = Object.new
+    def unavailable.validate(_data, _params)
+      raise DDBJValidator::EndpointUnavailable, 'Virtuoso is down'
+    end
+
+    DDBJValidator::BioSampleValidator.stub :new, unavailable do
+      assert_raises DDBJValidator::EndpointUnavailable do
+        @validator.execute({biosample: file_path, output: output_file_path})
+      end
+    end
+
+    refute File.exist?(output_file_path)
   end
 
   # TODO
