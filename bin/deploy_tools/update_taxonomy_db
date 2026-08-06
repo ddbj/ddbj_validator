@@ -1,0 +1,36 @@
+#!/bin/bash -l
+# 日次ビルドが作った taxonomy.sqlite3 をインスタンスの shared/ に置く。
+#
+# update_validator_dbfile と違い、**コンテナを止めない**。以前は virtuoso.db を
+# 差し替えるために virtuoso を停止 → 起動していたので、そのたびに検証できない窓が
+# できていた。taxonomy はファイルを読むだけになったので、置き換えるだけでよい。
+#
+# 同一ファイルシステム内の mv なので、切り替えは atomic。検証中のプロセスは古い inode を
+# 掴んだまま最後まで一貫した taxonomy を見て、次の検証から新しい方を開く。
+set -eu
+
+if [ -z "${BASE_DIR:-}" ]; then
+  echo 'require environment variable BASE_DIR' >&2
+  exit 1
+fi
+
+SOURCE=${SOURCE:-/data1/w3sabi/DDBJValidator/db_update/data_updater/dbfile/taxonomy.sqlite3}
+DEST=$BASE_DIR/shared/taxonomy.sqlite3
+
+LOG() { echo "$(date +'%Y/%m/%d %H:%M:%S') $1"; }
+
+LOG 'start update'
+
+if [ ! -f "$SOURCE" ]; then
+  LOG "source not found: $SOURCE"
+  exit 1
+fi
+
+# 途中まで書かれたファイルを DEST に見せないよう、コピーしてから rename する
+LOG 'copy'
+cp "$SOURCE" "$DEST.new"
+
+LOG 'switch'
+mv "$DEST.new" "$DEST"
+
+LOG "end ($(du -h "$DEST" | cut -f1))"

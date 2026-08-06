@@ -47,6 +47,12 @@ wanted = (SEED_TAX_IDS + LINEAGE_ROOTS).to_set
   end
 end
 
+# seed に存在しない tax_id が混ざっていても黙って小さい fixture ができるだけなので、
+# 気付けるように出す (テストが「その tax_id が無い」ことに依存してしまう)
+missing = (SEED_TAX_IDS + LINEAGE_ROOTS).reject { full.get_first_value('SELECT 1 FROM taxa WHERE tax_id = ?', [it]) }
+
+warn "seed のうち taxonomy に存在しない tax_id: #{missing.sort.inspect}" if missing.any?
+
 File.delete(output) if File.exist?(output)
 
 small = SQLite3::Database.new(output)
@@ -77,7 +83,7 @@ SQL
 
 small.execute('VACUUM')
 
-warn "#{ids.size} taxa / #{small.get_first_value('SELECT COUNT(*) FROM names')} names -> #{output} (#{(File.size(output) / 1024.0).round} KB)"
+warn "#{small.get_first_value('SELECT COUNT(*) FROM taxa')} taxa / #{small.get_first_value('SELECT COUNT(*) FROM names')} names -> #{output} (#{(File.size(output) / 1024.0).round} KB)"
 
 small.close
 full.close

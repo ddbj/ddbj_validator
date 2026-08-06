@@ -14,10 +14,17 @@ class TestValidatorCache < ActiveSupport::TestCase
     super
   end
 
+  # taxonomy 由来のキャッシュは、読んでいるファイルの識別子をキーに含む。
+  # 日次で差し替わるのにキャッシュはプロセスの寿命だけ生きるので、混ぜないと
+  # 新しく追加された organism が「存在しない」と言われ続ける
+  def taxonomy_key (*parts)
+    [:taxonomy, @validator.instance_variable_get(:@org_validator).source_digest, *parts]
+  end
+
   def test_cache_invalid_host_organism_name
     host_name = 'Homo sapiens'
     ret1 = @validator.send('invalid_host_organism_name', 'BS_R0015', 'sampleA', '', host_name, 1)
-    assert Rails.cache.exist?(['exist_organism_name', host_name])
+    assert Rails.cache.exist?(taxonomy_key('exist_organism_name', host_name))
     ret2 = @validator.send('invalid_host_organism_name', 'BS_R0015', 'sampleA', '9606', 'Homo sapiens', 1)
     assert_equal ret1, ret2
   end
@@ -26,7 +33,7 @@ class TestValidatorCache < ActiveSupport::TestCase
     organism_name = 'Homo sapiens'
     ret1 = @validator.send('taxonomy_error_warning', 'BS_R0045', 'sampleA', organism_name, 1)
     assert_equal({status: 'exist', tax_id: '9606', scientific_name: 'Homo sapiens'},
-                 Rails.cache.read(['exist_organism_name', organism_name]))
+                 Rails.cache.read(taxonomy_key('exist_organism_name', organism_name)))
     ret2 = @validator.send('taxonomy_error_warning', 'BS_R0045', 'sampleA', organism_name, 1)
     assert_equal ret1, ret2
   end
@@ -60,7 +67,7 @@ class TestValidatorCache < ActiveSupport::TestCase
     package_name = 'MIGS.ba.microbial'
     organism_name = 'Nostoc sp. PCC 7120'
     ret1 = @validator.send('package_versus_organism', 'BS_R0048', 'SampleA', taxonomy_id, package_name, organism_name, 1)
-    assert Rails.cache.exist?(['tax_vs_package', taxonomy_id, package_name])
+    assert Rails.cache.exist?(taxonomy_key('tax_vs_package', taxonomy_id, package_name))
     ret2 = @validator.send('package_versus_organism', 'BS_R0048', 'SampleA', taxonomy_id, package_name, organism_name, 1)
     assert_equal ret1, ret2
 
@@ -69,7 +76,7 @@ class TestValidatorCache < ActiveSupport::TestCase
     package_name = 'MIGS.ba.microbial'
     organism_name = 'Homo sapiens'
     ret3 = @validator.send('package_versus_organism', 'BS_R0048', 'SampleA', taxonomy_id, package_name, organism_name, 1)
-    assert Rails.cache.exist?(['tax_vs_package', taxonomy_id, package_name])
+    assert Rails.cache.exist?(taxonomy_key('tax_vs_package', taxonomy_id, package_name))
     ret4 = @validator.send('package_versus_organism', 'BS_R0048', 'SampleA', taxonomy_id, package_name, organism_name, 1)
     assert_equal ret3, ret4
   end
@@ -78,7 +85,7 @@ class TestValidatorCache < ActiveSupport::TestCase
     taxonomy_id = '103690'
     organism_name = 'Nostoc sp. PCC 7120'
     ret1 = @validator.send('taxonomy_name_and_id_not_match', 'BS_R0004', 'SampleA', taxonomy_id, organism_name, 1)
-    assert Rails.cache.exist?(['tax_match_organism', taxonomy_id])
+    assert Rails.cache.exist?(taxonomy_key('tax_match_organism', taxonomy_id))
     ret2 = @validator.send('taxonomy_name_and_id_not_match', 'BS_R0004', 'SampleA', taxonomy_id, organism_name, 1)
     assert_equal ret1, ret2
   end
@@ -91,14 +98,14 @@ class TestValidatorCache < ActiveSupport::TestCase
     sex = 'male'
     organism_name = 'Nostoc sp. PCC 7120'
     ret1 = @validator.send('sex_for_bacteria', 'BS_R0059', 'SampleA', taxonomy_id, sex, organism_name, 1)
-    assert Rails.cache.exist?(['tax_has_linage', taxonomy_id, bac_vir_linages])
+    assert Rails.cache.exist?(taxonomy_key('tax_has_linage', taxonomy_id, bac_vir_linages))
     ret2 = @validator.send('sex_for_bacteria', 'BS_R0059', 'SampleA', taxonomy_id, sex, organism_name, 1)
     assert_equal ret1, ret2
 
     taxonomy_id = '1445577'
     organism_name = 'Colletotrichum fioriniae PJ7'
     ret3 = @validator.send('sex_for_bacteria', 'BS_R0059', 'SampleA', taxonomy_id, sex, organism_name, 1)
-    assert Rails.cache.exist?(['tax_has_linage', taxonomy_id, fungi_linages])
+    assert Rails.cache.exist?(taxonomy_key('tax_has_linage', taxonomy_id, fungi_linages))
     ret4 = @validator.send('sex_for_bacteria', 'BS_R0059', 'SampleA', taxonomy_id, sex, organism_name, 1)
     assert_equal ret3, ret4
   end

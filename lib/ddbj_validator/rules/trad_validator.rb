@@ -332,7 +332,7 @@ module DDBJValidator
 
         valid_flag = true
         organism_name = line[:value]
-        ret_org = DDBJValidator.cache.fetch(['exist_organism_name', organism_name]) {
+        ret_org = DDBJValidator.cache.fetch([:taxonomy, @org_validator.source_digest, 'exist_organism_name', organism_name]) {
           @org_validator.suggest_taxid_from_name(organism_name)
         }
         annotation = [

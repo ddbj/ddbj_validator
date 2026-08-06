@@ -14,10 +14,9 @@ module DDBJValidator
     # 大文字小文字を無視した検索が対象にする名前の種類。以前 SPARQL の VALUES に
     # 並んでいた 11 個の述語に対応する taxdump の name class。
     #
-    # このうち genbank synonym / anamorph / genbank anamorph / teleomorph /
-    # unpublished name は現在の taxdump には 1 件も無い。NCBI が name class を
-    # 整理した後も残っていたもので、消さずに残してあるのは、また現れたときに
-    # 黙って対象から外れるのを避けるため
+    # このうち何件かは public 版の taxdump に 1 件も無い (private 版には
+    # unpublished name がある)。NCBI が name class を整理した後も述語だけ残っていた
+    # もので、消さずに置いてあるのは、また現れたときに黙って対象から外れるのを避けるため
     SEARCHABLE_NAME_CLASSES = [
       'scientific name', 'synonym', 'genbank synonym', 'equivalent name', 'authority',
       'common name', 'genbank common name', 'anamorph', 'genbank anamorph',
@@ -64,6 +63,9 @@ module DDBJValidator
         WHERE names.name_lower = ?
           AND names.name_class IN (#{placeholders})
           AND NOT (names.tax_id = ? AND names.name_class != ?)
+        -- 並びは suggest_taxid_from_name が "10088, 10090" と連結して投稿者に見せる。
+        -- 索引の並びに任せると、fixture の作り直しやプランナ次第で変わりうる
+        ORDER BY names.tax_id, names.name_class
       SQL
         {tax_no: tax_id.to_s, organism_name: name, name_type: name_class, scientific_name: scientific_name}
       }
@@ -79,14 +81,18 @@ module DDBJValidator
       parent_tax_ids.any? { ancestors.include?(it.to_i) }
     end
 
-    # tax_id から根に向かって辿り、指定した rank の祖先があれば返す
-    def ancestor_of_rank (tax_id, rank)
+    # tax_id から根に向かって辿り、指定した rank のいずれかに当たる祖先があるか。
+    # rank をまとめて受けるのは、呼び出し側が 4 つの rank を順に試すため —
+    # 1 つずつ聞かれると同じ系統を 4 回辿ることになる
+    def ancestor_of_any_rank? (tax_id, ranks)
       ids = ancestors_including_self(tax_id)
 
-      return nil if ids.empty?
+      return false if ids.empty? || ranks.empty?
 
-      db.get_first_value(<<~SQL, [rank])
-        SELECT tax_id FROM taxa WHERE tax_id IN (#{ids.join(', ')}) AND rank = ? LIMIT 1
+      placeholders = (['?'] * ranks.size).join(', ')
+
+      !db.get_first_value(<<~SQL, ranks).nil?
+        SELECT tax_id FROM taxa WHERE tax_id IN (#{ids.join(', ')}) AND rank IN (#{placeholders}) LIMIT 1
       SQL
     end
 
@@ -104,11 +110,22 @@ module DDBJValidator
       SQL
     end
 
+    # 開けないファイルは「まだ検証していない」であって「データが悪い」ではない。
+    # 日次で差し替わるものなので、コピーの途中を掴むことは起こりうる。SQLite は
+    # open が遅延評価で、壊れていても最初のクエリまで気付かない — だから 1 度だけ
+    # 引いてみて、そこまで含めて EndpointUnavailable に寄せる。
+    # ここを素の SQLite3 例外のまま出すと、ホストは retry_on できずに投稿を失敗させる
     def db
       @db ||= begin
         raise DDBJValidator::EndpointUnavailable, "taxonomy database is not there: #{@path}" unless File.exist?(@path)
 
-        SQLite3::Database.new(@path, readonly: true)
+        begin
+          opened = SQLite3::Database.new(@path, readonly: true)
+          opened.get_first_value("SELECT value FROM meta WHERE key = 'source_digest'")
+          opened
+        rescue SQLite3::Exception => ex
+          raise DDBJValidator::EndpointUnavailable, "taxonomy database is not readable: #{@path} (#{ex.class})", ex.backtrace
+        end
       end
     end
   end

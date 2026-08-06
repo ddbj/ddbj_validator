@@ -152,9 +152,15 @@ WebMock が `allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub`
 作られている。取り違えると 45 万件の生物が「存在しない」ことになる。
 
 ```sh
-ruby data_updater/taxonomy/generate.rb <taxdump-dir> taxonomy.sqlite3   # 約 8 分・1.1GB
-ruby data_updater/taxonomy/verify.rb   taxonomy.sqlite3 <new_taxdump-dir>
+data_updater/taxonomy/build.sh                                         # 日次。.env を読む
+ruby data_updater/taxonomy/verify.rb taxonomy.sqlite3 <new_taxdump-dir>
+bin/deploy_tools/update_taxonomy_db_staging1.sh                        # 各インスタンスへ配る
 ```
+
+`build.sh` は `generate.rb`（約 8 分・1.1GB）を包んで、出来上がってから置く。配布側の
+`update_taxonomy_db` は **コンテナを止めない** — copy して mv するだけ。同一ファイル
+システム内なので切り替えは atomic で、検証中のプロセスは古い inode を掴んだまま最後まで
+一貫した taxonomy を見て、次の検証から新しい方を開く。
 
 `verify.rb` は NCBI が別途配っている `taxidlineage.dmp` / `rankedlineage.dmp` と
 突き合わせる（674 万件）。**同じ計算を二度するのではなく、NCBI の答えと比べている**
@@ -189,8 +195,8 @@ ruby data_updater/taxonomy/verify.rb   taxonomy.sqlite3 <new_taxdump-dir>
 稼働していた。taxonomy に追加された organism が「存在しない」と言われ続ける、という
 形で出ていた。
 
-taxonomy がファイルになり、`source_digest` で「今どれを読んでいるか」が言えるように
-なったので、この問題は消えた。
+taxonomy がファイルになって「今どれを読んでいるか」が言えるようになり、その識別子を
+キーに混ぜたので、この問題は消えた。**残る 2 群（中央 DB / 静的データ）は未対応。**
 
 ### キャッシュしているものは 1 種類ではない
 
@@ -204,8 +210,9 @@ taxonomy がファイルになり、`source_digest` で「今どれを読んで�
 | gem 同梱データ | 4 | gem の版と一緒 | `package_attributes` / `package_attribute_groups` / `country_from_latlon` / （`unknown_package` は不要になり削除） |
 | 外部 | 1 | 実質不変 | `exist_pubchem_id`（NCBI） |
 
-**taxonomy 群の版の出所は解決した** — `TaxonomyDb#source_digest` がファイル自身から
-入力の SHA256 を返すので、キーに混ぜれば差し替えで自然に外れる。まだ混ぜてはいない。
+**taxonomy 群は解決済み。** `TaxonomyDb#source_digest` がファイル自身から入力の SHA256 を
+返し、11 箇所すべてのキーに混ぜてある（`[:taxonomy, digest, 'exist_organism_name', name]`）。
+差し替えれば digest が変わり、古い答えは参照されなくなる。
 
 **中央 DB の 4 件は別のバグ。** 随時変わるデータを無期限にキャッシュしている。
 BioProject が umbrella になっても submitter が変わっても、プロセスが生きている限り
@@ -280,11 +287,13 @@ taxdump が親子関係を直接持っている。`search_taxid_from_fuzzy_name`
 未決:
 
 - **キャッシュの 3 群分け**（上記）。gem 側で出所を鍵に出し、ホストが群ごとの方針を
-  決める。taxonomy 群は `source_digest` を混ぜるだけ。中央 DB 群は今すぐにでも直せる
+  決める。**taxonomy 群は対応済み**。中央 DB 群（随時変わるものを無期限にキャッシュ
+  している）は今すぐにでも直せる
 - 中央 PostgreSQL への接続を repository が持つ是非
-- **`taxonomy.sqlite3` を誰がいつ作って、どこに置くか**。日次で 1.1GB を作り直すのか、
-  差分にするのか。validator が使わなくなった `generate_validator_dbfile.sh` の日次
-  Virtuoso ビルドを廃止できるか（他の利用者の確認が先）
-- **本番 `compose.yaml` の virtuoso サービス**の削除。あわせて `shared/` の置き方
+- validator が使わなくなった `generate_validator_dbfile.sh` の日次 Virtuoso ビルドを
+  廃止できるか（**他の利用者の確認が先**）。crontab から taxonomy 側
+  (`data_updater/taxonomy/build.sh` → `bin/deploy_tools/update_taxonomy_db_*.sh`) への
+  切り替えも要る
+- 日次で 1.1GB を作り直す形でよいか（差分にする余地）
 - 1.2.1 以前のパッケージ定義 6 版を削るタイミング（3 週間のログに `version=` 付きの
   リクエストは 1 件も無かった）

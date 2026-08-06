@@ -45,17 +45,8 @@ jobs:
         with:
           bundler-cache: true
 
-      - name: Start Virtuoso & Postgres with fixtures
+      - name: Start Postgres with fixtures
         run: docker compose -f compose.dev.yaml up -d
-
-      - name: Wait for Virtuoso to accept SPARQL
-        run: |
-          for _ in $(seq 1 30); do
-            curl -sS -m 2 'http://localhost:8890/sparql?query=ASK+WHERE+%7B%7D' > /dev/null && exit 0
-            sleep 2
-          done
-          echo 'Virtuoso did not become ready' >&2
-          exit 1
 
       - name: Wait for Postgres to be ready
         run: |
@@ -67,10 +58,7 @@ jobs:
           docker compose -f compose.dev.yaml logs postgres | tail -40 >&2
           exit 1
 
-      - name: Load taxonomy / biosample fixture
-        run: docker compose -f compose.dev.yaml exec -T virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
-
       # -v で各テスト名を標準出力に流す。どのテストで詰まったかを CI ログから特定できるように
-      # pub / coll_dump は test/test_helpers.rb が env 経由で test/fixtures を指すので、
-      # ここで conf/pub にステージする必要はない
+      # pub / coll_dump / taxonomy は test/test_helper.rb が test/fixtures を指すので、
+      # ここでステージする必要はない
       - run: bin/rails test -v

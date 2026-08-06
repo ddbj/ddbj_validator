@@ -34,8 +34,9 @@ SQL
 
 statement = db.prepare(ANCESTORS)
 
-checked    = 0
-mismatched = []
+lineage_checked = 0
+name_checked    = 0
+mismatched      = []
 
 warn 'taxidlineage.dmp と祖先を突き合わせ中'
 
@@ -47,7 +48,7 @@ File.foreach(lineage_dmp) do |line|
   expected = lineage.to_s.split.map(&:to_i).reject { it == 1 }.to_set
   actual   = statement.execute(tax_id.to_i).map { it.first }.reject { it == 1 }.to_set
 
-  checked += 1
+  lineage_checked += 1
 
   next if expected == actual
 
@@ -66,7 +67,7 @@ if File.exist?(ranked_dmp)
 
     stored = select.execute(tax_id.to_i).first&.first
 
-    checked += 1
+    name_checked += 1
 
     mismatched << "#{tax_id}: scientific_name が #{name.inspect} でなく #{stored.inspect}" unless stored == name
   end
@@ -77,9 +78,9 @@ end
 db.close
 
 if mismatched.empty?
-  warn "OK: #{checked} 件が一致"
+  warn "OK: 祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件が一致"
 else
-  warn "NG: #{mismatched.size} 件 (確認 #{checked} 件)"
+  warn "NG: #{mismatched.size} 件 (祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件を確認)"
   mismatched.first(20).each { warn "  #{it}" }
   exit 1
 end

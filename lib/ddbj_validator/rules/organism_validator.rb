@@ -35,6 +35,11 @@ module DDBJValidator
       @taxonomy = taxonomy
     end
 
+    # 今読んでいる taxonomy の識別子。キャッシュのキーに混ぜるためにある —
+    # taxonomy は日次で差し替わるのに、キャッシュはプロセスの寿命だけ生きる。
+    # 混ぜないと、新しく追加された organism が「存在しない」と言われ続ける
+    def source_digest = @taxonomy.source_digest
+
     #
     # Returns true if the organism_name specified is exist in taxonomy onotology as scientific name.
     #
@@ -168,7 +173,7 @@ module DDBJValidator
     def is_infraspecific_rank (tax_id)
       infraspecific_rank = ['Species', 'Subspecies', 'Varietas', 'Forma']
       # いずれかのランク以下であるかを検証
-      infraspecific_rank.any? { @taxonomy.ancestor_of_rank(tax_id, it) }
+      @taxonomy.ancestor_of_any_rank?(tax_id, infraspecific_rank)
     end
 
     #

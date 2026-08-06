@@ -5,7 +5,7 @@ require 'rails/test_help'
 
 require 'webmock/minitest'
 
-# localhost (Virtuoso / Postgres) だけ許可して、それ以外の外部 HTTP は全て stub 経由に縛る。
+# localhost (Postgres) だけ許可して、それ以外の外部 HTTP は全て stub 経由に縛る。
 WebMock.disable_net_connect!(allow_localhost: true)
 
 # DDBJValidator::BioSampleValidator#read_config が参照する INSDC 国名リスト / coll_dump を

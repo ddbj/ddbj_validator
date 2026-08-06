@@ -3,8 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    depends_on:
-      - virtuoso
     ports:
       - ${APP_PORT:-18840}:80
     environment:
@@ -20,23 +18,3 @@ services:
       - /data1/w3sabi/DDBJValidator/ddbj_validator_${RAILS_ENV:-production}1/logs:/rails/logs
       - /home/ddbjshare/public/mirror_database/ftp.ncbi.nih.gov/ncbi_taxonomy/taxonomydb:/rails/conf/coll_dump
       - /lustre9/open/shared_data/db/config:/rails/conf/pub
-
-  virtuoso:
-    image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
-    environment:
-      DBA_PASSWORD: "dba"
-      VIRT_Parameters_DirsAllowed: "., ../vad, /usr/share/proj, /database"
-      VIRT_Parameters_NumberOfBuffers: "170000"
-      VIRT_Parameters_MaxDirtyBuffers: "130000"
-      VIRT_Client_SQL_PREFETCH_ROWS: "10000"
-      VIRT_Client_SQL_PREFETCH_BYTES: "160000"
-      VIRT_SPARQL_ResultSetMaxRows: "1000000"
-      VIRT_SPARQL_MaxSortedTopRows: "100000"
-      VIRT_SPARQL_MaxQueryExecutionTime: "300"
-      VIRT_SPARQL_MaxQueryCostEstimationTime: "-1"
-    ports:
-      - ${VIRTUOSO_PORT:-18841}:8890
-    user: 0:0
-    volumes:
-      - ${PWD}/shared/config/virtuoso:/settings
-      - ${PWD}/shared/data/virtuoso:/database

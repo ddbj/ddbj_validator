@@ -1,10 +1,26 @@
 require 'fileutils'
+require 'tmpdir'
 require 'test_helper'
 
 class TestJVarValidator < ActiveSupport::TestCase
   def setup
     @validator = DDBJValidator::JVarValidator.new
     @test_file_dir = Rails.root.join('test/data/jvar')
+    @work_dir = Dir.mktmpdir('jvar_validator_test')
+  end
+
+  def teardown
+    FileUtils.rm_rf(@work_dir)
+    super
+  end
+
+  # JVarValidator は Excel を JSON に変換して**入力ファイルの隣**に書く。fixture の
+  # 場所で検証すると、同じ .xlsx を使う 4 つのテストが同じ .json を取り合う。
+  # 32 プロセス並列なので、片方が File.exist? を見た直後にもう片方が消して落ちていた
+  def staged (name)
+    path = File.join(@work_dir, name)
+    FileUtils.cp(@test_file_dir.join(name), path)
+    path
   end
 
   #### テスト用共通メソッド ####
@@ -35,7 +51,7 @@ class TestJVarValidator < ActiveSupport::TestCase
   # rule:JV_R0001
   def test_not_well_excel
     # ok case
-    excel_file = "#{@test_file_dir}/JVar-test_OK.xlsx"
+    excel_file = staged('JVar-test_OK.xlsx')
     ret = exec_validator('load_excel', 'JV_R0001', excel_file)
     assert_equal 0, ret[:error_list].size
 
@@ -50,13 +66,13 @@ class TestJVarValidator < ActiveSupport::TestCase
   # rule:JV_R0002
   def test_load_sheet
     # ok case
-    excel_file = "#{@test_file_dir}/JVar-test_OK.xlsx"
+    excel_file = staged('JVar-test_OK.xlsx')
     xlsx = @validator.load_excel('JV_R0001', excel_file)
     ret = exec_validator('load_sheet', 'JV_R0002', xlsx, 'SAMPLE')
     assert_equal 0, ret[:error_list].size
 
     # ng case (not exist sheet name)
-    excel_file = "#{@test_file_dir}/JVar-test_OK.xlsx"
+    excel_file = staged('JVar-test_OK.xlsx')
     xlsx = @validator.load_excel('JV_R0001', excel_file)
     ret = exec_validator('load_sheet', 'JV_R0002', xlsx, 'NO EXIST SHEET')
     # assert_equal false, ret[:result] #このメソッドはtrue/falseでは返さない
@@ -75,11 +91,10 @@ class TestJVarValidator < ActiveSupport::TestCase
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # ng case with file
-    excel_file = "#{@test_file_dir}/JVar-test_ERROR.xlsx"
+    excel_file = staged('JVar-test_ERROR.xlsx')
     ret = exec_validator('validate', excel_file)
     error_list = ret[:error_list].select {|failed| failed[:id] == 'JV_R0003' }
     assert error_list.size > 0
-    FileUtils.rm("#{@test_file_dir}/JVar-test_ERROR.json") if File.exist?("#{@test_file_dir}/JVar-test_ERROR.json") # delete convert file
   end
 
   # rule:JV_R0004
@@ -93,11 +108,10 @@ class TestJVarValidator < ActiveSupport::TestCase
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # ng case with file
-    excel_file = "#{@test_file_dir}/JVar-test_WARNING.xlsx"
+    excel_file = staged('JVar-test_WARNING.xlsx')
     ret = exec_validator('validate', excel_file)
     error_list = ret[:error_list].select {|failed| failed[:id] == 'JV_R0004' }
     assert error_list.size > 0
-    FileUtils.rm("#{@test_file_dir}/JVar-test_WARNING.json") if File.exist?("#{@test_file_dir}/JVar-test_WARNING.json") # delete convert file
   end
 
   # rule:JV_R0005
@@ -111,11 +125,10 @@ class TestJVarValidator < ActiveSupport::TestCase
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # ng case with file
-    excel_file = "#{@test_file_dir}/JVar-test_WARNING.xlsx"
+    excel_file = staged('JVar-test_WARNING.xlsx')
     ret = exec_validator('validate', excel_file)
     error_list = ret[:error_list].select {|failed| failed[:id] == 'JV_R0005' }
     assert error_list.size > 0
-    FileUtils.rm("#{@test_file_dir}/JVar-test_WARNING.json") if File.exist?("#{@test_file_dir}/JVar-test_WARNING.json") # delete convert file
   end
 
   # rule:JV_R0006
@@ -129,11 +142,10 @@ class TestJVarValidator < ActiveSupport::TestCase
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # ng case with file
-    excel_file = "#{@test_file_dir}/JVar-test_WARNING.xlsx"
+    excel_file = staged('JVar-test_WARNING.xlsx')
     ret = exec_validator('validate', excel_file)
     error_list = ret[:error_list].select {|failed| failed[:id] == 'JV_R0006' }
     assert error_list.size > 0
-    FileUtils.rm("#{@test_file_dir}/JVar-test_WARNING.json") if File.exist?("#{@test_file_dir}/JVar-test_WARNING.json") # delete convert file
   end
 
   # rule:JV_R0007
@@ -147,11 +159,10 @@ class TestJVarValidator < ActiveSupport::TestCase
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
     # ng case with file
-    excel_file = "#{@test_file_dir}/JVar-test_WARNING.xlsx"
+    excel_file = staged('JVar-test_WARNING.xlsx')
     ret = exec_validator('validate', excel_file)
     error_list = ret[:error_list].select {|failed| failed[:id] == 'JV_R0007' }
     assert error_list.size > 0
-    FileUtils.rm("#{@test_file_dir}/JVar-test_WARNING.json") if File.exist?("#{@test_file_dir}/JVar-test_WARNING.json") # delete convert file
   end
 
   def test_html2text

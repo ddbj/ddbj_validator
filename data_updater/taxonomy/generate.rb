@@ -12,6 +12,7 @@
 # 検証が投げる 6 本のクエリが聞いているのは taxdump の列そのものだった
 # (詳細は CLAUDE.md)。1 日 1 回まとめて入れ替えて以降は読むだけ、という形は
 # SQLite のファイル 1 つで足りる。
+require 'active_support/core_ext/object/blank'
 require 'digest'
 require 'sqlite3'
 
@@ -97,8 +98,14 @@ warn 'names.dmp'
 db.transaction do
   insert = db.prepare('INSERT INTO names (tax_id, name, name_class, name_lower) VALUES (?, ?, ?, ?)')
 
-  each_dmp_row(names) do |tax_id, name, _unique_name, name_class|
+  each_dmp_row(names) do |tax_id, name, unique_name, name_class|
     insert.execute(tax_id.to_i, name, name_class, name.downcase)
+
+    # unique_name ("Bacteria <bacteria>") は同名の別分類を区別するための表記で、
+    # 45 万行にある。RDF では tax:uniqueName という別の述語になっていて、
+    # organism_name_of_synonym は「学名以外のあらゆる名前」を探すので対象に入っていた。
+    # 落とすと、その経路だけ静かに引けなくなる
+    insert.execute(tax_id.to_i, unique_name, 'unique name', unique_name.downcase) if unique_name.present? && unique_name != name
   end
 
   insert.close
