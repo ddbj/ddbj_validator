@@ -128,6 +128,12 @@ module DDBJValidator
         return {status: 'fail', message: 'Invalid package version. Expected version is over 1.4'}
       end
 
+      # version も package_id も、この先はパスの一部になって send_file まで届く。
+      # 知っている名前だけを通す — "1.4.0" は上の to_f を素通りするので、版も含めて確かめる
+      unless @definitions.known_version?(version) && @definitions.valid_package_name?(version, package_id)
+        return {status: 'fail', message: 'Invalid package_id'}
+      end
+
       # accept header から希望ファイル形式を決める
       accept_header_list = accept_header.to_s.split(',').map(&:strip)
       return_file_format = accept_header_list.include?('text/tab-separated-values') ? 'tsv' : 'excel'

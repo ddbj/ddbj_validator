@@ -51,10 +51,17 @@ module DDBJValidator
 
     def versions = load('versions.json') { {} }
 
-    def valid_package_names (version) = load("#{version}/valid_package_names.json.gz") { [] }
-    def attribute_comments  (version) = load("#{version}/attribute_comments.json.gz") { {} }.transform_keys(&:to_s)
+    # version も package_id も外から来る文字列で、この下でパスになる。versions.json に
+    # 載っている名前でなければファイルを探しにいかない — Pathname#join は "../" を
+    # そのまま繋ぐので、確かめずに組み立てると conf/package_definitions の外に出られる
+    def valid_package_names (version) = known_version?(version) ? load("#{version}/valid_package_names.json.gz") { [] } : []
+    def attribute_comments  (version) = known_version?(version) ? load("#{version}/attribute_comments.json.gz") { {} } : {}
 
-    def rows (version, name) = load("#{version}/#{name}.json.gz") { [] }.map { symbolize(it) }
+    def rows (version, name)
+      return [] unless known_version?(version)
+
+      load("#{version}/#{name}.json.gz") { [] }.map { symbolize(it) }
+    end
 
     # package_id は投稿ファイルや ?package= から来る。パスとして組み立てる前に、
     # 知っている名前かどうかで弾く — 名前の一覧はこちらが持っているので、

@@ -8,6 +8,13 @@ module DDBJValidator
     EUTILS_SUMMARY_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi'
     DBCLS_MEDLINE_URL  = 'http://tm.dbcls.jp/medline'
 
+    # 429 は 4xx だが「あとで聞き直せ」の意味で、リトライすれば通る。BS rule 11 は
+    # サンプルごと・参照属性ごとに叩くので、大きな投稿では上流の絞りに当たりうる。
+    # QueryFailed に落とすと、待てば通るものを投稿全体の失敗にしてしまう
+    RETRYABLE_STATUSES = [429].freeze
+
+    def self.retryable_status? (res) = res.status.server_error? || RETRYABLE_STATUSES.include?(res.status.code)
+
     #
     # 引数の PubMed ID が実在するかを DBCLS/medline 経由で確認する。
     # 数字でない文字列には false、nil には nil。
@@ -34,7 +41,7 @@ module DDBJValidator
       return nil if pubmed_id.nil?
       url = "#{DBCLS_MEDLINE_URL}/#{pubmed_id}.json"
       res = HTTP.get(url)
-      raise DDBJValidator::EndpointUnavailable, "'tm.dbcls.jp/medline' returns a server error. url: #{url}\n" if res.status.server_error?
+      raise DDBJValidator::EndpointUnavailable, "'tm.dbcls.jp/medline' returns a server error. url: #{url}\n" if retryable_status?(res)
       raise DDBJValidator::QueryFailed,          "'tm.dbcls.jp/medline' returns an error. url: #{url}\n"        if res.status.client_error?
 
       entry = res.parse(:json)
@@ -61,7 +68,7 @@ module DDBJValidator
       sleep(0.4)
       url = "#{EUTILS_SUMMARY_URL}?db=#{db_name}&id=#{id}&retmode=json"
       res = HTTP.get(url)
-      raise DDBJValidator::EndpointUnavailable, "'NCBI eutils' returns a server error. url: #{url}\n" if res.status.server_error?
+      raise DDBJValidator::EndpointUnavailable, "'NCBI eutils' returns a server error. url: #{url}\n" if retryable_status?(res)
       raise DDBJValidator::QueryFailed,          "'NCBI eutils' returns an error. url: #{url}\n"        if res.status.client_error?
 
       entry = res.parse(:json)

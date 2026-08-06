@@ -17,20 +17,27 @@ class TestExcel2Tsv < ActiveSupport::TestCase
     FileUtils.rm_rf(@base_dir)
   end
 
-  # 拡張子が .xlsx でないと roo は TypeError を、上限を超えた workbook では
-  # Roo::Error ですらない ExceedsMaxError を上げる。どちらも投稿者が直せる問題なので
-  # finding にする — 例外のまま抜けると 500 になり、投稿者には何も分からない
-  def test_split_sheet_rejects_a_non_xlsx_extension_as_a_finding
-    base_dir = output_dir('non_xlsx')
+  # 読めない spreadsheet は投稿者が直せる問題なので finding にする。例外のまま抜けると
+  # Validator#execute に拾われて中身の無い 500 になり、投稿者には何も分からない。
+  #
+  # roo は壊れ方ごとに別系統の例外を上げるので、代表的な 2 つを押さえておく
+  # (DDBJValidator::SPREADSHEET_ERRORS に一覧がある)
+  {
+    'zip ですらない'         => ->(file) { file.write('not an excel file') },
+    'zip だが workbook が無い' => ->(file) { Zip::OutputStream.open(file.path) {|zip| zip.put_next_entry('hello.txt'); zip.write('hi') } }
+  }.each do |label, corrupt|
+    define_method("test_split_sheet_reports_a_broken_workbook_as_a_finding_#{label}") do
+      base_dir = output_dir('broken')
 
-    Tempfile.create(['submission', '.xls']) do |file|
-      file.write('not an excel file')
-      file.flush
+      Tempfile.create(['submission', '.xlsx']) do |file|
+        corrupt.call(file)
+        file.flush
 
-      ret = @excel2tsv.split_sheet(file.path, base_dir)
+        ret = @excel2tsv.split_sheet(file.path, base_dir)
 
-      assert_equal 'failed', ret[:status]
-      assert_equal 1, ret[:error_list].size
+        assert_equal 'failed', ret[:status], label
+        assert_equal 1, ret[:error_list].size, label
+      end
     end
   end
 

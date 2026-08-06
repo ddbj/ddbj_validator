@@ -14,6 +14,7 @@ require 'net/ftp'
 require 'net/http'
 require 'nokogiri'
 require 'pg'
+require 'securerandom'
 require 'roo'
 require 'zip' # Roo::Excelx が壊れた xlsx に対して上げるのは Zip::Error
 
@@ -51,10 +52,19 @@ module DDBJValidator
   # does it with a bare `Thread.new`. The lock is not held across `yield`:
   # two threads racing on a cold key both compute, which costs a duplicate
   # lookup and nothing else, precisely because the values are reproducible.
+  #
+  # Bounded because the keys are submitter-supplied strings — organism names,
+  # publication ids, package names — and a worker that stays up for weeks
+  # would otherwise keep every one it has ever seen. Dropping the oldest is
+  # safe for the same reason the unlocked `yield` is: an evicted entry is
+  # recomputed, not lost.
   class MemoryCache
-    def initialize
-      @store = {}
-      @lock  = Mutex.new
+    DEFAULT_MAX_ENTRIES = 10_000
+
+    def initialize (max_entries: DEFAULT_MAX_ENTRIES)
+      @max_entries = max_entries
+      @store       = {}
+      @lock        = Mutex.new
     end
 
     def fetch(key)
@@ -63,7 +73,11 @@ module DDBJValidator
 
       computed = yield
 
-      @lock.synchronize { @store[key] = computed }
+      @lock.synchronize {
+        @store.shift while @store.size >= @max_entries # Hash は挿入順なので最古から落ちる
+
+        @store[key] = computed
+      }
     end
   end
 
@@ -97,13 +111,23 @@ module DDBJValidator
   # A spreadsheet we could not read — a submitter's problem, so it becomes a
   # finding rather than an exception.
   #
-  # Collected here because roo does not have one exception hierarchy:
-  # `ExceedsMaxError` is a bare `StandardError`, and a wrong extension is a
-  # `TypeError` unless `file_warning: :ignore` is passed. Rescuing
-  # `Roo::Error` alone lets a `.xls` upload or an oversized workbook escape
-  # as a 500 instead of the finding the submitter needs to see.
+  # Collected here because roo has no single exception hierarchy for "this is
+  # not a workbook I can open". Each entry below is a case that reaches us
+  # from real uploads, verified against the roo we bundle:
+  #
+  #   Zip::Error                     not a zip at all, or truncated
+  #   ArgumentError                  a zip, but with no workbook part inside
+  #   Roo::Excelx::ExceedsMaxError   past roo's cell limit (a bare StandardError)
+  #   Roo::Error                     roo's own hierarchy
+  #   Errno::ENOENT                  the file is not there
+  #   TypeError                      wrong extension, if `file_warning:` is not
+  #                                  `:ignore` — both call sites pass it, so this
+  #                                  is here to keep a future one from regressing
+  #
+  # Rescuing `Roo::Error` alone lets most of these escape as a bodyless 500
+  # instead of the finding the submitter can act on.
   SPREADSHEET_ERRORS = [
-    Roo::Error, Roo::Excelx::ExceedsMaxError, Zip::Error, Errno::ENOENT, TypeError
+    Roo::Error, Roo::Excelx::ExceedsMaxError, Zip::Error, ArgumentError, Errno::ENOENT, TypeError
   ].freeze
 
   def self.connection_error?(error)

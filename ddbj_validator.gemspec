@@ -15,11 +15,15 @@ Gem::Specification.new do |spec|
   # the rule configuration and the XSDs, lib/ddbj_validator/sparql the
   # queries. `conf/pub` and `conf/coll_dump` are deliberately absent: they
   # are corpora mounted at run time, not part of the rules.
-  # `select(File.file?)` は Dir が返すディレクトリ自身を落とすため。`conf/pub` は
+  # `Dir.chdir(__dir__)` は Dir[] がプロセスの CWD を見るため。bundler の `gemspec`
+  # 指示は偶然 chdir してくれるが、別の場所から `gem build` すると中身の無い gem ができる。
+  # `select(File.file?)` は Dir が返すディレクトリ自身を落とすため — `conf/pub` は
   # 配下だけを reject しても、エントリそのものは残ってしまう。
-  spec.files = Dir['lib/**/*.rb', 'lib/ddbj_validator/sparql/**/*.rq.erb', 'conf/**/*']
-                 .select { File.file?(it) }
-                 .reject { it.start_with?('conf/pub/', 'conf/coll_dump/') }
+  spec.files = Dir.chdir(__dir__) {
+    Dir['lib/**/*.rb', 'lib/ddbj_validator/sparql/**/*.rq.erb', 'conf/**/*']
+      .select { File.file?(it) }
+      .reject { it.start_with?('conf/pub/', 'conf/coll_dump/') }
+  }
 
   spec.require_paths = ['lib']
 

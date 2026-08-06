@@ -21,8 +21,12 @@ module DDBJValidator
       unless File.exist?(dump_file)
         # 転送が途中で切れたファイルを dump_file に残さない。残すと、リトライしたときに
         # 「もうある」と見なされ、途中で切れた institution リストが正典として使われる —
-        # 打ち切り位置より後ろの institution が一斉に投稿者への指摘になる
-        partial_file = "#{dump_file}.#{Process.pid}.part"
+        # 打ち切り位置より後ろの institution が一斉に投稿者への指摘になる。
+        #
+        # 名前はスレッドごとに変える。検証は 1 プロセス内の Thread で並行に走り、
+        # ここは検証のたびに呼ばれるので、プロセス ID だけでは同じ .part に 2 本が
+        # 書き込み、混ざったものが rename で正典になる
+        partial_file = "#{dump_file}.#{Process.pid}.#{SecureRandom.hex(8)}.part"
 
         begin
           ftp = Net::FTP.new('ftp.ncbi.nlm.nih.gov')
