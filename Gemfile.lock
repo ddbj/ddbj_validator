@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ddbj_validator (1.0.13)
+    ddbj_validator (1.1.0)
       activesupport
       csv
       http
