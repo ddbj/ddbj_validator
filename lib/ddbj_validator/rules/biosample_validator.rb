@@ -955,42 +955,41 @@ module DDBJValidator
         # NCBI に届かなかった場合は例外がそのまま抜ける。以前はここで握って
         # 「connection to NCBI service failed」という finding に変えていたが、
         # それは投稿者のサンプルに対する指摘として並んだ。
-        begin
-          # check exist ref
-          if ref =~ /\d{6,}/ && ref !~ /\./ # pubmed id
-            exist_pubchem = DDBJValidator.cache.fetch(['exist_pubchem_id', ref]) {
-              NcbiEutils.exist_pubmed_id?(ref)
-            }
-            result = exist_pubchem && result
-          elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ # DOI
-            # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
-          else # ref !~ /^https?/ #URL
-            begin
-              url = URI.parse(ref)
-            rescue URI::InvalidURIError
-              result = false
-            end
-          end
-
-          if result == false
-            annotation = [
-              {key: 'Sample name', value: sample_name},
-              {key: 'Attribute', value: attr_name},
-              {key: 'Attribute value', value: attr_val}
-            ]
-            if attr_val != ref # 置換候補があればAuto annotationをつける
-              if @data_format == 'json' || @data_format == 'tsv'
-                location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
-              else
-                location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
-              end
-              annotation.push(ErrorBuilder.suggested_annotation([ref], 'Attribute value', location, true))
-              add_error(rule_code, annotation, auto_annotation: true)
-            else # 置換候補がないエラー
-              add_error(rule_code, annotation)
-            end
+        #
+        # check exist ref
+        if ref =~ /\d{6,}/ && ref !~ /\./ # pubmed id
+          exist_pubchem = DDBJValidator.cache.fetch(['exist_pubchem_id', ref]) {
+            NcbiEutils.exist_pubmed_id?(ref)
+          }
+          result = exist_pubchem && result
+        elsif ref =~ /\./ && ref !~ /http/ && ref !~ /https/ # DOI
+          # DOIの場合はチェックをしない  https://github.com/ddbj/ddbj_validator/issues/18
+        else # ref !~ /^https?/ #URL
+          begin
+            url = URI.parse(ref)
+          rescue URI::InvalidURIError
             result = false
           end
+        end
+
+        if result == false
+          annotation = [
+            {key: 'Sample name', value: sample_name},
+            {key: 'Attribute', value: attr_name},
+            {key: 'Attribute value', value: attr_val}
+          ]
+          if attr_val != ref # 置換候補があればAuto annotationをつける
+            if @data_format == 'json' || @data_format == 'tsv'
+              location = auto_annotation_location(@data_format, line_num, attr_name, 'value')
+            else
+              location = @xml_convertor.xpath_from_attrname(attr_name, line_num)
+            end
+            annotation.push(ErrorBuilder.suggested_annotation([ref], 'Attribute value', location, true))
+            add_error(rule_code, annotation, auto_annotation: true)
+          else # 置換候補がないエラー
+            add_error(rule_code, annotation)
+          end
+          result = false
         end
       end
       result

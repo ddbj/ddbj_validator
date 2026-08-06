@@ -5,9 +5,9 @@ Rails.application.configure do
   config.validator = config_for(:validator).deep_stringify_keys
 end
 
-# ルールコード (app/models/*) は Rails を直接参照しない。必要なのは設定・キャッシュ・
-# ロガー・エラー報告の 4 つだけで、それを DDBJValidator 経由で受け取る
-# (lib/ddbj_validator/runtime.rb)。ここはその 4 つに Rails 版を差し込むだけの層で、
+# ルールコード (lib/ddbj_validator/rules/*) は Rails を直接参照しない。必要なのは設定・
+# キャッシュ・ロガー・エラー報告の 4 つだけで、それを DDBJValidator 経由で受け取る
+# (lib/ddbj_validator.rb)。ここはその 4 つに Rails 版を差し込むだけの層で、
 # これがあるので同じルールが Rails なしでも動く。
 # 値ではなく lookup を渡す。Rails.cache / Rails.logger は差し替えられる
 # (テストが null_store を MemoryStore に置き換える、リクエストごとの tagged

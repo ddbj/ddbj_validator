@@ -46,13 +46,24 @@ module DDBJValidator
   # expensive but reproducible (a SPARQL query, an NCBI request). A plain
   # Hash is therefore a correct cache, and the process-wide default keeps
   # a bare `require` working. A host with Solid Cache passes that instead.
+  #
+  # Guarded because hosts run validations concurrently — the Rails wrapper
+  # does it with a bare `Thread.new`. The lock is not held across `yield`:
+  # two threads racing on a cold key both compute, which costs a duplicate
+  # lookup and nothing else, precisely because the values are reproducible.
   class MemoryCache
-    def initialize = @store = {}
+    def initialize
+      @store = {}
+      @lock  = Mutex.new
+    end
 
     def fetch(key)
-      return @store.fetch(key) if @store.key?(key)
+      hit, value = @lock.synchronize { [@store.key?(key), @store[key]] }
+      return value if hit
 
-      @store[key] = yield
+      computed = yield
+
+      @lock.synchronize { @store[key] = computed }
     end
   end
 
