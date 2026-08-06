@@ -149,7 +149,8 @@ comm -23 /tmp/after.txt /tmp/before.txt   # 新しく落ちたもの
 03:00  taxdump → taxonomy.ttl                    (OwlConverter / ddbj-ontologies)
 04:15  使い捨て Virtuoso にロード → 索引作成 →
        virtuoso.db をファイルとして取り出す      (data_updater/generate_validator_dbfile.sh)
-         └ 共有領域 ddbj.nig.ac.jp/rdf/ddbj_owl.virtuoso.db にも置く
+         └ 共有ディスクにも置く（URL ではなくパス。公開されていない）
+           /lustre9/open/database/ddbjshare/private/ddbj.nig.ac.jp/rdf/ddbj_owl.virtuoso.db
 05:00  staging1 に差し替えて再起動               (bin/deploy_tools/update_validator_dbfile*)
 05:15  staging2
 ```

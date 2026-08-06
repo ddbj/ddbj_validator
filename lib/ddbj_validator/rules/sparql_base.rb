@@ -27,7 +27,7 @@ module DDBJValidator
       max_retry_times = 10
       begin
         count += 1
-        result = sparql_ep.query(query, format: 'json')
+        result = sparql_ep.query(query)
         result_json = JSON.parse(result)
       rescue => ex
         if count < max_retry_times
