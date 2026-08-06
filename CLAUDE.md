@@ -13,18 +13,21 @@ ddbj_validator.gemspec        version は lib/ddbj_validator/version.rb を読�
 lib/
   ddbj_validator.rb           ホストから受け取るもの・ディレクトリ・例外・ローダ
   ddbj_validator/
-    rules/    (40 files)      ルール本体。DDBJValidator 名前空間
-    sparql/                   .rq.erb クエリテンプレート
+    rules/    (41 files)      ルール本体。DDBJValidator 名前空間
 conf/                         ルール設定・XSD（gem に同梱）
+  package_definitions/        BioSample パッケージ定義 7.6MB（同梱。下記）
   pub/ coll_dump/             ← gitignore。実行時に bind mount される参照データ
 app/controllers/ config/      gem の HTTP ラッパ
 public/template/              配布用属性テンプレート（アプリ側の資産）
-data_updater/                 日次の virtuoso.db ビルド（下記）
+data_updater/                 参照データの作り方（下記）
 ```
 
+**外部に要るのは 2 つだけ**になった。中央 PostgreSQL（`ddbj_rdb`）と、ホストが配置する
+`taxonomy.sqlite3`（+ `conf/pub` / `conf/coll_dump`）。**Virtuoso はもう要らない。**
+
 **ルールは gem、Rails アプリはその最初の利用者**という形になっている
-(`refactor/extract-rules-gem`)。同一リポジトリなのは、ルールと参照データと SPARQL
-クエリが一緒にバージョニングされるものだから — **その版は `DDBJValidator::VERSION`
+(`refactor/extract-rules-gem`)。同一リポジトリなのは、ルールと参照データが
+一緒にバージョニングされるものだから — **その版は `DDBJValidator::VERSION`
 一本**で、gem の版であり、`result.json` の `version` として投稿者にも見える。
 
 （かつては `conf/version.yml` に `api` / `rule` / `validator` の 3 つがあったが、
@@ -43,8 +46,9 @@ data_updater/                 日次の virtuoso.db ビルド（下記）
 正準形は v3 DDBJ Record JSON。境界を残す限り **6 DB ぶんの変換層**と、ファイル位置に
 紐付いた指摘を識別子に読み替える層を永久に持つことになる。
 
-**Virtuoso と中央 PostgreSQL と 174MB の `conf/pub` はどの案でも外部のまま。**
-gem 化はそれらを消さない。消すのは HTTP 境界だけ。
+当初は「**Virtuoso と中央 PostgreSQL と 174MB の `conf/pub` はどの案でも外部のまま**、
+gem 化が消すのは HTTP 境界だけ」と見ていた。Virtuoso については誤りで、中身を数えたら
+triplestore を必要としていなかった（後述）。今は外れている。
 
 移行中は **D-way が HTTP API を使い続ける**ので、Rails アプリはラッパとして残す。
 
@@ -86,41 +90,28 @@ validity を invalid にしていたこと。設備障害を検証結果に化�
 
 ## テストの見方
 
-**Virtuoso と PostgreSQL が要る。** 起動していないと接続拒否で大量に落ちる。
+**要るのは PostgreSQL だけ。**
 
 ```sh
 docker compose -f compose.dev.yaml up -d
-docker compose -f compose.dev.yaml exec virtuoso isql -U dba -P dba exec='LOAD /fixtures/load.sql;'
 ```
 
-**2 行目を忘れると Virtuoso は空のまま上がる。** PostgreSQL は `init.sh` が
-`docker-entrypoint-initdb.d` から自動で走って 4 DB と seed まで入るが、Virtuoso には
-同等の仕組みがないので `load.sql` を手で流す。入ったかどうかはグラフを数えれば分かる
-（taxonomy 5347 / biosample-1.5.0 約 209 万。`up -d` 直後は 2499 = システムトリプルのみ）。
-`compose.dev.yaml` の virtuoso に named volume は無いので、消えたらやり直し。
+`init.sh` が `docker-entrypoint-initdb.d` から自動で走り、4 DB と seed まで入る。
+手で流す手順は無い。
 
-**実データは要らない。** `test_helper.rb` が `PUB_DIR` / `COLL_DUMP_FILE` を
-`test/fixtures/conf/` のスナップショットに向け、外部 HTTP は WebMock が
-`allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub` (174MB) も coll_dump も不要。
+**実データは要らない。** `test_helper.rb` が `PUB_DIR` / `COLL_DUMP_FILE` /
+`DDBJValidator.taxonomy_db` を `test/fixtures/` のスナップショットに向け、外部 HTTP は
+WebMock が `allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub` (174MB) も
+1GB の taxonomy も不要（fixture は 322 taxa の 212KB）。
 
 | | runs | assertions | failures | errors | 時間 |
 |---|---|---|---|---|---|
-| **services 起動時** | 327 | 2651 | 0 | 0 | 11.1s |
-| services 未起動時 | 327 | 2049 | 3 | 93 | 54s |
+| **PostgreSQL 起動時** | 335 | 2674 | 0 | 0 | 2.0s |
+| 未起動時 | 335 | 2542 | 0 | 26 | 2.1s |
 
-**未起動でも「変更前と同じテストが落ちるか」は見られるが、それだけでは
-Virtuoso と中央 DB を通る経路が一度も実行されない。** SPARQL や RDB の呼び出しに
-手を入れたなら、services を上げて 0 failures / 0 errors を確認すること。未起動の
-方が遅いのは、失敗するまでのリトライ (`sparql_base` の `sleep 2` 等) を待つため。
-
-未起動で比較するときは、数だけでなく**失敗したテストの集合**を突き合わせる
-（数はネットワーク依存テストで ±1 揺れる）。
-
-```sh
-bin/rails test 2>&1 | grep '^bin/rails test test' | sort > /tmp/after.txt
-git stash && bin/rails test 2>&1 | grep '^bin/rails test test' | sort > /tmp/before.txt; git stash pop
-comm -23 /tmp/after.txt /tmp/before.txt   # 新しく落ちたもの
-```
+未起動でも 26 errors で済み、時間も変わらない。Virtuoso を使っていた頃は 93 errors・
+54 秒だった（失敗するまでのリトライ待ちで、起動時より 5 倍遅かった）。
+**RDB の呼び出しに手を入れたなら PostgreSQL を上げて 0 errors を確認すること。**
 
 **テストの出力先は `Dir.mktmpdir` を使う。** `test/data/**` は 32 プロセスが共有する
 読み取り専用の fixture 置き場で、そこに書くと相手の書きかけを読む（`annotated.xml` を
@@ -142,38 +133,64 @@ comm -23 /tmp/after.txt /tmp/before.txt   # 新しく落ちたもの
 - **Rails は `lib/` を autoload しない**（`config.autoload_lib` を外してある）。
   gem 自身の Zeitwerk ローダが管理する。2 つのローダが同じディレクトリを管理すると
   Zeitwerk が拒否する
-- ルールの inflection（`SPARQL`、`DDBJDbValidator` 等）は `DDBJValidator::INFLECTIONS`
+- ルールの inflection（`DDBJDbValidator`、`BioSampleValidator` 等）は `DDBJValidator::INFLECTIONS`
 - **正規表現で定数を一括置換しない。** XPath 文字列とヒアドキュメント区切り子を壊した
 - `=begin` / `=end` は行頭固定。ファイルをインデントするとき戻す必要がある
 
-## データ更新（`w3sabi@a012` の crontab）
+## 参照データの更新
 
-**Virtuoso は生きたトリプルストアではなく日次のビルド成果物。**
+| データ | 作り方 | 更新 | 置き場所 |
+|---|---|---|---|
+| **taxonomy** | `data_updater/taxonomy/generate.rb`（taxdump → SQLite） | 日次 | ホストが配置（`taxonomy_db`） |
+| BioSample パッケージ定義 | `data_updater/package_definitions/`（下記） | 版が増えたとき | gem に同梱 |
+| `conf/pub` / `conf/coll_dump` | 外部 | — | bind mount |
+
+### taxonomy
+
+**入力は private FTP 版の taxdump。** public 版は未公開の生物種を含まないぶん
+**45 万件少なく**（292 万 vs 337 万）、本番のグラフ（3,370,787 taxa）は private 版から
+作られている。取り違えると 45 万件の生物が「存在しない」ことになる。
+
+```sh
+ruby data_updater/taxonomy/generate.rb <taxdump-dir> taxonomy.sqlite3   # 約 8 分・1.1GB
+ruby data_updater/taxonomy/verify.rb   taxonomy.sqlite3 <new_taxdump-dir>
+```
+
+`verify.rb` は NCBI が別途配っている `taxidlineage.dmp` / `rankedlineage.dmp` と
+突き合わせる（674 万件）。**同じ計算を二度するのではなく、NCBI の答えと比べている**
+のが要点。new_taxdump は検証にしか使わない — 祖先は親子関係から計算できるので、
+運用側が取得するファイルを増やす理由がない。
+
+**差し替えは新しいファイルを開くだけ。停止も再起動も要らない。** 以前は
+`virtuoso.db` を日次でビルドして 2 系統を順に再起動しており、そのたびに窓ができていた。
+
+`meta` テーブルに**入力の SHA256** が入っている。アプリは自分がどの taxonomy を読んで
+いるか言えるので、キャッシュのキーに混ぜられる（下記の未解決だった点）。
+
+### 日次ビルドは validator のものではなくなった
+
+`data_updater/generate_validator_dbfile.sh` はまだ `virtuoso.db` を作り、共有ディスクに
+置いている。
 
 ```
-03:00  taxdump → taxonomy.ttl                    (OwlConverter / ddbj-ontologies)
-04:15  使い捨て Virtuoso にロード → 索引作成 →
-       virtuoso.db をファイルとして取り出す      (data_updater/generate_validator_dbfile.sh)
-         └ 共有ディスクにも置く（URL ではなくパス。公開されていない）
-           /lustre9/open/database/ddbjshare/private/ddbj.nig.ac.jp/rdf/ddbj_owl.virtuoso.db
-05:00  staging1 に差し替えて再起動               (bin/deploy_tools/update_validator_dbfile*)
-05:15  staging2
+/lustre9/open/database/ddbjshare/private/ddbj.nig.ac.jp/rdf/ddbj_owl.virtuoso.db
 ```
 
-ビルド側は共有成果物を作る仕事なので、利用側は「今日のファイルを取ってきて
-Virtuoso を再起動する」だけでよい。**差し替えには停止が要る**ので窓ができる。
-repository 側はそれを blue/green ではなく**キューイング**で吸収する方針
-（検証は非同期ジョブなので `retry_on EndpointUnavailable`）。
+これは URL ではなくパスで、公開されていない。**validator が使うのをやめたことと、
+この日次ビルドを廃止することは別**。共有成果物なので他に利用者がいるかもしれない。
+廃止するなら、その確認が先。
 
-### キャッシュはグラフより長生きしている
+### キャッシュはグラフより長生きしていた
 
-差し替えスクリプトが再起動するのは **virtuoso だけ**。`compose.yaml` の `app` は
-`depends_on: virtuoso` を持つが、`depends_on` は依存先の再起動に追随しない。
-crontab にもアプリを再起動する行はない。
+**解消済み。** 差し替えスクリプトが再起動するのは virtuoso だけで（`compose.yaml` の
+`app` は `depends_on: virtuoso` を持つが `depends_on` は再起動に追随しない）、crontab に
+アプリを再起動する行も無かった。`cache_store` は `:memory_store` なので、**グラフが
+日次で入れ替わってもキャッシュは残った**。実測でも app は 3 週間・virtuoso は 14 時間
+稼働していた。taxonomy に追加された organism が「存在しない」と言われ続ける、という
+形で出ていた。
 
-`cache_store` は `:memory_store`、`WEB_CONCURRENCY: 4`。つまり**グラフが日次で
-入れ替わってもキャッシュは残る**。taxonomy に追加された organism が「存在しない」と
-言われ続ける、という形で出る。デプロイまで直らない。
+taxonomy がファイルになり、`source_digest` で「今どれを読んでいるか」が言えるように
+なったので、この問題は消えた。
 
 ### キャッシュしているものは 1 種類ではない
 
@@ -182,13 +199,13 @@ crontab にもアプリを再起動する行はない。
 
 | 出所 | 件数 | 変わるタイミング | キー |
 |---|---|---|---|
-| Virtuoso のグラフ (taxonomy) | 11 | 日次の差し替え | `exist_organism_name` ×4 / `tax_match_organism` ×3 / `tax_has_linage` ×2 / `tax_vs_package` / `metage_source_lineage` |
+| taxonomy（SQLite） | 11 | 日次の差し替え | `exist_organism_name` ×4 / `tax_match_organism` ×3 / `tax_has_linage` ×2 / `tax_vs_package` / `metage_source_lineage` |
 | **DDBJ 中央 PostgreSQL** | 4 | **随時**（キュレータが動かす） | `is_umbrella_id` / `bioproject_submitter` / `bioproject_prjd_id` / `locus_tag_prefix` |
 | gem 同梱データ | 4 | gem の版と一緒 | `package_attributes` / `package_attribute_groups` / `country_from_latlon` / （`unknown_package` は不要になり削除） |
 | 外部 | 1 | 実質不変 | `exist_pubchem_id`（NCBI） |
 
-パッケージ定義を同梱した（下記）ことで、graph 群は 14 → 11 に減り、**残っているのは
-すべて taxonomy** になった。
+**taxonomy 群の版の出所は解決した** — `TaxonomyDb#source_digest` がファイル自身から
+入力の SHA256 を返すので、キーに混ぜれば差し替えで自然に外れる。まだ混ぜてはいない。
 
 **中央 DB の 4 件は別のバグ。** 随時変わるデータを無期限にキャッシュしている。
 BioProject が umbrella になっても submitter が変わっても、プロセスが生きている限り
@@ -201,42 +218,42 @@ BioProject が umbrella になっても submitter が変わっても、プロセ
 （ホストから見れば `exist_organism_name` も `is_umbrella_id` も同じ書き込み）。
 
 ```ruby
-cache.fetch([:graph,  'exist_organism_name', name])       { ... }
-cache.fetch([:rdb,    'is_umbrella_id', accession])       { ... }
-cache.fetch([:static, 'country_from_latlon', lat, lon])   { ... }
+cache.fetch([:taxonomy, taxonomy.source_digest, 'exist_organism_name', name]) { ... }
+cache.fetch([:rdb,      'is_umbrella_id', accession])                         { ... }
+cache.fetch([:static,   'country_from_latlon', lat, lon])                     { ... }
 ```
 
-**ホスト側**: 群ごとの方針を決める。graph 群は版で無効化、rdb 群は短い TTL か
+**ホスト側**: 群ごとの方針を決める。taxonomy 群は版で無効化、rdb 群は短い TTL か
 キャッシュしない、static 群は無期限。ストアの選択でも、単一の名前空間を被せることでも
 ない — **1 つの名前空間では 3 群を区別できない**。
 
-未解決なのは graph 群の**版の出所**。アプリからは今どのグラフを見ているのか分からない。
-候補: `ddbj_owl.virtuoso.YYYYMMDD.db` の日付を渡す / グラフ自身に版のトリプルを
-持たせて SPARQL で引く。`DDBJValidator::VERSION` は**ルール**の版であってグラフの版では
-ないので使えない。**taxonomy を Virtuoso から出せば、この問題自体が消える**（下記）。
+## Virtuoso に何が入っていたか
 
-## Virtuoso に何が入っているか
-
-**2 つのデータが入っていて、性質が正反対だった。**
+判断を誤りやすい形だったので残しておく。**性質が正反対の 2 つが 1 つのエンドポイントの
+裏にあった**ため、「Virtuoso は外せるか」に単一の答えが出せなかった。
 
 | | 実体 | 更新 | 現在地 |
 |---|---|---|---|
-| BioSample パッケージ定義 | 232×1021 の表を OWL reification で表現したもの (209 万トリプル) | 版が増えるときだけ | **gem に同梱済み** (`conf/package_definitions/`) |
-| taxonomy | NCBI taxdump (`nodes.dmp` / `names.dmp` / `merged.dmp`) の機械変換 | 日次 | Virtuoso |
+| BioSample パッケージ定義 | 232×1021 の表を OWL reification で表現したもの（209 万トリプル） | 版が増えるときだけ | gem に同梱 |
+| taxonomy | NCBI taxdump（`nodes.dmp` / `names.dmp`）の機械変換 | 日次 | ホストが置く SQLite |
 
-**どちらも triplestore を必要としていない。** taxonomy への 8 種のクエリが聞いている
-のは taxdump の列そのもので、唯一グラフらしいのは `rdfs:subClassOf*`（祖先辿り）だが、
-taxdump は親子関係を直接持っている。`search_taxid_from_fuzzy_name` の `bif:contains` も
-全文検索ではない — 直後に `FILTER (lcase(?x) = lcase(...))` があるので、大文字小文字を
-無視した完全一致の前段フィルタでしかなく、`lower(name)` の索引で置き換わる。
+**どちらも triplestore を必要としていなかった。** taxonomy への 6 種のクエリが聞いて
+いたのは taxdump の列そのもので、唯一グラフらしい `rdfs:subClassOf*`（祖先辿り）も、
+taxdump が親子関係を直接持っている。`search_taxid_from_fuzzy_name` の `bif:contains` は
+全文検索ではなく、直後の `FILTER (lcase(?x) = lcase(...))` の前段フィルタでしかなかった。
 
 変換は `taxdump2owl.rb`（DBCLS rdfsummit）1 本で、**DDBJ 独自の要素は混ざっていない**。
-`citations.dmp` の出力に至ってはロードすらされていない。
+`citations.dmp` の出力に至ってはロードすらされていなかった。
 
-taxonomy を出せば「一括置き換え + 以降読み取り」になり、SQLite が素直に当たる。
-**日次ビルド → 差し替え → 2 系統の再起動 → 停止窓**という運用と、上記のキャッシュの
-版問題が、まとめて消える。ビルド側の共有成果物は他の利用者がいるかもしれないので、
-**利用をやめることと日次ビルドを廃止することは別**。
+数えて分かった副産物:
+
+- **`geneticCodePt`（plastid）は private FTP 版の拡張列**から作られる想定だったが、
+  手元の private dump にもその列は無く、本番のグラフにも 0 件だった。唯一の利用者
+  だった BS_R0081 の plastid チェックは、結果が次行で上書きされていて効いたことが
+  ない。**復活させてはいけない** — Viridiplantae 39 万件のうち plastid を持たない
+  12 件は全部 Balanophoraceae で、葉緑体を失った正当な寄生植物である
+- **rank の対応表が古い**。`domain` / `realm` / `cellular root` / `acellular root` が
+  漏れていて、RDF ではそれらが壊れた URI になっていた
 
 ### パッケージ定義の作り直し
 
@@ -254,7 +271,7 @@ taxonomy を出せば「一括置き換え + 以降読み取り」になり、SQ
 
 1. ~~ルールを gem 化、Rails アプリを薄いラッパに~~ 済
 2. ~~パッケージ定義を gem に同梱し、Virtuoso から切り離す~~ 済
-3. taxonomy を Virtuoso から出す（SQLite 案）。ここまでで Virtuoso が不要になる
+3. ~~taxonomy を Virtuoso から出す（SQLite）。Virtuoso が不要になる~~ 済
 4. ddbj-repository が gem に依存し BP/BS を in-process 化。最初は既存の入り口
    (TSV/JSON) に食わせる ＝ 変換層は一旦そのまま
 5. DB ごとに v3 を直接受ける入り口を足し、その DB の変換層を捨てる
@@ -263,6 +280,11 @@ taxonomy を出せば「一括置き換え + 以降読み取り」になり、SQ
 未決:
 
 - **キャッシュの 3 群分け**（上記）。gem 側で出所を鍵に出し、ホストが群ごとの方針を
-  決める。graph 群は版の出所を先に決める必要がある。中央 DB 群は今すぐにでも直せる
+  決める。taxonomy 群は `source_digest` を混ぜるだけ。中央 DB 群は今すぐにでも直せる
 - 中央 PostgreSQL への接続を repository が持つ是非
-- `data_updater` の所有者
+- **`taxonomy.sqlite3` を誰がいつ作って、どこに置くか**。日次で 1.1GB を作り直すのか、
+  差分にするのか。validator が使わなくなった `generate_validator_dbfile.sh` の日次
+  Virtuoso ビルドを廃止できるか（他の利用者の確認が先）
+- **本番 `compose.yaml` の virtuoso サービス**の削除。あわせて `shared/` の置き方
+- 1.2.1 以前のパッケージ定義 6 版を削るタイミング（3 週間のログに `version=` 付きの
+  リクエストは 1 件も無かった）
