@@ -11,9 +11,9 @@ class TradValidator < ValidatorBase
   #
   def initialize
     super
-    @conf[:validation_config]          = JSON.parse(Rails.root.join('conf/trad/rule_config_trad.json').read)
-    @conf[:locus_tag_require_features] = JSON.parse(Rails.root.join('conf/trad/locus_tag_require_features.json').read)
-    @conf[:bs_null_accepted]           = JSON.parse(Rails.root.join('conf/biosample/null_accepted.json').read)
+    @conf[:validation_config]          = JSON.parse(DDBJValidator.root.join('conf/trad/rule_config_trad.json').read)
+    @conf[:locus_tag_require_features] = JSON.parse(DDBJValidator.root.join('conf/trad/locus_tag_require_features.json').read)
+    @conf[:bs_null_accepted]           = JSON.parse(DDBJValidator.root.join('conf/biosample/null_accepted.json').read)
 
     @validation_config = @conf[:validation_config]
     @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
@@ -331,7 +331,7 @@ class TradValidator < ValidatorBase
 
       valid_flag = true
       organism_name = line[:value]
-      ret_org = Rails.cache.fetch(['exist_organism_name', organism_name]) {
+      ret_org = DDBJValidator.cache.fetch(['exist_organism_name', organism_name]) {
         @org_validator.suggest_taxid_from_name(organism_name)
       }
       annotation = [

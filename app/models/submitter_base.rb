@@ -1,6 +1,6 @@
 class SubmitterBase
   def initialize
-    config = Rails.configuration.validator['ddbj_rdb']
+    config = DDBJValidator.config['ddbj_rdb']
 
     @pg_host    = config['pg_host']
     @pg_port    = config['pg_port']

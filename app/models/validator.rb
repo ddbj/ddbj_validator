@@ -11,7 +11,7 @@ class Validator
     def initialize
       @version = YAML.load(ERB.new(File.read(File.expand_path('../../conf/version.yml', __dir__))).result)
       @latest_version = @version['version']['validator']
-      @setting = Rails.configuration.validator
+      @setting = DDBJValidator.config
       @running_dir = @setting['api_log']['path'] + '/running/'
       FileUtils.mkdir_p(@running_dir)
     end
@@ -22,7 +22,7 @@ class Validator
     # @return [void]
     def execute(params)
       begin
-        Rails.logger.info('execute validation:' + params.to_s)
+        DDBJValidator.logger.info('execute validation:' + params.to_s)
         running_file = Tempfile.new(['validator-', '.tmp'], @running_dir)
         running_file.close
 
@@ -36,7 +36,7 @@ class Validator
             return
           else # TSVに変換された場合はそのTSVファイルを validator 実行対象として加える(paramsにmerge)
             filetypes.each do |filetype, path|
-              Rails.logger.info("splitted sheet validation: #{filetype} => #{path}")
+              DDBJValidator.logger.info("splitted sheet validation: #{filetype} => #{path}")
             end
             params.merge!(filetypes)
           end
@@ -60,7 +60,7 @@ class Validator
           end
         end
         if permission_error_list.any?
-          Rails.logger.error("File not found or permision denied: #{permission_error_list.join(', ')}")
+          DDBJValidator.logger.error("File not found or permision denied: #{permission_error_list.join(', ')}")
           ret = {status: 'error', format: ARGV[1], message: "permision error: #{permission_error_list.join(', ')}"}
           JSON.generate(ret)
           running_file.unlink
@@ -83,7 +83,7 @@ class Validator
           ret = {version: @latest_version, validity: true}
           ret['stats']  = get_result_stats(error_list)
           ret['messages'] = []
-          Rails.logger.info('validation result: ' + 'success')
+          DDBJValidator.logger.info('validation result: ' + 'success')
         else
           ret = {version: @latest_version, validity: true}
 
@@ -91,11 +91,11 @@ class Validator
           ret[:validity] = false if stats[:error_count] > 0
           ret['stats'] = stats
           ret['messages'] = error_list
-          Rails.logger.info('validation result: ' + 'fail')
+          DDBJValidator.logger.info('validation result: ' + 'fail')
         end
       rescue => ex
-        Rails.logger.info('validation result: error')
-        Rails.error.report(ex)
+        DDBJValidator.logger.info('validation result: error')
+        DDBJValidator.error.report(ex)
         ret = {status: 'error', message: ex.message}
       end
 
@@ -173,7 +173,7 @@ class Validator
         ret[:validity] = false if stats[:error_count] > 0
         ret['stats'] = stats
         ret['messages'] = split_result[:error_list]
-        Rails.logger.info('validation result: ' + 'fail')
+        DDBJValidator.logger.info('validation result: ' + 'fail')
         atomic_write(params[:output], JSON.generate(ret))
       else # 正常に変換できた場合は、Excelに含まれていたfiletypeと出力TSVのファイルパスを返す
         result = split_result[:filetypes]

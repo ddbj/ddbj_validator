@@ -12,5 +12,9 @@ Rails.autoloaders.main.inflector.inflect(
   'ddbj_db_validator'         => 'DDBJDbValidator',
   'sparql'                    => 'SPARQL',
   'sparql_base'               => 'SPARQLBase',
-  'excel2tsv'                 => 'Excel2Tsv'
+  'excel2tsv'                 => 'Excel2Tsv',
+
+  # lib/ddbj_validator.rb — the host shim the rules read their settings,
+  # cache, logger and error reporter from.
+  'ddbj_validator'            => 'DDBJValidator'
 )

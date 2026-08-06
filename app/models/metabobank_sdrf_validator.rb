@@ -9,7 +9,7 @@ class MetaboBankSdrfValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = Rails.root.join('conf/metabobank_sdrf')
+    conf_dir = DDBJValidator.root.join('conf/metabobank_sdrf')
     @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_metabobank_sdrf.json').read)
 
     @validation_config = @conf[:validation_config]

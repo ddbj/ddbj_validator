@@ -3,7 +3,7 @@ require 'erb'
 class Package < SPARQLBase
   # クラス読み込み時に app/sparql/package/*.rq.erb を全部 ERB コンパイルしてキャッシュする。
   # 呼び出し側は SPARQL[:package_list].result_with_hash(params) だけで済む。
-  SPARQL = Rails.root.glob('app/sparql/package/*.rq.erb').to_h {|path|
+  SPARQL = DDBJValidator.root.glob('app/sparql/package/*.rq.erb').to_h {|path|
     [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
 
@@ -15,7 +15,7 @@ class Package < SPARQLBase
   #
   def initialize (endpoint)
     super(endpoint)
-    @setting = Rails.configuration.validator
+    @setting = DDBJValidator.config
   end
 
   def package_list (version)
@@ -157,7 +157,7 @@ class Package < SPARQLBase
     # accept header から希望ファイル形式を決める
     accept_header_list = accept_header.to_s.split(',').map(&:strip)
     return_file_format = accept_header_list.include?('text/tab-separated-values') ? 'tsv' : 'excel'
-    template_file_dir = Rails.root.join('public/template')
+    template_file_dir = DDBJValidator.root.join('public/template')
     file_path = ''
     if return_file_format == 'tsv'
       file_path = "#{template_file_dir}/#{version}/bs/tsv/#{package_id}.tsv"
@@ -171,7 +171,7 @@ class Package < SPARQLBase
     if File.exist?(file_path)
       {status: 'success', file_path: file_path, file_type: return_file_format}
     else
-      Rails.logger.warn("Not exist package template file: #{file_path}")
+      DDBJValidator.logger.warn("Not exist package template file: #{file_path}")
       {status: 'fail', message: 'Invalid package_id'}
     end
   end

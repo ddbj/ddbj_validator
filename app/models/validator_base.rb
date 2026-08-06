@@ -5,11 +5,11 @@ class ValidatorBase
   end
 
   #
-  # config/validator.yml (env 別セクションを Rails.configuration.validator が
+  # config/validator.yml (env 別セクションを DDBJValidator.config が
   # マージ済み) を各 validator が期待する shape に整えて返す。
   #
   def read_common_config
-    setting = Rails.configuration.validator
+    setting = DDBJValidator.config
 
     {
       sparql_config:   setting['sparql_endpoint'],

@@ -1,6 +1,6 @@
 class FileParser
   def initialize
-    @setting = Rails.configuration.validator
+    @setting = DDBJValidator.config
   end
   #
   # ファイルからフォーマットを判定してパースしたデータを返す
@@ -64,8 +64,8 @@ class FileParser
               return {format: 'tsv', data: ret[:data]}
             end
           rescue => ex
-            Rails.logger.warn('Fail to parse a file as JSON/XML/TSV.')
-            Rails.logger.warn(ex)
+            DDBJValidator.logger.warn('Fail to parse a file as JSON/XML/TSV.')
+            DDBJValidator.logger.warn(ex)
             return {format: 'unknown', message: ex.message, data: nil}
           end
         end
@@ -89,12 +89,12 @@ class FileParser
         begin
           tsv_data = CSV.read(file_path, encoding: encoding, col_sep: col_sep, row_sep: "\r\n")
         rescue => ex2
-          Rails.logger.warn('Fail to parse a file as TSV file. Invalid encoding or newline char.')
-          Rails.logger.warn(ex2)
+          DDBJValidator.logger.warn('Fail to parse a file as TSV file. Invalid encoding or newline char.')
+          DDBJValidator.logger.warn(ex2)
         end
       else # 文字コードに関係ないエラー
-        Rails.logger.warn('Fail to parse a file as TSV file.')
-        Rails.logger.warn(ex1)
+        DDBJValidator.logger.warn('Fail to parse a file as TSV file.')
+        DDBJValidator.logger.warn(ex1)
         message = ex1.message
       end
     end

@@ -9,7 +9,7 @@ class RunValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = Rails.root.join('conf/dra')
+    conf_dir = DDBJValidator.root.join('conf/dra')
     @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_dra.json').read)
     @conf[:xsd_path]          = conf_dir.join('xsd/SRA.run.xsd').to_s
 

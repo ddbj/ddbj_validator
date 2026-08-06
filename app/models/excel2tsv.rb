@@ -13,7 +13,7 @@ class Excel2Tsv
   }
 
   def initialize
-    @validation_config = JSON.parse(Rails.root.join('conf/all_db/rule_config_all_db.json').read)
+    @validation_config = JSON.parse(DDBJValidator.root.join('conf/all_db/rule_config_all_db.json').read)
     @error_list = []
   end
 

@@ -2,7 +2,7 @@ require 'yaml'
 
 class Submitter
   def initialize
-    @setting = Rails.configuration.validator
+    @setting = DDBJValidator.config
     @version = YAML.load(ERB.new(File.read(File.expand_path('../../conf/version.yml', __dir__))).result)
     @latest_version = @version['version']['validator']
   end

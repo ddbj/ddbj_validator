@@ -9,7 +9,7 @@ class BioSampleValidator < ValidatorBase
   attr_reader :conf
 
   # クラス読み込み時に app/sparql/biosample/*.rq.erb を ERB コンパイルしてキャッシュする。
-  SPARQL = Rails.root.glob('app/sparql/biosample/*.rq.erb').to_h {|path|
+  SPARQL = DDBJValidator.root.glob('app/sparql/biosample/*.rq.erb').to_h {|path|
     [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
   }.freeze
   #
@@ -17,7 +17,7 @@ class BioSampleValidator < ValidatorBase
   #
   def initialize
     super
-    conf_dir = Rails.root.join('conf/biosample')
+    conf_dir = DDBJValidator.root.join('conf/biosample')
 
     # pub リポジトリ (github.com/ddbj/pub) と coll_dump は本番ではそれぞれ外部ディレクトリが
     # conf/pub / conf/coll_dump にバインドマウントされる。テストで本物のマウントを用意する代わりに、
@@ -361,7 +361,7 @@ class BioSampleValidator < ValidatorBase
   #   {...}, ...
   # ]
   def get_attributes_of_package (package_name, package_version)
-    Rails.cache.fetch(['package_attributes', package_name]) {
+    DDBJValidator.cache.fetch(['package_attributes', package_name]) {
       sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:attributes_of_package].result_with_hash(params)
@@ -399,7 +399,7 @@ class BioSampleValidator < ValidatorBase
     # package version 1.4未満ではgroup attributeの定義はない
     return [] if Gem::Version.create(package_version) < Gem::Version.create('1.4.0')
 
-    Rails.cache.fetch(['package_attribute_groups', package_name]) {
+    DDBJValidator.cache.fetch(['package_attribute_groups', package_name]) {
       sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:attribute_groups_of_package].result_with_hash(params)
@@ -643,7 +643,7 @@ class BioSampleValidator < ValidatorBase
   def unknown_package (rule_code, sample_name, package_name, package_version, line_num)
     return nil if package_name.blank?
 
-    result = Rails.cache.fetch(['unknown_package', package_name]) {
+    result = DDBJValidator.cache.fetch(['unknown_package', package_name]) {
       sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
       params = {package_name: package_name, version: package_version}
       sparql_query = SPARQL[:valid_package_name].result_with_hash(params)
@@ -954,7 +954,7 @@ class BioSampleValidator < ValidatorBase
       begin
         # check exist ref
         if ref =~ /\d{6,}/ && ref !~ /\./ # pubmed id
-          exist_pubchem = Rails.cache.fetch(['exist_pubchem_id', ref]) {
+          exist_pubchem = DDBJValidator.cache.fetch(['exist_pubchem_id', ref]) {
             NcbiEutils.exist_pubmed_id?(ref)
           }
           result = exist_pubchem && result
@@ -1173,7 +1173,7 @@ class BioSampleValidator < ValidatorBase
 
     lat = iso_latlon[:latitude]
     lon = iso_latlon[:longitude]
-    actual_iso = Rails.cache.fetch(['country_from_latlon', lat, lon]) {
+    actual_iso = DDBJValidator.cache.fetch(['country_from_latlon', lat, lon]) {
       Geolocation.country_at(lat, lon)
     }
     return nil if actual_iso.nil?
@@ -1258,7 +1258,7 @@ class BioSampleValidator < ValidatorBase
       end
       if !(host_taxid.nil? || host_taxid.strip == '' || host_tax_id_not_integer) # host_taxid記述あり
         annotation.push({key: 'host_taxid', value: host_taxid})
-        scientific_name = Rails.cache.fetch(['tax_match_organism', host_taxid]) {
+        scientific_name = DDBJValidator.cache.fetch(['tax_match_organism', host_taxid]) {
           @org_validator.get_organism_name(host_taxid)
         }
         # scientific_nameがあり、ユーザの入力値と一致する
@@ -1272,7 +1272,7 @@ class BioSampleValidator < ValidatorBase
           ret = false
         end
       else # host_id記述なしまたは不正
-        org_ret = Rails.cache.fetch(['exist_organism_name', host_name]) {
+        org_ret = DDBJValidator.cache.fetch(['exist_organism_name', host_name]) {
           @org_validator.suggest_taxid_from_name(host_name)
         }
         if org_ret[:status] == 'exist' # 該当するtaxonomy_idがあった場合
@@ -1313,7 +1313,7 @@ class BioSampleValidator < ValidatorBase
   #
   def taxonomy_error_warning (rule_code, sample_name, organism_name, line_num)
     return nil if InsdcNullability.null_value?(organism_name)
-    ret = Rails.cache.fetch(['exist_organism_name', organism_name]) {
+    ret = DDBJValidator.cache.fetch(['exist_organism_name', organism_name]) {
       @org_validator.suggest_taxid_from_name(organism_name)
     }
     annotation = [
@@ -1374,7 +1374,7 @@ class BioSampleValidator < ValidatorBase
   def taxonomy_name_and_id_not_match (rule_code, sample_name, taxonomy_id, organism_name, line_num)
     return nil if InsdcNullability.null_value?(organism_name) || InsdcNullability.null_value?(taxonomy_id)
 
-    scientific_name = Rails.cache.fetch(['tax_match_organism', taxonomy_id]) {
+    scientific_name = DDBJValidator.cache.fetch(['tax_match_organism', taxonomy_id]) {
       @org_validator.get_organism_name(taxonomy_id)
     }
     # scientific_nameがあり、ユーザの入力値と一致する。tax_id=1(新規生物)が入力された場合にもエラーは出力する
@@ -1410,7 +1410,7 @@ class BioSampleValidator < ValidatorBase
   def package_versus_organism (rule_code, sample_name, taxonomy_id, package_name, organism, line_num)
     return nil if package_name.blank? || InsdcNullability.null_value?(taxonomy_id) || taxonomy_id == OrganismValidator::TAX_INVALID
 
-    valid_result = Rails.cache.fetch(['tax_vs_package', taxonomy_id, package_name]) {
+    valid_result = DDBJValidator.cache.fetch(['tax_vs_package', taxonomy_id, package_name]) {
       @org_validator.org_vs_package_validate(taxonomy_id.to_i, package_name)
     }
 
@@ -1451,10 +1451,10 @@ class BioSampleValidator < ValidatorBase
     bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
     fungi_linages = [OrganismValidator::TAX_FUNGI]
     unless sex == ''
-      has_linage_bac_vir = Rails.cache.fetch(['tax_has_linage', taxonomy_id, bac_vir_linages]) {
+      has_linage_bac_vir = DDBJValidator.cache.fetch(['tax_has_linage', taxonomy_id, bac_vir_linages]) {
         @org_validator.has_linage(taxonomy_id, bac_vir_linages)
       }
-      has_linage_fungi = Rails.cache.fetch(['tax_has_linage', taxonomy_id, fungi_linages]) {
+      has_linage_fungi = DDBJValidator.cache.fetch(['tax_has_linage', taxonomy_id, fungi_linages]) {
         @org_validator.has_linage(taxonomy_id, fungi_linages)
       }
 
@@ -2005,7 +2005,7 @@ class BioSampleValidator < ValidatorBase
     return nil if InsdcNullability.null_value?(bioproject_accession)
     return nil if submitter_id.nil?
 
-    ret = Rails.cache.fetch(['bioproject_submitter', bioproject_accession]) {
+    ret = DDBJValidator.cache.fetch(['bioproject_submitter', bioproject_accession]) {
       @db_validator.get_bioproject_referenceable_submitter_ids(bioproject_accession)
     }
 
@@ -2074,7 +2074,7 @@ class BioSampleValidator < ValidatorBase
   def invalid_bioproject_type (rule_code, sample_name, bioproject_accession, line_num)
     return nil if InsdcNullability.null_value?(bioproject_accession)
 
-    is_umbrella = Rails.cache.fetch(['is_umbrella_id', bioproject_accession]) {
+    is_umbrella = DDBJValidator.cache.fetch(['is_umbrella_id', bioproject_accession]) {
       @db_validator.umbrella_project?(bioproject_accession)
     }
     return true unless is_umbrella
@@ -2209,7 +2209,7 @@ class BioSampleValidator < ValidatorBase
     duplicated_in_file = biosample_list.count { it['attributes']['locus_tag_prefix'] == locus_tag } > 1
 
     # 異なるsubmission_idでlocus_tag_prefixが既にDBに存在していればNG(submission_idの入力がない場合も同様)
-    all_prefix_list = Rails.cache.fetch(['locus_tag_prefix', 'all']) {
+    all_prefix_list = DDBJValidator.cache.fetch(['locus_tag_prefix', 'all']) {
       @db_validator.get_all_locus_tag_prefix()
     }
     duplicated_in_db = all_prefix_list.any? { it[:locus_tag_prefix] == locus_tag && it[:submission_id] != submission_id }
@@ -2243,7 +2243,7 @@ class BioSampleValidator < ValidatorBase
     return nil  if InsdcNullability.null_value?(psub_id)
     return true unless /^PSUB/ =~ psub_id
 
-    biosample_accession = Rails.cache.fetch(['bioproject_prjd_id', psub_id]) {
+    biosample_accession = DDBJValidator.cache.fetch(['bioproject_prjd_id', psub_id]) {
       @db_validator.get_bioproject_accession(psub_id)
     }
     return true if biosample_accession.nil? # Auto-annotation できない
@@ -2282,7 +2282,7 @@ class BioSampleValidator < ValidatorBase
 
     # 入力 organism よりも tax_id に紐づく scientific_name を優先する。
     # ユーザがミスタイプ ("eschericha coli" → tax_id 561) でも annotation は正しい属名 ("Escherichia") を示せる。
-    scientific_name = Rails.cache.fetch(['tax_match_organism', taxonomy_id]) {
+    scientific_name = DDBJValidator.cache.fetch(['tax_match_organism', taxonomy_id]) {
       @org_validator.get_organism_name(taxonomy_id)
     }
     annotation = [
@@ -2477,7 +2477,7 @@ class BioSampleValidator < ValidatorBase
       {key: 'component_organism', value: component_organism}
     ]
 
-    org_ret = Rails.cache.fetch(['exist_organism_name', component_organism]) {
+    org_ret = DDBJValidator.cache.fetch(['exist_organism_name', component_organism]) {
       @org_validator.suggest_taxid_from_name(component_organism)
     }
 
@@ -2523,7 +2523,7 @@ class BioSampleValidator < ValidatorBase
     ret = true
 
     metagenome_linages = [OrganismValidator::TAX_METAGENOMES]
-    has_linage_metagenome = Rails.cache.fetch(['metage_source_lineage', metagenome_source, metagenome_linages]) {
+    has_linage_metagenome = DDBJValidator.cache.fetch(['metage_source_lineage', metagenome_source, metagenome_linages]) {
       org_ret = @org_validator.suggest_taxid_from_name(metagenome_source) # metagenome_sourceからtax_idを検索
       if org_ret[:status] == 'exist' # tax_idが1件
         linage_ret = @org_validator.has_linage(org_ret[:tax_id], metagenome_linages)

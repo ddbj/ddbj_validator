@@ -1,7 +1,7 @@
 # 元ファイルからAuto annotateしたファイルを生成して返す
 class AutoAnnotator
   def initialize
-    @setting = Rails.configuration.validator
+    @setting = DDBJValidator.config
   end
 
   # Executes auto annotation
@@ -14,7 +14,7 @@ class AutoAnnotator
   # @return result  {status: "succeed", file: annotated_file_path} or {status: "error", message: message}
   def create_annotated_file(org_file, result_file, annotated_file_path, filetype, accept_header)
     info = {orginal_file: org_file.to_s, output_file: annotated_file_path}
-    Rails.logger.info("execute auto_annotation: #{info}")
+    DDBJValidator.logger.info("execute auto_annotation: #{info}")
     begin
       accept_header_list = accept_header.to_s.split(',').map(&:strip)
       input_file_format = ''
