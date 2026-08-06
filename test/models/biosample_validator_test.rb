@@ -2,8 +2,8 @@ require 'test_helper'
 
 class TestBioSampleValidator < ActiveSupport::TestCase
   def setup
-    @validator = BioSampleValidator.new
-    @xml_convertor = XmlConvertor.new
+    @validator = DDBJValidator::BioSampleValidator.new
+    @xml_convertor = DDBJValidator::XmlConvertor.new
     @test_file_dir = Rails.root.join('test/data/biosample')
     @package_version = Rails.configuration.validator['biosample']['package_version']
   end
@@ -867,7 +867,7 @@ class TestBioSampleValidator < ActiveSupport::TestCase
     expect_taxid_annotation = '9606'
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxonomy_id')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxonomy_id')
     assert_equal expect_taxid_annotation, suggest_value
     ## exist but not correct as scientific name
     ret = exec_validator('taxonomy_error_warning', 'BS_R0045', 'sampleA', 'Anabaena sp. PCC 7120', 1)
@@ -875,9 +875,9 @@ class TestBioSampleValidator < ActiveSupport::TestCase
     expect_organism_annotation = 'Nostoc sp. PCC 7120 = FACHB-418'
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxonomy_id')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxonomy_id')
     assert_equal expect_taxid_annotation, suggest_value
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'organism')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'organism')
     assert_equal expect_organism_annotation, suggest_value
     ## exist but not correct caracter case
     ret = exec_validator('taxonomy_error_warning', 'BS_R0045', 'sampleA', 'nostoc sp. pcc 7120 = FACHB-418', 1)
@@ -885,9 +885,9 @@ class TestBioSampleValidator < ActiveSupport::TestCase
     expect_organism_annotation = 'Nostoc sp. PCC 7120 = FACHB-418'
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxonomy_id')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'taxonomy_id')
     assert_equal expect_taxid_annotation, suggest_value
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'organism')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'organism')
     assert_equal expect_organism_annotation, suggest_value
     ## multiple exist
     ret = exec_validator('taxonomy_error_warning', 'BS_R0045', 'sampleA', 'mouse', 1)
@@ -1952,13 +1952,13 @@ jkl\"  "
     ret = exec_validator('taxonomy_warning', 'BS_R0105', 'SampleA', 'Homo Sapiens', 8, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'component_organism')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'component_organism')
     assert_equal 'Homo sapiens', suggest_value
     ## synonym
     ret = exec_validator('taxonomy_warning', 'BS_R0105', 'SampleA', 'Anabaena sp. PCC 7120', 8, 1)
     assert_equal false, ret[:result]
     assert_equal 1, ret[:error_list].size
-    suggest_value = ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'component_organism')
+    suggest_value = DDBJValidator::ErrorBuilder.auto_annotation_with_target_key(ret[:error_list][0], 'component_organism')
     assert_equal 'Nostoc sp. PCC 7120 = FACHB-418', suggest_value
 
     # nil case
@@ -2012,7 +2012,7 @@ jkl\"  "
   end
 
   def test_invalid_culture_collection
-    institution_list = CollDump.parse(Rails.root.join('test/fixtures/conf/coll_dump/coll_dump.txt'))
+    institution_list = DDBJValidator::CollDump.parse(Rails.root.join('test/fixtures/conf/coll_dump/coll_dump.txt'))
     # ok case
     ret = exec_validator('invalid_culture_collection', 'BS_R0114', 'SampleA', 'ATCC:1234', institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2089,7 +2089,7 @@ jkl\"  "
   end
 
   def test_invalid_specimen_voucher
-    institution_list = CollDump.parse(Rails.root.join('test/fixtures/conf/coll_dump/coll_dump.txt'))
+    institution_list = DDBJValidator::CollDump.parse(Rails.root.join('test/fixtures/conf/coll_dump/coll_dump.txt'))
     # ok case
     ret = exec_validator('invalid_specimen_voucher', 'BS_R0117', 'SampleA', 'UAM:12345', institution_list, 5, 1)
     assert_equal true, ret[:result]
@@ -2138,7 +2138,7 @@ jkl\"  "
   end
 
   def test_invalid_bio_material
-    institution_list = CollDump.parse(Rails.root.join('test/fixtures/conf/coll_dump/coll_dump.txt'))
+    institution_list = DDBJValidator::CollDump.parse(Rails.root.join('test/fixtures/conf/coll_dump/coll_dump.txt'))
     # ok case
     ret = exec_validator('invalid_bio_material', 'BS_R0119', 'SampleA', 'ABRC:CS22676', institution_list, 1)
     assert_equal true, ret[:result]
@@ -2241,7 +2241,7 @@ jkl\"  "
 
   def test_unaligned_sample_attributes
     # ok case
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ok.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ok.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('unaligned_sample_attributes', 'BS_R0125', biosample_list)
 
@@ -2250,19 +2250,19 @@ jkl\"  "
 
     # ng case
     # 不足属性がある
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ng1.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ng1.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('unaligned_sample_attributes', 'BS_R0125', biosample_list)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
     ## 追加属性がある
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ng2.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ng2.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('unaligned_sample_attributes', 'BS_R0125', biosample_list)
     assert_equal false, ret[:result]
     assert_equal 2, ret[:error_list].size
     ## 属性名は一致するが順序が異なる
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ng3.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/125_unaligned_sample_attributes_ng3.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('unaligned_sample_attributes', 'BS_R0125', biosample_list)
     assert_equal false, ret[:result]
@@ -2271,7 +2271,7 @@ jkl\"  "
 
   def test_multiple_packages
     # ok case
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_packages_ok.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_packages_ok.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('multiple_packages', 'BS_R0126', biosample_list)
     assert_equal true, ret[:result]
@@ -2279,7 +2279,7 @@ jkl\"  "
 
     # ng case
     # 複数のPackage名の記載
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_packages_ng.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_packages_ng.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('multiple_packages', 'BS_R0126', biosample_list)
     assert_equal false, ret[:result]
@@ -2287,7 +2287,7 @@ jkl\"  "
 
     # null case
     # Packageの記載がないサンプルがある(これも記載揺らぎとしてNG)
-    file_content = FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_packages_null.json", 'json')
+    file_content = DDBJValidator::FileParser.new.get_file_data("#{@test_file_dir}/json/126_multiple_packages_null.json", 'json')
     biosample_list = @validator.biosample_obj(file_content[:data])
     ret = exec_validator('multiple_packages', 'BS_R0126', biosample_list)
     assert_equal false, ret[:result]

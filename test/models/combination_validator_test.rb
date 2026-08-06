@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestCombinationValidator < ActiveSupport::TestCase
   def setup
-    @validator = CombinationValidator.new
+    @validator = DDBJValidator::CombinationValidator.new
     @test_file_dir = Rails.root.join('test/data/combination')
   end
 

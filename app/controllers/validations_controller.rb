@@ -31,7 +31,7 @@ class ValidationsController < ApplicationController
     write_status_file(status_file_path, {uuid: uuid, status: 'running', start_time: start_time})
 
     Thread.new {
-      Validator.new.execute(validation_params)
+      DDBJValidator::Validator.new.execute(validation_params)
       result = JSON.parse(File.read(output_file_path))
       final  = result['status'] == 'error' ? 'error' : 'finished'
       write_status_file(status_file_path, {uuid: uuid, status: final, start_time: start_time, end_time: Time.now})
@@ -61,7 +61,7 @@ class ValidationsController < ApplicationController
     if result['status'] == 'error'
       head :internal_server_error
     else
-      result = Validator.new.grouped_message(result) if params.key?('grouped_messages')
+      result = DDBJValidator::Validator.new.grouped_message(result) if params.key?('grouped_messages')
       render json: status_json.merge('result' => result)
     end
   rescue Errno::ENOENT
@@ -108,7 +108,7 @@ class ValidationsController < ApplicationController
 
     FileUtils.mkdir_p(annotated_file_dir)
 
-    result = AutoAnnotator.new.create_annotated_file(org_file, result_file, annotated_file_path, params[:filetype], accept_header)
+    result = DDBJValidator::AutoAnnotator.new.create_annotated_file(org_file, result_file, annotated_file_path, params[:filetype], accept_header)
 
     if result.nil? || result[:status] != 'succeed'
       render json: {status: 'error', message: result && result[:message]}, status: :internal_server_error

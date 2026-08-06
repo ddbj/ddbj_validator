@@ -5,8 +5,8 @@ require 'test_helper'
 #
 class TestSaveAutoAnnotation < ActiveSupport::TestCase
   def setup
-    @validator = BioSampleValidator.new
-    @xml_convertor = XmlConvertor.new
+    @validator = DDBJValidator::BioSampleValidator.new
+    @xml_convertor = DDBJValidator::XmlConvertor.new
     @test_file_dir = Rails.root.join('test/data/biosample')
   end
 

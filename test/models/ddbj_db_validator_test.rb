@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestDDBJDbValidator < ActiveSupport::TestCase
   def setup
-    @db_validator = DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])
+    @db_validator = DDBJValidator::DDBJDbValidator.new(Rails.configuration.validator['ddbj_rdb'])
   end
 
   def test_valid_bioproject_id?

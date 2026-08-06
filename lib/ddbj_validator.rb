@@ -131,16 +131,17 @@ module DDBJValidator
   }.freeze
 
   # The rules are autoloaded, by the library rather than by whatever
-  # happens to be hosting it. They still define top-level constants —
-  # namespacing 40 of them is a separate change — so the directory is
-  # pushed as its own root rather than as `DDBJValidator::Rules`.
+  # happens to be hosting it, and under this namespace: they are about to
+  # be loaded into a host's process, and `SPARQL`, `Package`, `Validator`
+  # and `DateFormat` are not names to be claiming at the top level. (The
+  # `sparql` gem defines `SPARQL` too.)
   def self.loader
     @loader ||= Zeitwerk::Loader.new.tap {|loader|
       loader.inflector = Class.new(Zeitwerk::Inflector) {
         def camelize(basename, abspath) = INFLECTIONS.fetch(basename) { super }
       }.new
 
-      loader.push_dir(ROOT.join('lib/ddbj_validator/rules').to_s)
+      loader.push_dir(ROOT.join('lib/ddbj_validator/rules').to_s, namespace: DDBJValidator)
       loader.setup
     }
   end

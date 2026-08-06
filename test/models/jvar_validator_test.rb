@@ -3,7 +3,7 @@ require 'test_helper'
 
 class TestJVarValidator < ActiveSupport::TestCase
   def setup
-    @validator = JVarValidator.new
+    @validator = DDBJValidator::JVarValidator.new
     @test_file_dir = Rails.root.join('test/data/jvar')
   end
 

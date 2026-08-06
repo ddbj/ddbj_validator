@@ -8,7 +8,7 @@ require 'webmock/minitest'
 # localhost (Virtuoso / Postgres) だけ許可して、それ以外の外部 HTTP は全て stub 経由に縛る。
 WebMock.disable_net_connect!(allow_localhost: true)
 
-# BioSampleValidator#read_config が参照する INSDC 国名リスト / coll_dump を
+# DDBJValidator::BioSampleValidator#read_config が参照する INSDC 国名リスト / coll_dump を
 # test/fixtures 配下のスナップショットに向ける。本番は .env で別ディレクトリを指すので影響なし
 ENV['PUB_DIR']        ||= File.expand_path('fixtures/conf/pub',                   __dir__)
 ENV['COLL_DUMP_FILE'] ||= File.expand_path('fixtures/conf/coll_dump/coll_dump.txt', __dir__)
@@ -41,7 +41,7 @@ end
 
 Minitest::Test.include(DefaultHttpStubs)
 
-# Validator の `@db_validator` を任意の値/Proc を返す fake で差し替える test helper。
+# DDBJValidator::Validator の `@db_validator` を任意の値/Proc を返す fake で差し替える test helper。
 # 引数の Hash は method 名 → 戻り値 (Proc なら呼び出し時に引数を渡して返す)。
 #
 #   stub_db_validator(@validator,

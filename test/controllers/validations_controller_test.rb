@@ -49,7 +49,7 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
       File.write(params[:output], JSON.generate({status: 'success'}))
     end
 
-    Validator.stub :new, fake_validator do
+    DDBJValidator::Validator.stub :new, fake_validator do
       post '/api/validation', params: {biosample: '<BioSampleSet/>'}
     end
 
@@ -119,7 +119,7 @@ class ValidationsControllerTest < ActionDispatch::IntegrationTest
       {status: 'succeed', file_path: output, file_type: 'xml'}
     end
 
-    AutoAnnotator.stub :new, fake_annotator do
+    DDBJValidator::AutoAnnotator.stub :new, fake_annotator do
       get "/api/validation/#{uuid}/biosample/autocorrect"
     end
 

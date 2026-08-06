@@ -1,117 +1,119 @@
-#
-# A class for MetaboBank IDF validation
-#
-class MetaboBankIdfValidator < ValidatorBase
-  attr_reader :error_list
+module DDBJValidator
+  #
+  # A class for MetaboBank IDF validation
+  #
+  class MetaboBankIdfValidator < ValidatorBase
+    attr_reader :error_list
 
-  #
-  # Initializer
-  #
-  def initialize
-    super
-    conf_dir = DDBJValidator.conf_dir.join('metabobank_idf')
-    @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_metabobank_idf.json').read)
-    @conf[:field_settings]    = JSON.parse(conf_dir.join('field_settings.json').read)
+    #
+    # Initializer
+    #
+    def initialize
+      super
+      conf_dir = DDBJValidator.conf_dir.join('metabobank_idf')
+      @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_metabobank_idf.json').read)
+      @conf[:field_settings]    = JSON.parse(conf_dir.join('field_settings.json').read)
 
-    @validation_config = @conf[:validation_config]
-    @json_schema       = JSON.parse(conf_dir.join('schema.json').read)
-    @tsv_validator     = TsvFieldValidator.new
-    @error_list        = []
-  end
-
-  #
-  # Validate the all rules for the bioproject data.
-  # Error/warning list is stored to @error_list
-  #
-  # ==== Args
-  # data_xml: xml file path
-  #
-  #
-  def validate (data_file, params = {})
-    @data_file = File.basename(data_file)
-    field_settings = @conf[:field_settings]
-
-    # file typeのチェック
-    file_content = nil
-    unless params['file_format']['metabobank_idf'].nil? || params['file_format']['metabobank_idf'].strip.chomp == ''
-      @data_format = params['file_format']['metabobank_idf']
-    else # 推測されたtypeがなければ中身をパースして推測
-      file_content = FileParser.new.get_file_data(data_file)
-      @data_format = file_content[:format]
-    end
-    ret = invalid_file_format('MB_IR0002', @data_format, ['tsv', 'json']) # baseのメソッドを呼び出し
-    return if ret == false # ファイルが読めなければvalidationは中止
-
-    if @data_format == 'json'
-      file_content = FileParser.new.get_file_data(data_file, 'json') if file_content.nil?
-      idf_data = file_content[:data]
-      ret = invalid_json_structure('MB_IR0001', bp_data, @json_schema) # baseのメソッドを呼び出し
-      return if ret == false # スキーマNGの場合はvalidationは中止
-    elsif @data_format == 'tsv'
-      file_content = FileParser.new.get_file_data(data_file, 'tsv') if file_content.nil?
-      idf_data = @tsv_validator.tsv2ojb(file_content[:data])
-    else
-      invalid_file_format('MB_IR0002', @data_format, ['tsv', 'json']) # baseのメソッドを呼び出し
-      return
+      @validation_config = @conf[:validation_config]
+      @json_schema       = JSON.parse(conf_dir.join('schema.json').read)
+      @tsv_validator     = TsvFieldValidator.new
+      @error_list        = []
     end
 
-    # 不正な文字のチェック
-    invalid_characters('MB_IR0024', idf_data)
-  end
+    #
+    # Validate the all rules for the bioproject data.
+    # Error/warning list is stored to @error_list
+    #
+    # ==== Args
+    # data_xml: xml file path
+    #
+    #
+    def validate (data_file, params = {})
+      @data_file = File.basename(data_file)
+      field_settings = @conf[:field_settings]
 
-  #
-  # rule:MB_IR0024
-  # 許容する文字以外が含まれていないか
-  #
-  # ==== Args
-  # data: idf data
-  # level: error level (error or warning)
-  # ==== Return
-  # true/false
-  #
-  def invalid_characters(rule_code, data)
-    invalid_list = @tsv_validator.non_ascii_characters(data)
+      # file typeのチェック
+      file_content = nil
+      unless params['file_format']['metabobank_idf'].nil? || params['file_format']['metabobank_idf'].strip.chomp == ''
+        @data_format = params['file_format']['metabobank_idf']
+      else # 推測されたtypeがなければ中身をパースして推測
+        file_content = FileParser.new.get_file_data(data_file)
+        @data_format = file_content[:format]
+      end
+      ret = invalid_file_format('MB_IR0002', @data_format, ['tsv', 'json']) # baseのメソッドを呼び出し
+      return if ret == false # ファイルが読めなければvalidationは中止
 
-    # 除外項目だけ一旦チェック結果を削除して再度チェック？
-    invalid_list.reject! { it[:field_name] == 'Study Description' || it[:field_name] == 'Protocol Description' }
-    invalid_list.concat(invalid_char_on_desc('Study Description',    @tsv_validator.field_value(data, 'Study Description')))
-    invalid_list.concat(invalid_char_on_desc('Protocol Description', @tsv_validator.field_value(data, 'Protocol Description')))
-    return true if invalid_list.empty?
+      if @data_format == 'json'
+        file_content = FileParser.new.get_file_data(data_file, 'json') if file_content.nil?
+        idf_data = file_content[:data]
+        ret = invalid_json_structure('MB_IR0001', bp_data, @json_schema) # baseのメソッドを呼び出し
+        return if ret == false # スキーマNGの場合はvalidationは中止
+      elsif @data_format == 'tsv'
+        file_content = FileParser.new.get_file_data(data_file, 'tsv') if file_content.nil?
+        idf_data = @tsv_validator.tsv2ojb(file_content[:data])
+      else
+        invalid_file_format('MB_IR0002', @data_format, ['tsv', 'json']) # baseのメソッドを呼び出し
+        return
+      end
 
-    invalid_list.each do |invalid|
-      annotation = [{key: 'Field name', value: invalid[:field_name]}]
-      annotation.push({key: 'Value', value: invalid[:value]}) unless invalid[:value_idx].nil? # field_value が NG の場合のみ value を出す
-      annotation.push({key: 'Invalid Position', value: invalid[:disp_txt]})
-      add_error(rule_code, annotation)
+      # 不正な文字のチェック
+      invalid_characters('MB_IR0024', idf_data)
     end
-    false
-  end
 
-  # メタボバンク用の特殊文字を含んだチェック
-  def invalid_char_on_desc(field_name, value_list)
-    return [] if value_list.nil?
-    invalid_list = []
-    value_list.each_with_index do |value_text, idx|
-      ret = true
-      index = 0
-      disp_text = ''
-      value_text.each_char do |char1|
-        index += 1
-        unless char1.ascii_only?
-          if char1.match?(/^(\s|°|±|°|μ|µ|≦|≧|≒|≠|←|→|↑|↓|↔|Å|[Α-Ω]|[α-ω])+$/)
-            disp_text += char1.to_s
+    #
+    # rule:MB_IR0024
+    # 許容する文字以外が含まれていないか
+    #
+    # ==== Args
+    # data: idf data
+    # level: error level (error or warning)
+    # ==== Return
+    # true/false
+    #
+    def invalid_characters(rule_code, data)
+      invalid_list = @tsv_validator.non_ascii_characters(data)
+
+      # 除外項目だけ一旦チェック結果を削除して再度チェック？
+      invalid_list.reject! { it[:field_name] == 'Study Description' || it[:field_name] == 'Protocol Description' }
+      invalid_list.concat(invalid_char_on_desc('Study Description',    @tsv_validator.field_value(data, 'Study Description')))
+      invalid_list.concat(invalid_char_on_desc('Protocol Description', @tsv_validator.field_value(data, 'Protocol Description')))
+      return true if invalid_list.empty?
+
+      invalid_list.each do |invalid|
+        annotation = [{key: 'Field name', value: invalid[:field_name]}]
+        annotation.push({key: 'Value', value: invalid[:value]}) unless invalid[:value_idx].nil? # field_value が NG の場合のみ value を出す
+        annotation.push({key: 'Invalid Position', value: invalid[:disp_txt]})
+        add_error(rule_code, annotation)
+      end
+      false
+    end
+
+    # メタボバンク用の特殊文字を含んだチェック
+    def invalid_char_on_desc(field_name, value_list)
+      return [] if value_list.nil?
+      invalid_list = []
+      value_list.each_with_index do |value_text, idx|
+        ret = true
+        index = 0
+        disp_text = ''
+        value_text.each_char do |char1|
+          index += 1
+          unless char1.ascii_only?
+            if char1.match?(/^(\s|°|±|°|μ|µ|≦|≧|≒|≠|←|→|↑|↓|↔|Å|[Α-Ω]|[α-ω])+$/)
+              disp_text += char1.to_s
+            else
+              disp_text += '[### invalid char ###]'
+              ret = false
+            end
           else
-            disp_text += '[### invalid char ###]'
-            ret = false
+            disp_text += char1.to_s
           end
-        else
-          disp_text += char1.to_s
+        end
+        unless ret
+          invalid_list.push({field_name: field_name, value: value_text, value_idx: idx, disp_txt: disp_text})
         end
       end
-      unless ret
-        invalid_list.push({field_name: field_name, value: value_text, value_idx: idx, disp_txt: disp_text})
-      end
+      invalid_list
     end
-    invalid_list
   end
 end

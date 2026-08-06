@@ -4,7 +4,7 @@ require 'test_helper'
 
 class TestTradValidator < ActiveSupport::TestCase
   def setup
-    @validator = TradValidator.new
+    @validator = DDBJValidator::TradValidator.new
     @test_file_dir = Rails.root.join('test/data/trad')
 
     # 各 test の fixture から拾った「DDBJ DB 上で valid」とされる ID 一覧。

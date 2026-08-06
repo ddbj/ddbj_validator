@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestXmlConvertor < ActiveSupport::TestCase
   def setup
-    @convertor = XmlConvertor.new
+    @convertor = DDBJValidator::XmlConvertor.new
     @test_file_dir = Rails.root.join('test/data/biosample')
   end
 

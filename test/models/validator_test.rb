@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestValidator < ActiveSupport::TestCase
   def setup
-    @validator = Validator.new
+    @validator = DDBJValidator::Validator.new
     @tmp_file_dir = Rails.root.join('test/data/tmp')
     @bs_test_file_dir = Rails.root.join('test/data/biosample')
     @bp_test_file_dir = Rails.root.join('test/data/bioproject')

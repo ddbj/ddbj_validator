@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestBioProjectTsvValidator < ActiveSupport::TestCase
   def setup
-    @validator = BioProjectTsvValidator.new
+    @validator = DDBJValidator::BioProjectTsvValidator.new
     @test_file_dir = Rails.root.join('test/data/bioproject')
   end
 
@@ -161,7 +161,7 @@ class TestBioProjectTsvValidator < ActiveSupport::TestCase
     # nil case
     ret = exec_validator('metagenome_or_environmental', 'BP_R0020', '562', 'Escherichia coli', nil)
     assert_nil ret[:result]
-    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', OrganismValidator::TAX_INVALID, 'hoge', 'Environment')
+    ret = exec_validator('metagenome_or_environmental', 'BP_R0020', DDBJValidator::OrganismValidator::TAX_INVALID, 'hoge', 'Environment')
     assert_nil ret[:result]
   end
 

@@ -6,7 +6,7 @@ class TestCollDump < ActiveSupport::TestCase
     file_name = 'coll_dump.txt'
     # get file (first run downloads from NCBI)
     FileUtils.rm(file_name) if File.exist?(file_name)
-    ret = CollDump.parse(file_name)
+    ret = DDBJValidator::CollDump.parse(file_name)
     assert_equal true, ret[:specimen_voucher].include?('UWBM')
     assert_equal true, ret[:culture_collection].include?('ATCC')
     assert_equal true, ret[:bio_material].include?('CIAT')
@@ -14,7 +14,7 @@ class TestCollDump < ActiveSupport::TestCase
     assert_equal true, ret[:bio_material].include?('ANDES:T')
 
     # second call reuses the already-downloaded file
-    ret = CollDump.parse(file_name)
+    ret = DDBJValidator::CollDump.parse(file_name)
     assert_equal true, ret[:specimen_voucher].include?('UWBM')
     assert_equal true, ret[:culture_collection].include?('ATCC')
   ensure

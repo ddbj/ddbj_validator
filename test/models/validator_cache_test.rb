@@ -1,12 +1,12 @@
 require 'test_helper'
 
-# BioSampleValidator の各 rule が Rails.cache 経由でキャッシュを効かせていることの確認。
+# DDBJValidator::BioSampleValidator の各 rule が Rails.cache 経由でキャッシュを効かせていることの確認。
 # test env のデフォルトは :null_store なので、ここだけ MemoryStore に差し替えて検証する。
 class TestValidatorCache < ActiveSupport::TestCase
   def setup
     @original_cache = Rails.cache
     Rails.cache = ActiveSupport::Cache::MemoryStore.new
-    @validator = BioSampleValidator.new
+    @validator = DDBJValidator::BioSampleValidator.new
   end
 
   def teardown
@@ -90,8 +90,8 @@ class TestValidatorCache < ActiveSupport::TestCase
   end
 
   def test_cache_sex_for_bacteria
-    bac_vir_linages = [OrganismValidator::TAX_BACTERIA, OrganismValidator::TAX_VIRUSES]
-    fungi_linages = [OrganismValidator::TAX_FUNGI]
+    bac_vir_linages = [DDBJValidator::OrganismValidator::TAX_BACTERIA, DDBJValidator::OrganismValidator::TAX_VIRUSES]
+    fungi_linages = [DDBJValidator::OrganismValidator::TAX_FUNGI]
 
     taxonomy_id = '103690'
     sex = 'male'

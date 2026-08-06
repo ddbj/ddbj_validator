@@ -10,7 +10,7 @@ DDBJValidator.config = {
 
 DDBJValidator.loader
 
-v = BioProjectTsvValidator.new
+v = DDBJValidator::BioProjectTsvValidator.new
 
 # Two rules that need neither Virtuoso nor the DDBJ RDB.
 # BP_R0062: a value with no field name against it.

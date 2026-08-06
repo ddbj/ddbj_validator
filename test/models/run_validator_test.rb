@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestRunValidator < ActiveSupport::TestCase
   def setup
-    @validator = RunValidator.new
+    @validator = DDBJValidator::RunValidator.new
     @test_file_dir = Rails.root.join('test/data/dra')
   end
 

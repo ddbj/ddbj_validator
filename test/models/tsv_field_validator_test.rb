@@ -2,7 +2,7 @@ require 'test_helper'
 
 class TestTsvFieldValidator < ActiveSupport::TestCase
   def setup
-    @validator = TsvFieldValidator.new
+    @validator = DDBJValidator::TsvFieldValidator.new
   end
 
   ## COMMON method start

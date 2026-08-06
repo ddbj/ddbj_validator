@@ -14,7 +14,7 @@ class PackagesController < ApplicationController
   end
 
   def attribute_template
-    ret = Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)
+    ret = DDBJValidator::Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)
 
     case ret[:status]
     when 'success'
@@ -41,7 +41,7 @@ class PackagesController < ApplicationController
   end
 
   def sparql_package
-    Package.new(validator_setting['sparql_endpoint']['master_endpoint'])
+    DDBJValidator::Package.new(validator_setting['sparql_endpoint']['master_endpoint'])
   end
 
   def requested_version

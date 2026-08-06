@@ -27,7 +27,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     fake = Object.new
     def fake.public_submission_id_list = %w[SSUB000001 SSUB000002]
 
-    BioSampleSubmitter.stub :new, fake do
+    DDBJValidator::BioSampleSubmitter.stub :new, fake do
       get '/api/submission/ids/biosample', headers: {'HTTP_API_KEY' => 'curator'}
     end
 
@@ -39,7 +39,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     fake = Object.new
     def fake.public_submission_id_list = %w[PSUB000001]
 
-    BioProjectSubmitter.stub :new, fake do
+    DDBJValidator::BioProjectSubmitter.stub :new, fake do
       get '/api/submission/ids/bioproject', headers: {'HTTP_API_KEY' => 'curator'}
     end
 
@@ -61,7 +61,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     fake = Object.new
     def fake.public_submission_id_list = raise(StandardError, 'boom')
 
-    BioSampleSubmitter.stub :new, fake do
+    DDBJValidator::BioSampleSubmitter.stub :new, fake do
       get '/api/submission/ids/biosample', headers: {'HTTP_API_KEY' => 'curator'}
     end
 
@@ -74,7 +74,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
       File.write(output, '<BioSampleSet/>')
     end
 
-    BioSampleSubmitter.stub :new, fake do
+    DDBJValidator::BioSampleSubmitter.stub :new, fake do
       get '/api/submission/biosample/SSUB000001', headers: {'HTTP_API_KEY' => 'curator'}
     end
 
@@ -93,7 +93,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     fake = Object.new
     def fake.output_xml_file(_submission_id, _output) = nil
 
-    BioSampleSubmitter.stub :new, fake do
+    DDBJValidator::BioSampleSubmitter.stub :new, fake do
       get '/api/submission/biosample/SSUB999999', headers: {'HTTP_API_KEY' => 'curator'}
     end
 
@@ -105,7 +105,7 @@ class SubmissionsControllerTest < ActionDispatch::IntegrationTest
     fake = Object.new
     def fake.output_xml_file(_submission_id, _output) = raise(StandardError, 'boom')
 
-    BioSampleSubmitter.stub :new, fake do
+    DDBJValidator::BioSampleSubmitter.stub :new, fake do
       get '/api/submission/biosample/SSUB000001', headers: {'HTTP_API_KEY' => 'curator'}
     end
 

@@ -1,230 +1,232 @@
-#
-# A class for DRA experiment validation
-#
-class ExperimentValidator < ValidatorBase
-  attr_reader :error_list
+module DDBJValidator
+  #
+  # A class for DRA experiment validation
+  #
+  class ExperimentValidator < ValidatorBase
+    attr_reader :error_list
 
-  #
-  # Initializer
-  #
-  def initialize
-    super
-    conf_dir = DDBJValidator.conf_dir.join('dra')
-    @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_dra.json').read)
-    @conf[:xsd_path]          = conf_dir.join('xsd/SRA.experiment.xsd').to_s
+    #
+    # Initializer
+    #
+    def initialize
+      super
+      conf_dir = DDBJValidator.conf_dir.join('dra')
+      @conf[:validation_config] = JSON.parse(conf_dir.join('rule_config_dra.json').read)
+      @conf[:xsd_path]          = conf_dir.join('xsd/SRA.experiment.xsd').to_s
 
-    @validation_config = @conf[:validation_config]
-    @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
-    @error_list        = []
-  end
-
-  #
-  # Validate the all rules for the dra data.
-  # Error/warning list is stored to @error_list
-  #
-  # ==== Args
-  # data_xml: xml file path
-  #
-  #
-  def validate (data_xml, submitter_id = nil)
-    if submitter_id.nil?
-      @submitter_id = @xml_convertor.get_submitter_id(xml_document) # TODO
-    else
-      @submitter_id = submitter_id
+      @validation_config = @conf[:validation_config]
+      @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
+      @error_list        = []
     end
-    # TODO @submitter_id が取得できない場合はエラーにする?
-    @data_file = File.basename(data_xml)
-    valid_xml = not_well_format_xml('DRA_R0001', data_xml)
-    # xml検証が通った場合のみ実行
-    if valid_xml
-      valid_schema = xml_data_schema('DRA_R0002', data_xml, @conf[:xsd_path])
-      doc = Nokogiri::XML(File.read(data_xml))
-      experiment_set = doc.xpath('//EXPERIMENT')
-      # 各エクスペリメント毎の検証
-      experiment_set.each_with_index do |experiment_node, idx|
-        idx += 1
-        experiment_name = get_experiment_label(experiment_node, idx)
-        invalid_center_name('DRA_R0004', submission_name, submission_node, acc_center_name, idx)
-        missing_experiment_title('DRA_R0010', experiment_name, experiment_node, idx)
-        missing_experiment_description('DRA_R0013', experiment_name, experiment_node, idx)
-        missing_library_name('DRA_R0018', experiment_name, experiment_node, idx)
-        missing_insert_size_for_paired_library('DRA_R0019', experiment_name, experiment_node, idx)
-        insert_size_too_large('DRA_R0020', experiment_name, experiment_node, idx)
+
+    #
+    # Validate the all rules for the dra data.
+    # Error/warning list is stored to @error_list
+    #
+    # ==== Args
+    # data_xml: xml file path
+    #
+    #
+    def validate (data_xml, submitter_id = nil)
+      if submitter_id.nil?
+        @submitter_id = @xml_convertor.get_submitter_id(xml_document) # TODO
+      else
+        @submitter_id = submitter_id
+      end
+      # TODO @submitter_id が取得できない場合はエラーにする?
+      @data_file = File.basename(data_xml)
+      valid_xml = not_well_format_xml('DRA_R0001', data_xml)
+      # xml検証が通った場合のみ実行
+      if valid_xml
+        valid_schema = xml_data_schema('DRA_R0002', data_xml, @conf[:xsd_path])
+        doc = Nokogiri::XML(File.read(data_xml))
+        experiment_set = doc.xpath('//EXPERIMENT')
+        # 各エクスペリメント毎の検証
+        experiment_set.each_with_index do |experiment_node, idx|
+          idx += 1
+          experiment_name = get_experiment_label(experiment_node, idx)
+          invalid_center_name('DRA_R0004', submission_name, submission_node, acc_center_name, idx)
+          missing_experiment_title('DRA_R0010', experiment_name, experiment_node, idx)
+          missing_experiment_description('DRA_R0013', experiment_name, experiment_node, idx)
+          missing_library_name('DRA_R0018', experiment_name, experiment_node, idx)
+          missing_insert_size_for_paired_library('DRA_R0019', experiment_name, experiment_node, idx)
+          insert_size_too_large('DRA_R0020', experiment_name, experiment_node, idx)
+        end
       end
     end
-  end
 
-  #
-  # Experimentを一意識別するためのlabelを返す
-  # 順番, alias, Experiment title, ccession IDの順に採用される
-  #
-  # ==== Args
-  # experiment_node: 1experimentのxml nodeset オプジェクト
-  # line_num
-  #
-  def get_experiment_label (experiment_node, line_num)
-    experiment_name = 'No:' + line_num
-    # name
-    title_node = experiment_node.xpath('EXPERIMENT/@alias')
-    if !title_node.empty? && get_node_text(title_node) != ''
-      experiment_name += ', Name:' + get_node_text(title_node)
+    #
+    # Experimentを一意識別するためのlabelを返す
+    # 順番, alias, Experiment title, ccession IDの順に採用される
+    #
+    # ==== Args
+    # experiment_node: 1experimentのxml nodeset オプジェクト
+    # line_num
+    #
+    def get_experiment_label (experiment_node, line_num)
+      experiment_name = 'No:' + line_num
+      # name
+      title_node = experiment_node.xpath('EXPERIMENT/@alias')
+      if !title_node.empty? && get_node_text(title_node) != ''
+        experiment_name += ', Name:' + get_node_text(title_node)
+      end
+      # Title
+      title_node = experiment_node.xpath('EXPERIMENT/TITLE')
+      if !title_node.empty? && get_node_text(title_node) != ''
+        experiment_name += ', TITLE:' + get_node_text(title_node)
+      end
+      # Accession ID
+      archive_node = experiment_node.xpath('EXPERIMENT[@accession]')
+      if !archive_node.empty? && get_node_text(archive_node) != ''
+        experiment_name += ', AccessionID:' +  get_node_text(archive_node)
+      end
+      experiment_name
     end
-    # Title
-    title_node = experiment_node.xpath('EXPERIMENT/TITLE')
-    if !title_node.empty? && get_node_text(title_node) != ''
-      experiment_name += ', TITLE:' + get_node_text(title_node)
+
+    ### validate method ###
+
+    #
+    # rule:DRA_R0004
+    # center name はアカウント情報と一致しているかどうか
+    #
+    # ==== Args
+    # experiment_label: experiment label for error displaying
+    # experiment_node: a experiment node object
+    # ==== Return
+    # true/false
+    #
+    def invalid_center_name (rule_code, experiment_label, experiment_node, submitter_id, line_num)
+      acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
+      mismatched = experiment_node.xpath('@center_name').map { get_node_text(it, '.') }.reject { it == acc_center_name }
+      return true if mismatched.empty?
+
+      mismatched.each do |center_name|
+        annotation = [
+          {key: 'Experiment name', value: experiment_label},
+          {key: 'center name',     value: center_name},
+          {key: 'Path',            value: '//EXPERIMENT/@center_name'}
+        ]
+        add_error(rule_code, annotation)
+      end
+      false
     end
-    # Accession ID
-    archive_node = experiment_node.xpath('EXPERIMENT[@accession]')
-    if !archive_node.empty? && get_node_text(archive_node) != ''
-      experiment_name += ', AccessionID:' +  get_node_text(archive_node)
-    end
-    experiment_name
-  end
 
-  ### validate method ###
+    #
+    # rule:DRA_R0010
+    # EXPERIMENTのTITLE要素が存在し空白ではないか
+    #
+    # ==== Args
+    # experiment_label: experiment label for error displaying
+    # experiment_node: a experiment node object
+    # ==== Return
+    # true/false
+    #
+    def missing_experiment_title (rule_code, experiment_label, experiment_node, line_num)
+      title_path = '//EXPERIMENT/TITLE'
+      return true unless node_blank?(experiment_node, title_path)
 
-  #
-  # rule:DRA_R0004
-  # center name はアカウント情報と一致しているかどうか
-  #
-  # ==== Args
-  # experiment_label: experiment label for error displaying
-  # experiment_node: a experiment node object
-  # ==== Return
-  # true/false
-  #
-  def invalid_center_name (rule_code, experiment_label, experiment_node, submitter_id, line_num)
-    acc_center_name = @db_validator.get_submitter_center_name(submitter_id)
-    mismatched = experiment_node.xpath('@center_name').map { get_node_text(it, '.') }.reject { it == acc_center_name }
-    return true if mismatched.empty?
-
-    mismatched.each do |center_name|
       annotation = [
-        {key: 'Experiment name', value: experiment_label},
-        {key: 'center name',     value: center_name},
-        {key: 'Path',            value: '//EXPERIMENT/@center_name'}
+        {key: 'Experimentt name', value: experiment_label},
+        {key: 'Path',             value: "#{title_path}"}
       ]
       add_error(rule_code, annotation)
+      false
     end
-    false
-  end
 
-  #
-  # rule:DRA_R0010
-  # EXPERIMENTのTITLE要素が存在し空白ではないか
-  #
-  # ==== Args
-  # experiment_label: experiment label for error displaying
-  # experiment_node: a experiment node object
-  # ==== Return
-  # true/false
-  #
-  def missing_experiment_title (rule_code, experiment_label, experiment_node, line_num)
-    title_path = '//EXPERIMENT/TITLE'
-    return true unless node_blank?(experiment_node, title_path)
+    #
+    # rule:DRA_R0013
+    # EXPERIMENTのDESIGN_DESCRIPTION要素が存在し空白ではないか
+    #
+    # ==== Args
+    # experiment_label: experiment label for error displaying
+    # experiment_node: a experiment node object
+    # ==== Return
+    # true/false
+    #
+    def missing_experiment_description (rule_code, experiment_label, experiment_node, line_num)
+      desc_path = '//EXPERIMENT/DESIGN/DESIGN_DESCRIPTION'
+      return true unless node_blank?(experiment_node, desc_path)
 
-    annotation = [
-      {key: 'Experimentt name', value: experiment_label},
-      {key: 'Path',             value: "#{title_path}"}
-    ]
-    add_error(rule_code, annotation)
-    false
-  end
+      annotation = [
+        {key: 'Experimentt name', value: experiment_label},
+        {key: 'Path',             value: "#{desc_path}"}
+      ]
+      add_error(rule_code, annotation)
+      false
+    end
 
-  #
-  # rule:DRA_R0013
-  # EXPERIMENTのDESIGN_DESCRIPTION要素が存在し空白ではないか
-  #
-  # ==== Args
-  # experiment_label: experiment label for error displaying
-  # experiment_node: a experiment node object
-  # ==== Return
-  # true/false
-  #
-  def missing_experiment_description (rule_code, experiment_label, experiment_node, line_num)
-    desc_path = '//EXPERIMENT/DESIGN/DESIGN_DESCRIPTION'
-    return true unless node_blank?(experiment_node, desc_path)
+    #
+    # rule:DRA_R0018
+    # EXPERIMENTのLIBRARY_NAME要素が存在し空白ではないか
+    #
+    # ==== Args
+    # experiment_label: experiment label for error displaying
+    # experiment_node: a experiment node object
+    # ==== Return
+    # true/false
+    #
+    def missing_library_name (rule_code, experiment_label, experiment_node, line_num)
+      lib_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_NAME'
+      return true unless node_blank?(experiment_node, lib_path)
 
-    annotation = [
-      {key: 'Experimentt name', value: experiment_label},
-      {key: 'Path',             value: "#{desc_path}"}
-    ]
-    add_error(rule_code, annotation)
-    false
-  end
+      annotation = [
+        {key: 'Experimentt name', value: experiment_label},
+        {key: 'Path',             value: "#{lib_path}"}
+      ]
+      add_error(rule_code, annotation)
+      false
+    end
 
-  #
-  # rule:DRA_R0018
-  # EXPERIMENTのLIBRARY_NAME要素が存在し空白ではないか
-  #
-  # ==== Args
-  # experiment_label: experiment label for error displaying
-  # experiment_node: a experiment node object
-  # ==== Return
-  # true/false
-  #
-  def missing_library_name (rule_code, experiment_label, experiment_node, line_num)
-    lib_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_NAME'
-    return true unless node_blank?(experiment_node, lib_path)
+    #
+    # rule:DRA_R0019
+    # EXPERIMENTのpairedの場合にnominal lengthが記述されているか
+    #
+    # ==== Args
+    # experiment_label: experiment label for error displaying
+    # experiment_node: a experiment node object
+    # ==== Return
+    # true/false
+    #
+    def missing_insert_size_for_paired_library (rule_code, experiment_label, experiment_node, line_num)
+      paired_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED'
+      return true if experiment_node.xpath(paired_path).empty?
 
-    annotation = [
-      {key: 'Experimentt name', value: experiment_label},
-      {key: 'Path',             value: "#{lib_path}"}
-    ]
-    add_error(rule_code, annotation)
-    false
-  end
+      length_path = paired_path + '/@NOMINAL_LENGTH'
+      return true unless node_blank?(experiment_node, length_path)
 
-  #
-  # rule:DRA_R0019
-  # EXPERIMENTのpairedの場合にnominal lengthが記述されているか
-  #
-  # ==== Args
-  # experiment_label: experiment label for error displaying
-  # experiment_node: a experiment node object
-  # ==== Return
-  # true/false
-  #
-  def missing_insert_size_for_paired_library (rule_code, experiment_label, experiment_node, line_num)
-    paired_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED'
-    return true if experiment_node.xpath(paired_path).empty?
+      annotation = [
+        {key: 'Experimentt name', value: experiment_label},
+        {key: 'Path',             value: "#{length_path}"}
+      ]
+      add_error(rule_code, annotation)
+      false
+    end
 
-    length_path = paired_path + '/@NOMINAL_LENGTH'
-    return true unless node_blank?(experiment_node, length_path)
+    #
+    # rule:DRA_R0020
+    # EXPERIMENTのnominal lengthが上限(10000000)超えていないか
+    #
+    # ==== Args
+    # experiment_label: experiment label for error displaying
+    # experiment_node: a experiment node object
+    # ==== Return
+    # true/false
+    #
+    def insert_size_too_large (rule_code, experiment_label, experiment_node, line_num)
+      length_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED/@NOMINAL_LENGTH'
+      return true if node_blank?(experiment_node, length_path)
 
-    annotation = [
-      {key: 'Experimentt name', value: experiment_label},
-      {key: 'Path',             value: "#{length_path}"}
-    ]
-    add_error(rule_code, annotation)
-    false
-  end
+      length = get_node_text(experiment_node, length_path)
+      # TODO 型チェック
+      return true unless length.to_i > 10000000
 
-  #
-  # rule:DRA_R0020
-  # EXPERIMENTのnominal lengthが上限(10000000)超えていないか
-  #
-  # ==== Args
-  # experiment_label: experiment label for error displaying
-  # experiment_node: a experiment node object
-  # ==== Return
-  # true/false
-  #
-  def insert_size_too_large (rule_code, experiment_label, experiment_node, line_num)
-    length_path = '//EXPERIMENT/DESIGN/LIBRARY_DESCRIPTOR/LIBRARY_LAYOUT/PAIRED/@NOMINAL_LENGTH'
-    return true if node_blank?(experiment_node, length_path)
-
-    length = get_node_text(experiment_node, length_path)
-    # TODO 型チェック
-    return true unless length.to_i > 10000000
-
-    annotation = [
-      {key: 'Experimentt name', value: experiment_label},
-      {key: 'Nominal length',   value: "#{length}"},
-      {key: 'Path',             value: "#{length_path}"}
-    ]
-    add_error(rule_code, annotation)
-    false
+      annotation = [
+        {key: 'Experimentt name', value: experiment_label},
+        {key: 'Nominal length',   value: "#{length}"},
+        {key: 'Path',             value: "#{length_path}"}
+      ]
+      add_error(rule_code, annotation)
+      false
+    end
   end
 end

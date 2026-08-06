@@ -4,7 +4,7 @@ require 'test_helper'
 #
 class TestAutoAnnotatorTsv < ActiveSupport::TestCase
   def setup
-    @auto_annotater = AutoAnnotatorTsv.new
+    @auto_annotater = DDBJValidator::AutoAnnotatorTsv.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
   end
 
@@ -13,7 +13,7 @@ class TestAutoAnnotatorTsv < ActiveSupport::TestCase
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
     output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.tsv"
     @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject')
-    data = FileParser.new().parse_csv(output_file, "\t")
+    data = DDBJValidator::FileParser.new().parse_csv(output_file, "\t")
     assert_equal 'My project title', data[:data][11][1]
     assert_equal 'missing', data[:data][16][1]
     assert_equal 'missing', data[:data][16][2]
@@ -24,7 +24,7 @@ class TestAutoAnnotatorTsv < ActiveSupport::TestCase
   end
 
   def test_update_data
-    data = FileParser.new().parse_csv("#{@test_file_dir}/bioproject_test_warning.tsv", "\t")
+    data = DDBJValidator::FileParser.new().parse_csv("#{@test_file_dir}/bioproject_test_warning.tsv", "\t")
 
     # add value
     location = {'mode' => 'add', 'add_data' => ['taxonomy_id', '9606']}
@@ -38,7 +38,7 @@ class TestAutoAnnotatorTsv < ActiveSupport::TestCase
     assert_equal data[:data][11][1], suggested_value
   end
   def test_replace_data
-    data = FileParser.new().parse_csv("#{@test_file_dir}/bioproject_test_warning.tsv", "\t")
+    data = DDBJValidator::FileParser.new().parse_csv("#{@test_file_dir}/bioproject_test_warning.tsv", "\t")
 
     suggested_value = 'my value'
     location = {row_index: 11, column_index: 1} # with symbol key

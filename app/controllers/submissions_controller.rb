@@ -4,7 +4,7 @@ class SubmissionsController < ApplicationController
   before_action :authenticate_curator
 
   def ids
-    ret = Submitter.new.submission_id_list(params[:filetype])
+    ret = DDBJValidator::Submitter.new.submission_id_list(params[:filetype])
 
     case ret[:status]
     when 'success' then render json: ret[:data]
@@ -19,7 +19,7 @@ class SubmissionsController < ApplicationController
 
     FileUtils.mkdir_p(save_dir)
 
-    ret = Submitter.new.submission_xml(params[:filetype], params[:submission_id], save_dir)
+    ret = DDBJValidator::Submitter.new.submission_xml(params[:filetype], params[:submission_id], save_dir)
 
     case ret[:status]
     when 'success' then send_file ret[:file_path], filename: File.basename(ret[:file_path]), type: 'application/xml'

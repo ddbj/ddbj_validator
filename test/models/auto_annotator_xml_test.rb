@@ -4,7 +4,7 @@ require 'test_helper'
 #
 class TestAutoAnnotatorXml < ActiveSupport::TestCase
   def setup
-    @auto_annotater = AutoAnnotatorXml.new
+    @auto_annotater = DDBJValidator::AutoAnnotatorXml.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
   end
 
@@ -13,7 +13,7 @@ class TestAutoAnnotatorXml < ActiveSupport::TestCase
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
     @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample')
-    data = XmlConvertor.new().xml2obj(File.read(output_file), 'biosample')
+    data = DDBJValidator::XmlConvertor.new().xml2obj(File.read(output_file), 'biosample')
     attr = data.first['attributes']
     assert_equal attr['num_replicons'], 'aaaa bbb' # BS_R0013 "aaaa   bbb"
     assert_equal attr['my attribute'].is_a?(String), true # BS_R0013 "my   attribute"(attribute name)

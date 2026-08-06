@@ -4,7 +4,7 @@ require 'test_helper'
 #
 class TestAutoAnnotatorBase < ActiveSupport::TestCase
   def setup
-    @auto_annotater = AutoAnnotatorBase.new
+    @auto_annotater = DDBJValidator::AutoAnnotatorBase.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
   end
 

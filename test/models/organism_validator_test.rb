@@ -5,7 +5,7 @@ require 'test_helper'
 class TestOrganismValidator < ActiveSupport::TestCase
   def setup
     setting = Rails.configuration.validator
-    @validator = OrganismValidator.new(setting['sparql_endpoint']['master_endpoint'], setting['named_graph_uri']['taxonomy'])
+    @validator = DDBJValidator::OrganismValidator.new(setting['sparql_endpoint']['master_endpoint'], setting['named_graph_uri']['taxonomy'])
   end
 
   def test_get_organism_name
@@ -35,7 +35,7 @@ class TestOrganismValidator < ActiveSupport::TestCase
 
   def test_suggest_taxid_from_name
     # no exist
-    expect_value = {status: 'no exist', tax_id: OrganismValidator::TAX_ROOT}
+    expect_value = {status: 'no exist', tax_id: DDBJValidator::OrganismValidator::TAX_ROOT}
     ret = @validator.suggest_taxid_from_name('not exist name')
     assert_equal expect_value, ret
     # exist one tax
@@ -60,13 +60,13 @@ class TestOrganismValidator < ActiveSupport::TestCase
     ret = @validator.suggest_taxid_from_name('Unidentified')
     assert_equal expect_value, ret
     # no exist (32644"Unidentified" tax) #Synonymは無効とする"none","other","unknown"などがある
-    expect_value = {status: 'no exist', tax_id: OrganismValidator::TAX_ROOT}
+    expect_value = {status: 'no exist', tax_id: DDBJValidator::OrganismValidator::TAX_ROOT}
     ret = @validator.suggest_taxid_from_name('none')
     assert_equal expect_value, ret
 
     # dummy taxon
     # exist one tax(unpublished tax)
-    expect_value = {status: 'no exist', tax_id: OrganismValidator::TAX_ROOT}
+    expect_value = {status: 'no exist', tax_id: DDBJValidator::OrganismValidator::TAX_ROOT}
     ret = @validator.suggest_taxid_from_name('Alkalobacillus saladarense')
     assert_equal expect_value, ret
   end

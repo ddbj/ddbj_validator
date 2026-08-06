@@ -4,7 +4,7 @@ require 'test_helper'
 #
 class TestAutoAnnotator < ActiveSupport::TestCase
   def setup
-    @auto_annotater = AutoAnnotator.new
+    @auto_annotater = DDBJValidator::AutoAnnotator.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
   end
   def test_create_annotated_file
@@ -69,7 +69,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal 'error', ret[:status]
-    # ファイル不在時は FileParser 側で "unknown" フォーマットとして扱われ、auto_annotator が
+    # ファイル不在時は DDBJValidator::FileParser 側で "unknown" フォーマットとして扱われ、auto_annotator が
     # "Can't parse ... original file type." を raise する (元の期待文言 "Original file is not found" は未実装)
     assert ret[:message].include?("Can't parse")
 
