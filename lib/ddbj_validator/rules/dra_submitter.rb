@@ -60,7 +60,7 @@ module DDBJValidator
         message += "#{ex.message} (#{ex.class})"
         p message
         p ex.backtrace
-        raise StandardError, message, ex.backtrace
+        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       ensure
         connection.close if connection
       end

@@ -952,6 +952,9 @@ module DDBJValidator
           result = false
         end
 
+        # NCBI に届かなかった場合は例外がそのまま抜ける。以前はここで握って
+        # 「connection to NCBI service failed」という finding に変えていたが、
+        # それは投稿者のサンプルに対する指摘として並んだ。
         begin
           # check exist ref
           if ref =~ /\d{6,}/ && ref !~ /\./ # pubmed id
@@ -988,15 +991,6 @@ module DDBJValidator
             end
             result = false
           end
-        rescue => ex # NCBI問合せ中のシステムエラーの場合はその旨メッセージを追加
-          annotation = [
-            {key: 'Sample name', value: sample_name},
-            {key: 'Attribute', value: attr_name},
-            {key: 'Attribute value', value: attr_val},
-            {key: 'Message', value: 'Validation processing failed because connection to NCBI service failed.'}
-          ]
-          add_error(rule_code, annotation)
-          result = false
         end
       end
       result

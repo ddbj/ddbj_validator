@@ -14,6 +14,7 @@ require 'net/http'
 require 'nokogiri'
 require 'pg'
 require 'roo'
+require 'zip' # Roo::Excelx が壊れた xlsx に対して上げるのは Zip::Error
 
 # ActiveSupport, for `blank?` / `present?` and friends — the rule code
 # leans on them throughout. Core extensions only: no framework, no
@@ -52,6 +53,38 @@ module DDBJValidator
 
       @store[key] = yield
     end
+  end
+
+  # What the rules raise, told apart by what the caller can do about it.
+  #
+  # The distinction the rules did not have: a service that did not answer
+  # says nothing whatsoever about the data, and used to be reported as
+  # though it did — an unreachable NCBI became a finding against the
+  # submitter's file, so everything was invalid while NCBI was down. It
+  # also could not be retried, because by the time it left the library it
+  # was a StandardError like any other.
+  class Error < StandardError; end
+
+  # Virtuoso, the DDBJ RDB, NCBI. Nothing was validated; ask again later.
+  class EndpointUnavailable < Error; end
+
+  # The query reached the service and the service refused it. Retrying
+  # will not help — this is ours to fix.
+  class QueryFailed < Error; end
+
+  # Connection-ish failures, whoever raises them. `PG::ConnectionBad` and
+  # friends are the honest signal; the socket-level ones arrive when the
+  # host is simply not there.
+  CONNECTION_ERRORS = [
+    Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::ETIMEDOUT,
+    SocketError, IOError, Timeout::Error
+  ].freeze
+
+  def self.connection_error?(error)
+    return true if defined?(PG::ConnectionBad)  && error.is_a?(PG::ConnectionBad)
+    return true if defined?(PG::UnableToSend)   && error.is_a?(PG::UnableToSend)
+
+    CONNECTION_ERRORS.any? { error.is_a?(it) }
   end
 
   # `Rails.error.report`, in the one place that calls it.

@@ -34,11 +34,15 @@ module DDBJValidator
     def split_sheet(original_excel_path, base_dir, mandatory_sheets = [])
       ret = {}
       sheet_list = nil
+      # 「読めない spreadsheet」だけを finding にする。`rescue => ex` は
+      # ライブラリが読み込まれていない (NameError) のような、データとは無関係な
+      # 失敗まで「Failed read excel file.」に変えてしまう — gem 化で roo が
+      # require されなくなったとき、症状は「出力ファイルが無い」だけだった。
       begin
         @data_file = File.basename(original_excel_path)
         xlsx = Roo::Excelx.new(original_excel_path, {expand_merged_ranges: true})
         sheet_list = xlsx.sheets
-      rescue => ex
+      rescue Roo::Error, Zip::Error, Errno::ENOENT => ex
         # load error
         annotation = [
           {key: 'Message', value: 'Failed read excel file.'}

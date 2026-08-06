@@ -62,7 +62,9 @@ module DDBJValidator
         # file_warning: :ignore — Roo の拡張子チェックで warn が出るのを抑える。
         # 中身がパースできない場合は後段で例外が上がるので、ここで弾く必要はない。
         xlsx = Roo::Excelx.new(data_xlsx, expand_merged_ranges: true, file_warning: :ignore)
-      rescue => ex
+      # 「読めない spreadsheet」だけを finding にする。データと無関係な失敗
+      # (ライブラリ不在など) までここで飲み込むと、原因が消える。
+      rescue Roo::Error, Zip::Error, Errno::ENOENT => ex
         annotation = [
           {key: 'Excel file', value: @data_file},
           {key: 'Error message', value: ex.message}

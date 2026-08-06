@@ -13,7 +13,7 @@ module DDBJValidator
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{BIOPROJECT_DB_NAME}'.\n"
         message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
+        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       ensure
         connection.close if connection
       end
@@ -26,7 +26,7 @@ module DDBJValidator
       rescue => ex
         message = 'Failed to convert xml file'
         message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
+        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       end
     end
 
@@ -37,7 +37,7 @@ module DDBJValidator
       rescue => ex
         message = "Failed to execute the query to DDBJ '#{BIOPROJECT_DB_NAME}'.\n"
         message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
+        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       ensure
         connection.close if connection
       end
@@ -58,7 +58,7 @@ module DDBJValidator
       rescue => ex
         message = 'Failed to convert xml file'
         message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
+        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       end
     end
 

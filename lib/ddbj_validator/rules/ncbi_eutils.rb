@@ -34,15 +34,17 @@ module DDBJValidator
       return nil if pubmed_id.nil?
       url = "#{DBCLS_MEDLINE_URL}/#{pubmed_id}.json"
       res = HTTP.get(url)
-      raise "'tm.dbcls.jp/medline' returns a server error. url: #{url}\n" if res.status.server_error?
-      raise "'tm.dbcls.jp/medline' returns an error. url: #{url}\n"       if res.status.client_error?
+      raise DDBJValidator::EndpointUnavailable, "'tm.dbcls.jp/medline' returns a server error. url: #{url}\n" if res.status.server_error?
+      raise DDBJValidator::QueryFailed,          "'tm.dbcls.jp/medline' returns an error. url: #{url}\n"        if res.status.client_error?
 
       entry = res.parse(:json)
       !entry['MedlineCitationSet'].nil? && !entry['MedlineCitationSet'].keys.empty?
     rescue JSON::ParserError
-      raise "Parse error: 'tm.dbcls.jp/medline' might not return JSON. url: #{url}\n body: #{res&.body}\n"
+      raise DDBJValidator::EndpointUnavailable, "Parse error: 'tm.dbcls.jp/medline' might not return JSON. url: #{url}\n body: #{res&.body}\n"
+    rescue DDBJValidator::Error
+      raise
     rescue => ex
-      raise StandardError, "Connection to 'tm.dbcls.jp/medline' failed. url: #{url}\n", ex.backtrace
+      raise DDBJValidator::EndpointUnavailable, "Connection to 'tm.dbcls.jp/medline' failed. url: #{url}\n", ex.backtrace
     end
 
     #
@@ -55,16 +57,18 @@ module DDBJValidator
       sleep(0.4)
       url = "#{EUTILS_SUMMARY_URL}?db=#{db_name}&id=#{id}&retmode=json"
       res = HTTP.get(url)
-      raise "'NCBI eutils' returns a server error. url: #{url}\n" if res.status.server_error?
-      raise "'NCBI eutils' returns an error. url: #{url}\n"       if res.status.client_error?
+      raise DDBJValidator::EndpointUnavailable, "'NCBI eutils' returns a server error. url: #{url}\n" if res.status.server_error?
+      raise DDBJValidator::QueryFailed,          "'NCBI eutils' returns an error. url: #{url}\n"        if res.status.client_error?
 
       entry = res.parse(:json)
       # responseデータに error キーがなければ存在する ID
       !entry['result'].nil? && !entry['result'][id].nil? && entry['result'][id]['error'].nil?
     rescue JSON::ParserError
-      raise "Parse error: 'NCBI eutils' might not return JSON. url: #{url}\n body: #{res&.body}\n"
+      raise DDBJValidator::EndpointUnavailable, "Parse error: 'NCBI eutils' might not return JSON. url: #{url}\n body: #{res&.body}\n"
+    rescue DDBJValidator::Error
+      raise
     rescue => ex
-      raise StandardError, "Connection to 'NCBI eutils' failed. url: #{url}\n", ex.backtrace
+      raise DDBJValidator::EndpointUnavailable, "Connection to 'NCBI eutils' failed. url: #{url}\n", ex.backtrace
     end
   end
 end

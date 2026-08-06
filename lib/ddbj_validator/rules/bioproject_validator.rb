@@ -210,36 +210,36 @@ module DDBJValidator
     #
     def invalid_publication_identifier (rule_code, project_label, project_node, line_num)
       pub_path = '//Project/ProjectDescr/Publication'
+      # NCBI に届かなかった場合は例外がそのまま抜ける。以前はここで握って
+      # 「connection to NCBI service failed」という finding に変えていたが、
+      # それは投稿者のファイルに対する指摘として並び、validity を invalid に
+      # した。NCBI が落ちている間、投稿は全部「無効」になっていた。
       bad = project_node.xpath(pub_path).each_with_index.filter_map {|pub_node, idx| # 複数出現の可能性あり
         id = get_node_text(pub_node, '@id')
         db_type = ''
-        message = nil
-        begin
-          if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !NcbiEutils.exist_pubmed_id?(id)
-            db_type = 'ePubmed'
-          elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
-            # DOI の場合はチェックをしない https://github.com/ddbj/ddbj_validator/issues/18
-            next
-          elsif !pub_node.xpath("DbType[text()='ePMC']").empty? && !NcbiEutils.exist_pmc_id?(id)
-            db_type = 'ePMC'
-          else
-            next
-          end
-        rescue # NCBI 問合せ中のシステムエラー
-          message = 'Validation processing failed because connection to NCBI service failed.'
+
+        if !pub_node.xpath("DbType[text()='ePubmed']").empty? && !NcbiEutils.exist_pubmed_id?(id)
+          db_type = 'ePubmed'
+        elsif !pub_node.xpath("DbType[text()='eDOI']").empty?
+          # DOI の場合はチェックをしない https://github.com/ddbj/ddbj_validator/issues/18
+          next
+        elsif !pub_node.xpath("DbType[text()='ePMC']").empty? && !NcbiEutils.exist_pmc_id?(id)
+          db_type = 'ePMC'
+        else
+          next
         end
-        [db_type, id, idx + 1, message]
+
+        [db_type, id, idx + 1]
       }
       return true if bad.empty?
 
-      bad.each do |db_type, id, position, message|
+      bad.each do |db_type, id, position|
         annotation = [
           {key: 'Project name', value: project_label},
           {key: 'DbType',       value: db_type},
           {key: 'ID',           value: id},
           {key: 'Path',         value: "#{pub_path}[#{position}]/@id"} # 順番を表示
         ]
-        annotation.push({key: 'Message', value: message}) if message
         add_error(rule_code, annotation)
       end
       false

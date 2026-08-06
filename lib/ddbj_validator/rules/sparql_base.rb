@@ -36,7 +36,7 @@ module DDBJValidator
         end
         message = "Failed the sparql query. endpoint: '#{@endpoint_url}' sparql query: '#{query}'.\n"
         message += "#{ex.message} (#{ex.class})"
-        raise StandardError, message, ex.backtrace
+        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       end
       return [] if result_json['results']['bindings'].empty?
       result = result_json['results']['bindings'].map do |b|

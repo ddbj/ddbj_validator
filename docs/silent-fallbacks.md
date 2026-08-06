@@ -7,7 +7,7 @@
 
 ---
 
-## A. 設備障害が「データの誤り」として報告される
+## A. 設備障害が「データの誤り」として報告される  — **対応済み**
 
 投稿者は自分のファイルを直そうとする。直しようがない。
 
@@ -124,4 +124,8 @@ end
 - A-1 / A-2 / B-1 / B-2 の `rescue` はこれを握らない（素通りさせる）
 - ホスト (ddbj-repository) 側: `retry_on DDBJValidator::EndpointUnavailable`
 
-A から着手する。投稿者に嘘をついているのは A だけで、B は「効いていない」だけなので。
+A は対応済み。`Error` / `EndpointUnavailable` / `QueryFailed` を導入し、
+NCBI・DDBJ RDB・Virtuoso の接続失敗が rule を素通りするようにした
+(`DDBJValidator.connection_error?` が socket / PG レベルの失敗を判定する)。
+残りは B。「効いていない」だけで嘘はついていないぶん急がないが、
+気付けないぶん性質は悪い。
