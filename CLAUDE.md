@@ -152,10 +152,13 @@ WebMock が `allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub`
 作られている。取り違えると 45 万件の生物が「存在しない」ことになる。
 
 ```sh
-data_updater/taxonomy/build.sh                                         # 日次。.env を読む
+data_updater/taxonomy/build.sh                                         # 日次
 ruby data_updater/taxonomy/verify.rb taxonomy.sqlite3 <new_taxdump-dir>
 bin/deploy_tools/update_taxonomy_db_staging1.sh                        # 各インスタンスへ配る
 ```
+
+**サーバ側の準備は要らない。** 読み書きする場所は `data_updater/paths.sh` に書いてあり、
+チェックアウトすればそのまま動く（以前は `.env` を作る必要があった）。
 
 `build.sh` は `generate.rb`（約 8 分・1.1GB）を包んで、出来上がってから置く。配布側の
 `update_taxonomy_db` は **コンテナを止めない** — copy して mv するだけ。同一ファイル

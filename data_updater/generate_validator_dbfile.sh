@@ -1,19 +1,16 @@
 #!/bin/bash
 set -e
 
-# .envの環境変数を使用
-if [ -f .env ]; then
-  export $(grep -v '^#' .env | xargs)
-fi
+. "$(dirname "$0")/paths.sh"
 
-VIRTUOSO_DIR=$BASE_DIR/virtuoso
-TAX_OWL_DIR=$BASE_DIR/ddbj-ontologies
-DBFILE_DIR=$BASE_DIR/dbfile
+VIRTUOSO_DIR=$DATA_UPDATER_DIR/virtuoso
+TAX_OWL_DIR=$DATA_UPDATER_DIR/ddbj-ontologies
+DBFILE_DIR=$DATA_UPDATER_DIR/dbfile
 if [ ! -d "$DBFILE_DIR" ]; then
     mkdir -p "$DBFILE_DIR"
 fi
 
-LOG_FILE=$BASE_DIR/update_db_file.log
+LOG_FILE=$DATA_UPDATER_DIR/update_db_file.log
 LOG()
 {
  echo `date +'%Y/%m/%d %H:%M:%S'` $1 >> $LOG_FILE
@@ -22,7 +19,7 @@ LOG()
 # 最新の taxdump から Owl Convartor を使って変換してttlファイルを生成する
 LOG "generate latest taxonomy-private.ttl"
 cd $TAX_OWL_DIR
-cp $DDBJ_SHARE_DIR/$ORIGINAL_TAX_DUMP_FILE $TAX_OWL_DIR/data/taxdump/
+cp $TAXDUMP $TAX_OWL_DIR/data/taxdump/
 podman-compose run --rm convertor sh /usr/src/app/bin/generate_ontologies_taxonomy_ttl.sh
 
 # ロード用ディレクトリにコピー
@@ -49,7 +46,7 @@ podman-compose up -d
 count=0
 while :
 do
-  length="$(curl -fsSL http://localhost:${VIRT_PORT} | wc -l)"
+  length="$(curl -fsSL http://localhost:${UPDATER_VIRTUOSO_PORT} | wc -l)"
   if [ $length -ne 0 ]; then
     break
   fi
