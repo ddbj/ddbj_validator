@@ -2,19 +2,19 @@ class PackagesController < ApplicationController
   before_action :ensure_package_param, only: %i[attributes attribute_template info]
 
   def list
-    render_package_result(sparql_package.package_list(requested_version))
+    render_package_result(packages.package_list(requested_version))
   end
 
   def list_with_groups
-    render_package_result(sparql_package.package_and_group_list(requested_version))
+    render_package_result(packages.package_and_group_list(requested_version))
   end
 
   def attributes
-    render_package_result(sparql_package.attribute_list(requested_version, params[:package]))
+    render_package_result(packages.attribute_list(requested_version, params[:package]))
   end
 
   def attribute_template
-    ret = DDBJValidator::Package.new(nil).attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)
+    ret = packages.attribute_template_file(requested_version, params[:package], params[:only_biosample_sheet].present?, accept_header)
 
     case ret[:status]
     when 'success'
@@ -29,7 +29,7 @@ class PackagesController < ApplicationController
   end
 
   def info
-    render_package_result(sparql_package.package_info(requested_version, params[:package]))
+    render_package_result(packages.package_info(requested_version, params[:package]))
   end
 
   private
@@ -40,9 +40,8 @@ class PackagesController < ApplicationController
     render_error("'package' parameter is required", status: :bad_request)
   end
 
-  def sparql_package
-    DDBJValidator::Package.new(validator_setting['sparql_endpoint']['master_endpoint'])
-  end
+  # パッケージ定義は gem に同梱されているので、エンドポイントも接続も要らない
+  def packages = DDBJValidator::Package.new
 
   def requested_version
     params[:version].presence || biosample_package_version

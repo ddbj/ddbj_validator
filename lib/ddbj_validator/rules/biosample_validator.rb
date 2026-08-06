@@ -9,10 +9,6 @@ module DDBJValidator
     attr_reader :error_list
     attr_reader :conf
 
-    # クラス読み込み時に app/sparql/biosample/*.rq.erb を ERB コンパイルしてキャッシュする。
-    SPARQL = DDBJValidator.sparql_dir.glob('biosample/*.rq.erb').to_h {|path|
-      [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
-    }.freeze
     #
     # Initializer
     #
@@ -49,6 +45,7 @@ module DDBJValidator
       @org_validator     = OrganismValidator.new(@conf[:sparql_config]['master_endpoint'], @conf[:named_graph_uri]['taxonomy'])
       @institution_list  = CollDump.parse(@conf[:institution_list_file])
       @tsv_validator     = TsvColumnValidator.new
+      @package_defs      = PackageDefinitions.new
       @package_version   = @conf[:biosample]['package_version']
       @db_validator      = DDBJDbValidator.new(@conf[:ddbj_db_config])
       @error_list        = []
@@ -363,10 +360,7 @@ module DDBJValidator
     # ]
     def get_attributes_of_package (package_name, package_version)
       DDBJValidator.cache.fetch(['package_attributes', package_name]) {
-        sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
-        params = {package_name: package_name, version: package_version}
-        sparql_query = SPARQL[:attributes_of_package].result_with_hash(params)
-        result = sparql.query(sparql_query)
+        result = @package_defs.attributes_of_package(package_version, package_name)
         result.map {|row|
           attr_require = row[:require] == 'has_mandatory_attribute' ? 'mandatory' : 'optional'
           type = row[:require].sub('has_', '')  # 'mandatory_attribute', 'either_one_mandatory_attribute', 'optional_attribute', 'attribute'
@@ -401,10 +395,7 @@ module DDBJValidator
       return [] if Gem::Version.create(package_version) < Gem::Version.create('1.4.0')
 
       DDBJValidator.cache.fetch(['package_attribute_groups', package_name]) {
-        sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
-        params = {package_name: package_name, version: package_version}
-        sparql_query = SPARQL[:attribute_groups_of_package].result_with_hash(params)
-        result = sparql.query(sparql_query)
+        result = @package_defs.attribute_groups_of_package(package_version, package_name)
         result.group_by {|row| row[:group_name] }.map {|group, items|
           {group_name: group, attribute_set: items.map { it[:attribute_name] }}
         }
@@ -644,13 +635,7 @@ module DDBJValidator
     def unknown_package (rule_code, sample_name, package_name, package_version, line_num)
       return nil if package_name.blank?
 
-      result = DDBJValidator.cache.fetch(['unknown_package', package_name]) {
-        sparql = SPARQLBase.new(@conf[:sparql_config]['master_endpoint'])
-        params = {package_name: package_name, version: package_version}
-        sparql_query = SPARQL[:valid_package_name].result_with_hash(params)
-        sparql.query(sparql_query)
-      }
-      if result.first[:count].to_i <= 0
+      unless @package_defs.valid_package_name?(package_version, package_name)
         annotation = [
           {key: 'Sample name', value: sample_name},
           {key: 'package', value: package_name}

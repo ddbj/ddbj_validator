@@ -1,44 +1,26 @@
-require 'erb'
-
 module DDBJValidator
-  class Package < SPARQLBase
-    # クラス読み込み時に app/sparql/package/*.rq.erb を全部 ERB コンパイルしてキャッシュする。
-    # 呼び出し側は SPARQL[:package_list].result_with_hash(params) だけで済む。
-    SPARQL = DDBJValidator.sparql_dir.glob('package/*.rq.erb').to_h {|path|
-      [path.basename('.rq.erb').to_s.to_sym, ERB.new(path.read).freeze]
-    }.freeze
-
-    #
-    # Initializer
-    #
-    # ==== Args
-    # endpoint: endpoint url
-    #
-    def initialize (endpoint)
-      super(endpoint)
-      @setting = DDBJValidator.config
+  # BioSample パッケージ定義を返す API。以前は版ごとの named graph に SPARQL を投げて
+  # いたが、定義は gem に同梱されたので endpoint は要らなくなった (PackageDefinitions)。
+  class Package
+    def initialize (definitions = PackageDefinitions.new)
+      @definitions = definitions
     end
 
     def package_list (version)
-      params = {version: version}
-      sparql_query = SPARQL[:package_list].result_with_hash(params)
-      ret = query(sparql_query)
+      ret = @definitions.package_list(version)
       if ret.any?
         {status: 'success', data: ret}
       else  # 結果が空の場合に存在するversionかチェック
-        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
-        ret_package_data = query(sparql_query)
-        if ret_package_data.empty?
-          {status: 'fail', message: 'Wrong parameter: invalid package version'}
-        else
+        if @definitions.known_version?(version)
           {status: 'error', message: 'Processing finished with error. Please check the validation service.'}
+        else
+          {status: 'fail', message: 'Wrong parameter: invalid package version'}
         end
       end
     end
 
     # package_groupとpackageのリストをアプリ表示用に階層型に整形して返す
     def package_and_group_list (version)
-      params = {version: version}
       begin
         if version.split('.')[0..1].join('.').to_f < 1.4
           return {status: 'fail', message: 'Wrong parameter: This method is supported since version 1.4.'}
@@ -48,15 +30,13 @@ module DDBJValidator
       end
 
       # package listを取得
-      sparql_query = SPARQL[:package_list].result_with_hash(params)
-      package_list = query(sparql_query)
+      package_list = @definitions.package_list(version)
       package_list.each do |row|
         row[:type] = 'package'
       end
 
       # package group listを取得
-      sparql_query = SPARQL[:package_group_list].result_with_hash(params)
-      package_group_list = query(sparql_query)
+      package_group_list = @definitions.package_group_list(version)
       package_group_list.each do |row|
         row[:type] = 'package_group'
       end
@@ -70,12 +50,10 @@ module DDBJValidator
         end
         {status: 'success', data: package_tree}
       else # 結果が空の場合に存在するversionかチェック
-        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
-        ret_package_data = query(sparql_query)
-        if ret_package_data.empty?
-          {status: 'fail', message: 'Wrong parameter: invalid package version.'}
-        else
+        if @definitions.known_version?(version)
           {status: 'error', message: 'Processing finished with error. Please check the validation service.'}
+        else
+          {status: 'fail', message: 'Wrong parameter: invalid package version.'}
         end
       end
     end
@@ -123,12 +101,9 @@ module DDBJValidator
     end
 
     def attribute_list (version, package_id)
-      params = {version: version, package_id: package_id}
-      sparql_query = SPARQL[:attribute_list].result_with_hash(params)
-      attr_list = query(sparql_query)
+      attr_list = @definitions.attribute_list(version, package_id)
       if attr_list.any?
-        sparql_query = SPARQL[:attribute_group_list].result_with_hash(params)
-        group_list = query(sparql_query)
+        group_list = @definitions.attribute_group_list(version, package_id)
         attr_list.each do |row|
           match = group_list.find {|group| group[:attribute_name] == row[:attribute_name] }
           unless match.nil?
@@ -140,12 +115,10 @@ module DDBJValidator
         end
         {status: 'success', data: attr_list}
       else # 結果が空の場合に存在するversionかチェック
-        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
-        ret_package_data = query(sparql_query)
-        if ret_package_data.empty?
-          {status: 'fail', message: 'Wrong parameter: invalid package version.'}
-        else
+        if @definitions.known_version?(version)
           {status: 'fail', message: 'Wrong parameter: invalid package version or package id.'}
+        else
+          {status: 'fail', message: 'Wrong parameter: invalid package version.'}
         end
       end
     end
@@ -178,18 +151,14 @@ module DDBJValidator
     end
 
     def package_info (version, package_id)
-      params = {version: version, package_id: package_id}
-      sparql_query = SPARQL[:package_info].result_with_hash(params)
-      ret = query(sparql_query)
+      ret = @definitions.package_info(version, package_id)
       if ret.any?
         {status: 'success', data: ret.first}
       else  # 結果が空の場合に存在するversionかチェック
-        sparql_query = SPARQL[:is_exist_package_version].result_with_hash(params)
-        ret_package_data = query(sparql_query)
-        if ret_package_data.empty?
-          {status: 'fail', message: 'Wrong parameter: invalid package version.'}
-        else
+        if @definitions.known_version?(version)
           {status: 'fail', message: 'Wrong parameter: invalid package version or package id.'}
+        else
+          {status: 'fail', message: 'Wrong parameter: invalid package version.'}
         end
       end
     end

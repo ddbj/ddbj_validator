@@ -1,0 +1,26 @@
+# conf/package_definitions/ を作り直すためだけの使い捨て Virtuoso。
+# 実行時には使わない — パッケージ定義は gem に同梱されている。
+#
+#   cd data_updater/package_definitions
+#   docker compose up -d && ./load.sh
+#   ruby generate.rb http://localhost:8891/sparql
+#   ruby verify.rb   http://localhost:8891/sparql
+#   docker compose down
+#
+# 開発用 (compose.dev.yaml) と衝突しないようポートをずらしてある。
+services:
+  virtuoso:
+    image: openlink/virtuoso-opensource-7:7.2.6-r1-g0a3336c
+    ports:
+      - '127.0.0.1:8891:8890'
+    environment:
+      DBA_PASSWORD: dba
+      VIRT_Parameters_DirsAllowed: '., /ttl'
+      VIRT_Parameters_NumberOfBuffers: '340000'
+      VIRT_Parameters_MaxDirtyBuffers: '250000'
+      # 1.5.0 だけで 209 万トリプルあるので、既定の上限では取り切れない
+      VIRT_SPARQL_ResultSetMaxRows: '5000000'
+      VIRT_SPARQL_MaxQueryExecutionTime: '3000'
+      VIRT_SPARQL_MaxQueryCostEstimationTime: '-1'
+    volumes:
+      - ../virtuoso/rdf_data/biosample:/ttl:ro

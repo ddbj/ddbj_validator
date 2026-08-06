@@ -41,15 +41,9 @@ class TestValidatorCache < ActiveSupport::TestCase
     assert_equal ret1, ret2
   end
 
-  def test_cache_unknown_package
-    package_name    = 'MIGS.ba.soil'
-    package_version = @validator.instance_variable_get(:@package_version)
-
-    ret1 = @validator.send('unknown_package', 'BS_R0026', 'sampleA', package_name, package_version, 1)
-    assert Rails.cache.exist?(['unknown_package', package_name])
-    ret2 = @validator.send('unknown_package', 'BS_R0026', 'sampleA', package_name, package_version, 1)
-    assert_equal ret1, ret2
-  end
+  # unknown_package のキャッシュは無くなった。パッケージ名が有効かどうかは gem に同梱した
+  # 一覧の集合演算になり、ホストのキャッシュに載せる意味が無い (挙動は
+  # biosample_validator_test#test_unknown_package)
 
   def test_cache_invalid_publication_identifier
     ref_attr = JSON.parse(Rails.root.join('conf/biosample/reference_attributes.json').read)
