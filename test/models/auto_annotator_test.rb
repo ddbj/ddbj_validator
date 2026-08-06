@@ -69,9 +69,10 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal 'error', ret[:status]
-    # ファイル不在時は DDBJValidator::FileParser 側で "unknown" フォーマットとして扱われ、auto_annotator が
-    # "Can't parse ... original file type." を raise する (元の期待文言 "Original file is not found" は未実装)
-    assert ret[:message].include?("Can't parse")
+    # 不在のファイルは不在として報告される。以前は FileParser が読み込み失敗を
+    # 握って "unknown" フォーマットに変え、"Can't parse ... original file type."
+    # になっていた — 「読めない」が「知らない形式」に化けていた。
+    assert_match(/No such file or directory/, ret[:message])
 
     ## biosample invalid original file format (xml => json)
     http_accept = '*/*'

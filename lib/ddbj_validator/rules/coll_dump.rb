@@ -14,7 +14,7 @@ module DDBJValidator
     #   specimen_voucher:   ["ASU", "NBSB", "NBSB:Bird", ...],
     #   bio_material:       ["ABRC", "CIAT", "CIAT:Bean", ...]
     # }
-    # ダウンロードに失敗した/ファイルが空の場合は nil
+    # ダウンロードに失敗した/ファイルが空の場合は EndpointUnavailable
     #
     def self.parse (dump_file)
       # 指定された coll_dump.txt がない場合はダウンロードする
@@ -25,12 +25,21 @@ module DDBJValidator
           ftp.passive = true
           ftp.chdir('/pub/taxonomy/')
           ftp.getbinaryfile('coll_dump.txt', dump_file, 1024)
-        rescue
+        rescue => ex
+          # 以前はここで握り潰し、参照データ無しのまま検証を続けていた。
+          # specimen_voucher / culture_collection / bio_material のチェックが
+          # 黙って効かなくなるだけで、レポートには何も出なかった。
+          raise DDBJValidator::EndpointUnavailable,
+                "Failed to download coll_dump.txt from NCBI FTP. #{ex.message} (#{ex.class})",
+                ex.backtrace
         ensure
           ftp.close unless ftp.nil?
         end
       end
-      return nil if !File.exist?(dump_file) || File.size(dump_file) == 0
+
+      if !File.exist?(dump_file) || File.size(dump_file) == 0
+        raise DDBJValidator::EndpointUnavailable, "coll_dump.txt is missing or empty: #{dump_file}"
+      end
 
       ret = {culture_collection: [], specimen_voucher: [], bio_material: []}
       File.open(dump_file) do |f|

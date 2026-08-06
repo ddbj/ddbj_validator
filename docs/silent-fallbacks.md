@@ -59,7 +59,7 @@ rescue => ex
 
 ---
 
-## B. 設備障害が「何も見つからなかった」になる
+## B. 設備障害が「何も見つからなかった」になる — **対応済み**
 
 誰も気付かない。検証は通る。
 
@@ -93,7 +93,14 @@ specimen_voucher / culture_collection のチェックが**黙って効かなく�
 ### B-3. FileParser の多段フォールバック
 
 `file_parser.rb` 7 箇所。json → xml → tsv と順に試し、全部失敗したら nil。
-「壊れた JSON」と「JSON ではない何か」と「読めないファイル」が同じ。
+
+**多段フォールバック自体は妥当だった** — これは投稿ファイルの形式判定なので。
+実際の欠陥は 2 つと狭い。(1) JSON 分岐だけが理由 (`message:`) を捨てていた。
+(2) `File.read` の失敗までフォールバックに流れ込み、**存在しないファイルが
+「知らない形式」として報告されていた**。パースエラーだけを握るようにした。
+
+ついでに `document.error` (正しくは `errors`) という潜在バグが出た。元の分岐が
+素の `raise` だったので触れずに済んでいたもの。
 
 ---
 
@@ -124,8 +131,12 @@ end
 - A-1 / A-2 / B-1 / B-2 の `rescue` はこれを握らない（素通りさせる）
 - ホスト (ddbj-repository) 側: `retry_on DDBJValidator::EndpointUnavailable`
 
-A は対応済み。`Error` / `EndpointUnavailable` / `QueryFailed` を導入し、
-NCBI・DDBJ RDB・Virtuoso の接続失敗が rule を素通りするようにした
+A・B とも対応済み。`Error` / `EndpointUnavailable` / `QueryFailed` を導入し、
+NCBI・DDBJ RDB・Virtuoso・NCBI FTP の接続失敗が rule を素通りするようにした
 (`DDBJValidator.connection_error?` が socket / PG レベルの失敗を判定する)。
-残りは B。「効いていない」だけで嘘はついていないぶん急がないが、
-気付けないぶん性質は悪い。
+
+新しい `rescue` を書くときの判断:
+
+- **設備に届かなかった** → `EndpointUnavailable`。データについては何も言わない
+- **届いて断られた** → `QueryFailed`。リトライしても無駄
+- **データが期待した形でない** → finding。これだけが検証結果

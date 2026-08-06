@@ -19,8 +19,11 @@ module DDBJValidator
         begin
           ret = JSON.parse(File.read(file_path))
           return {format: 'json', data: ret}
-        rescue # 拡張子と中身があっていなければnil
-          return {format: 'invalid:json', data: nil}
+        rescue JSON::ParserError => ex # 拡張子と中身があっていない
+          # xml / tsv 分岐と同じく理由を持って帰る。ここだけ捨てていたので、
+          # 「JSON として壊れている」が理由のない invalid:json になっていた。
+          # ファイル自体が読めない場合 (Errno) はここで握らず素通りさせる。
+          return {format: 'invalid:json', message: ex.message, data: nil}
         end
       elsif filetype == 'xml' || ext.downcase == 'xml'
         begin
@@ -28,10 +31,10 @@ module DDBJValidator
           if document.errors.empty?
             return {format: 'xml', data: document}
           else
-            return {format: 'invalid:xml', message: document.error, data: nil}
+            return {format: 'invalid:xml', message: document.errors.join(', '), data: nil}
           end
-        rescue # 拡張子と中身があっていなければnil
-          return {format: 'invalid:xml', data: nil}
+        rescue Nokogiri::XML::SyntaxError => ex # 拡張子と中身があっていない
+          return {format: 'invalid:xml', message: ex.message, data: nil}
         end
       elsif filetype == 'tsv' || ext.downcase == 'tsv'
         ret = parse_csv(file_path, "\t")
@@ -45,18 +48,23 @@ module DDBJValidator
       elsif ext.downcase == 'csv'
         return {format: 'csv', data: nil}  # 扱わないのでパースしない
       else # 拡張子が明示的でなければ中身で判定
+        # 読めなかった時点で打ち切る。以前は File.read の失敗も下の
+        # フォールバックに流れ込み、「存在しないファイル」が「知らない形式」
+        # として報告されていた。
+        content = File.read(file_path)
+
         begin
-          document = Nokogiri::XML(File.read(file_path))
+          document = Nokogiri::XML(content)
           if document.errors.empty?
             return {format: 'xml', data: document}
           else
-            raise
+            raise Nokogiri::XML::SyntaxError, document.errors.join(', ')
           end
-        rescue
+        rescue Nokogiri::XML::SyntaxError
           begin
-            ret = JSON.parse(File.read(file_path))
+            ret = JSON.parse(content)
             return {format: 'json', data: ret}
-          rescue
+          rescue JSON::ParserError
             begin
               ret = parse_csv(file_path, "\t")
               if ret[:data].nil?

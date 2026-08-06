@@ -139,8 +139,13 @@ module DDBJValidator
         hash = JSON.parse(json)
         head = hash['head']['vars']
         body = hash['results']['bindings']
-      rescue
-        return ''
+      rescue => ex
+        # 以前はここで '' を返していた。呼び出し側はそれを「該当なし」と読むので、
+        # Virtuoso が SPARQL 結果を返していないことと「その organism は存在しない」
+        # が同じ意味になっていた。
+        raise DDBJValidator::EndpointUnavailable,
+              "SPARQL endpoint did not return a parsable result. #{ex.message} (#{ex.class})",
+              ex.backtrace
       end
       text = ''
       text << head.join("\t") + "\n"
