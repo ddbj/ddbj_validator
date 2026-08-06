@@ -1,11 +1,7 @@
-require 'yaml'
-
 module DDBJValidator
   class Submitter
     def initialize
       @setting = DDBJValidator.config
-      @version = YAML.load(ERB.new(DDBJValidator.conf_dir.join('version.yml').read).result)
-      @latest_version = @version['version']['validator']
     end
     def submission_id_list(file_type)
       case file_type

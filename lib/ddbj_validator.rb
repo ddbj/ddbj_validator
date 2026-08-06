@@ -2,6 +2,8 @@
 
 require 'logger'
 require 'pathname'
+
+require_relative 'ddbj_validator/version'
 # Everything the rules use. They were getting these for free from the
 # Rails app's `Bundler.require`, which requires what the Gemfile lists —
 # a gem has to ask for its own.

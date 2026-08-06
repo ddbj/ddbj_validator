@@ -10,8 +10,6 @@ module DDBJValidator
 
       # constructor
       def initialize
-        @version = YAML.load(ERB.new(DDBJValidator.conf_dir.join('version.yml').read).result)
-        @latest_version = @version['version']['validator']
         @setting = DDBJValidator.config
         @running_dir = @setting['api_log']['path'] + '/running/'
         FileUtils.mkdir_p(@running_dir)
@@ -84,7 +82,7 @@ module DDBJValidator
 
             stats = get_result_stats(error_list)
 
-            ret = {version: @latest_version, validity: true}
+            ret = {version: DDBJValidator::VERSION, validity: true}
             ret[:validity]  = false if stats[:error_count] > 0
             ret['stats']    = stats
             ret['messages'] = error_list
@@ -174,7 +172,7 @@ module DDBJValidator
         # ExcelからTSVへの変換の実行
         split_result = Excel2Tsv.new().split_sheet(original_excel_path, base_dir, mandatory_sheets)
         if split_result[:status] == 'failed' # 変換時にルール違反があった場合はfailedとして結果する
-          ret = {version: @latest_version, validity: true}
+          ret = {version: DDBJValidator::VERSION, validity: true}
           stats = get_result_stats(split_result[:error_list])
           ret[:validity] = false if stats[:error_count] > 0
           ret['stats'] = stats

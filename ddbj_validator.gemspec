@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'yaml'
+require_relative 'lib/ddbj_validator/version'
 
 Gem::Specification.new do |spec|
   spec.name    = 'ddbj_validator'
-  spec.version = YAML.safe_load_file(File.expand_path('conf/version.yml', __dir__)).dig('version', 'validator')
+  spec.version = DDBJValidator::VERSION
   spec.summary = 'DDBJ submission validation rules (BioSample / BioProject / DRA / Trad / JVar / MetaboBank)'
   spec.authors = ['DDBJ']
   spec.license = 'MIT'

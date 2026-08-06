@@ -9,7 +9,7 @@ DDBJ Validator — BioSample / BioProject / DRA / Trad / JVar / MetaboBank の
 ## 構成
 
 ```
-ddbj_validator.gemspec        version は conf/version.yml の validator: を読む
+ddbj_validator.gemspec        version は lib/ddbj_validator/version.rb を読む
 lib/
   ddbj_validator.rb           ホストから受け取るもの・ディレクトリ・例外・ローダ
   ddbj_validator/
@@ -24,8 +24,12 @@ data_updater/                 日次の virtuoso.db ビルド（下記）
 
 **ルールは gem、Rails アプリはその最初の利用者**という形になっている
 (`refactor/extract-rules-gem`)。同一リポジトリなのは、ルールと参照データと SPARQL
-クエリが一緒にバージョニングされるものだから（`conf/version.yml` の `rule:` が
-それらをまとめて指す）。
+クエリが一緒にバージョニングされるものだから — **その版は `DDBJValidator::VERSION`
+一本**で、gem の版であり、`result.json` の `version` として投稿者にも見える。
+
+（かつては `conf/version.yml` に `api` / `rule` / `validator` の 3 つがあったが、
+読まれていたのは `validator` だけで、残り 2 つはどこからも参照されていなかった。
+「`rule:` が参照データの版を指す」というのは意図の表明であって仕組みではなかった。）
 
 ## なぜ gem 化したか
 
@@ -208,7 +212,7 @@ cache.fetch([:static, 'country_from_latlon', lat, lon])   { ... }
 
 未解決なのは graph 群の**版の出所**。アプリからは今どのグラフを見ているのか分からない。
 候補: `ddbj_owl.virtuoso.YYYYMMDD.db` の日付を渡す / グラフ自身に版のトリプルを
-持たせて SPARQL で引く。`conf/version.yml` は**ルール**の版であってグラフの版では
+持たせて SPARQL で引く。`DDBJValidator::VERSION` は**ルール**の版であってグラフの版では
 ないので使えない。**taxonomy を Virtuoso から出せば、この問題自体が消える**（下記）。
 
 ## Virtuoso に何が入っているか
