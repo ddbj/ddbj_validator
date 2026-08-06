@@ -60,6 +60,8 @@ module DDBJValidator
     #
     #
     def validate (data_file, params = {})
+      start_run
+
       @data_file = File.basename(data_file)
 
       params = {} if params.nil? # nil エラー回避
@@ -999,7 +1001,7 @@ module DDBJValidator
 
       valid_format = bioproject_accession =~ /^PRJ[D|E|N]\w?\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
       ddbj_managed = bioproject_accession =~ /^PRJDB\d{1,}$/ || bioproject_accession =~ /^PSUB\d{6}$/
-      return true if valid_format && (!ddbj_managed || @db_validator.valid_bioproject_id?(bioproject_accession))
+      return true if valid_format && (!ddbj_managed || within_run(:valid_bioproject_id, bioproject_accession) { @db_validator.valid_bioproject_id?(bioproject_accession) })
 
       annotation = [
         {key: 'Sample name', value: sample_name},

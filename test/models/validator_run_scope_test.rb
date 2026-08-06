@@ -41,13 +41,42 @@ class TestValidatorRunScope < ActiveSupport::TestCase
     assert_equal 2, asked, '検証をまたいだら引き直す (随時変わるデータなので)'
   end
 
-  # ホストのキャッシュに載せてしまうと、プロセスの寿命ぶん古い答えが残る
-  def test_the_central_db_answer_does_not_reach_the_host_cache
+  # ホストのキャッシュに載せてしまうと、プロセスの寿命ぶん古い答えが残る。
+  # 1 箇所だけ確かめても他の差し戻しに気付けないので、中央 DB を引く rule を
+  # ひととおり通してからストアが空であることを見る
+  def test_no_central_db_answer_reaches_the_host_cache
     validator = DDBJValidator::BioSampleValidator.new
 
-    stub_db_validator(validator, umbrella_project?: ->(_accession) { false })
-    validator.send('invalid_bioproject_type', 'BS_R0028', 'sampleA', 'PRJDB1', 1)
+    stub_db_validator(validator,
+      umbrella_project?:                        ->(_) { false },
+      valid_bioproject_id?:                     ->(_) { true },
+      get_bioproject_referenceable_submitter_ids: ->(_) { ['test01'] },
+      get_bioproject_accession:                 ->(_) { 'PRJDB1' },
+      get_all_locus_tag_prefix:                 ->     { [] }
+    )
 
-    assert_empty Rails.cache.instance_variable_get(:@data).keys.grep(/umbrella/)
+    validator.send('invalid_bioproject_type',              'BS_R0028', 'sampleA', 'PRJDB1', 1)
+    validator.send('invalid_bioproject_accession',         'BS_R0005', 'sampleA', 'PRJDB1', 1)
+    validator.send('duplicated_locus_tag_prefix',           'BS_R0091', 'sampleA', 'ABC', [], 'SSUB000001', 1)
+    validator.send('bioproject_submission_id_replacement', 'BS_R0095', 'sampleA', 'PSUB004142', 1)
+
+    assert_empty Rails.cache.instance_variable_get(:@data),
+                 '中央 DB の答えはホストのキャッシュに載せない'
+  end
+
+  # インスタンスを使い回されても持ち越さない。利用者が conf の読み直しを避けようとして
+  # 使い回すのはありうるので、「そうなっているはず」ではなく validate の入口で捨てる
+  def test_a_reused_validator_still_asks_again
+    validator = DDBJValidator::BioSampleValidator.new
+    asked     = 0
+
+    stub_db_validator(validator, umbrella_project?: ->(_) { asked += 1; false })
+
+    2.times do
+      validator.send('start_run')
+      validator.send('invalid_bioproject_type', 'BS_R0028', 'sampleA', 'PRJDB1', 1)
+    end
+
+    assert_equal 2, asked
   end
 end

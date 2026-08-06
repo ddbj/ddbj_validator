@@ -199,7 +199,7 @@ bin/deploy_tools/update_taxonomy_db_staging1.sh                        # 各イ�
 形で出ていた。
 
 taxonomy がファイルになって「今どれを読んでいるか」が言えるようになり、その識別子を
-キーに混ぜたので、この問題は消えた。**残る 2 群（中央 DB / 静的データ）は未対応。**
+キーに混ぜたので、この問題は消えた。中央 DB 群も別の形で片付いた（下記）。
 
 ### キャッシュしているものは 1 種類ではない
 
@@ -241,9 +241,15 @@ within_run(:is_umbrella_id, accession) { @db_validator.umbrella_project?(accessi
 
 ```ruby
 cache.fetch([:taxonomy, taxonomy.source_digest, 'exist_organism_name', name]) { ... }
-cache.fetch([:rdb,      'is_umbrella_id', accession])                         { ... }
 cache.fetch([:static,   'country_from_latlon', lat, lon])                     { ... }
+
+# 中央 DB はホストのキャッシュに渡さない。検証 1 回に閉じる
+within_run(:is_umbrella_id, accession) { ... }
 ```
+
+**中央 DB の答えを `cache.fetch` に書かないこと。** 随時変わるものをプロセスの寿命ぶん
+持ち続けることになる（それが下記のバグだった）。新しく中央 DB を引くときは
+`within_run` を使う。
 
 **ホスト側**: 残る 2 群の方針を決める。taxonomy 群は版で無効化（対応済み）、static 群は
 無期限。rdb 群はホストに渡さず gem 側で検証 1 回に閉じたので、ホストが考えることは

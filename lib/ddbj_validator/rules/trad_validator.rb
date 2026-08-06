@@ -33,6 +33,8 @@ module DDBJValidator
     #
     #
     def validate(anno_file, seq_file, agp_file = nil, params = {})
+      start_run
+
       unless params['submitter_id'].nil?
         submitter_id = params['submitter_id']
       end
@@ -591,7 +593,7 @@ module DDBJValidator
         accession = bioproject_line[:value]
         case accession
         when /^PRJD\w?\d{1,}$/
-          next if @db_validator.valid_bioproject_id?(accession)
+          next if within_run(:valid_bioproject_id, accession) { @db_validator.valid_bioproject_id?(accession) }
         when /^PRJ(E|N)\w?\d{1,}$/
           next # 他極データは無視 (TR_R0033 でチェック)
         end
@@ -626,7 +628,7 @@ module DDBJValidator
         accession = biosample_line[:value]
         case accession
         when /^SAMD\w?\d{1,}$/
-          next if @db_validator.is_valid_biosample_id?(accession)
+          next if within_run(:valid_biosample_id, accession) { @db_validator.is_valid_biosample_id?(accession) }
         when /^SAM(E|N)\w?\d{1,}$/
           next # 他極データは無視 (TR_R0033 でチェック)
         end
@@ -1613,7 +1615,7 @@ module DDBJValidator
       bioproject_list.each do |row|
         bioproject_accession = row[:value]
         if bioproject_accession =~ /^PRJD\w?\d{1,}$/
-          is_umbrella = @db_validator.umbrella_project?(bioproject_accession)
+          is_umbrella = within_run(:is_umbrella_id, bioproject_accession) { @db_validator.umbrella_project?(bioproject_accession) }
           if is_umbrella == true # NG
             annotation = [
                 {key: 'DBLINK/project', value: bioproject_accession},

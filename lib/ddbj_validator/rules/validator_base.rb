@@ -16,9 +16,18 @@ module DDBJValidator
     # 返し続ける（本番のアプリは 3 週間動きっぱなしだった）。
     #
     # validator は検証ごとに new されるので、インスタンス変数がそのままこのスコープになる。
+    # ただしそれは前提であって強制ではない — 利用者が conf の読み直しを避けようとして
+    # インスタンスを使い回すと、プロセスの寿命まで戻ってしまう。だから validate の
+    # 入口で捨てる (start_run)。
     #
     def within_run (*key)
       @within_run.fetch(key) { @within_run[key] = yield }
+    end
+
+    # 各 validator の validate が最初に呼ぶ。持ち越しを「そうなっているはず」ではなく
+    # 「そうする」に変えるためのもの
+    def start_run
+      @within_run.clear
     end
 
     #
