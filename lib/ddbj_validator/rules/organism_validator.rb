@@ -194,22 +194,6 @@ module DDBJValidator
     end
 
     #
-    # 指定されたtax_idがplastidを持つ生物として知られていればtrueを返す
-    #
-    # ==== Args
-    # tax_id: target_tax_id ex. "132459"
-    #
-    # ==== Return
-    # returns true if tax_id has plastid flag(has geneticCodePt 4 or 11)
-    #
-    def has_plastids(tax_id)
-      params = {tax_id: tax_id, tax_graph_uri: @tax_graph_uri}
-      sparql_query = SPARQL[:has_plastid].result_with_hash(params)
-      result = query(sparql_query)
-      result.any?
-    end
-
-    #
     # 指定したtax_idの分類のランクがSpecies以下ならばtrueを返す
     #
     # ==== Args
@@ -289,11 +273,16 @@ module DDBJValidator
         end
       elsif package_name == 'Plant' # rule BS_R0081
         rule_id = 'BS_R0081'
+        # ここには「Viridiplantae 系統 かつ plastid を持つ」を意図した plastid チェックが
+        # あったが、直後の代入で結果が捨てられていて一度も効いたことがない。
+        #
+        # 効かせてはいけない。taxdump で Viridiplantae 配下 391,214 件のうち plastid の
+        # genetic code を持たないのは 12 件だけで、その全部が Balanophoraceae
+        # (Balanophora / Thonningia) — 葉緑体ゲノムを失った全寄生植物という、正しく
+        # 記載された植物である。plastid を条件に足しても新たに弾けるものは無く、
+        # この 12 件を誤って弾くだけになる (plastid を持つが Viridiplantae 外の 94,138 件は
+        # 系統チェックが既に除外している)。
         linages = [TAX_VIRIDIPLANTAE]
-        has_plastids = has_plastids(tax_id)
-        unless linages && has_plastids
-          result = false
-        end
         result = has_linage(tax_id, linages)
       elsif package_name == 'Virus' # rule BS_R0082
         rule_id = 'BS_R0082'
