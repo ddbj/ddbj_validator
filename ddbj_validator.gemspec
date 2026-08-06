@@ -12,15 +12,15 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = '>= 3.4'
 
   # The rules and the data they read, which travel together — conf/ holds
-  # the rule configuration and the XSDs, lib/ddbj_validator/sparql the
-  # queries. `conf/pub` and `conf/coll_dump` are deliberately absent: they
-  # are corpora mounted at run time, not part of the rules.
+  # the rule configuration, the XSDs and the BioSample package definitions.
+  # `conf/pub` and `conf/coll_dump` are deliberately absent, and so is the
+  # taxonomy: those are corpora placed at run time, not part of the rules.
   # `Dir.chdir(__dir__)` は Dir[] がプロセスの CWD を見るため。bundler の `gemspec`
   # 指示は偶然 chdir してくれるが、別の場所から `gem build` すると中身の無い gem ができる。
   # `select(File.file?)` は Dir が返すディレクトリ自身を落とすため — `conf/pub` は
   # 配下だけを reject しても、エントリそのものは残ってしまう。
   spec.files = Dir.chdir(__dir__) {
-    Dir['lib/**/*.rb', 'lib/ddbj_validator/sparql/**/*.rq.erb', 'conf/**/*']
+    Dir['lib/**/*.rb', 'conf/**/*']
       .select { File.file?(it) }
       .reject { it.start_with?('conf/pub/', 'conf/coll_dump/') }
   }

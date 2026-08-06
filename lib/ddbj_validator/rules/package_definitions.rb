@@ -1,5 +1,4 @@
 require 'json'
-require 'monitor'
 require 'zlib'
 
 module DDBJValidator
@@ -12,10 +11,12 @@ module DDBJValidator
   #
   # 中身は当時のクエリの結果そのまま。生成と検証は data_updater/package_definitions/。
   class PackageDefinitions
+    # インスタンスは共有されない。Rails のラッパはリクエストごとに Package.new を作り、
+    # BioSampleValidator は検証ごとに new されるので、@memo の寿命はそのどちらか。
+    # 共有しないから施錠もしない — 逆に、共有する使い方をするなら @memo を守る必要がある。
     def initialize (dir = DDBJValidator.conf_dir.join('package_definitions'))
-      @dir     = dir
-      @memo    = {}
-      @monitor = Monitor.new
+      @dir  = dir
+      @memo = {}
     end
 
     # 旧 is_exist_package_version の代わり。「グラフにトリプルがあるか」は同梱データに
@@ -75,12 +76,10 @@ module DDBJValidator
     def symbolize (row) = row.to_h {|k, v| [k.to_sym, v] }
 
     def load (path)
-      @monitor.synchronize {
-        @memo.fetch(path) {
-          full = @dir.join(path)
+      @memo.fetch(path) {
+        full = @dir.join(path)
 
-          @memo[path] = full.exist? ? JSON.parse(path.end_with?('.gz') ? Zlib::GzipReader.open(full, &:read) : full.read) : yield
-        }
+        @memo[path] = full.exist? ? JSON.parse(path.end_with?('.gz') ? Zlib::GzipReader.open(full, &:read) : full.read) : yield
       }
     end
   end
