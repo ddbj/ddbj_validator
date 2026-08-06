@@ -1,20 +1,27 @@
 require 'fileutils'
 require 'tempfile'
+require 'tmpdir'
 require 'test_helper'
 
 class TestExcel2Tsv < ActiveSupport::TestCase
   def setup
     @excel2tsv = DDBJValidator::Excel2Tsv.new
     @test_file_dir = Rails.root.join('test/data/all_data')
+    # テストは 32 プロセス並列で走るので、出力先を共有すると互いの成果物を
+    # 消し合う。プロセスごとに別ディレクトリを取れば競合しないし、
+    # test/data 配下に成果物も残らない
+    @base_dir = Pathname.new(Dir.mktmpdir('excel2tsv_test'))
+  end
+
+  def teardown
+    FileUtils.rm_rf(@base_dir)
   end
 
   # 拡張子が .xlsx でないと roo は TypeError を、上限を超えた workbook では
   # Roo::Error ですらない ExceedsMaxError を上げる。どちらも投稿者が直せる問題なので
   # finding にする — 例外のまま抜けると 500 になり、投稿者には何も分からない
   def test_split_sheet_rejects_a_non_xlsx_extension_as_a_finding
-    base_dir = @test_file_dir.join('output')
-    FileUtils.rm_rf(base_dir)
-    base_dir.mkpath
+    base_dir = output_dir('non_xlsx')
 
     Tempfile.create(['submission', '.xls']) do |file|
       file.write('not an excel file')
@@ -25,19 +32,12 @@ class TestExcel2Tsv < ActiveSupport::TestCase
       assert_equal 'failed', ret[:status]
       assert_equal 1, ret[:error_list].size
     end
-
-    FileUtils.rm_rf(base_dir)
   end
 
   def test_split_sheet
     # ok case
     excel_file = "#{@test_file_dir}/bpbs_test_warning.xlsx"
-    base_dir = @test_file_dir.join('output')
-    # 出力ディレクトの初期化
-    if File.exist?(base_dir)
-      FileUtils.rm_rf(base_dir)
-    end
-    base_dir.mkpath
+    base_dir = output_dir('ok')
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     assert File.exist?("#{base_dir}/bioproject/bpbs_test_warning_bioproject.tsv")
@@ -47,28 +47,17 @@ class TestExcel2Tsv < ActiveSupport::TestCase
 
     # ng base
     excel_file = "#{@test_file_dir}/invalid_excel.xlsx" # 中身はただのTextファイル
-    base_dir = @test_file_dir.join('output')
-    # 出力ディレクトの初期化
-    if File.exist?(base_dir)
-      FileUtils.rm_rf(base_dir)
-    end
-    base_dir.mkpath
+    base_dir = output_dir('invalid')
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     assert_equal 'failed', ret[:status]
     assert_equal 1, ret[:error_list].size
     assert !File.exist?("#{base_dir}/bioproject")
     assert !File.exist?("#{base_dir}/biosample")
-    FileUtils.rm_rf(base_dir)
 
     # 関数とセル結合のあるファイルがパースできるか
     excel_file = "#{@test_file_dir}/bioproject_test_merge_cells.xlsx"
-    base_dir = @test_file_dir.join('output')
-    # 出力ディレクトの初期化
-    if File.exist?(base_dir)
-      FileUtils.rm_rf(base_dir)
-    end
-    base_dir.mkpath
+    base_dir = output_dir('merge_cells')
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     tsv_file = "#{base_dir}/bioproject/bioproject_test_merge_cells_bioproject.tsv"
@@ -96,12 +85,7 @@ class TestExcel2Tsv < ActiveSupport::TestCase
 
     # macro付きExcelがパース出来、かつmacroが実行されないか
     excel_file = "#{@test_file_dir}/bioproject_test_with_macro.xlsm"
-    base_dir = @test_file_dir.join('output')
-    # 出力ディレクトの初期化
-    if File.exist?(base_dir)
-      FileUtils.rm_rf(base_dir)
-    end
-    base_dir.mkpath
+    base_dir = output_dir('macro')
 
     ret = @excel2tsv.split_sheet(excel_file, base_dir)
     tsv_file = "#{base_dir}/bioproject/bioproject_test_with_macro_bioproject.tsv"
@@ -115,7 +99,6 @@ class TestExcel2Tsv < ActiveSupport::TestCase
         assert_equal 'DDBJ', row[2]
       end
     end
-    FileUtils.rm_rf(base_dir)
   end
 
   def test_mandatory_sheet_check
@@ -144,5 +127,13 @@ class TestExcel2Tsv < ActiveSupport::TestCase
     exist_sheet_list = ['HELP']
     ret = @excel2tsv.mandatory_sheet_check(mandatory_filetypes, exist_sheet_list, sheet_settings)
     assert_equal false, ret
+  end
+
+  private
+
+  # ケースごとに空のディレクトリを渡す。「何も出力されていないこと」を見るケースが
+  # あるので、使い回して消すのではなく最初から別の場所を使う
+  def output_dir (name)
+    @base_dir.join(name).tap(&:mkpath)
   end
 end

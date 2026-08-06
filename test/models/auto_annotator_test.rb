@@ -1,3 +1,5 @@
+require 'fileutils'
+require 'tmpdir'
 require 'test_helper'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
@@ -6,14 +8,23 @@ class TestAutoAnnotator < ActiveSupport::TestCase
   def setup
     @auto_annotater = DDBJValidator::AutoAnnotator.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
+    # 入力は fixture を読むだけだが、出力先は書き込む。テストは 32 プロセス並列で
+    # 走るので、同じ名前のファイルに複数のテストが同時に書くと互いの途中経過を
+    # 読んでしまう (auto_annotator_xml_test と同じ annotated.xml を使っていた)
+    @output_dir = Dir.mktmpdir('auto_annotator_test')
   end
+
+  def teardown
+    FileUtils.rm_rf(@output_dir)
+  end
+
   def test_create_annotated_file
     # OK case biosample
     # biosample (input:xml, output: any)
     http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
-    output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
+    output_file = "#{@output_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal 'succeed', ret[:status]
     assert_equal output_file, ret[:file_path]
@@ -24,7 +35,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*, text/tab-separated-values'
     input_file = "#{@test_file_dir}/bioproject_test_warning.tsv"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.tsv"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated.tsv"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject', http_accept)
     assert_equal 'succeed', ret[:status]
     assert_equal output_file, ret[:file_path]
@@ -34,17 +45,17 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = 'application/json'
     input_file = "#{@test_file_dir}/bioproject_test_warning.tsv"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated_from_tsv.tsv"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated_from_tsv.tsv"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject', http_accept)
     assert_equal 'succeed', ret[:status]
-    assert_equal "#{@test_file_dir}/bioproject_test_warning_annotated_from_tsv.json", ret[:file_path] # 拡張子のの変更 .tsv => .json
+    assert_equal "#{@output_dir}/bioproject_test_warning_annotated_from_tsv.json", ret[:file_path] # 拡張子のの変更 .tsv => .json
     assert_equal 'json', ret[:file_type]
 
     ## bioproject(input:tsv, output:json)
     http_accept = '*/*' # default format is json
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.json"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated.json"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject', http_accept)
     assert_equal 'succeed', ret[:status]
     assert_equal output_file, ret[:file_path]
@@ -54,10 +65,10 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*, text/tab-separated-values'
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated_from_json.json"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated_from_json.json"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject', http_accept)
     assert_equal 'succeed', ret[:status]
-    assert_equal "#{@test_file_dir}/bioproject_test_warning_annotated_from_json.tsv", ret[:file_path] # 拡張子のの変更 .json => .tsv
+    assert_equal "#{@output_dir}/bioproject_test_warning_annotated_from_json.tsv", ret[:file_path] # 拡張子のの変更 .json => .tsv
     assert_equal 'tsv', ret[:file_type]
 
 
@@ -66,7 +77,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning_not_exist.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
-    output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
+    output_file = "#{@output_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal 'error', ret[:status]
     # 不在のファイルは不在として報告される。以前は FileParser が読み込み失敗を
@@ -78,7 +89,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*'
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
-    output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
+    output_file = "#{@output_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal 'error', ret[:status]
     assert ret[:message].include?('Failed to output annotated file')
@@ -87,7 +98,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result_not_exist.json"
-    output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
+    output_file = "#{@output_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal ret[:status], 'error'
     assert ret[:message].include?('Validation result file is not found.')
@@ -96,7 +107,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*'
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result_broken.json"
-    output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
+    output_file = "#{@output_dir}/biosample_test_warning_annotated.xml"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample', http_accept)
     assert_equal ret[:status], 'error'
     assert ret[:message]
@@ -107,7 +118,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = '*/*, text/tab-separated-values'
     input_file = "#{@test_file_dir}/bioproject_test_warning_not_exist.tsv"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_tsv_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.tsv"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated.tsv"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject', http_accept)
     assert_equal ret[:status], 'error'
     assert ret[:message]
@@ -116,7 +127,7 @@ class TestAutoAnnotator < ActiveSupport::TestCase
     http_accept = 'application/json'
     input_file = "#{@test_file_dir}/bioproject_test_warning_broken.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.json"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated.json"
     ret = @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject', http_accept)
     assert_equal ret[:status], 'error'
     assert ret[:message]

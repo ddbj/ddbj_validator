@@ -1,3 +1,5 @@
+require 'fileutils'
+require 'tmpdir'
 require 'test_helper'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
@@ -6,12 +8,19 @@ class TestAutoAnnotatoJson < ActiveSupport::TestCase
   def setup
     @auto_annotater = DDBJValidator::AutoAnnotatorJson.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
+    # 出力先はテストごとに分ける。auto_annotator_test と同じ名前のファイルに
+    # 書いていたので、並列実行で相手の書きかけを読むことがあった
+    @output_dir = Dir.mktmpdir('auto_annotator_json_test')
+  end
+
+  def teardown
+    FileUtils.rm_rf(@output_dir)
   end
 
   def test_create_annotated_file
     input_file = "#{@test_file_dir}/bioproject_test_warning.json"
     validator_result_file = "#{@test_file_dir}/bioproject_test_warning_json_result.json"
-    output_file = "#{@test_file_dir}/bioproject_test_warning_annotated.json"
+    output_file = "#{@output_dir}/bioproject_test_warning_annotated.json"
     @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'bioproject')
     data = JSON.parse(File.read(output_file))
 

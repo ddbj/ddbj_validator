@@ -117,7 +117,11 @@ git stash && bin/rails test 2>&1 | grep '^bin/rails test test' | sort > /tmp/bef
 comm -23 /tmp/after.txt /tmp/before.txt   # 新しく落ちたもの
 ```
 
-テストは `test/data/**` に成果物を書くことがある。`git status` に出たら消す。
+**テストの出力先は `Dir.mktmpdir` を使う。** `test/data/**` は 32 プロセスが共有する
+読み取り専用の fixture 置き場で、そこに書くと相手の書きかけを読む（`annotated.xml` を
+4 つのテストが同じパスに書いていて、数回に 1 回落ちていた）。残っているのは
+`validator_test` の `test_excel` だけ — `Excel2Tsv` の出力先が入力ファイルの位置から
+決まるので、fixture ごと tmpdir に移さないと直らない。`git status` に出たら消す。
 
 ## 落とし穴
 

@@ -1,3 +1,5 @@
+require 'fileutils'
+require 'tmpdir'
 require 'test_helper'
 
 # auto_annotationのエラー情報で元ファイルから補正後のファイルが正しく出力できるか確認
@@ -6,12 +8,19 @@ class TestAutoAnnotatorXml < ActiveSupport::TestCase
   def setup
     @auto_annotater = DDBJValidator::AutoAnnotatorXml.new
     @test_file_dir = Rails.root.join('test/data/auto_annotator')
+    # 出力先はテストごとに分ける。auto_annotator_test と同じ名前のファイルに
+    # 書いていたので、並列実行で相手の書きかけを読むことがあった
+    @output_dir = Dir.mktmpdir('auto_annotator_xml_test')
+  end
+
+  def teardown
+    FileUtils.rm_rf(@output_dir)
   end
 
   def test_create_annotated_file
     input_file = "#{@test_file_dir}/biosample_test_warning.xml"
     validator_result_file = "#{@test_file_dir}/biosample_test_warning_xml_result.json"
-    output_file = "#{@test_file_dir}/biosample_test_warning_annotated.xml"
+    output_file = "#{@output_dir}/biosample_test_warning_annotated.xml"
     @auto_annotater.create_annotated_file(input_file, validator_result_file, output_file, 'biosample')
     data = DDBJValidator::XmlConvertor.new().xml2obj(File.read(output_file), 'biosample')
     attr = data.first['attributes']
