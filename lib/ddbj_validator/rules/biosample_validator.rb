@@ -359,7 +359,9 @@ module DDBJValidator
     #   {...}, ...
     # ]
     def get_attributes_of_package (package_name, package_version)
-      DDBJValidator.cache.fetch(['package_attributes', package_name]) {
+      # 版をキーに含める。同じパッケージ名でも版が違えば属性も並びも違うので、
+      # package_version を変えたのに古い版の答えが残る、という形で効く
+      DDBJValidator.cache.fetch(['package_attributes', package_version, package_name]) {
         result = @package_defs.attributes_of_package(package_version, package_name)
         result.map {|row|
           attr_require = row[:require] == 'has_mandatory_attribute' ? 'mandatory' : 'optional'
@@ -394,7 +396,7 @@ module DDBJValidator
       # package version 1.4未満ではgroup attributeの定義はない
       return [] if Gem::Version.create(package_version) < Gem::Version.create('1.4.0')
 
-      DDBJValidator.cache.fetch(['package_attribute_groups', package_name]) {
+      DDBJValidator.cache.fetch(['package_attribute_groups', package_version, package_name]) {
         result = @package_defs.attribute_groups_of_package(package_version, package_name)
         result.group_by {|row| row[:group_name] }.map {|group, items|
           {group_name: group, attribute_set: items.map { it[:attribute_name] }}

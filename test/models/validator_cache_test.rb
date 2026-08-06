@@ -36,7 +36,7 @@ class TestValidatorCache < ActiveSupport::TestCase
     package_version = @validator.instance_variable_get(:@package_version)
 
     ret1 = @validator.send('get_attributes_of_package', package_name, package_version)
-    assert Rails.cache.exist?(['package_attributes', package_name])
+    assert Rails.cache.exist?(['package_attributes', package_version, package_name])
     ret2 = @validator.send('get_attributes_of_package', package_name, package_version)
     assert_equal ret1, ret2
   end

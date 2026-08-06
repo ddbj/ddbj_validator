@@ -46,41 +46,68 @@ def render (path, **params)
   ERB.new(QUERY_DIR.join(path).read).result_with_hash(params)
 end
 
-GROUP_KEYS = %w[attribute_group_list attribute_groups_of_package].freeze
+# 中身の確認用。順序を作らない素直な書き方 (owl:oneOf/rdf:rest*/rdf:first) でメンバーを
+# 集める。生成側が鎖を辿るのとは別の経路なので、取りこぼしがあれば食い違う。
+#
+# パッケージ側の絞り込みは 2 本の元クエリで違う (biosample の方だけ rdfs:label を要求する)。
+# 片方の書き方で両方を確かめると、確かめている対象が実際に生成に使ったクエリとずれる。
+# しかも要求する側の rdfs:label は、Virtuoso が行を落とすのを観測したまさにその
+# トリプルなので、揃えておく意味は大きい
+FLATTENED_MEMBERS = {
+  'attribute_groups_of_package' => <<~SPARQL,
+    PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
+    PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
-# 中身の確認用。順序を作らない素直な書き方 (owl:oneOf/rdf:rest*/rdf:first) で
-# メンバーを集める。生成側が鎖を辿るのとは別の経路なので、取りこぼしがあれば食い違う
-FLATTENED_MEMBERS = <<~SPARQL
-  PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
-  PREFIX dc: <http://purl.org/dc/elements/1.1/>
+    SELECT DISTINCT ?group_name ?attribute_name
+    FROM <http://ddbj.nig.ac.jp/ontologies/biosample/%<version>s>
+    WHERE {
+      VALUES ?package_id { "%<package_id>s" }
+      ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ; dc:identifier ?package_id ; rdfs:label ?label .
+      ?restriction owl:domain ?package ; rdfs:label ?group_name ; rdfs:range ?range .
+      ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
+      ?axiom owl:annotatedTarget ?restriction ; owl:annotatedSource ?source ; rdfs:isDefinedBy dbs:Attribute_Group .
+      ?attribute dc:identifier ?attribute_name ; rdfs:subClassOf dbs:Attribute .
+    }
+  SPARQL
 
-  SELECT DISTINCT ?group_name ?attribute_name
-  FROM <http://ddbj.nig.ac.jp/ontologies/biosample/%<version>s>
-  WHERE {
-    VALUES ?package_id { "%<package_id>s" }
-    ?package rdfs:subClassOf dbs:DDBJ_Defined_Package ; dc:identifier ?package_id ; rdfs:label ?label .
-    ?restriction owl:domain ?package ; rdfs:label ?group_name ; rdfs:range ?range .
-    ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
-    ?axiom owl:annotatedTarget ?restriction ; owl:annotatedSource ?source ; rdfs:isDefinedBy dbs:Attribute_Group .
-    ?attribute dc:identifier ?attribute_name ; rdfs:subClassOf dbs:Attribute .
-  }
-SPARQL
+  'attribute_group_list' => <<~SPARQL
+    PREFIX dc: <http://purl.org/dc/elements/1.1/>
+    PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 
-def flattened_group_members (endpoint, version, package_id)
-  fetch(endpoint, format(FLATTENED_MEMBERS, version:, package_id:))
+    SELECT DISTINCT ?group_name ?attribute_name
+    FROM <http://ddbj.nig.ac.jp/ontologies/biosample/%<version>s>
+    WHERE {
+      VALUES ?package_id { "%<package_id>s" }
+      ?package_uri rdfs:subClassOf ddbj_bs:DDBJ_Defined_Package ; dc:identifier ?package_id .
+      ?restriction owl:domain ?package_uri ; rdfs:label ?group_name ; rdfs:range ?range .
+      ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
+      ?axiom owl:annotatedTarget ?restriction ; owl:annotatedSource ?source ; rdfs:isDefinedBy ddbj_bs:Attribute_Group .
+      ?attribute dc:identifier ?attribute_name ; rdfs:subClassOf ddbj_bs:Attribute .
+    }
+  SPARQL
+}.freeze
+
+GROUP_KEYS = FLATTENED_MEMBERS.keys.freeze
+
+def flattened_group_members (endpoint, key, version, package_id)
+  fetch(endpoint, format(FLATTENED_MEMBERS.fetch(key), version:, package_id:))
 end
 
-# 並びの確認用。generate.rb と同じ結果になるべきだが、あちらを呼ばずにここで書く
-def walk_lists (rows)
-  rows.group_by { it['group_name'] }.sort_by { it.first }.flat_map {|group_name, group_rows|
+# 並びの確認用。generate.rb#order_by_list と同じ結果になるべきだが、あちらを呼ばずに
+# ここで書く。辿り切れなかったときに黙って短い配列を返すと、同梱側が余分な行を持って
+# いるように見えてしまうので、その場合は失敗として上げる
+def walk_lists (failures, label, rows)
+  rows.uniq.group_by { [it['group_name'], it['list']] }.sort.flat_map {|(group_name, list), group_rows|
     by_node = group_rows.to_h { [it['node'], it] }
-    node    = group_rows.first['list']
+    node    = list
     ordered = []
 
     while (row = by_node[node])
       ordered << {'group_name' => group_name, 'attribute_name' => row['attribute_name']}
       node = row['next']
     end
+
+    failures << "#{label}: 検証側がリストを辿り切れなかった (#{ordered.size}/#{group_rows.size})" unless ordered.size == group_rows.size
 
     ordered
   }
@@ -159,11 +186,13 @@ versions.each do |version, info|
       # 同じ関数を呼ぶと生成側のバグを写すので、中身と並びを別々に、それぞれ
       # 独立した手段で確かめる
       if GROUP_KEYS.include?(key)
-        compare(failures, "#{version}/#{package_id}/#{key} (中身)",
-                flattened_group_members(endpoint, version, package_id).sort_by { it.to_a },
-                stored_rows.sort_by { it.to_a })
-        compare(failures, "#{version}/#{package_id}/#{key} (並び)",
-                walk_lists(fetch(endpoint, render(template, version:, **params))),
+        label = "#{version}/#{package_id}/#{key}"
+
+        compare(failures, "#{label} (中身)",
+                flattened_group_members(endpoint, key, version, package_id).sort_by { it.to_a },
+                stored_rows.uniq.sort_by { it.to_a })
+        compare(failures, "#{label} (並び)",
+                walk_lists(failures, label, fetch(endpoint, render(template, version:, **params))),
                 stored_rows)
         checked += 2
         next

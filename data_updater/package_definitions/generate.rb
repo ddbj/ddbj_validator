@@ -45,7 +45,12 @@ end
 # 素の JSON では 156MB になるものが 1/20 以下になる。読み出しは 1 パッケージぶん
 # だけなので展開のコストは無視できる
 def write_json (path, data)
-  Zlib::GzipWriter.open(path) { it.write(JSON.generate(data)) }
+  Zlib::GzipWriter.open(path) {|gz|
+    # gzip ヘッダには既定で生成時刻が入る。中身が同じでもバイト列が変わるので、
+    # 作り直すたびに 500 ファイルが差分に出て、本当に変わった定義が埋もれる
+    gz.mtime = 0
+    gz.write(JSON.generate(data))
+  }
 end
 
 # attribute group のクエリはリストの構造 (list / node / next) を返す。定義に書かれた順序は
@@ -55,9 +60,15 @@ end
 # 途中で辿れなくなったら黙って切り詰めず落とす — short list は指摘文から属性が消えるという
 # 形で出るので、生成時に気付けないと後で分からなくなる
 def order_by_list (rows)
-  rows.group_by { it[:group_name] }.sort_by { it.first }.flat_map {|group_name, group_rows|
+  # 束ねる単位は group_name ではなくリスト。同じ表示名の restriction が 2 つあると、
+  # 名前だけでまとめては片方の鎖しか辿れない。
+  #
+  # uniq は ?label / ?source を存在確認としてだけ使っているため、束縛が複数あると
+  # 同じ行が重複して返るから。辿り切れたかの判定を重複込みの件数と比べると、
+  # 鎖は正しく辿れているのに落ちる
+  rows.uniq.group_by { [it[:group_name], it[:list]] }.sort.flat_map {|(group_name, list), group_rows|
     by_node = group_rows.to_h { [it[:node], it] }
-    node    = group_rows.first[:list]
+    node    = list
     ordered = []
 
     while (row = by_node[node])
