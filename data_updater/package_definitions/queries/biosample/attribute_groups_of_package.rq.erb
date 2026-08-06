@@ -1,7 +1,16 @@
 PREFIX dbs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 
-SELECT ?group_name ?attribute_name
+# 属性は owl:oneOf の RDF リスト、つまり順序付きで書かれている。この並びは BS_R0036 の
+# 指摘文にそのまま出る ("Attribute names: strain, isolate, ...") ので、定義された順で返したい。
+#
+# ORDER BY で済ませられない。SPARQL に経路長が無いので rdf:rest の回数を数えることになるが、
+# その集計サブクエリを足すと Virtuoso が行を落とす — 無関係な `?package rdfs:label ?x` が
+# 有るか無いかで同じパッケージが 7 行になったり 5 行になったりした。
+#
+# なので順序付けはここでやらず、リストの構造 (list / node / next) をそのまま返し、
+# generate.rb が鎖を辿って並べる。ここは素の BGP なので上記の問題は起きない。
+SELECT ?group_name ?list ?node ?next ?attribute_name
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 WHERE
 {
@@ -12,7 +21,10 @@ WHERE
   ?restriction owl:domain ?package ;
     rdfs:label ?group_name ;
     rdfs:range ?range .
-  ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
+  ?range owl:oneOf ?list .
+  ?list rdf:rest* ?node .
+  ?node rdf:first ?attribute ;
+    rdf:rest ?next .
   ?axiom owl:annotatedTarget ?restriction ;
      owl:annotatedSource ?source ;
      rdfs:isDefinedBy dbs:Attribute_Group .

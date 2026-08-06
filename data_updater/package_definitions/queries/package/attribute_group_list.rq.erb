@@ -1,7 +1,9 @@
 PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX ddbj_bs: <http://ddbj.nig.ac.jp/ontologies/biosample/>
 
-SELECT DISTINCT ?group_name ?attribute_name
+# attribute_groups_of_package と同じ理由でリストの構造を返し、並べ直しは generate.rb で行う
+# (あちらのコメントに経緯がある)。
+SELECT DISTINCT ?group_name ?list ?node ?next ?attribute_name
 FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
 {
   VALUES ?package_id { "<%= package_id %>" }
@@ -10,7 +12,10 @@ FROM <http://ddbj.nig.ac.jp/ontologies/biosample/<%= version %>>
   ?restriction owl:domain ?package_uri ;
     rdfs:label ?group_name ;
     rdfs:range ?range .
-  ?range owl:oneOf/rdf:rest*/rdf:first ?attribute .
+  ?range owl:oneOf ?list .
+  ?list rdf:rest* ?node .
+  ?node rdf:first ?attribute ;
+    rdf:rest ?next .
   ?axiom owl:annotatedTarget ?restriction ;
      owl:annotatedSource ?source ;
      rdfs:isDefinedBy ddbj_bs:Attribute_Group .

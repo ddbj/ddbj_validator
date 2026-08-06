@@ -48,6 +48,29 @@ def write_json (path, data)
   Zlib::GzipWriter.open(path) { it.write(JSON.generate(data)) }
 end
 
+# attribute group のクエリはリストの構造 (list / node / next) を返す。定義に書かれた順序は
+# その鎖の順で、SPARQL 側では取り出せなかった (クエリのコメント参照)。ここで鎖を辿り、
+# 読み出し側が期待する {group_name, attribute_name} の並びに戻す。
+#
+# 途中で辿れなくなったら黙って切り詰めず落とす — short list は指摘文から属性が消えるという
+# 形で出るので、生成時に気付けないと後で分からなくなる
+def order_by_list (rows)
+  rows.group_by { it[:group_name] }.sort_by { it.first }.flat_map {|group_name, group_rows|
+    by_node = group_rows.to_h { [it[:node], it] }
+    node    = group_rows.first[:list]
+    ordered = []
+
+    while (row = by_node[node])
+      ordered << {group_name: group_name, attribute_name: row[:attribute_name]}
+      node = row[:next]
+    end
+
+    abort "#{group_name}: リストを辿り切れなかった (#{ordered.size}/#{group_rows.size})" unless ordered.size == group_rows.size
+
+    ordered
+  }
+end
+
 # valid_package_name は投稿者が書いた任意の名前を数えるクエリなので、答えを版ごとに
 # 列挙しておく。VALUES の束縛を外して同じパターンを引くと、一致する集合が得られる
 ALL_PACKAGE_IDS = <<~SPARQL
@@ -115,9 +138,9 @@ VERSIONS.each do |version|
     write_json(package_dir.join("#{package_id}.json.gz"),
       package_info:                sparql.query(render('package/package_info.rq.erb',                  version:, package_id:)),
       attribute_list:              attribute_list,
-      attribute_group_list:        sparql.query(render('package/attribute_group_list.rq.erb',          version:, package_id:)),
-      attributes_of_package:       sparql.query(render('biosample/attributes_of_package.rq.erb',       version:, package_name: package_id)),
-      attribute_groups_of_package: sparql.query(render('biosample/attribute_groups_of_package.rq.erb', version:, package_name: package_id))
+      attribute_group_list:        order_by_list(sparql.query(render('package/attribute_group_list.rq.erb',          version:, package_id:))),
+      attributes_of_package:       sparql.query(render('biosample/attributes_of_package.rq.erb',                     version:, package_name: package_id)),
+      attribute_groups_of_package: order_by_list(sparql.query(render('biosample/attribute_groups_of_package.rq.erb', version:, package_name: package_id)))
     )
   end
 
