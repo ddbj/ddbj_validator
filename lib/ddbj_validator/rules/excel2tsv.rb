@@ -40,9 +40,12 @@ module DDBJValidator
       # require されなくなったとき、症状は「出力ファイルが無い」だけだった。
       begin
         @data_file = File.basename(original_excel_path)
-        xlsx = Roo::Excelx.new(original_excel_path, {expand_merged_ranges: true})
+        # file_warning: :ignore — 拡張子が .xls などのとき roo は TypeError を上げる。
+        # それは投稿者の間違いであってシステムの障害ではないので、中身を読んだ結果の
+        # 例外 (Zip::Error 等) として後段の finding に流す
+        xlsx = Roo::Excelx.new(original_excel_path, expand_merged_ranges: true, file_warning: :ignore)
         sheet_list = xlsx.sheets
-      rescue Roo::Error, Zip::Error, Errno::ENOENT => ex
+      rescue *DDBJValidator::SPREADSHEET_ERRORS => ex
         # load error
         annotation = [
           {key: 'Message', value: 'Failed read excel file.'}

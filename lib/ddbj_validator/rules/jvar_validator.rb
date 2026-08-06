@@ -64,7 +64,7 @@ module DDBJValidator
         xlsx = Roo::Excelx.new(data_xlsx, expand_merged_ranges: true, file_warning: :ignore)
       # 「読めない spreadsheet」だけを finding にする。データと無関係な失敗
       # (ライブラリ不在など) までここで飲み込むと、原因が消える。
-      rescue Roo::Error, Zip::Error, Errno::ENOENT => ex
+      rescue *DDBJValidator::SPREADSHEET_ERRORS => ex
         annotation = [
           {key: 'Excel file', value: @data_file},
           {key: 'Error message', value: ex.message}

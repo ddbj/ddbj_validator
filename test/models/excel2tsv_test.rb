@@ -1,10 +1,32 @@
 require 'fileutils'
+require 'tempfile'
 require 'test_helper'
 
 class TestExcel2Tsv < ActiveSupport::TestCase
   def setup
     @excel2tsv = DDBJValidator::Excel2Tsv.new
     @test_file_dir = Rails.root.join('test/data/all_data')
+  end
+
+  # 拡張子が .xlsx でないと roo は TypeError を、上限を超えた workbook では
+  # Roo::Error ですらない ExceedsMaxError を上げる。どちらも投稿者が直せる問題なので
+  # finding にする — 例外のまま抜けると 500 になり、投稿者には何も分からない
+  def test_split_sheet_rejects_a_non_xlsx_extension_as_a_finding
+    base_dir = @test_file_dir.join('output')
+    FileUtils.rm_rf(base_dir)
+    base_dir.mkpath
+
+    Tempfile.create(['submission', '.xls']) do |file|
+      file.write('not an excel file')
+      file.flush
+
+      ret = @excel2tsv.split_sheet(file.path, base_dir)
+
+      assert_equal 'failed', ret[:status]
+      assert_equal 1, ret[:error_list].size
+    end
+
+    FileUtils.rm_rf(base_dir)
   end
 
   def test_split_sheet

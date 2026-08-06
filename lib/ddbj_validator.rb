@@ -83,6 +83,18 @@ module DDBJValidator
     HTTP::ConnectionError, HTTP::TimeoutError
   ].freeze
 
+  # A spreadsheet we could not read — a submitter's problem, so it becomes a
+  # finding rather than an exception.
+  #
+  # Collected here because roo does not have one exception hierarchy:
+  # `ExceedsMaxError` is a bare `StandardError`, and a wrong extension is a
+  # `TypeError` unless `file_warning: :ignore` is passed. Rescuing
+  # `Roo::Error` alone lets a `.xls` upload or an oversized workbook escape
+  # as a 500 instead of the finding the submitter needs to see.
+  SPREADSHEET_ERRORS = [
+    Roo::Error, Roo::Excelx::ExceedsMaxError, Zip::Error, Errno::ENOENT, TypeError
+  ].freeze
+
   def self.connection_error?(error)
     return true if defined?(PG::ConnectionBad)  && error.is_a?(PG::ConnectionBad)
     return true if defined?(PG::UnableToSend)   && error.is_a?(PG::UnableToSend)

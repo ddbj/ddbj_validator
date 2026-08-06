@@ -28,5 +28,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'nokogiri'
   spec.add_dependency 'pg'
   spec.add_dependency 'roo'
+  # roo 経由でしか入っていなかった。壊れた xlsx に対して上がるのは Zip::Error なので、
+  # ここで宣言していないと roo の依存が変わった日に rescue が黙って効かなくなる
+  spec.add_dependency 'rubyzip'
   spec.add_dependency 'zeitwerk'
 end
