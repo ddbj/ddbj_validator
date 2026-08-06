@@ -132,18 +132,38 @@ crontab にもアプリを再起動する行はない。
 入れ替わってもキャッシュは残る**。taxonomy に追加された organism が「存在しない」と
 言われ続ける、という形で出る。デプロイまで直らない。
 
-**筋は、ストアを選び直すことではなくキーに版を混ぜること。**
+### キャッシュしているものは 1 種類ではない
+
+20 箇所の出所を数えると 3 群に割れる。**寿命が違うので、まとめて扱うと必ずどれかが
+間違う。**
+
+| 出所 | 件数 | 変わるタイミング | キー |
+|---|---|---|---|
+| Virtuoso のグラフ | 14 | 日次の差し替え | `exist_organism_name` ×4 / `tax_match_organism` ×3 / `tax_has_linage` ×2 / `tax_vs_package` / `metage_source_lineage` / `package_attributes` / `package_attribute_groups` / `unknown_package` |
+| **DDBJ 中央 PostgreSQL** | 4 | **随時**（キュレータが動かす） | `is_umbrella_id` / `bioproject_submitter` / `bioproject_prjd_id` / `locus_tag_prefix` |
+| ローカル・外部 | 2 | 実質不変 | `country_from_latlon`（同梱 JSON での計算）/ `exist_pubchem_id`（NCBI） |
+
+**中央 DB の 4 件は別のバグ。** 随時変わるデータを無期限にキャッシュしている。
+BioProject が umbrella になっても submitter が変わっても、プロセスが生きている限り
+古い答えを返す。**グラフの版を混ぜても直らない** — キュレータが umbrella フラグを
+立てた日にグラフの版は変わらないので。
+
+### 分担
+
+**gem 側**: 各エントリが**何に依存しているか**を鍵に出す。これは gem にしか分からない
+（ホストから見れば `exist_organism_name` も `is_umbrella_id` も同じ書き込み）。
 
 ```ruby
-DDBJValidator.cache.fetch([graph_version, 'exist_organism_name', name]) { ... }
+cache.fetch([:graph,  'exist_organism_name', name])       { ... }
+cache.fetch([:rdb,    'is_umbrella_id', accession])       { ... }
+cache.fetch([:static, 'country_from_latlon', lat, lon])   { ... }
 ```
 
-グラフが入れ替わればキーが変わり、古い値は参照されなくなる。ストアの種類にも
-再起動にも依存しない。repository に載せると Puma も SolidQueue も日をまたいで
-動き続けるので、**再起動に頼る前提は最初から成立しない**（Solid Cache に載せれば
-プロセスを跨いで永続化されるぶん今より悪化する）。
+**ホスト側**: 群ごとの方針を決める。graph 群は版で無効化、rdb 群は短い TTL か
+キャッシュしない、static 群は無期限。ストアの選択でも、単一の名前空間を被せることでも
+ない — **1 つの名前空間では 3 群を区別できない**。
 
-未解決なのは**版の出所**。アプリからは今どのグラフを見ているのか分からない。
+未解決なのは graph 群の**版の出所**。アプリからは今どのグラフを見ているのか分からない。
 候補: `ddbj_owl.virtuoso.YYYYMMDD.db` の日付を渡す / グラフ自身に版のトリプルを
 持たせて SPARQL で引く。`conf/version.yml` は**ルール**の版であってグラフの版では
 ないので使えない。
@@ -158,7 +178,7 @@ DDBJValidator.cache.fetch([graph_version, 'exist_organism_name', name]) { ... }
 
 未決:
 
-- **キャッシュキーにグラフの版を混ぜる**（上記）。版の出所を先に決める必要がある。
-  ストアの選択の問題ではない
+- **キャッシュの 3 群分け**（上記）。gem 側で出所を鍵に出し、ホストが群ごとの方針を
+  決める。graph 群は版の出所を先に決める必要がある。中央 DB 群は今すぐにでも直せる
 - 中央 PostgreSQL への接続を repository が持つ是非
 - `data_updater` の所有者
