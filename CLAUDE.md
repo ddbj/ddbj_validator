@@ -122,6 +122,32 @@ Virtuoso を再起動する」だけでよい。**差し替えには停止が要
 repository 側はそれを blue/green ではなく**キューイング**で吸収する方針
 （検証は非同期ジョブなので `retry_on EndpointUnavailable`）。
 
+### キャッシュはグラフより長生きしている
+
+差し替えスクリプトが再起動するのは **virtuoso だけ**。`compose.yaml` の `app` は
+`depends_on: virtuoso` を持つが、`depends_on` は依存先の再起動に追随しない。
+crontab にもアプリを再起動する行はない。
+
+`cache_store` は `:memory_store`、`WEB_CONCURRENCY: 4`。つまり**グラフが日次で
+入れ替わってもキャッシュは残る**。taxonomy に追加された organism が「存在しない」と
+言われ続ける、という形で出る。デプロイまで直らない。
+
+**筋は、ストアを選び直すことではなくキーに版を混ぜること。**
+
+```ruby
+DDBJValidator.cache.fetch([graph_version, 'exist_organism_name', name]) { ... }
+```
+
+グラフが入れ替わればキーが変わり、古い値は参照されなくなる。ストアの種類にも
+再起動にも依存しない。repository に載せると Puma も SolidQueue も日をまたいで
+動き続けるので、**再起動に頼る前提は最初から成立しない**（Solid Cache に載せれば
+プロセスを跨いで永続化されるぶん今より悪化する）。
+
+未解決なのは**版の出所**。アプリからは今どのグラフを見ているのか分からない。
+候補: `ddbj_owl.virtuoso.YYYYMMDD.db` の日付を渡す / グラフ自身に版のトリプルを
+持たせて SPARQL で引く。`conf/version.yml` は**ルール**の版であってグラフの版では
+ないので使えない。
+
 ## 次の段階
 
 1. ~~ルールを gem 化、Rails アプリを薄いラッパに~~ 済
@@ -130,5 +156,9 @@ repository 側はそれを blue/green ではなく**キューイング**で吸�
 3. DB ごとに v3 を直接受ける入り口を足し、その DB の変換層を捨てる
 4. D-way 廃止後にラッパを削除
 
-未決: `Rails.cache` 20 箇所の寿命（プロセス跨ぎ前提なら repository の Solid Cache）/
-中央 PostgreSQL への接続を repository が持つ是非 / `data_updater` の所有者。
+未決:
+
+- **キャッシュキーにグラフの版を混ぜる**（上記）。版の出所を先に決める必要がある。
+  ストアの選択の問題ではない
+- 中央 PostgreSQL への接続を repository が持つ是非
+- `data_updater` の所有者
