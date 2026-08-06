@@ -80,9 +80,18 @@ validity を invalid にしていたこと。設備障害を検証結果に化�
 docker compose -f compose.dev.yaml up -d
 ```
 
-**未起動時のベースラインは 321 runs / 3 failures / 93 errors。** 変更の影響を見るには
-数だけでなく**失敗したテストの集合**を突き合わせる（数はネットワーク依存テストで
-±1 揺れる）。
+| | runs | assertions | failures | errors | 時間 |
+|---|---|---|---|---|---|
+| **services 起動時** | 321 | 2639 | 0 | 0 | 11.6s |
+| services 未起動時 | 321 | 2036 | 3 | 93 | 54s |
+
+**未起動でも「変更前と同じテストが落ちるか」は見られるが、それだけでは
+Virtuoso と中央 DB を通る経路が一度も実行されない。** SPARQL や RDB の呼び出しに
+手を入れたなら、services を上げて 0 failures / 0 errors を確認すること。未起動の
+方が遅いのは、失敗するまでのリトライ (`sparql_base` の `sleep 2` 等) を待つため。
+
+未起動で比較するときは、数だけでなく**失敗したテストの集合**を突き合わせる
+（数はネットワーク依存テストで ±1 揺れる）。
 
 ```sh
 bin/rails test 2>&1 | grep '^bin/rails test test' | sort > /tmp/after.txt
