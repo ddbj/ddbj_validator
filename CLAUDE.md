@@ -177,9 +177,13 @@ crontab にもアプリを再起動する行はない。
 
 | 出所 | 件数 | 変わるタイミング | キー |
 |---|---|---|---|
-| Virtuoso のグラフ | 14 | 日次の差し替え | `exist_organism_name` ×4 / `tax_match_organism` ×3 / `tax_has_linage` ×2 / `tax_vs_package` / `metage_source_lineage` / `package_attributes` / `package_attribute_groups` / `unknown_package` |
+| Virtuoso のグラフ (taxonomy) | 11 | 日次の差し替え | `exist_organism_name` ×4 / `tax_match_organism` ×3 / `tax_has_linage` ×2 / `tax_vs_package` / `metage_source_lineage` |
 | **DDBJ 中央 PostgreSQL** | 4 | **随時**（キュレータが動かす） | `is_umbrella_id` / `bioproject_submitter` / `bioproject_prjd_id` / `locus_tag_prefix` |
-| ローカル・外部 | 2 | 実質不変 | `country_from_latlon`（同梱 JSON での計算）/ `exist_pubchem_id`（NCBI） |
+| gem 同梱データ | 4 | gem の版と一緒 | `package_attributes` / `package_attribute_groups` / `country_from_latlon` / （`unknown_package` は不要になり削除） |
+| 外部 | 1 | 実質不変 | `exist_pubchem_id`（NCBI） |
+
+パッケージ定義を同梱した（下記）ことで、graph 群は 14 → 11 に減り、**残っているのは
+すべて taxonomy** になった。
 
 **中央 DB の 4 件は別のバグ。** 随時変わるデータを無期限にキャッシュしている。
 BioProject が umbrella になっても submitter が変わっても、プロセスが生きている限り
@@ -204,15 +208,52 @@ cache.fetch([:static, 'country_from_latlon', lat, lon])   { ... }
 未解決なのは graph 群の**版の出所**。アプリからは今どのグラフを見ているのか分からない。
 候補: `ddbj_owl.virtuoso.YYYYMMDD.db` の日付を渡す / グラフ自身に版のトリプルを
 持たせて SPARQL で引く。`conf/version.yml` は**ルール**の版であってグラフの版では
-ないので使えない。
+ないので使えない。**taxonomy を Virtuoso から出せば、この問題自体が消える**（下記）。
+
+## Virtuoso に何が入っているか
+
+**2 つのデータが入っていて、性質が正反対だった。**
+
+| | 実体 | 更新 | 現在地 |
+|---|---|---|---|
+| BioSample パッケージ定義 | 232×1021 の表を OWL reification で表現したもの (209 万トリプル) | 版が増えるときだけ | **gem に同梱済み** (`conf/package_definitions/`) |
+| taxonomy | NCBI taxdump (`nodes.dmp` / `names.dmp` / `merged.dmp`) の機械変換 | 日次 | Virtuoso |
+
+**どちらも triplestore を必要としていない。** taxonomy への 8 種のクエリが聞いている
+のは taxdump の列そのもので、唯一グラフらしいのは `rdfs:subClassOf*`（祖先辿り）だが、
+taxdump は親子関係を直接持っている。`search_taxid_from_fuzzy_name` の `bif:contains` も
+全文検索ではない — 直後に `FILTER (lcase(?x) = lcase(...))` があるので、大文字小文字を
+無視した完全一致の前段フィルタでしかなく、`lower(name)` の索引で置き換わる。
+
+変換は `taxdump2owl.rb`（DBCLS rdfsummit）1 本で、**DDBJ 独自の要素は混ざっていない**。
+`citations.dmp` の出力に至ってはロードすらされていない。
+
+taxonomy を出せば「一括置き換え + 以降読み取り」になり、SQLite が素直に当たる。
+**日次ビルド → 差し替え → 2 系統の再起動 → 停止窓**という運用と、上記のキャッシュの
+版問題が、まとめて消える。ビルド側の共有成果物は他の利用者がいるかもしれないので、
+**利用をやめることと日次ビルドを廃止することは別**。
+
+### パッケージ定義の作り直し
+
+`data_updater/package_definitions/` に生成・検証・使い捨て Virtuoso 一式がある。
+新しい版が出たら `.ttl.gz` を足して `generate.rb` → `verify.rb`。**実行時に Virtuoso は
+要らない。**
+
+1.2.1 以前の 6 版は**別世代のオントロジー**（識別子が `Generic_v1.1`、`envPackage` や
+`display_order` を持たない）で、`package_list` 以下すべてが 0 行を返す。同梱対象は
+1.4.0 / 1.4.1 / 1.5.0 の 3 版だが、**空の応答と「知らない版」とでは応答が違う**ので
+`versions.json` には 9 版すべてを残してある。production 3 週間のログに `version=`
+付きのリクエストは 1 件も無かったので、古い版は将来削れる見込み。
 
 ## 次の段階
 
 1. ~~ルールを gem 化、Rails アプリを薄いラッパに~~ 済
-2. ddbj-repository が gem に依存し BP/BS を in-process 化。最初は既存の入り口
+2. ~~パッケージ定義を gem に同梱し、Virtuoso から切り離す~~ 済
+3. taxonomy を Virtuoso から出す（SQLite 案）。ここまでで Virtuoso が不要になる
+4. ddbj-repository が gem に依存し BP/BS を in-process 化。最初は既存の入り口
    (TSV/JSON) に食わせる ＝ 変換層は一旦そのまま
-3. DB ごとに v3 を直接受ける入り口を足し、その DB の変換層を捨てる
-4. D-way 廃止後にラッパを削除
+5. DB ごとに v3 を直接受ける入り口を足し、その DB の変換層を捨てる
+6. D-way 廃止後にラッパを削除
 
 未決:
 
