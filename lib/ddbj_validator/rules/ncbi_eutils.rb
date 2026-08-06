@@ -44,7 +44,11 @@ module DDBJValidator
     rescue DDBJValidator::Error
       raise
     rescue => ex
-      raise DDBJValidator::EndpointUnavailable, "Connection to 'tm.dbcls.jp/medline' failed. url: #{url}\n", ex.backtrace
+      # 届かなかったのか、こちらのバグなのかを区別する。全部 EndpointUnavailable に
+      # すると、ホストは決定的に失敗するバグを永久にリトライし続ける
+      raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed),
+            "Failed to check the pubmed id against 'tm.dbcls.jp/medline'. url: #{url}\n#{ex.message} (#{ex.class})",
+            ex.backtrace
     end
 
     #
@@ -68,7 +72,10 @@ module DDBJValidator
     rescue DDBJValidator::Error
       raise
     rescue => ex
-      raise DDBJValidator::EndpointUnavailable, "Connection to 'NCBI eutils' failed. url: #{url}\n", ex.backtrace
+      # 同上。届かなかったものだけが「あとで聞き直せ」
+      raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed),
+            "Failed to check the id against 'NCBI eutils'. url: #{url}\n#{ex.message} (#{ex.class})",
+            ex.backtrace
     end
   end
 end

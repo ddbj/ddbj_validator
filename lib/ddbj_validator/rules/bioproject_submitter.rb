@@ -24,9 +24,11 @@ module DDBJValidator
         end
         submission_id_list.uniq
       rescue => ex
-        message = 'Failed to convert xml file'
+        # RDB から取り出した内容を XML に組み立てているだけで、ここでは設備に触れていない。
+        # 接続失敗として上げると、壊れたレコード 1 件をホストが永久にリトライしてしまう
+        message = 'Failed to convert xml file. '
         message += "#{ex.message} (#{ex.class})"
-        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
+        raise DDBJValidator::Error, message, ex.backtrace
       end
     end
 
@@ -56,9 +58,11 @@ module DDBJValidator
           end
         end
       rescue => ex
-        message = 'Failed to convert xml file'
+        # RDB から取り出した内容を XML に組み立てているだけで、ここでは設備に触れていない。
+        # 接続失敗として上げると、壊れたレコード 1 件をホストが永久にリトライしてしまう
+        message = 'Failed to convert xml file. '
         message += "#{ex.message} (#{ex.class})"
-        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
+        raise DDBJValidator::Error, message, ex.backtrace
       end
     end
 
