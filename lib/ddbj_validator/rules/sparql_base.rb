@@ -36,7 +36,11 @@ module DDBJValidator
         end
         message = "Failed the sparql query. endpoint: '#{@endpoint_url}' sparql query: '#{query}'.\n"
         message += "#{ex.message} (#{ex.class})"
-        raise (DDBJValidator.connection_error?(ex) ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
+        # 応答が JSON として読めないのは「答えが返っていない」であって「断られた」では
+        # ない。日次の virtuoso.db 差し替え中に返るプロキシの 502 や切れた応答がここに
+        # 来る — まさに retry_on させたい状況なので、QueryFailed に落とすと諦められる
+        endpoint_unavailable = DDBJValidator.connection_error?(ex) || ex.is_a?(JSON::ParserError)
+        raise (endpoint_unavailable ? DDBJValidator::EndpointUnavailable : DDBJValidator::QueryFailed), message, ex.backtrace
       end
       return [] if result_json['results']['bindings'].empty?
       result = result_json['results']['bindings'].map do |b|

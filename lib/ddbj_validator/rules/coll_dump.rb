@@ -19,13 +19,21 @@ module DDBJValidator
     def self.parse (dump_file)
       # 指定された coll_dump.txt がない場合はダウンロードする
       unless File.exist?(dump_file)
+        # 転送が途中で切れたファイルを dump_file に残さない。残すと、リトライしたときに
+        # 「もうある」と見なされ、途中で切れた institution リストが正典として使われる —
+        # 打ち切り位置より後ろの institution が一斉に投稿者への指摘になる
+        partial_file = "#{dump_file}.#{Process.pid}.part"
+
         begin
           ftp = Net::FTP.new('ftp.ncbi.nlm.nih.gov')
           ftp.login
           ftp.passive = true
           ftp.chdir('/pub/taxonomy/')
-          ftp.getbinaryfile('coll_dump.txt', dump_file, 1024)
+          ftp.getbinaryfile('coll_dump.txt', partial_file, 1024)
+
+          File.rename(partial_file, dump_file)
         rescue => ex
+          FileUtils.rm_f(partial_file)
           # 以前はここで握り潰し、参照データ無しのまま検証を続けていた。
           # specimen_voucher / culture_collection / bio_material のチェックが
           # 黙って効かなくなるだけで、レポートには何も出なかった。

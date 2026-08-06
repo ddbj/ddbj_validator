@@ -6,6 +6,7 @@ require 'pathname'
 # Rails app's `Bundler.require`, which requires what the Gemfile lists —
 # a gem has to ask for its own.
 require 'csv'
+require 'fileutils'
 require 'http'
 require 'json'
 require 'json-schema'
@@ -74,10 +75,12 @@ module DDBJValidator
 
   # Connection-ish failures, whoever raises them. `PG::ConnectionBad` and
   # friends are the honest signal; the socket-level ones arrive when the
-  # host is simply not there.
+  # host is simply not there, and `HTTP::ConnectionError` is what the http
+  # gem wraps them in before the rule code ever sees them.
   CONNECTION_ERRORS = [
     Errno::ECONNREFUSED, Errno::ECONNRESET, Errno::EHOSTUNREACH, Errno::ENETUNREACH, Errno::ETIMEDOUT,
-    SocketError, IOError, Timeout::Error
+    SocketError, IOError, Timeout::Error,
+    HTTP::ConnectionError, HTTP::TimeoutError
   ].freeze
 
   def self.connection_error?(error)
