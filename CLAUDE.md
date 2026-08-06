@@ -152,13 +152,25 @@ WebMock が `allow_localhost` 以外を塞ぐ。共有ディスクの `conf/pub`
 作られている。取り違えると 45 万件の生物が「存在しない」ことになる。
 
 ```sh
-data_updater/taxonomy/build.sh                                         # 日次
-ruby data_updater/taxonomy/verify.rb taxonomy.sqlite3 <new_taxdump-dir>
-bin/deploy_tools/update_taxonomy_db_staging1.sh                        # 各インスタンスへ配る
+ddbj-validator-build-taxonomy  <taxdump-dir> taxonomy.sqlite3   # gem の実行ファイル
+ddbj-validator-verify-taxonomy taxonomy.sqlite3 <new_taxdump-dir>
+
+data_updater/taxonomy/build.sh                                  # a012 の日次ラッパ
+bin/deploy_tools/update_taxonomy_db_staging1.sh                 # 各インスタンスへ配る
 ```
 
-**サーバ側の準備は要らない。** 読み書きする場所は `data_updater/paths.sh` に書いてあり、
-チェックアウトすればそのまま動く（以前は `.env` を作る必要があった）。
+**生成器は gem の実行ファイル。** taxonomy は同梱できない（337 万件・日次更新）ので
+利用者が自分で作るしかなく、その手段が gem に無いとリポジトリを持っていないと用意
+できない。**ddbj-repository は `gem install` だけで taxonomy を作れる。**
+
+表の定義は `DDBJValidator::TaxonomyDb::SCHEMA` にあり、書く側と読む側が同じ gem に入って
+いる。`meta.schema_version` を開くときに照合するので、別の版で作ったファイルを掴むと
+`DDBJValidator::Error`（作り直しが要る＝リトライしても直らない）で落ちる。
+
+`build.sh` はサイト固有のパスを与えるラッパで、共有ディスクのどこに taxdump があるかは
+`data_updater/paths.sh` に書いてある。**チェックアウトすればそのまま動く**（以前は `.env`
+を作る必要があった）。パッケージ定義の生成器は gem に入れていない — あちらが作るのは
+gem に同梱される中身そのもので、走らせるのはこのリポジトリの管理者だけ。
 
 `build.sh` は `generate.rb`（約 8 分・1.1GB）を包んで、出来上がってから置く。配布側の
 `update_taxonomy_db` は **コンテナを止めない** — copy して mv するだけ。同一ファイル

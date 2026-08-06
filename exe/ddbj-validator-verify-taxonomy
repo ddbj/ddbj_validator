@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # generate.rb が作った SQLite を、NCBI が別途配っている答えと突き合わせる。
 #
-#   ruby data_updater/taxonomy/verify.rb <taxonomy.sqlite3> <new_taxdump-dir>
+#   ddbj-validator-verify-taxonomy <taxonomy.sqlite3> <new_taxdump-dir>
 #
 # new_taxdump には taxidlineage.dmp があり、各 tax_id の祖先が展開済みで入っている。
 # こちらは nodes.dmp の親子関係から祖先を辿るので、両者が一致すれば「辿り方」に
@@ -33,15 +33,24 @@ ANCESTORS = <<~SQL
 SQL
 
 statement = db.prepare(ANCESTORS)
+exists    = db.prepare('SELECT 1 FROM taxa WHERE tax_id = ?')
 
 lineage_checked = 0
 name_checked    = 0
+skipped         = 0
 mismatched      = []
 
 warn 'taxidlineage.dmp と祖先を突き合わせ中'
 
 File.foreach(lineage_dmp) do |line|
   tax_id, lineage = line.delete_suffix("\t|\n").split("\t|\t")
+
+  # このファイルに無い tax_id は比べようがない。取得時点が違えば片方にしか無いものが
+  # 出るし、テスト用に切り出した部分集合を確かめることもある。数えて見えるようにする
+  if exists.execute(tax_id.to_i).first.nil?
+    skipped += 1
+    next
+  end
 
   # NCBI の並びは根から順。こちらは自分の親から根へ遡るので、集合で比べる。
   # 根 (1) は NCBI 側の一覧に含まれないので落とす
@@ -56,6 +65,7 @@ File.foreach(lineage_dmp) do |line|
 end
 
 statement.close
+exists.close
 
 if File.exist?(ranked_dmp)
   warn 'rankedlineage.dmp と scientific_name を突き合わせ中'
@@ -66,6 +76,11 @@ if File.exist?(ranked_dmp)
     tax_id, name, * = line.delete_suffix("\t|\n").split("\t|\t")
 
     stored = select.execute(tax_id.to_i).first&.first
+
+    if stored.nil?
+      skipped += 1
+      next
+    end
 
     name_checked += 1
 
@@ -78,9 +93,9 @@ end
 db.close
 
 if mismatched.empty?
-  warn "OK: 祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件が一致"
+  warn "OK: 祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件が一致 (このファイルに無い #{skipped} 件は対象外)"
 else
-  warn "NG: #{mismatched.size} 件 (祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件を確認)"
+  warn "NG: #{mismatched.size} 件 (祖先 #{lineage_checked} 件 / 学名 #{name_checked} 件を確認、#{skipped} 件は対象外)"
   mismatched.first(20).each { warn "  #{it}" }
   exit 1
 end

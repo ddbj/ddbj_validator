@@ -11,6 +11,40 @@ module DDBJValidator
   # 作り方は data_updater/taxonomy/。ホストが配置したファイルのパスを
   # DDBJValidator.taxonomy_db に渡す。
   class TaxonomyDb
+    # 表の定義は読む側と同じ場所に置く。作るのは exe/ddbj-validator-build-taxonomy で、
+    # 同じ gem に入っているので、書いた形と読む形がずれない。
+    #
+    # 版を上げるのは列や意味が変わったとき。**同じ gem の中では必ず一致する**が、
+    # gem 1.1 が作ったファイルを gem 1.2 が読むことはありうるので、開くときに確かめる
+    SCHEMA_VERSION = '1'
+
+    SCHEMA = <<~SQL
+      CREATE TABLE taxa (
+        tax_id          INTEGER PRIMARY KEY,
+        parent_tax_id   INTEGER NOT NULL,
+        rank            TEXT    NOT NULL,
+        scientific_name TEXT
+      );
+
+      CREATE TABLE names (
+        tax_id     INTEGER NOT NULL,
+        name       TEXT    NOT NULL,
+        name_class TEXT    NOT NULL,
+        -- 大文字小文字を無視した一致は Ruby の downcase で畳んだ列を引く。SQLite の
+        -- NOCASE は ASCII しか畳まないので、照合順序に任せると読み書きで規則がずれる
+        name_lower TEXT    NOT NULL
+      );
+
+      -- ファイル自身が「どの taxdump から、どの形で作られたか」を持つ
+      CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);
+    SQL
+
+    INDEXES = [
+      'CREATE INDEX names_on_name       ON names (name)',
+      'CREATE INDEX names_on_name_lower ON names (name_lower)',
+      'CREATE INDEX names_on_tax_id     ON names (tax_id)'
+    ].freeze
+
     # 大文字小文字を無視した検索が対象にする名前の種類。以前 SPARQL の VALUES に
     # 並んでいた 11 個の述語に対応する taxdump の name class。
     #
@@ -119,13 +153,25 @@ module DDBJValidator
       @db ||= begin
         raise DDBJValidator::EndpointUnavailable, "taxonomy database is not there: #{@path}" unless File.exist?(@path)
 
-        begin
-          opened = SQLite3::Database.new(@path, readonly: true)
-          opened.get_first_value("SELECT value FROM meta WHERE key = 'source_digest'")
-          opened
-        rescue SQLite3::Exception => ex
-          raise DDBJValidator::EndpointUnavailable, "taxonomy database is not readable: #{@path} (#{ex.class})", ex.backtrace
+        opened =
+          begin
+            SQLite3::Database.new(@path, readonly: true).tap {
+              it.get_first_value("SELECT value FROM meta WHERE key = 'source_digest'")
+            }
+          rescue SQLite3::Exception => ex
+            raise DDBJValidator::EndpointUnavailable, "taxonomy database is not readable: #{@path} (#{ex.class})", ex.backtrace
+          end
+
+        # 版が合わないのは設備障害ではなく、作り直しが要るということ。待っても直らないので
+        # EndpointUnavailable にはしない (retry_on されると通らないものを繰り返す)
+        found = opened.get_first_value("SELECT value FROM meta WHERE key = 'schema_version'")
+
+        unless found == SCHEMA_VERSION
+          raise DDBJValidator::Error,
+                "taxonomy database was built for schema #{found.inspect}, this gem reads #{SCHEMA_VERSION.inspect}: #{@path}"
         end
+
+        opened
       end
     end
   end

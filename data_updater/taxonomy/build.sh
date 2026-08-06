@@ -1,5 +1,9 @@
 #!/bin/bash
 # 日次で taxonomy.sqlite3 を作る。読み書きする場所は ../paths.sh にある。
+#
+# 生成そのものは gem の実行ファイル (ddbj-validator-build-taxonomy) がやる。
+# ここはこのサイト固有のパスを与えるラッパ — 共有ディスクのどこに taxdump があり、
+# 出来上がりをどこに置くか、はこのホストの話なので gem には入らない。
 set -eu
 
 cd "$(dirname "$0")"
@@ -21,7 +25,7 @@ LOG 'extract taxdump'
 tar xzf "$TAXDUMP" -C "$WORK_DIR" nodes.dmp names.dmp
 
 LOG 'generate sqlite'
-ruby generate.rb "$WORK_DIR" "$WORK_DIR/taxonomy.sqlite3"
+ddbj-validator-build-taxonomy "$WORK_DIR" "$WORK_DIR/taxonomy.sqlite3"
 
 # 出来上がってから置く。作りかけのファイルを配布側に見せない
 LOG 'publish'

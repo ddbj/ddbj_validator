@@ -20,10 +20,17 @@ Gem::Specification.new do |spec|
   # `select(File.file?)` は Dir が返すディレクトリ自身を落とすため — `conf/pub` は
   # 配下だけを reject しても、エントリそのものは残ってしまう。
   spec.files = Dir.chdir(__dir__) {
-    Dir['lib/**/*.rb', 'conf/**/*']
+    Dir['lib/**/*.rb', 'exe/*', 'conf/**/*']
       .select { File.file?(it) }
       .reject { it.start_with?('conf/pub/', 'conf/coll_dump/') }
   }
+
+  # taxonomy は同梱できない（337 万件・日次更新）ので、利用者が自分で作る。
+  # その手段が gem に入っていないと、リポジトリを持っていないと用意できない。
+  # パッケージ定義の生成器は入れない — あちらが作るのは gem に同梱される中身そのもので、
+  # 走らせるのはこのリポジトリの管理者だけ
+  spec.bindir      = 'exe'
+  spec.executables = %w[ddbj-validator-build-taxonomy ddbj-validator-verify-taxonomy]
 
   spec.require_paths = ['lib']
 
