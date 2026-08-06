@@ -48,7 +48,8 @@ gem 化はそれらを消さない。消すのは HTTP 境界だけ。
 
 ActiveRecord は 1 箇所も使っていない（中央 PG は生の `pg`）。Rails 依存は
 **66 箇所・5 API のみ**で、`lib/ddbj_validator.rb` の注入シムに置き換えるだけで
-`bin/rails` なしでルールが走る（`spike_no_rails.rb`）。
+`bin/rails` なしでルールが走る。確認に使った `spike_no_rails.rb` は役目を終えたので
+削除した（`git log -- spike_no_rails.rb`）。
 
 **`Rails.cache` / `Rails.logger` はオブジェクトでなく lookup。** 起動時に値を掴むと
 テストが差し替えたときに古い方へ書き続ける（`validator_cache_test` が捕捉した）。
