@@ -139,7 +139,7 @@ GEM
       drb (~> 2.0)
       prism (~> 1.5)
     minitest-mock (5.27.0)
-    msgpack (1.8.1)
+    msgpack (1.8.2)
     net-ftp (0.3.9)
       net-protocol
       time
